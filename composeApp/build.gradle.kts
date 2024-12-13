@@ -6,9 +6,10 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidApplication)
 }
 
 kotlin {
@@ -25,7 +26,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm("desktop")
     
     @OptIn(ExperimentalWasmDsl::class)
@@ -60,28 +61,40 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.ktor)
+            implementation(libs.coil)
+            implementation(libs.coil.network)
+            implementation(libs.zoomImage)
         }
 
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.android)
+        }
+
+        appleMain.dependencies {
+            implementation(libs.ktor.apple)
         }
 
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.java)
         }
     }
 }
 
 android {
     namespace = "love.yinlin"
-    compileSdk = 34 //noinspection GradleDependency
+	//noinspection GradleDependency
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "love.yinlin"
         minSdk = 29
-        targetSdk = 34 //noinspection OldTargetApi
+        //noinspection OldTargetApi
+        targetSdk = 34
         versionCode = 300
         versionName = "3.0.0"
 

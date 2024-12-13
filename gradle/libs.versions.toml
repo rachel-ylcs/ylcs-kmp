@@ -3,17 +3,36 @@ compose-multiplatform = "1.7.0"
 agp = "8.7.3"
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.9.0"
+
+ktor = "3.0.2"
+coil = "3.0.4"
+
 androidx-activityCompose = "1.9.3"
-androidx-lifecycle = "2.8.3"
+androidx-lifecycle = "2.8.4"
 
 [libraries]
+# Common
+ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
+zoomImage = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", version = "1.1.0" }
+
+# Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+
+# Apple
+ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+
+# Desktop
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+ktor-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
