@@ -15,16 +15,12 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
+    listOf(iosArm64()).forEach {
+        it.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
         }
@@ -54,11 +50,7 @@ kotlin {
     
     sourceSets {
         val desktopMain by getting
-        
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-        }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -69,6 +61,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
         }
+
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(libs.androidx.activity.compose)
+        }
+
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
@@ -78,28 +76,61 @@ kotlin {
 
 android {
     namespace = "love.yinlin"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 34 //noinspection GradleDependency
 
     defaultConfig {
         applicationId = "love.yinlin"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = 29
+        targetSdk = 34 //noinspection OldTargetApi
+        versionCode = 300
+        versionName = "3.0.0"
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters += arrayOf("arm64-v8a")
+        }
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
+
+    signingConfigs {
+        register("rachel") {
+            keyAlias = "rachel"
+            keyPassword = "rachel1211"
+            storeFile = file("./src/androidMain/key.jks")
+            storePassword = "rachel1211"
+        }
+    }
+
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("rachel")
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("rachel")
+        }
+    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -112,9 +143,9 @@ compose.desktop {
         mainClass = "love.yinlin.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "love.yinlin"
-            packageVersion = "1.0.0"
+            packageVersion = "3.0.0"
         }
     }
 }
