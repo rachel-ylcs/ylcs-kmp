@@ -12,6 +12,7 @@ androidx-lifecycle = "2.8.4"
 
 [libraries]
 # Common
+json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0-RC" }
 ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
@@ -19,15 +20,16 @@ zoomImage = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", vers
 
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+mmkv-android = { module = "com.tencent:mmkv", version = "2.0.1" }
 
 # Apple
 ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 # Desktop
-kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 ktor-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 [plugins]

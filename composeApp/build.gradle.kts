@@ -19,19 +19,23 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-    
-    listOf(iosArm64()).forEach {
-        it.binaries.framework {
-            baseName = "ComposeApp"
+
+    iosArm64 {
+        binaries.framework {
+            baseName = "ylcs-ios"
             isStatic = true
         }
     }
 
-    jvm("desktop")
-    
+    jvm("desktop") {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        moduleName = "ylcs-web-wasm"
         browser {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
@@ -39,7 +43,6 @@ kotlin {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
                         add(rootDirPath)
                         add(projectDirPath)
                     }
@@ -48,10 +51,8 @@ kotlin {
         }
         binaries.executable()
     }
-    
-    sourceSets {
-        val desktopMain by getting
 
+    sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -61,6 +62,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.json)
             implementation(libs.ktor)
             implementation(libs.coil)
             implementation(libs.coil.network)
@@ -71,30 +73,39 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.android)
+            implementation(libs.mmkv.android)
         }
 
-        appleMain.dependencies {
+        iosArm64Main.dependencies {
             implementation(libs.ktor.apple)
         }
 
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.ktor.java)
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(libs.ktor.java)
+            }
         }
+    }
+
+    dependencies {
+        debugImplementation(compose.uiTooling)
+    }
+
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
 
 android {
     namespace = "love.yinlin"
-	//noinspection GradleDependency
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "love.yinlin"
         minSdk = 29
-        //noinspection OldTargetApi
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 300
         versionName = "3.0.0"
 
@@ -135,7 +146,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "./src/androidMain/proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("rachel")
         }
@@ -147,16 +158,12 @@ android {
     }
 }
 
-dependencies {
-    debugImplementation(compose.uiTooling)
-}
-
 compose.desktop {
     application {
         mainClass = "love.yinlin.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
+            targetFormats(TargetFormat.Exe)
             packageName = "love.yinlin"
             packageVersion = "3.0.0"
         }

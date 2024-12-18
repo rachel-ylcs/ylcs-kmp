@@ -11,14 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import coil3.compose.AsyncImage
+import love.yinlin.platform.Platform
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
@@ -27,10 +25,10 @@ fun App() {
                 Text("Click me!")
             }
             AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
+                val greeting = remember { Platform.platformName }
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     AsyncImage(model = "https://img.picgo.net/2024/12/11/3c5f1ce4ae8953d6a.md.webp", contentDescription = null)
-                    //Image(painterResource(Res.drawable.compose_multiplatform), null)
+                    // Image(painterResource(Res.drawable.compose_multiplatform), null)
                     Text("Compose: $greeting")
                 }
             }
