@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 val projectSrcDir: Directory get() = project.layout.projectDirectory.dir("src")
 val projectBuildDir: Directory get() = project.layout.buildDirectory.get()
-val outputDir: Directory get() = projectBuildDir.dir("publication")
+val outputDir: Directory get() = projectBuildDir.dir("production")
 val androidMainDir: Directory get() = projectSrcDir.dir("androidMain")
 val iosArm64MainDir: Directory get() = projectSrcDir.dir("iosArm64Main")
 val desktopMainDir: Directory get() = projectSrcDir.dir("desktopMain")

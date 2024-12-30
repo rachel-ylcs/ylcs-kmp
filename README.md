@@ -1,21 +1,51 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop.
+## **银临茶舍APP跨平台项目**
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+| 名称      | 平台  | 运行环境   |
+|---------|-----|--------|
+| Android | 安卓  | Native |
+| IOS     | 苹果  | Native |
+| Windows | 桌面  | JVM    |
+| Linux   | 桌面  | JVM    |
+| Mac     | 桌面  | JVM    |
+| Web     | 网页  | Wasm   |
+| Server  | 服务器 | JVM    |
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+### `compose UI multiplatform`
+
+源代码目录 `composeApp`
+
+发布目录 `composeApp/build/production`
+
+1. androidMain
+   - 运行：`IDEA - Android App`
+   - 发布签名安装包：`composeApp:assembleRelease`
+2. iosArm64Main
+   - 运行
+   - 发布签名安装包
+3. desktopMain
+   - 运行(Debug)：`composeApp:run`
+   - 运行(Release)：`composeApp:runRelease`
+   - 发布可执行文件：`composeApp:createReleaseDistributable`
+4. wasmJsMain
+   - 浏览器运行：`composeApp:wasmJsBrowserRun`
+   - 发布网页：`composeApp:wasmJsBrowserDistribution`
+
+  
+### `kotlin logic multiplatform`
+
+源代码目录 `shared`
 
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+### `iosApp`
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+源代码目录 `iosApp`, `composeApp/iosArm64Main`
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+
+### `server`
+
+源代码目录 `server`
+
+发布目录 `build/production`
+
+- 运行： `IDEA - Ktor`
+- 发布可执行文件：`server:buildFatJar`

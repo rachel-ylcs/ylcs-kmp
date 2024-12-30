@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 val projectBuildDir: Directory get() = project.layout.buildDirectory.get()
 val outputName: String = "ylcs.jar"
-val outputDir: Directory get() = projectBuildDir.dir("publication")
+val outputDir: Directory get() = projectBuildDir.dir("production")
 
 plugins {
     alias(libs.plugins.gradleApplication)
