@@ -1,0 +1,33 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
+        </encoder>
+        <filter class="com.yinlin.rachel.WorkFilter" />
+    </appender>
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/work/%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
+        </encoder>
+        <filter class="com.yinlin.rachel.WorkFilter" />
+    </appender>
+    <appender name="REQUEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/request/%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
+        </encoder>
+        <filter class="com.yinlin.rachel.RequestFilter" />
+    </appender>
+    <logger name="com.yinlin.rachel.RachelLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="ROLLING" />
+        <appender-ref ref="REQUEST" />
+    </logger>
+</configuration>

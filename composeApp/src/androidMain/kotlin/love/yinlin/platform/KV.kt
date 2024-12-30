@@ -2,12 +2,11 @@ package love.yinlin.platform
 
 import android.content.Context
 import com.tencent.mmkv.MMKV
+import com.tencent.mmkv.MMKVLogLevel
 
-actual class KVContext(val context: Context)
-
-actual class KV actual constructor(context: KVContext) {
-	val kv = run {
-		MMKV.initialize(context.context)
+actual class KV(context: Context) {
+	val kv: MMKV = run {
+		MMKV.initialize(context, MMKVLogLevel.LevelNone)
 		MMKV.defaultMMKV()
 	}
 
@@ -53,4 +52,8 @@ actual class KV actual constructor(context: KVContext) {
 	}
 
 	actual fun has(key: String): Boolean = kv.containsKey(key)
+
+	actual fun remove(key: String) {
+		kv.removeValueForKey(key)
+	}
 }

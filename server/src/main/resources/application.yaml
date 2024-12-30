@@ -1,0 +1,6 @@
+ktor:
+  application:
+    modules:
+      - love.yinlin.ApplicationKt.module
+  deployment:
+    port: 1211

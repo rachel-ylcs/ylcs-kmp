@@ -1,30 +1,16 @@
-rootProject.name = "ylcs-kmp"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 pluginManagement {
     repositories {
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
         maven("https://maven.aliyun.com/repository/gradle-plugin")
     }
 }
 
+@Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
     repositories {
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
+        google()
         mavenCentral()
         maven("https://maven.aliyun.com/repository/central")
         maven("https://maven.aliyun.com/repository/public")
@@ -33,4 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
+rootProject.name = "ylcs-kmp"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+include(":composeApp", ":server", ":shared")

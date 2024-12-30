@@ -78,10 +78,6 @@
 -keep class org.libpag.**{*;}
 -keep class androidx.exifinterface.**{*;}
 
-# gson
-
--keep class com.google.gson.**{*;}
-
 # GsyVideoPlayer
 
 -keep class com.shuyu.gsyvideoplayer.video.** {*;}
@@ -98,8 +94,3 @@
 -keep interface androidx.media3.**
 
 # 反射用到的字段
-
-# APP
-
--keep,allowobfuscation @com.yinlin.rachel.annotation.** class *
--keepclassmembers class com.yinlin.rachel.data.**{*;}

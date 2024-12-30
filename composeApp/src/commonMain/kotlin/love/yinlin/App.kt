@@ -1,37 +1,52 @@
 package love.yinlin
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import coil3.compose.AsyncImage
-import love.yinlin.platform.Platform
-import org.jetbrains.compose.resources.painterResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.compose_multiplatform
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import love.yinlin.model.AppModel
+import love.yinlin.platform.AppContext
+import love.yinlin.screen.Route
+import love.yinlin.screen.ScreenMain
+
+val LocalAppContext = staticCompositionLocalOf<AppContext> {
+	error("CompositionLocal AppContext not present")
+}
 
 @Composable
-fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Platform.platformName }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    AsyncImage(model = "https://img.picgo.net/2024/12/11/3c5f1ce4ae8953d6a.md.webp", contentDescription = null)
-                    // Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
-    }
+fun App(appModel: AppModel) {
+	val navController = rememberNavController()
+	NavHost(
+		modifier = Modifier.fillMaxSize(),
+		navController = navController,
+		startDestination = Route.Main,
+	) {
+		composable<Route.Main> {
+			ScreenMain(appModel, navController)
+		}
+	}
+}
+
+@Composable
+fun AppWrapper(
+	appContext: AppContext,
+	darkMode: Boolean = isSystemInDarkTheme(),
+	content: @Composable () -> Unit
+) {
+	CompositionLocalProvider(
+		LocalAppContext provides appContext,
+		LocalDensity provides Density(
+			density = appContext.screenWidth / appContext.designWidth.value,
+			fontScale = appContext.fontScale
+		)
+	) {
+		RachelTheme(content, darkMode)
+	}
 }

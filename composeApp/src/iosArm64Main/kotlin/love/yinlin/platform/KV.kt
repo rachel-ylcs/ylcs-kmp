@@ -1,15 +1,14 @@
 package love.yinlin.platform
 
-actual class KVContext
-
-actual class KV actual constructor(context: KVContext) {
-	actual fun set(key: String, value: Boolean, expire: Int) { }
-	actual fun set(key: String, value: Int, expire: Int) { }
-	actual fun set(key: String, value: Long, expire: Int) { }
-	actual fun set(key: String, value: Float, expire: Int) { }
-	actual fun set(key: String, value: Double, expire: Int) { }
-	actual fun set(key: String, value: String, expire: Int) { }
-	actual fun set(key: String, value: ByteArray, expire: Int) { }
-	actual inline fun <reified T> get(key: String, default: T): T { return default }
-	actual fun has(key: String): Boolean { return false }
+actual class KV {
+	actual fun set(key: String, value: Boolean, expire: Int) { TODO() }
+	actual fun set(key: String, value: Int, expire: Int) { TODO() }
+	actual fun set(key: String, value: Long, expire: Int) { TODO() }
+	actual fun set(key: String, value: Float, expire: Int) { TODO() }
+	actual fun set(key: String, value: Double, expire: Int) { TODO() }
+	actual fun set(key: String, value: String, expire: Int) { TODO() }
+	actual fun set(key: String, value: ByteArray, expire: Int) { TODO() }
+	actual inline fun <reified T> get(key: String, default: T): T { TODO() }
+	actual fun has(key: String): Boolean { TODO() }
+	actual fun remove(key: String) { TODO() }
 }
