@@ -1,9 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-val projectBuildDir: Directory get() = project.layout.buildDirectory.get()
-val outputName: String = "ylcs.jar"
-val outputDir: Directory get() = projectBuildDir.dir("production")
-
 plugins {
     alias(libs.plugins.gradleApplication)
     alias(libs.plugins.kotlinJvm)
@@ -19,22 +15,21 @@ kotlin {
 
 dependencies {
     implementation(projects.shared)
-    implementation(libs.server.ktor.core)
-    implementation(libs.server.ktor.host)
-    implementation(libs.server.ktor.netty)
-    implementation(libs.server.ktor.config)
-    implementation(libs.server.ktor.negotiation)
+    implementation(libs.ktor.server)
+    implementation(libs.ktor.server.host)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.config)
+    implementation(libs.ktor.server.negotiation)
 
-    implementation(libs.server.logback)
-    implementation(libs.server.mysql)
-    implementation(libs.server.mysql.pool)
-    implementation(libs.server.redis)
+    implementation(libs.logback)
+    implementation(libs.mysql)
+    implementation(libs.mysql.pool)
+    implementation(libs.redis)
 }
 
 application {
-    mainClass.set("love.yinlin.ApplicationKt")
-    applicationName = "ylcs-server"
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=false")
+    mainClass.set(rootProject.extra["appMainClass"] as String)
+    applicationName = rootProject.extra["appName"] as String
 }
 
 tasks.apply {
@@ -44,7 +39,7 @@ tasks.apply {
     shadowDistZip { enabled = false }
     jar { enabled = false }
     shadowJar {
-        archiveFileName = outputName
-        destinationDirectory = outputDir
+        archiveFileName = rootProject.extra["serverOutputFileName"] as String
+        destinationDirectory = rootProject.extra["serverOutputDir"] as Directory
     }
 }

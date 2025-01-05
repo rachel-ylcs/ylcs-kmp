@@ -1,10 +1,10 @@
 package love.yinlin.model
 
 import androidx.lifecycle.ViewModel
-import love.yinlin.platform.KV
+import androidx.navigation.NavController
 
 class AppModel(
-	val kv: KV,
+	val navController: NavController
 ) : ViewModel() {
-
+	val msgModel = MsgModel()
 }

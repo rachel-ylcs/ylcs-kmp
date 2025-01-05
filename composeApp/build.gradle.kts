@@ -3,29 +3,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
-val projectSrcDir: Directory get() = project.layout.projectDirectory.dir("src")
-val projectBuildDir: Directory get() = project.layout.buildDirectory.get()
-val outputDir: Directory get() = projectBuildDir.dir("production")
-val androidMainDir: Directory get() = projectSrcDir.dir("androidMain")
-val iosArm64MainDir: Directory get() = projectSrcDir.dir("iosArm64Main")
-val desktopMainDir: Directory get() = projectSrcDir.dir("desktopMain")
-val wasmJsMainDir: Directory get() = projectSrcDir.dir("wasmJsMain")
-
-val proguardOptimizeFilename: String = "proguard-android-optimize.txt"
-
-val androidKeyName: String = "rachel"
-val androidKeyPassword: String = "rachel1211"
-val androidKeyStoreFile: File get() = androidMainDir.file("key.jks").asFile
-val androidR8RulesFile: File get() = androidMainDir.file("proguard-rules.pro").asFile
-val androidOutputName: String = "ylcs.apk"
-
-val desktopCurrentDir: Directory get() = projectBuildDir.dir("test")
-val desktopLibsDir: Directory get() = desktopMainDir.dir("libs")
-val desktopR8RulesFile: File get() = desktopMainDir.file("proguard-rules.pro").asFile
-val desktopOutputDir: Directory get() = outputDir.dir("desktop")
-
-val webOutputDir: Directory get() = outputDir.dir("web")
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
@@ -34,9 +11,15 @@ plugins {
     alias(libs.plugins.androidApplication)
 }
 
+val appVersionName: String by rootProject.extra
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
+    composeCompiler {
+        stabilityConfigurationFiles.add(rootProject.extra["composeStabilityFile"] as RegularFile)
     }
 
     androidTarget {
@@ -47,12 +30,12 @@ kotlin {
 
     iosArm64 {
         binaries.framework {
-            baseName = "composeApp"
+            baseName = rootProject.extra["composeProjectName"] as String
             isStatic = true
         }
     }
 
-    jvm("desktop") {
+    jvm {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
@@ -65,13 +48,12 @@ kotlin {
         }
         browser {
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
+                outputFileName = "${rootProject.extra["composeProjectName"]}.js"
                 cssSupport {
                     enabled = true
                 }
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    port = 8000
-                    static?.addAll(mutableListOf(rootDir.path, projectDir.path))
+                    port = rootProject.extra["webServerPort"] as Int
                     client?.overlay = false
                 }
             }
@@ -81,7 +63,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(projects.shared)
+            implementation(projects.shared)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -93,16 +75,22 @@ kotlin {
             implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.json)
-            implementation(libs.ktor)
-            implementation(libs.coil)
-            implementation(libs.coil.network)
-            implementation(libs.zoomImage)
+            implementation(libs.datetime)
+            implementation(libs.ktor.client)
+            implementation(libs.ktor.client.negotiation)
+            implementation(libs.ktor.json)
+            implementation(libs.sketch)
+            implementation(libs.sketch.http)
+            implementation(libs.sketch.resources)
+            implementation(libs.sketch.gif)
+            implementation(libs.sketch.webp)
+            implementation(libs.sketch.zoom)
         }
 
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.activity.compose)
-            implementation(libs.ktor.android)
+            implementation(libs.ktor.okhttp)
             implementation(libs.mmkv.android)
         }
 
@@ -111,21 +99,20 @@ kotlin {
         }
 
         wasmJsMain.dependencies {
-            implementation(libs.ktor.web)
+            implementation(libs.ktor.js)
         }
 
-        val desktopMain by getting
-        desktopMain.dependencies {
+        jvmMain.dependencies {
             implementation(compose.preview)
             implementation(compose.desktop.currentOs)
-            implementation(libs.ktor.java)
+            implementation(libs.ktor.okhttp)
         }
     }
 }
 
 android {
-    namespace = "love.yinlin"
-    compileSdk = libs.versions.android.targetSdk.get().toInt()
+    namespace = rootProject.extra["appPackageName"] as String
+    compileSdk = rootProject.extra["androidBuildSDK"] as Int
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -133,23 +120,27 @@ android {
     }
 
     defaultConfig {
-        applicationId = "love.yinlin"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = libs.versions.rachel.version.get().toInt()
-        versionName = libs.versions.rachel.versionName.get()
+        applicationId = rootProject.extra["appPackageName"] as String
+        minSdk = rootProject.extra["androidMinSDK"] as Int
+        targetSdk = rootProject.extra["androidBuildSDK"] as Int
+        versionCode = rootProject.extra["appVersion"] as Int
+        versionName = appVersionName
 
         ndk {
-            //noinspection ChromeOsAbiSupport
-            abiFilters += arrayOf("arm64-v8a")
+            for (abi in rootProject.extra["androidNDKABI"] as Array<*>) {
+                abiFilters += abi.toString()
+            }
         }
     }
+
+    val androidKeyName: String by rootProject.extra
+    val androidKeyPassword: String by rootProject.extra
 
     signingConfigs {
         register(androidKeyName) {
             keyAlias = androidKeyName
             keyPassword = androidKeyPassword
-            storeFile = androidKeyStoreFile
+            storeFile = (rootProject.extra["androidKeyFile"] as RegularFile).asFile
             storePassword = androidKeyPassword
         }
     }
@@ -165,8 +156,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile(proguardOptimizeFilename),
-                androidR8RulesFile
+                getDefaultProguardFile(rootProject.extra["r8OptimizeFilename"] as String),
+                rootProject.extra["androidR8File"] as RegularFile
             )
             signingConfig = signingConfigs.getByName(androidKeyName)
         }
@@ -189,12 +180,12 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "love.yinlin.MainKt"
+        mainClass = rootProject.extra["appMainClass"] as String
 
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.endsWith("run") || taskName.endsWith("runRelease")) {
-            jvmArgs += "-Duser.dir=${desktopCurrentDir}"
-            jvmArgs += "-Djava.library.path=${desktopLibsDir}"
+            jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
+            jvmArgs += "-Djava.library.path=${rootProject.extra["desktopLibsDir"]}"
         }
 
         buildTypes.release.proguard {
@@ -202,35 +193,34 @@ compose.desktop {
             optimize = true
             obfuscate = true
             joinOutputJars = true
-            configurationFiles.from(desktopR8RulesFile)
+            configurationFiles.from(rootProject.extra["desktopR8File"])
         }
 
         nativeDistributions {
-            val version = libs.versions.rachel.versionName.get()
-            packageName = "ylcs"
-            packageVersion = version
+            packageName = rootProject.extra["appName"] as String
+            packageVersion = appVersionName
             includeAllModules = false
 
             targetFormats(TargetFormat.Exe)
-            outputBaseDir.set(desktopOutputDir)
+            outputBaseDir.set(rootProject.extra["desktopOutputDir"] as Directory)
 
             windows {
                 console = false
-                exePackageVersion = version
+                exePackageVersion = appVersionName
             }
         }
     }
 }
 
 val publishAPK by tasks.registering(Copy::class) {
-    from("${projectBuildDir}/outputs/apk/release/${project.name}-release.apk")
-    into(outputDir)
-    rename { _ -> androidOutputName }
+    from(rootProject.extra["androidOriginOutputPath"])
+    into(rootProject.extra["androidOutputDir"] as Directory)
+    rename { _ -> rootProject.extra["androidOutputFileName"] as String }
 }
 
 val publishWeb by tasks.registering(Copy::class) {
-    from("${projectBuildDir}/dist/wasmJs/productionExecutable")
-    into(webOutputDir)
+    from(rootProject.extra["webOriginOutputPath"])
+    into(rootProject.extra["webOutputDir"] as String)
 }
 
 afterEvaluate {

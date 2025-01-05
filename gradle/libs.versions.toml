@@ -1,67 +1,64 @@
 [versions]
-rachel-version = "300"
-rachel-versionName = "3.0.0"
-android-minSdk = "29"
-android-targetSdk = "35"
-
-compose-multiplatform = "1.8.0-alpha01"
-agp = "8.7.3"
+# 插件
 kotlin = "2.1.0"
-coroutines = "1.10.1"
-
-navigation = "2.8.0-alpha11"
-lifecycle = "2.9.0-alpha01"
-json = "1.8.0-RC"
+compose-multiplatform = "1.7.3"
+agp = "8.7.3"
+# 库
 ktor = "3.0.3"
-coil = "3.0.4"
-
-activity-compose = "1.9.3"
-
-[libraries]
-# Common
-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "json" }
-ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
-
-zoomImage = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", version = "1.1.0" }
-
-# Android
-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
-ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-mmkv-android = { module = "com.tencent:mmkv", version = "2.0.2" }
-
-# Apple
-ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-
-# Desktop
-ktor-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
-
-# Web
-ktor-web = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
-
-# Server
-server-ktor-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
-server-ktor-host = { module = "io.ktor:ktor-server-host-common-jvm", version.ref = "ktor" }
-server-ktor-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-server-ktor-config = { module = "io.ktor:ktor-server-config-yaml-jvm", version.ref = "ktor" }
-server-ktor-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
-server-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
-server-mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
-server-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-server-redis = { module = "redis.clients:jedis", version = "5.3.0-beta1" }
+lifecycle = "2.8.4"
+sketch = "4.0.1"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+
+[libraries]
+# Common
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
+navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.8.0-alpha11" }
+lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0-RC" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
+ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+sketch = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
+sketch-http = { module = "io.github.panpf.sketch4:sketch-http-ktor3", version.ref = "sketch" }
+sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
+sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
+sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
+sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.1.0" }
+
+# JVM
+ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+
+# Android
+activity-compose = { module = "androidx.activity:activity-compose", version = "1.9.3" }
+mmkv-android = { module = "com.tencent:mmkv", version = "2.0.2" }
+
+# Apple
+ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+
+# Desktop
+
+# Web
+ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+
+# Server
+ktor-server = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
+ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
+mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
+mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
+redis = { module = "redis.clients:jedis", version = "5.3.0-beta1" }

@@ -24,9 +24,19 @@ expect class KV {
 	fun remove(key: String)
 }
 
-inline fun <reified T> KV.setJson(key: String, value: T, expire: Int = KVExpire.NEVER) = set(key, Json.encodeToString(value), expire)
+inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire.NEVER) {
+	try {
+		set(key, Json.encodeToString(value), expire)
+	}
+	catch (_: Exception) {}
+}
 
-inline fun <reified T> KV.getJson(key: String, default: T?): T? {
-	val json = get(key, "")
-	return if (json.isEmpty()) default else Json.decodeFromString<T>(json)
+inline fun <reified T> KV.getJson(key: String, default: T): T {
+	return try {
+		val json = get(key, "")
+		if (json.isEmpty()) default else Json.decodeFromString(json)
+	}
+	catch (_: Exception) {
+		default
+	}
 }

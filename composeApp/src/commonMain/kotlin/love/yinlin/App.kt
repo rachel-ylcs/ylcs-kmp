@@ -1,52 +1,51 @@
 package love.yinlin
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import love.yinlin.model.AppModel
-import love.yinlin.platform.AppContext
 import love.yinlin.screen.Route
 import love.yinlin.screen.ScreenMain
 
-val LocalAppContext = staticCompositionLocalOf<AppContext> {
-	error("CompositionLocal AppContext not present")
-}
-
 @Composable
-fun App(appModel: AppModel) {
+fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 	val navController = rememberNavController()
+	val appModel = viewModel { AppModel(navController) }
 	NavHost(
-		modifier = Modifier.fillMaxSize(),
+		modifier = modifier,
 		navController = navController,
 		startDestination = Route.Main,
 	) {
 		composable<Route.Main> {
-			ScreenMain(appModel, navController)
+			ScreenMain(appModel)
 		}
 	}
 }
 
 @Composable
 fun AppWrapper(
-	appContext: AppContext,
 	darkMode: Boolean = isSystemInDarkTheme(),
 	content: @Composable () -> Unit
 ) {
 	CompositionLocalProvider(
-		LocalAppContext provides appContext,
 		LocalDensity provides Density(
-			density = appContext.screenWidth / appContext.designWidth.value,
-			fontScale = appContext.fontScale
+			density = app.screenWidth / app.designWidth.value,
+			fontScale = app.fontScale
 		)
 	) {
-		RachelTheme(content, darkMode)
+		RachelTheme(darkMode) {
+			Box(modifier = Modifier.fillMaxSize()) {
+				content()
+			}
+		}
 	}
 }

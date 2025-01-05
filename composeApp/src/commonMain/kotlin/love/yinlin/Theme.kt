@@ -189,7 +189,7 @@ private fun RachelShapes(): Shapes = Shapes(
 )
 
 @Composable
-fun RachelTheme(content: @Composable () -> Unit, darkMode: Boolean) {
+fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
 		colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
 		shapes = RachelShapes(),

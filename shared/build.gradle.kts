@@ -15,28 +15,28 @@ kotlin {
     }
 
     iosArm64()
-    
-    jvm("desktop") {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
+
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
-    
+
     sourceSets {
         commonMain.dependencies {
-
+            implementation(libs.json)
         }
     }
 }
 
 android {
-    namespace = "love.yinlin"
-    compileSdk = libs.versions.android.targetSdk.get().toInt()
+    namespace = "${rootProject.extra["appPackageName"]}.shared"
+    compileSdk = rootProject.extra["androidBuildSDK"] as Int
+
+    defaultConfig {
+        minSdk = rootProject.extra["androidMinSDK"] as Int
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

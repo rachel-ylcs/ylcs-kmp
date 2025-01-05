@@ -20,6 +20,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ylcs-kmp"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+include("composeApp", "server", "shared")
 
-include(":composeApp", ":server", ":shared")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
