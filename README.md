@@ -18,11 +18,13 @@
 3. 桌面、安卓、网页Wasm代码混淆，高性能低体积。
 4. 服务端与客户端共享数据格式、序列化库、网络库
 
+发布目录 `outputs`
+
+
 ### `compose UI multiplatform`
 
 源代码目录 `composeApp`
 
-发布目录 `composeApp/build/production`
 
 1. androidMain
    - 运行：`IDEA - Android App`
@@ -38,7 +40,7 @@
    - 浏览器运行：`composeApp:wasmJsBrowserRun`
    - 发布网页：`composeApp:wasmJsBrowserDistribution`
 
-  
+
 ### `kotlin logic multiplatform`
 
 源代码目录 `shared`
@@ -52,8 +54,6 @@
 ### `server`
 
 源代码目录 `server`
-
-发布目录 `build/production`
 
 - 运行： `IDEA - Ktor`
 - 发布可执行文件：`server:buildFatJar`
