@@ -29,6 +29,9 @@ val appMainClass by extra("${appPackageName}.MainKt")
 // Shared
 val sharedDir by extra(dirProject.dir("shared").dir("src"))
 
+// Common
+val commonR8File by extra(dirComposeApp.file("R8Common.pro"))
+
 // JVM
 val composeStabilityFile by extra(dirConfig.file("stability.conf"))
 val r8OptimizeFilename by extra("proguard-android-optimize.txt")
@@ -41,7 +44,7 @@ val androidNDKABI by extra(arrayOf("arm64-v8a"))
 val androidKeyFile by extra(dirConfig.file("androidKey.jks"))
 val androidKeyName by extra("rachel")
 val androidKeyPassword by extra("rachel1211")
-val androidR8File by extra(dirConfig.file("androidR8.pro"))
+val androidR8File by extra(dirComposeApp.file("R8Android.pro"))
 val androidOriginOutputPath by extra("${dirBuild}/outputs/apk/release/${composeProjectName}-release.apk")
 val androidOutputDir by extra(dirOutput)
 val androidOutputFileName by extra("ylcs.apk")
@@ -53,8 +56,10 @@ val iosDir by extra(dirSrc.dir("iosArm64Main"))
 val desktopDir by extra(dirSrc.dir("jvmMain"))
 val desktopCurrentDir by extra(dirBuild.dir("desktopRun"))
 val desktopLibsDir by extra(desktopDir.dir("libs"))
-val desktopR8File by extra(dirConfig.file("desktopR8.pro"))
+val desktopR8File by extra(dirComposeApp.file("R8Desktop.pro"))
+val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/app/ylcs")
 val desktopOutputDir by extra(dirOutput.dir("desktop"))
+val desktopOutputAppDir by extra(desktopOutputDir.dir("app"))
 
 // Web
 val webDir by extra(dirSrc.dir("wasmJsMain"))
@@ -66,4 +71,4 @@ val webOutputDir by extra(dirOutput.dir("web"))
 val serverDir by extra(dirProject.dir("server"))
 val serverBuildDir by extra(serverDir.dir("build"))
 val serverOutputFileName by extra("ylcs.jar")
-val serverOutputDir by extra(dirOutput.dir("server"))
+val serverOutputDir by extra(dirOutput)

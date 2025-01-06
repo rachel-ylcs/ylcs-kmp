@@ -28,17 +28,18 @@
 
 1. androidMain
    - 运行：`IDEA - Android App`
-   - 发布签名安装包：`composeApp:assembleRelease`
+   - 发布签名安装包：`composeApp:androidPublish`
 2. iosArm64Main
    - 运行
    - 发布签名安装包
 3. desktopMain
-   - 运行(Debug)：`composeApp:run`
-   - 运行(Release)：`composeApp:runRelease`
-   - 发布可执行文件：`composeApp:createReleaseDistributable`
+   - 运行(Debug)：`composeApp:desktopRunDebug`
+   - 运行(Release)：`composeApp:desktopRunRelease`
+   - 检查模块完整性: `composeApp:desktopCheckModules`
+   - 发布可执行文件：`composeApp:desktopPublish`
 4. wasmJsMain
-   - 浏览器运行：`composeApp:wasmJsBrowserRun`
-   - 发布网页：`composeApp:wasmJsBrowserDistribution`
+   - 浏览器运行：`composeApp:webRun`
+   - 发布网页：`composeApp:webPublish`
 
 
 ### `kotlin logic multiplatform`
@@ -56,4 +57,4 @@
 源代码目录 `server`
 
 - 运行： `IDEA - Ktor`
-- 发布可执行文件：`server:buildFatJar`
+- 发布可执行文件：`server:serverPublish`

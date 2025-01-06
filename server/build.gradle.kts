@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.ktor.server.config)
     implementation(libs.ktor.server.negotiation)
 
+    implementation(libs.json)
     implementation(libs.logback)
     implementation(libs.mysql)
     implementation(libs.mysql.pool)
@@ -32,14 +33,26 @@ application {
     applicationName = rootProject.extra["appName"] as String
 }
 
-tasks.apply {
-    distTar { enabled = false }
-    distZip { enabled = false }
-    shadowDistTar { enabled = false }
-    shadowDistZip { enabled = false }
-    jar { enabled = false }
-    shadowJar {
+ktor {
+    fatJar {
         archiveFileName = rootProject.extra["serverOutputFileName"] as String
-        destinationDirectory = rootProject.extra["serverOutputDir"] as Directory
+    }
+}
+
+afterEvaluate {
+    tasks.apply {
+        distTar { enabled = false }
+        distZip { enabled = false }
+        shadowDistTar { enabled = false }
+        shadowDistZip { enabled = false }
+        jar { enabled = false }
+        shadowJar {
+            destinationDirectory = rootProject.extra["serverOutputDir"] as Directory
+        }
+    }
+
+    // 发布服务端
+    val serverPublish: Task by tasks.creating {
+        dependsOn(tasks.named("buildFatJar"))
     }
 }

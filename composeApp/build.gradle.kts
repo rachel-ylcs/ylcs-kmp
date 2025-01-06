@@ -90,6 +90,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.activity.compose)
+            implementation(libs.coroutines.android)
             implementation(libs.ktor.okhttp)
             implementation(libs.mmkv.android)
         }
@@ -157,7 +158,8 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile(rootProject.extra["r8OptimizeFilename"] as String),
-                rootProject.extra["androidR8File"] as RegularFile
+                rootProject.extra["commonR8File"]!!,
+                rootProject.extra["androidR8File"]!!
             )
             signingConfig = signingConfigs.getByName(androidKeyName)
         }
@@ -165,7 +167,10 @@ android {
 
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += arrayOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "DebugProbesKt.bin"
+            )
         }
 
         dex {
@@ -192,17 +197,25 @@ compose.desktop {
             isEnabled = true
             optimize = true
             obfuscate = true
-            joinOutputJars = true
-            configurationFiles.from(rootProject.extra["desktopR8File"])
+            configurationFiles.from(
+                rootProject.extra["commonR8File"],
+                rootProject.extra["desktopR8File"]
+            )
         }
 
         nativeDistributions {
             packageName = rootProject.extra["appName"] as String
             packageVersion = appVersionName
-            includeAllModules = false
 
             targetFormats(TargetFormat.Exe)
-            outputBaseDir.set(rootProject.extra["desktopOutputDir"] as Directory)
+
+            modules(
+                "java.instrument",
+                "java.management",
+                "jdk.unsupported",
+                "jdk.unsupported",
+                "java.net.http",
+            )
 
             windows {
                 console = false
@@ -212,23 +225,66 @@ compose.desktop {
     }
 }
 
-val publishAPK by tasks.registering(Copy::class) {
-    from(rootProject.extra["androidOriginOutputPath"])
-    into(rootProject.extra["androidOutputDir"] as Directory)
-    rename { _ -> rootProject.extra["androidOutputFileName"] as String }
-}
-
-val publishWeb by tasks.registering(Copy::class) {
-    from(rootProject.extra["webOriginOutputPath"])
-    into(rootProject.extra["webOutputDir"] as String)
-}
+// ----------------------------------------- 任务列表 ----------------------------------------------
 
 afterEvaluate {
-    tasks.named("assembleRelease") {
-        finalizedBy(publishAPK)
+    val androidCopyAPK by tasks.registering(Copy::class) {
+        from(rootProject.extra["androidOriginOutputPath"])
+        into(rootProject.extra["androidOutputDir"]!!)
+        rename { _ -> rootProject.extra["androidOutputFileName"] as String }
     }
 
-    tasks.named("wasmJsBrowserDistribution") {
-        finalizedBy(publishWeb)
+    // 发布安卓安装包
+    val androidPublish: Task by tasks.creating {
+        dependsOn(tasks.named("assembleRelease"))
+        finalizedBy(androidCopyAPK)
+    }
+
+    // 运行 桌面程序 Debug
+    val desktopRunDebug by tasks.creating {
+        dependsOn(tasks.named("run"))
+    }
+
+    // 运行 桌面程序 Release
+    val desktopRunRelease by tasks.creating {
+        dependsOn(tasks.named("runRelease"))
+    }
+
+    // 检查桌面模块完整性
+    val desktopCheckModules by tasks.creating {
+        dependsOn(tasks.named("suggestRuntimeModules"))
+    }
+
+    val desktopCopyLibs by tasks.registering(Copy::class) {
+        from(rootProject.extra["desktopLibsDir"])
+        into(rootProject.extra["desktopOutputAppDir"]!!)
+    }
+
+    val desktopCopyDir by tasks.registering(Copy::class) {
+        from(rootProject.extra["desktopOriginOutputPath"])
+        into(rootProject.extra["desktopOutputDir"]!!)
+        finalizedBy(desktopCopyLibs)
+    }
+
+    // 发布桌面应用程序
+    val desktopPublish by tasks.creating {
+        dependsOn(tasks.named("createReleaseDistributable"))
+        finalizedBy(desktopCopyDir)
+    }
+
+    val webCopyDir by tasks.registering(Copy::class) {
+        from(rootProject.extra["webOriginOutputPath"])
+        into(rootProject.extra["webOutputDir"]!!)
+    }
+
+    // 运行 Web 应用程序
+    val webRun by tasks.creating {
+        dependsOn(tasks.named("wasmJsBrowserRun"))
+    }
+
+    // 发布 Web 应用程序
+    val webPublish: Task by tasks.creating {
+        dependsOn(tasks.named("wasmJsBrowserDistribution"))
+        finalizedBy(webCopyDir)
     }
 }

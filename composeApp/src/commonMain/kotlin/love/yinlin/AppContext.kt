@@ -2,7 +2,7 @@ package love.yinlin
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import love.yinlin.common.Config
 import love.yinlin.platform.KV
 

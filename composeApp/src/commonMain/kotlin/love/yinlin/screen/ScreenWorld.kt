@@ -2,7 +2,6 @@ package love.yinlin.screen
 
 import androidx.compose.runtime.Composable
 import com.github.panpf.sketch.AsyncImage
-import io.ktor.websocket.Frame.Text
 import love.yinlin.model.AppModel
 
 @Composable

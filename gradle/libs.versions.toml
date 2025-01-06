@@ -1,12 +1,24 @@
 [versions]
-# 插件
+
+# 插件 #
 kotlin = "2.1.0"
 compose-multiplatform = "1.7.3"
 agp = "8.7.3"
-# 库
-ktor = "3.0.3"
+
+# 库 #
+
+# Common
+coroutines = "1.10.1"
 lifecycle = "2.8.4"
+ktor = "3.0.3"
+navigation = "2.8.0-alpha11"
+json = "1.8.0-RC"
+datetime = "0.6.1"
 sketch = "4.0.1"
+
+# Android
+activity-compose = "1.9.3"
+
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
@@ -21,12 +33,12 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 
 [libraries]
 # Common
-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.8.0-alpha11" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
 lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0-RC" }
-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
+json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "json" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
@@ -41,7 +53,8 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-activity-compose = { module = "androidx.activity:activity-compose", version = "1.9.3" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 mmkv-android = { module = "com.tencent:mmkv", version = "2.0.2" }
 
 # Apple
