@@ -1,2 +1,2 @@
 * text=auto
-*.kt linguist-language=ss
+*.h linguist-language=c++
