@@ -120,7 +120,7 @@ private val LightColorScheme = lightColorScheme(
 	onBackground = Colors.Black,
 	surface = Colors.Gray2,
 	onSurface = Colors.Black,
-	onSurfaceVariant = Colors.Dark,
+	onSurfaceVariant = Colors.Gray7,
 	error = Colors.Red4,
 	onError = Colors.White
 )
@@ -142,7 +142,7 @@ private val DarkColorScheme = darkColorScheme(
 	onBackground = Colors.White,
 	surface = Colors.Gray7,
 	onSurface = Colors.White,
-	onSurfaceVariant = Colors.Ghost,
+	onSurfaceVariant = Colors.Gray2,
 	error = Colors.Yellow4,
 	onError = Colors.Black
 )

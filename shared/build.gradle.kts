@@ -26,6 +26,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.json)
+            implementation(libs.datetime)
         }
     }
 }

@@ -5,12 +5,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ensureActive
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.component.BoxState
 import love.yinlin.data.Data
+import love.yinlin.data.RequestError
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.platform.Coroutines
 
@@ -26,22 +26,22 @@ class MsgModel {
 		suspend fun requestWeibo() {
 			if (state != BoxState.LOADING) {
 				state = BoxState.LOADING
-				val newItems = mutableStateListOf<Weibo>()
-				if (localWeiboUsers.isEmpty()) {
-					state = BoxState.EMPTY
-					isFirstLoad = false
-				}
-				else withContext(NonCancellable) {
+				state = if (localWeiboUsers.isEmpty()) BoxState.EMPTY
+				else {
+					val newItems = mutableStateListOf<Weibo>()
 					Coroutines.io {
 						for (user in localWeiboUsers) {
 							val result = WeiboAPI.getUserWeibo(user.id)
 							if (result is Data.Success) newItems += result.data
+							else if (result is Data.Error && result.type == RequestError.Canceled) {
+								state = BoxState.EMPTY
+								ensureActive()
+							}
 						}
 					}
 					newItems.sortDescending()
 					items += newItems
-					state = if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
-					isFirstLoad = false
+					if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
 				}
 			}
 		}

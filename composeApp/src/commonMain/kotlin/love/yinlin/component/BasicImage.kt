@@ -1,40 +1,37 @@
 package love.yinlin.component
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.PainterState
 import com.github.panpf.sketch.cache.CachePolicy
-import com.github.panpf.sketch.fetch.newFileUri
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageOptions
-import com.github.panpf.sketch.request.LoadState
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
-import com.github.panpf.sketch.state.rememberPainterStateImage
-import kotlinx.io.files.Path
 import love.yinlin.Colors
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.img_logo
+import ylcs_kmp.composeapp.generated.resources.placeholder_pic
 
 @Composable
 fun MiniIcon(
@@ -108,27 +105,39 @@ fun MiniImage(
 	)
 }
 
+enum class WebImageQuality {
+	Low, Medium, High
+}
+
 @Composable
 private fun Modifier.shimmerLoading(
 	isActive: Boolean = true,
-	durationMillis: Int = 1500
-): Modifier = if (!isActive) this else composed {
-	val transition = rememberInfiniteTransition()
-	val offsetX = transition.animateFloat(
-		initialValue = 0f,
-		targetValue = durationMillis + 500f,
-		animationSpec = infiniteRepeatable(
-			animation = tween(durationMillis = durationMillis),
-			repeatMode = RepeatMode.Restart
+	durationMillis: Int = 3000
+): Modifier = composed {
+	if (isActive) {
+		val transition = rememberInfiniteTransition()
+		val offsetX = transition.animateFloat(
+			initialValue = 0f,
+			targetValue = durationMillis + 500f,
+			animationSpec = infiniteRepeatable(
+				animation = tween(durationMillis = durationMillis),
+				repeatMode = RepeatMode.Restart
+			)
 		)
-	)
-	background(
-		brush = Brush.linearGradient(
+		background(brush = Brush.linearGradient(
 			colors = listOf(Colors.Gray2, Colors.Gray3, Colors.Gray2),
 			start = Offset(x = offsetX.value - 500, y = 0f),
 			end = Offset(x = offsetX.value, y = 0f)
-		)
-	)
+		))
+	}
+	else background(Colors.White)
+}
+
+@Composable
+private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(key) {
+	if (key == null) uri
+	else if (uri.contains("?")) "$uri&_cacheKey=$key"
+	else "$uri?_cacheKey=$key"
 }
 
 @Composable
@@ -136,32 +145,33 @@ fun WebImage(
 	uri: String,
 	key: Any? = null,
 	modifier: Modifier = Modifier,
+	circle: Boolean = false,
+	quality: WebImageQuality = WebImageQuality.Medium,
+	contentScale: ContentScale = ContentScale.FillWidth,
+	placeholder: DrawableResource = Res.drawable.placeholder_pic
 ) {
 	val state = rememberAsyncImageState(ComposableImageOptions {
 		downloadCachePolicy(CachePolicy.ENABLED)
 		memoryCachePolicy(CachePolicy.ENABLED)
-		placeholder(rememberIconPainterStateImage(Res.drawable.img_logo))
+		sizeMultiplier(when (quality) {
+			WebImageQuality.Low -> 1f
+			WebImageQuality.Medium -> 2f
+			WebImageQuality.High -> 4f
+		})
+		placeholder(rememberIconPainterStateImage(placeholder))
 		crossfade()
-		resizeOnDraw()
 	})
 	AsyncImage(
-		modifier = modifier.shimmerLoading(state.loadState !is LoadState.Success),
-		uri = uri + if (key != null) "?cacheKey=${key}" else "",
+		uri = rememberWebImageKeyUrl(uri, key),
+		contentDescription = null,
 		state = state,
-		contentScale = ContentScale.FillWidth,
-		contentDescription = null
-	)
-}
-
-@Composable
-fun WebImage(
-	path: Path
-) {
-	AsyncImage(
-		uri = newFileUri(path.toString()),
-		state = rememberAsyncImageState(ComposableImageOptions {
-			downloadCachePolicy(CachePolicy.DISABLED)
-		}),
-		contentDescription = null
+		contentScale = contentScale,
+		modifier = modifier.let { if (circle) it.clip(CircleShape) else it }
+			.shimmerLoading(state.painterState is PainterState.Loading),
+		filterQuality = when (quality) {
+			WebImageQuality.Low -> FilterQuality.Low
+			WebImageQuality.Medium -> FilterQuality.Medium
+			WebImageQuality.High -> FilterQuality.High
+		}
 	)
 }

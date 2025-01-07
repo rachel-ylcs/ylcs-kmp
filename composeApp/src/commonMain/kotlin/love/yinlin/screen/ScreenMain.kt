@@ -3,7 +3,7 @@ package love.yinlin.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerScope
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,9 +20,11 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 private fun NavigationItemText(
 	item: TabItem,
-	selected: Boolean
+	selected: Boolean,
+	modifier: Modifier = Modifier
 ) {
 	Text(
+		modifier = modifier,
 		text = stringResource(item.title),
 		style = MaterialTheme.typography.titleMedium,
 		color = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
@@ -30,17 +32,23 @@ private fun NavigationItemText(
 }
 
 @Composable
-private fun PagerScope.PageContent(
+private fun PageContent(
 	model: AppModel,
-	index: Int
+	pagerState: PagerState,
+	modifier: Modifier = Modifier
 ) {
-	Box(modifier = Modifier.fillMaxSize()) {
-		when (index) {
-			TabItem.WORLD.ordinal -> ScreenWorld(model)
-			TabItem.MSG.ordinal -> ScreenMsg(model)
-			TabItem.MUSIC.ordinal -> ScreenMusic(model)
-			TabItem.DISCOVERY.ordinal -> ScreenDiscovery(model)
-			TabItem.ME.ordinal -> ScreenMe(model)
+	HorizontalPager (
+		state = pagerState,
+		modifier = modifier
+	) {
+		Box(modifier = Modifier.fillMaxSize()) {
+			when (it) {
+				TabItem.WORLD.ordinal -> ScreenWorld(model)
+				TabItem.MSG.ordinal -> ScreenMsg(model)
+				TabItem.MUSIC.ordinal -> ScreenMusic(model)
+				TabItem.DISCOVERY.ordinal -> ScreenDiscovery(model)
+				TabItem.ME.ordinal -> ScreenMe(model)
+			}
 		}
 	}
 }
@@ -71,15 +79,12 @@ private fun Portrait(model: AppModel) {
 				}
 			}
 		}
-	) { padding ->
-		HorizontalPager(
-			state = pagerState,
-			modifier = Modifier.fillMaxSize()
-				.background(MaterialTheme.colorScheme.background)
-				.padding(padding)
-		) {
-			PageContent(model, it)
-		}
+	) {
+		PageContent(
+			model = model,
+			pagerState = pagerState,
+			modifier = Modifier.fillMaxSize().padding(it)
+		)
 	}
 }
 
@@ -106,15 +111,12 @@ private fun Landscape(model: AppModel) {
 				)
 			}
 		}
-		Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) { padding ->
-			HorizontalPager (
-				state = pagerState,
-				modifier = Modifier.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
-					.padding(padding)
-			) {
-				PageContent(model, it)
-			}
+		Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
+			PageContent(
+				model = model,
+				pagerState = pagerState,
+				modifier = Modifier.fillMaxSize().padding(it)
+			)
 		}
 	}
 }

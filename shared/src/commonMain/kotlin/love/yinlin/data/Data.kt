@@ -5,19 +5,19 @@ interface Failed
 object Empty : Failed
 
 enum class RequestError : Failed {
-	Forbidden,
+	ClientError,
+	Timeout,
+	Canceled,
 	Unauthorized,
-	Failed
+	InvalidArgument,
 }
 
 sealed interface Data<out D> {
-	data class Error(val error: Failed = Empty) : Data<Nothing>
+	data class Error(val type: Failed = Empty, val throwable: Throwable? = null) : Data<Nothing>
 	data class Success<out D>(val data: D) : Data<D>
 }
 
-inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> {
-	return when(this) {
-		is Data.Error -> Data.Error(error)
-		is Data.Success -> Data.Success(map(data))
-	}
+inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> = when(this) {
+	is Data.Error -> this
+	is Data.Success -> Data.Success(map(data))
 }

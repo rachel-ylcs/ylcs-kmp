@@ -1,8 +1,10 @@
 package love.yinlin
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -21,7 +23,7 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 	val navController = rememberNavController()
 	val appModel = viewModel { AppModel(navController) }
 	NavHost(
-		modifier = modifier,
+		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		navController = navController,
 		startDestination = Route.Main,
 	) {

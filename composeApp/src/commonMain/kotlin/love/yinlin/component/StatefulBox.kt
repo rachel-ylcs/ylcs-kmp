@@ -54,7 +54,7 @@ private fun LoadingBox() {
 			horizontalArrangement = Arrangement.spacedBy(20.dp)
 		) {
 			CircularProgressIndicator(modifier = Modifier.size(32.dp))
-			Text(stringResource(Res.string.loading_state_string))
+			Text(text = stringResource(Res.string.loading_state_string))
 		}
 	}
 }
@@ -75,7 +75,7 @@ private fun EmptyBox() {
 			horizontalArrangement = Arrangement.spacedBy(20.dp)
 		) {
 			MiniIcon(Icons.Filled.Error)
-			Text(stringResource(Res.string.empty_state_string))
+			Text(text = stringResource(Res.string.empty_state_string))
 		}
 	}
 }
@@ -105,7 +105,7 @@ private fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
 			)
 		}
 		Button(onClick = { retry?.invoke() }) {
-			Text(stringResource(Res.string.network_error_retry_string))
+			Text(text = stringResource(Res.string.network_error_retry_string))
 		}
 	}
 }
@@ -119,10 +119,10 @@ fun StatefulBox(
 ) {
 	Crossfade(
 		targetState = state,
-		modifier = modifier.fillMaxSize(),
+		modifier = modifier,
 	) {
 		Box(
-			modifier = modifier.fillMaxSize(),
+			modifier = Modifier.fillMaxSize(),
 			contentAlignment = Alignment.Center
 		) {
 			when (it) {

@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.sketch.gif)
             implementation(libs.sketch.webp)
             implementation(libs.sketch.zoom)
+            implementation(libs.richtext)
         }
 
         androidMain.dependencies {
@@ -187,8 +188,9 @@ compose.desktop {
     application {
         mainClass = rootProject.extra["appMainClass"] as String
 
+        // 为调试运行提供工作目录与库目录, 但发布打包时不需要
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
-        if (taskName.endsWith("run") || taskName.endsWith("runRelease")) {
+        if (taskName.contains("desktopRun")) {
             jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
             jvmArgs += "-Djava.library.path=${rootProject.extra["desktopLibsDir"]}"
         }

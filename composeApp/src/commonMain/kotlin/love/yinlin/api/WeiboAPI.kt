@@ -2,7 +2,6 @@ package love.yinlin.api
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.app
 import love.yinlin.data.Data
@@ -16,7 +15,7 @@ import love.yinlin.extension.int
 import love.yinlin.extension.obj
 import love.yinlin.extension.string
 import love.yinlin.platform.Constants
-import kotlin.coroutines.coroutineContext
+import love.yinlin.platform.safeCall
 
 object WeiboAPI {
 	private fun getWeibo(card: JsonObject): Weibo {
@@ -73,31 +72,22 @@ object WeiboAPI {
 		)
 	}
 
-	suspend fun getUserWeibo(uid: String): Data<List<Weibo>> = try {
-		val items = mutableListOf<Weibo>()
+	suspend fun getUserWeibo(uid: String): Data<List<Weibo>> = app.client.safeCall { client ->
 		val url = "https://${Constants.WEIBO_HOST}/api/container/getIndex?type=uid&value=$uid&containerid=${WeiboContainer.weibo(uid)}"
-		val json = app.client.get(url).body<JsonObject>()
+		val json = client.get(url).body<JsonObject>()
 		val cards = json.obj("data").arr("cards")
+		val items = mutableListOf<Weibo>()
 		for (item in cards) {
-			try {
-				val card = item.obj
-				if (card["card_type"].int != 9) continue  // 非微博类型
-				items += getWeibo(card)
-			}
-			catch (_: Exception) {
-				coroutineContext.ensureActive()
-			}
+			val card = item.obj
+			if (card["card_type"].int != 9) continue  // 非微博类型
+			items += getWeibo(card)
 		}
-		Data.Success(items)
-	}
-	catch (_: Exception) {
-		coroutineContext.ensureActive()
-		Data.Error()
+		items
 	}
 
-	suspend fun getWeiboUser(uid: String): Data<WeiboUser> = try {
+	suspend fun getWeiboUser(uid: String): Data<WeiboUser> = app.client.safeCall { client ->
 		val url = "https://${Constants.WEIBO_HOST}/api/container/getIndex?type=uid&value=$uid"
-		val json = app.client.get(url).body<JsonObject>()
+		val json = client.get(url).body<JsonObject>()
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].string
 		val name = userInfo["screen_name"].string
@@ -106,16 +96,12 @@ object WeiboAPI {
 		val signature = userInfo["description"].string
 		val followNum = userInfo["follow_count"].string
 		val fansNum = userInfo["followers_count_str"]?.string ?: userInfo["followers_count"].string
-		Data.Success(WeiboUser(
+		WeiboUser(
 			info = WeiboUserInfo(id, name, avatar),
 			background = background,
 			signature = signature,
 			followNum = followNum,
 			fansNum = fansNum
-		))
-	}
-	catch (_: Exception) {
-		coroutineContext.ensureActive()
-		Data.Error()
+		)
 	}
 }

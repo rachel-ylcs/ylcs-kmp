@@ -12,7 +12,10 @@ import love.yinlin.screen.common.WeiboGrid
 fun ScreenWeibo(model: AppModel) {
 	val weiboState = model.msgModel.weiboState
 
-	StatefulBox(weiboState.state) {
+	StatefulBox(
+		state = weiboState.state,
+		modifier = Modifier.fillMaxSize()
+	) {
 		WeiboGrid(
 			modifier = Modifier.fillMaxSize(),
 			items = weiboState.items
@@ -22,6 +25,9 @@ fun ScreenWeibo(model: AppModel) {
 	}
 
 	LaunchedEffect(true) {
-		if (weiboState.isFirstLoad) weiboState.requestWeibo()
+		if (weiboState.isFirstLoad) {
+			weiboState.isFirstLoad = false
+			weiboState.requestWeibo()
+		}
 	}
 }

@@ -2,18 +2,29 @@ package love.yinlin.screen.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.Colors
+import love.yinlin.component.WebImage
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.extension.DateEx
 
 @Composable
 fun WeiboCard(
@@ -21,14 +32,56 @@ fun WeiboCard(
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
-	ElevatedCard(
-		modifier = modifier,
-		onClick = onClick
-	) {
-		Row {
-
+	ElevatedCard(onClick = onClick) {
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				WebImage(
+					uri = weibo.info.avatar,
+					key = DateEx.currentDateString,
+					modifier = Modifier.size(50.dp),
+					circle = true
+				)
+				Column(
+					modifier = Modifier.weight(1f),
+					verticalArrangement = Arrangement.spacedBy(5.dp)
+				) {
+					Text(
+						modifier = Modifier.fillMaxWidth(),
+						text = weibo.info.name,
+						color = MaterialTheme.colorScheme.primary,
+						style = MaterialTheme.typography.titleMedium
+					)
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+					) {
+						Text(
+							modifier = Modifier.weight(1f),
+							text = weibo.time,
+							color = MaterialTheme.colorScheme.onSurfaceVariant,
+							overflow = TextOverflow.Ellipsis
+						)
+						Text(
+							text = weibo.location,
+							color = MaterialTheme.colorScheme.onSurfaceVariant,
+						)
+					}
+				}
+			}
+			Text(
+				text = weibo.text,
+				modifier = Modifier.background(Colors.Green2),
+				maxLines = 5,
+				overflow = TextOverflow.Ellipsis
+			)
 		}
-		Text(weibo.text, modifier = Modifier.background(Colors.Green2))
 	}
 }
 
@@ -50,7 +103,10 @@ fun WeiboGrid(
 			key = { it.id }
 		) {
 			WeiboCard(
-				weibo = it
+				weibo = it,
+				modifier = Modifier.fillMaxWidth()
+					.background(MaterialTheme.colorScheme.surface)
+					.padding(10.dp)
 			) {
 				onClick(it)
 			}
