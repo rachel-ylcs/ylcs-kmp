@@ -1,2 +1,3 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+*.kt linguist-language=Kotlin
+*.cpp linguist-language=Kotlin
+*.h linguist-language=C++
