@@ -1,3 +1,6 @@
 *.kt linguist-language=Kotlin
-*.cpp linguist-language=Kotlin
+*.kts linguist-language=Kotlin
+*.java linguist-language=Kotlin
+*.cpp linguist-language=C++
 *.h linguist-language=C++
+*.S linguist-language=Assembly
