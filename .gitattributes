@@ -1,2 +1,2 @@
-*.kt linguist-language=kotlin
-*.h linguist-language=c++
+*.kt linguist-language=Kotlin
+*.h linguist-language=C++
