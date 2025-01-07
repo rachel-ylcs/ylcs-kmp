@@ -14,10 +14,14 @@ val dirProject: Directory = layout.projectDirectory
 val dirConfig by extra(dirProject.dir("config"))
 val composeProjectName by extra("composeApp")
 val dirComposeApp by extra(dirProject.dir(composeProjectName))
-val dirIOSApp by extra(dirProject.dir("iosApp"))
 val dirSrc by extra(dirComposeApp.dir("src"))
 val dirBuild by extra(dirComposeApp.dir("build"))
+val dirIOSApp by extra(dirProject.dir("iosApp"))
+val dirCpp by extra(dirProject.dir("cpp"))
 val dirOutput by extra(dirProject.dir("outputs"))
+
+// Cpp
+val cppLibsDir by extra(dirCpp.dir("libs"))
 
 // App
 val appName by extra("ylcs")
@@ -55,7 +59,6 @@ val iosDir by extra(dirSrc.dir("iosArm64Main"))
 // Desktop
 val desktopDir by extra(dirSrc.dir("jvmMain"))
 val desktopCurrentDir by extra(dirBuild.dir("desktopRun"))
-val desktopLibsDir by extra(desktopDir.dir("libs"))
 val desktopR8File by extra(dirComposeApp.file("R8Desktop.pro"))
 val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/app/ylcs")
 val desktopOutputDir by extra(dirOutput.dir("desktop"))

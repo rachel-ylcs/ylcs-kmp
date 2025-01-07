@@ -192,7 +192,7 @@ compose.desktop {
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.contains("desktopRun")) {
             jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
-            jvmArgs += "-Djava.library.path=${rootProject.extra["desktopLibsDir"]}"
+            jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
         }
 
         buildTypes.release.proguard {
@@ -257,9 +257,11 @@ afterEvaluate {
         dependsOn(tasks.named("suggestRuntimeModules"))
     }
 
-    val desktopCopyLibs by tasks.registering(Copy::class) {
-        from(rootProject.extra["desktopLibsDir"])
-        into(rootProject.extra["desktopOutputAppDir"]!!)
+    val desktopCopyLibs by tasks.creating {
+        copy {
+            from(rootProject.extra["cppLibsDir"])
+            into(rootProject.extra["desktopOutputAppDir"]!!)
+        }
     }
 
     val desktopCopyDir by tasks.registering(Copy::class) {
