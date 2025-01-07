@@ -1,2 +1,1 @@
-*.kt linguist-language=Kotlin
-*.h linguist-language=C++
+. text=auto
