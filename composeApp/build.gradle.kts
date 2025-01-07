@@ -230,65 +230,93 @@ compose.desktop {
 // ----------------------------------------- 任务列表 ----------------------------------------------
 
 afterEvaluate {
-    val androidCopyAPK by tasks.registering(Copy::class) {
-        from(rootProject.extra["androidOriginOutputPath"])
-        into(rootProject.extra["androidOutputDir"]!!)
-        rename { _ -> rootProject.extra["androidOutputFileName"] as String }
-    }
+    val assembleRelease = tasks.named("assembleRelease")
 
-    // 发布安卓安装包
-    val androidPublish: Task by tasks.creating {
-        dependsOn(tasks.named("assembleRelease"))
-        finalizedBy(androidCopyAPK)
-    }
-
-    // 运行 桌面程序 Debug
-    val desktopRunDebug by tasks.creating {
-        dependsOn(tasks.named("run"))
-    }
-
-    // 运行 桌面程序 Release
-    val desktopRunRelease by tasks.creating {
-        dependsOn(tasks.named("runRelease"))
-    }
-
-    // 检查桌面模块完整性
-    val desktopCheckModules by tasks.creating {
-        dependsOn(tasks.named("suggestRuntimeModules"))
-    }
-
-    val desktopCopyLibs by tasks.creating {
-        copy {
-            from(rootProject.extra["cppLibsDir"])
-            into(rootProject.extra["desktopOutputAppDir"]!!)
+    val androidCopyAPK by tasks.registering {
+        mustRunAfter(assembleRelease)
+        doLast {
+            copy {
+                from(rootProject.extra["androidOriginOutputPath"])
+                into(rootProject.extra["androidOutputDir"]!!)
+                rename { _ -> rootProject.extra["androidOutputFileName"] as String }
+            }
         }
     }
 
-    val desktopCopyDir by tasks.registering(Copy::class) {
-        from(rootProject.extra["desktopOriginOutputPath"])
-        into(rootProject.extra["desktopOutputDir"]!!)
-        finalizedBy(desktopCopyLibs)
+    // 发布安卓安装包
+    val androidPublish by tasks.registering {
+        dependsOn(assembleRelease)
+        dependsOn(androidCopyAPK)
+    }
+
+    val run = tasks.named("run")
+    val runRelease = tasks.named("runRelease")
+    val createReleaseDistributable = tasks.named("createReleaseDistributable")
+    val suggestRuntimeModules = tasks.named("suggestRuntimeModules")
+
+    // 运行 桌面程序 Debug
+    val desktopRunDebug by tasks.registering {
+        dependsOn(run)
+    }
+
+    // 运行 桌面程序 Release
+    val desktopRunRelease by tasks.registering {
+        dependsOn(runRelease)
+    }
+
+    // 检查桌面模块完整性
+    val desktopCheckModules by tasks.registering {
+        dependsOn(suggestRuntimeModules)
+    }
+
+    val desktopCopyDir by tasks.registering {
+        mustRunAfter(createReleaseDistributable)
+        doLast {
+            copy {
+                from(rootProject.extra["desktopOriginOutputPath"])
+                into(rootProject.extra["desktopOutputDir"]!!)
+            }
+        }
+    }
+
+    val desktopCopyLibs by tasks.registering {
+        mustRunAfter(desktopCopyDir)
+        doLast {
+            copy {
+                from(rootProject.extra["cppLibsDir"])
+                into(rootProject.extra["desktopOutputAppDir"]!!)
+            }
+        }
     }
 
     // 发布桌面应用程序
-    val desktopPublish by tasks.creating {
-        dependsOn(tasks.named("createReleaseDistributable"))
-        finalizedBy(desktopCopyDir)
+    val desktopPublish by tasks.registering {
+        dependsOn(createReleaseDistributable)
+        dependsOn(desktopCopyDir)
+        dependsOn(desktopCopyLibs)
     }
 
-    val webCopyDir by tasks.registering(Copy::class) {
-        from(rootProject.extra["webOriginOutputPath"])
-        into(rootProject.extra["webOutputDir"]!!)
+    val wasmJsBrowserRun = tasks.named("wasmJsBrowserRun")
+    val wasmJsBrowserDistribution = tasks.named("wasmJsBrowserDistribution")
+
+    val webCopyDir by tasks.registering {
+        mustRunAfter(wasmJsBrowserDistribution)
+        doLast {
+            copy {
+                from(rootProject.extra["webOriginOutputPath"])
+                into(rootProject.extra["webOutputDir"]!!)
+            }
+        }
     }
 
     // 运行 Web 应用程序
-    val webRun by tasks.creating {
-        dependsOn(tasks.named("wasmJsBrowserRun"))
+    val webRun by tasks.registering {
+        dependsOn(wasmJsBrowserRun)
     }
 
     // 发布 Web 应用程序
-    val webPublish: Task by tasks.creating {
-        dependsOn(tasks.named("wasmJsBrowserDistribution"))
-        finalizedBy(webCopyDir)
+    val webPublish by tasks.registering {
+        dependsOn(wasmJsBrowserDistribution)
+        dependsOn(webCopyDir)
     }
 }
