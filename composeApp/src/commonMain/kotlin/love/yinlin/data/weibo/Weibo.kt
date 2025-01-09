@@ -1,19 +1,22 @@
 package love.yinlin.data.weibo
 
+import androidx.compose.runtime.Stable
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
+import love.yinlin.component.RichString
 import love.yinlin.data.common.Picture
 
+@Stable
 data class Weibo(
 	val id: String, // ID
 	val info: WeiboUserInfo, // 用户信息
 	val time: String, // 时间
 	val location: String, // 定位
-	val text: String, // 内容
+	val text: RichString, // 内容
 	val commentNum: Int, // 评论数
 	val likeNum: Int, // 点赞数
 	val repostNum: Int, // 转发数

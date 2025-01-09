@@ -1,6 +1,8 @@
 package love.yinlin.component
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -39,13 +41,21 @@ fun AppTopBar(
 			}
 		},
 		actions = {
-			ClickIconRow(
-				color = MaterialTheme.colorScheme.onSecondaryContainer,
-				items = listOf(
-					Icons.Filled.Remove to onMinimized,
-					Icons.Filled.Close to onClosed
+			Row(
+				modifier = Modifier.padding(horizontal = 10.dp),
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				ClickIcon(
+					imageVector = Icons.Filled.Remove,
+					color = MaterialTheme.colorScheme.onPrimary,
+					onClick = onMinimized
 				)
-			)
+				ClickIcon(
+					imageVector = Icons.Filled.Close,
+					color = MaterialTheme.colorScheme.onPrimary,
+					onClick = onClosed
+				)
+			}
 		}
 	)
 }

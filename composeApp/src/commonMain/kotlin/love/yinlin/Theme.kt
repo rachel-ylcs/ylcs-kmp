@@ -16,6 +16,7 @@ import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.xwwk
 
 object Colors {
+	val Unspecified = Color.Unspecified
 	val Transparent = Color(0x00000000)
 	val White = Color(0xffffffff)
 	val Ghost = Color(0xfff8f8ff)
@@ -103,6 +104,10 @@ object Colors {
 	val Steel8 = Color(0xff1a5276)
 }
 
+object ThemeColor {
+
+}
+
 private val LightColorScheme = lightColorScheme(
 	primary = Colors.Steel4,
 	onPrimary = Colors.White,
@@ -121,6 +126,7 @@ private val LightColorScheme = lightColorScheme(
 	surface = Colors.Gray2,
 	onSurface = Colors.Black,
 	onSurfaceVariant = Colors.Gray7,
+	surfaceContainer = Colors.Gray1,
 	error = Colors.Red4,
 	onError = Colors.White
 )
@@ -143,6 +149,7 @@ private val DarkColorScheme = darkColorScheme(
 	surface = Colors.Gray7,
 	onSurface = Colors.White,
 	onSurfaceVariant = Colors.Gray2,
+	surfaceContainer = Colors.Gray8,
 	error = Colors.Yellow4,
 	onError = Colors.Black
 )

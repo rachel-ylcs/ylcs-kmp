@@ -85,7 +85,7 @@ kotlin {
             implementation(libs.sketch.gif)
             implementation(libs.sketch.webp)
             implementation(libs.sketch.zoom)
-            implementation(libs.richtext)
+            implementation(libs.html)
         }
 
         androidMain.dependencies {

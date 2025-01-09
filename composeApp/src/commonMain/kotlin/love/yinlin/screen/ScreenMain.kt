@@ -1,20 +1,29 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
+import love.yinlin.ThemeMode
 import love.yinlin.app
+import love.yinlin.component.ClickIcon
 import love.yinlin.component.MiniImage
+import love.yinlin.component.Space
 import love.yinlin.data.item.TabItem
-import love.yinlin.extension.shadowTop
 import love.yinlin.model.AppModel
+import love.yinlin.next
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -54,30 +63,71 @@ private fun PageContent(
 }
 
 @Composable
-private fun Portrait(model: AppModel) {
-	val pagerState = rememberPagerState(0) { TabItem.entries.size }
-	val coroutineScope = rememberCoroutineScope()
-	Scaffold(
-		modifier = Modifier.fillMaxSize(),
-		bottomBar = {
-			NavigationBar(
-				modifier = Modifier.fillMaxWidth().shadowTop(),
-				containerColor = MaterialTheme.colorScheme.surface,
-			) {
-				TabItem.entries.forEachIndexed { index, tabItem ->
-					val isSelected = index == pagerState.currentPage
-					NavigationBarItem(
-						selected = isSelected,
-						icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
-						label = { NavigationItemText(tabItem, isSelected) },
-						onClick = {
-							coroutineScope.launch {
-								pagerState.scrollToPage(index)
-							}
-						}
-					)
-				}
+private fun PortraitNavigation(currentPage: Int, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+	Surface(
+		modifier = modifier.zIndex(5f),
+		shadowElevation = 5.dp
+	) {
+		NavigationBar(modifier = Modifier.fillMaxWidth()) {
+			TabItem.entries.forEachIndexed { index, tabItem ->
+				val isSelected = index == currentPage
+				NavigationBarItem(
+					selected = isSelected,
+					icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
+					label = { NavigationItemText(tabItem, isSelected) },
+					onClick = { onNavigate(index) }
+				)
 			}
+		}
+	}
+}
+
+@Composable
+private fun LandscapeNavigation(currentPage: Int, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+	Surface(
+		modifier = modifier.zIndex(5f),
+		shadowElevation = 5.dp
+	) {
+		NavigationRail(
+			modifier = Modifier.fillMaxHeight(),
+			header = {
+				Space(10.dp)
+				ClickIcon(
+					imageVector = when (app.theme) {
+						ThemeMode.SYSTEM -> Icons.Filled.Contrast
+						ThemeMode.LIGHT -> Icons.Filled.LightMode
+						ThemeMode.DARK -> Icons.Filled.DarkMode
+					},
+					color = MaterialTheme.colorScheme.primary,
+					onClick = {
+						app.theme = app.theme.next
+					}
+				)
+			}
+		) {
+			TabItem.entries.forEachIndexed { index, tabItem ->
+				val isSelected = index == currentPage
+				NavigationRailItem(
+					selected = isSelected,
+					icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
+					label = { NavigationItemText(tabItem, isSelected) },
+					onClick = { onNavigate(index) }
+				)
+			}
+		}
+	}
+}
+
+@Composable
+private fun Portrait(model: AppModel, pagerState: PagerState, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+	Scaffold(
+		modifier = modifier,
+		bottomBar = {
+			PortraitNavigation(
+				modifier = Modifier.fillMaxWidth(),
+				currentPage = pagerState.currentPage,
+				onNavigate = onNavigate
+			)
 		}
 	) {
 		PageContent(
@@ -89,28 +139,13 @@ private fun Portrait(model: AppModel) {
 }
 
 @Composable
-private fun Landscape(model: AppModel) {
-	val pagerState = rememberPagerState(0) { TabItem.entries.size }
-	val coroutineScope = rememberCoroutineScope()
-	Row {
-		NavigationRail(
+private fun Landscape(model: AppModel, pagerState: PagerState, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+	Row(modifier = modifier) {
+		LandscapeNavigation(
 			modifier = Modifier.fillMaxHeight(),
-			containerColor = MaterialTheme.colorScheme.surface
-		) {
-			TabItem.entries.forEachIndexed { index, tabItem ->
-				val isSelected = index == pagerState.currentPage
-				NavigationRailItem(
-					selected = isSelected,
-					icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
-					label = { NavigationItemText(tabItem, isSelected) },
-					onClick = {
-						coroutineScope.launch {
-							pagerState.scrollToPage(index)
-						}
-					}
-				)
-			}
-		}
+			currentPage = pagerState.currentPage,
+			onNavigate = onNavigate
+		)
 		Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
 			PageContent(
 				model = model,
@@ -123,6 +158,14 @@ private fun Landscape(model: AppModel) {
 
 @Composable
 fun ScreenMain(model: AppModel) {
-	if (app.isPortrait) Portrait(model)
-	else Landscape(model)
+	val coroutineScope = rememberCoroutineScope()
+	val pagerState = rememberPagerState(0) { TabItem.entries.size }
+	val onNavigate = { index: Int ->
+		coroutineScope.launch {
+			pagerState.scrollToPage(index)
+		}
+		Unit
+	}
+	if (app.isPortrait) Portrait(model, pagerState, onNavigate, Modifier.fillMaxSize())
+	else Landscape(model, pagerState, onNavigate, Modifier.fillMaxSize())
 }

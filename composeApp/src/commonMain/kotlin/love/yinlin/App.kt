@@ -1,7 +1,6 @@
 package love.yinlin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -34,17 +33,14 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 }
 
 @Composable
-fun AppWrapper(
-	darkMode: Boolean = isSystemInDarkTheme(),
-	content: @Composable () -> Unit
-) {
+fun AppWrapper(content: @Composable () -> Unit) {
 	CompositionLocalProvider(
 		LocalDensity provides Density(
 			density = app.screenWidth / app.designWidth.value,
 			fontScale = app.fontScale
 		)
 	) {
-		RachelTheme(darkMode) {
+		RachelTheme(app.isDarkMode) {
 			Box(modifier = Modifier.fillMaxSize()) {
 				content()
 			}

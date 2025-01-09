@@ -12,35 +12,36 @@ import love.yinlin.component.BoxState
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.replaceAll
 import love.yinlin.platform.Coroutines
 
 class MsgModel {
 	open class PageState {
-		var isFirstLoad: Boolean = true
-		var state by mutableStateOf(BoxState.EMPTY)
+		val launchFlag = LaunchFlag()
+		var boxState by mutableStateOf(BoxState.EMPTY)
 	}
 
 	inner class WeiboState : PageState() {
 		val items = mutableStateListOf<Weibo>()
 
 		suspend fun requestWeibo() {
-			if (state != BoxState.LOADING) {
-				state = BoxState.LOADING
-				state = if (localWeiboUsers.isEmpty()) BoxState.EMPTY
+			if (boxState != BoxState.LOADING) {
+				boxState = BoxState.LOADING
+				boxState = if (localWeiboUsers.isEmpty()) BoxState.EMPTY
 				else {
-					val newItems = mutableStateListOf<Weibo>()
+					val newItems = mutableMapOf<String, Weibo>()
 					Coroutines.io {
 						for (user in localWeiboUsers) {
 							val result = WeiboAPI.getUserWeibo(user.id)
-							if (result is Data.Success) newItems += result.data
+							if (result is Data.Success) newItems += result.data.associateBy { it.id }
 							else if (result is Data.Error && result.type == RequestError.Canceled) {
-								state = BoxState.EMPTY
+								boxState = BoxState.EMPTY
 								ensureActive()
 							}
 						}
 					}
-					newItems.sortDescending()
-					items += newItems
+					items.replaceAll(newItems.map { it.value }.sortedDescending())
 					if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
 				}
 			}

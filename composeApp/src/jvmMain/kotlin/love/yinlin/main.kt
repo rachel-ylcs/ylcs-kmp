@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +29,7 @@ fun main() {
             width = context.windowWidth.dp,
             height = context.windowHeight.dp
         )
-        var isOpen by remember { mutableStateOf(true) }
+        var isOpen by rememberSaveable { mutableStateOf(true) }
         if (isOpen) {
             Window(
                 onCloseRequest = ::exitApplication,
@@ -39,7 +39,7 @@ fun main() {
                 transparent = false,
                 state = state,
             ) {
-                AppWrapper(false) {
+                AppWrapper {
                     Column(modifier = Modifier.fillMaxSize()) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                             AppTopBar(

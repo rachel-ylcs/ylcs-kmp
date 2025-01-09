@@ -1,33 +1,17 @@
 package love.yinlin.extension
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Stable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.CoroutineScope
 
-@Stable
-fun Modifier.shadowStart(value: Dp = 3.dp): Modifier = composed {
-	padding(start = value)
-	shadow(value)
-}
+class LaunchFlag(var flag: Unit? = null)
 
-@Stable
-fun Modifier.shadowEnd(value: Dp = 3.dp): Modifier = composed {
-	padding(end = value)
-	shadow(value)
-}
-
-@Stable
-fun Modifier.shadowTop(value: Dp = 3.dp): Modifier = composed {
-	padding(top = value)
-	shadow(value)
-}
-
-@Stable
-fun Modifier.shadowBottom(value: Dp = 3.dp): Modifier = composed {
-	padding(bottom = value)
-	shadow(value)
+@Composable
+inline fun LaunchOnce(ref: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
+	LaunchedEffect(Unit) {
+		if (ref.flag == null) {
+			ref.flag = Unit
+			block()
+		}
+	}
 }

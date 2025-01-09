@@ -2,9 +2,9 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import love.yinlin.component.StatefulBox
+import love.yinlin.extension.LaunchOnce
 import love.yinlin.model.AppModel
 import love.yinlin.screen.common.WeiboGrid
 
@@ -13,21 +13,19 @@ fun ScreenWeibo(model: AppModel) {
 	val weiboState = model.msgModel.weiboState
 
 	StatefulBox(
-		state = weiboState.state,
+		state = weiboState.boxState,
 		modifier = Modifier.fillMaxSize()
 	) {
 		WeiboGrid(
 			modifier = Modifier.fillMaxSize(),
-			items = weiboState.items
-		) {
+			items = weiboState.items,
+			onClick = {
 
-		}
+			}
+		)
 	}
 
-	LaunchedEffect(true) {
-		if (weiboState.isFirstLoad) {
-			weiboState.isFirstLoad = false
-			weiboState.requestWeibo()
-		}
+	LaunchOnce(weiboState.launchFlag) {
+		weiboState.requestWeibo()
 	}
 }

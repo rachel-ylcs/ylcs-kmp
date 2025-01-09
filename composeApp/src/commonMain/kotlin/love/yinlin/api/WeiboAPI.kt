@@ -1,23 +1,82 @@
 package love.yinlin.api
 
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Element
+import com.fleeksoft.ksoup.nodes.Node
+import com.fleeksoft.ksoup.nodes.TextNode
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.app
+import love.yinlin.component.RichContainer
+import love.yinlin.component.RichString
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
-import love.yinlin.data.weibo.WeiboContainer
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.arr
 import love.yinlin.extension.int
 import love.yinlin.extension.obj
 import love.yinlin.extension.string
-import love.yinlin.platform.Constants
 import love.yinlin.platform.safeCall
 
+expect val WEIBO_HOST: String
+
 object WeiboAPI {
+	object Container {
+//		fun searchUser(name: String): String {
+//			val encodeName = try { URLEncoder.encode(name, "UTF-8") } catch (_: Exception) { name }
+//			return "100103type%3D3%26q%3D$encodeName"
+//		}
+		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
+		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
+		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
+		fun album(uid: String): String = "107803$uid"
+		const val CHAOHUA: String = "10080848e33cc4065cd57c5503c2419cdea983_-_sort_time"
+	}
+
+	private fun weiboHtmlNodeTransform(node: Node, container: RichContainer) {
+		if (node is TextNode) {
+			val text = node.text()
+			if (text.startsWith('#') && text.endsWith('#')) { // # 话题
+				val topic = text.removePrefix("#").removeSuffix("#")
+				container.topic("https://$WEIBO_HOST/${Container.searchTopic(topic)}", text)
+			}
+			else container.text(text) // 普通文本
+		}
+		else if (node is Element) {
+			val childNodes = node.childNodes()
+			when (node.tagName()) {
+				"br" -> container.br()
+				"a" -> {
+					val href = node.attribute("href")?.value
+					val text = (childNodes.firstOrNull() as? TextNode?)?.text()
+					if (childNodes.size == 1 && href != null && text != null) {
+						if (href.startsWith("/n/")) container.at("https://$WEIBO_HOST$href", text) // @ 标签
+						else if (href.startsWith("/status/")) container.link("https://$WEIBO_HOST$href", text)
+						else container.link(href, text)
+					}
+					else weiboHtmlNodesTransform(childNodes, container)
+				}
+				"span" -> weiboHtmlNodesTransform(childNodes, container)
+				"img" -> node.attribute("src")?.value?.let { container.image(it) }
+			}
+		}
+	}
+
+	private fun weiboHtmlNodesTransform(nodes: List<Node>, container: RichContainer) {
+		for (node in nodes) weiboHtmlNodeTransform(node, container)
+	}
+
+
+	private fun weiboHtmlToRichString(text: String): RichString {
+		val html = Ksoup.parse(text).body()
+		return RichString {
+			weiboHtmlNodesTransform(html.childNodes(), this)
+		}
+	}
+
 	private fun getWeibo(card: JsonObject): Weibo {
 		var blogs = card.obj("mblog")
 		// 提取ID
@@ -64,7 +123,7 @@ object WeiboAPI {
 			info = WeiboUserInfo(userId, userName, avatar),
 			time = time,
 			location = location,
-			text = text,
+			text = weiboHtmlToRichString(text),
 			commentNum = commentNum,
 			likeNum = likeNum,
 			repostNum = repostNum,
@@ -73,7 +132,7 @@ object WeiboAPI {
 	}
 
 	suspend fun getUserWeibo(uid: String): Data<List<Weibo>> = app.client.safeCall { client ->
-		val url = "https://${Constants.WEIBO_HOST}/api/container/getIndex?type=uid&value=$uid&containerid=${WeiboContainer.weibo(uid)}"
+		val url = "https://$WEIBO_HOST/${Container.userDetails(uid)}"
 		val json = client.get(url).body<JsonObject>()
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<Weibo>()
@@ -86,7 +145,7 @@ object WeiboAPI {
 	}
 
 	suspend fun getWeiboUser(uid: String): Data<WeiboUser> = app.client.safeCall { client ->
-		val url = "https://${Constants.WEIBO_HOST}/api/container/getIndex?type=uid&value=$uid"
+		val url = "https://${WEIBO_HOST}/${Container.userInfo(uid)}"
 		val json = client.get(url).body<JsonObject>()
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].string

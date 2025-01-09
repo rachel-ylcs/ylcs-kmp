@@ -51,8 +51,10 @@ afterEvaluate {
         }
     }
 
+    val buildFatJar = tasks.named("buildFatJar")
+
     // 发布服务端
     val serverPublish: Task by tasks.creating {
-        dependsOn(tasks.named("buildFatJar"))
+        dependsOn(buildFatJar)
     }
 }

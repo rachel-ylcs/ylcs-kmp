@@ -1,5 +1,10 @@
 package love.yinlin
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.ktor.client.*
@@ -22,6 +27,16 @@ val Platform.isWeb: Boolean get() = this == Platform.WebWasm
 // 平台
 expect val platform: Platform
 
+enum class ThemeMode {
+	SYSTEM, LIGHT, DARK
+}
+
+val ThemeMode.next: ThemeMode get() = when (this) {
+	ThemeMode.SYSTEM -> ThemeMode.LIGHT
+	ThemeMode.LIGHT -> ThemeMode.DARK
+	ThemeMode.DARK -> ThemeMode.SYSTEM
+}
+
 abstract class AppContext {
 	// 屏幕宽度
 	abstract val screenWidth: Int
@@ -35,6 +50,16 @@ abstract class AppContext {
 	val designWidth: Dp get() = if (isPortrait) 360.dp else 1200.dp
 	// 设计高度
 	val designHeight: Dp get() = 800.dp
+
+	// 主题
+	var theme by mutableStateOf(ThemeMode.SYSTEM)
+
+	val isDarkMode: Boolean @Composable get() = when (theme) {
+		ThemeMode.SYSTEM -> isSystemInDarkTheme()
+		ThemeMode.LIGHT -> false
+		ThemeMode.DARK -> true
+	}
+
 	// KV
 	abstract val kv: KV
 	// Config

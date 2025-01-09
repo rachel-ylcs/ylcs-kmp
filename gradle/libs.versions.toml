@@ -16,7 +16,7 @@ json = "1.8.0"
 datetime = "0.6.1"
 sketch = "4.0.1"
 sketch-zoom = "1.1.0"
-richtext = "1.0.0-rc10"
+html = "0.2.1"
 
 # Android
 activity-compose = "1.9.3"
@@ -50,8 +50,7 @@ sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources"
 sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version.ref = "sketch-zoom" }
-richtext = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richtext" }
-
+html = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "html" }
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 

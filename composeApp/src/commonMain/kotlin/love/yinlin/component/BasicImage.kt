@@ -9,7 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
@@ -33,11 +34,13 @@ import org.jetbrains.compose.resources.painterResource
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.placeholder_pic
 
+val DEFAULT_ICON_SIZE = 28.dp
+
 @Composable
 fun MiniIcon(
 	imageVector: ImageVector? = null,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = 32.dp,
+	size: Dp = DEFAULT_ICON_SIZE,
 	modifier: Modifier = Modifier
 ) {
 	if (imageVector != null) {
@@ -57,7 +60,7 @@ fun MiniIcon(
 fun ClickIcon(
 	imageVector: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = 32.dp,
+	size: Dp = DEFAULT_ICON_SIZE,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
@@ -70,32 +73,9 @@ fun ClickIcon(
 }
 
 @Composable
-fun ClickIconRow(
-	items: List<Pair<ImageVector, () -> Unit>>,
-	space: Dp = 10.dp,
-	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = 32.dp,
-	modifier: Modifier = Modifier,
-) {
-	Row(
-		modifier = modifier.padding(horizontal = 10.dp),
-		horizontalArrangement = Arrangement.spacedBy(space)
-	) {
-		for (item in items) {
-			Icon(
-				modifier = Modifier.size(size).clickable(onClick = item.second),
-				imageVector = item.first,
-				contentDescription = null,
-				tint = color,
-			)
-		}
-	}
-}
-
-@Composable
 fun MiniImage(
 	res: DrawableResource,
-	size: Dp = 32.dp,
+	size: Dp = DEFAULT_ICON_SIZE,
 	modifier: Modifier = Modifier,
 ) {
 	Image(
@@ -110,31 +90,12 @@ enum class WebImageQuality {
 }
 
 @Composable
-private fun Modifier.shimmerLoading(
-	isActive: Boolean = true,
-	durationMillis: Int = 3000
-): Modifier = composed {
-	if (isActive) {
-		val transition = rememberInfiniteTransition()
-		val offsetX = transition.animateFloat(
-			initialValue = 0f,
-			targetValue = durationMillis + 500f,
-			animationSpec = infiniteRepeatable(
-				animation = tween(durationMillis = durationMillis),
-				repeatMode = RepeatMode.Restart
-			)
-		)
-		background(brush = Brush.linearGradient(
-			colors = listOf(Colors.Gray2, Colors.Gray3, Colors.Gray2),
-			start = Offset(x = offsetX.value - 500, y = 0f),
-			end = Offset(x = offsetX.value, y = 0f)
-		))
-	}
-	else background(Colors.White)
+private fun Modifier.circleImage(circle: Boolean): Modifier = composed {
+	if (circle) clip(CircleShape) else this
 }
 
 @Composable
-private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(key) {
+private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = rememberSaveable(key) {
 	if (key == null) uri
 	else if (uri.contains("?")) "$uri&_cacheKey=$key"
 	else "$uri?_cacheKey=$key"
@@ -147,7 +108,8 @@ fun WebImage(
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
 	quality: WebImageQuality = WebImageQuality.Medium,
-	contentScale: ContentScale = ContentScale.FillWidth,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	placeholder: DrawableResource = Res.drawable.placeholder_pic
 ) {
 	val state = rememberAsyncImageState(ComposableImageOptions {
@@ -165,9 +127,9 @@ fun WebImage(
 		uri = rememberWebImageKeyUrl(uri, key),
 		contentDescription = null,
 		state = state,
+		alignment = alignment,
 		contentScale = contentScale,
-		modifier = modifier.let { if (circle) it.clip(CircleShape) else it }
-			.shimmerLoading(state.painterState is PainterState.Loading),
+		modifier = modifier.circleImage(circle).background(MaterialTheme.colorScheme.surface),
 		filterQuality = when (quality) {
 			WebImageQuality.Low -> FilterQuality.Low
 			WebImageQuality.Medium -> FilterQuality.Medium
