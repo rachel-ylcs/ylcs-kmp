@@ -64,10 +64,13 @@
     <string name="weibo_user_list_like">微博关注</string>
     <string name="weibo_user_list_search">搜索结果</string>
 
-    <string name="ok">确定</string>
-    <string name="cancel">取消</string>
-    <string name="yes">是</string>
-    <string name="no">否</string>
+    <string name="dialog_ok">确定</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_yes">是</string>
+    <string name="dialog_no">否</string>
+    <string name="dialog_info">提示</string>
+    <string name="dialog_confirm">确认</string>
+    <string name="dialog_progress">下载中...</string>
 
     <string name="qqgroup_main">828049503</string>
     <string name="qqgroup_mod0">836289670</string>

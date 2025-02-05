@@ -1,4 +1,4 @@
-package love.yinlin.component
+package love.yinlin.ui.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth

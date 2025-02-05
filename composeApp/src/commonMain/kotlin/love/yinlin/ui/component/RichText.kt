@@ -1,4 +1,4 @@
-package love.yinlin.component
+package love.yinlin.ui.component
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.InlineTextContent
@@ -7,7 +7,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -149,7 +149,9 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override fun build(context: RichContext) {
 			val id = context.id
+			context.builder.append(' ')
 			context.builder.appendInlineContent(id, " ")
+			context.builder.append(' ')
 			context.content.put(id, this)
 		}
 
@@ -172,10 +174,11 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		}
 
 		override fun build(context: RichContext) {
+			context.builder.append(' ')
 			context.builder.withLink(link = LinkAnnotation.Url(
 				url = uri,
 				styles = TextLinkStyles(
-					style = SpanStyle(color = Color.Blue)
+					style = SpanStyle(color = Colors.Yellow6)
 				),
 				linkInteractionListener = {
 					context.onLinkClick?.invoke(uri)
@@ -183,6 +186,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 			)) {
 				append(text)
 			}
+			context.builder.append(' ')
 		}
 	}
 	fun link(uri: String, text: String) = makeItem(Link(uri, text))
@@ -195,10 +199,11 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		}
 
 		override fun build(context: RichContext) {
+			context.builder.append(' ')
 			context.builder.withLink(link = LinkAnnotation.Url(
 				url = uri,
 				styles = TextLinkStyles(
-					style = SpanStyle(color = Color.Green)
+					style = SpanStyle(color = Colors.Cyan4)
 				),
 				linkInteractionListener = {
 					context.onTopicClick?.invoke(uri)
@@ -206,6 +211,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 			)) {
 				append(text)
 			}
+			context.builder.append(' ')
 		}
 	}
 	fun topic(uri: String, text: String) = makeItem(Topic(uri, text))
@@ -218,10 +224,11 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		}
 
 		override fun build(context: RichContext) {
+			context.builder.append(' ')
 			context.builder.withLink(link = LinkAnnotation.Url(
 				url = uri,
 				styles = TextLinkStyles(
-					style = SpanStyle(color = Color.Red)
+					style = SpanStyle(color = Colors.Red4)
 				),
 				linkInteractionListener = {
 					context.onAtClick?.invoke(uri)
@@ -229,6 +236,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 			)) {
 				append(text)
 			}
+			context.builder.append(' ')
 		}
 	}
 	fun at(uri: String, text: String) = makeItem(At(uri, text))
@@ -360,13 +368,13 @@ fun RichText(
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
 ) {
-	val state = rememberSaveable(text) { text.asState(
+	val state = remember(text) { text.asState(
 		onLinkClick = onLinkClick,
 		onTopicClick = onTopicClick,
 		onAtClick = onAtClick
 	) }
 	val fontSize = LocalTextStyle.current.fontSize
-	val inlineTextContent = rememberSaveable(fontSize) {
+	val inlineTextContent = remember(fontSize) {
 		state.content.mapValues { drawable ->
 			InlineTextContent(
 				placeholder = Placeholder(

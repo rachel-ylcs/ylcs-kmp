@@ -1,8 +1,8 @@
 [versions]
 
 # 插件 #
-kotlin = "2.1.0"
-compose-multiplatform = "1.7.3"
+kotlin = "2.1.10"
+cmp = "1.7.3"
 agp = "8.7.3"
 
 # 库 #
@@ -11,10 +11,10 @@ agp = "8.7.3"
 coroutines = "1.10.1"
 lifecycle = "2.8.4"
 ktor = "3.0.3"
-navigation = "2.8.0-alpha11"
+navigation = "2.8.0-alpha12"
 json = "1.8.0"
 datetime = "0.6.1"
-sketch = "4.0.1"
+sketch = "4.0.2"
 sketch-zoom = "1.1.0"
 html = "0.2.1"
 
@@ -28,7 +28,7 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }

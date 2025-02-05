@@ -1,18 +1,23 @@
 package love.yinlin.api
 
+import androidx.core.uri.UriUtils
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.app
-import love.yinlin.component.RichContainer
-import love.yinlin.component.RichString
+import love.yinlin.ui.component.RichContainer
+import love.yinlin.ui.component.RichString
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.data.weibo.WeiboAlbum
+import love.yinlin.data.weibo.WeiboComment
+import love.yinlin.data.weibo.WeiboSubComment
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.arr
@@ -32,7 +37,8 @@ object WeiboAPI {
 		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
 		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
 		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
-		fun album(uid: String): String = "107803$uid"
+		fun weiboDetails(uid: String): String = "comments/hotflow?id=$uid&mid=$uid"
+		fun userAlbum(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107803$uid"
 		const val CHAOHUA: String = "10080848e33cc4065cd57c5503c2419cdea983_-_sort_time"
 	}
 
@@ -69,7 +75,6 @@ object WeiboAPI {
 		for (node in nodes) weiboHtmlNodeTransform(node, container)
 	}
 
-
 	private fun weiboHtmlToRichString(text: String): RichString {
 		val html = Ksoup.parse(text).body()
 		return RichString {
@@ -77,15 +82,23 @@ object WeiboAPI {
 		}
 	}
 
+	private fun getWeiboUserInfo(user: JsonObject): WeiboUserInfo {
+		// 提取名称和头像
+		val userId = user["id"].string
+		val userName = user["screen_name"].string
+		val avatar = user["avatar_hd"].string
+		return WeiboUserInfo(
+			id = userId,
+			name = userName,
+			avatar = avatar
+		)
+	}
+
 	private fun getWeibo(card: JsonObject): Weibo {
 		var blogs = card.obj("mblog")
 		// 提取ID
 		val blogId = blogs["id"].string
-		// 提取名称和头像
-		val user = blogs.obj("user")
-		val userId = user["id"].string
-		val userName = user["screen_name"].string
-		val avatar = user["avatar_hd"].string
+		val userInfo = getWeiboUserInfo(blogs.obj("user"))
 		// 提取时间
 		val time = Weibo.formatTime(blogs["created_at"].string)
 		// 提取IP
@@ -120,7 +133,7 @@ object WeiboAPI {
 		}
 		return Weibo(
 			id = blogId,
-			info = WeiboUserInfo(userId, userName, avatar),
+			info = userInfo,
 			time = time,
 			location = location,
 			text = weiboHtmlToRichString(text),
@@ -144,6 +157,55 @@ object WeiboAPI {
 		items
 	}
 
+	private fun getWeiboComment(card: JsonObject): WeiboComment {
+		val commentId = card["id"].string
+		// 提取名称和头像
+		val userInfo = getWeiboUserInfo(card.obj("user"))
+		// 提取时间
+		val time = Weibo.formatTime(card["created_at"].string)
+		// 提取IP
+		val location = card["source"]?.string?.removePrefix("来自") ?: "IP未知"
+		// 提取内容
+		val text = card["text"].string
+		// 带图片
+		val pic = if (card.containsKey("pic")) {
+			card.obj("pic").let { Picture(it["url"].string, it.obj("large")["url"].string) }
+		} else null
+		// 楼中楼
+		val subComments = mutableListOf<WeiboSubComment>()
+		val comments = card["comments"]
+		if (comments as? JsonArray != null) {
+			for (subCard in comments) {
+				val subCardObj = subCard.obj
+				subComments += WeiboSubComment(
+					id = subCardObj["id"].string,
+					info = getWeiboUserInfo(subCardObj.obj("user")),
+					time = Weibo.formatTime(subCardObj["created_at"].string),
+					location = subCardObj["source"]?.string?.removePrefix("来自") ?: "IP未知",
+					text = weiboHtmlToRichString(subCardObj["text"].string)
+				)
+			}
+		}
+		return WeiboComment(
+			id = commentId,
+			info = userInfo,
+			time = time,
+			location = location,
+			text = weiboHtmlToRichString(text),
+			pic = pic,
+			subComments = subComments
+		)
+	}
+
+	suspend fun getWeiboDetails(id: String): Data<List<WeiboComment>> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}"
+		val json = client.get(url).body<JsonObject>()
+		val cards = json.obj("data").arr("data")
+		val items = mutableListOf<WeiboComment>()
+		for (item in cards) items += getWeiboComment(item.obj)
+		items
+	}
+
 	suspend fun getWeiboUser(uid: String): Data<WeiboUser> = app.client.safeCall { client ->
 		val url = "https://${WEIBO_HOST}/${Container.userInfo(uid)}"
 		val json = client.get(url).body<JsonObject>()
@@ -162,5 +224,31 @@ object WeiboAPI {
 			followNum = followNum,
 			fansNum = fansNum
 		)
+	}
+
+	suspend fun getWeiboUserAlbum(uid: String): Data<List<WeiboAlbum>> = app.client.safeCall { client ->
+		val url = "https://${WEIBO_HOST}/${Container.userAlbum(uid)}"
+		val json = client.get(url).body<JsonObject>()
+		val cards = json.obj("data").arr("cards")
+		val items = mutableListOf<WeiboAlbum>()
+		for (item1 in cards) {
+			val card = item1.obj
+			if (card["itemid"].string.endsWith("albumeach")) {
+				for (item2 in card.arr("card_group")) {
+					val album = item2.obj
+					if (album["card_type"].int == 8) {
+						val containerId = UriUtils.parse(album["scheme"].string).getQueryParameters("containerid").first()
+						items += WeiboAlbum(
+							containerId = containerId,
+							title = album["title_sub"].string,
+							num = album["desc1"].string,
+							time = album["desc2"].string,
+							pic = album["pic"].string
+						)
+					}
+				}
+			}
+		}
+		items
 	}
 }

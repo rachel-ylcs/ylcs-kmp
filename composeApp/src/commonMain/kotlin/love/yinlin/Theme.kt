@@ -70,6 +70,7 @@ object Colors {
 	val Cyan6 = Color(0xff0e7490)
 	val Cyan7 = Color(0xff155e75)
 	val Cyan8 = Color(0xff164e63)
+	val Blue = Color(0xff0000ff)
 	val Blue1 = Color(0xffbfdbfe)
 	val Blue2 = Color(0xff93c5fd)
 	val Blue3 = Color(0xff60a5fa)
@@ -105,7 +106,7 @@ object Colors {
 }
 
 object ThemeColor {
-
+	val fade: Color @Composable get() = if (app.isDarkMode) Colors.Gray4 else Colors.Gray5
 }
 
 private val LightColorScheme = lightColorScheme(
@@ -156,11 +157,8 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 @Stable
-private fun DefaultFont(): FontFamily = FontFamily(Font(Res.font.xwwk))
-
-@Composable
 private fun RachelTextStyle(size: TextUnit, isBold: Boolean = false): TextStyle = TextStyle(
-	fontFamily = DefaultFont(),
+	fontFamily = FontFamily(Font(Res.font.xwwk)),
 	fontWeight = if (isBold) FontWeight.SemiBold else FontWeight.Light,
 	fontSize = size,
 	lineHeight = size * 1.5f,

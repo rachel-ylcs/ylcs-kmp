@@ -1,6 +1,6 @@
 package love.yinlin.common
 
-import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.data.weibo.WeiboUserLocal
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
@@ -53,5 +53,5 @@ class Config(kv: KV) {
 	}
 
 	// 微博用户
-	val weiboUsers: List<WeiboUserInfo> by kv.jsonValue { WeiboUserInfo.DEFAULT_WEIBO_USER_INFO }
+	val weiboUsers: List<WeiboUserLocal> by kv.jsonValue(version = "1") { WeiboUserLocal.DEFAULT }
 }

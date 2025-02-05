@@ -2,6 +2,7 @@ package love.yinlin
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,16 +40,22 @@ val ThemeMode.next: ThemeMode get() = when (this) {
 
 abstract class AppContext {
 	// 屏幕宽度
+	@Stable
 	abstract val screenWidth: Int
 	// 屏幕高度
+	@Stable
 	abstract val screenHeight: Int
 	// 字体缩放
+	@Stable
 	abstract val fontScale: Float
 	// 是否竖屏
+	@Stable
 	val isPortrait: Boolean get() = screenWidth <= screenHeight
 	// 设计宽度
+	@Stable
 	val designWidth: Dp get() = if (isPortrait) 360.dp else 1200.dp
 	// 设计高度
+	@Stable
 	val designHeight: Dp get() = 800.dp
 
 	// 主题

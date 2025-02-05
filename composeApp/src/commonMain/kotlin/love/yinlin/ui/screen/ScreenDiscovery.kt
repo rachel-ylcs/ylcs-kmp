@@ -1,10 +1,9 @@
-package love.yinlin.screen
+package love.yinlin.ui.screen
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import love.yinlin.model.AppModel
 
 @Composable
-fun ScreenDiscovery(model: AppModel) {
+fun ScreenDiscovery() {
 	Text("ScreenDiscovery")
 }

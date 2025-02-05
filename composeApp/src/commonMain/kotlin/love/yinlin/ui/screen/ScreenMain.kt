@@ -1,30 +1,48 @@
-package love.yinlin.screen
+package love.yinlin.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.launch
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import love.yinlin.AppModel
 import love.yinlin.ThemeMode
 import love.yinlin.app
-import love.yinlin.component.ClickIcon
-import love.yinlin.component.MiniImage
-import love.yinlin.component.Space
 import love.yinlin.data.item.TabItem
-import love.yinlin.model.AppModel
 import love.yinlin.next
+import love.yinlin.ui.component.ClickIcon
+import love.yinlin.ui.component.MiniImage
+import love.yinlin.ui.component.Space
+import love.yinlin.ui.screen.msg.MsgModel
+import love.yinlin.ui.screen.msg.ScreenMsg
 import org.jetbrains.compose.resources.stringResource
+
+class MainModel(val appModel: AppModel) {
+	val pagerState = object : PagerState() {
+		override val pageCount: Int = TabItem.entries.size
+	}
+
+	val msgModel = MsgModel(this)
+
+	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
+	fun pop() = appModel.pop()
+	fun launch(block: suspend CoroutineScope.() -> Unit): Job = appModel.launch(block)
+
+	fun onNavigate(index: Int) {
+		launch { pagerState.scrollToPage(index) }
+	}
+}
 
 @Composable
 private fun NavigationItemText(
@@ -42,28 +60,31 @@ private fun NavigationItemText(
 
 @Composable
 private fun PageContent(
-	model: AppModel,
-	pagerState: PagerState,
+	model: MainModel,
 	modifier: Modifier = Modifier
 ) {
 	HorizontalPager (
-		state = pagerState,
+		state = model.pagerState,
 		modifier = modifier
 	) {
 		Box(modifier = Modifier.fillMaxSize()) {
 			when (it) {
-				TabItem.WORLD.ordinal -> ScreenWorld(model)
-				TabItem.MSG.ordinal -> ScreenMsg(model)
-				TabItem.MUSIC.ordinal -> ScreenMusic(model)
-				TabItem.DISCOVERY.ordinal -> ScreenDiscovery(model)
-				TabItem.ME.ordinal -> ScreenMe(model)
+				TabItem.WORLD.ordinal -> ScreenWorld()
+				TabItem.MSG.ordinal -> ScreenMsg(model.msgModel)
+				TabItem.MUSIC.ordinal -> ScreenMusic()
+				TabItem.DISCOVERY.ordinal -> ScreenDiscovery()
+				TabItem.ME.ordinal -> ScreenMe()
 			}
 		}
 	}
 }
 
 @Composable
-private fun PortraitNavigation(currentPage: Int, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun PortraitNavigation(
+	currentPage: Int,
+	onNavigate: (Int) -> Unit,
+	modifier: Modifier = Modifier
+) {
 	Surface(
 		modifier = modifier.zIndex(5f),
 		shadowElevation = 5.dp
@@ -83,7 +104,11 @@ private fun PortraitNavigation(currentPage: Int, onNavigate: (Int) -> Unit, modi
 }
 
 @Composable
-private fun LandscapeNavigation(currentPage: Int, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun LandscapeNavigation(
+	currentPage: Int,
+	onNavigate: (Int) -> Unit,
+	modifier: Modifier = Modifier
+) {
 	Surface(
 		modifier = modifier.zIndex(5f),
 		shadowElevation = 5.dp
@@ -119,37 +144,41 @@ private fun LandscapeNavigation(currentPage: Int, onNavigate: (Int) -> Unit, mod
 }
 
 @Composable
-private fun Portrait(model: AppModel, pagerState: PagerState, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun Portrait(
+	model: MainModel,
+	modifier: Modifier = Modifier
+) {
 	Scaffold(
 		modifier = modifier,
 		bottomBar = {
 			PortraitNavigation(
 				modifier = Modifier.fillMaxWidth(),
-				currentPage = pagerState.currentPage,
-				onNavigate = onNavigate
+				currentPage = model.pagerState.currentPage,
+				onNavigate = { model.onNavigate(it) }
 			)
 		}
 	) {
 		PageContent(
 			model = model,
-			pagerState = pagerState,
 			modifier = Modifier.fillMaxSize().padding(it)
 		)
 	}
 }
 
 @Composable
-private fun Landscape(model: AppModel, pagerState: PagerState, onNavigate: (Int) -> Unit, modifier: Modifier = Modifier) {
+private fun Landscape(
+	model: MainModel,
+	modifier: Modifier = Modifier
+) {
 	Row(modifier = modifier) {
 		LandscapeNavigation(
 			modifier = Modifier.fillMaxHeight(),
-			currentPage = pagerState.currentPage,
-			onNavigate = onNavigate
+			currentPage = model.pagerState.currentPage,
+			onNavigate = { model.onNavigate(it) }
 		)
 		Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
 			PageContent(
 				model = model,
-				pagerState = pagerState,
 				modifier = Modifier.fillMaxSize().padding(it)
 			)
 		}
@@ -158,14 +187,12 @@ private fun Landscape(model: AppModel, pagerState: PagerState, onNavigate: (Int)
 
 @Composable
 fun ScreenMain(model: AppModel) {
-	val coroutineScope = rememberCoroutineScope()
-	val pagerState = rememberPagerState(0) { TabItem.entries.size }
-	val onNavigate = { index: Int ->
-		coroutineScope.launch {
-			pagerState.scrollToPage(index)
-		}
-		Unit
-	}
-	if (app.isPortrait) Portrait(model, pagerState, onNavigate, Modifier.fillMaxSize())
-	else Landscape(model, pagerState, onNavigate, Modifier.fillMaxSize())
+	if (app.isPortrait) Portrait(
+		model = model.mainModel,
+		modifier = Modifier.fillMaxSize()
+	)
+	else Landscape(
+		model = model.mainModel,
+		modifier = Modifier.fillMaxSize()
+	)
 }
