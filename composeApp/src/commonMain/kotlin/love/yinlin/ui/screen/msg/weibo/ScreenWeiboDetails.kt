@@ -13,11 +13,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
-import love.yinlin.ui.component.EmptyBox
-import love.yinlin.ui.component.LoadingBox
-import love.yinlin.ui.component.NineGrid
-import love.yinlin.ui.component.RichText
-import love.yinlin.ui.component.SubScreen
+import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.ui.component.layout.NineGrid
+import love.yinlin.ui.component.text.RichText
+import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
@@ -25,6 +25,7 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.AppModel
+import love.yinlin.launch
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.common.WeiboLayout
 import love.yinlin.ui.common.WeiboDataBar
@@ -35,6 +36,15 @@ class WeiboDetailsModel(model: AppModel) : ViewModel() {
 	val weibo: Weibo? = msgModel.currentWeibo
 	val launchFlag = LaunchFlag()
 	var comments: List<WeiboComment>? by mutableStateOf(null)
+
+	fun init(weibo: Weibo) {
+		launch {
+			comments = Coroutines.io {
+				val data = WeiboAPI.getWeiboDetails(weibo.id)
+				if (data is Data.Success) data.data else emptyList()
+			}
+		}
+	}
 }
 
 @Composable
@@ -194,7 +204,7 @@ fun ScreenWeiboDetails(model: AppModel) {
 		modifier = Modifier.fillMaxSize(),
 		title = "微博详情",
 		onBack = { model.pop() }
-	) {
+	) { isBacking ->
 		if (screenModel.weibo == null) EmptyBox()
 		else {
 			if (app.isPortrait) Portrait(
@@ -209,10 +219,7 @@ fun ScreenWeiboDetails(model: AppModel) {
 			)
 
 			LaunchOnce(screenModel.launchFlag) {
-				screenModel.comments = Coroutines.io {
-					val data = WeiboAPI.getWeiboDetails(screenModel.weibo.id)
-					if (data is Data.Success) data.data else emptyList()
-				}
+				screenModel.init(screenModel.weibo)
 			}
 		}
 	}

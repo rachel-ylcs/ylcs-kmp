@@ -53,5 +53,5 @@ class Config(kv: KV) {
 	}
 
 	// 微博用户
-	val weiboUsers: List<WeiboUserLocal> by kv.jsonValue(version = "1") { WeiboUserLocal.DEFAULT }
+	var weiboUsers: List<WeiboUserLocal> by kv.jsonValue(version = "1") { WeiboUserLocal.DEFAULT }
 }

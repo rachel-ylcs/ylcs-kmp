@@ -108,6 +108,16 @@ kotlin {
             implementation(compose.preview)
             implementation(compose.desktop.currentOs)
             implementation(libs.ktor.okhttp)
+
+            "win".let {
+                implementation(libs.javafx.base.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.graphics.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.controls.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.fxml.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.media.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.swing.get()) { artifact { classifier = it } }
+                implementation(libs.javafx.web.get()) { artifact { classifier = it } }
+            }
         }
     }
 }
@@ -214,9 +224,12 @@ compose.desktop {
             modules(
                 "java.instrument",
                 "java.management",
-                "jdk.unsupported",
-                "jdk.unsupported",
                 "java.net.http",
+                "jdk.jfr",
+                "jdk.jsobject",
+                "jdk.unsupported",
+                "jdk.unsupported.desktop",
+                "jdk.xml.dom"
             )
 
             windows {

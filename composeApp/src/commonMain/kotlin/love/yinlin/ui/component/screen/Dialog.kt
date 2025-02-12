@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -19,8 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import love.yinlin.Colors
 import love.yinlin.app
 import love.yinlin.extension.condition
+import love.yinlin.ui.component.text.InputType
+import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.rememberTextInputState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.*
@@ -55,6 +61,75 @@ sealed interface DialogInfo {
 
 open class DialogState {
 	var isOpen: Boolean by mutableStateOf(false)
+}
+
+open class TipState {
+	enum class Type {
+		INFO, SUCCESS, WARNING, ERROR,
+	}
+
+	val host = SnackbarHostState()
+	var type by mutableStateOf(Type.INFO)
+		private set
+
+	suspend fun show(text: String, type: Type = Type.INFO) {
+		host.currentSnackbarData?.dismiss()
+		this.type = type
+		host.showSnackbar(
+			message = text,
+			duration = SnackbarDuration.Short
+		)
+	}
+
+	suspend fun info(text: String) = show(text, Type.INFO)
+	suspend fun success(text: String) = show(text, Type.SUCCESS)
+	suspend fun warning(text: String) = show(text, Type.WARNING)
+	suspend fun error(text: String) = show(text, Type.ERROR)
+}
+
+@Composable
+fun Tip(state: TipState) {
+	SnackbarHost(
+		hostState = state.host,
+		modifier = Modifier.fillMaxSize().zIndex(Float.MAX_VALUE)
+	) {
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.BottomCenter
+		) {
+			Row(
+				modifier = Modifier.padding(bottom = 100.dp)
+					.size(width = 300.dp, height = 150.dp)
+					.offset(x = (-10).dp)
+			) {
+				Image(
+					painter = painterResource(Res.drawable.img_toast_rachel),
+					contentDescription = null,
+					modifier = Modifier.width(75.dp).fillMaxHeight()
+						.offset(x = 20.dp).zIndex(2f)
+				)
+				Surface(
+					shape = MaterialTheme.shapes.extraLarge,
+					shadowElevation = 5.dp,
+					color = when (state.type) {
+						TipState.Type.INFO -> MaterialTheme.colorScheme.surface
+						TipState.Type.SUCCESS -> Colors.Green4
+						TipState.Type.WARNING -> Colors.Yellow4
+						TipState.Type.ERROR -> Colors.Red4
+					},
+					modifier = Modifier.weight(1f).fillMaxHeight()
+						.padding(top = 40.dp, bottom = 20.dp).zIndex(1f)
+				) {
+					Text(
+						text = it.visuals.message,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.fillMaxSize()
+							.padding(top = 5.dp, bottom = 5.dp, start = 25.dp, end = 5.dp)
+					)
+				}
+			}
+		}
+	}
 }
 
 @Composable
@@ -109,7 +184,7 @@ private fun RachelDialog(
 					Box(
 						modifier = Modifier.fillMaxWidth()
 							.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
-							.condition(scrollable, { verticalScroll(rememberScrollState()) })
+							.condition(scrollable) { verticalScroll(rememberScrollState()) }
 					) {
 						content()
 					}
@@ -193,6 +268,10 @@ fun DialogConfirm(
 fun DialogInput(
 	state: DialogState,
 	hint: String,
+	inputType: InputType = InputType.COMMON,
+	maxLength: Int = 0,
+	maxLines: Int = 1,
+	clearButton: Boolean = true,
 	onInput: (String) -> Unit
 ) {
 	val textInputState = rememberTextInputState()
@@ -218,6 +297,10 @@ fun DialogInput(
 		TextInput(
 			state = textInputState,
 			hint = hint,
+			inputType = inputType,
+			maxLength = maxLength,
+			maxLines = maxLines,
+			clearButton = clearButton,
 			modifier = Modifier.fillMaxWidth()
 		)
 	}

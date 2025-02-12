@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.text
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.InlineTextContent
@@ -24,6 +24,8 @@ import love.yinlin.extension.arr
 import love.yinlin.extension.boolean
 import love.yinlin.extension.int
 import love.yinlin.extension.string
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.WebImageQuality
 
 // RichString DSL
 
@@ -374,7 +376,7 @@ fun RichText(
 		onAtClick = onAtClick
 	) }
 	val fontSize = LocalTextStyle.current.fontSize
-	val inlineTextContent = remember(fontSize) {
+	val inlineTextContent = remember (state, fontSize) {
 		state.content.mapValues { drawable ->
 			InlineTextContent(
 				placeholder = Placeholder(

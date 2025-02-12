@@ -24,6 +24,8 @@ import love.yinlin.ui.Route
 import love.yinlin.ui.Route.Companion.buildRoute
 import love.yinlin.ui.screen.MainModel
 
+fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
+
 class AppModel(
 	private val navController: NavController
 ) : ViewModel() {
@@ -31,7 +33,6 @@ class AppModel(
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
 	fun pop() = navController.popBackStack()
-	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 }
 
 @Composable

@@ -42,8 +42,6 @@ fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
 	}
 }
 
-
-
 inline fun <R> HttpClient.safeCall(block: (HttpClient) -> R): Data<R> = try {
 	Data.Success(block(this))
 }

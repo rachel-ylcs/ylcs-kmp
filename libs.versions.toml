@@ -1,15 +1,15 @@
 [versions]
 
-# 插件 #
+# Plugins #
 kotlin = "2.1.10"
 cmp = "1.7.3"
 agp = "8.7.3"
 
-# 库 #
+# Libs #
 
 # Common
 coroutines = "1.10.1"
-lifecycle = "2.8.4"
+lifecycle = "2.9.0-alpha02"
 ktor = "3.0.3"
 navigation = "2.8.0-alpha12"
 json = "1.8.0"
@@ -17,10 +17,13 @@ datetime = "0.6.1"
 sketch = "4.0.2"
 sketch-zoom = "1.1.0"
 html = "0.2.1"
+mmkv = "2.0.2"
 
 # Android
-activity-compose = "1.9.3"
+activity-compose = "1.10.0"
 
+# Desktop
+javafx = "17.0.9" #noinspection GradleDependency
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
@@ -51,18 +54,26 @@ sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.r
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version.ref = "sketch-zoom" }
 html = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "html" }
+
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
-mmkv-android = { module = "com.tencent:mmkv", version = "2.0.2" }
+mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 
 # Apple
 ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 # Desktop
+javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
+javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
+javafx-controls = { module = "org.openjfx:javafx-controls", version.ref = "javafx" }
+javafx-fxml = { module = "org.openjfx:javafx-fxml", version.ref = "javafx" }
+javafx-media = { module = "org.openjfx:javafx-media", version.ref = "javafx" }
+javafx-swing = { module = "org.openjfx:javafx-swing", version.ref = "javafx" }
+javafx-web = { module = "org.openjfx:javafx-web", version.ref = "javafx" }
 
 # Web
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }

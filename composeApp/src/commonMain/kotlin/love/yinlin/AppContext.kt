@@ -38,6 +38,7 @@ val ThemeMode.next: ThemeMode get() = when (this) {
 	ThemeMode.DARK -> ThemeMode.SYSTEM
 }
 
+@Stable
 abstract class AppContext {
 	// 屏幕宽度
 	@Stable
@@ -80,5 +81,7 @@ abstract class AppContext {
 	}
 }
 
+@Stable
 var appContext: AppContext? = null
+@Stable
 val app: AppContext get() = appContext!!

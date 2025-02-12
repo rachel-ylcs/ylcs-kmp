@@ -1,5 +1,8 @@
 package love.yinlin.data.weibo
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class WeiboAlbum(
 	val containerId: String, // ID
 	val title: String, // 标题

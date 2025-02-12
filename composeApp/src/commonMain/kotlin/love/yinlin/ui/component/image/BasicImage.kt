@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.image
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,7 +87,6 @@ fun ClickIcon(
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
-	val interactionSource = remember { MutableInteractionSource() }
 	Icon(
 		modifier = modifier.condition(value = indication,
 			ifTrue = { clickable(onClick = onClick) },
@@ -122,7 +122,10 @@ enum class WebImageQuality {
 }
 
 @Composable
-private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember (key) {
+private fun rememberWebImageKeyUrl(
+	uri: String,
+	key: Any? = null
+): String = rememberSaveable(key) {
 	if (key == null) uri
 	else if (uri.contains("?")) "$uri&_cacheKey=$key"
 	else "$uri?_cacheKey=$key"
@@ -164,7 +167,7 @@ fun WebImage(
 			WebImageQuality.High -> FilterQuality.High
 		},
 		alpha = alpha,
-		modifier = modifier.condition(circle, { clip(CircleShape) })
-			.condition(onClick != null, { clickable(onClick = onClick ?: {}) })
+		modifier = modifier.condition(circle) { clip(CircleShape) }
+			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
 	)
 }

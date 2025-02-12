@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.ThemeColor
 import love.yinlin.api.WeiboAPI
@@ -30,21 +30,24 @@ import love.yinlin.app
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
+import love.yinlin.data.weibo.WeiboUserLocal
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
+import love.yinlin.launch
 import love.yinlin.platform.Coroutines
+import love.yinlin.ui.Route
 import love.yinlin.ui.common.WeiboCard
 import love.yinlin.ui.common.WeiboGrid
-import love.yinlin.ui.component.ClickIcon
-import love.yinlin.ui.component.EmptyBox
-import love.yinlin.ui.component.SimpleEmptyBox
-import love.yinlin.ui.component.SimpleLoadingBox
-import love.yinlin.ui.component.Space
-import love.yinlin.ui.component.SubScreen
-import love.yinlin.ui.component.WebImage
 import love.yinlin.ui.common.WeiboGridData
-import love.yinlin.ui.component.StatefulBox
+import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.ui.component.layout.SimpleEmptyBox
+import love.yinlin.ui.component.layout.SimpleLoadingBox
+import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.screen.SubScreen
 
 class WeiboUserModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
@@ -53,19 +56,44 @@ class WeiboUserModel(model: AppModel) : ViewModel() {
 	var user: WeiboUser? by mutableStateOf(null)
 	var albums: List<WeiboAlbum>? by mutableStateOf(null)
 
-	fun onFollowClick(user: WeiboUser) {
+	fun init(id: String) {
+		launch {
+			user = Coroutines.io {
+				val data = WeiboAPI.getWeiboUser(id)
+				if (data is Data.Success) data.data else null
+			}
+			user?.let {
+				grid.requestWeibo(listOf(it.info.id))
+			}
+		}
+		launch {
+			albums = Coroutines.io {
+				val data = WeiboAPI.getWeiboUserAlbum(id)
+				if (data is Data.Success) data.data else null
+			}
+		}
+	}
 
+	fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
+		if (isFollow) {
+			if (msgModel.isFollowed(user.info)) return
+			else msgModel.followUsers += user.info
+		}
+		else msgModel.followUsers -= user.info
+		// 持久化
+		app.config.weiboUsers = msgModel.followUsers.map { WeiboUserLocal(it.id, it.name) }
 	}
 
 	fun onAlbumClick(album: WeiboAlbum) {
-
+		msgModel.mainModel.navigate(Route.WeiboAlbum(album))
 	}
 }
 
 @Composable
 private fun UserInfoCard(
 	user: WeiboUser,
-	onFollowClick: () -> Unit,
+	isFollowed: Boolean,
+	onFollowClick: (Boolean) -> Unit,
 	modifier: Modifier = Modifier
 ) {
 	Row(
@@ -93,10 +121,10 @@ private fun UserInfoCard(
 					modifier = Modifier.weight(1f)
 				)
 				ClickIcon(
-					imageVector = Icons.Filled.Favorite,
+					imageVector = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
 					color = MaterialTheme.colorScheme.primary,
 					size = 24.dp,
-					onClick = onFollowClick
+					onClick = { onFollowClick(!isFollowed) }
 				)
 			}
 			Row(
@@ -165,7 +193,7 @@ private fun Portrait(
 	user: WeiboUser,
 	albums: List<WeiboAlbum>?,
 	grid: WeiboGridData,
-	onFollowClick: () -> Unit,
+	onFollowClick: (Boolean) -> Unit,
 	onAlbumClick: (WeiboAlbum) -> Unit
 ) {
 	LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -179,10 +207,11 @@ private fun Portrait(
 			)
 			UserInfoCard(
 				user = user,
+				isFollowed = model.msgModel.followUsers.contains(user.info),
 				onFollowClick = onFollowClick,
 				modifier = Modifier.fillMaxWidth()
 			)
-			HorizontalDivider(modifier = Modifier.padding(start = 5.dp, end = 5.dp, bottom = 5.dp))
+			HorizontalDivider(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp))
 		}
 		if (albums != null) {
 			items(
@@ -192,9 +221,19 @@ private fun Portrait(
 				UserAlbumItem(
 					album = it,
 					onAlbumClick = { onAlbumClick(it) },
-					modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+					modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
 				)
 			}
+		}
+		item(key = -2) {
+			Text(
+				text = "最新微博",
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.titleMedium,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+			)
 		}
 		items(
 			items = grid.items,
@@ -202,7 +241,7 @@ private fun Portrait(
 		) { weibo ->
 			WeiboCard(
 				weibo = weibo,
-				modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
 				onClick = { model.msgModel.onWeiboClick(weibo) },
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
 				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
@@ -219,7 +258,7 @@ private fun Landscape(
 	user: WeiboUser,
 	albums: List<WeiboAlbum>?,
 	grid: WeiboGridData,
-	onFollowClick: () -> Unit,
+	onFollowClick: (Boolean) -> Unit,
 	onAlbumClick: (WeiboAlbum) -> Unit
 ) {
 	Row(modifier = Modifier.fillMaxSize()) {
@@ -237,18 +276,19 @@ private fun Landscape(
 				)
 				UserInfoCard(
 					user = user,
+					isFollowed = model.msgModel.isFollowed(user.info),
 					onFollowClick = onFollowClick,
 					modifier = Modifier.fillMaxWidth()
 				)
 				HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
-				Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 5.dp)) {
+				Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 10.dp)) {
 					if (albums == null) SimpleLoadingBox()
 					else {
 						if (albums.isEmpty()) SimpleEmptyBox()
 						else LazyColumn(
 							modifier = Modifier.fillMaxWidth(),
-							contentPadding = PaddingValues(horizontal = 5.dp),
-							verticalArrangement = Arrangement.spacedBy(5.dp)
+							contentPadding = PaddingValues(horizontal = 10.dp),
+							verticalArrangement = Arrangement.spacedBy(10.dp)
 						) {
 							items(
 								items = albums,
@@ -292,15 +332,15 @@ fun ScreenWeiboUser(model: AppModel, id: String) {
 		modifier = Modifier.fillMaxSize(),
 		title = screenModel.user?.info?.name ?: "",
 		onBack = { model.pop() }
-	) {
-		if (screenModel.user == null) EmptyBox()
+	) { isBacking ->
+		if (screenModel.user == null) LoadingBox()
 		else screenModel.user?.let { user ->
 			if (app.isPortrait) Portrait(
 				model = screenModel,
 				user = user,
 				albums = screenModel.albums,
 				grid = screenModel.grid,
-				onFollowClick = { screenModel.onFollowClick(user) },
+				onFollowClick = { screenModel.onFollowClick(user, it) },
 				onAlbumClick = { screenModel.onAlbumClick(it) }
 			)
 			else Landscape(
@@ -308,27 +348,13 @@ fun ScreenWeiboUser(model: AppModel, id: String) {
 				user = user,
 				albums = screenModel.albums,
 				grid = screenModel.grid,
-				onFollowClick = { screenModel.onFollowClick(user) },
+				onFollowClick = { screenModel.onFollowClick(user, it) },
 				onAlbumClick = { screenModel.onAlbumClick(it) }
 			)
 		}
+	}
 
-		LaunchOnce(screenModel.launchFlag) {
-			launch {
-				screenModel.user = Coroutines.io {
-					val data = WeiboAPI.getWeiboUser(id)
-					if (data is Data.Success) data.data else null
-				}
-				screenModel.user?.let {
-					screenModel.grid.requestWeibo(listOf(it.info.id))
-				}
-			}
-			launch {
-				screenModel.albums = Coroutines.io {
-					val data = WeiboAPI.getWeiboUserAlbum(id)
-					if (data is Data.Success) data.data else null
-				}
-			}
-		}
+	LaunchOnce(screenModel.launchFlag) {
+		screenModel.init(id)
 	}
 }

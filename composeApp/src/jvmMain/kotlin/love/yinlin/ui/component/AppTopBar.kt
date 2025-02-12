@@ -1,4 +1,4 @@
-package love.yinlin.component
+package love.yinlin.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import love.yinlin.ui.component.ClickIcon
-import love.yinlin.ui.component.MiniImage
+import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniImage
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.app_name

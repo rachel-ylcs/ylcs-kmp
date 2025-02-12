@@ -8,7 +8,7 @@ import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import love.yinlin.data.common.Picture
-import love.yinlin.ui.component.RichString
+import love.yinlin.ui.component.text.RichString
 
 @Stable
 data class Weibo(

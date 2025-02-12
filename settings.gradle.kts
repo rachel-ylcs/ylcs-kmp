@@ -17,6 +17,12 @@ dependencyResolutionManagement {
         maven("https://maven.aliyun.com/repository/google")
         maven("https://jitpack.io")
     }
+
+    versionCatalogs {
+        create("libs") {
+            from(files("libs.versions.toml"))
+        }
+    }
 }
 
 rootProject.name = "ylcs-kmp"

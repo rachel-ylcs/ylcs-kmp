@@ -4,6 +4,7 @@
 .idea/
 .fleet/
 .gradle/
+gradle/
 kotlin-js-store/
 
 *.xcodeproj/*

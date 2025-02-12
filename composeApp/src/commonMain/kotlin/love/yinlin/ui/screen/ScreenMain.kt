@@ -20,10 +20,11 @@ import love.yinlin.AppModel
 import love.yinlin.ThemeMode
 import love.yinlin.app
 import love.yinlin.data.item.TabItem
+import love.yinlin.launch
 import love.yinlin.next
-import love.yinlin.ui.component.ClickIcon
-import love.yinlin.ui.component.MiniImage
-import love.yinlin.ui.component.Space
+import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.screen.msg.MsgModel
 import love.yinlin.ui.screen.msg.ScreenMsg
 import org.jetbrains.compose.resources.stringResource
@@ -37,7 +38,7 @@ class MainModel(val appModel: AppModel) {
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
 	fun pop() = appModel.pop()
-	fun launch(block: suspend CoroutineScope.() -> Unit): Job = appModel.launch(block)
+	fun launch(block: suspend CoroutineScope.() -> Unit): Job = appModel.launch(block = block)
 
 	fun onNavigate(index: Int) {
 		launch { pagerState.scrollToPage(index) }

@@ -10,8 +10,8 @@ import io.ktor.client.request.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.app
-import love.yinlin.ui.component.RichContainer
-import love.yinlin.ui.component.RichString
+import love.yinlin.ui.component.text.RichContainer
+import love.yinlin.ui.component.text.RichString
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
@@ -30,15 +30,16 @@ expect val WEIBO_HOST: String
 
 object WeiboAPI {
 	object Container {
-//		fun searchUser(name: String): String {
-//			val encodeName = try { URLEncoder.encode(name, "UTF-8") } catch (_: Exception) { name }
-//			return "100103type%3D3%26q%3D$encodeName"
-//		}
+		fun searchUser(key: String): String {
+			val encodeName = try { UriUtils.encode(key) } catch (_: Exception) { key }
+			return "api/container/getIndex?containerid=100103type%3D3%26q%3D$encodeName&page_type=searchall"
+		}
 		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
 		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
 		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
 		fun weiboDetails(uid: String): String = "comments/hotflow?id=$uid&mid=$uid"
 		fun userAlbum(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107803$uid"
+		fun albumPics(containerId: String, page: Int, limit: Int): String = "api/container/getSecond?containerid=$containerId&count=$limit&page=$page"
 		const val CHAOHUA: String = "10080848e33cc4065cd57c5503c2419cdea983_-_sort_time"
 	}
 
@@ -144,19 +145,6 @@ object WeiboAPI {
 		)
 	}
 
-	suspend fun getUserWeibo(uid: String): Data<List<Weibo>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.userDetails(uid)}"
-		val json = client.get(url).body<JsonObject>()
-		val cards = json.obj("data").arr("cards")
-		val items = mutableListOf<Weibo>()
-		for (item in cards) {
-			val card = item.obj
-			if (card["card_type"].int != 9) continue  // 非微博类型
-			items += getWeibo(card)
-		}
-		items
-	}
-
 	private fun getWeiboComment(card: JsonObject): WeiboComment {
 		val commentId = card["id"].string
 		// 提取名称和头像
@@ -197,7 +185,24 @@ object WeiboAPI {
 		)
 	}
 
-	suspend fun getWeiboDetails(id: String): Data<List<WeiboComment>> = app.client.safeCall { client ->
+	suspend fun getUserWeibo(
+		uid: String
+	): Data<List<Weibo>> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.userDetails(uid)}"
+		val json = client.get(url).body<JsonObject>()
+		val cards = json.obj("data").arr("cards")
+		val items = mutableListOf<Weibo>()
+		for (item in cards) {
+			val card = item.obj
+			if (card["card_type"].int != 9) continue  // 非微博类型
+			items += getWeibo(card)
+		}
+		items
+	}
+
+	suspend fun getWeiboDetails(
+		id: String
+	): Data<List<WeiboComment>> = app.client.safeCall { client ->
 		val url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}"
 		val json = client.get(url).body<JsonObject>()
 		val cards = json.obj("data").arr("data")
@@ -206,8 +211,10 @@ object WeiboAPI {
 		items
 	}
 
-	suspend fun getWeiboUser(uid: String): Data<WeiboUser> = app.client.safeCall { client ->
-		val url = "https://${WEIBO_HOST}/${Container.userInfo(uid)}"
+	suspend fun getWeiboUser(
+		uid: String
+	): Data<WeiboUser> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.userInfo(uid)}"
 		val json = client.get(url).body<JsonObject>()
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].string
@@ -226,8 +233,10 @@ object WeiboAPI {
 		)
 	}
 
-	suspend fun getWeiboUserAlbum(uid: String): Data<List<WeiboAlbum>> = app.client.safeCall { client ->
-		val url = "https://${WEIBO_HOST}/${Container.userAlbum(uid)}"
+	suspend fun getWeiboUserAlbum(
+		uid: String
+	): Data<List<WeiboAlbum>> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.userAlbum(uid)}"
 		val json = client.get(url).body<JsonObject>()
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboAlbum>()
@@ -244,6 +253,52 @@ object WeiboAPI {
 							num = album["desc1"].string,
 							time = album["desc2"].string,
 							pic = album["pic"].string
+						)
+					}
+				}
+			}
+		}
+		items
+	}
+
+	suspend fun getWeiboAlbumPics(
+		containerId: String,
+		page: Int,
+		limit: Int
+	): Data<Pair<List<Picture>, Int>> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}"
+		val json = client.get(url).body<JsonObject>()
+		val data = json.obj("data")
+		val cards = data.arr("cards")
+		val pics = mutableListOf<Picture>()
+		for (item1 in cards) {
+			val card = item1.obj
+			for (item2 in card.arr("pics")) {
+				val pic = item2.obj
+				pics += Picture(pic["pic_middle"].string, pic["pic_ori"].string)
+			}
+		}
+		pics.take(limit) to data["count"].int
+	}
+
+	suspend fun searchWeiboUser(
+		key: String
+	): Data<List<WeiboUserInfo>> = app.client.safeCall { client ->
+		val url = "https://$WEIBO_HOST/${Container.searchUser(key)}"
+		val json = client.get(url).body<JsonObject>()
+		val cards = json.obj("data").arr("cards")
+		val items = mutableListOf<WeiboUserInfo>()
+		for (item1 in cards) {
+			val group = item1.obj
+			if (group["card_type"].int == 11) {
+				for (item2 in group.arr("card_group")) {
+					val card = item2.obj
+					if (card["card_type"].int == 10) {
+						val user = card["user"].obj
+						items += WeiboUserInfo(
+							id = user["id"].string,
+							name = user["screen_name"].string,
+							avatar = user["avatar_hd"].string
 						)
 					}
 				}

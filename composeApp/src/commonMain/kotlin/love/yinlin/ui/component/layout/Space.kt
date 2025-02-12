@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.layout
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope

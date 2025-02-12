@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.text
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -7,12 +7,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import love.yinlin.extension.Saver
+import love.yinlin.ui.component.image.ClickIcon
 
 enum class InputType {
 	COMMON,
@@ -32,22 +33,10 @@ private fun InputType.toKeyboardOptions() = when (this) {
 class TextInputState {
 	var text: String by mutableStateOf("")
 	var overflow: Boolean by mutableStateOf(false)
-
-	companion object {
-		val saver = listSaver(
-			save = { listOf(it.text, it.overflow) },
-			restore = {
-				TextInputState().apply {
-					text = it[0] as String
-					overflow = it[1] as Boolean
-				}
-			}
-		)
-	}
 }
 
 @Composable
-fun rememberTextInputState() = rememberSaveable(saver = TextInputState.saver) { TextInputState() }
+fun rememberTextInputState() = rememberSaveable(saver = Saver.TextInputState) { TextInputState() }
 
 @Composable
 fun TextInput(

@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.layout
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.Colors
 import love.yinlin.data.common.Picture
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.WebImage
 
 @Composable
 fun NineGrid(

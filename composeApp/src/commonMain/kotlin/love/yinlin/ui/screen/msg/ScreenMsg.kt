@@ -20,8 +20,8 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.ui.Route
 import love.yinlin.ui.common.WeiboGridData
-import love.yinlin.ui.component.ClickIcon
-import love.yinlin.ui.component.Segment
+import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.layout.Segment
 import love.yinlin.ui.screen.MainModel
 import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
 import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
@@ -44,7 +44,12 @@ class MsgModel(val mainModel: MainModel) {
 	// 关注用户
 	val followUsers = app.config.weiboUsers.map {
 		WeiboUserInfo(it.id, it.name, "")
+	}.distinctBy {
+		it.id
 	}.toMutableStateList()
+
+	fun isFollowed(info: WeiboUserInfo) = followUsers.find { it.id == info.id } != null
+
 	// 微博数据
 	val weiboState = WeiboState()
 	// 超话数据
@@ -126,7 +131,7 @@ fun ScreenMsg(model: MsgModel) {
 			Box(modifier = Modifier.fillMaxSize()) {
 				when (it) {
 					MsgTabItem.WEIBO.ordinal -> ScreenWeibo(model)
-					MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua()
+					MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(model)
 					MsgTabItem.PICTURES.ordinal -> ScreenPictures()
 				}
 			}

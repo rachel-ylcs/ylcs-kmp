@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.layout
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import love.yinlin.ui.component.image.MiniIcon
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.*
@@ -168,8 +169,10 @@ fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
 					color = MaterialTheme.colorScheme.error
 				)
 			}
-			Button(onClick = { retry?.invoke() }) {
-				Text(text = stringResource(Res.string.network_error_retry_string))
+			if (retry != null) {
+				Button(onClick = { retry() }) {
+					Text(text = stringResource(Res.string.network_error_retry_string))
+				}
 			}
 		}
 	}

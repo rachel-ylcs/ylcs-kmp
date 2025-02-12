@@ -1,7 +1,7 @@
 package love.yinlin.data.weibo
 
 import androidx.compose.runtime.Stable
-import love.yinlin.ui.component.RichString
+import love.yinlin.ui.component.text.RichString
 import love.yinlin.data.common.Picture
 
 @Stable

@@ -28,7 +28,7 @@ inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire
 	try {
 		set(key, Json.encodeToString(value), expire)
 	}
-	catch (_: Exception) {}
+	catch (_: Exception) { }
 }
 
 inline fun <reified T> KV.getJson(key: String, default: T): T {
