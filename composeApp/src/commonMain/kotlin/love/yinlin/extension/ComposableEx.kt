@@ -2,6 +2,7 @@ package love.yinlin.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,14 @@ inline fun <T> rememberState(vararg keys: Any?, crossinline init: () -> T) =
 inline fun <T> rememberStateSaveable(vararg keys: Any?, saver: Saver<T, out Any>? = null, crossinline init: () -> T) =
 	if (saver == null) rememberSaveable(*keys, saver = autoSaver()) { mutableStateOf(init()) }
 	else rememberSaveable(*keys, stateSaver = saver) { mutableStateOf(init()) }
+
+
+// Reference
+
+@Stable
+class Reference<T> {
+	var value: T? = null
+}
 
 
 // LaunchFlag

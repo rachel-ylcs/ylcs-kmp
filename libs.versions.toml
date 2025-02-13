@@ -2,16 +2,16 @@
 
 # Plugins #
 kotlin = "2.1.10"
-cmp = "1.7.3"
+cmp = "1.8.0-alpha03"
 agp = "8.7.3"
 
 # Libs #
 
 # Common
 coroutines = "1.10.1"
-lifecycle = "2.9.0-alpha02"
-ktor = "3.0.3"
-navigation = "2.8.0-alpha12"
+lifecycle = "2.9.0-alpha03"
+ktor = "3.1.0"
+navigation = "2.8.0-alpha13"
 json = "1.8.0"
 datetime = "0.6.1"
 sketch = "4.0.2"
