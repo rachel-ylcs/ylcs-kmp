@@ -70,7 +70,7 @@ private fun PageContent(
 	) {
 		Box(modifier = Modifier.fillMaxSize()) {
 			when (it) {
-				TabItem.WORLD.ordinal -> ScreenWorld()
+				TabItem.WORLD.ordinal -> ScreenWorld(model)
 				TabItem.MSG.ordinal -> ScreenMsg(model.msgModel)
 				TabItem.MUSIC.ordinal -> ScreenMusic()
 				TabItem.DISCOVERY.ordinal -> ScreenDiscovery()

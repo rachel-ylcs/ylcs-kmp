@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ensureActive
 import love.yinlin.api.WeiboAPI
 import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.layout.NineGrid
+import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.data.weibo.Weibo
@@ -32,6 +32,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
+import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.screen.msg.MsgModel
@@ -165,7 +166,9 @@ fun WeiboLayout(
 	onAvatarClick: (WeiboUserInfo) -> Unit,
 	onLinkClick: (String) -> Unit,
 	onTopicClick: (String) -> Unit,
-	onAtClick: (String) -> Unit
+	onAtClick: (String) -> Unit,
+	onImageClick: (List<Picture>, Int) -> Unit,
+	onVideoClick: (Picture) -> Unit
 ) {
 	WeiboUserBar(
 		modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
@@ -186,7 +189,9 @@ fun WeiboLayout(
 	if (weibo.pictures.isNotEmpty()) {
 		NineGrid(
 			pics = weibo.pictures,
-			modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+			modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+			onImageClick = { onImageClick(weibo.pictures, it) },
+			onVideoClick = onVideoClick
 		)
 	}
 	WeiboDataBar(
@@ -205,7 +210,9 @@ fun WeiboCard(
 	onAvatarClick: (WeiboUserInfo) -> Unit,
 	onLinkClick: (String) -> Unit,
 	onTopicClick: (String) -> Unit,
-	onAtClick: (String) -> Unit
+	onAtClick: (String) -> Unit,
+	onImageClick: (List<Picture>, Int) -> Unit,
+	onVideoClick: (Picture) -> Unit
 ) {
 	ElevatedCard(
 		modifier = modifier,
@@ -218,7 +225,9 @@ fun WeiboCard(
 				onAvatarClick = onAvatarClick,
 				onLinkClick = onLinkClick,
 				onTopicClick = onTopicClick,
-				onAtClick = onAtClick
+				onAtClick = onAtClick,
+				onImageClick = onImageClick,
+				onVideoClick = onVideoClick
 			)
 		}
 	}
@@ -248,7 +257,9 @@ fun WeiboGrid(
 				onAvatarClick = { model.onWeiboAvatarClick(it) },
 				onLinkClick = { model.onWeiboLinkClick(it) },
 				onTopicClick = { model.onWeiboTopicClick(it) },
-				onAtClick = { model.onWeiboAtClick(it) }
+				onAtClick = { model.onWeiboAtClick(it) },
+				onImageClick = { pics, current -> model.onWeiboPicClick(pics, current) },
+				onVideoClick = { model.onWeiboVideoClick(it) }
 			)
 		}
 	}

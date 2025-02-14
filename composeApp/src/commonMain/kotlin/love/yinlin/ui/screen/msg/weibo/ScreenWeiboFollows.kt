@@ -129,7 +129,7 @@ fun ScreenWeiboFollows(model: AppModel) {
 				onClick = { screenModel.refreshLocalUser() }
 			)
 		}
-	) { isBacking ->
+	) {
 		StatefulBox(
 			state = screenModel.state,
 			modifier = Modifier.fillMaxSize()

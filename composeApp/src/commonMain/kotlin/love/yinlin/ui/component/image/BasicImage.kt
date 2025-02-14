@@ -25,6 +25,9 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageOptions
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
+import com.github.panpf.zoomimage.SketchZoomAsyncImage
+import com.github.panpf.zoomimage.SketchZoomState
+import com.github.panpf.zoomimage.rememberSketchZoomState
 import love.yinlin.extension.condition
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -63,7 +66,7 @@ fun ClickIcon(
 	onClick: () -> Unit,
 ) {
 	Icon(
-		modifier = modifier.size(size).condition(value = indication,
+		modifier = modifier.size(size).clip(CircleShape).condition(value = indication,
 			ifTrue = { clickable(onClick = onClick) },
 			ifFalse = {
 				clickable(
@@ -88,7 +91,7 @@ fun ClickIcon(
 	onClick: () -> Unit,
 ) {
 	Icon(
-		modifier = modifier.condition(value = indication,
+		modifier = modifier.clip(CircleShape).condition(value = indication,
 			ifTrue = { clickable(onClick = onClick) },
 			ifFalse = {
 				clickable(
@@ -125,7 +128,7 @@ enum class WebImageQuality {
 private fun rememberWebImageKeyUrl(
 	uri: String,
 	key: Any? = null
-): String = rememberSaveable(key) {
+): String = rememberSaveable(uri, key) {
 	if (key == null) uri
 	else if (uri.contains("?")) "$uri&_cacheKey=$key"
 	else "$uri?_cacheKey=$key"
@@ -142,7 +145,7 @@ fun WebImage(
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	placeholder: DrawableResource = Res.drawable.placeholder_pic,
-	onClick: (() -> Unit)? = null,
+	onClick: (() -> Unit)? = null
 ) {
 	val state = rememberAsyncImageState(ComposableImageOptions {
 		downloadCachePolicy(CachePolicy.ENABLED)
@@ -169,5 +172,45 @@ fun WebImage(
 		alpha = alpha,
 		modifier = modifier.condition(circle) { clip(CircleShape) }
 			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+	)
+}
+
+@Composable
+fun ZoomWebImage(
+	uri: String,
+	key: Any? = null,
+	zoomState: SketchZoomState = rememberSketchZoomState(),
+	modifier: Modifier = Modifier,
+	quality: WebImageQuality = WebImageQuality.Medium,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
+	alpha: Float = 1f,
+	placeholder: DrawableResource = Res.drawable.placeholder_pic
+) {
+	val state = rememberAsyncImageState(ComposableImageOptions {
+		downloadCachePolicy(CachePolicy.ENABLED)
+		memoryCachePolicy(CachePolicy.ENABLED)
+		sizeMultiplier(when (quality) {
+			WebImageQuality.Low -> 1f
+			WebImageQuality.Medium -> 2f
+			WebImageQuality.High -> 4f
+		})
+		placeholder(rememberIconPainterStateImage(placeholder))
+	})
+	SketchZoomAsyncImage(
+		uri = rememberWebImageKeyUrl(uri, key),
+		contentDescription = null,
+		state = state,
+		zoomState = zoomState,
+		alignment = alignment,
+		contentScale = contentScale,
+		filterQuality = when (quality) {
+			WebImageQuality.Low -> FilterQuality.Low
+			WebImageQuality.Medium -> FilterQuality.Medium
+			WebImageQuality.High -> FilterQuality.High
+		},
+		alpha = alpha,
+		scrollBar = null,
+		modifier = modifier
 	)
 }

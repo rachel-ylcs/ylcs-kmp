@@ -19,10 +19,10 @@ import love.yinlin.extension.Reference
 import love.yinlin.ui.CustomUI
 
 @Stable
-actual class WebPageState actual constructor(val settings: WebPageSettings) {
+actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	internal val webview = Reference<WebView>()
 
-	internal var mUrl: String by mutableStateOf("")
+	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl
 		set(value) { webview.value?.loadUrl(value) }
 
@@ -143,6 +143,7 @@ actual fun WebPage(
 			}
 			webview.webViewClient = state.client
 			webview.webChromeClient = state.chromeClient
+			if (state.mUrl.isNotEmpty()) webview.loadUrl(state.mUrl)
 			webview
 		},
 		release = { webview ->

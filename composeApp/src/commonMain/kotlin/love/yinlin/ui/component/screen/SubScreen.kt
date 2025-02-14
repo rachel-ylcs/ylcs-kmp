@@ -6,24 +6,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import love.yinlin.extension.rememberStateSaveable
 import love.yinlin.ui.component.image.ClickIcon
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SubScreen(
 	modifier: Modifier = Modifier,
 	title: @Composable () -> Unit,
 	actions: @Composable (RowScope.() -> Unit) = { },
 	onBack: (() -> Unit)? = null,
-	content: @Composable (isBacking: Boolean) -> Unit
+	content: @Composable () -> Unit
 ) {
-	var isBacking by rememberStateSaveable { false }
+	BackHandler { onBack?.invoke() }
+
 	Scaffold(
 		modifier = modifier,
 		topBar = {
@@ -39,12 +39,7 @@ fun SubScreen(
 							ClickIcon(
 								modifier = Modifier.padding(horizontal = 5.dp),
 								imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-								onClick = {
-									if (!isBacking) {
-										isBacking = true
-										onBack()
-									}
-								}
+								onClick = onBack
 							)
 						}
 					},
@@ -58,7 +53,7 @@ fun SubScreen(
 			.padding(it)
 			.background(MaterialTheme.colorScheme.background)
 		) {
-			content(isBacking)
+			content()
 		}
 	}
 }
@@ -69,7 +64,7 @@ fun SubScreen(
 	title: String = "",
 	actions: @Composable (RowScope.() -> Unit) = { },
 	onBack: () -> Unit,
-	content: @Composable (isBacking: Boolean) -> Unit
+	content: @Composable () -> Unit
 ) {
 	SubScreen(
 		modifier = modifier,

@@ -73,6 +73,7 @@ inline fun LaunchOnce(ref: LaunchFlag, crossinline block: suspend CoroutineScope
 
 // Debounce
 
+@Stable
 @Composable
 fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
 	var lastTime by rememberStateSaveable(saver = love.yinlin.extension.Saver.Instant) { Instant.fromEpochMilliseconds(0L) }

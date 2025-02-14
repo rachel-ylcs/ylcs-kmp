@@ -15,7 +15,7 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.layout.NineGrid
+import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.data.Data
@@ -113,7 +113,9 @@ private fun Portrait(
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
 				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
 				onTopicClick = { model.msgModel.onWeiboTopicClick(it) },
-				onAtClick = { model.msgModel.onWeiboAtClick(it) }
+				onAtClick = { model.msgModel.onWeiboAtClick(it) },
+				onImageClick = { pics, current -> model.msgModel.onWeiboPicClick(pics, current) },
+				onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
 			)
 		}
 		if (comments != null) {
@@ -173,7 +175,9 @@ private fun Landscape(
 			if (weibo.pictures.isNotEmpty()) {
 				NineGrid(
 					pics = weibo.pictures,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
+					onImageClick = { model.msgModel.onWeiboPicClick(weibo.pictures, it) },
+					onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
 				)
 			}
 		}
@@ -204,7 +208,7 @@ fun ScreenWeiboDetails(model: AppModel) {
 		modifier = Modifier.fillMaxSize(),
 		title = "微博详情",
 		onBack = { model.pop() }
-	) { isBacking ->
+	) {
 		if (screenModel.weibo == null) EmptyBox()
 		else {
 			if (app.isPortrait) Portrait(

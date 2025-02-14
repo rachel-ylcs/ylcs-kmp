@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import com.sun.javafx.application.PlatformImpl
+import javafx.application.Platform
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
@@ -28,7 +28,9 @@ fun main() {
     appContext = context.initialize()
 
     // JavaFx
-    PlatformImpl.setImplicitExit(false)
+    Platform.startup {
+        Platform.setImplicitExit(false)
+    }
 
     application {
         val rawDensity = LocalDensity.current

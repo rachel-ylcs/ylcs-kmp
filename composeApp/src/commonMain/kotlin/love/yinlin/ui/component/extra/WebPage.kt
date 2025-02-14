@@ -2,7 +2,6 @@ package love.yinlin.ui.component.extra
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 
@@ -29,7 +28,7 @@ data class WebPageError(
 )
 
 @Stable
-expect class WebPageState(settings: WebPageSettings) {
+expect class WebPageState(settings: WebPageSettings, initUrl: String = "") {
 	var url: String // URL
 
 	val loadingState: WebPageLoadingState // 加载状态
@@ -45,9 +44,6 @@ expect class WebPageState(settings: WebPageSettings) {
 	fun goForward() // 前进
 	fun evaluateJavaScript(script: String) // 执行 JavaScript
 }
-
-@Composable
-inline fun rememberWebPageState(crossinline settings: () -> WebPageSettings) = remember { WebPageState(settings()) }
 
 @Composable
 expect fun WebPage(

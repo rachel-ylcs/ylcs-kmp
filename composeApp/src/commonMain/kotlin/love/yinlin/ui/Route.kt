@@ -5,8 +5,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.data.common.Picture
 import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.screen.ScreenMain
+import love.yinlin.ui.screen.common.ScreenImagePreview
+import love.yinlin.ui.screen.common.ScreenWebPage
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboAlbum
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
@@ -16,6 +19,12 @@ sealed interface Route {
 	@Serializable
 	data object Main: Route
 
+	// 通用
+	@Serializable
+	data class ImagePreview(val images: List<Picture>, val current: Int) : Route
+	@Serializable
+	data class WebPage(val url: String): Route
+
 	// 微博
 	@Serializable
 	data object WeiboDetails: Route
@@ -24,7 +33,7 @@ sealed interface Route {
 	@Serializable
 	data object WeiboFollows: Route
 	@Serializable
-	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum) : Route
+	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum): Route
 
 	companion object {
 		fun NavGraphBuilder.buildRoute(
@@ -32,6 +41,12 @@ sealed interface Route {
 		) {
 			composable<Main> {
 				ScreenMain(appModel)
+			}
+
+			// 通用
+			composable<WebPage> {
+				val args = it.toRoute<WebPage>()
+				ScreenWebPage(appModel, args.url)
 			}
 
 			// 微博
@@ -48,6 +63,10 @@ sealed interface Route {
 			composable<WeiboAlbum>(typeMap = buildNavTypeMap<love.yinlin.data.weibo.WeiboAlbum>()) {
 				val args = it.toRoute<WeiboAlbum>()
 				ScreenWeiboAlbum(appModel, args.album)
+			}
+			composable<ImagePreview>(typeMap = buildNavTypeMap<List<Picture>>()) {
+				val args = it.toRoute<ImagePreview>()
+				ScreenImagePreview(appModel, args.images, args.current)
 			}
 		}
 	}

@@ -8,9 +8,11 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.toLocalDateTime
 
 object DateEx {
-	val currentDateString: String = run {
+	val currentDateString: String
+
+	init {
 		val date = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-		date.format(LocalDate.Format {
+		currentDateString = date.format(LocalDate.Format {
 			year()
 			monthNumber(padding = Padding.ZERO)
 			dayOfMonth(padding = Padding.ZERO)

@@ -20,10 +20,10 @@ import platform.Foundation.NSMutableURLRequest
 import platform.Foundation.NSURL
 
 @Stable
-actual class WebPageState actual constructor(val settings: WebPageSettings) {
+actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	internal val webview = Reference<WKWebView>()
 
-	internal var mUrl: String by mutableStateOf("")
+	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl
 		set(value) { webview.value?.loadRequest(NSMutableURLRequest(NSURL(string = value))) }
 
@@ -106,6 +106,7 @@ actual fun WebPage(
 			webview.setUserInteractionEnabled(true)
 			webview.allowsBackForwardNavigationGestures = true
 			webview.navigationDelegate = state.protocol
+			if (state.mUrl.isNotEmpty()) webview.loadRequest(NSMutableURLRequest(NSURL(string = state.mUrl)))
 			webview
 		}
 	)

@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.layout
+package love.yinlin.ui.component.image
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,14 +12,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.Colors
 import love.yinlin.data.common.Picture
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.WebImage
 
 @Composable
 fun NineGrid(
 	pics: List<Picture>,
 	padding: Dp = 5.dp,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onImageClick: (Int) -> Unit,
+	onVideoClick: (Picture) -> Unit
 ) {
 	val size = pics.size.coerceAtMost(9)
 	if (size == 1) {
@@ -30,7 +30,11 @@ fun NineGrid(
 		) {
 			WebImage(
 				uri = pic.image,
-				modifier = Modifier.matchParentSize().zIndex(1f)
+				modifier = Modifier.matchParentSize().zIndex(1f),
+				onClick = {
+					if (pic.isVideo) onVideoClick(pic)
+					else onImageClick(0)
+				}
 			)
 			if (pic.isVideo) {
 				MiniIcon(
@@ -62,7 +66,8 @@ fun NineGrid(
 								WebImage(
 									uri = pics[index].image,
 									modifier = Modifier.size(squareSize),
-									contentScale = ContentScale.Crop
+									contentScale = ContentScale.Crop,
+									onClick = { onImageClick(index) }
 								)
 							}
 						}

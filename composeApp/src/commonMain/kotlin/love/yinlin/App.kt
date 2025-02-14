@@ -17,6 +17,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -32,7 +33,9 @@ class AppModel(
 	val mainModel = MainModel(this)
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
-	fun pop() = navController.popBackStack()
+	fun pop() {
+		if (navController.previousBackStackEntry != null) navController.popBackStack()
+	}
 }
 
 @Composable

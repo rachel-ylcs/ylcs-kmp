@@ -1,4 +1,17 @@
-## **银临茶舍APP跨平台项目**
+<div align="center">
+    <h1>银临茶舍跨平台APP</h1>
+    <p>集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 水群：828049503</p>
+    <div>
+        <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android"/>
+		<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
+        <img src="https://img.shields.io/badge/Platform-Windows-blue.svg?logo=esotericsoftware"/>
+        <img src="https://img.shields.io/badge/Platform-Linux-red.svg?logo=linux"/>
+        <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript"/>
+        <img src="https://img.shields.io/badge/Platform-Server-orange.svg?logo=openjdk"/>
+    </div>
+    <br>
+</div>
+
 
 | 名称      | 平台  | 运行环境   |
 |---------|-----|--------|

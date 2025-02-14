@@ -19,11 +19,11 @@ inline fun <T> webPageListener(crossinline listener: (T) -> Unit) =
 	ChangeListener<T> { _, _, value -> value?.let { listener(value) } }
 
 @Stable
-actual class WebPageState actual constructor(val settings: WebPageSettings) {
+actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	internal val jfxPanel = Reference<JFXPanel>()
 	private val webview: WebView? get() = jfxPanel.value?.scene?.root as? WebView
 
-	internal var mUrl: String by mutableStateOf("")
+	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl
 		set(value) {
 			Platform.runLater {
@@ -97,11 +97,11 @@ actual fun WebPage(
 		modifier = modifier,
 		factory = {
 			val jfxPanel = JFXPanel()
-			jfxPanel.background = java.awt.Color.WHITE
 			Platform.runLater {
 				val webview = WebView()
-				webview.engine.isJavaScriptEnabled = state.settings.enableJavaScript
 				webview.engine?.apply {
+					isJavaScriptEnabled = state.settings.enableJavaScript
+
 					loadWorker.apply {
 						stateProperty().addListener(state.loadingStateListener)
 						progressProperty().addListener(state.progressListener)
@@ -109,14 +109,17 @@ actual fun WebPage(
 					history.currentIndexProperty().addListener(state.historyListener)
 					onError = state.errorListener
 					titleProperty().addListener(state.titleListener)
+
+					if (state.mUrl.isNotEmpty()) load(state.mUrl)
 				}
 				jfxPanel.scene = Scene(webview)
+				jfxPanel.background = java.awt.Color.WHITE
 			}
 			jfxPanel
 		},
 		release = {
 			Platform.runLater {
-				(it.scene.root as? WebView)?.engine?.apply {
+				(it.scene?.root as? WebView)?.engine?.apply {
 					loadWorker.apply {
 						stateProperty().removeListener(state.loadingStateListener)
 						progressProperty().removeListener(state.progressListener)

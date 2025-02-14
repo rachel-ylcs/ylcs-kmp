@@ -10,7 +10,9 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -132,6 +134,7 @@ fun Tip(state: TipState) {
 	}
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun RachelDialog(
 	state: DialogState,
@@ -143,6 +146,9 @@ private fun RachelDialog(
 	content: @Composable () -> Unit
 ) {
 	val info = DialogInfo.instance
+
+	BackHandler(!dismissOnBackPress) {}
+
 	Dialog(
 		onDismissRequest = { state.isOpen = false },
 		properties = DialogProperties(
@@ -426,6 +432,7 @@ open class DialogProgressState : DialogState() {
 	var progress by mutableIntStateOf(0)
 	var maxProgress by mutableIntStateOf(100)
 	var isCancel by mutableStateOf(false)
+		internal set
 }
 
 @Composable
@@ -484,10 +491,13 @@ fun DialogProgress(
 	}
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DialogLoading(
 	state: DialogState
 ) {
+	BackHandler {}
+
 	Dialog(
 		onDismissRequest = { state.isOpen = false },
 		properties = DialogProperties(

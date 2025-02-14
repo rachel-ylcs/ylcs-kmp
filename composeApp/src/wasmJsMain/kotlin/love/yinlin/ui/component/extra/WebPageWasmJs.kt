@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
-actual class WebPageState actual constructor(val settings: WebPageSettings) {
-	actual var url: String = ""
+actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
+	actual var url: String = initUrl
 
 	actual val loadingState: WebPageLoadingState get() = WebPageLoadingState.Initializing
 

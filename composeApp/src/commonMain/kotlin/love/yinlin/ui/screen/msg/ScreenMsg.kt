@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.app
+import love.yinlin.data.common.Picture
 import love.yinlin.data.item.MsgTabItem
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -83,14 +84,22 @@ class MsgModel(val mainModel: MainModel) {
 	}
 
 	fun onWeiboLinkClick(arg: String) {
-
+		mainModel.navigate(Route.WebPage(arg))
 	}
 
 	fun onWeiboTopicClick(arg: String) {
-
+		mainModel.navigate(Route.WebPage(arg))
 	}
 
 	fun onWeiboAtClick(arg: String) {
+		mainModel.navigate(Route.WebPage(arg))
+	}
+
+	fun onWeiboPicClick(pics: List<Picture>, current: Int) {
+		mainModel.navigate(Route.ImagePreview(pics, current))
+	}
+
+	fun onWeiboVideoClick(pic: Picture) {
 
 	}
 }

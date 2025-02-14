@@ -246,7 +246,9 @@ private fun Portrait(
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
 				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
 				onTopicClick = { model.msgModel.onWeiboTopicClick(it) },
-				onAtClick = { model.msgModel.onWeiboAtClick(it) }
+				onAtClick = { model.msgModel.onWeiboAtClick(it) },
+				onImageClick = { pics, current -> model.msgModel.onWeiboPicClick(pics, current) },
+				onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
 			)
 		}
 	}
@@ -332,7 +334,7 @@ fun ScreenWeiboUser(model: AppModel, id: String) {
 		modifier = Modifier.fillMaxSize(),
 		title = screenModel.user?.info?.name ?: "",
 		onBack = { model.pop() }
-	) { isBacking ->
+	) {
 		if (screenModel.user == null) LoadingBox()
 		else screenModel.user?.let { user ->
 			if (app.isPortrait) Portrait(

@@ -112,7 +112,7 @@ fun ScreenWeiboAlbum(model: AppModel, album: WeiboAlbum) {
 		modifier = Modifier.fillMaxSize(),
 		title = "${album.title} - 共 ${screenModel.num} 张",
 		onBack = { model.pop() }
-	) { isBacking ->
+	) {
 		Column(
 			modifier = Modifier.fillMaxSize().padding(10.dp),
 			verticalArrangement = Arrangement.spacedBy(10.dp),

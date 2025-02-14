@@ -72,6 +72,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(libs.coroutines)
             implementation(libs.navigation)
+            implementation(libs.backhandler)
             implementation(libs.lifecycle.viewmodel)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.json)
@@ -86,6 +87,7 @@ kotlin {
             implementation(libs.sketch.webp)
             implementation(libs.sketch.zoom)
             implementation(libs.html)
+            implementation(libs.filekit)
         }
 
         androidMain.dependencies {
@@ -227,6 +229,7 @@ compose.desktop {
                 "java.net.http",
                 "jdk.jfr",
                 "jdk.jsobject",
+                "jdk.security.auth",
                 "jdk.unsupported",
                 "jdk.unsupported.desktop",
                 "jdk.xml.dom"
