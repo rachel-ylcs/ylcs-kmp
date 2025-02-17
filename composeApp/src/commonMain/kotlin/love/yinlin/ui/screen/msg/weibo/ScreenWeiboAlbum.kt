@@ -28,7 +28,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.app
+import love.yinlin.platform.app
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.WeiboAlbum

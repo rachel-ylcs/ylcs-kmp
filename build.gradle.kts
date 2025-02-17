@@ -73,5 +73,6 @@ val webOutputDir by extra(dirOutput.dir("web"))
 // Server
 val serverDir by extra(dirProject.dir("server"))
 val serverBuildDir by extra(serverDir.dir("build"))
+val serverCurrentDir by extra(serverBuildDir.dir("serverRun"))
 val serverOutputFileName by extra("ylcs.jar")
 val serverOutputDir by extra(dirOutput)

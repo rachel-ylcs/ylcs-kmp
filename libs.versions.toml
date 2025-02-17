@@ -9,7 +9,6 @@ agp = "8.7.3"
 
 # Common
 coroutines = "1.10.1"
-io = "0.6.0"
 lifecycle = "2.9.0-alpha03"
 ktor = "3.1.0"
 navigation = "2.8.0-alpha13"

@@ -8,9 +8,7 @@ import androidx.compose.runtime.*
 fun ScreenWorld(model: MainModel) {
 	Button(
 		onClick = {
-			model.launch {
 
-			}
 		}
 	) {
 		Text("Screen World")

@@ -23,7 +23,7 @@ fun NineGrid(
 ) {
 	val size = pics.size.coerceAtMost(9)
 	if (size == 1) {
-		val pic = pics.first()
+		val pic = pics[0]
 		Box(
 			modifier = modifier.height(200.dp),
 			contentAlignment = Alignment.Center

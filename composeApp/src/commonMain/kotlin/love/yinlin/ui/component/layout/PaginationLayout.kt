@@ -41,12 +41,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import love.yinlin.platform.OS
+import love.yinlin.platform.isPhone
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 @Stable
-internal enum class PaginationStatus {
+private enum class PaginationStatus {
 	IDLE, RUNNING, PULL, RELEASE
 }
 
@@ -80,7 +82,7 @@ private class SwipeState {
 }
 
 @Composable
-internal fun DefaultSwipePaginationHeader(
+private fun DefaultSwipePaginationHeader(
 	status: PaginationStatus,
 	progress: Float
 ) {
@@ -111,7 +113,7 @@ internal fun DefaultSwipePaginationHeader(
 }
 
 @Composable
-internal fun DefaultSwipePaginationFooter(
+private fun DefaultSwipePaginationFooter(
 	status: PaginationStatus,
 	progress: Float
 ) {
@@ -142,7 +144,7 @@ internal fun DefaultSwipePaginationFooter(
 }
 
 @Composable
-internal fun SwipePaginationLayout(
+private fun SwipePaginationLayout(
 	canRefresh: Boolean = true,
 	canLoading: Boolean = false,
 	onRefresh: (suspend () -> Unit)? = null,
@@ -269,7 +271,7 @@ private fun DefaultClickPaginationIndicator(
 }
 
 @Composable
-internal fun <T> ClickPaginationColumn(
+private fun <T> ClickPaginationColumn(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	state: LazyListState = rememberLazyListState(),
@@ -309,7 +311,7 @@ internal fun <T> ClickPaginationColumn(
 }
 
 @Composable
-internal fun <T> ClickPaginationGrid(
+private fun <T> ClickPaginationGrid(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	columns: GridCells,
@@ -354,7 +356,7 @@ internal fun <T> ClickPaginationGrid(
 }
 
 @Composable
-internal fun <T> ClickPaginationStaggeredGrid(
+private fun <T> ClickPaginationStaggeredGrid(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	columns: StaggeredGridCells,
@@ -399,7 +401,7 @@ internal fun <T> ClickPaginationStaggeredGrid(
 }
 
 @Composable
-expect fun <T> PaginationColumn(
+fun <T> PaginationColumn(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	state: LazyListState = rememberLazyListState(),
@@ -412,10 +414,44 @@ expect fun <T> PaginationColumn(
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
-)
+) {
+	if (OS.platform.isPhone) {
+		SwipePaginationLayout(
+			canRefresh = canRefresh,
+			canLoading = canLoading,
+			onRefresh = onRefresh,
+			onLoading = onLoading,
+			modifier = modifier
+		) {
+			LazyColumn(
+				modifier = Modifier.fillMaxSize(),
+				state = state,
+				contentPadding = contentPadding,
+				verticalArrangement = verticalArrangement,
+				horizontalAlignment = horizontalAlignment,
+			) {
+				items(items = items, key = key, itemContent = itemContent)
+			}
+		}
+	}
+	else {
+		ClickPaginationColumn(
+			items = items,
+			key = key,
+			state = state,
+			canLoading = canLoading,
+			onLoading = onLoading,
+			modifier = modifier,
+			contentPadding = contentPadding,
+			verticalArrangement = verticalArrangement,
+			horizontalAlignment = horizontalAlignment,
+			itemContent = itemContent
+		)
+	}
+}
 
 @Composable
-expect fun <T> PaginationGrid(
+fun <T> PaginationGrid(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	columns: GridCells,
@@ -429,10 +465,46 @@ expect fun <T> PaginationGrid(
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
-)
+) {
+	if (OS.platform.isPhone) {
+		SwipePaginationLayout(
+			canRefresh = canRefresh,
+			canLoading = canLoading,
+			onRefresh = onRefresh,
+			onLoading = onLoading,
+			modifier = modifier
+		) {
+			LazyVerticalGrid(
+				columns = columns,
+				modifier = Modifier.fillMaxSize(),
+				state = state,
+				contentPadding = contentPadding,
+				verticalArrangement = verticalArrangement,
+				horizontalArrangement = horizontalArrangement,
+			) {
+				items(items = items, key = key, itemContent = itemContent)
+			}
+		}
+	}
+	else {
+		ClickPaginationGrid(
+			items = items,
+			key = key,
+			columns = columns,
+			state = state,
+			canLoading = canLoading,
+			onLoading = onLoading,
+			modifier = modifier,
+			contentPadding = contentPadding,
+			verticalArrangement = verticalArrangement,
+			horizontalArrangement = horizontalArrangement,
+			itemContent = itemContent
+		)
+	}
+}
 
 @Composable
-expect fun <T> PaginationStaggeredGrid(
+fun <T> PaginationStaggeredGrid(
 	items: List<T>,
 	key: ((T) -> Any)? = null,
 	columns: StaggeredGridCells,
@@ -446,4 +518,40 @@ expect fun <T> PaginationStaggeredGrid(
 	verticalItemSpacing: Dp = 0.dp,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
-)
+) {
+	if (OS.platform.isPhone) {
+		SwipePaginationLayout(
+			canRefresh = canRefresh,
+			canLoading = canLoading,
+			onRefresh = onRefresh,
+			onLoading = onLoading,
+			modifier = modifier
+		) {
+			LazyVerticalStaggeredGrid(
+				columns = columns,
+				modifier = Modifier.fillMaxSize(),
+				state = state,
+				contentPadding = contentPadding,
+				verticalItemSpacing = verticalItemSpacing,
+				horizontalArrangement = horizontalArrangement
+			) {
+				items(items = items, key = key, itemContent = itemContent)
+			}
+		}
+	}
+	else {
+		ClickPaginationStaggeredGrid(
+			items = items,
+			key = key,
+			columns = columns,
+			state = state,
+			canLoading = canLoading,
+			onLoading = onLoading,
+			modifier = modifier,
+			contentPadding = contentPadding,
+			verticalItemSpacing = verticalItemSpacing,
+			horizontalArrangement = horizontalArrangement,
+			itemContent = itemContent
+		)
+	}
+}

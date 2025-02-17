@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import love.yinlin.platform.app
 import org.jetbrains.compose.resources.Font
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.xwwk

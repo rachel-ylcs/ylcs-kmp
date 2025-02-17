@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.ThemeColor
 import love.yinlin.api.WeiboAPI
-import love.yinlin.app
+import love.yinlin.platform.app
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
@@ -37,7 +37,6 @@ import love.yinlin.extension.LaunchOnce
 import love.yinlin.launch
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.Route
-import love.yinlin.ui.common.WeiboCard
 import love.yinlin.ui.common.WeiboGrid
 import love.yinlin.ui.common.WeiboGridData
 import love.yinlin.ui.component.image.ClickIcon
@@ -239,16 +238,9 @@ private fun Portrait(
 			items = grid.items,
 			key = { it.id }
 		) { weibo ->
-			WeiboCard(
+			model.msgModel.WeiboCard(
 				weibo = weibo,
-				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp),
-				onClick = { model.msgModel.onWeiboClick(weibo) },
-				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
-				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
-				onTopicClick = { model.msgModel.onWeiboTopicClick(it) },
-				onAtClick = { model.msgModel.onWeiboAtClick(it) },
-				onImageClick = { pics, current -> model.msgModel.onWeiboPicClick(pics, current) },
-				onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
+				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
 			)
 		}
 	}

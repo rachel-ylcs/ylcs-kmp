@@ -7,9 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.platform.LocalDensity
 import love.yinlin.Colors
-import love.yinlin.DesktopContext
-import love.yinlin.app
 import love.yinlin.extension.Reference
+import love.yinlin.platform.appNative
 import java.awt.Component
 
 @Composable
@@ -29,7 +28,7 @@ fun <T : Component> CustomUI(
 		}
 	}
 
-	(app as DesktopContext).rawDensity?.let { density ->
+	appNative.rawDensity?.let { density ->
 		CompositionLocalProvider(LocalDensity provides density) {
 			SwingPanel(
 				modifier = modifier,

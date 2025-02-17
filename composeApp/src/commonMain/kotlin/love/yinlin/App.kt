@@ -17,10 +17,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.Route.Companion.buildRoute
 import love.yinlin.ui.screen.MainModel

@@ -17,14 +17,18 @@ import androidx.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.AppModel
-import love.yinlin.ThemeMode
-import love.yinlin.app
+import love.yinlin.platform.ThemeMode
+import love.yinlin.platform.app
 import love.yinlin.data.item.TabItem
 import love.yinlin.launch
-import love.yinlin.next
+import love.yinlin.platform.next
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.screen.community.DiscoveryModel
+import love.yinlin.ui.screen.community.MeModel
+import love.yinlin.ui.screen.community.ScreenDiscovery
+import love.yinlin.ui.screen.community.ScreenMe
 import love.yinlin.ui.screen.msg.MsgModel
 import love.yinlin.ui.screen.msg.ScreenMsg
 import org.jetbrains.compose.resources.stringResource
@@ -35,6 +39,8 @@ class MainModel(val appModel: AppModel) {
 	}
 
 	val msgModel = MsgModel(this)
+	val discoveryModel = DiscoveryModel(this)
+	val meModel = MeModel(this)
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
 	fun pop() = appModel.pop()
@@ -73,8 +79,8 @@ private fun PageContent(
 				TabItem.WORLD.ordinal -> ScreenWorld(model)
 				TabItem.MSG.ordinal -> ScreenMsg(model.msgModel)
 				TabItem.MUSIC.ordinal -> ScreenMusic()
-				TabItem.DISCOVERY.ordinal -> ScreenDiscovery()
-				TabItem.ME.ordinal -> ScreenMe()
+				TabItem.DISCOVERY.ordinal -> ScreenDiscovery(model.discoveryModel)
+				TabItem.ME.ordinal -> ScreenMe(model.meModel)
 			}
 		}
 	}

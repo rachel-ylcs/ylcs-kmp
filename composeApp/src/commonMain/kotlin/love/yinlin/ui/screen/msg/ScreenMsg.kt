@@ -6,24 +6,39 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import love.yinlin.app
+import love.yinlin.api.WeiboAPI
+import love.yinlin.data.Data
+import love.yinlin.platform.app
 import love.yinlin.data.common.Picture
 import love.yinlin.data.item.MsgTabItem
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.OS
+import love.yinlin.platform.isWeb
 import love.yinlin.ui.Route
 import love.yinlin.ui.common.WeiboGridData
+import love.yinlin.ui.common.WeiboLayout
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.layout.Segment
+import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.layout.TabBar
 import love.yinlin.ui.screen.MainModel
+import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
 import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
 
@@ -34,7 +49,40 @@ class MsgModel(val mainModel: MainModel) {
 	}
 
 	class ChaohuaState {
+		val launchFlag = LaunchFlag()
+		val grid = WeiboGridData()
+		var sinceId: Long = 0L
+		var canLoading by mutableStateOf(false)
 
+		suspend fun requestNewData() {
+			if (grid.state != BoxState.LOADING) {
+				grid.state = BoxState.LOADING
+				canLoading = false
+				grid.state = Coroutines.io {
+					val result = WeiboAPI.extractChaohua(sinceId)
+					if (result is Data.Success) {
+						val (data, newSinceId) = result.data
+						sinceId = newSinceId
+						canLoading = newSinceId != 0L
+						grid.items = data
+						if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+					}
+					else BoxState.NETWORK_ERROR
+				}
+			}
+		}
+
+		suspend fun requestMoreData() {
+			Coroutines.io {
+				val result = WeiboAPI.extractChaohua(sinceId)
+				if (result is Data.Success) {
+					val (data, newSinceId) = result.data
+					sinceId = newSinceId
+					canLoading = newSinceId != 0L
+					grid.items += data
+				}
+			}
+		}
 	}
 
 	val pagerState = object : PagerState() {
@@ -65,8 +113,8 @@ class MsgModel(val mainModel: MainModel) {
 			MsgTabItem.WEIBO.ordinal -> mainModel.launch {
 				weiboState.grid.requestWeibo(followUsers.map { it.id })
 			}
-			MsgTabItem.CHAOHUA.ordinal -> {
-
+			MsgTabItem.CHAOHUA.ordinal -> mainModel.launch {
+				chaohuaState.requestNewData()
 			}
 			MsgTabItem.PICTURES.ordinal -> {
 
@@ -84,15 +132,18 @@ class MsgModel(val mainModel: MainModel) {
 	}
 
 	fun onWeiboLinkClick(arg: String) {
-		mainModel.navigate(Route.WebPage(arg))
+		if (OS.platform.isWeb) OS.openURL(arg)
+		else mainModel.navigate(Route.WebPage(arg))
 	}
 
 	fun onWeiboTopicClick(arg: String) {
-		mainModel.navigate(Route.WebPage(arg))
+		if (OS.platform.isWeb) OS.openURL(arg)
+		else mainModel.navigate(Route.WebPage(arg))
 	}
 
 	fun onWeiboAtClick(arg: String) {
-		mainModel.navigate(Route.WebPage(arg))
+		if (OS.platform.isWeb) OS.openURL(arg)
+		else mainModel.navigate(Route.WebPage(arg))
 	}
 
 	fun onWeiboPicClick(pics: List<Picture>, current: Int) {
@@ -102,10 +153,36 @@ class MsgModel(val mainModel: MainModel) {
 	fun onWeiboVideoClick(pic: Picture) {
 
 	}
+
+	@Composable
+	fun WeiboCard(
+		weibo: Weibo,
+		modifier: Modifier = Modifier
+	) {
+		ElevatedCard(
+			modifier = modifier,
+			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
+			onClick = { onWeiboClick(weibo) }
+		) {
+			Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+				WeiboLayout(
+					weibo = weibo,
+					onAvatarClick = ::onWeiboAvatarClick,
+					onLinkClick = ::onWeiboLinkClick,
+					onTopicClick = ::onWeiboTopicClick,
+					onAtClick = ::onWeiboAtClick,
+					onImageClick = ::onWeiboPicClick,
+					onVideoClick = ::onWeiboVideoClick
+				)
+			}
+		}
+	}
 }
 
 @Composable
 fun ScreenMsg(model: MsgModel) {
+	val tabItems = remember { MsgTabItem.entries.map { it.title to it.icon } }
+
 	Column(modifier = Modifier.fillMaxSize()) {
 		Surface(
 			modifier = Modifier.fillMaxWidth().zIndex(5f),
@@ -116,15 +193,15 @@ fun ScreenMsg(model: MsgModel) {
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
+				TabBar(
+					currentPage = model.pagerState.currentPage,
+					onNavigate = { model.onNavigate(it) },
+					items = tabItems,
+					modifier = Modifier.weight(1f)
+				)
 				ClickIcon(
 					imageVector = Icons.Filled.Refresh,
 					onClick = { model.onRefresh() }
-				)
-				Segment(
-					modifier = Modifier.weight(1f),
-					items = MsgTabItem.entries.map { it.title },
-					currentIndex = model.pagerState.currentPage,
-					onSelected = { model.onNavigate(it) }
 				)
 				ClickIcon(
 					imageVector = Icons.Filled.AccountCircle,

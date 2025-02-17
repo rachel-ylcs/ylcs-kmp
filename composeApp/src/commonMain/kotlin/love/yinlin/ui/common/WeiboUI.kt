@@ -8,8 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -203,37 +201,6 @@ fun WeiboLayout(
 }
 
 @Composable
-fun WeiboCard(
-	weibo: Weibo,
-	modifier: Modifier = Modifier,
-	onClick: () -> Unit,
-	onAvatarClick: (WeiboUserInfo) -> Unit,
-	onLinkClick: (String) -> Unit,
-	onTopicClick: (String) -> Unit,
-	onAtClick: (String) -> Unit,
-	onImageClick: (List<Picture>, Int) -> Unit,
-	onVideoClick: (Picture) -> Unit
-) {
-	ElevatedCard(
-		modifier = modifier,
-		colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-		onClick = onClick
-	) {
-		Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
-			WeiboLayout(
-				weibo = weibo,
-				onAvatarClick = onAvatarClick,
-				onLinkClick = onLinkClick,
-				onTopicClick = onTopicClick,
-				onAtClick = onAtClick,
-				onImageClick = onImageClick,
-				onVideoClick = onVideoClick
-			)
-		}
-	}
-}
-
-@Composable
 fun WeiboGrid(
 	model: MsgModel,
 	items: List<Weibo>,
@@ -250,17 +217,7 @@ fun WeiboGrid(
 			items = items,
 			key = { it.id }
 		) { weibo ->
-			WeiboCard(
-				weibo = weibo,
-				modifier = Modifier.fillMaxWidth(),
-				onClick = { model.onWeiboClick(weibo) },
-				onAvatarClick = { model.onWeiboAvatarClick(it) },
-				onLinkClick = { model.onWeiboLinkClick(it) },
-				onTopicClick = { model.onWeiboTopicClick(it) },
-				onAtClick = { model.onWeiboAtClick(it) },
-				onImageClick = { pics, current -> model.onWeiboPicClick(pics, current) },
-				onVideoClick = { model.onWeiboVideoClick(it) }
-			)
+			model.WeiboCard(weibo = weibo, modifier = Modifier.fillMaxWidth())
 		}
 	}
 }

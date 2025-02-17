@@ -17,8 +17,9 @@ dependencies {
     implementation(projects.shared)
     implementation(libs.ktor.server)
     implementation(libs.ktor.server.host)
-    implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.config)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.json)
     implementation(libs.ktor.server.negotiation)
 
     implementation(libs.json)
@@ -31,6 +32,12 @@ dependencies {
 application {
     mainClass.set(rootProject.extra["appMainClass"] as String)
     applicationName = rootProject.extra["appName"] as String
+
+    val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
+    if (!taskName.contains("serverPublish")) {
+        val serverCurrentDir: Directory by rootProject.extra
+        serverCurrentDir.asFile.mkdir()
+    }
 }
 
 ktor {

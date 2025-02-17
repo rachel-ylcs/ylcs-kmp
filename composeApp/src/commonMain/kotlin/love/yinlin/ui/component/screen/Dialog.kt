@@ -22,7 +22,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import love.yinlin.Colors
-import love.yinlin.app
+import love.yinlin.platform.app
 import love.yinlin.extension.condition
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.layout.LoadingBox
@@ -62,7 +62,7 @@ sealed interface DialogInfo {
 }
 
 open class DialogState {
-	var isOpen: Boolean by mutableStateOf(false)
+	open var isOpen: Boolean by mutableStateOf(false)
 }
 
 open class TipState {
@@ -429,8 +429,23 @@ fun DialogChoice(
 }
 
 open class DialogProgressState : DialogState() {
-	var progress by mutableIntStateOf(0)
-	var maxProgress by mutableIntStateOf(100)
+	override var isOpen: Boolean
+		get() = super.isOpen
+		set(value) {
+			if (super.isOpen != value) {
+				super.isOpen = value
+				if (value) {
+					current = "0"
+					total = "0"
+					progress = 0f
+					isCancel = false
+				}
+			}
+		}
+
+	var current by mutableStateOf("0")
+	var total by mutableStateOf("0")
+	var progress by mutableFloatStateOf(0f)
 	var isCancel by mutableStateOf(false)
 		internal set
 }
@@ -460,9 +475,8 @@ fun DialogProgress(
 			modifier = Modifier.fillMaxWidth(),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
 		) {
-			val value = if (state.maxProgress == 0) 0f else state.progress.toFloat() / state.maxProgress
 			LinearProgressIndicator(
-				progress = { value },
+				progress = { state.progress },
 				modifier = Modifier.fillMaxWidth().height(6.dp),
 				gapSize = 0.dp,
 				drawStopIndicator = {}
@@ -473,14 +487,14 @@ fun DialogProgress(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
-					text = "${(value * 100).roundToInt()}%",
+					text = "${(state.progress * 100).roundToInt()}%",
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
 				Text(
-					text = "${state.progress} / ${state.maxProgress}",
+					text = "${state.current} / ${state.total}",
 					textAlign = TextAlign.End,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,

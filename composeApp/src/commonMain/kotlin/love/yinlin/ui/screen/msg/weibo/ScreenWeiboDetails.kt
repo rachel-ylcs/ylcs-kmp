@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.app
+import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.image.NineGrid

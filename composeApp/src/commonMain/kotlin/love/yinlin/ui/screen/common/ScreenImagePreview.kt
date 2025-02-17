@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Checkbox
@@ -18,14 +20,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.delay
 import love.yinlin.AppModel
-import love.yinlin.app
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
 import love.yinlin.launch
-import love.yinlin.platform.Coroutines
+import love.yinlin.platform.OS
+import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
@@ -49,75 +50,73 @@ class ImagePreviewModel(
 	fun downloadPicture() {
 		val preview = previews[current]
 		val url = if (preview.isSource) preview.pic.source else preview.pic.image
-		launch {
-			dialogState.isOpen = true
-			dialogState.progress = 0
-			dialogState.maxProgress = 100
-			Coroutines.io {
-				repeat(20) {
-					delay(300)
-					dialogState.progress += 5
-				}
-			}
-			dialogState.isOpen = false
-		}
+		launch { OS.downloadImage(url, dialogState) }
 	}
 }
 
 @Composable
-private fun PreviewLayout(
+private fun PreviewControls(
 	model: ImagePreviewModel,
 	current: Int,
 	modifier: Modifier = Modifier
 ) {
 	val preview = model.previews[current]
-
-	val isAllSources by derivedStateOf { model.previews.all { it.isSource } }
-
-	Column(
+	Row(
 		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(10.dp),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(10.dp)
 	) {
-		ZoomWebImage(
-			uri = if (preview.isSource) preview.pic.source else preview.pic.image,
-			key = DateEx.currentDateString,
-			modifier = Modifier.fillMaxWidth().weight(1f)
+		Checkbox(
+			checked = preview.isSource,
+			onCheckedChange = {
+				preview.isSource = it
+			}
 		)
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			Checkbox(
-				checked = preview.isSource,
-				onCheckedChange = { preview.isSource = it }
-			)
-			Text(text = "原图")
-			Checkbox(
-				checked = isAllSources,
-				onCheckedChange = { value ->
-					model.previews.forEach { it.isSource = value }
-				}
-			)
-			Text(text = if (isAllSources) "取消全选" else "全选")
-		}
+		Text(text = "原图")
 	}
 }
 
 @Composable
-private fun Portrait(
-	model: ImagePreviewModel
-) {
+private fun Portrait(model: ImagePreviewModel) {
+	val state = rememberPagerState(
+		initialPage = model.current,
+		pageCount = { model.previews.size }
+	)
+	Column(
+		modifier = Modifier.fillMaxSize(),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		HorizontalPager(
+			state = state,
+			key = {
+				val preview = model.previews[it]
+				if (preview.isSource) preview.pic.source else preview.pic.image
+			},
+			modifier = Modifier.fillMaxWidth().weight(1f)
+		) {
+			val preview = model.previews[it]
+			ZoomWebImage(
+				uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+				key = DateEx.currentDateString,
+				modifier = Modifier.fillMaxSize()
+			)
+		}
+		PreviewControls(
+			model = model,
+			current = model.current,
+			modifier = Modifier.fillMaxWidth()
+		)
+	}
 
+	LaunchedEffect(state.currentPage) {
+		model.current = state.currentPage
+	}
 }
 
 @Composable
-private fun Landscape(
-	model: ImagePreviewModel
-) {
+private fun Landscape(model: ImagePreviewModel) {
 	Row(modifier = Modifier.fillMaxSize()) {
-		val state = rememberLazyListState()
+		val state = rememberLazyListState(model.current)
 		LazyColumn(
 			modifier = Modifier.width(150.dp).fillMaxHeight(),
 			state = state,
@@ -141,14 +140,21 @@ private fun Landscape(
 			}
 		}
 		VerticalDivider(modifier = Modifier.padding(end = 10.dp))
-		PreviewLayout(
-			model = model,
-			current = model.current,
-			modifier = Modifier.weight(1f).fillMaxHeight()
-		)
-
-		LaunchedEffect(Unit) {
-			state.scrollToItem(model.current)
+		Column(
+			modifier = Modifier.weight(1f).fillMaxHeight(),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			val preview = model.previews[model.current]
+			ZoomWebImage(
+				uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+				key = DateEx.currentDateString,
+				modifier = Modifier.fillMaxWidth().weight(1f)
+			)
+			PreviewControls(
+				model = model,
+				current = model.current,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
 	}
 }
