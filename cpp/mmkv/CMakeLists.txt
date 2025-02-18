@@ -18,13 +18,18 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.30)
+# Sets the minimum version of CMake required to build the native library.
+
+cmake_minimum_required(VERSION 3.10.0)
 
 IF(APPLE)
+    # tell ranlib to ignore empty compilation units
     SET(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
     SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+    # prevents ar from invoking ranlib, let CMake do it
     SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> qc -S <TARGET> <LINK_FLAGS> <OBJECTS>")
     SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> qc -S <TARGET> <LINK_FLAGS> <OBJECTS>")
+
     add_compile_definitions(FORCE_POSIX)
 ENDIF()
 
@@ -41,6 +46,9 @@ ELSEIF("${ANDROID_ABI}" STREQUAL "armeabi")
     SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS} -march=armv5 -D__ANDROID__")
 ENDIF()
 
+#include(CMakePrintHelpers)
+#cmake_print_variables(CMAKE_SYSTEM_PROCESSOR OHOS OHOS_ARCH CFLAGS ASM_OPTIONS CMAKE_ASM_FLAGS)
+
 IF(OHOS)
     IF("${OHOS_ARCH}" STREQUAL "arm64-v8a")
         SET(ASM_OPTIONS "-x assembler-with-cpp")
@@ -52,6 +60,7 @@ ELSEIF(UNIX AND (NOT APPLE))
         SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS} -march=armv8-a+crypto")
     ENDIF()
 ENDIF()
+
 
 project(mmkv)
 
@@ -67,6 +76,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../libs)
 add_library(mmkv SHARED
         main.cpp
 
+        # Provides a relative path to your source file(s).
         MMKV.h
         MMKV.cpp
         MMKV_Android.cpp
@@ -127,20 +137,23 @@ add_library(mmkv SHARED
         crc32/zlib/crc32.h
         crc32/zlib/crc32.cpp
         MMKVPredef.h
-)
+        )
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 
 IF (MSVC OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
+    # .S files is not supported by MSVC.
+    # x86_64 asm not supported in OHOS
 ELSE()
     target_sources(mmkv PRIVATE
         aes/openssl/openssl_aesv8-armx.S
         aes/openssl/openssl_aes-armv4.S)
 ENDIF()
 
-target_include_directories(mmkv PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(mmkv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 IF (WIN32)
+    # MMKV can be used only with Unicode on Windows.
     target_compile_definitions(mmkv PUBLIC UNICODE)
     target_compile_definitions(mmkv PUBLIC _UNICODE)
 ENDIF()
@@ -149,12 +162,57 @@ set_target_properties(mmkv PROPERTIES
         CXX_STANDARD 20
         CXX_EXTENSIONS OFF
         POSITION_INDEPENDENT_CODE ON
-)
+        )
 
-find_library(zlib z)
+find_library(zlib
+        z
+        )
 
 IF (NOT zlib)
     target_compile_definitions(mmkv PUBLIC MMKV_EMBED_ZLIB=1)
 ELSE()
     target_link_libraries(mmkv ${zlib})
 ENDIF()
+
+function(copy_files)
+    list(LENGTH ARGN num_args)
+
+    if(num_args LESS 2)
+        message(FATAL_ERROR "copy_files function requires at least one source file and one destination directory.")
+        return()
+    endif()
+
+    # Get the last argument as the destination directory
+    list(GET ARGN -1 destination_dir)
+    # Get all arguments except the last one as the source files
+    list(REMOVE_AT ARGN -1)
+    set(source_files ${ARGN})
+
+    file(MAKE_DIRECTORY ${destination_dir})
+
+    foreach(file ${source_files})
+        get_filename_component(file_dir ${file} DIRECTORY)
+        file(MAKE_DIRECTORY ${destination_dir}/${file_dir})
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${file} DESTINATION ${destination_dir}/${file_dir})
+    endforeach()
+endfunction()
+
+#file(REMOVE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+copy_files(
+        MMKV.h
+        MMKVPredef.h
+        MMBuffer.h
+        MiniPBCoder.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/MMKV)
+
+#message(STATUS "copying headers to ${CMAKE_CURRENT_SOURCE_DIR}/include/MMKV")
+#message(STATUS "copying headers with ${OHOS} or ${ANDROID}")
+
+IF(OHOS OR ANDROID)
+    file(COPY MemoryFile.h MMKVLog.h DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/MMKV)
+ELSE()
+    file(REMOVE include/MMKV/MemoryFile.h include/MMKV/MMKVLog.h)
+ENDIF()
+
+target_include_directories(mmkv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

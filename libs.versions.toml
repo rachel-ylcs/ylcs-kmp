@@ -18,7 +18,7 @@ datetime = "0.6.1"
 sketch = "4.0.2"
 sketch-zoom = "1.1.0"
 html = "0.2.1"
-mmkv = "2.0.2"
+mmkv = "2.1.0"
 
 # Android
 activity-compose = "1.10.0"
