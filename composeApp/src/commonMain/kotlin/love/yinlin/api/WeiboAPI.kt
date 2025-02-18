@@ -5,8 +5,6 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
-import io.ktor.client.call.*
-import io.ktor.client.request.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.platform.app
@@ -27,7 +25,7 @@ import love.yinlin.extension.obj
 import love.yinlin.extension.string
 import love.yinlin.platform.OS
 import love.yinlin.platform.isWeb
-import love.yinlin.platform.safeCall
+import love.yinlin.platform.safeGet
 
 object WeiboAPI {
 	const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
@@ -226,9 +224,9 @@ object WeiboAPI {
 
 	suspend fun getUserWeibo(
 		uid: String
-	): Data<List<Weibo>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.userDetails(uid)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<List<Weibo>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.userDetails(uid)}"
+	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<Weibo>()
 		for (item in cards) {
@@ -241,9 +239,9 @@ object WeiboAPI {
 
 	suspend fun getWeiboDetails(
 		id: String
-	): Data<List<WeiboComment>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<List<WeiboComment>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.weiboDetails(id)}"
+	) { json: JsonObject ->
 		val cards = json.obj("data").arr("data")
 		val items = mutableListOf<WeiboComment>()
 		for (item in cards) items += getWeiboComment(item.obj)
@@ -252,9 +250,9 @@ object WeiboAPI {
 
 	suspend fun getWeiboUser(
 		uid: String
-	): Data<WeiboUser> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.userInfo(uid)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<WeiboUser> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.userInfo(uid)}"
+	) { json: JsonObject ->
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].string
 		val name = userInfo["screen_name"].string
@@ -274,9 +272,9 @@ object WeiboAPI {
 
 	suspend fun getWeiboUserAlbum(
 		uid: String
-	): Data<List<WeiboAlbum>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.userAlbum(uid)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<List<WeiboAlbum>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.userAlbum(uid)}"
+	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboAlbum>()
 		for (item1 in cards) {
@@ -304,9 +302,9 @@ object WeiboAPI {
 		containerId: String,
 		page: Int,
 		limit: Int
-	): Data<Pair<List<Picture>, Int>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<Pair<List<Picture>, Int>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}"
+	) { json: JsonObject ->
 		val data = json.obj("data")
 		val cards = data.arr("cards")
 		val pics = mutableListOf<Picture>()
@@ -325,9 +323,9 @@ object WeiboAPI {
 
 	suspend fun searchWeiboUser(
 		key: String
-	): Data<List<WeiboUserInfo>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.searchUser(key)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<List<WeiboUserInfo>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.searchUser(key)}"
+	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboUserInfo>()
 		for (item1 in cards) {
@@ -351,9 +349,9 @@ object WeiboAPI {
 
 	suspend fun extractChaohua(
 		sinceId: Long
-	): Data<Pair<List<Weibo>, Long>> = app.client.safeCall { client ->
-		val url = "https://$WEIBO_HOST/${Container.chaohua(sinceId)}"
-		val json = client.get(url).body<JsonObject>()
+	): Data<Pair<List<Weibo>, Long>> = app.client.safeGet(
+		"https://$WEIBO_HOST/${Container.chaohua(sinceId)}"
+	) { json: JsonObject ->
 		val data = json.obj("data")
 		val newSinceId = data.obj("pageInfo")["since_id"].long
 		val cards = data.arr("cards")

@@ -28,12 +28,11 @@ import love.yinlin.data.item.MsgTabItem
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
-import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.isWeb
 import love.yinlin.ui.Route
-import love.yinlin.ui.common.WeiboGridData
-import love.yinlin.ui.common.WeiboLayout
+import love.yinlin.ui.screen.msg.weibo.WeiboGridData
+import love.yinlin.ui.screen.msg.weibo.WeiboLayout
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.TabBar
@@ -58,29 +57,25 @@ class MsgModel(val mainModel: MainModel) {
 			if (grid.state != BoxState.LOADING) {
 				grid.state = BoxState.LOADING
 				canLoading = false
-				grid.state = Coroutines.io {
-					val result = WeiboAPI.extractChaohua(sinceId)
-					if (result is Data.Success) {
-						val (data, newSinceId) = result.data
-						sinceId = newSinceId
-						canLoading = newSinceId != 0L
-						grid.items = data
-						if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-					}
-					else BoxState.NETWORK_ERROR
+				val result = WeiboAPI.extractChaohua(sinceId)
+				grid.state = if (result is Data.Success) {
+					val (data, newSinceId) = result.data
+					sinceId = newSinceId
+					canLoading = newSinceId != 0L
+					grid.items = data
+					if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
 				}
+				else BoxState.NETWORK_ERROR
 			}
 		}
 
 		suspend fun requestMoreData() {
-			Coroutines.io {
-				val result = WeiboAPI.extractChaohua(sinceId)
-				if (result is Data.Success) {
-					val (data, newSinceId) = result.data
-					sinceId = newSinceId
-					canLoading = newSinceId != 0L
-					grid.items += data
-				}
+			val result = WeiboAPI.extractChaohua(sinceId)
+			if (result is Data.Success) {
+				val (data, newSinceId) = result.data
+				sinceId = newSinceId
+				canLoading = newSinceId != 0L
+				grid.items += data
 			}
 		}
 	}

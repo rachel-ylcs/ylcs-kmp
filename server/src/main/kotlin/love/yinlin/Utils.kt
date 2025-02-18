@@ -2,6 +2,7 @@ package love.yinlin
 
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.sql.Timestamp
 
 val String.md5: String get() = try {
 	val md = MessageDigest.getInstance("MD5")
@@ -15,3 +16,7 @@ val String.md5: String get() = try {
 	hexString.toString()
 }
 catch (_: Exception) { "" }
+
+val currentTS: Timestamp get() = Timestamp(System.currentTimeMillis())
+
+fun currentUniqueId(id: Any? = null) = "${System.currentTimeMillis()}${id}"

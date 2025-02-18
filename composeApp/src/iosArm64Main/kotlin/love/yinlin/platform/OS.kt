@@ -28,16 +28,18 @@ actual object OS {
 
 	@OptIn(ExperimentalForeignApi::class)
 	actual suspend fun downloadImage(url: String, state: DialogProgressState) {
-		val data = NSData.dataWithContentsOfURL(url = NSURL(string = url))
-		if (data != null) {
-			val image = UIImage.imageWithData(data = data)
-			if (image != null) {
-				UIImageWriteToSavedPhotosAlbum(
-					image = image,
-					completionTarget = null,
-					completionSelector = null,
-					contextInfo = null
-				)
+		Coroutines.io {
+			val data = NSData.dataWithContentsOfURL(url = NSURL(string = url))
+			if (data != null) {
+				val image = UIImage.imageWithData(data = data)
+				if (image != null) {
+					UIImageWriteToSavedPhotosAlbum(
+						image = image,
+						completionTarget = null,
+						completionSelector = null,
+						contextInfo = null
+					)
+				}
 			}
 		}
 	}

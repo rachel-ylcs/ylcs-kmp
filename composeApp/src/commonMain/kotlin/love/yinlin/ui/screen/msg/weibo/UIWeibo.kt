@@ -1,4 +1,4 @@
-package love.yinlin.ui.common
+package love.yinlin.ui.screen.msg.weibo
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -21,19 +21,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ensureActive
 import love.yinlin.api.WeiboAPI
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.NineGrid
-import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.data.weibo.Weibo
-import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
 import love.yinlin.data.common.Picture
+import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
-import love.yinlin.platform.Coroutines
+import love.yinlin.extension.DateEx
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.NineGrid
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.msg.MsgModel
+import kotlin.coroutines.coroutineContext
 
 class WeiboGridData {
 	var state by mutableStateOf(BoxState.EMPTY)
@@ -45,14 +45,12 @@ class WeiboGridData {
 			state = if (users.isEmpty()) BoxState.EMPTY
 			else {
 				val newItems = mutableMapOf<String, Weibo>()
-				Coroutines.io {
-					for (id in users) {
-						val result = WeiboAPI.getUserWeibo(id)
-						if (result is Data.Success) newItems += result.data.associateBy { it.id }
-						else if (result is Data.Error && result.type == RequestError.Canceled) {
-							state = BoxState.EMPTY
-							ensureActive()
-						}
+				for (id in users) {
+					val result = WeiboAPI.getUserWeibo(id)
+					if (result is Data.Success) newItems += result.data.associateBy { it.id }
+					else if (result is Data.Error && result.type == RequestError.Canceled) {
+						state = BoxState.EMPTY
+						coroutineContext.ensureActive()
 					}
 				}
 				items = newItems.map { it.value }.sortedDescending()

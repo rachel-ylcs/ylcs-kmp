@@ -13,7 +13,5 @@ actual object OS {
 		window.open(url, "_blank")
 	}
 
-	actual suspend fun downloadImage(url: String, state: DialogProgressState) {
-		window.open(url, "_blank")
-	}
+	actual suspend fun downloadImage(url: String, state: DialogProgressState) = openURL(url)
 }

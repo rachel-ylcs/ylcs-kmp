@@ -432,22 +432,15 @@ open class DialogProgressState : DialogState() {
 	override var isOpen: Boolean
 		get() = super.isOpen
 		set(value) {
-			if (super.isOpen != value) {
-				super.isOpen = value
-				if (value) {
-					current = "0"
-					total = "0"
-					progress = 0f
-					isCancel = false
-				}
-			}
+			super.isOpen = value
+			current = "0"
+			total = "0"
+			progress = 0f
 		}
 
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
 	var progress by mutableFloatStateOf(0f)
-	var isCancel by mutableStateOf(false)
-		internal set
 }
 
 @Composable
@@ -464,9 +457,8 @@ fun DialogProgress(
 		actions = {
 			DialogButton(
 				text = stringResource(Res.string.dialog_cancel),
-				enabled = !state.isCancel
+				enabled = state.isOpen
 			) {
-				state.isCancel = true
 				state.isOpen = false
 			}
 		}

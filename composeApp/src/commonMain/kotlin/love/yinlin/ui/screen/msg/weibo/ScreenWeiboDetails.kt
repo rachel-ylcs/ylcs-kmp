@@ -4,32 +4,34 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.platform.app
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.image.NineGrid
-import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
-import love.yinlin.AppModel
 import love.yinlin.launch
-import love.yinlin.platform.Coroutines
-import love.yinlin.ui.common.WeiboLayout
-import love.yinlin.ui.common.WeiboDataBar
-import love.yinlin.ui.common.WeiboUserBar
+import love.yinlin.platform.app
+import love.yinlin.ui.component.image.NineGrid
+import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.text.RichText
 
 class WeiboDetailsModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
@@ -39,10 +41,8 @@ class WeiboDetailsModel(model: AppModel) : ViewModel() {
 
 	fun init(weibo: Weibo) {
 		launch {
-			comments = Coroutines.io {
-				val data = WeiboAPI.getWeiboDetails(weibo.id)
-				if (data is Data.Success) data.data else emptyList()
-			}
+			val data = WeiboAPI.getWeiboDetails(weibo.id)
+			comments = if (data is Data.Success) data.data else emptyList()
 		}
 	}
 }

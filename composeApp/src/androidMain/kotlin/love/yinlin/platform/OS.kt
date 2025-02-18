@@ -1,14 +1,13 @@
 package love.yinlin.platform
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.compose.runtime.Stable
-import io.ktor.client.request.prepareGet
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.streams.asByteWriteChannel
+import io.ktor.utils.io.streams.*
 import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
 import love.yinlin.ui.component.screen.DialogProgressState
@@ -29,39 +28,32 @@ actual object OS {
 	}
 
 	actual suspend fun downloadImage(url: String, state: DialogProgressState) {
-		state.isOpen = true
-		app.fileClient.safeCall { client ->
-			client.prepareGet(url).execute { response ->
-				val totalSize = response.bodyLength()
-				Coroutines.main { state.total = totalSize.fileSizeString }
-				val readChannel = response.bodyAsChannel()
+		try {
+			val filename = url.substringAfterLast('/').substringBefore('?')
+			val values = ContentValues()
+			values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+			values.put(MediaStore.Images.Media.MIME_TYPE, MimeType.IMAGE)
+			values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+			val resolver = appNative.context.contentResolver
+			val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
 
-				val filename = url.substringAfterLast('/').substringBefore('?')
-				val values = ContentValues()
-				values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
-				values.put(MediaStore.Images.Media.MIME_TYPE, MimeType.IMAGE)
-				values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-				val resolver = appNative.context.contentResolver
-				val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
-				val outputStream = resolver.openOutputStream(uri)!!
-				val writeChannel = outputStream.asByteWriteChannel()
-
-				try {
-					Coroutines.io {
-						transfer(readChannel, writeChannel, { state.isCancel }) {
-							Coroutines.main {
-								state.progress = if (totalSize != 0L) it.toFloat() / totalSize else 0f
-								state.current = it.fileSizeString
-							}
-						}
-					}
-				}
-				finally {
-					writeChannel.flushAndClose()
-					outputStream.close()
-				}
-			}
+			state.isOpen = true
+			app.fileClient.safeDownload(
+				url = url,
+				isCancel = { !state.isOpen },
+				onStart = { state.total = it.fileSizeString },
+				onTick = { current, total ->
+					state.current = current.fileSizeString
+					if (total != 0L) state.progress = current / total.toFloat()
+				},
+				onWriteBegin = { @SuppressLint("Recycle") resolver.openOutputStream(uri) },
+				onWriteChannel = { it.asByteWriteChannel() },
+				onWriteEnd = { it.close() }
+			)
+			state.isOpen = false
 		}
-		state.isOpen = false
+		catch (e: Exception) {
+			e.printStackTrace()
+		}
 	}
 }

@@ -97,7 +97,6 @@ private fun Portrait(model: ImagePreviewModel) {
 			val preview = model.previews[it]
 			ZoomWebImage(
 				uri = if (preview.isSource) preview.pic.source else preview.pic.image,
-				key = DateEx.currentDateString,
 				modifier = Modifier.fillMaxSize()
 			)
 		}
@@ -127,7 +126,6 @@ private fun Landscape(model: ImagePreviewModel) {
 			itemsIndexed(items = model.previews) { index, item ->
 				WebImage(
 					uri = item.pic.image,
-					key = DateEx.currentDateString,
 					contentScale = ContentScale.Crop,
 					modifier = Modifier.fillMaxWidth().height(150.dp)
 						.condition(index == model.current) {
@@ -147,7 +145,6 @@ private fun Landscape(model: ImagePreviewModel) {
 			val preview = model.previews[model.current]
 			ZoomWebImage(
 				uri = if (preview.isSource) preview.pic.source else preview.pic.image,
-				key = DateEx.currentDateString,
 				modifier = Modifier.fillMaxWidth().weight(1f)
 			)
 			PreviewControls(

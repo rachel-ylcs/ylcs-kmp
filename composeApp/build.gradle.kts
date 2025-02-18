@@ -71,6 +71,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(libs.coroutines)
+            implementation(libs.io)
             implementation(libs.navigation)
             implementation(libs.backhandler)
             implementation(libs.lifecycle.viewmodel)
@@ -87,7 +88,6 @@ kotlin {
             implementation(libs.sketch.webp)
             implementation(libs.sketch.zoom)
             implementation(libs.html)
-            implementation(libs.filekit)
         }
 
         androidMain.dependencies {

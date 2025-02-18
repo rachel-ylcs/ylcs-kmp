@@ -10,9 +10,11 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.float
 import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
@@ -20,10 +22,12 @@ import kotlinx.serialization.json.jsonPrimitive
 
 val JsonElement?.boolean: Boolean get() = this?.jsonPrimitive?.boolean ?: error("")
 val JsonElement?.int: Int get() = this?.jsonPrimitive?.int ?: error("")
+val JsonElement?.intOrNull: Int? get() = if (this == null || this == JsonNull) null else this.jsonPrimitive.intOrNull
 val JsonElement?.long: Long get() = this?.jsonPrimitive?.long ?: error("")
 val JsonElement?.float: Float get() = this?.jsonPrimitive?.float ?: error("")
 val JsonElement?.double: Double get() = this?.jsonPrimitive?.double ?: error("")
 val JsonElement?.string: String get() = this?.jsonPrimitive?.content ?: error("")
+val JsonElement?.stringOrNull: String? get() = if (this == null || this == JsonNull) null else this.jsonPrimitive.contentOrNull
 val JsonElement?.obj: JsonObject get() = this?.jsonObject ?: error("")
 val JsonElement?.arr: JsonArray get() = this?.jsonArray ?: error("")
 fun JsonObject.obj(key: String): JsonObject = this[key]?.jsonObject ?: error("")

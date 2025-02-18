@@ -1,15 +1,13 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
-import io.github.vinceglb.filekit.core.FileKit
-import io.ktor.client.request.prepareGet
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.HttpHeaders
-import io.ktor.util.cio.writeChannel
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.io.files.Path
 import love.yinlin.extension.fileSizeString
 import love.yinlin.ui.component.screen.DialogProgressState
 import java.awt.Desktop
-import java.io.File
+import java.awt.FileDialog
+import java.awt.Frame
 import java.net.URI
 
 @Stable
@@ -34,31 +32,26 @@ actual object OS {
 	}
 
 	actual suspend fun downloadImage(url: String, state: DialogProgressState) {
-		val filename = url.substringAfterLast('/').substringBefore('?')
-		val outFilename = FileKit.saveFile(bytes = null, baseName = filename, extension = "*")
-		if (outFilename != null) {
-			state.isOpen = true
-			app.fileClient.safeCall { client ->
-				client.prepareGet(url).execute { response ->
-					val totalSize = response.bodyLength()
-					Coroutines.main { state.total = totalSize.fileSizeString }
-					val readChannel = response.bodyAsChannel()
-					val writeChannel = outFilename.file.writeChannel()
+		val saveFile = suspendCancellableCoroutine { continuation ->
+			val filename = url.substringAfterLast('/').substringBefore('?')
+			val fileDialog = FileDialog(null as? Frame?, "保存到", FileDialog.SAVE)
+			fileDialog.isMultipleMode = false
+			fileDialog.file = filename
+			fileDialog.isVisible = true
+			fileDialog.filenameFilter
+			continuation.resume(fileDialog.files?.firstOrNull()) { _, _, _ -> fileDialog.dispose() }
+		}
 
-					try {
-						Coroutines.io {
-							transfer(readChannel, writeChannel, { state.isCancel }) {
-								Coroutines.main {
-									state.progress = if (totalSize != 0L) it.toFloat() / totalSize else 0f
-									state.current = it.fileSizeString
-								}
-							}
-						}
-					}
-					finally {
-						writeChannel.flushAndClose()
-					}
-				}
+		if (saveFile != null) {
+			state.isOpen = true
+			app.fileClient.safeDownload(
+				url = url,
+				file = Path(saveFile.path),
+				isCancel = { !state.isOpen },
+				onStart = { state.total = it.fileSizeString }
+			) { current, total ->
+				state.current = current.fileSizeString
+				if (total != 0L) state.progress = current / total.toFloat()
 			}
 			state.isOpen = false
 		}

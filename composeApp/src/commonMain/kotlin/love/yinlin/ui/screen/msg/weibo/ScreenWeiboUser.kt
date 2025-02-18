@@ -26,7 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.ThemeColor
 import love.yinlin.api.WeiboAPI
-import love.yinlin.platform.app
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
@@ -35,17 +34,11 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.launch
-import love.yinlin.platform.Coroutines
+import love.yinlin.platform.app
 import love.yinlin.ui.Route
-import love.yinlin.ui.common.WeiboGrid
-import love.yinlin.ui.common.WeiboGridData
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.layout.SimpleEmptyBox
-import love.yinlin.ui.component.layout.SimpleLoadingBox
-import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 
 class WeiboUserModel(model: AppModel) : ViewModel() {
@@ -57,19 +50,15 @@ class WeiboUserModel(model: AppModel) : ViewModel() {
 
 	fun init(id: String) {
 		launch {
-			user = Coroutines.io {
-				val data = WeiboAPI.getWeiboUser(id)
-				if (data is Data.Success) data.data else null
-			}
+			val data = WeiboAPI.getWeiboUser(id)
+			user = if (data is Data.Success) data.data else null
 			user?.let {
 				grid.requestWeibo(listOf(it.info.id))
 			}
 		}
 		launch {
-			albums = Coroutines.io {
-				val data = WeiboAPI.getWeiboUserAlbum(id)
-				if (data is Data.Success) data.data else null
-			}
+			val data = WeiboAPI.getWeiboUserAlbum(id)
+			albums = if (data is Data.Success) data.data else null
 		}
 	}
 

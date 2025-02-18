@@ -26,7 +26,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.launch
-import love.yinlin.platform.Coroutines
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -70,7 +69,7 @@ class WeiboFollowsModel(val model: AppModel) : ViewModel() {
 	fun onSearchWeiboUser(key: String) {
 		launch {
 			state = BoxState.LOADING
-			val result = Coroutines.io { WeiboAPI.searchWeiboUser(key) }
+			val result = WeiboAPI.searchWeiboUser(key)
 			isLocal = false
 			if (result is Data.Success) {
 				val data = result.data

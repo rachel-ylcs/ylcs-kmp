@@ -1,8 +1,16 @@
 package love.yinlin.api
 
+import io.ktor.server.request.receive
 import io.ktor.server.routing.Routing
+import love.yinlin.DB
 import love.yinlin.Redis
-import love.yinlin.throwQuerySQLSingle
+import love.yinlin.Resources
+import love.yinlin.currentTS
+import love.yinlin.extension.int
+import love.yinlin.extension.intOrNull
+import love.yinlin.extension.makeObject
+import love.yinlin.extension.string
+import love.yinlin.md5
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -13,17 +21,54 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
+/* ------------------ 邮箱 --------------------- */
+
+object Mail {
+	const val TIP = 1 // 通知
+	const val CONFIRM = 2 // 确认
+	const val DECISION = 4 // 决定
+	const val INPUT = 8 // 输入
+
+	object Filter {
+		const val REGISTER = "user#register"
+		const val FORGOT_PASSWORD = "user#forgotPassword"
+		const val OPEN_BETA_2024 = "user#2024OpenBeta"
+		const val COIN_REWARD = "user#coinReward"
+	}
+}
+
+/* ------------------ 权限 --------------------- */
+
+object Privilege {
+	const val BACKUP = 1 // 备份
+	const val RES = 2 // 美图
+	const val TOPIC = 4 // 主题
+	const val UNUSED = 8 // 未定
+	const val VIP_ACCOUNT = 16 // 账号管理
+	const val VIP_TOPIC = 32 // 主题管理
+	const val VIP_CALENDAR = 64 // 日历管理
+
+	fun has(privilege: Int, mask: Int): Boolean = (privilege and mask) != 0
+	fun backup(privilege: Int): Boolean = has(privilege, BACKUP)
+	fun res(privilege: Int): Boolean = has(privilege, RES)
+	fun topic(privilege: Int): Boolean = has(privilege, TOPIC)
+	fun vipAccount(privilege: Int): Boolean = has(privilege, VIP_ACCOUNT)
+	fun vipTopic(privilege: Int): Boolean = has(privilege, VIP_TOPIC)
+	fun vipCalendar(privilege: Int): Boolean = has(privilege, VIP_CALENDAR)
+}
+
 /* ------------------ 验证 --------------------- */
 
-object Validation {
+object VN {
 	class ValidationError(source: String, data: Any? = null) : Throwable() {
 		override val message: String = "ValidationError $data"
 	}
 
-	const val MIN_NAME_LENGTH = 2
-	const val MAX_NAME_LENGTH = 16
-	const val MIN_PWD_LENGTH = 6
-	const val MAX_PWD_LENGTH = 18
+	private const val MIN_NAME_LENGTH = 2
+	private const val MAX_NAME_LENGTH = 16
+	private const val MIN_PWD_LENGTH = 6
+	private const val MAX_PWD_LENGTH = 18
+
 	const val RENAME_COIN_COST = 5
 
 	fun throwIf(vararg args: Boolean) = if (args.any { it })
@@ -36,12 +81,12 @@ object Validation {
 		throw ValidationError("Password", args) else Unit
 	fun throwEmpty(vararg args: String) = if (args.any { it.isEmpty() })
 		throw ValidationError("Empty", args) else Unit
-	fun throwGetUser(uid: Int, col: String = "uid") = throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
+	fun throwGetUser(uid: Int, col: String = "uid") = DB.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
 }
 
 /* ------------------ 鉴权 --------------------- */
 
-object Authorization {
+object AN {
 	private const val TOKEN_SECRET_KEY = "token_secret_key"
 
 	private val AES_KEY: SecretKey = Redis.use {
@@ -131,9 +176,170 @@ object Authorization {
 /* ------------------ 接口 --------------------- */
 
 fun Routing.userAPI(implMap: ImplMap) {
+	// ------  登录  ------
 	catchAsyncPost("/user/login") {
 		data class Body(val name: String, val pwd: String)
 		val (name, pwd) = call.to<Body>()
+		VN.throwName(name)
+		VN.throwPassword(pwd)
+		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name)
+		if (user == null) return@catchAsyncPost call.failed("ID未注册")
+		if (user["pwd"].string != pwd.md5) return@catchAsyncPost call.failed("密码错误")
+		val uid = user["uid"].int
+		// 根据 uid 和 timestamp 生成 token
+		val token = AN.throwGenerateToken(uid)
+		// 返回用户信息
+		call.success(makeObject { "token" to token })
+	}
 
+	// ------  注销  ------
+	catchAsyncPost("/user/logoff") {
+		data class Body(val token: String)
+		val (token) = call.receive<Body>()
+		AN.throwRemoveToken(token)
+		call.success()
+	}
+
+	// ------  更新 Token  ------
+	catchAsyncPost("/user/updateToken") {
+		data class Body(val token: String)
+		val (token) = call.receive<Body>()
+		val uid = AN.throwExpireToken(token)
+		// 生成新的Token
+		val newToken = AN.throwGenerateToken(uid)
+		call.success(makeObject { "token" to newToken })
+	}
+
+	// ------  注册审批  ------
+	catchAsyncPost("/user/register") {
+		data class Body(val name: String, val pwd: String, val inviterName: String)
+		val (name, pwd, inviterName) = call.receive<Body>()
+		VN.throwName(name, inviterName)
+		VN.throwPassword(pwd)
+
+		// 查询ID是否注册过或是否正在审批
+		if (DB.querySQLSingle("""
+            SELECT name FROM user WHERE name = ?
+            UNION
+            SELECT param1 FROM mail WHERE param1 = ? AND filter = '${Mail.Filter.REGISTER}'
+        """, name, name) != null)
+			return@catchAsyncPost call.failed("\"${name}\"已注册或正在注册审批中")
+
+		// 检查邀请人是否有审核资格
+		val inviter = DB.querySQLSingle("""
+                SELECT uid, privilege FROM user WHERE (privilege & ${Privilege.VIP_ACCOUNT}) != 0 AND name = ?
+            """, inviterName)
+		if (inviter == null) return@catchAsyncPost call.failed("邀请人\"${inviterName}\"不存在")
+		if (!Privilege.vipAccount(inviter["privilege"].int))
+			return@catchAsyncPost call.failed("邀请人\"${inviterName}\"无审核资格")
+
+		// 提交申请
+		DB.throwExecuteSQL("""
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, inviter["uid"].int, Mail.DECISION, "用户注册审核",
+			"小银子\"${name}\"填写你作为邀请人注册，是否同意？",
+			Mail.Filter.REGISTER, name, pwd.md5)
+		call.success("提交申请成功, 请等待管理员审核")
+	}
+
+	// ------  # 注册实现 #  ------
+	implMap[Mail.Filter.REGISTER] = ImplContext@ {
+		val inviterID = it["uid"].int
+		val registerName = it["param1"].string
+		val registerPwd = it["param2"].string
+		val createTime = currentTS
+		val registerID = DB.throwInsertSQLGeneratedKey("""
+            INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, registerName, registerPwd, inviterID, createTime, createTime, "{}", ByteArray(46)
+		).toInt()
+		if (registerID == 0) return@ImplContext "\"${registerName}\"已注册".failedObject
+		// 处理用户目录
+		val userPath = Resources.Public.Users.User(registerID)
+		// 如果用户目录存在则先删除
+		if (userPath.exists()) userPath.deleteRecursively()
+		// 创建用户目录
+		userPath.mkdir()
+		// 创建用户图片目录
+		userPath.Pics().mkdir()
+		// 复制初始资源
+		Resources.Public.Assets.DefaultAvatar.copyTo(userPath.avatar)
+		Resources.Public.Assets.DefaultWall.copyTo(userPath.wall)
+		"注册用户\"${registerName}\"成功".successObject
+	}
+
+	// ------  忘记密码审批  ------
+	catchAsyncPost("/user/forgotPassword") {
+		data class Body(val name: String, val pwd: String)
+		val (name, pwd) = call.receive<Body>()
+		VN.throwName(name)
+		VN.throwPassword(pwd)
+		val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name)
+		if (user == null) return@catchAsyncPost call.failed("ID\"${name}\"未注册")
+		val inviterUid = user["inviter"].intOrNull ?: return@catchAsyncPost call.failed("原始ID请联系管理员修改密码")
+
+		// 检查邀请人是否有审核资格
+		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid)
+		if (inviter == null) return@catchAsyncPost call.failed("邀请人不存在")
+		val inviterName = inviter["name"].string
+		if (!Privilege.vipAccount(inviter["privilege"].int))
+			return@catchAsyncPost call.failed("邀请人\"${inviterName}\"无审核资格")
+		// 查询ID是否注册过或是否正在审批
+		if (DB.querySQLSingle("""
+            SELECT uid FROM mail
+            WHERE uid = ? AND filter = '${Mail.Filter.FORGOT_PASSWORD}' AND param1 = ? AND processed = 0
+        """, inviterUid, name) != null)
+			return@catchAsyncPost call.failed("已提交过审批，请等待邀请人\"${inviterName}\"审核")
+		// 提交申请
+		DB.throwExecuteSQL("""
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2) VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, inviterUid, Mail.DECISION, "用户修改密码审核",
+			"\"${name}\"需要修改密码，是否同意？",
+			Mail.Filter.FORGOT_PASSWORD, name, pwd.md5)
+		call.success("提交申请成功, 请等待管理员审核")
+	}
+
+	// ------  # 忘记密码实现 #  ------
+	implMap[Mail.Filter.FORGOT_PASSWORD] = ImplContext@ {
+		val name = it["param1"].string
+		val pwd = it["param2"].string
+		val user = DB.querySQLSingle("SELECT uid FROM user WHERE name = ?", name)
+		if (user == null) return@ImplContext "用户不存在".failedObject
+		DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
+		// 清除修改密码用户的 Token
+		AN.removeToken(user["uid"].int)
+		"\"${name}\"修改密码成功".successObject
+	}
+
+	// ------  取用户信息  ------
+	catchAsyncPost("/user/getInfo") {
+		data class Body(val token: String)
+		val (token) = call.receive<Body>()
+		val uid = AN.throwExpireToken(token)
+		val user = DB.throwQuerySQLSingle("""
+            SELECT u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u2.name AS inviterName
+            FROM user AS u1
+            LEFT JOIN user AS u2
+            ON u1.inviter = u2.uid
+            WHERE u1.uid = ?
+        """, uid)
+		// 更新最后上线时间
+		DB.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", currentTS, uid)
+		call.success(user)
+	}
+
+	// 更新昵称
+	catchAsyncPost("/user/updateName") {
+		data class Body(val token: String, val name: String)
+		val (token, name) = call.receive<Body>()
+		VN.throwName(name)
+		val uid = AN.throwExpireToken(token)
+		if (DB.querySQLSingle("SELECT 1 FROM user WHERE name = ?", name) != null)
+			return@catchAsyncPost call.failed("ID\"${name}\"已被注册")
+		if (DB.updateSQL("""
+            UPDATE user SET name = ? , coin = coin - ? WHERE uid = ? AND coin >= ?
+        """, name, VN.RENAME_COIN_COST, uid, VN.RENAME_COIN_COST)) call.success("修改ID成功")
+		else call.failed("你的银币不够哦")
 	}
 }
