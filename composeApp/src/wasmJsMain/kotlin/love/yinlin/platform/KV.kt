@@ -1,7 +1,7 @@
 package love.yinlin.platform
 
 import kotlinx.browser.localStorage
-import kotlinx.serialization.json.Json
+import love.yinlin.extension.Json
 
 actual class KV {
 	actual fun set(key: String, value: Boolean, expire: Int) {

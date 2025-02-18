@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import love.yinlin.Colors
+import love.yinlin.extension.Json
 import love.yinlin.extension.arr
 import love.yinlin.extension.boolean
 import love.yinlin.extension.int
@@ -100,8 +101,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 
 	override fun toString(): String {
-		val format = Json { prettyPrint = false }
-		return format.encodeToString(json)
+		return Json.encodeToString(json)
 	}
 
 	protected fun makeItem(item: RichItem) {

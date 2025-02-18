@@ -3,7 +3,6 @@ package love.yinlin.extension
 import androidx.core.bundle.Bundle
 import androidx.core.uri.UriUtils
 import androidx.navigation.NavType
-import kotlinx.serialization.json.Json
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 

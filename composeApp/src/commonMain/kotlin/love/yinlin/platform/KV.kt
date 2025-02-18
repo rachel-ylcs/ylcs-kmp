@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-import kotlinx.serialization.json.Json
+import love.yinlin.extension.Json
 
 object KVExpire {
 	const val NEVER = 0

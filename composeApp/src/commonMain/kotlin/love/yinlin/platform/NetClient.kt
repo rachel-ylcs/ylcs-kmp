@@ -14,11 +14,11 @@ import io.ktor.utils.io.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.json.Json
 import love.yinlin.IOThread
 import love.yinlin.MainThread
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
+import love.yinlin.extension.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 expect object NetClient {
@@ -32,10 +32,7 @@ fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useJson() {
 	}
 
 	install(ContentNegotiation) {
-		json(Json {
-			ignoreUnknownKeys = true
-			prettyPrint = false
-		})
+		json(Json)
 	}
 }
 
@@ -89,9 +86,13 @@ suspend inline fun <reified T, R> HttpClient.safePost(
 }
 
 class PostFormScope(internal val builder: FormBuilder) {
-	fun add(key: String, value: String) = builder.append(key, value)
-	fun add(key: String, file: Path) = builder.append(
-		key = key,
+	infix fun String.to(text: String) = builder.append(
+		key = this,
+		value = text
+	)
+
+	infix fun String.to(file: Path) = builder.append(
+		key = this,
 		value = InputProvider { SystemFileSystem.source(file).buffered() },
 		headers = Headers.build {
 			append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")

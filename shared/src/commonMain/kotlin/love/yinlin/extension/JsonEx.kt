@@ -1,5 +1,6 @@
 package love.yinlin.extension
 
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonArrayBuilder
 import kotlinx.serialization.json.JsonElement
@@ -20,6 +21,11 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.jsonPrimitive
 
+val Json = Json {
+	prettyPrint = false
+	ignoreUnknownKeys = true
+}
+
 val JsonElement?.boolean: Boolean get() = this?.jsonPrimitive?.boolean ?: error("")
 val JsonElement?.int: Int get() = this?.jsonPrimitive?.int ?: error("")
 val JsonElement?.intOrNull: Int? get() = if (this == null || this == JsonNull) null else this.jsonPrimitive.intOrNull
@@ -28,6 +34,8 @@ val JsonElement?.float: Float get() = this?.jsonPrimitive?.float ?: error("")
 val JsonElement?.double: Double get() = this?.jsonPrimitive?.double ?: error("")
 val JsonElement?.string: String get() = this?.jsonPrimitive?.content ?: error("")
 val JsonElement?.stringOrNull: String? get() = if (this == null || this == JsonNull) null else this.jsonPrimitive.contentOrNull
+@OptIn(ExperimentalStdlibApi::class)
+val JsonElement?.byteArray: ByteArray get() = this?.jsonPrimitive?.content?.hexToByteArray() ?: error("")
 val JsonElement?.obj: JsonObject get() = this?.jsonObject ?: error("")
 val JsonElement?.arr: JsonArray get() = this?.jsonArray ?: error("")
 fun JsonObject.obj(key: String): JsonObject = this[key]?.jsonObject ?: error("")
@@ -36,6 +44,8 @@ fun JsonObject.arr(key: String): JsonArray = this[key]?.jsonArray ?: error("")
 val Boolean?.json: JsonElement get() = JsonPrimitive(this)
 val Number?.json: JsonElement get() = JsonPrimitive(this)
 val String.json: JsonElement get() = JsonPrimitive(this)
+
+inline fun <reified T> T?.toJsonString() : String = if (this == null) "null" else Json.encodeToString(this)
 
 data class JsonArrayScope(val builder: JsonArrayBuilder) {
 	fun add(value: Nothing?) = builder.add(JsonNull)

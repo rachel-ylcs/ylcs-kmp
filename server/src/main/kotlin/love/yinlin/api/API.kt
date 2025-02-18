@@ -13,10 +13,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.io.readByteArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import love.yinlin.currentUniqueId
+import love.yinlin.extension.Json
 import love.yinlin.extension.makeObject
 import love.yinlin.logger
 import java.io.File
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -36,7 +41,13 @@ class TokenExpireError(uid: Int) : Throwable() {
 
 // Request
 
-fun RoutingCall.params(): Map<String, String> = this.queryParameters.toMap().mapValues { it.value.first() }
+inline fun <reified T> RoutingCall.params(): T {
+	val map = this.queryParameters.toMap().mapValues { it.value.first() }
+	val json = makeObject {
+		for ((key, value) in map) key to value
+	}
+	return Json.decodeFromJsonElement(json)
+}
 
 suspend inline fun <reified T : Any> RoutingCall.to(): T = this.receive<T>()
 
@@ -67,6 +78,14 @@ suspend fun RoutingCall.toForm(): Map<String, String> {
 		}
 	}
 	return map
+}
+
+suspend inline fun <reified T> RoutingCall.toFormObject(): T {
+	val form = this.toForm()
+	val json = makeObject {
+		for ((key, value) in form) key to value
+	}
+	return Json.decodeFromJsonElement(json)
 }
 
 // Response

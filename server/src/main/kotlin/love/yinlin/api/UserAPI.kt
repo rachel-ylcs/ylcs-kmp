@@ -2,20 +2,27 @@ package love.yinlin.api
 
 import io.ktor.server.request.receive
 import io.ktor.server.routing.Routing
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import love.yinlin.DB
 import love.yinlin.Redis
 import love.yinlin.Resources
 import love.yinlin.currentTS
+import love.yinlin.extension.byteArray
 import love.yinlin.extension.int
 import love.yinlin.extension.intOrNull
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.string
+import love.yinlin.extension.toJsonString
 import love.yinlin.md5
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -81,8 +88,9 @@ object VN {
 		throw ValidationError("Password", args) else Unit
 	fun throwEmpty(vararg args: String) = if (args.any { it.isEmpty() })
 		throw ValidationError("Empty", args) else Unit
-	fun throwGetUser(uid: Int, col: String = "uid") = DB.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
 }
+
+fun DB.throwGetUser(uid: Int, col: String = "uid") = DB.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
 
 /* ------------------ 鉴权 --------------------- */
 
@@ -178,7 +186,9 @@ object AN {
 fun Routing.userAPI(implMap: ImplMap) {
 	// ------  登录  ------
 	catchAsyncPost("/user/login") {
+		@Serializable
 		data class Body(val name: String, val pwd: String)
+
 		val (name, pwd) = call.to<Body>()
 		VN.throwName(name)
 		VN.throwPassword(pwd)
@@ -194,7 +204,9 @@ fun Routing.userAPI(implMap: ImplMap) {
 
 	// ------  注销  ------
 	catchAsyncPost("/user/logoff") {
+		@Serializable
 		data class Body(val token: String)
+
 		val (token) = call.receive<Body>()
 		AN.throwRemoveToken(token)
 		call.success()
@@ -202,7 +214,9 @@ fun Routing.userAPI(implMap: ImplMap) {
 
 	// ------  更新 Token  ------
 	catchAsyncPost("/user/updateToken") {
+		@Serializable
 		data class Body(val token: String)
+
 		val (token) = call.receive<Body>()
 		val uid = AN.throwExpireToken(token)
 		// 生成新的Token
@@ -212,7 +226,9 @@ fun Routing.userAPI(implMap: ImplMap) {
 
 	// ------  注册审批  ------
 	catchAsyncPost("/user/register") {
+		@Serializable
 		data class Body(val name: String, val pwd: String, val inviterName: String)
+
 		val (name, pwd, inviterName) = call.receive<Body>()
 		VN.throwName(name, inviterName)
 		VN.throwPassword(pwd)
@@ -271,7 +287,9 @@ fun Routing.userAPI(implMap: ImplMap) {
 
 	// ------  忘记密码审批  ------
 	catchAsyncPost("/user/forgotPassword") {
+		@Serializable
 		data class Body(val name: String, val pwd: String)
+
 		val (name, pwd) = call.receive<Body>()
 		VN.throwName(name)
 		VN.throwPassword(pwd)
@@ -314,7 +332,9 @@ fun Routing.userAPI(implMap: ImplMap) {
 
 	// ------  取用户信息  ------
 	catchAsyncPost("/user/getInfo") {
+		@Serializable
 		data class Body(val token: String)
+
 		val (token) = call.receive<Body>()
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
@@ -329,9 +349,11 @@ fun Routing.userAPI(implMap: ImplMap) {
 		call.success(user)
 	}
 
-	// 更新昵称
+	// ------  更新昵称  ------
 	catchAsyncPost("/user/updateName") {
+		@Serializable
 		data class Body(val token: String, val name: String)
+
 		val (token, name) = call.receive<Body>()
 		VN.throwName(name)
 		val uid = AN.throwExpireToken(token)
@@ -341,5 +363,90 @@ fun Routing.userAPI(implMap: ImplMap) {
             UPDATE user SET name = ? , coin = coin - ? WHERE uid = ? AND coin >= ?
         """, name, VN.RENAME_COIN_COST, uid, VN.RENAME_COIN_COST)) call.success("修改ID成功")
 		else call.failed("你的银币不够哦")
+	}
+
+	// ------  更新头像  ------
+	catchAsyncPost("/user/updateAvatar") {
+		@Serializable
+		data class Body(val token: String, val avatar: String)
+
+		val (token, avatar) = call.toFormObject<Body>()
+		val uid = AN.throwExpireToken(token)
+		// 保存头像
+		File(avatar).copyTo(Resources.Public.Users.User(uid).avatar)
+		call.success("更新成功")
+	}
+
+	// ------  更新个性签名  ------
+	catchAsyncPost("/user/updateSignature") {
+		@Serializable
+		data class Body(val token: String, val signature: String)
+
+		val (token, signature) = call.receive<Body>()
+		VN.throwEmpty(signature)
+		val uid = AN.throwExpireToken(token)
+		DB.throwExecuteSQL("UPDATE user SET signature = ? WHERE uid = ?", signature, uid)
+		call.success("更新成功")
+	}
+
+	// ------  更新背景墙  ------
+	catchAsyncPost("/user/updateWall") {
+		@Serializable
+		data class Body(val token: String, val wall: String)
+
+		val (token, wall) = call.toFormObject<Body>()
+		val uid = AN.throwExpireToken(token)
+		// 保存背景墙
+		File(wall).copyTo(Resources.Public.Users.User(uid).wall)
+		call.success("更新成功")
+	}
+
+	// ------  歌单云备份  ------
+	catchAsyncPost("/user/uploadPlaylist") {
+		@Serializable
+		data class Body(val token: String, val playlist: JsonObject)
+
+		val (token, playlist) = call.receive<Body>()
+		val uid = AN.throwExpireToken(token)
+		if (DB.updateSQL("""
+            UPDATE user SET playlist = ? WHERE uid = ? AND (privilege & ${Privilege.BACKUP}) != 0
+        """, playlist.toJsonString(), uid)) call.success("上传成功")
+		else call.failed("无权限")
+	}
+
+	// ------  歌单云还原  ------
+	catchAsyncPost("/user/downloadPlaylist") {
+		@Serializable
+		data class Body(val token: String)
+
+		val (token) = call.receive<Body>()
+		val uid = AN.throwExpireToken(token)
+		val user = DB.throwGetUser(uid, "privilege, playlist")
+		if (Privilege.backup(user["privilege"].int)) call.success("下载成功", user["playlist"]!!)
+		else call.failed("无权限")
+	}
+
+	// ------  签到  ------
+	catchAsyncPost("/user/signin") {
+		@Serializable
+		data class Body(val token: String)
+
+		val (token) = call.receive<Body>()
+		val uid = AN.throwExpireToken(token)
+		val user = DB.throwGetUser(uid, "signin")
+		// 查询是否签到 ... 签到记录46字节(368位)
+		val signin = user["signin"].byteArray
+		val currentDate = LocalDate.now()
+		val firstDayOfYear = LocalDate.of(currentDate.year, 1, 1)
+		val dayIndex = ChronoUnit.DAYS.between(firstDayOfYear, currentDate).toInt()
+		val byteIndex = dayIndex / 8
+		val bitIndex = dayIndex % 8
+		val byteValue = signin[byteIndex].toInt()
+		val bitValue = (byteValue shr bitIndex) and 1
+		if (bitValue == 1) return@catchAsyncPost call.failed("今天已经签到!")
+		signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
+		// 更新签到值，银币增加
+		DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
+		call.success("签到成功, 银币+1")
 	}
 }
