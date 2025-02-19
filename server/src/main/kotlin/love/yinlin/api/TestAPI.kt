@@ -1,13 +1,14 @@
 package love.yinlin.api
 
 import io.ktor.server.routing.Routing
+import love.yinlin.data.Data
 
 fun Routing.testAPI(implMap: ImplMap) {
-	catchAsyncGet("/test") {
-		call.success()
+	api(API.Test.Get) {
+		Data.Success(it.toString())
 	}
 
-	catchAsyncPost("/test") {
-		call.success()
+	api(API.Test.Post) {
+		Data.Success(it.toString())
 	}
 }

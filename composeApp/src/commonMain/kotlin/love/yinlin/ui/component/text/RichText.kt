@@ -20,11 +20,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import love.yinlin.Colors
+import love.yinlin.extension.Array
+import love.yinlin.extension.Boolean
+import love.yinlin.extension.Int
 import love.yinlin.extension.Json
-import love.yinlin.extension.arr
-import love.yinlin.extension.boolean
-import love.yinlin.extension.int
-import love.yinlin.extension.string
+import love.yinlin.extension.String
+import love.yinlin.extension.json
+import love.yinlin.extension.makeObject
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.WebImageQuality
 
@@ -81,19 +83,20 @@ interface RichItem {
 
 @Stable
 abstract class RichObject(protected val type: String) : RichItem {
-	protected open val map: MutableMap<String, JsonElement> get() = mutableMapOf(
-		RICH_ARG_TYPE to JsonPrimitive(type)
-	)
+	protected open val map: JsonObject get() = makeObject { RICH_ARG_TYPE to type }
 
-	override val json: JsonElement get() = JsonObject(map)
+	override val json: JsonElement get() = map
 }
 
 @Stable
 abstract class RichContainer(type: String) : RichObject(type) {
 	protected val items = mutableListOf<RichItem>()
 
-	override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-		this[RICH_ARG_MEMBER] = JsonArray(items.map { it.json })
+	override val map: JsonObject get() = makeObject {
+		merge(super.map)
+		arr(RICH_ARG_MEMBER) {
+			for (item in items) add(item.json)
+		}
 	}
 
 	override fun build(context: RichContext) {
@@ -115,7 +118,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Text(private val text: String) : RichItem {
-		override val json: JsonElement get() = JsonPrimitive(text)
+		override val json: JsonElement get() = text.json
 
 		override fun build(context: RichContext) {
 			context.builder.append(text)
@@ -125,10 +128,10 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Emoji(private val id: Int) : RichItem {
-		override val json: JsonElement get() = JsonPrimitive(id)
+		override val json: JsonElement get() = id.json
 
 		override fun build(context: RichContext) {
-
+			TODO()
 		}
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
@@ -145,8 +148,9 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Image(private val uri: String) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
-		override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-			this[RICH_ARG_URI] = JsonPrimitive(uri)
+		override val map: JsonObject get() = makeObject {
+			merge(super.map)
+			RICH_ARG_URI to uri
 		}
 
 		override fun build(context: RichContext) {
@@ -170,9 +174,10 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Link(private val uri: String, private val text: String) : RichObject(RICH_TYPE_LINK) {
-		override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-			this[RICH_ARG_URI] = JsonPrimitive(uri)
-			this[RICH_ARG_TEXT] = JsonPrimitive(text)
+		override val map: JsonObject get() = makeObject {
+			merge(super.map)
+			RICH_ARG_URI to uri
+			RICH_ARG_TEXT to text
 		}
 
 		override fun build(context: RichContext) {
@@ -195,9 +200,10 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Topic(private val uri: String, private val text: String) : RichObject(RICH_TYPE_TOPIC) {
-		override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-			this[RICH_ARG_URI] = JsonPrimitive(uri)
-			this[RICH_ARG_TEXT] = JsonPrimitive(text)
+		override val map: JsonObject get() = makeObject {
+			merge(super.map)
+			RICH_ARG_URI to uri
+			RICH_ARG_TEXT to text
 		}
 
 		override fun build(context: RichContext) {
@@ -220,9 +226,10 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class At(private val uri: String, private val text: String) : RichObject(RICH_TYPE_AT)  {
-		override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-			this[RICH_ARG_URI] = JsonPrimitive(uri)
-			this[RICH_ARG_TEXT] = JsonPrimitive(text)
+		override val map: JsonObject get() = makeObject {
+			merge(super.map)
+			RICH_ARG_URI to uri
+			RICH_ARG_TEXT to text
 		}
 
 		override fun build(context: RichContext) {
@@ -252,13 +259,14 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		private val underline: Boolean,
 		private val strikethrough: Boolean
 	) : RichContainer(RICH_TYPE_STYLE) {
-		override val map: MutableMap<String, JsonElement> get() = super.map.apply {
-			if (textSize != null) this[RICH_ARG_TEXT_SIZE] = JsonPrimitive(textSize.value)
-			if (color != null) this[RICH_ARG_COLOR] = JsonPrimitive(color.toArgb())
-			if (bold) this[RICH_ARG_BOLD] = JsonPrimitive(bold)
-			if (italic) this[RICH_ARG_ITALIC] = JsonPrimitive(italic)
-			if (underline) this[RICH_ARG_UNDERLINE] = JsonPrimitive(underline)
-			if (strikethrough) this[RICH_ARG_STRIKETHROUGH] = JsonPrimitive(strikethrough)
+		override val map: JsonObject get() = makeObject {
+			merge(super.map)
+			if (textSize != null) RICH_ARG_TEXT_SIZE to textSize.value
+			if (color != null) RICH_ARG_COLOR to color.toArgb()
+			if (bold) RICH_ARG_BOLD to bold
+			if (italic) RICH_ARG_ITALIC to italic
+			if (underline) RICH_ARG_UNDERLINE to underline
+			if (strikethrough) RICH_ARG_STRIKETHROUGH to strikethrough
 		}
 
 		override fun build(context: RichContext) {
@@ -323,25 +331,25 @@ class RichString(content: RichContainer.() -> Unit) : RichContainer(RICH_TYPE_RO
 					else container.emoji(obj.int)
 				}
 				is JsonObject -> {
-					when (obj[RICH_ARG_TYPE].string) {
-						RICH_TYPE_IMAGE -> container.image(obj[RICH_ARG_URI].string)
-						RICH_TYPE_LINK -> container.link(obj[RICH_ARG_URI].string, obj[RICH_ARG_TEXT].string)
-						RICH_TYPE_TOPIC -> container.topic(obj[RICH_ARG_URI].string, obj[RICH_ARG_TEXT].string)
-						RICH_TYPE_AT -> container.at(obj[RICH_ARG_URI].string, obj[RICH_ARG_TEXT].string)
+					when (obj[RICH_ARG_TYPE].String) {
+						RICH_TYPE_IMAGE -> container.image(obj[RICH_ARG_URI].String)
+						RICH_TYPE_LINK -> container.link(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
+						RICH_TYPE_TOPIC -> container.topic(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
+						RICH_TYPE_AT -> container.at(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
 						RICH_TYPE_STYLE -> {
 							container.style(
-								textSize = obj[RICH_ARG_TEXT_SIZE]?.int?.sp,
-								color = obj[RICH_ARG_COLOR]?.int?.let { Color(it) },
-								bold = obj[RICH_ARG_BOLD]?.boolean == true,
-								italic = obj[RICH_ARG_ITALIC]?.boolean == true,
-								underline = obj[RICH_ARG_UNDERLINE]?.boolean == true,
-								strikethrough = obj[RICH_ARG_STRIKETHROUGH]?.boolean == true
+								textSize = obj[RICH_ARG_TEXT_SIZE]?.Int?.sp,
+								color = obj[RICH_ARG_COLOR]?.Int?.let { Color(it) },
+								bold = obj[RICH_ARG_BOLD]?.Boolean == true,
+								italic = obj[RICH_ARG_ITALIC]?.Boolean == true,
+								underline = obj[RICH_ARG_UNDERLINE]?.Boolean == true,
+								strikethrough = obj[RICH_ARG_STRIKETHROUGH]?.Boolean == true
 							) {
-								for (item in obj[RICH_ARG_MEMBER].arr) parseElement(item, this)
+								for (item in obj[RICH_ARG_MEMBER].Array) parseElement(item, this)
 							}
 						}
 						RICH_TYPE_ROOT -> {
-							for (item in obj[RICH_ARG_MEMBER].arr) parseElement(item, container)
+							for (item in obj[RICH_ARG_MEMBER].Array) parseElement(item, container)
 						}
 					}
 				}
@@ -349,7 +357,7 @@ class RichString(content: RichContainer.() -> Unit) : RichContainer(RICH_TYPE_RO
 			}
 		}
 
-		fun parse(data: String) = try {
+		fun parse(data: String): RichString = try {
 			RichString {
 				parseElement(Json.parseToJsonElement(data), this)
 			}

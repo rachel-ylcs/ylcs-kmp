@@ -18,11 +18,14 @@ import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.data.weibo.WeiboSubComment
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.extension.ArrayEmpty
+import love.yinlin.extension.Int
+import love.yinlin.extension.Long
+import love.yinlin.extension.Object
+import love.yinlin.extension.String
+import love.yinlin.extension.StringNull
 import love.yinlin.extension.arr
-import love.yinlin.extension.int
-import love.yinlin.extension.long
 import love.yinlin.extension.obj
-import love.yinlin.extension.string
 import love.yinlin.platform.OS
 import love.yinlin.platform.isWeb
 import love.yinlin.platform.safeGet
@@ -110,9 +113,9 @@ object WeiboAPI {
 
 	private fun getWeiboUserInfo(user: JsonObject): WeiboUserInfo {
 		// 提取名称和头像
-		val userId = user["id"].string
-		val userName = user["screen_name"].string
-		val avatar = transferWeiboImageUrl(user["avatar_hd"].string)
+		val userId = user["id"].String
+		val userName = user["screen_name"].String
+		val avatar = transferWeiboImageUrl(user["avatar_hd"].String)
 		return WeiboUserInfo(
 			id = userId,
 			name = userName,
@@ -123,40 +126,40 @@ object WeiboAPI {
 	private fun getWeibo(card: JsonObject): Weibo {
 		var blogs = card.obj("mblog")
 		// 提取ID
-		val blogId = blogs["id"].string
+		val blogId = blogs["id"].String
 		val userInfo = getWeiboUserInfo(blogs.obj("user"))
 		// 提取时间
-		val time = Weibo.formatTime(blogs["created_at"].string)
+		val time = Weibo.formatTime(blogs["created_at"].String)
 		// 提取IP
-		val location = blogs["region_name"]?.string?.let {
+		val location = blogs["region_name"]?.StringNull?.let {
 			val index = it.indexOf(' ')
 			if (index != -1) it.substring(index + 1) else it
 		} ?: "IP未知"
 		// 提取内容
-		val text = blogs["text"].string
+		val text = blogs["text"].String
 		// 提取数据
-		val commentNum = blogs["comments_count"].int
-		val likeNum = blogs["attitudes_count"].int
-		val repostNum = blogs["reposts_count"].int
-		blogs = blogs["retweeted_status"]?.obj ?: blogs // 转发微博
+		val commentNum = blogs["comments_count"].Int
+		val likeNum = blogs["attitudes_count"].Int
+		val repostNum = blogs["reposts_count"].Int
+		blogs = blogs["retweeted_status"]?.Object ?: blogs // 转发微博
 		// 图片微博
 		val pictures = mutableListOf<Picture>()
 		if (blogs.contains("pics")) {
 			for (picItem in blogs.arr("pics")) {
-				val pic = picItem.obj
+				val pic = picItem.Object
 				pictures += Picture(
-					image = transferWeiboImageUrl(pic["url"].string),
-					source = transferWeiboImageUrl(pic.obj("large")["url"].string)
+					image = transferWeiboImageUrl(pic["url"].String),
+					source = transferWeiboImageUrl(pic.obj("large")["url"].String)
 				)
 			}
 		} else if (blogs.contains("page_info")) {
 			val pageInfo = blogs.obj("page_info")
-			if (pageInfo["type"].string == "video") {
+			if (pageInfo["type"].String == "video") {
 				val urls = pageInfo.obj("urls")
-				val videoUrl = if (urls.contains("mp4_720p_mp4")) urls["mp4_720p_mp4"].string
-				else if (urls.contains("mp4_hd_mp4")) urls["mp4_hd_mp4"].string
-				else urls["mp4_ld_mp4"].string
-				val videoPicUrl = pageInfo.obj("page_pic")["url"].string
+				val videoUrl = if (urls.contains("mp4_720p_mp4")) urls["mp4_720p_mp4"].String
+				else if (urls.contains("mp4_hd_mp4")) urls["mp4_hd_mp4"].String
+				else urls["mp4_ld_mp4"].String
+				val videoPicUrl = pageInfo.obj("page_pic")["url"].String
 				pictures += Picture(
 					image = transferWeiboImageUrl(videoPicUrl),
 					source = transferWeiboImageUrl(videoPicUrl),
@@ -178,21 +181,21 @@ object WeiboAPI {
 	}
 
 	private fun getWeiboComment(card: JsonObject): WeiboComment {
-		val commentId = card["id"].string
+		val commentId = card["id"].String
 		// 提取名称和头像
 		val userInfo = getWeiboUserInfo(card.obj("user"))
 		// 提取时间
-		val time = Weibo.formatTime(card["created_at"].string)
+		val time = Weibo.formatTime(card["created_at"].String)
 		// 提取IP
-		val location = card["source"]?.string?.removePrefix("来自") ?: "IP未知"
+		val location = card["source"]?.StringNull?.removePrefix("来自") ?: "IP未知"
 		// 提取内容
-		val text = card["text"].string
+		val text = card["text"].String
 		// 带图片
 		val pic = if (card.containsKey("pic")) {
 			card.obj("pic").let {
 				Picture(
-					image = transferWeiboImageUrl(it["url"].string),
-					source = transferWeiboImageUrl(it.obj("large")["url"].string)
+					image = transferWeiboImageUrl(it["url"].String),
+					source = transferWeiboImageUrl(it.obj("large")["url"].String)
 				)
 			}
 		} else null
@@ -201,13 +204,13 @@ object WeiboAPI {
 		val comments = card["comments"]
 		if (comments as? JsonArray != null) {
 			for (subCard in comments) {
-				val subCardObj = subCard.obj
+				val subCardObj = subCard.Object
 				subComments += WeiboSubComment(
-					id = subCardObj["id"].string,
+					id = subCardObj["id"].String,
 					info = getWeiboUserInfo(subCardObj.obj("user")),
-					time = Weibo.formatTime(subCardObj["created_at"].string),
-					location = subCardObj["source"]?.string?.removePrefix("来自") ?: "IP未知",
-					text = weiboHtmlToRichString(subCardObj["text"].string)
+					time = Weibo.formatTime(subCardObj["created_at"].String),
+					location = subCardObj["source"]?.StringNull?.removePrefix("来自") ?: "IP未知",
+					text = weiboHtmlToRichString(subCardObj["text"].String)
 				)
 			}
 		}
@@ -230,8 +233,8 @@ object WeiboAPI {
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<Weibo>()
 		for (item in cards) {
-			val card = item.obj
-			if (card["card_type"].int != 9) continue  // 非微博类型
+			val card = item.Object
+			if (card["card_type"].Int != 9) continue  // 非微博类型
 			items += getWeibo(card)
 		}
 		items
@@ -244,7 +247,7 @@ object WeiboAPI {
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("data")
 		val items = mutableListOf<WeiboComment>()
-		for (item in cards) items += getWeiboComment(item.obj)
+		for (item in cards) items += getWeiboComment(item.Object)
 		items
 	}
 
@@ -254,13 +257,13 @@ object WeiboAPI {
 		"https://$WEIBO_HOST/${Container.userInfo(uid)}"
 	) { json: JsonObject ->
 		val userInfo = json.obj("data").obj("userInfo")
-		val id = userInfo["id"].string
-		val name = userInfo["screen_name"].string
-		val avatar = transferWeiboImageUrl(userInfo["avatar_hd"].string)
-		val background = transferWeiboImageUrl(userInfo["cover_image_phone"].string)
-		val signature = userInfo["description"].string
-		val followNum = userInfo["follow_count"].string
-		val fansNum = userInfo["followers_count_str"]?.string ?: userInfo["followers_count"].string
+		val id = userInfo["id"].String
+		val name = userInfo["screen_name"].String
+		val avatar = transferWeiboImageUrl(userInfo["avatar_hd"].String)
+		val background = transferWeiboImageUrl(userInfo["cover_image_phone"].String)
+		val signature = userInfo["description"].String
+		val followNum = userInfo["follow_count"].String
+		val fansNum = userInfo["followers_count_str"]?.StringNull ?: userInfo["followers_count"].String
 		WeiboUser(
 			info = WeiboUserInfo(id, name, avatar),
 			background = background,
@@ -278,18 +281,18 @@ object WeiboAPI {
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboAlbum>()
 		for (item1 in cards) {
-			val card = item1.obj
-			if (card["itemid"].string.endsWith("albumeach")) {
+			val card = item1.Object
+			if (card["itemid"].String.endsWith("albumeach")) {
 				for (item2 in card.arr("card_group")) {
-					val album = item2.obj
-					if (album["card_type"].int == 8) {
-						val containerId = UriUtils.parse(album["scheme"].string).getQueryParameters("containerid").first()
+					val album = item2.Object
+					if (album["card_type"].Int == 8) {
+						val containerId = UriUtils.parse(album["scheme"].String).getQueryParameters("containerid").first()
 						items += WeiboAlbum(
 							containerId = containerId,
-							title = album["title_sub"].string,
-							num = album["desc1"].string,
-							time = album["desc2"].string,
-							pic = transferWeiboImageUrl(album["pic"].string)
+							title = album["title_sub"].String,
+							num = album["desc1"].String,
+							time = album["desc2"].String,
+							pic = transferWeiboImageUrl(album["pic"].String)
 						)
 					}
 				}
@@ -309,16 +312,16 @@ object WeiboAPI {
 		val cards = data.arr("cards")
 		val pics = mutableListOf<Picture>()
 		for (item1 in cards) {
-			val card = item1.obj
+			val card = item1.Object
 			for (item2 in card.arr("pics")) {
-				val pic = item2.obj
+				val pic = item2.Object
 				pics += Picture(
-					image = transferWeiboImageUrl(pic["pic_middle"].string),
-					source = transferWeiboImageUrl(pic["pic_ori"].string)
+					image = transferWeiboImageUrl(pic["pic_middle"].String),
+					source = transferWeiboImageUrl(pic["pic_ori"].String)
 				)
 			}
 		}
-		pics.take(limit) to data["count"].int
+		pics.take(limit) to data["count"].Int
 	}
 
 	suspend fun searchWeiboUser(
@@ -329,16 +332,16 @@ object WeiboAPI {
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboUserInfo>()
 		for (item1 in cards) {
-			val group = item1.obj
-			if (group["card_type"].int == 11) {
+			val group = item1.Object
+			if (group["card_type"].Int == 11) {
 				for (item2 in group.arr("card_group")) {
-					val card = item2.obj
-					if (card["card_type"].int == 10) {
-						val user = card["user"].obj
+					val card = item2.Object
+					if (card["card_type"].Int == 10) {
+						val user = card["user"].Object
 						items += WeiboUserInfo(
-							id = user["id"].string,
-							name = user["screen_name"].string,
-							avatar = transferWeiboImageUrl(user["avatar_hd"].string)
+							id = user["id"].String,
+							name = user["screen_name"].String,
+							avatar = transferWeiboImageUrl(user["avatar_hd"].String)
 						)
 					}
 				}
@@ -353,17 +356,15 @@ object WeiboAPI {
 		"https://$WEIBO_HOST/${Container.chaohua(sinceId)}"
 	) { json: JsonObject ->
 		val data = json.obj("data")
-		val newSinceId = data.obj("pageInfo")["since_id"].long
+		val newSinceId = data.obj("pageInfo")["since_id"].Long
 		val cards = data.arr("cards")
 		val items = mutableListOf<Weibo>()
 		for (item in cards) {
 			try {
-				val card = item.obj
-				val cardType = card["card_type"].int
+				val card = item.Object
+				val cardType = card["card_type"].Int
 				if (cardType == 11) {
-					card["card_group"]?.arr?.let {
-						for (subCard in it) items += getWeibo(subCard.obj)
-					}
+					for (subCard in card["card_group"].ArrayEmpty) items += getWeibo(subCard.Object)
 				}
 				else if (cardType == 9) items += getWeibo(card)
 			}

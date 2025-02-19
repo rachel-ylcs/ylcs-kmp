@@ -1,0 +1,145 @@
+package love.yinlin.api.user
+
+import io.ktor.server.routing.Routing
+import love.yinlin.DB
+import love.yinlin.Resources
+import love.yinlin.api.API
+import love.yinlin.api.EmptySuccessData
+import love.yinlin.api.ImplMap
+import love.yinlin.api.api
+import love.yinlin.api.failedData
+import love.yinlin.api.failedObject
+import love.yinlin.api.successData
+import love.yinlin.api.successObject
+import love.yinlin.currentTS
+import love.yinlin.data.Data
+import love.yinlin.extension.Int
+import love.yinlin.extension.IntNull
+import love.yinlin.extension.String
+import love.yinlin.md5
+
+fun Routing.accountAPI(implMap: ImplMap) {
+	// ------  登录  ------
+	api(API.User.Account.Login) { (name, pwd) ->
+		VN.throwName(name)
+		VN.throwPassword(pwd)
+		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name)
+		if (user == null) return@api "ID未注册".failedData
+		if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
+		val uid = user["uid"].Int
+		// 根据 uid 和 timestamp 生成 token
+		Data.Success(AN.throwGenerateToken(uid))
+	}
+
+	// ------  注销  ------
+	api(API.User.Account.Logoff) { token ->
+		AN.throwRemoveToken(token)
+		EmptySuccessData
+	}
+
+	// ------  更新 Token  ------
+	api(API.User.Account.UpdateToken) { token ->
+		val uid = AN.throwExpireToken(token)
+		// 生成新的Token
+		Data.Success(AN.throwGenerateToken(uid))
+	}
+
+	// ------  注册审批  ------
+	api(API.User.Account.Register) { (name, pwd, inviterName) ->
+		VN.throwName(name, inviterName)
+		VN.throwPassword(pwd)
+
+		// 查询ID是否注册过或是否正在审批
+		if (DB.querySQLSingle("""
+            SELECT name FROM user WHERE name = ?
+            UNION
+            SELECT param1 FROM mail WHERE param1 = ? AND filter = '${Mail.Filter.REGISTER}'
+        """, name, name) != null)
+			return@api "\"${name}\"已注册或正在注册审批中".failedData
+
+		// 检查邀请人是否有审核资格
+		val inviter = DB.querySQLSingle("""
+                SELECT uid, privilege FROM user WHERE (privilege & ${Privilege.VIP_ACCOUNT}) != 0 AND name = ?
+            """, inviterName)
+		if (inviter == null) return@api "邀请人\"${inviterName}\"不存在".failedData
+		if (!Privilege.vipAccount(inviter["privilege"].Int))
+			return@api "邀请人\"${inviterName}\"无审核资格".failedData
+
+		// 提交申请
+		DB.throwExecuteSQL("""
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, inviter["uid"].Int, Mail.DECISION, "用户注册审核",
+			"小银子\"${name}\"填写你作为邀请人注册，是否同意？",
+			Mail.Filter.REGISTER, name, pwd.md5)
+		"提交申请成功, 请等待管理员审核".successData
+	}
+
+	// ------  # 注册实现 #  ------
+	implMap[Mail.Filter.REGISTER] = ImplContext@ {
+		val inviterID = it["uid"].Int
+		val registerName = it["param1"].String
+		val registerPwd = it["param2"].String
+		val createTime = currentTS
+		val registerID = DB.throwInsertSQLGeneratedKey("""
+            INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin)
+            VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, registerName, registerPwd, inviterID, createTime, createTime, "{}", ByteArray(46)
+		).toInt()
+		if (registerID == 0) return@ImplContext "\"${registerName}\"已注册".failedObject
+		// 处理用户目录
+		val userPath = Resources.Public.Users.User(registerID)
+		// 如果用户目录存在则先删除
+		if (userPath.exists()) userPath.deleteRecursively()
+		// 创建用户目录
+		userPath.mkdir()
+		// 创建用户图片目录
+		userPath.Pics().mkdir()
+		// 复制初始资源
+		Resources.Public.Assets.DefaultAvatar.copyTo(userPath.avatar)
+		Resources.Public.Assets.DefaultWall.copyTo(userPath.wall)
+		"注册用户\"${registerName}\"成功".successObject
+	}
+
+	// ------  忘记密码审批  ------
+	api(API.User.Account.ForgotPassword) { (name, pwd) ->
+		VN.throwName(name)
+		VN.throwPassword(pwd)
+
+		val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name)
+		if (user == null) return@api "ID\"${name}\"未注册".failedData
+		val inviterUid = user["inviter"].IntNull ?: return@api "原始ID请联系管理员修改密码".failedData
+
+		// 检查邀请人是否有审核资格
+		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid)
+		if (inviter == null) return@api "邀请人不存在".failedData
+		val inviterName = inviter["name"].String
+		if (!Privilege.vipAccount(inviter["privilege"].Int))
+			return@api "邀请人\"${inviterName}\"无审核资格".failedData
+		// 查询ID是否注册过或是否正在审批
+		if (DB.querySQLSingle("""
+            SELECT uid FROM mail
+            WHERE uid = ? AND filter = '${Mail.Filter.FORGOT_PASSWORD}' AND param1 = ? AND processed = 0
+        """, inviterUid, name) != null)
+			return@api "已提交过审批，请等待邀请人\"${inviterName}\"审核".failedData
+		// 提交申请
+		DB.throwExecuteSQL("""
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2) VALUES(?, ?, ?, ?, ?, ?, ?)
+        """, inviterUid, Mail.DECISION, "用户修改密码审核",
+			"\"${name}\"需要修改密码，是否同意？",
+			Mail.Filter.FORGOT_PASSWORD, name, pwd.md5)
+		"提交申请成功, 请等待管理员审核".successData
+	}
+
+	// ------  # 忘记密码实现 #  ------
+	implMap[Mail.Filter.FORGOT_PASSWORD] = ImplContext@ {
+		val name = it["param1"].String
+		val pwd = it["param2"].String
+		val user = DB.querySQLSingle("SELECT uid FROM user WHERE name = ?", name)
+		if (user == null) return@ImplContext "用户不存在".failedObject
+		DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
+		// 清除修改密码用户的 Token
+		AN.removeToken(user["uid"].Int)
+		"\"${name}\"修改密码成功".successObject
+	}
+}

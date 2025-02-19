@@ -7,9 +7,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.extension.Json
+import love.yinlin.extension.Object
 import love.yinlin.extension.json
 import love.yinlin.extension.makeArray
-import love.yinlin.extension.obj
 import java.math.BigDecimal
 import java.sql.Connection
 import java.sql.Date
@@ -34,6 +34,8 @@ object Database {
 	})
 
 	val connection: Connection get() = dataSource.connection
+
+	fun close() = dataSource.close()
 }
 
 object SQLConverter {
@@ -99,13 +101,13 @@ object DB {
 	fun throwQuerySQLSingle(sql: String, vararg args: Any?): JsonObject {
 		val result = throwQuerySQL(sql, *args)
 		if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
-		return result[0].obj
+		return result[0].Object
 	}
 
 	fun querySQLSingle(sql: String, vararg args: Any?): JsonObject? = try {
 		val result = throwQuerySQL(sql, *args)
 		if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
-		result[0].obj
+		result[0].Object
 	}
 	catch (_: Throwable) { null }
 

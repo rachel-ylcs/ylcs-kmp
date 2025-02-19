@@ -6,12 +6,10 @@ import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.IOThread
@@ -56,13 +54,13 @@ suspend inline fun <R> HttpClient.safeCall(
 	Data.Success(block(this@safeCall))
 }
 catch (e: HttpRequestTimeoutException) {
-	Data.Error(RequestError.Timeout, e)
+	Data.Error(RequestError.Timeout, "网络连接超时", e)
 }
 catch (e: CancellationException) {
-	Data.Error(RequestError.Canceled, e)
+	Data.Error(RequestError.Canceled, "操作取消", e)
 }
 catch (e: Exception) {
-	Data.Error(RequestError.ClientError, e)
+	Data.Error(RequestError.ClientError, "未知异常", e)
 }
 
 suspend inline fun <reified T, R> HttpClient.safeGet(
@@ -80,36 +78,6 @@ suspend inline fun <reified T, R> HttpClient.safePost(
 	crossinline block: @MainThread suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
 	client.preparePost(url).execute { response ->
-		val data = response.body<T>()
-		Coroutines.main { block(data) }
-	}
-}
-
-class PostFormScope(internal val builder: FormBuilder) {
-	infix fun String.to(text: String) = builder.append(
-		key = this,
-		value = text
-	)
-
-	infix fun String.to(file: Path) = builder.append(
-		key = this,
-		value = InputProvider { SystemFileSystem.source(file).buffered() },
-		headers = Headers.build {
-			append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
-		}
-	)
-}
-
-suspend inline fun <reified T, R> HttpClient.safePostForm(
-	url: String,
-	crossinline init: PostFormScope.() -> Unit,
-	crossinline block: @MainThread suspend (T) -> R
-) = this.safeCall { client ->
-	client.preparePost(url) {
-		setBody(MultiPartFormDataContent(formData {
-			PostFormScope(this).init()
-		}))
-	}.execute { response ->
 		val data = response.body<T>()
 		Coroutines.main { block(data) }
 	}

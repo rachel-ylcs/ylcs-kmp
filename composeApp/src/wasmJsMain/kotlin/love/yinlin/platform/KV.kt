@@ -36,14 +36,7 @@ actual class KV {
 		val value = localStorage.getItem(key)
 		return if (value == null) default else {
 			if (default is String) value as T
-			else {
-				try {
-					Json.decodeFromString(value)
-				}
-				catch (_: Exception) {
-					default
-				}
-			}
+			else try { Json.decodeFromString(value) } catch (_: Exception) { default }
 		}
 	}
 

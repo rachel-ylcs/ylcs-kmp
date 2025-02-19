@@ -11,10 +11,13 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.io.readByteArray
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import love.yinlin.api.user.userAPI
 import love.yinlin.currentUniqueId
+import love.yinlin.data.Data
+import love.yinlin.data.RequestError
 import love.yinlin.extension.Json
 import love.yinlin.extension.makeObject
 import love.yinlin.logger
@@ -25,19 +28,8 @@ import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.random.Random
 
-typealias ImplFunc = suspend RoutingContext.(JsonObject) -> JsonObject
+typealias ImplFunc = suspend (JsonObject) -> JsonObject
 typealias ImplMap = MutableMap<String, ImplFunc>
-
-object Code {
-	const val SUCCESS = 0
-	const val FORBIDDEN = 1
-	const val UNAUTHORIZED = 2
-	const val FAILED = 3
-}
-
-class TokenExpireError(uid: Int) : Throwable() {
-	override val message: String? = "TokenExpireError $uid"
-}
 
 // Request
 
@@ -90,55 +82,79 @@ suspend inline fun <reified T> RoutingCall.toFormObject(): T {
 
 // Response
 
+class TokenExpireError(val uid: Int) : Throwable() {
+	override val message: String get() = "TokenExpireError $uid"
+}
+
 val String.successObject: JsonObject get() = makeObject {
-	"code" to Code.SUCCESS
-	"msg" to this
+	"code" to APICode.SUCCESS
+	"msg" to this@successObject
 }
 val String.failedObject: JsonObject get() = makeObject {
-	"code" to Code.FAILED
-	"msg" to this
+	"code" to APICode.FAILED
+	"msg" to this@failedObject
 }
-
-suspend fun RoutingCall.data(value: JsonElement) = this.respond(value)
-suspend fun RoutingCall.success() = this.respond(makeObject {
-	"code" to Code.SUCCESS
-})
-suspend fun RoutingCall.success(msg: String) = this.respond(msg.successObject)
-suspend fun RoutingCall.success(data: JsonElement) = this.respond(makeObject {
-	"code" to Code.SUCCESS
-	"data" to data
-})
-suspend fun RoutingCall.success(msg: String, data: JsonElement) = this.respond(makeObject {
-	"code" to Code.SUCCESS
-	"msg" to msg
-	"data" to data
-})
-suspend fun RoutingCall.failed(msg: String) = this.respond(msg.failedObject)
-suspend fun RoutingCall.expire() = this.respond(makeObject {
-	"code" to Code.UNAUTHORIZED
-	"msg" to "登录信息已过期"
-})
-suspend fun RoutingCall.die(err: Throwable) {
-	logger.error("CallDie - {}", err.stackTraceToString())
-	this.respond(makeObject {
-		"code" to Code.FORBIDDEN
-		"msg" to "网络异常"
-	})
+val String.expireObject: JsonObject get() = makeObject {
+	"code" to APICode.UNAUTHORIZED
+	"msg" to this@expireObject
 }
+val String.forbiddenObject: JsonObject get() = makeObject {
+	"code" to APICode.FORBIDDEN
+	"msg" to this@forbiddenObject
+}
+val EmptySuccessData: Data.Success<Default.Response> get() = Data.Success(Default.Response)
+val String.successData: Data.Success<Default.Response> get() = Data.Success(Default.Response, this)
+val String.failedData: Data.Error get() = Data.Error(RequestError.InvalidArgument, this)
 
-inline fun Route.catchAsyncRequest(path: String, method: HttpMethod, crossinline body: RoutingHandler): Route {
-	return route(path, method) {
-		handle {
-			try {
-				withContext(Dispatchers.IO) {
-					body()
+inline fun <reified Request : Any, reified Response : Any> Route.api(
+	route: APIRoute<Request, Response>,
+	crossinline body: suspend (Request) -> Data<Response>
+): Route = route(path = route.path, method = when (route.method) {
+	APIMethod.Get -> HttpMethod.Get
+	APIMethod.Post -> HttpMethod.Post
+	APIMethod.Form -> HttpMethod.Post
+}) {
+	handle {
+		try {
+			val result = withContext(Dispatchers.IO) {
+				val requestData: Request = when (route.method) {
+					APIMethod.Get -> call.params()
+					APIMethod.Post -> call.to()
+					APIMethod.Form -> call.toFormObject()
+				}
+				body(requestData)
+			}
+			when (result) {
+				is Data.Success -> call.respond(makeObject {
+					"code" to APICode.SUCCESS
+					result.message?.let { "msg" to it }
+					if (result.data !is Default.Response) {
+						"data" to Json.encodeToJsonElement(result.data)
+					}
+				})
+				is Data.Error -> when (result.type) {
+					RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
+					RequestError.Timeout -> call.respond("网络连接超时".failedObject)
+					RequestError.Canceled -> call.respond("操作取消".failedObject)
+					RequestError.Unauthorized -> call.respond("登录信息已过期".expireObject)
+					RequestError.InvalidArgument -> call.respond("${result.message}".failedObject)
+					else -> call.respond("未知错误: ${result.message}".failedObject)
 				}
 			}
-			catch (_: TokenExpireError) { call.expire() }
-			catch (err: Throwable) { call.die(err) }
+		}
+		catch (_: TokenExpireError) {
+			call.respond("登录信息已过期".expireObject)
+		}
+		catch (err: Throwable) {
+			logger.error("CallDie - {}", err.stackTraceToString())
+			call.respond("非法操作".forbiddenObject)
 		}
 	}
 }
 
-inline fun Route.catchAsyncGet(path: String, crossinline body: RoutingHandler): Route = catchAsyncRequest(path, HttpMethod.Get, body)
-inline fun Route.catchAsyncPost(path: String, crossinline body: RoutingHandler): Route = catchAsyncRequest(path, HttpMethod.Post, body)
+fun Routing.initAPI() {
+	val implMap = mutableMapOf<String, ImplFunc>()
+	commonAPI(implMap)
+	userAPI(implMap)
+	testAPI(implMap)
+}

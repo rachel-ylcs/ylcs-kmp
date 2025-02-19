@@ -13,11 +13,11 @@ enum class RequestError : Failed {
 }
 
 sealed interface Data<out D> {
-	data class Error(val type: Failed = Empty, val throwable: Throwable? = null) : Data<Nothing>
-	data class Success<out D>(val data: D) : Data<D>
+	data class Error(val type: Failed = Empty, val message: String? = null, val throwable: Throwable? = null) : Data<Nothing>
+	data class Success<out D>(val data: D, val message: String? = null) : Data<D>
 }
 
 inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> = when(this) {
 	is Data.Error -> this
-	is Data.Success -> Data.Success(map(data))
+	is Data.Success -> Data.Success(map(data), message)
 }

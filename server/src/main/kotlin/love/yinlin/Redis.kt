@@ -18,4 +18,6 @@ object Redis {
 	}, Config.HOST, Config.Redis.PORT, 3000, Config.Redis.PASSWORD)
 
 	inline fun <R> use(block: (Jedis) -> R): R = RedisConnection(dataSource.resource).use { block(it.jedis) }
+
+	fun close() = dataSource.close()
 }
