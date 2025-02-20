@@ -73,6 +73,6 @@ object Resources {
 		val config = classLoader.getResourceAsStream("config.properties")!!
 		prop.load(config)
 		config.close()
-		println(prop)
+		println(prop["host"])
 	}
 }
