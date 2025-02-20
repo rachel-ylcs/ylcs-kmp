@@ -25,7 +25,6 @@ fun Application.module() {
 
 fun main(args: Array<String>) {
     Resources.copyResources()
-    Resources.initializeConfig()
     EngineMain.main(args)
 
     Redis.close()

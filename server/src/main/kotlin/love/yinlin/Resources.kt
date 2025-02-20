@@ -4,8 +4,6 @@ import java.io.File
 import java.net.JarURLConnection
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.*
-
 
 open class Res : File {
 	constructor(path: String) : super(path)
@@ -15,7 +13,6 @@ open class Res : File {
 
 object Resources {
 	private const val PUBLIC_DIR_NAME = "public"
-	private val classLoader = Resources::class.java.classLoader
 
 	object Public : Res(PUBLIC_DIR_NAME) {
 		object Activity : Res(this, "activity") {
@@ -49,6 +46,7 @@ object Resources {
 
 	fun copyResources() {
 		if (Public.exists()) return
+		val classLoader = Resources::class.java.classLoader
 		val publicResourceUrl = classLoader.getResource(PUBLIC_DIR_NAME)!!
 		if (publicResourceUrl.protocol == "jar") {
 			Public.mkdirs()
@@ -66,12 +64,5 @@ object Resources {
 			}
 		}
 		else copyResourcesFromFile(File(publicResourceUrl.toURI()), Public)
-	}
-
-	fun initializeConfig() {
-		val prop = Properties()
-		val config = classLoader.getResourceAsStream("config.properties")!!
-		prop.load(config)
-		config.close()
 	}
 }
