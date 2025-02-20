@@ -22,3 +22,4 @@ kotlin-js-store/
 cpp/libs
 
 local.properties
+server/src/main/resources/config.properties
