@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import kotlin.plus
 
 plugins {
     alias(libs.plugins.gradleApplication)
@@ -40,10 +41,21 @@ application {
     }
 }
 
+val outputFileName = rootProject.extra["serverOutputFileName"] as String
+val outputDir = rootProject.extra["serverOutputDir"] as Directory
+val outputFile = outputDir.file(outputFileName)
+
 ktor {
     fatJar {
-        archiveFileName = rootProject.extra["serverOutputFileName"] as String
+        archiveFileName = outputFileName
     }
+}
+
+tasks.withType<Jar> {
+    excludes += arrayOf(
+        "/META-INF/{AL2.0,LGPL2.1}",
+        "DebugProbesKt.bin"
+    )
 }
 
 afterEvaluate {
@@ -54,14 +66,22 @@ afterEvaluate {
         shadowDistZip { enabled = false }
         jar { enabled = false }
         shadowJar {
-            destinationDirectory = rootProject.extra["serverOutputDir"] as Directory
+            destinationDirectory = outputDir
+        }
+    }
+
+    val cleanFatJar by tasks.registering {
+        doLast {
+            delete(outputFile)
         }
     }
 
     val buildFatJar = tasks.named("buildFatJar")
+    buildFatJar.get().mustRunAfter(cleanFatJar)
 
     // 发布服务端
     val serverPublish: Task by tasks.creating {
+        dependsOn(cleanFatJar)
         dependsOn(buildFatJar)
     }
 }
