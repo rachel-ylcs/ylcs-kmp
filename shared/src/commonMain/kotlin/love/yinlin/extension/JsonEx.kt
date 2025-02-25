@@ -1,6 +1,13 @@
 package love.yinlin.extension
 
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonArrayBuilder
 import kotlinx.serialization.json.JsonElement
@@ -13,8 +20,10 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.float
 import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.int
@@ -22,10 +31,12 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
 
-val Json = Json {
+val Json = kotlinx.serialization.json.Json {
 	prettyPrint = false
 	ignoreUnknownKeys = true
 }
+
+// Json fetch
 
 val JsonElement?.Boolean: Boolean get() = (this as? JsonPrimitive)?.boolean ?: error("")
 val JsonElement?.BooleanNull: Boolean? get() = (this as? JsonPrimitive)?.booleanOrNull
@@ -39,10 +50,6 @@ val JsonElement?.Double: Double get() = (this as? JsonPrimitive)?.double ?: erro
 val JsonElement?.DoubleNull: Double? get() = (this as? JsonPrimitive)?.doubleOrNull
 val JsonElement?.String: String get() = (this as? JsonPrimitive)?.content ?: error("")
 val JsonElement?.StringNull: String? get() = (this as? JsonPrimitive)?.contentOrNull
-@OptIn(ExperimentalStdlibApi::class)
-val JsonElement?.ByteArray: ByteArray get() = (this as? JsonPrimitive)?.content?.hexToByteArray(HexFormat.UpperCase) ?: error("")
-@OptIn(ExperimentalStdlibApi::class)
-val JsonElement?.ByteArrayEmpty: ByteArray get() = (this as? JsonPrimitive)?.contentOrNull?.hexToByteArray(HexFormat.UpperCase) ?: byteArrayOf()
 val JsonElement?.Object: JsonObject get() = (this as? JsonObject) ?: error("")
 val JsonElement?.ObjectNull: JsonObject? get() = this as? JsonObject
 val JsonElement?.ObjectEmpty: JsonObject get() = (this as? JsonObject) ?: buildJsonObject { }
@@ -51,13 +58,42 @@ val JsonElement?.ArrayEmpty: JsonArray get() = (this as? JsonArray) ?: buildJson
 fun JsonObject.obj(key: String): JsonObject = (this[key] as? JsonObject) ?: error("")
 fun JsonObject.arr(key: String): JsonArray = (this[key] as? JsonArray) ?: error("")
 
+// Json <-> Value
+
+inline fun <reified T> T?.toJson(): JsonElement = if (this == null) JsonNull else Json.encodeToJsonElement(this)
+fun <T> T?.toJson(serializer: SerializationStrategy<T>): JsonElement = if (this == null) JsonNull else Json.encodeToJsonElement(serializer, this)
 val Boolean?.json: JsonElement get() = JsonPrimitive(this)
 val Number?.json: JsonElement get() = JsonPrimitive(this)
 val String?.json: JsonElement get() = JsonPrimitive(this)
-@OptIn(ExperimentalStdlibApi::class)
-val ByteArray?.json: JsonElement get() = JsonPrimitive(this?.toHexString(HexFormat.UpperCase))
+val ByteArray?.json: JsonElement get() = this.toJson(JsonConverter.ByteArray)
 
-inline fun <reified T> T?.toJsonString() : String = if (this == null) "null" else Json.encodeToString(this)
+inline fun <reified T> JsonElement.to(): T = Json.decodeFromJsonElement(this)
+fun <T> JsonElement.to(deserializer: DeserializationStrategy<T>): T = Json.decodeFromJsonElement(deserializer, this)
+
+// Json <-> String
+
+val String?.parseJson: JsonElement get() = if (this == null) JsonNull else Json.parseToJsonElement(this)
+
+// Value <-> String
+
+inline fun <reified T> T?.toJsonString(): String = if (this == null) "null" else Json.encodeToString(this)
+fun <T> T?.toJsonString(serializer: SerializationStrategy<T>): String = if (this == null) "null" else Json.encodeToString(serializer, this)
+
+inline fun <reified T> String?.parseJsonValue(): T? = if (this == null) null else Json.decodeFromString(this)
+fun <T> String?.parseJsonValue(deserializer: DeserializationStrategy<T>): T? = if (this == null) null else Json.decodeFromString(deserializer, this)
+
+// JsonConverter
+
+object JsonConverter {
+	@OptIn(ExperimentalStdlibApi::class)
+	val ByteArray = object : KSerializer<ByteArray> {
+		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ByteArray", PrimitiveKind.STRING)
+		override fun serialize(encoder: Encoder, value: ByteArray) = encoder.encodeString(value.toHexString(HexFormat.UpperCase))
+		override fun deserialize(decoder: Decoder) = decoder.decodeString().hexToByteArray(HexFormat.UpperCase)
+	}
+}
+
+// JsonMaker
 
 data class JsonArrayScope(val builder: JsonArrayBuilder) {
 	fun add(value: Nothing?) = builder.add(JsonNull)
@@ -75,11 +111,11 @@ data class JsonArrayScope(val builder: JsonArrayBuilder) {
 }
 
 data class JsonObjectScope(val builder: JsonObjectBuilder) {
-	infix fun String.to(value: Nothing?) = builder.put(this, JsonNull)
-	infix fun String.to(value: Boolean) = builder.put(this, value.json)
-	infix fun String.to(value: Number) = builder.put(this, value.json)
-	infix fun String.to(value: String) = builder.put(this, value.json)
-	infix fun String.to(value: JsonElement) = builder.put(this, value)
+	infix fun String.with(value: Nothing?) = builder.put(this, JsonNull)
+	infix fun String.with(value: Boolean) = builder.put(this, value.json)
+	infix fun String.with(value: Number) = builder.put(this, value.json)
+	infix fun String.with(value: String) = builder.put(this, value.json)
+	infix fun String.with(value: JsonElement) = builder.put(this, value)
 
 	inline fun arr(key: String, init: JsonArrayScope.() -> Unit) = builder.put(key, makeArray(init))
 	inline fun obj(key: String, init: JsonObjectScope.() -> Unit) = builder.put(key, makeObject(init))

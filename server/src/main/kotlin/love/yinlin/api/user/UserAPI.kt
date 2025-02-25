@@ -5,6 +5,8 @@ import love.yinlin.DB
 import love.yinlin.Redis
 import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
+import love.yinlin.data.rachel.Comment
+import love.yinlin.data.rachel.UserConstraint
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -15,66 +17,25 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
-/* ------------------ 邮箱 --------------------- */
-
-object Mail {
-	const val TIP = 1 // 通知
-	const val CONFIRM = 2 // 确认
-	const val DECISION = 4 // 决定
-	const val INPUT = 8 // 输入
-
-	object Filter {
-		const val REGISTER = "user#register"
-		const val FORGOT_PASSWORD = "user#forgotPassword"
-		const val OPEN_BETA_2024 = "user#2024OpenBeta"
-		const val COIN_REWARD = "user#coinReward"
-	}
-}
-
-/* ------------------ 权限 --------------------- */
-
-object Privilege {
-	const val BACKUP = 1 // 备份
-	const val RES = 2 // 美图
-	const val TOPIC = 4 // 主题
-	const val UNUSED = 8 // 未定
-	const val VIP_ACCOUNT = 16 // 账号管理
-	const val VIP_TOPIC = 32 // 主题管理
-	const val VIP_CALENDAR = 64 // 日历管理
-
-	fun has(privilege: Int, mask: Int): Boolean = (privilege and mask) != 0
-	fun backup(privilege: Int): Boolean = has(privilege, BACKUP)
-	fun res(privilege: Int): Boolean = has(privilege, RES)
-	fun topic(privilege: Int): Boolean = has(privilege, TOPIC)
-	fun vipAccount(privilege: Int): Boolean = has(privilege, VIP_ACCOUNT)
-	fun vipTopic(privilege: Int): Boolean = has(privilege, VIP_TOPIC)
-	fun vipCalendar(privilege: Int): Boolean = has(privilege, VIP_CALENDAR)
-}
-
 /* ------------------ 验证 --------------------- */
 
 object VN {
 	class ValidationError(source: String, data: Any? = null) : Throwable() {
-		override val message: String = "ValidationError $data"
+		override val message: String = "ValidationError $source $data"
 	}
-
-	private const val MIN_NAME_LENGTH = 2
-	private const val MAX_NAME_LENGTH = 16
-	private const val MIN_PWD_LENGTH = 6
-	private const val MAX_PWD_LENGTH = 18
-
-	const val RENAME_COIN_COST = 5
 
 	fun throwIf(vararg args: Boolean) = if (args.any { it })
 		throw ValidationError("If") else Unit
-	fun throwName(vararg args: String) = if (args.any { it.length !in MIN_NAME_LENGTH .. MAX_NAME_LENGTH })
+	fun throwName(vararg args: String) = if (!UserConstraint.checkName(*args))
 		throw ValidationError("Name", args) else Unit
 	fun throwId(vararg args: Number) = if (args.any { it.toLong() <= 0L })
 		throw ValidationError("Id", args) else Unit
-	fun throwPassword(vararg args: String) = if (args.any { it.length !in MIN_PWD_LENGTH .. MAX_PWD_LENGTH })
+	fun throwPassword(vararg args: String) = if (!UserConstraint.checkPassword(*args))
 		throw ValidationError("Password", args) else Unit
 	fun throwEmpty(vararg args: String) = if (args.any { it.isEmpty() })
 		throw ValidationError("Empty", args) else Unit
+	fun throwSection(section: Int) = if (section !in Comment.Section.NOTIFICATION .. Comment.Section.DISCUSSION)
+		throw ValidationError("Section", section) else Comment.Section.commentTable(section)
 }
 
 fun DB.throwGetUser(uid: Int, col: String = "uid") = this.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
@@ -173,6 +134,7 @@ object AN {
 
 fun Routing.userAPI(implMap: ImplMap) {
 	accountAPI(implMap)
+	activityAPI(implMap)
 	backupAPI(implMap)
 	infoAPI(implMap)
 	mailAPI(implMap)

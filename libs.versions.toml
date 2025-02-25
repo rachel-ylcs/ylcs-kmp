@@ -3,25 +3,16 @@
 # Plugins #
 kotlin = "2.1.10"
 cmp = "1.8.0-alpha03"
+cmp-stable = "1.7.3"
 agp = "8.7.3"
 
 # Libs #
 
 # Common
-coroutines = "1.10.1"
-io = "0.6.0"
 lifecycle = "2.9.0-alpha03"
 ktor = "3.1.0"
-navigation = "2.8.0-alpha13"
-json = "1.8.0"
-datetime = "0.6.1"
-sketch = "4.0.2"
-sketch-zoom = "1.1.0"
-html = "0.2.1"
+sketch = "4.0.3"
 mmkv = "2.1.0"
-
-# Android
-activity-compose = "1.10.0"
 
 # Desktop
 javafx = "17.0.9" #noinspection GradleDependency
@@ -39,31 +30,44 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 
 [libraries]
 # Common
-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "io" }
-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "cmp" }
-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "json" }
-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
+compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "cmp" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
+compose-material3-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
+
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.0" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0" }
+
+runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.8.0-alpha13" }
+runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
 sketch = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
 sketch-http = { module = "io.github.panpf.sketch4:sketch-http-ktor3", version.ref = "sketch" }
 sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources", version.ref = "sketch" }
 sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
-sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version.ref = "sketch-zoom" }
-html = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "html" }
+sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.1.0" }
+
+html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
 
 # JVM
+compose-ui-tooling-preview-desktop = { module = "org.jetbrains.compose.ui:ui-tooling-preview-desktop", version.ref = "cmp" }
+
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
+
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 
 # Apple
@@ -87,6 +91,7 @@ ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }

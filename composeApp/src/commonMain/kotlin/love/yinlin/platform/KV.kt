@@ -1,6 +1,7 @@
 package love.yinlin.platform
 
-import love.yinlin.extension.Json
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 
 object KVExpire {
 	const val NEVER = 0
@@ -26,7 +27,7 @@ expect class KV {
 
 inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire.NEVER) {
 	try {
-		set(key, Json.encodeToString(value), expire)
+		set(key, value.toJsonString(), expire)
 	}
 	catch (_: Exception) { }
 }
@@ -34,7 +35,7 @@ inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire
 inline fun <reified T> KV.getJson(key: String, default: T): T {
 	return try {
 		val json = get(key, "")
-		if (json.isEmpty()) default else Json.decodeFromString(json)
+		if (json.isEmpty()) default else json.parseJsonValue() ?: default
 	}
 	catch (_: Exception) {
 		default

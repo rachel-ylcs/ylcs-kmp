@@ -64,36 +64,40 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.shared)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(libs.coroutines)
-            implementation(libs.io)
-            implementation(libs.navigation)
-            implementation(libs.backhandler)
-            implementation(libs.lifecycle.viewmodel)
-            implementation(libs.lifecycle.runtime.compose)
-            implementation(libs.json)
-            implementation(libs.datetime)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material3.icons.extended)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.ui.backhandler)
+            implementation(libs.compose.components.resources)
+
+            implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.io)
+            implementation(libs.kotlinx.json)
+
+            implementation(libs.runtime.navigation)
+            implementation(libs.runtime.viewmodel)
+            implementation(libs.runtime.lifecycle)
+
             implementation(libs.ktor.client)
             implementation(libs.ktor.client.negotiation)
             implementation(libs.ktor.json)
+
             implementation(libs.sketch)
             implementation(libs.sketch.http)
             implementation(libs.sketch.resources)
             implementation(libs.sketch.gif)
             implementation(libs.sketch.webp)
             implementation(libs.sketch.zoom)
+
             implementation(libs.html)
         }
 
         androidMain.dependencies {
             implementation(compose.preview)
-            implementation(libs.activity.compose)
-            implementation(libs.coroutines.android)
+            implementation(libs.compose.activity)
             implementation(libs.ktor.okhttp)
             implementation(libs.mmkv.android)
         }
@@ -107,8 +111,8 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(compose.preview)
             implementation(compose.desktop.currentOs)
+            implementation(libs.compose.ui.tooling.preview.desktop)
             implementation(libs.ktor.okhttp)
 
             "win".let {

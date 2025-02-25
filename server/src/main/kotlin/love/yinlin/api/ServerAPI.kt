@@ -12,14 +12,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.io.readByteArray
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
+import love.yinlin.api.common.commonAPI
+import love.yinlin.api.test.testAPI
 import love.yinlin.api.user.userAPI
+import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
-import love.yinlin.extension.Json
 import love.yinlin.extension.makeObject
+import love.yinlin.extension.to
+import love.yinlin.extension.toJson
+import love.yinlin.extension.toJsonString
 import love.yinlin.logger
 import java.io.File
 import kotlin.collections.component1
@@ -35,49 +38,79 @@ typealias ImplMap = MutableMap<String, ImplFunc>
 
 inline fun <reified T> RoutingCall.params(): T {
 	val map = this.queryParameters.toMap().mapValues { it.value.first() }
-	val json = makeObject {
-		for ((key, value) in map) key to value
-	}
-	return Json.decodeFromJsonElement(json)
+	return makeObject {
+		for ((key, value) in map) key with value
+	}.to()
 }
 
 suspend inline fun <reified T : Any> RoutingCall.to(): T = this.receive<T>()
 
-suspend fun RoutingCall.toForm(): Map<String, String> {
-	val map = mutableMapOf<String, String>()
+suspend inline fun <reified T> RoutingCall.toForm(): T {
+	val multiFiles = mutableMapOf<String, MutableList<ClientFile>>()
+	val multipartData = this@toForm.receiveMultipart()
 	var index = 0
-	val multipartData = this.receiveMultipart()
-	multipartData.forEachPart { part ->
-		try {
-			val name: String = part.name ?: return@forEachPart
-			when (part) {
-				is PartData.FormItem -> map[name] = part.value
-				is PartData.FileItem -> {
-					val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
-					val output = File(System.getProperty("java.io.tmpdir"), filename)
-					if (part.provider().copyAndClose(output.writeChannel()) > 0)
-						map[name] = output.absolutePath
+	val form = makeObject {
+		multipartData.forEachPart { part ->
+			try {
+				val name: String = part.name ?: return@forEachPart
+				when (part) {
+					is PartData.FormItem -> name with part.value
+					is PartData.FileItem -> {
+						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
+						val output = File(System.getProperty("java.io.tmpdir"), filename)
+						if (part.provider().copyAndClose(output.writeChannel()) > 0) {
+							val file = ClientFile(output.absolutePath)
+							val newName = if (name.startsWith('#') && name.contains('!')) {
+								val fetchName = name.substringAfter('#').substringBeforeLast('!')
+								val fetchIndex = name.substringAfter('!')
+								if (fetchName.isNotEmpty() && fetchIndex.isNotEmpty()) fetchName
+								else name
+							}
+							else name
+							if (newName == name) newName with file.toJson()
+							else {
+								val thisFiles = multiFiles[newName]
+								val newFiles = if (thisFiles == null) {
+									val files = mutableListOf<ClientFile>()
+									multiFiles[newName] = files
+									files
+								} else thisFiles
+								newFiles += file
+							}
+						}
+					}
+					is PartData.BinaryItem -> name with part.provider().readByteArray().toString(Charsets.UTF_8)
+					else -> { }
 				}
-				is PartData.BinaryItem -> map[name] = part.provider().readByteArray().toString(Charsets.UTF_8)
-				else -> { }
+			}
+			catch (err: Throwable) {
+				logger.error("RoutingCall.toForm - {}", err.stackTraceToString())
+			}
+			finally {
+				part.dispose()
 			}
 		}
-		catch (err: Throwable) {
-			logger.error("RoutingCall.toForm - {}", err.stackTraceToString())
-		}
-		finally {
-			part.dispose()
-		}
+		for ((filesName, files) in multiFiles) filesName with files.toJson()
 	}
-	return map
+	return form.to()
 }
 
-suspend inline fun <reified T> RoutingCall.toFormObject(): T {
-	val form = this.toForm()
-	val json = makeObject {
-		for ((key, value) in form) key to value
+class NineGridProcessor(private val pics: List<ClientFile>) {
+	private val actualPics: List<String>
+
+	init {
+		if (pics.size > 9) throw error("NineGrid num error")
+		actualPics = List(pics.size) { currentUniqueId(it) }
 	}
-	return Json.decodeFromJsonElement(json)
+
+	val jsonString: String get() = actualPics.toJsonString()
+
+	fun copy(callback: (String) -> ResNode): String? {
+		repeat(actualPics.size) {
+			pics[it].copy(callback(actualPics[it]))
+		}
+		return actualPics.firstOrNull()
+	}
 }
 
 // Response
@@ -87,20 +120,20 @@ class TokenExpireError(val uid: Int) : Throwable() {
 }
 
 val String.successObject: JsonObject get() = makeObject {
-	"code" to APICode.SUCCESS
-	"msg" to this@successObject
+	"code" with APICode.SUCCESS
+	"msg" with this@successObject
 }
 val String.failedObject: JsonObject get() = makeObject {
-	"code" to APICode.FAILED
-	"msg" to this@failedObject
+	"code" with APICode.FAILED
+	"msg" with this@failedObject
 }
 val String.expireObject: JsonObject get() = makeObject {
-	"code" to APICode.UNAUTHORIZED
-	"msg" to this@expireObject
+	"code" with APICode.UNAUTHORIZED
+	"msg" with this@expireObject
 }
 val String.forbiddenObject: JsonObject get() = makeObject {
-	"code" to APICode.FORBIDDEN
-	"msg" to this@forbiddenObject
+	"code" with APICode.FORBIDDEN
+	"msg" with this@forbiddenObject
 }
 val EmptySuccessData: Data.Success<Default.Response> get() = Data.Success(Default.Response)
 val String.successData: Data.Success<Default.Response> get() = Data.Success(Default.Response, this)
@@ -120,16 +153,16 @@ inline fun <reified Request : Any, reified Response : Any> Route.api(
 				val requestData: Request = when (route.method) {
 					APIMethod.Get -> call.params()
 					APIMethod.Post -> call.to()
-					APIMethod.Form -> call.toFormObject()
+					APIMethod.Form -> call.toForm()
 				}
 				body(requestData)
 			}
 			when (result) {
 				is Data.Success -> call.respond(makeObject {
-					"code" to APICode.SUCCESS
-					result.message?.let { "msg" to it }
+					"code" with APICode.SUCCESS
+					result.message?.let { "msg" with it }
 					if (result.data !is Default.Response) {
-						"data" to Json.encodeToJsonElement(result.data)
+						"data" with result.data.toJson()
 					}
 				})
 				is Data.Error -> when (result.type) {

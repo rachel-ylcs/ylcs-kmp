@@ -9,7 +9,6 @@ import love.yinlin.api.failedData
 import love.yinlin.api.successData
 
 fun Routing.infoAPI(implMap: ImplMap) {
-	// ------  用户反馈  ------
 	api(API.User.Info.SendFeedback) { (token, content) ->
 		val uid = AN.throwExpireToken(token)
 		if (DB.throwInsertSQLDuplicateKey("INSERT INTO feedback(uid, content) VALUES(?, ?)", uid, content))

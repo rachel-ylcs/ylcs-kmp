@@ -1,5 +1,8 @@
 package love.yinlin.data.weibo
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class WeiboUser(
 	val info: WeiboUserInfo, // 用户信息
 	val background: String, // 背景图

@@ -1,5 +1,6 @@
 package love.yinlin.data.item
 
+import androidx.compose.runtime.Stable
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import ylcs_kmp.composeapp.generated.resources.Res
@@ -19,6 +20,7 @@ import ylcs_kmp.composeapp.generated.resources.tab_music_normal
 import ylcs_kmp.composeapp.generated.resources.tab_world_active
 import ylcs_kmp.composeapp.generated.resources.tab_world_normal
 
+@Stable
 enum class TabItem(
 	val title: StringResource,
 	val iconNormal: DrawableResource,

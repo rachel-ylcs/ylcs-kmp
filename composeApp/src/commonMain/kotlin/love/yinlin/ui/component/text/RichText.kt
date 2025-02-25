@@ -23,10 +23,11 @@ import love.yinlin.Colors
 import love.yinlin.extension.Array
 import love.yinlin.extension.Boolean
 import love.yinlin.extension.Int
-import love.yinlin.extension.Json
 import love.yinlin.extension.String
 import love.yinlin.extension.json
 import love.yinlin.extension.makeObject
+import love.yinlin.extension.parseJson
+import love.yinlin.extension.toJsonString
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.WebImageQuality
 
@@ -83,7 +84,7 @@ interface RichItem {
 
 @Stable
 abstract class RichObject(protected val type: String) : RichItem {
-	protected open val map: JsonObject get() = makeObject { RICH_ARG_TYPE to type }
+	protected open val map: JsonObject get() = makeObject { RICH_ARG_TYPE with type }
 
 	override val json: JsonElement get() = map
 }
@@ -103,9 +104,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		for (item in items) item.build(context)
 	}
 
-	override fun toString(): String {
-		return Json.encodeToString(json)
-	}
+	override fun toString(): String = json.toJsonString()
 
 	protected fun makeItem(item: RichItem) {
 		items += item
@@ -150,7 +149,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	protected class Image(private val uri: String) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
 		override val map: JsonObject get() = makeObject {
 			merge(super.map)
-			RICH_ARG_URI to uri
+			RICH_ARG_URI with uri
 		}
 
 		override fun build(context: RichContext) {
@@ -176,8 +175,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	protected class Link(private val uri: String, private val text: String) : RichObject(RICH_TYPE_LINK) {
 		override val map: JsonObject get() = makeObject {
 			merge(super.map)
-			RICH_ARG_URI to uri
-			RICH_ARG_TEXT to text
+			RICH_ARG_URI with uri
+			RICH_ARG_TEXT with text
 		}
 
 		override fun build(context: RichContext) {
@@ -202,8 +201,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	protected class Topic(private val uri: String, private val text: String) : RichObject(RICH_TYPE_TOPIC) {
 		override val map: JsonObject get() = makeObject {
 			merge(super.map)
-			RICH_ARG_URI to uri
-			RICH_ARG_TEXT to text
+			RICH_ARG_URI with uri
+			RICH_ARG_TEXT with text
 		}
 
 		override fun build(context: RichContext) {
@@ -228,8 +227,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	protected class At(private val uri: String, private val text: String) : RichObject(RICH_TYPE_AT)  {
 		override val map: JsonObject get() = makeObject {
 			merge(super.map)
-			RICH_ARG_URI to uri
-			RICH_ARG_TEXT to text
+			RICH_ARG_URI with uri
+			RICH_ARG_TEXT with text
 		}
 
 		override fun build(context: RichContext) {
@@ -261,12 +260,12 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	) : RichContainer(RICH_TYPE_STYLE) {
 		override val map: JsonObject get() = makeObject {
 			merge(super.map)
-			if (textSize != null) RICH_ARG_TEXT_SIZE to textSize.value
-			if (color != null) RICH_ARG_COLOR to color.toArgb()
-			if (bold) RICH_ARG_BOLD to bold
-			if (italic) RICH_ARG_ITALIC to italic
-			if (underline) RICH_ARG_UNDERLINE to underline
-			if (strikethrough) RICH_ARG_STRIKETHROUGH to strikethrough
+			if (textSize != null) RICH_ARG_TEXT_SIZE with textSize.value
+			if (color != null) RICH_ARG_COLOR with color.toArgb()
+			if (bold) RICH_ARG_BOLD with bold
+			if (italic) RICH_ARG_ITALIC with italic
+			if (underline) RICH_ARG_UNDERLINE with underline
+			if (strikethrough) RICH_ARG_STRIKETHROUGH with strikethrough
 		}
 
 		override fun build(context: RichContext) {
@@ -303,11 +302,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 }
 
 @Stable
-class RichString(content: RichContainer.() -> Unit) : RichContainer(RICH_TYPE_ROOT) {
-	init {
-		content()
-	}
-
+class RichString : RichContainer(RICH_TYPE_ROOT) {
 	fun asState(
 		onLinkClick: ((String) -> Unit)?,
 		onTopicClick: ((String) -> Unit)?,
@@ -358,14 +353,20 @@ class RichString(content: RichContainer.() -> Unit) : RichContainer(RICH_TYPE_RO
 		}
 
 		fun parse(data: String): RichString = try {
-			RichString {
-				parseElement(Json.parseToJsonElement(data), this)
+			buildRichString {
+				parseElement(data.parseJson, this)
 			}
 		}
 		catch (_: Exception) {
-			RichString {}
+			RichString()
 		}
 	}
+}
+
+inline fun buildRichString(content: RichContainer.() -> Unit): RichString {
+	val richString = RichString()
+	richString.content()
+	return richString
 }
 
 @Composable

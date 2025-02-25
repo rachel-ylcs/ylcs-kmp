@@ -2,24 +2,28 @@ package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
 import love.yinlin.DB
-import love.yinlin.Resources
 import love.yinlin.api.API
 import love.yinlin.api.EmptySuccessData
 import love.yinlin.api.ImplMap
+import love.yinlin.api.ServerRes
 import love.yinlin.api.api
 import love.yinlin.api.failedData
 import love.yinlin.api.failedObject
 import love.yinlin.api.successData
 import love.yinlin.api.successObject
+import love.yinlin.copy
 import love.yinlin.currentTS
 import love.yinlin.data.Data
+import love.yinlin.data.rachel.Mail
+import love.yinlin.data.rachel.UserPrivilege
+import love.yinlin.deleteRecursively
 import love.yinlin.extension.Int
 import love.yinlin.extension.IntNull
 import love.yinlin.extension.String
 import love.yinlin.md5
+import love.yinlin.mkdir
 
 fun Routing.accountAPI(implMap: ImplMap) {
-	// ------  登录  ------
 	api(API.User.Account.Login) { (name, pwd) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
@@ -31,20 +35,17 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		Data.Success(AN.throwGenerateToken(uid))
 	}
 
-	// ------  注销  ------
 	api(API.User.Account.Logoff) { token ->
 		AN.throwRemoveToken(token)
 		EmptySuccessData
 	}
 
-	// ------  更新 Token  ------
 	api(API.User.Account.UpdateToken) { token ->
 		val uid = AN.throwExpireToken(token)
 		// 生成新的Token
 		Data.Success(AN.throwGenerateToken(uid))
 	}
 
-	// ------  注册审批  ------
 	api(API.User.Account.Register) { (name, pwd, inviterName) ->
 		VN.throwName(name, inviterName)
 		VN.throwPassword(pwd)
@@ -59,23 +60,22 @@ fun Routing.accountAPI(implMap: ImplMap) {
 
 		// 检查邀请人是否有审核资格
 		val inviter = DB.querySQLSingle("""
-                SELECT uid, privilege FROM user WHERE (privilege & ${Privilege.VIP_ACCOUNT}) != 0 AND name = ?
+                SELECT uid, privilege FROM user WHERE (privilege & ${UserPrivilege.VIP_ACCOUNT}) != 0 AND name = ?
             """, inviterName)
 		if (inviter == null) return@api "邀请人\"${inviterName}\"不存在".failedData
-		if (!Privilege.vipAccount(inviter["privilege"].Int))
+		if (!UserPrivilege.vipAccount(inviter["privilege"].Int))
 			return@api "邀请人\"${inviterName}\"无审核资格".failedData
 
 		// 提交申请
 		DB.throwExecuteSQL("""
             INSERT INTO mail(uid, type, title, content, filter, param1, param2)
             VALUES(?, ?, ?, ?, ?, ?, ?)
-        """, inviter["uid"].Int, Mail.DECISION, "用户注册审核",
+        """, inviter["uid"].Int, Mail.Type.DECISION, "用户注册审核",
 			"小银子\"${name}\"填写你作为邀请人注册，是否同意？",
 			Mail.Filter.REGISTER, name, pwd.md5)
 		"提交申请成功, 请等待管理员审核".successData
 	}
 
-	// ------  # 注册实现 #  ------
 	implMap[Mail.Filter.REGISTER] = ImplContext@ {
 		val inviterID = it["uid"].Int
 		val registerName = it["param1"].String
@@ -88,20 +88,19 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		).toInt()
 		if (registerID == 0) return@ImplContext "\"${registerName}\"已注册".failedObject
 		// 处理用户目录
-		val userPath = Resources.Public.Users.User(registerID)
+		val userPath = ServerRes.Users.User(registerID)
 		// 如果用户目录存在则先删除
-		if (userPath.exists()) userPath.deleteRecursively()
+		userPath.deleteRecursively()
 		// 创建用户目录
 		userPath.mkdir()
 		// 创建用户图片目录
 		userPath.Pics().mkdir()
 		// 复制初始资源
-		Resources.Public.Assets.DefaultAvatar.copyTo(userPath.avatar)
-		Resources.Public.Assets.DefaultWall.copyTo(userPath.wall)
+		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
+		ServerRes.Assets.DefaultWall.copy(userPath.wall)
 		"注册用户\"${registerName}\"成功".successObject
 	}
 
-	// ------  忘记密码审批  ------
 	api(API.User.Account.ForgotPassword) { (name, pwd) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
@@ -114,7 +113,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid)
 		if (inviter == null) return@api "邀请人不存在".failedData
 		val inviterName = inviter["name"].String
-		if (!Privilege.vipAccount(inviter["privilege"].Int))
+		if (!UserPrivilege.vipAccount(inviter["privilege"].Int))
 			return@api "邀请人\"${inviterName}\"无审核资格".failedData
 		// 查询ID是否注册过或是否正在审批
 		if (DB.querySQLSingle("""
@@ -125,13 +124,12 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		// 提交申请
 		DB.throwExecuteSQL("""
             INSERT INTO mail(uid, type, title, content, filter, param1, param2) VALUES(?, ?, ?, ?, ?, ?, ?)
-        """, inviterUid, Mail.DECISION, "用户修改密码审核",
+        """, inviterUid, Mail.Type.DECISION, "用户修改密码审核",
 			"\"${name}\"需要修改密码，是否同意？",
 			Mail.Filter.FORGOT_PASSWORD, name, pwd.md5)
 		"提交申请成功, 请等待管理员审核".successData
 	}
 
-	// ------  # 忘记密码实现 #  ------
 	implMap[Mail.Filter.FORGOT_PASSWORD] = ImplContext@ {
 		val name = it["param1"].String
 		val pwd = it["param2"].String

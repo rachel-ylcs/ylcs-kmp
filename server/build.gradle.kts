@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import kotlin.plus
 
 plugins {
     alias(libs.plugins.gradleApplication)
@@ -16,6 +15,9 @@ kotlin {
 
 dependencies {
     implementation(projects.shared)
+
+    implementation(libs.kotlinx.json)
+
     implementation(libs.ktor.server)
     implementation(libs.ktor.server.host)
     implementation(libs.ktor.server.config)
@@ -23,7 +25,6 @@ dependencies {
     implementation(libs.ktor.json)
     implementation(libs.ktor.server.negotiation)
 
-    implementation(libs.json)
     implementation(libs.logback)
     implementation(libs.mysql)
     implementation(libs.mysql.pool)

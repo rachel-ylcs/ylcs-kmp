@@ -18,31 +18,29 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
 import love.yinlin.extension.Int
-import love.yinlin.extension.Json
 import love.yinlin.extension.Object
 import love.yinlin.extension.ObjectNull
 import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
 import love.yinlin.extension.makeObject
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.to
+import love.yinlin.extension.toJson
 import love.yinlin.platform.app
 import kotlin.coroutines.cancellation.CancellationException
 
-object API {
-	const val HOST = "yinlin.love"
-
+object ClientAPI {
 	suspend inline fun <reified Response : Any> processResponse(response: HttpResponse): Data<Response> {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
 		val data = json["data"].ObjectNull
 		return if (code == APICode.SUCCESS) {
-			if (data != null) Data.Success(Json.decodeFromJsonElement(data), msg)
-			else Data.Success(Json.decodeFromString("{}"), msg)
+			if (data != null) Data.Success(data.to(), msg)
+			else Data.Success("{}".parseJsonValue()!!, msg)
 		}
 		else Data.Error(RequestError.InvalidArgument, msg)
 	}
@@ -53,10 +51,10 @@ object API {
 	): Data<Response> {
 		val client = if (route.method == APIMethod.Form) app.fileClient else app.client
 		return try {
-			var url = "https://$HOST${route.path}"
+			var url = "${APIConfig.URL}${route.path}"
 			if (route.method == APIMethod.Get) {
 				val args = StringBuilder()
-				val argsMap = if (data !is Default.Request) Json.encodeToJsonElement(data).Object else makeObject { }
+				val argsMap = if (data !is Default.Request) data.toJson().Object else makeObject { }
 				for ((key, value) in argsMap) args.append("$key=${UriUtils.encode(value.String)}&")
 				if (args.isNotEmpty()) url += "?${args.dropLast(1)}"
 			}
@@ -81,18 +79,23 @@ object API {
 	}
 
 	class PostFormScope(internal val builder: FormBuilder) {
-		infix fun String.to(text: String) = builder.append(
+		infix fun String.with(text: String) = builder.append(
 			key = this,
 			value = text
 		)
 
-		infix fun String.to(file: Path) = builder.append(
+		infix fun String.with(file: Path) = builder.append(
 			key = this,
 			value = InputProvider { SystemFileSystem.source(file).buffered() },
 			headers = Headers.build {
 				append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
 			}
 		)
+
+		infix fun String.with(files: List<Path>) {
+			var index = 0
+			for (file in files) "#$this!${index++}" with file
+		}
 	}
 
 	suspend inline fun <reified Request : Any, reified Response : Any> request(

@@ -4,8 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Diversity1
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 
+@Stable
 enum class MsgTabItem(
 	val title: String,
 	val icon: ImageVector

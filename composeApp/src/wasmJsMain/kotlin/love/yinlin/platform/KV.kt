@@ -1,7 +1,9 @@
 package love.yinlin.platform
 
 import kotlinx.browser.localStorage
-import love.yinlin.extension.Json
+import love.yinlin.extension.JsonConverter
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 
 actual class KV {
 	actual fun set(key: String, value: Boolean, expire: Int) {
@@ -29,14 +31,20 @@ actual class KV {
 	}
 
 	actual fun set(key: String, value: ByteArray, expire: Int) {
-		localStorage.setItem(key, Json.encodeToString(value))
+		localStorage.setItem(key, value.toJsonString(JsonConverter.ByteArray))
 	}
 
 	actual inline fun <reified T> get(key: String, default: T): T {
 		val value = localStorage.getItem(key)
-		return if (value == null) default else {
-			if (default is String) value as T
-			else try { Json.decodeFromString(value) } catch (_: Exception) { default }
+		return if (value == null) default else when (default) {
+			is Boolean -> value as T
+			is Int -> value as T
+			is Long -> value as T
+			is Float -> value as T
+			is Double -> value as T
+			is String -> value as T
+			is ByteArray -> value.parseJsonValue(JsonConverter.ByteArray) as? T ?: default
+			else -> default
 		}
 	}
 

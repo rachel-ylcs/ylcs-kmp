@@ -1,7 +1,9 @@
 package love.yinlin.data.weibo
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
+@Stable
 @Serializable
 data class WeiboAlbum(
 	val containerId: String, // ID

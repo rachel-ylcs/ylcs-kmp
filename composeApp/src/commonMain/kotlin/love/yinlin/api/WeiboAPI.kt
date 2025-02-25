@@ -29,6 +29,7 @@ import love.yinlin.extension.obj
 import love.yinlin.platform.OS
 import love.yinlin.platform.isWeb
 import love.yinlin.platform.safeGet
+import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
 	const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
@@ -106,7 +107,7 @@ object WeiboAPI {
 
 	private fun weiboHtmlToRichString(text: String): RichString {
 		val html = Ksoup.parse(text).body()
-		return RichString {
+		return buildRichString {
 			weiboHtmlNodesTransform(html.childNodes(), this)
 		}
 	}

@@ -9,21 +9,10 @@ import kotlin.reflect.typeOf
 inline fun <reified T> buildNavType(
 	isNullableAllowed: Boolean = false
 ): NavType<T> = object : NavType<T>(isNullableAllowed = isNullableAllowed) {
-	override fun put(bundle: Bundle, key: String, value: T) {
-		bundle.putString(key, Json.encodeToString(value))
-	}
-
-	override fun get(bundle: Bundle, key: String): T? {
-		return bundle.getString(key)?.let { Json.decodeFromString(it) }
-	}
-
-	override fun parseValue(value: String): T {
-		return Json.decodeFromString(UriUtils.decode(value))
-	}
-
-	override fun serializeAsValue(value: T): String {
-		return UriUtils.encode(Json.encodeToString(value))
-	}
+	override fun put(bundle: Bundle, key: String, value: T) = bundle.putString(key, value.toJsonString())
+	override fun get(bundle: Bundle, key: String): T? = bundle.getString(key)?.parseJsonValue()
+	override fun parseValue(value: String): T = UriUtils.decode(value).parseJsonValue()!!
+	override fun serializeAsValue(value: T): String = UriUtils.encode(value.toJsonString())
 }
 
 val navTypeCaches = mutableMapOf<String, NavType<*>>()

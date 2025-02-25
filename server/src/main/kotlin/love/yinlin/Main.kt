@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 import love.yinlin.api.initAPI
 import love.yinlin.extension.Json
 import love.yinlin.plugins.IPMonitor
+import java.io.File
 
 @Suppress("unused")
 fun Application.module() {
@@ -16,7 +17,7 @@ fun Application.module() {
     install(IPMonitor)
 
     routing {
-        staticFiles("/public", Resources.Public)
+        staticFiles("/public", File("public"))
         initAPI()
     }
 
@@ -24,7 +25,7 @@ fun Application.module() {
 }
 
 fun main(args: Array<String>) {
-    Resources.copyResources()
+    copyResources(Application::class.java.classLoader, "public")
     EngineMain.main(args)
 
     Redis.close()
