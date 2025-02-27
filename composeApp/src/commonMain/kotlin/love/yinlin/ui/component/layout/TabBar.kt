@@ -42,7 +42,9 @@ fun TabBar(
 			Row(
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier.clickable{ onNavigate(index) }.padding(horizontal = 15.dp, vertical = 10.dp)
+				modifier = Modifier.clickable {
+					if (currentPage != index) onNavigate(index)
+				}.padding(horizontal = 15.dp, vertical = 10.dp)
 			) {
 				MiniIcon(
 					imageVector = icon,

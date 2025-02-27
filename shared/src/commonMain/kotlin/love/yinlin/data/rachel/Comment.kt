@@ -22,6 +22,9 @@ data class Comment(
 	val coin: Int // [用户银币]
 ) {
 	object Section {
+		const val LATEST = -1 // 最新
+		const val HOT = -2 // 热门
+
 		const val UNGROUPED = 0 // 未分组
 		const val NOTIFICATION = 1 // 通知
 		const val WATER = 2 // 水贴

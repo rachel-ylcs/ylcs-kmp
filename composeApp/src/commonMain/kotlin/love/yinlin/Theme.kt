@@ -118,8 +118,10 @@ object Colors {
 
 object ThemeColor {
 	val fade: Color @Composable get() = if (app.isDarkMode) Colors.Gray4 else Colors.Gray5
+	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Red4
 }
 
+@Stable
 private val LightColorScheme = lightColorScheme(
 	primary = Colors.Steel4,
 	onPrimary = Colors.White,
@@ -143,6 +145,7 @@ private val LightColorScheme = lightColorScheme(
 	onError = Colors.White
 )
 
+@Stable
 private val DarkColorScheme = darkColorScheme(
 	primary = Colors.Red4,
 	onPrimary = Colors.Black,
@@ -207,7 +210,7 @@ private fun RachelShapes(): Shapes = Shapes(
 @Composable
 fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = LightColorScheme,
+		colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
 		shapes = RachelShapes(),
 		typography = RachelTypography(),
 		content = content

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -123,11 +124,11 @@ fun ColorfulIcon(
 	size: Dp = DEFAULT_ICON_SIZE
 ) {
 	Box(
-		modifier = Modifier.clip(CircleShape).background(imageVector.background).padding(3.dp),
+		modifier = Modifier.size(size).clip(CircleShape).background(imageVector.background).padding(4.dp),
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
-			modifier = Modifier.size(size),
+			modifier = Modifier.fillMaxSize(),
 			imageVector = imageVector.icon,
 			contentDescription = null,
 			tint = imageVector.color,

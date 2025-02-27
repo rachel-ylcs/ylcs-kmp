@@ -5,25 +5,28 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Diversity1
+import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.item.MsgTabItem
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
@@ -39,6 +42,16 @@ import love.yinlin.ui.screen.MainModel
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
 import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
+
+@Stable
+private enum class MsgTabItem(
+	val title: String,
+	val icon: ImageVector
+) {
+	WEIBO("微博", Icons.Filled.Newspaper),
+	CHAOHUA("超话", Icons.Filled.Diversity1),
+	PICTURES("美图", Icons.Filled.PhotoLibrary)
+}
 
 class MsgModel(val mainModel: MainModel) {
 	class WeiboState {
@@ -137,7 +150,7 @@ class MsgModel(val mainModel: MainModel) {
 	}
 
 	fun onWeiboVideoClick(pic: Picture) {
-
+		TODO()
 	}
 
 	@Composable

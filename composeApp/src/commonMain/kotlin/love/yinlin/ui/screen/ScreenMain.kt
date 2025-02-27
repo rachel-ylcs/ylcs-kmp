@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -19,7 +20,6 @@ import kotlinx.coroutines.Job
 import love.yinlin.AppModel
 import love.yinlin.ThemeMode
 import love.yinlin.platform.app
-import love.yinlin.data.item.TabItem
 import love.yinlin.launch
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
@@ -30,7 +30,23 @@ import love.yinlin.ui.screen.community.ScreenDiscovery
 import love.yinlin.ui.screen.community.ScreenMe
 import love.yinlin.ui.screen.msg.MsgModel
 import love.yinlin.ui.screen.msg.ScreenMsg
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import ylcs_kmp.composeapp.generated.resources.*
+
+@Stable
+private enum class TabItem(
+	val title: StringResource,
+	val iconNormal: DrawableResource,
+	val iconActive: DrawableResource
+) {
+	WORLD(Res.string.home_nav_world, Res.drawable.tab_world_normal, Res.drawable.tab_world_active),
+	MSG(Res.string.home_nav_msg, Res.drawable.tab_msg_normal, Res.drawable.tab_msg_active),
+	MUSIC(Res.string.home_nav_music, Res.drawable.tab_music_normal, Res.drawable.tab_music_active),
+	DISCOVERY(Res.string.home_nav_discovery, Res.drawable.tab_discovery_normal, Res.drawable.tab_discovery_active),
+	ME(Res.string.home_nav_me, Res.drawable.tab_me_normal, Res.drawable.tab_me_active),
+}
 
 class MainModel(val appModel: AppModel) {
 	val pagerState = object : PagerState() {

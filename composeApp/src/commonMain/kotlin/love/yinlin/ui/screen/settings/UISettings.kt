@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -39,12 +42,13 @@ object SettingsScope {
 	fun Item(
 		title: String,
 		icon: ColorfulImageVector? = null,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		hasDivider: Boolean = true,
 		onClick: () -> Unit = {},
 		content: @Composable () -> Unit
 	) {
 		Row(
-			modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(15.dp),
+			modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 15.dp, vertical = 10.dp),
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
@@ -52,6 +56,7 @@ object SettingsScope {
 			Text(
 				text = title,
 				style = MaterialTheme.typography.labelLarge,
+				color = color,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
 			)
@@ -71,6 +76,7 @@ object SettingsScope {
 	fun ItemText(
 		title: String,
 		icon: ColorfulImageVector? = null,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		text: String,
 		maxLines: Int = 1,
 		hasDivider: Boolean = true,
@@ -79,6 +85,7 @@ object SettingsScope {
 		Item(
 			title = title,
 			icon = icon,
+			color = color,
 			hasDivider = hasDivider,
 			onClick = onClick
 		) {
@@ -88,6 +95,57 @@ object SettingsScope {
 				maxLines = maxLines,
 				overflow = TextOverflow.Ellipsis
 			)
+		}
+	}
+
+	@Composable
+	fun ItemExpander(
+		title: String,
+		icon: ColorfulImageVector? = null,
+		color: Color = MaterialTheme.colorScheme.onSurface,
+		hasDivider: Boolean = true,
+		onClick: () -> Unit = {}
+	) {
+		Item(
+			title = title,
+			icon = icon,
+			color = color,
+			hasDivider = hasDivider,
+			onClick = onClick
+		) {
+			MiniIcon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
+		}
+	}
+
+	@Composable
+	fun ItemTextExpander(
+		title: String,
+		icon: ColorfulImageVector? = null,
+		color: Color = MaterialTheme.colorScheme.onSurface,
+		text: String,
+		maxLines: Int = 1,
+		hasDivider: Boolean = true,
+		onClick: () -> Unit = {}
+	) {
+		Item(
+			title = title,
+			icon = icon,
+			color = color,
+			hasDivider = hasDivider,
+			onClick = onClick
+		) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					text = text,
+					color = ThemeColor.fade,
+					maxLines = maxLines,
+					overflow = TextOverflow.Ellipsis
+				)
+				MiniIcon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
+			}
 		}
 	}
 }
@@ -100,7 +158,7 @@ fun SettingsLayout(
 	content: @Composable SettingsScope.() -> Unit
 ) {
 	Surface(
-		modifier = modifier.padding(10.dp),
+		modifier = modifier,
 		shape = MaterialTheme.shapes.large,
 		shadowElevation = 3.dp
 	) {

@@ -96,7 +96,7 @@ private fun ToolBar(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		ClickIcon(
-			imageVector = Icons.Filled.QrCodeScanner,
+			imageVector = Icons.Filled.CropFree,
 			onClick = { model.scanQrcode() }
 		)
 		ClickIcon(
