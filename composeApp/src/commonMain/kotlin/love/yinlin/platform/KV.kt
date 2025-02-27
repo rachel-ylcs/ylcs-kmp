@@ -1,5 +1,7 @@
 package love.yinlin.platform
 
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 
@@ -29,15 +31,38 @@ inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire
 	try {
 		set(key, value.toJsonString(), expire)
 	}
-	catch (_: Exception) { }
+	catch (e: Exception) {
+		e.printStackTrace()
+	}
 }
 
-inline fun <reified T> KV.getJson(key: String, default: T): T {
+fun <T> KV.setJson(serializer: SerializationStrategy<T>, key: String, value: T?, expire: Int = KVExpire.NEVER) {
+	try {
+		set(key, value.toJsonString(serializer), expire)
+	}
+	catch (e: Exception) {
+		e.printStackTrace()
+	}
+}
+
+inline fun <reified T> KV.getJson(key: String, defaultFactory: () -> T): T {
 	return try {
 		val json = get(key, "")
-		if (json.isEmpty()) default else json.parseJsonValue() ?: default
+		if (json.isEmpty()) defaultFactory() else json.parseJsonValue() ?: defaultFactory()
 	}
-	catch (_: Exception) {
-		default
+	catch (e: Exception) {
+		e.printStackTrace()
+		defaultFactory()
+	}
+}
+
+fun <T> KV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaultFactory: () -> T): T {
+	return try {
+		val json = get(key, "")
+		if (json.isEmpty()) defaultFactory() else json.parseJsonValue(deserializer) ?: defaultFactory()
+	}
+	catch (e: Exception) {
+		e.printStackTrace()
+		defaultFactory()
 	}
 }

@@ -10,8 +10,8 @@ agp = "8.7.3"
 
 # Common
 lifecycle = "2.9.0-alpha03"
-ktor = "3.1.0"
-sketch = "4.0.3"
+ktor = "3.1.1"
+sketch = "4.0.4"
 mmkv = "2.1.0"
 
 # Desktop

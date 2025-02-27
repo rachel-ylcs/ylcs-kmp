@@ -7,6 +7,7 @@ import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.UserConstraint
+import love.yinlin.platform.Platform
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -42,6 +43,43 @@ fun DB.throwGetUser(uid: Int, col: String = "uid") = this.throwQuerySQLSingle("S
 
 /* ------------------ 鉴权 --------------------- */
 
+data class Token(
+	val uid: Int,
+	val platform: Platform,
+	val magic: Int = MAGIC,
+	val timestamp: Long = System.currentTimeMillis()
+) {
+	companion object {
+		const val MAGIC = 19911211
+
+		fun fromBytes(bytes: ByteArray): Token? {
+			val uidBytes = bytes.copyOfRange(0, 4)
+			val magicBytes = bytes.copyOfRange(4, 8)
+			val platformBytes = bytes.copyOfRange(8, 12)
+			val timestampBytes = bytes.copyOfRange(12, 20)
+			val uid = ByteBuffer.wrap(uidBytes).int
+			val magic = ByteBuffer.wrap(magicBytes).int
+			val platform = Platform.fromInt(ByteBuffer.wrap(platformBytes).int)
+			val timestamp = ByteBuffer.wrap(timestampBytes).long
+			return if (uid > 0 && magic == MAGIC && timestamp in 1727755860000..1917058260000 && platform != null)
+				Token(uid = uid, platform = platform, timestamp = timestamp) else null
+		}
+
+		fun keys(uid: Int): List<String> = Platform.entries.map { "token/${it.ordinal}/$uid" }
+	}
+
+	val bytes: ByteArray get() {
+		val buffer = ByteBuffer.allocate(Int.SIZE_BYTES * 3 + Long.SIZE_BYTES)
+		buffer.putInt(uid)
+		buffer.putInt(19911211)
+		buffer.putInt(platform.ordinal)
+		buffer.putLong(timestamp)
+		return buffer.array()
+	}
+
+	val key: String get() = "token/${platform.ordinal}/$uid"
+}
+
 object AN {
 	private const val TOKEN_SECRET_KEY = "token_secret_key"
 	private const val KEY_ALGORITHM = "AES"
@@ -69,66 +107,54 @@ object AN {
 		}
 	}
 
-	private fun tokenKey(uid: Int): String = "token/${uid}"
+	@Suppress("GetInstance")
+	fun throwGenerateToken(token: Token): String {
+		val cipher = Cipher.getInstance(KEY_ALGORITHM)
+		cipher.init(Cipher.ENCRYPT_MODE, AES_KEY)
+		val encryptedBytes = cipher.doFinal(token.bytes)
+		val tokenString = Base64.getEncoder().encodeToString(encryptedBytes)
+		Redis.use {
+			it.setex(token.key, 7 * 24 * 60 * 60, tokenString)
+		}
+		return tokenString
+	}
 
 	@Suppress("GetInstance")
-	private fun tokenParseUid(token: String): Int = try {
-		val encryptedBytes = Base64.getDecoder().decode(token)
+	private fun parseToken(tokenString: String): Token {
+		val encryptedBytes = Base64.getDecoder().decode(tokenString)
 		val cipher = Cipher.getInstance(KEY_ALGORITHM)
 		cipher.init(Cipher.DECRYPT_MODE, AES_KEY)
 		val bytes = cipher.doFinal(encryptedBytes)
-		val uidBytes = bytes.copyOfRange(0, 4)
-		val timestampBytes = bytes.copyOfRange(8, 16)
-		val uid = ByteBuffer.wrap(uidBytes).int
-		val timestamp = ByteBuffer.wrap(timestampBytes).long
-		if (uid > 0 && timestamp in 1727755860000..1917058260000) uid
-		else 0
-	}
-	catch (_: Throwable) { 0 }
-
-	@Suppress("GetInstance")
-	fun throwGenerateToken(uid: Int): String {
-		val timestamp = System.currentTimeMillis()
-		val buffer = ByteBuffer.allocate(Int.SIZE_BYTES + Int.SIZE_BYTES + Long.SIZE_BYTES)
-		buffer.putInt(uid)
-		buffer.putInt(19911211)
-		buffer.putLong(timestamp)
-		val cipher = Cipher.getInstance(KEY_ALGORITHM)
-		cipher.init(Cipher.ENCRYPT_MODE, AES_KEY)
-		val encryptedBytes = cipher.doFinal(buffer.array())
-		val token = Base64.getEncoder().encodeToString(encryptedBytes)
-		Redis.use {
-			it.setex(tokenKey(uid), 7 * 24 * 60 * 60, token)
-		}
-		return token
+		return Token.fromBytes(bytes)!!
 	}
 
-	fun throwExpireToken(token: String): Int {
-		val uid = tokenParseUid(token)
+	fun throwExpireToken(tokenString: String): Int {
+		val token = parseToken(tokenString)
+		// keyToken 可能是 null 或 已经失效的 token
+		val saveTokenString = Redis.use { it.get(token.key) }
+		return if (saveTokenString == tokenString) token.uid else throw TokenExpireError(token.uid)
+	}
+
+	fun throwReGenerateToken(srcTokenString: String): String {
+		val token = parseToken(srcTokenString)
+		val saveTokenString = Redis.use { it.get(token.key) }
+		return if (saveTokenString == srcTokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
+			else throw TokenExpireError(token.uid)
+	}
+
+	fun removeToken(tokenString: String) {
+		val token = parseToken(tokenString)
+		val saveTokenString = Redis.use { it.get(token.key) }
+		if (saveTokenString == tokenString) Redis.use { it.del(token.key) }
+		else throw TokenExpireError(token.uid)
+	}
+
+	fun removeAllTokens(uid: Int) {
 		if (uid > 0) {
-			// keyToken 可能是 null 或 已经失效的 token
-			val keyToken = Redis.use {
-				it.get(tokenKey(uid))
+			for (tokenString in Token.keys(uid)) {
+				Redis.use { it.del(tokenString) }
 			}
-			if (keyToken == token) return uid
 		}
-		throw TokenExpireError(uid)
-	}
-
-	fun removeToken(uid: Int): Boolean {
-		val key = tokenKey(uid)
-		return Redis.use {
-			if (it.exists(key)) {
-				it.del(key)
-				true
-			}
-			else false
-		}
-	}
-
-	fun throwRemoveToken(token: String) {
-		val uid = tokenParseUid(token)
-		if (uid <= 0 || !removeToken(uid)) throw TokenExpireError(uid)
 	}
 }
 

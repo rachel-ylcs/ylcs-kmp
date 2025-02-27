@@ -11,7 +11,7 @@ import love.yinlin.ui.component.extra.WebPageSettings
 import love.yinlin.ui.component.extra.WebPageState
 import love.yinlin.ui.component.screen.SubScreen
 
-class WebPageModel(url: String) : ViewModel() {
+private class WebPageModel(url: String) : ViewModel() {
 	val state = WebPageState(WebPageSettings(), url)
 }
 

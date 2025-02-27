@@ -85,7 +85,7 @@ fun LoadingBox() {
 		) {
 			Image(
 				modifier = Modifier.height(200.dp),
-				painter = painterResource(Res.drawable.state_loading),
+				painter = painterResource(Res.drawable.img_state_loading),
 				contentDescription = null
 			)
 			Row(
@@ -127,8 +127,8 @@ fun EmptyBox() {
 		) {
 			Image(
 				modifier = Modifier.size(200.dp),
-				painter = painterResource(Res.drawable.state_empty),
-				contentDescription = null,
+				painter = painterResource(Res.drawable.img_state_empty),
+				contentDescription = null
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -153,8 +153,8 @@ fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
 		) {
 			Image(
 				modifier = Modifier.size(200.dp),
-				painter = painterResource(Res.drawable.state_network_error),
-				contentDescription = null,
+				painter = painterResource(Res.drawable.img_state_network_error),
+				contentDescription = null
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,

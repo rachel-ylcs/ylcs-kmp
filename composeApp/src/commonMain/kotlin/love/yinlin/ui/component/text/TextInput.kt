@@ -17,22 +17,24 @@ import love.yinlin.ui.component.image.ClickIcon
 
 enum class InputType {
 	COMMON,
-	PASSWORD
+	PASSWORD;
+
+	internal val toVisualTransformation: VisualTransformation get() = when (this) {
+		COMMON -> VisualTransformation.None
+		PASSWORD -> PasswordVisualTransformation()
+	}
+
+	internal val toKeyboardOptions: KeyboardOptions get() = when (this) {
+		COMMON -> KeyboardOptions.Default
+		PASSWORD -> KeyboardOptions(keyboardType = KeyboardType.Password)
+	}
 }
 
-private fun InputType.toVisualTransformation() = when (this) {
-	InputType.COMMON -> VisualTransformation.None
-	InputType.PASSWORD -> PasswordVisualTransformation()
-}
+class TextInputState(str: String = "", isOverflow: Boolean = false) {
+	var text: String by mutableStateOf(str)
+	var overflow: Boolean by mutableStateOf(isOverflow)
 
-private fun InputType.toKeyboardOptions() = when (this) {
-	InputType.COMMON -> KeyboardOptions.Default
-	InputType.PASSWORD -> KeyboardOptions(keyboardType = KeyboardType.Password)
-}
-
-class TextInputState {
-	var text: String by mutableStateOf("")
-	var overflow: Boolean by mutableStateOf(false)
+	val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
 }
 
 @Composable
@@ -66,12 +68,13 @@ fun TextInput(
 					imageVector = Icons.Filled.Clear,
 					onClick = {
 						state.text = ""
+						state.overflow = false
 					}
 				)
 			}
 		} else null,
-		visualTransformation = remember(inputType) { inputType.toVisualTransformation() },
-		keyboardOptions = remember(inputType) { inputType.toKeyboardOptions() },
+		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
+		keyboardOptions = remember(inputType) { inputType.toKeyboardOptions },
 		singleLine = maxLines.coerceAtLeast(1) == 1,
 		maxLines = maxLines.coerceAtLeast(1),
 		isError = state.overflow,

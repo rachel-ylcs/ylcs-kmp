@@ -16,7 +16,9 @@ data class SubComment(
 	val label: String, // [用户标签]
 	val coin: Int // [用户银币]
 ) {
+	@Stable
 	val level: Int get() = UserLevel.level(coin)
 
+	@Stable
 	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
 }

@@ -27,6 +27,7 @@ import love.yinlin.extension.condition
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.rememberTextInputState
 import org.jetbrains.compose.resources.painterResource
@@ -74,19 +75,19 @@ open class TipState {
 	var type by mutableStateOf(Type.INFO)
 		private set
 
-	suspend fun show(text: String, type: Type = Type.INFO) {
+	suspend fun show(text: String?, type: Type = Type.INFO) {
 		host.currentSnackbarData?.dismiss()
 		this.type = type
 		host.showSnackbar(
-			message = text,
+			message = text ?: "",
 			duration = SnackbarDuration.Short
 		)
 	}
 
-	suspend fun info(text: String) = show(text, Type.INFO)
-	suspend fun success(text: String) = show(text, Type.SUCCESS)
-	suspend fun warning(text: String) = show(text, Type.WARNING)
-	suspend fun error(text: String) = show(text, Type.ERROR)
+	suspend fun info(text: String?) = show(text, Type.INFO)
+	suspend fun success(text: String?) = show(text, Type.SUCCESS)
+	suspend fun warning(text: String?) = show(text, Type.WARNING)
+	suspend fun error(text: String?) = show(text, Type.ERROR)
 }
 
 @Composable
@@ -99,17 +100,14 @@ fun Tip(state: TipState) {
 			modifier = Modifier.fillMaxSize(),
 			contentAlignment = Alignment.BottomCenter
 		) {
-			Row(
-				modifier = Modifier.padding(bottom = 100.dp)
-					.size(width = 300.dp, height = 150.dp)
-					.offset(x = (-10).dp)
-			) {
-				Image(
-					painter = painterResource(Res.drawable.img_toast_rachel),
-					contentDescription = null,
-					modifier = Modifier.width(75.dp).fillMaxHeight()
-						.offset(x = 20.dp).zIndex(2f)
-				)
+			Row(modifier = Modifier.padding(bottom = 100.dp).size(width = 300.dp, height = 150.dp)) {
+				OffsetLayout(x = 10.dp) {
+					Image(
+						painter = painterResource(Res.drawable.img_toast_rachel),
+						contentDescription = null,
+						modifier = Modifier.width(75.dp).fillMaxHeight()
+					)
+				}
 				Surface(
 					shape = MaterialTheme.shapes.extraLarge,
 					shadowElevation = 5.dp,
@@ -120,7 +118,7 @@ fun Tip(state: TipState) {
 						TipState.Type.ERROR -> Colors.Red4
 					},
 					modifier = Modifier.weight(1f).fillMaxHeight()
-						.padding(top = 40.dp, bottom = 20.dp).zIndex(1f)
+						.padding(top = 40.dp, bottom = 20.dp)
 				) {
 					Text(
 						text = it.visuals.message,
@@ -158,20 +156,20 @@ private fun RachelDialog(
 		)
 	) {
 		Column(
-			modifier = Modifier.width(info.width)
-				.offset(y = (-18).dp),
+			modifier = Modifier.width(info.width),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			Image(
-				painter = painterResource(Res.drawable.img_dialog_rachel),
-				contentDescription = null,
-				modifier = Modifier.size(info.rachelWidth)
-					.offset(y = 18.dp).zIndex(2f)
-			)
+			OffsetLayout(y = info.rachelWidth / 15.5f) {
+				Image(
+					painter = painterResource(Res.drawable.img_dialog_rachel),
+					contentDescription = null,
+					modifier = Modifier.size(info.rachelWidth)
+				)
+			}
 			Surface(
 				shape = MaterialTheme.shapes.extraLarge,
 				shadowElevation = 5.dp,
-				modifier = Modifier.fillMaxWidth().zIndex(1f)
+				modifier = Modifier.fillMaxWidth()
 			) {
 				Column(
 					modifier = Modifier.fillMaxWidth().padding(15.dp),
@@ -290,7 +288,7 @@ fun DialogInput(
 		actions = {
 			DialogButton(
 				text = stringResource(Res.string.dialog_yes),
-				enabled = !textInputState.overflow && textInputState.text.isNotEmpty()
+				enabled = textInputState.ok
 			) {
 				state.isOpen = false
 				onInput(textInputState.text)

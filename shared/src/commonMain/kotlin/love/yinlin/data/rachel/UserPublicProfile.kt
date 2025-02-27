@@ -14,8 +14,12 @@ data class UserPublicProfile(
 	val label: String,
 	val coin: Int,
 ) {
-	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
-	val wallPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).wall}"
-
+	@Stable
 	val level: Int get() = UserLevel.level(coin)
+
+	@Stable
+	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
+
+	@Stable
+	val wallPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).wall}"
 }

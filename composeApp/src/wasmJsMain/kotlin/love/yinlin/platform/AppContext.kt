@@ -11,4 +11,4 @@ class AppContext : IAppContext() {
 }
 
 @Stable
-val appNative: AppContext get() = appContext as AppContext
+val appNative: AppContext get() = app as AppContext

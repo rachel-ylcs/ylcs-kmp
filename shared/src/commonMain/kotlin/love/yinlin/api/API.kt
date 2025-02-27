@@ -15,12 +15,17 @@ import love.yinlin.data.rachel.SubComment
 import love.yinlin.data.rachel.TopicDetails
 import love.yinlin.data.rachel.UserProfile
 import love.yinlin.data.rachel.UserPublicProfile
+import love.yinlin.platform.Platform
 
 // ------------  API 配置  ------------
 
 object APIConfig {
-	const val DEBUG = true
-	val URL = if (DEBUG) "http://localhost:1211" else "https://yinlin.love"
+	const val URL_MODE = 1
+	val URL = when (URL_MODE) {
+		0 -> "http://localhost:1211"
+		1 -> "http://49.235.151.78:1211"
+		else -> "https://yinlin.love"
+	}
 
 	const val MIN_PAGE_NUM = 10
 	const val MAX_PAGE_NUM = 20
@@ -44,27 +49,36 @@ data class ClientFile(val path: String) {
 
 open class ResNode protected constructor(val path: String) {
 	constructor(parent: ResNode, name: String) : this("${parent.path}/$name")
+
+	override fun toString(): String = path
 }
 
 object ServerRes : ResNode("public") {
 	object Activity : ResNode(this, "activity") {
 		fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
 	}
+
 	object Assets : ResNode(this, "assets") {
 		val DefaultAvatar = ResNode(this, "default_avatar.webp")
+
 		val DefaultWall = ResNode(this, "default_wall.webp")
 	}
+
 	object Users : ResNode(this, "users") {
 		class User(uid: Int) : ResNode(this, "$uid") {
 			val avatar = ResNode(this, "avatar.webp")
+
 			val wall = ResNode(this, "wall.webp")
+
 			inner class Pics : ResNode(this, "pics") {
 				fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
 			}
 		}
 	}
-	val Photo = ResNode(this, "photo.json")
+
 	val Server = ResNode(this, "server.json")
+	val Update = ResNode(this, "update.json")
+	val Photo = ResNode(this, "photo.json")
 }
 
 // ------------  API 接口  ------------
@@ -88,8 +102,6 @@ object Default {
 	data object Response
 
 
-	@Serializable
-	data class AuthorizationRequest(val name: String, val pwd: String)
 
 	@Serializable
 	data class PageAscRequest(val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
@@ -120,7 +132,10 @@ typealias APIResponse<Response> = APIRoute<Default.Request, Response>
 object API : APINode(null, "") {
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {
-			object Login : APIRoute<Default.AuthorizationRequest, String>(this, "login")
+			object Login : APIRoute<Login.Request, String>(this, "login") {
+				@Serializable
+				data class Request(val name: String, val pwd: String, val platform: Platform)
+			}
 
 			object Logoff : APIRequest<String>(this, "logoff")
 
@@ -131,7 +146,10 @@ object API : APINode(null, "") {
 				data class Request(val name: String, val pwd: String, val inviterName: String)
 			}
 
-			object ForgotPassword : APIRequest<Default.AuthorizationRequest>(this, "forgotPassword")
+			object ForgotPassword : APIRequest<ForgotPassword.Request>(this, "forgotPassword") {
+				@Serializable
+				data class Request(val name: String, val pwd: String)
+			}
 		}
 
 		object Activity : APINode(this, "activity") {

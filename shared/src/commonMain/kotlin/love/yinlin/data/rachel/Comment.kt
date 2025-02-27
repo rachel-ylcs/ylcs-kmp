@@ -37,7 +37,9 @@ data class Comment(
 		}
 	}
 
+	@Stable
 	val level: Int get() = UserLevel.level(coin)
 
+	@Stable
 	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
 }

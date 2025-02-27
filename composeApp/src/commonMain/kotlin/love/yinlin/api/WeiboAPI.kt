@@ -27,7 +27,6 @@ import love.yinlin.extension.StringNull
 import love.yinlin.extension.arr
 import love.yinlin.extension.obj
 import love.yinlin.platform.OS
-import love.yinlin.platform.isWeb
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.text.buildRichString
 

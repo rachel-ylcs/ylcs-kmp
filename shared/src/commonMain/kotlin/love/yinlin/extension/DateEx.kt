@@ -8,6 +8,7 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.toLocalDateTime
 
 object DateEx {
+	val currentDateInt: Int
 	val currentDateString: String
 
 	init {
@@ -17,5 +18,6 @@ object DateEx {
 			monthNumber(padding = Padding.ZERO)
 			dayOfMonth(padding = Padding.ZERO)
 		})
+		currentDateInt = currentDateString.toInt()
 	}
 }

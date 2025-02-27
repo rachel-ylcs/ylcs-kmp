@@ -17,11 +17,10 @@ import androidx.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.AppModel
-import love.yinlin.platform.ThemeMode
+import love.yinlin.ThemeMode
 import love.yinlin.platform.app
 import love.yinlin.data.item.TabItem
 import love.yinlin.launch
-import love.yinlin.platform.next
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space

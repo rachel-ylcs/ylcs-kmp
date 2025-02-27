@@ -19,6 +19,7 @@ import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
+import love.yinlin.data.rachel.MailEntry
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -31,7 +32,7 @@ import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.random.Random
 
-typealias ImplFunc = suspend (JsonObject) -> JsonObject
+typealias ImplFunc = suspend (MailEntry) -> JsonObject
 typealias ImplMap = MutableMap<String, ImplFunc>
 
 // Request

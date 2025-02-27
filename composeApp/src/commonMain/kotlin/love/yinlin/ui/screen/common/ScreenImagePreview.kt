@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.data.common.Picture
-import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
 import love.yinlin.launch
 import love.yinlin.platform.OS
@@ -35,11 +34,11 @@ import love.yinlin.ui.component.screen.DialogProgressState
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
-class PreviewPicture(val pic: Picture) {
+private class PreviewPicture(val pic: Picture) {
 	var isSource: Boolean by mutableStateOf(false)
 }
 
-class ImagePreviewModel(
+private class ImagePreviewModel(
 	images: List<Picture>,
 	current: Int
 ) : ViewModel() {

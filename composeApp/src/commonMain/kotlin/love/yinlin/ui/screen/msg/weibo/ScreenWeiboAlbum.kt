@@ -43,9 +43,9 @@ import love.yinlin.ui.component.screen.Tip
 import love.yinlin.ui.component.screen.TipState
 import love.yinlin.ui.component.image.WebImage
 
-data class AlbumCache(val count: Int, val items: List<Picture>)
+private data class AlbumCache(val count: Int, val items: List<Picture>)
 
-class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
+private class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
 	companion object {
 		const val PIC_LIMIT = 24
 		const val PIC_MAX_LIMIT = 1000
@@ -100,7 +100,7 @@ class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
 	}
 
 	fun onPictureClick(pic: Picture) {
-
+		TODO()
 	}
 }
 

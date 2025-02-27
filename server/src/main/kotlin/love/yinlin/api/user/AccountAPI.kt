@@ -24,26 +24,25 @@ import love.yinlin.md5
 import love.yinlin.mkdir
 
 fun Routing.accountAPI(implMap: ImplMap) {
-	api(API.User.Account.Login) { (name, pwd) ->
+	api(API.User.Account.Login) { (name, pwd, platform) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
 		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name)
 		if (user == null) return@api "ID未注册".failedData
 		if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
 		val uid = user["uid"].Int
-		// 根据 uid 和 timestamp 生成 token
-		Data.Success(AN.throwGenerateToken(uid))
+		// 根据 uid, platform, timestamp 生成 token
+		val token = Token(uid, platform)
+		Data.Success(AN.throwGenerateToken(token))
 	}
 
 	api(API.User.Account.Logoff) { token ->
-		AN.throwRemoveToken(token)
+		AN.removeToken(token)
 		EmptySuccessData
 	}
 
 	api(API.User.Account.UpdateToken) { token ->
-		val uid = AN.throwExpireToken(token)
-		// 生成新的Token
-		Data.Success(AN.throwGenerateToken(uid))
+		Data.Success(AN.throwReGenerateToken(token))
 	}
 
 	api(API.User.Account.Register) { (name, pwd, inviterName) ->
@@ -77,9 +76,9 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	}
 
 	implMap[Mail.Filter.REGISTER] = ImplContext@ {
-		val inviterID = it["uid"].Int
-		val registerName = it["param1"].String
-		val registerPwd = it["param2"].String
+		val inviterID = it.uid
+		val registerName = it.param1
+		val registerPwd = it.param2
 		val createTime = currentTS
 		val registerID = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin)
@@ -131,13 +130,13 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	}
 
 	implMap[Mail.Filter.FORGOT_PASSWORD] = ImplContext@ {
-		val name = it["param1"].String
-		val pwd = it["param2"].String
+		val name = it.param1
+		val pwd = it.param2
 		val user = DB.querySQLSingle("SELECT uid FROM user WHERE name = ?", name)
 		if (user == null) return@ImplContext "用户不存在".failedObject
 		DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
 		// 清除修改密码用户的 Token
-		AN.removeToken(user["uid"].Int)
+		AN.removeAllTokens(user["uid"].Int)
 		"\"${name}\"修改密码成功".successObject
 	}
 }

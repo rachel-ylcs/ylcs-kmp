@@ -14,10 +14,10 @@ data class Mail(
 	val title: String, // [标题]
 	val content: String // [内容]
 	// filter: String [邮件处理器]
-	// param1: String [处理参数1]
-	// param2: String [处理参数2]
-	// param3: String [处理参数3]
-	// info: JsonObject [其他处理参数]
+	// param1: String? [处理参数1]
+	// param2: String? [处理参数2]
+	// param3: String? [处理参数3]
+	// info: JsonObject? [其他处理参数]
 ) {
 	object Type {
 		const val INFO = 1

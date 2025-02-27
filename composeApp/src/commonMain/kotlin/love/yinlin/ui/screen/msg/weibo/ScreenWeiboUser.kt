@@ -29,19 +29,19 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
-import love.yinlin.data.weibo.WeiboUserLocal
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.launch
 import love.yinlin.platform.app
+import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 
-class WeiboUserModel(model: AppModel) : ViewModel() {
+private class WeiboUserModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
 	val launchFlag = LaunchFlag()
 	val grid = WeiboGridData()
@@ -63,13 +63,11 @@ class WeiboUserModel(model: AppModel) : ViewModel() {
 	}
 
 	fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
+		val weiboUsers = config.weiboUsers
 		if (isFollow) {
-			if (msgModel.isFollowed(user.info)) return
-			else msgModel.followUsers += user.info
+			if (!weiboUsers.contains { it.id == user.info.id }) weiboUsers += user.info
 		}
-		else msgModel.followUsers -= user.info
-		// 持久化
-		app.config.weiboUsers = msgModel.followUsers.map { WeiboUserLocal(it.id, it.name) }
+		else weiboUsers -= user.info
 	}
 
 	fun onAlbumClick(album: WeiboAlbum) {
@@ -85,15 +83,17 @@ private fun UserInfoCard(
 	modifier: Modifier = Modifier
 ) {
 	Row(
-		modifier = modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp),
+		modifier = modifier.padding(horizontal = 10.dp, vertical = 5.dp),
 		horizontalArrangement = Arrangement.spacedBy(10.dp),
 	) {
-		WebImage(
-			uri = user.info.avatar,
-			key = DateEx.currentDateString,
-			modifier = Modifier.size(64.dp).offset(y = (-20).dp),
-			circle = true
-		)
+		OffsetLayout(y = (-37).dp) {
+			WebImage(
+				uri = user.info.avatar,
+				key = DateEx.currentDateString,
+				modifier = Modifier.size(64.dp),
+				circle = true
+			)
+		}
 		Column(
 			modifier = Modifier.weight(1f),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -195,7 +195,7 @@ private fun Portrait(
 			)
 			UserInfoCard(
 				user = user,
-				isFollowed = model.msgModel.followUsers.contains(user.info),
+				isFollowed = config.weiboUsers.contains { it.id == user.info.id },
 				onFollowClick = onFollowClick,
 				modifier = Modifier.fillMaxWidth()
 			)
@@ -259,7 +259,7 @@ private fun Landscape(
 				)
 				UserInfoCard(
 					user = user,
-					isFollowed = model.msgModel.isFollowed(user.info),
+					isFollowed = config.weiboUsers.contains { it.id == user.info.id },
 					onFollowClick = onFollowClick,
 					modifier = Modifier.fillMaxWidth()
 				)

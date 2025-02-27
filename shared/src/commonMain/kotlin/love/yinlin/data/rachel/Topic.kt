@@ -22,6 +22,9 @@ data class Topic(
 	val rawSection: Int, // [原始板块]
 	val name: String, // [用户昵称]
 ) {
+	@Stable
 	val picPath: String get() = pic?.let { "${APIConfig.URL}/${ServerRes.Users.User(uid).Pics().pic(it)}" } ?: ""
+
+	@Stable
 	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
 }

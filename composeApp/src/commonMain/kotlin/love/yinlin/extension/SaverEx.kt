@@ -7,10 +7,7 @@ object Saver {
 	val TextInputState: Saver<TextInputState, Pair<String, Boolean>> = Saver(
 		save = { it.text to it.overflow },
 		restore = {
-			TextInputState().apply {
-				text = it.first
-				overflow = it.second
-			}
+			TextInputState(it.first, it.second)
 		}
 	)
 

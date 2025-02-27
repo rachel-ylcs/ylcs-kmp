@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.platform.OS
-import love.yinlin.platform.isPhone
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue

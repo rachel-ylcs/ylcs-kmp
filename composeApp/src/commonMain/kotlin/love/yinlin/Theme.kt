@@ -16,6 +16,16 @@ import org.jetbrains.compose.resources.Font
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.xwwk
 
+enum class ThemeMode {
+	SYSTEM, LIGHT, DARK;
+
+	val next: ThemeMode get() = when (this) {
+		SYSTEM -> LIGHT
+		LIGHT -> DARK
+		DARK -> SYSTEM
+	}
+}
+
 object Colors {
 	val Unspecified = Color.Unspecified
 	val Transparent = Color(0x00000000)
@@ -168,11 +178,11 @@ private fun RachelTextStyle(size: TextUnit, isBold: Boolean = false): TextStyle 
 
 @Composable
 private fun RachelTypography(): Typography = Typography(
-	displayLarge = RachelTextStyle(24.sp, true),
-	displayMedium = RachelTextStyle(20.sp, true),
+	displayLarge = RachelTextStyle(20.sp, true),
+	displayMedium = RachelTextStyle(18.sp, true),
 	displaySmall = RachelTextStyle(16.sp, true),
-	headlineLarge = RachelTextStyle(24.sp, false),
-	headlineMedium = RachelTextStyle(20.sp, false),
+	headlineLarge = RachelTextStyle(20.sp, false),
+	headlineMedium = RachelTextStyle(18.sp, false),
 	headlineSmall = RachelTextStyle(16.sp, false),
 	titleLarge = RachelTextStyle(16.sp, true),
 	titleMedium = RachelTextStyle(14.sp, true),
@@ -197,7 +207,7 @@ private fun RachelShapes(): Shapes = Shapes(
 @Composable
 fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
+		colorScheme = LightColorScheme,
 		shapes = RachelShapes(),
 		typography = RachelTypography(),
 		content = content

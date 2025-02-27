@@ -22,14 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
-import love.yinlin.platform.app
 import love.yinlin.data.common.Picture
 import love.yinlin.data.item.MsgTabItem
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.platform.OS
-import love.yinlin.platform.isWeb
+import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.screen.msg.weibo.WeiboGridData
 import love.yinlin.ui.screen.msg.weibo.WeiboLayout
@@ -85,14 +84,6 @@ class MsgModel(val mainModel: MainModel) {
 	}
 	// 当前微博
 	var currentWeibo: Weibo? = null
-	// 关注用户
-	val followUsers = app.config.weiboUsers.map {
-		WeiboUserInfo(it.id, it.name, "")
-	}.distinctBy {
-		it.id
-	}.toMutableStateList()
-
-	fun isFollowed(info: WeiboUserInfo) = followUsers.find { it.id == info.id } != null
 
 	// 微博数据
 	val weiboState = WeiboState()
@@ -106,7 +97,7 @@ class MsgModel(val mainModel: MainModel) {
 	fun onRefresh() {
 		when (pagerState.currentPage) {
 			MsgTabItem.WEIBO.ordinal -> mainModel.launch {
-				weiboState.grid.requestWeibo(followUsers.map { it.id })
+				weiboState.grid.requestWeibo(config.weiboUsers.map { it.id })
 			}
 			MsgTabItem.CHAOHUA.ordinal -> mainModel.launch {
 				chaohuaState.requestNewData()

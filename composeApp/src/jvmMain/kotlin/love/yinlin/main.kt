@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import javafx.application.Platform
 import love.yinlin.platform.AppContext
-import love.yinlin.platform.appContext
+import love.yinlin.platform.app
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
@@ -27,7 +27,7 @@ import ylcs_kmp.composeapp.generated.resources.app_name
 
 fun main() {
     val context = AppContext()
-    appContext = context.initialize()
+    app = context.initialize()
 
     // JavaFx
     Platform.startup {

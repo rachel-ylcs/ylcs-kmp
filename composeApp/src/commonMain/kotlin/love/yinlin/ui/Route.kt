@@ -10,10 +10,12 @@ import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebPage
+import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboAlbum
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
+import love.yinlin.ui.screen.settings.ScreenSettings
 
 sealed interface Route {
 	@Serializable
@@ -25,6 +27,10 @@ sealed interface Route {
 	@Serializable
 	data class WebPage(val url: String): Route
 
+	// 设置
+	@Serializable
+	data object Settings : Route
+
 	// 微博
 	@Serializable
 	data object WeiboDetails: Route
@@ -34,6 +40,10 @@ sealed interface Route {
 	data object WeiboFollows: Route
 	@Serializable
 	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum): Route
+
+	// 社区
+	@Serializable
+	data object Login : Route
 
 	companion object {
 		fun NavGraphBuilder.buildRoute(
@@ -47,6 +57,11 @@ sealed interface Route {
 			composable<WebPage> {
 				val args = it.toRoute<WebPage>()
 				ScreenWebPage(appModel, args.url)
+			}
+
+			// 设置
+			composable<Settings> {
+				ScreenSettings(appModel)
 			}
 
 			// 微博
@@ -67,6 +82,11 @@ sealed interface Route {
 			composable<ImagePreview>(typeMap = buildNavTypeMap<List<Picture>>()) {
 				val args = it.toRoute<ImagePreview>()
 				ScreenImagePreview(appModel, args.images, args.current)
+			}
+
+			// 社区
+			composable<Login> {
+				ScreenLogin(appModel)
 			}
 		}
 	}

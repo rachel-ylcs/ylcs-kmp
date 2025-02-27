@@ -33,7 +33,7 @@ import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
 
-class WeiboDetailsModel(model: AppModel) : ViewModel() {
+private class WeiboDetailsModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
 	val weibo: Weibo? = msgModel.currentWeibo
 	val launchFlag = LaunchFlag()

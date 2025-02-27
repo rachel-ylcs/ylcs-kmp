@@ -1,25 +1,36 @@
 package love.yinlin.ui.component.image
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -28,6 +39,7 @@ import com.github.panpf.sketch.state.rememberIconPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
+import love.yinlin.Colors
 import love.yinlin.extension.condition
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -53,6 +65,73 @@ fun MiniIcon(
 	}
 	else {
 		Spacer(modifier = modifier.size(size))
+	}
+}
+
+@Composable
+fun NoImage(
+	width: Dp = DEFAULT_ICON_SIZE,
+	height: Dp = DEFAULT_ICON_SIZE,
+	color: Color = MaterialTheme.colorScheme.onSurface
+) {
+	if (width == height) {
+		Box(
+			modifier = Modifier.shadow(2.dp, CircleShape),
+			contentAlignment = Alignment.Center
+		) {
+			Icon(
+				modifier = Modifier.size(width),
+				imageVector = Icons.AutoMirrored.Filled.Help,
+				contentDescription = null,
+				tint = color,
+			)
+		}
+	}
+	else {
+		Box(
+			modifier = Modifier.width(width).height(height).shadow(2.dp),
+			contentAlignment = Alignment.Center
+		) {
+			Icon(
+				modifier = Modifier.size(min(width, height)).padding(5.dp),
+				imageVector = Icons.AutoMirrored.Filled.Help,
+				contentDescription = null,
+				tint = color,
+			)
+		}
+	}
+}
+
+@Stable
+data class ColorfulImageVector(
+	val icon: ImageVector,
+	val color: Color,
+	val background: Color
+)
+
+@Stable
+@Composable
+fun colorfulImageVector(
+	icon: ImageVector,
+	color: Color = MaterialTheme.colorScheme.onSurface,
+	background: Color = Colors.Transparent
+) = ColorfulImageVector(icon, color, background)
+
+@Composable
+fun ColorfulIcon(
+	imageVector: ColorfulImageVector,
+	size: Dp = DEFAULT_ICON_SIZE
+) {
+	Box(
+		modifier = Modifier.clip(CircleShape).background(imageVector.background).padding(3.dp),
+		contentAlignment = Alignment.Center
+	) {
+		Icon(
+			modifier = Modifier.size(size),
+			imageVector = imageVector.icon,
+			contentDescription = null,
+			tint = imageVector.color,
+		)
 	}
 }
 
@@ -121,7 +200,19 @@ fun MiniImage(
 }
 
 enum class WebImageQuality {
-	Low, Medium, High
+	Low, Medium, High;
+
+	val sizeMultiplier: Float get() = when (this) {
+		Low -> 1f
+		Medium -> 2f
+		High -> 4f
+	}
+
+	val filterQuality: FilterQuality get() = when (this) {
+		Low -> FilterQuality.Low
+		Medium -> FilterQuality.Medium
+		High -> FilterQuality.High
+	}
 }
 
 @Composable
@@ -150,11 +241,7 @@ fun WebImage(
 	val state = rememberAsyncImageState(ComposableImageOptions {
 		downloadCachePolicy(CachePolicy.ENABLED)
 		memoryCachePolicy(CachePolicy.ENABLED)
-		sizeMultiplier(when (quality) {
-			WebImageQuality.Low -> 1f
-			WebImageQuality.Medium -> 2f
-			WebImageQuality.High -> 4f
-		})
+		sizeMultiplier(quality.sizeMultiplier)
 		placeholder(rememberIconPainterStateImage(placeholder))
 		crossfade()
 	})
@@ -164,11 +251,7 @@ fun WebImage(
 		state = state,
 		alignment = alignment,
 		contentScale = contentScale,
-		filterQuality = when (quality) {
-			WebImageQuality.Low -> FilterQuality.Low
-			WebImageQuality.Medium -> FilterQuality.Medium
-			WebImageQuality.High -> FilterQuality.High
-		},
+		filterQuality = quality.filterQuality,
 		alpha = alpha,
 		modifier = modifier.condition(circle) { clip(CircleShape) }
 			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
@@ -190,11 +273,7 @@ fun ZoomWebImage(
 	val state = rememberAsyncImageState(ComposableImageOptions {
 		downloadCachePolicy(CachePolicy.ENABLED)
 		memoryCachePolicy(CachePolicy.ENABLED)
-		sizeMultiplier(when (quality) {
-			WebImageQuality.Low -> 1f
-			WebImageQuality.Medium -> 2f
-			WebImageQuality.High -> 4f
-		})
+		sizeMultiplier(quality.sizeMultiplier)
 		placeholder(rememberIconPainterStateImage(placeholder))
 	})
 	SketchZoomAsyncImage(
@@ -204,11 +283,7 @@ fun ZoomWebImage(
 		zoomState = zoomState,
 		alignment = alignment,
 		contentScale = contentScale,
-		filterQuality = when (quality) {
-			WebImageQuality.Low -> FilterQuality.Low
-			WebImageQuality.Medium -> FilterQuality.Medium
-			WebImageQuality.High -> FilterQuality.High
-		},
+		filterQuality = quality.filterQuality,
 		alpha = alpha,
 		scrollBar = null,
 		modifier = modifier

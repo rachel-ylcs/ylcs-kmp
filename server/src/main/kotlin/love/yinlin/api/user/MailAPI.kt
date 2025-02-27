@@ -11,11 +11,9 @@ import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.api.successObject
 import love.yinlin.data.Data
-import love.yinlin.extension.Boolean
+import love.yinlin.data.rachel.MailEntry
 import love.yinlin.extension.Int
-import love.yinlin.extension.ObjectEmpty
 import love.yinlin.extension.String
-import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 
 fun Routing.mailAPI(implMap: ImplMap) {
@@ -33,29 +31,22 @@ fun Routing.mailAPI(implMap: ImplMap) {
 
 	api(API.User.Mail.ProcessMail) { (token, mid, confirm) ->
 		val uid = AN.throwExpireToken(token)
-		val mail = DB.throwQuerySQLSingle("SELECT * FROM mail WHERE mid = ? AND uid = ?", mid, uid)
-		if (mail["processed"].Boolean) return@api "此邮件已被处理".failedData
-		var ret = "已拒绝此邮件".successObject
-		if (confirm) {
-			val filter = mail["filter"].String
-			val implFunc = implMap[filter]!!
-			val args = makeObject {
-				merge(mail["info"].ObjectEmpty)
-				"uid" with uid
-				"param1" to mail["param1"]
-				"param2" to mail["param2"]
-				"param3" to mail["param3"]
-			}
-			ret = implFunc(args)
-		}
+		val mailEntry = DB.throwQuerySQLSingle("""
+			SELECT uid, processed, filter, param1, param2, param3, info
+			FROM mail
+			WHERE mid = ? AND uid = ?
+		""", mid, uid).to<MailEntry>()
+		if (mailEntry.processed) return@api "此邮件已被处理".failedData
+		val ret = if (confirm) {
+			val implFunc = implMap[mailEntry.filter]!!
+			implFunc(mailEntry)
+		} else "已拒绝此邮件".successObject
 		// 处理成功后将processed置为 1
-		val code = ret["code"].Int
-		val msg = ret["msg"].String
-		if (code == APICode.SUCCESS) {
+		if (ret["code"].Int == APICode.SUCCESS) {
 			DB.throwExecuteSQL("UPDATE mail SET processed = 1 WHERE mid = ?", mid)
-			msg.successData
+			ret["msg"].String.successData
 		}
-		else msg.failedData
+		else ret["msg"].String.failedData
 	}
 
 	api(API.User.Mail.DeleteMail) { (token, mid) ->

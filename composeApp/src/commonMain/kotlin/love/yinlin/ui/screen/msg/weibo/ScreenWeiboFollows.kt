@@ -26,6 +26,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.launch
+import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -35,7 +36,7 @@ import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.DialogState
 import love.yinlin.ui.component.screen.SubScreen
 
-class WeiboFollowsModel(val model: AppModel) : ViewModel() {
+private class WeiboFollowsModel(val model: AppModel) : ViewModel() {
 	var isLocal by mutableStateOf(true)
 	val searchDialog = DialogState()
 	var state by mutableStateOf(BoxState.CONTENT)
@@ -47,12 +48,12 @@ class WeiboFollowsModel(val model: AppModel) : ViewModel() {
 
 	fun refreshLocalUser() {
 		isLocal = true
-		val users = model.mainModel.msgModel.followUsers
 		launch {
-			users.forEachIndexed { index, user ->
+			val weiboUsers = config.weiboUsers
+			for ((index, user) in weiboUsers.withIndex()) {
 				if (user.avatar.isEmpty()) {
 					val data = WeiboAPI.getWeiboUser(user.id)
-					if (data is Data.Success) users[index] = data.data.info
+					if (data is Data.Success) weiboUsers[index] = data.data.info
 				}
 			}
 		}
@@ -141,8 +142,7 @@ fun ScreenWeiboFollows(model: AppModel) {
 				modifier = Modifier.fillMaxSize()
 			) {
 				items(
-					items = if (screenModel.isLocal) model.mainModel.msgModel.followUsers
-					else screenModel.searchResult,
+					items = if (screenModel.isLocal) config.weiboUsers.items else screenModel.searchResult,
 					key = { it.id }
 				) {
 					WeiboUserItem(

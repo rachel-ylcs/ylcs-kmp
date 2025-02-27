@@ -19,9 +19,13 @@ data class UserProfile(
 	// playlist: JsonObject [云歌单]
 	// signin: Binary [签到记录]
 ) {
+	@Stable
 	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
+
+	@Stable
 	val wallPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).wall}"
 
+	@Stable
 	val level: Int get() = UserLevel.level(coin)
 
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)

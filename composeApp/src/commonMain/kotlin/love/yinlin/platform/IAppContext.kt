@@ -9,34 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.ktor.client.*
-import love.yinlin.common.Config
-
-@Stable
-enum class Platform(name: String) {
-	Android("Android"),
-	IOS("IOS"),
-	Windows("Windows"),
-	Linux("Linux"),
-	MacOS("MacOS"),
-	WebWasm("Web/Wasm"),
-}
-
-@Stable
-val Platform.isPhone: Boolean get() = this == Platform.Android || this == Platform.IOS
-@Stable
-val Platform.isDesktop: Boolean get() = this == Platform.Windows || this == Platform.Linux || this == Platform.MacOS
-@Stable
-val Platform.isWeb: Boolean get() = this == Platform.WebWasm
-
-enum class ThemeMode {
-	SYSTEM, LIGHT, DARK
-}
-
-val ThemeMode.next: ThemeMode get() = when (this) {
-	ThemeMode.SYSTEM -> ThemeMode.LIGHT
-	ThemeMode.LIGHT -> ThemeMode.DARK
-	ThemeMode.DARK -> ThemeMode.SYSTEM
-}
+import love.yinlin.ThemeMode
+import love.yinlin.common.KVConfig
 
 @Stable
 abstract class IAppContext {
@@ -70,18 +44,17 @@ abstract class IAppContext {
 
 	// KV
 	abstract val kv: KV
-	// Config
-	val config by lazy { Config(kv) }
 	// HttpClient
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
 	fun initialize(): IAppContext {
+		config = KVConfig(kv)
 		return this
 	}
 }
 
 @Stable
-var appContext: IAppContext? = null
-@Stable
-val app: IAppContext get() = appContext!!
+lateinit var app: IAppContext
+
+lateinit var config: KVConfig

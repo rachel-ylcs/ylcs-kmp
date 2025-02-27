@@ -22,7 +22,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.RequestError
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
-import love.yinlin.extension.ObjectNull
 import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
 import love.yinlin.extension.makeObject
@@ -37,7 +36,7 @@ object ClientAPI {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
-		val data = json["data"].ObjectNull
+		val data = json["data"]
 		return if (code == APICode.SUCCESS) {
 			if (data != null) Data.Success(data.to(), msg)
 			else Data.Success("{}".parseJsonValue()!!, msg)

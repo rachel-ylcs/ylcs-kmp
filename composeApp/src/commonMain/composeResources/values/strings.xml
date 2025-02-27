@@ -58,6 +58,8 @@
     <string name="locked">未解锁</string>
     <string name="unlocked">已解锁</string>
 
+
+    <string name="login">登录</string>
     <string name="default_name">未登录</string>
     <string name="default_signature">泸沽烟水里的过客…</string>
 
