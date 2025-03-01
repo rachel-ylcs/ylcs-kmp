@@ -10,7 +10,6 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.io.readByteArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.api.common.commonAPI
 import love.yinlin.api.test.testAPI
@@ -20,101 +19,14 @@ import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.MailEntry
-import love.yinlin.extension.makeObject
-import love.yinlin.extension.to
-import love.yinlin.extension.toJson
-import love.yinlin.extension.toJsonString
+import love.yinlin.extension.*
 import love.yinlin.logger
 import java.io.File
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.random.Random
 
 typealias ImplFunc = suspend (MailEntry) -> JsonObject
 typealias ImplMap = MutableMap<String, ImplFunc>
-
-// Request
-
-inline fun <reified T> RoutingCall.params(): T {
-	val map = this.queryParameters.toMap().mapValues { it.value.first() }
-	return makeObject {
-		for ((key, value) in map) key with value
-	}.to()
-}
-
-suspend inline fun <reified T : Any> RoutingCall.to(): T = this.receive<T>()
-
-suspend inline fun <reified T> RoutingCall.toForm(): T {
-	val multiFiles = mutableMapOf<String, MutableList<ClientFile>>()
-	val multipartData = this@toForm.receiveMultipart()
-	var index = 0
-	val form = makeObject {
-		multipartData.forEachPart { part ->
-			try {
-				val name: String = part.name ?: return@forEachPart
-				when (part) {
-					is PartData.FormItem -> name with part.value
-					is PartData.FileItem -> {
-						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
-						val output = File(System.getProperty("java.io.tmpdir"), filename)
-						if (part.provider().copyAndClose(output.writeChannel()) > 0) {
-							val file = ClientFile(output.absolutePath)
-							val newName = if (name.startsWith('#') && name.contains('!')) {
-								val fetchName = name.substringAfter('#').substringBeforeLast('!')
-								val fetchIndex = name.substringAfter('!')
-								if (fetchName.isNotEmpty() && fetchIndex.isNotEmpty()) fetchName
-								else name
-							}
-							else name
-							if (newName == name) newName with file.toJson()
-							else {
-								val thisFiles = multiFiles[newName]
-								val newFiles = if (thisFiles == null) {
-									val files = mutableListOf<ClientFile>()
-									multiFiles[newName] = files
-									files
-								} else thisFiles
-								newFiles += file
-							}
-						}
-					}
-					is PartData.BinaryItem -> name with part.provider().readByteArray().toString(Charsets.UTF_8)
-					else -> { }
-				}
-			}
-			catch (err: Throwable) {
-				logger.error("RoutingCall.toForm - {}", err.stackTraceToString())
-			}
-			finally {
-				part.dispose()
-			}
-		}
-		for ((filesName, files) in multiFiles) filesName with files.toJson()
-	}
-	return form.to()
-}
-
-class NineGridProcessor(private val pics: List<ClientFile>) {
-	private val actualPics: List<String>
-
-	init {
-		if (pics.size > 9) throw error("NineGrid num error")
-		actualPics = List(pics.size) { currentUniqueId(it) }
-	}
-
-	val jsonString: String get() = actualPics.toJsonString()
-
-	fun copy(callback: (String) -> ResNode): String? {
-		repeat(actualPics.size) {
-			pics[it].copy(callback(actualPics[it]))
-		}
-		return actualPics.firstOrNull()
-	}
-}
-
-// Response
 
 class TokenExpireError(val uid: Int) : Throwable() {
 	override val message: String get() = "TokenExpireError $uid"
@@ -124,47 +36,59 @@ val String.successObject: JsonObject get() = makeObject {
 	"code" with APICode.SUCCESS
 	"msg" with this@successObject
 }
+
 val String.failedObject: JsonObject get() = makeObject {
 	"code" with APICode.FAILED
 	"msg" with this@failedObject
 }
+
 val String.expireObject: JsonObject get() = makeObject {
 	"code" with APICode.UNAUTHORIZED
 	"msg" with this@expireObject
 }
+
 val String.forbiddenObject: JsonObject get() = makeObject {
 	"code" with APICode.FORBIDDEN
 	"msg" with this@forbiddenObject
 }
-val EmptySuccessData: Data.Success<Default.Response> get() = Data.Success(Default.Response)
-val String.successData: Data.Success<Default.Response> get() = Data.Success(Default.Response, this)
+
+val EmptySuccessData: Data.Success<Response.Default> get() = Data.Success(Response.Default)
+
+val String.successData: Data.Success<Response.Default> get() = Data.Success(Response.Default, this)
+
 val String.failedData: Data.Error get() = Data.Error(RequestError.InvalidArgument, this)
 
-inline fun <reified Request : Any, reified Response : Any> Route.api(
-	route: APIRoute<Request, Response>,
-	crossinline body: suspend (Request) -> Data<Response>
-): Route = route(path = route.path, method = when (route.method) {
-	APIMethod.Get -> HttpMethod.Get
-	APIMethod.Post -> HttpMethod.Post
-	APIMethod.Form -> HttpMethod.Post
-}) {
+class NineGridProcessor(val mPics: APIFiles) {
+	val mActualPics: List<String>
+
+	init {
+		if (mPics.size > 9) throw error("NineGrid num error")
+		mActualPics = List(mPics.size) { currentUniqueId(it) }
+	}
+
+	val jsonString: String get() = mActualPics.toJsonString()
+
+	inline fun copy(callback: (String) -> ResNode): String? {
+		repeat(mActualPics.size) {
+			mPics[it].copy(callback(mActualPics[it]))
+		}
+		return mActualPics.firstOrNull()
+	}
+}
+
+inline fun <reified Response: Any> Route.safeAPI(
+	method: HttpMethod,
+	path: String,
+	crossinline body: suspend (RoutingCall) -> Data<Response>
+): Route = route(path = path, method = method) {
 	handle {
 		try {
-			val result = withContext(Dispatchers.IO) {
-				val requestData: Request = when (route.method) {
-					APIMethod.Get -> call.params()
-					APIMethod.Post -> call.to()
-					APIMethod.Form -> call.toForm()
-				}
-				body(requestData)
-			}
+			val result = withContext(Dispatchers.IO) { body(call) }
 			when (result) {
 				is Data.Success -> call.respond(makeObject {
 					"code" with APICode.SUCCESS
 					result.message?.let { "msg" with it }
-					if (result.data !is Default.Response) {
-						"data" with result.data.toJson()
-					}
+					"data" with result.data.toJson()
 				})
 				is Data.Error -> when (result.type) {
 					RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
@@ -184,6 +108,133 @@ inline fun <reified Request : Any, reified Response : Any> Route.api(
 			call.respond("非法操作".forbiddenObject)
 		}
 	}
+}
+
+fun RoutingCall.params() = makeObject {
+	val map = this@params.queryParameters.toMap().mapValues { it.value.first() }
+	for ((key, value) in map) key with value
+}
+
+@JvmName("apiGet")
+inline fun <reified Request : Any, reified Response : Any> Route.api(
+	route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
+	crossinline body: suspend (Request) -> Data<Response>
+): Route = safeAPI(HttpMethod.Get, route.toString()) { body(it.params().to()) }
+
+@JvmName("apiGetRequest")
+inline fun <reified Request : Any> Route.api(
+	route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
+	crossinline body: suspend (Request) -> Data<Response.Default>
+): Route = safeAPI(HttpMethod.Get, route.toString()) { body(it.params().to()) }
+
+@JvmName("apiGetResponse")
+inline fun <reified Response : Any> Route.api(
+	route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>,
+	crossinline body: suspend () -> Data<Response>
+): Route = safeAPI(HttpMethod.Get, route.toString()) { body() }
+
+@JvmName("apiPost")
+inline fun <reified Request : Any, reified Response : Any> Route.api(
+	route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
+	crossinline body: suspend (Request) -> Data<Response>
+): Route = safeAPI(HttpMethod.Post, route.toString()) { body(it.receive()) }
+
+@JvmName("apiPostRequest")
+inline fun <reified Request : Any> Route.api(
+	route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
+	crossinline body: suspend (Request) -> Data<Response.Default>
+): Route = safeAPI(HttpMethod.Post, route.toString()) { body(it.receive()) }
+
+@JvmName("apiPostResponse")
+inline fun <reified Response : Any> Route.api(
+	route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>,
+	crossinline body: suspend () -> Data<Response>
+): Route = safeAPI(HttpMethod.Post, route.toString()) { body() }
+
+suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
+	val multipartData = this.receiveMultipart()
+
+	var dataString: String? = null
+	val form = makeObject {
+		val tmpDir = System.getProperty("java.io.tmpdir")
+
+		val multiFiles = mutableMapOf<String, MutableList<APIFile>>()
+		var index = 0
+		multipartData.forEachPart { part ->
+			try {
+				val name: String = part.name ?: return@forEachPart
+				when (part) {
+					is PartData.FormItem -> {
+						if (name == "#data#") dataString = part.value
+						else if (name == "#ignoreFiles#") {
+							val ignoreFiles = part.value.parseJsonValue<List<String>>()!!
+							for (ignoreFile in ignoreFiles) ignoreFile with null
+						}
+					}
+					is PartData.FileItem -> {
+						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
+						val output = File(tmpDir, filename)
+						if (part.provider().copyAndClose(output.writeChannel()) > 0) {
+							val file = APIFile(output.absolutePath)
+							val newName = if (name.startsWith('#') && name.contains('!')) {
+								val fetchName = name.substringAfter('#').substringBeforeLast('!')
+								val fetchIndex = name.substringAfter('!')
+								if (fetchName.isNotEmpty() && fetchIndex.isNotEmpty()) fetchName
+								else name
+							}
+							else name
+							if (newName == name) newName with file.toJson()
+							else {
+								val thisFiles = multiFiles[newName]
+								val newFiles = if (thisFiles == null) {
+									val files = mutableListOf<APIFile>()
+									multiFiles[newName] = files
+									files
+								} else thisFiles
+								newFiles += file
+							}
+						}
+					}
+					else -> { }
+				}
+			}
+			catch (err: Throwable) {
+				logger.error("RoutingCall.toForm - {}", err.stackTraceToString())
+			}
+			finally {
+				part.dispose()
+			}
+		}
+		for ((filesName, files) in multiFiles) filesName with files.toJson()
+	}
+	return dataString to form
+}
+
+@JvmName("apiForm")
+inline fun <reified Request : Any, reified Response : Any, reified Files : Any> Route.api(
+	route: APIRoute<Request, Response, Files, APIMethod.Form>,
+	crossinline body: suspend (Request, Files) -> Data<Response>
+): Route = safeAPI(HttpMethod.Post, route.toString()) {
+	val (dataString, files) = it.toForm()
+	body(dataString.parseJsonValue()!!, files.to())
+}
+
+@JvmName("apiFormRequest")
+inline fun <reified Request : Any, reified Files : Any> Route.api(
+	route: APIRoute<Request, Response.Default, Files, APIMethod.Form>,
+	crossinline body: suspend (Request, Files) -> Data<Response.Default>
+): Route = safeAPI(HttpMethod.Post, route.toString()) {
+	val (dataString, files) = it.toForm()
+	body(dataString.parseJsonValue()!!, files.to())
+}
+
+@JvmName("apiFormResponse")
+inline fun <reified Response : Any, reified Files : Any> Route.api(
+	route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
+	crossinline body: suspend (Files) -> Data<Response>
+): Route = safeAPI(HttpMethod.Post, route.toString()) {
+	val (_, files) = it.toForm()
+	body(files.to())
 }
 
 fun Routing.initAPI() {

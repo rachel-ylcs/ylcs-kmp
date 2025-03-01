@@ -342,24 +342,6 @@ private fun TopicLayout(
 }
 
 @Composable
-private fun CommentFlag(
-	text: String,
-	color: Color
-) {
-	Box(
-		modifier = Modifier.padding(vertical = 3.dp).border(1.dp, color = color),
-		contentAlignment = Alignment.Center
-	) {
-		Text(
-			text = text,
-			style = MaterialTheme.typography.labelMedium,
-			color = color,
-			modifier = Modifier.padding(horizontal = 3.dp, vertical = 2.dp)
-		)
-	}
-}
-
-@Composable
 private fun CommentBar(
 	comment: Comment,
 	topicUid: Int,
@@ -386,8 +368,8 @@ private fun CommentBar(
 			horizontalArrangement = Arrangement.spacedBy(5.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			if (comment.isTop) CommentFlag(text = "置顶", color = MaterialTheme.colorScheme.primary)
-			if (comment.uid == topicUid) CommentFlag(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+			if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
+			if (comment.uid == topicUid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
 		}
 		Text(text = comment.content)
 		Row(
@@ -457,8 +439,8 @@ private fun SubCommentBar(
 			horizontalArrangement = Arrangement.spacedBy(5.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			if (subComment.uid == topicUid) CommentFlag(text = "楼主", color = MaterialTheme.colorScheme.secondary)
-			if (subComment.uid == commentUid) CommentFlag(text = "层主", color = MaterialTheme.colorScheme.tertiary)
+			if (subComment.uid == topicUid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+			if (subComment.uid == commentUid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
 			config.userProfile?.let { user ->
 				if (user.canDeleteComment(topicUid, subComment.uid)) {
 					Row(

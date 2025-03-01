@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.data.rachel.ActivityDetails
 import love.yinlin.data.rachel.ActivityInfo
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.SubComment
@@ -34,16 +33,18 @@ object APIConfig {
 
 // ------------  客户端资源  ------------
 
-@Serializable(with = ClientFile.ClientFileSerializer::class)
-data class ClientFile(val path: String) {
-	object ClientFileSerializer : KSerializer<ClientFile> {
-		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ClientFile", PrimitiveKind.STRING)
-		override fun serialize(encoder: Encoder, value: ClientFile) = encoder.encodeString(value.path)
-		override fun deserialize(decoder: Decoder) = ClientFile(decoder.decodeString())
+@Serializable(with = APIFile.APIFileSerializer::class)
+data class APIFile(private val path: String) {
+	object APIFileSerializer : KSerializer<APIFile> {
+		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.APIFile", PrimitiveKind.STRING)
+		override fun serialize(encoder: Encoder, value: APIFile) = encoder.encodeString(value.path)
+		override fun deserialize(decoder: Decoder) = APIFile(decoder.decodeString())
 	}
 
 	override fun toString(): String = path
 }
+
+typealias APIFiles = List<APIFile>
 
 // ------------  服务端资源  ------------
 
@@ -90,225 +91,242 @@ object APICode {
 	const val FAILED = 3
 }
 
-enum class APIMethod {
-	Get, Post, Form
+sealed interface APIMethod {
+	data object None : APIMethod
+	data object Get : APIMethod
+	data object Post : APIMethod
+	data object Form : APIMethod
 }
 
-object Default {
+object Request {
 	@Serializable
-	data object Request
-
-	@Serializable
-	data object Response
-
-
-
-	@Serializable
-	data class PageAscRequest(val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
-
-	@Serializable
-	data class PageDescRequest(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+	data object Default
 }
 
-abstract class APIPath<Request : Any, Response : Any> protected constructor(
-	val path: String,
-	val method: APIMethod
-)
+object Response {
+	@Serializable
+	data object Default
+}
+
+@Serializable
+data object NoFiles
+
+abstract class APIPath<Request : Any, Response : Any, Files: Any, Method : APIMethod> protected constructor(
+	private val path: String
+) {
+	override fun toString(): String = path
+}
 
 abstract class APINode protected constructor(
 	parent: APINode?,
 	name: String
-) : APIPath<Default.Request, Default.Response>(if (parent != null) "${parent.path}/$name" else "", APIMethod.Post)
+) : APIPath<Request.Default, Response.Default, NoFiles, APIMethod.None>(if (parent != null) "$parent/$name" else "")
 
-abstract class APIRoute<Request : Any, Response : Any> protected constructor(
+abstract class APIRoute<Request : Any, Response : Any, Files: Any, Method : APIMethod> protected constructor(
 	parent: APINode,
-	name: String,
-	method: APIMethod = APIMethod.Post
-) : APIPath<Request, Response>("${parent.path}/$name", method)
+	name: String
+) : APIPath<Request, Response, Files, Method>("$parent/$name")
 
-typealias APIRequest<Request> = APIRoute<Request, Default.Response>
-typealias APIResponse<Response> = APIRoute<Default.Request, Response>
+typealias APIGet<Request, Response> = APIRoute<Request, Response, NoFiles, APIMethod.Get>
+typealias APIPost<Request, Response> = APIRoute<Request, Response, NoFiles, APIMethod.Post>
+typealias APIForm<Request, Response, Files> = APIRoute<Request, Response, Files, APIMethod.Form>
+typealias APIRequest<Request, Files, Method> = APIRoute<Request, Response.Default, Files, Method>
+typealias APIResponse<Response, Files, Method> = APIRoute<Request.Default, Response, Files, Method>
+typealias APIGetRequest<Request> = APIRequest<Request, NoFiles, APIMethod.Get>
+typealias APIPostRequest<Request> = APIRequest<Request, NoFiles, APIMethod.Post>
+typealias APIFormRequest<Request, Files> = APIRequest<Request, Files, APIMethod.Form>
+typealias APIGetResponse<Response> = APIResponse<Response, NoFiles, APIMethod.Get>
+typealias APIPostResponse<Response> = APIResponse<Response, NoFiles, APIMethod.Post>
+typealias APIFormResponse<Response, Files> = APIResponse<Response, Files, APIMethod.Form>
 
 object API : APINode(null, "") {
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {
-			object Login : APIRoute<Login.Request, String>(this, "login") {
+			object Login : APIPost<Login.Request, String>(this, "login") {
 				@Serializable
 				data class Request(val name: String, val pwd: String, val platform: Platform)
 			}
 
-			object Logoff : APIRequest<String>(this, "logoff")
+			object Logoff : APIPostRequest<String>(this, "logoff")
 
-			object UpdateToken : APIRoute<String, String>(this, "updateToken")
+			object UpdateToken : APIPost<String, String>(this, "updateToken")
 
-			object Register : APIRequest<Register.Request>(this, "register") {
+			object Register : APIPostRequest<Register.Request>(this, "register") {
 				@Serializable
 				data class Request(val name: String, val pwd: String, val inviterName: String)
 			}
 
-			object ForgotPassword : APIRequest<ForgotPassword.Request>(this, "forgotPassword") {
+			object ForgotPassword : APIPostRequest<ForgotPassword.Request>(this, "forgotPassword") {
 				@Serializable
 				data class Request(val name: String, val pwd: String)
 			}
 		}
 
 		object Activity : APINode(this, "activity") {
-			object GetActivities : APIResponse<List<love.yinlin.data.rachel.Activity>>(this, "getActivities")
+			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.Activity>>(this, "getActivities")
 
-			object GetActivityDetails : APIRoute<String, ActivityDetails>(this, "getActivityDetails")
-
-			object AddActivity : APIRequest<AddActivity.Request>(this, "addActivity", APIMethod.Form) {
+			object AddActivity : APIFormRequest<AddActivity.Request, AddActivity.Files>(this, "addActivity") {
 				@Serializable
-				data class Request(val token: String, val info: ActivityInfo, val pics: List<ClientFile>)
-			}
-
-			object ModifyActivity : APIRequest<ModifyActivity.Request>(this, "modifyActivity", APIMethod.Form) {
+				data class Request(val token: String, val info: ActivityInfo)
 				@Serializable
-				data class Request(val token: String, val info: ActivityInfo, val pics: List<ClientFile>?)
+				data class Files(val pics: APIFiles)
 			}
-
-			object DeleteActivity : APIRequest<DeleteActivity.Request>(this, "deleteActivity") {
-				@Serializable
-				data class Request(val token: String, val ts: String)
-			}
+//
+//			object ModifyActivity : APIRequest<ModifyActivity.Request>(this, "modifyActivity", APIMethod.Form) {
+//				@Serializable
+//				data class Request(val token: String, val info: ActivityInfo, val pics: List<ClientFile>?)
+//			}
+//
+//			object DeleteActivity : APIRequest<DeleteActivity.Request>(this, "deleteActivity") {
+//				@Serializable
+//				data class Request(val token: String, val ts: String)
+//			}
 		}
 
 		object Backup : APINode(this, "backup") {
-			object UploadPlaylist : APIRequest<UploadPlaylist.Request>(this, "uploadPlaylist") {
+			object UploadPlaylist : APIPostRequest<UploadPlaylist.Request>(this, "uploadPlaylist") {
 				@Serializable
 				data class Request(val token: String, val playlist: JsonObject)
 			}
 
-			object DownloadPlaylist : APIRoute<String, JsonObject>(this, "downloadPlaylist")
+			object DownloadPlaylist : APIPost<String, JsonObject>(this, "downloadPlaylist")
 		}
 
 		object Info : APINode(this, "info") {
-			object SendFeedback : APIRequest<SendFeedback.Request>(this, "sendFeedback") {
+			object SendFeedback : APIPostRequest<SendFeedback.Request>(this, "sendFeedback") {
 				@Serializable
 				data class Request(val token: String, val content: String)
 			}
 		}
 
 		object Mail : APINode(this, "mail") {
-			object GetMails : APIRoute<GetMails.Request, List<love.yinlin.data.rachel.Mail>>(this, "getMails") {
+			object GetMails : APIPost<GetMails.Request, List<love.yinlin.data.rachel.Mail>>(this, "getMails") {
 				@Serializable
 				data class Request(val token: String, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object ProcessMail : APIRequest<ProcessMail.Request>(this, "processMail") {
+			object ProcessMail : APIPostRequest<ProcessMail.Request>(this, "processMail") {
 				@Serializable
 				data class Request(val token: String, val mid: Int, val confirm: Boolean)
 			}
 
-			object DeleteMail : APIRequest<DeleteMail.Request>(this, "deleteMail") {
+			object DeleteMail : APIPostRequest<DeleteMail.Request>(this, "deleteMail") {
 				@Serializable
 				data class Request(val token: String, val mid: Int)
 			}
 		}
 
 		object Profile : APINode(this, "profile") {
-			object GetProfile : APIRoute<String, UserProfile>(this, "getProfile")
+			object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
 
-			object GetPublicProfile : APIRoute<Int, UserPublicProfile>(this, "getPublicProfile")
+			object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
 
-			object UpdateName : APIRequest<UpdateName.Request>(this, "updateName") {
+			object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
 				@Serializable
 				data class Request(val token: String, val name: String)
 			}
 
-			object UpdateAvatar : APIRequest<UpdateAvatar.Request>(this, "updateAvatar", APIMethod.Form) {
+			object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
 				@Serializable
-				data class Request(val token: String, val avatar: ClientFile)
+				data class Files(val avatar: APIFile)
 			}
 
-			object UpdateSignature : APIRequest<UpdateSignature.Request>(this, "updateSignature") {
+			object UpdateSignature : APIPostRequest<UpdateSignature.Request>(this, "updateSignature") {
 				@Serializable
 				data class Request(val token: String, val signature: String)
 			}
 
-			object UpdateWall : APIRequest<UpdateWall.Request>(this, "updateWall", APIMethod.Form) {
+			object UpdateWall : APIFormRequest<String, UpdateWall.Files>(this, "updateWall") {
 				@Serializable
-				data class Request(val token: String, val wall: ClientFile)
+				data class Files(val wall: APIFile)
 			}
 
-			object Signin : APIRequest<String>(this, "signin")
+			object Signin : APIPostRequest<String>(this, "signin")
 		}
 
 		object Topic : APINode(this, "topic") {
-			object GetTopics : APIRoute<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
+			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
 				@Serializable
 				data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetLatestTopics : APIRoute<Default.PageDescRequest, List<love.yinlin.data.rachel.Topic>>(this, "getLatestTopics")
+			object GetLatestTopics : APIPost<GetLatestTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getLatestTopics") {
+				@Serializable
+				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
 
-			object GetHotTopics : APIRoute<Default.PageDescRequest, List<love.yinlin.data.rachel.Topic>>(this, "getHotTopics")
+			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getHotTopics") {
+				@Serializable
+				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
 
-			object GetSectionTopics : APIRoute<GetSectionTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getSectionTopics") {
+			object GetSectionTopics : APIPost<GetSectionTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getSectionTopics") {
 				@Serializable
 				data class Request(val section: Int, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetTopicDetails : APIRoute<Int, TopicDetails>(this, "getTopicDetails")
+			object GetTopicDetails : APIPost<Int, TopicDetails>(this, "getTopicDetails")
 
-			object GetTopicComments : APIRoute<GetTopicComments.Request, List<Comment>>(this, "getTopicComments") {
+			object GetTopicComments : APIPost<GetTopicComments.Request, List<Comment>>(this, "getTopicComments") {
 				@Serializable
 				data class Request(val tid: Int, val rawSection: Int, val isTop: Boolean = true, val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetTopicSubComments : APIRoute<GetTopicSubComments.Request, List<SubComment>>(this, "getTopicSubComments") {
+			object GetTopicSubComments : APIPost<GetTopicSubComments.Request, List<SubComment>>(this, "getTopicSubComments") {
 				@Serializable
 				data class Request(val cid: Int, val rawSection: Int, val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object SendTopic : APIRoute<SendTopic.Request, SendTopic.Response>(this, "sendTopic", APIMethod.Form) {
+			object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
 				@Serializable
-				data class Request(val token: String, val title: String, val content: String, val section: Int, val pics: List<ClientFile>)
+				data class Request(val token: String, val title: String, val content: String, val section: Int)
+				@Serializable
+				data class Files(val pics: APIFiles)
 				@Serializable
 				data class Response(val tid: Int, val pic: String?)
 			}
 
-			object UpdateTopicTop : APIRequest<UpdateTopicTop.Request>(this, "updateTopicTop") {
+			object UpdateTopicTop : APIPostRequest<UpdateTopicTop.Request>(this, "updateTopicTop") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val isTop: Boolean)
 			}
 
-			object DeleteTopic : APIRequest<DeleteTopic.Request>(this, "deleteTopic") {
+			object DeleteTopic : APIPostRequest<DeleteTopic.Request>(this, "deleteTopic") {
 				@Serializable
 				data class Request(val token: String, val tid: Int)
 			}
 
-			object MoveTopic : APIRequest<MoveTopic.Request>(this, "moveTopic") {
+			object MoveTopic : APIPostRequest<MoveTopic.Request>(this, "moveTopic") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val section: Int)
 			}
 
-			object SendCoin : APIRequest<SendCoin.Request>(this, "sendCoin") {
+			object SendCoin : APIPostRequest<SendCoin.Request>(this, "sendCoin") {
 				@Serializable
 				data class Request(val token: String, val uid: Int, val tid: Int, val value: Int)
 			}
 
-			object SendComment : APIRoute<SendComment.Request, Int>(this, "sendComment") {
+			object SendComment : APIPost<SendComment.Request, Int>(this, "sendComment") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val rawSection: Int, val content: String)
 			}
 
-			object SendSubComment : APIRoute<SendSubComment.Request, Int>(this, "sendSubComment") {
+			object SendSubComment : APIPost<SendSubComment.Request, Int>(this, "sendSubComment") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val cid: Int, val rawSection: Int, val content: String)
 			}
 
-			object UpdateCommentTop : APIRequest<UpdateCommentTop.Request>(this, "updateCommentTop") {
+			object UpdateCommentTop : APIPostRequest<UpdateCommentTop.Request>(this, "updateCommentTop") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val cid: Int, val rawSection: Int, val isTop: Boolean)
 			}
 
-			object DeleteComment : APIRequest<DeleteComment.Request>(this, "deleteComment") {
+			object DeleteComment : APIPostRequest<DeleteComment.Request>(this, "deleteComment") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val cid: Int, val rawSection: Int)
 			}
 
-			object DeleteSubComment : APIRequest<DeleteSubComment.Request>(this, "deleteSubComment") {
+			object DeleteSubComment : APIPostRequest<DeleteSubComment.Request>(this, "deleteSubComment") {
 				@Serializable
 				data class Request(val token: String, val tid: Int, val pid: Int, val cid: Int, val rawSection: Int)
 			}
@@ -316,11 +334,16 @@ object API : APINode(null, "") {
 	}
 
 	object Test : APINode(this, "test") {
-		object Get : APIRequest<String>(this, "get", APIMethod.Get)
-
-		object Post : APIRequest<Post.Request>(this, "post", APIMethod.Form) {
+		object Get : APIGetRequest<Get.Request>(this, "get") {
 			@Serializable
-			data class Request(val avatar: ClientFile, val pics: List<ClientFile>)
+			data class Request(val a: String)
+		}
+
+		object Post : APIFormRequest<Post.Request, Post.Files>(this, "post") {
+			@Serializable
+			data class Request(val a: String, val b: Int)
+			@Serializable
+			data class Files(val c: APIFile, val d: APIFiles, val e: APIFile?)
 		}
 	}
 }

@@ -176,7 +176,9 @@ private fun UserSpaceContainer(
 			TipButtonInfo("签到", Icons.Filled.EventAvailable) { },
 			TipButtonInfo("好友", Icons.Filled.Group) { },
 			TipButtonInfo("主题", Icons.AutoMirrored.Filled.Article) { },
-			TipButtonInfo("邮箱", Icons.Filled.Mail) { },
+			TipButtonInfo("邮箱", Icons.Filled.Mail) {
+				if (config.userToken.isNotEmpty()) model.mainModel.navigate(Route.Mail)
+			},
 			TipButtonInfo("徽章", Icons.Filled.MilitaryTech) { },
 		)
 	)

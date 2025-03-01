@@ -71,6 +71,10 @@
 - 运行： `IDEA - Ktor`
 - 发布可执行文件：`server:serverPublish`
 
+### `shared`
+
+共享数据与代码目录 `shared`
+
 ## 部署
 
 ### 编译与运行环境
@@ -105,15 +109,192 @@ git clone 源码，gradle同步，下载依赖，构建。
 
 ### Server
 
-构建后会自动将初始目录复制到当前目录下，可以直接运行或发布。
+构建后运行会自动部署，将初始目录复制到当前目录下，可以直接运行或发布。
 
 #### 分离环境
 
 redis和mysql配置可在resources中的config.properties配置
 可选择本地调试（连接备用服务器）或生产环境部署（连接localhost）
 
-#### 手动更新
+#### 更新
 
-服务器只在第一次运行时复制初始目录，当更新项目resources中如server.json, photos.json类的文件时
-并不会同步到服务器中，且重新启动服务器也是如此。
-需要手动将文件复制到服务器对应目录下的文件中。
+每次启动服务器时会自动更新resources下的如server.json类的文件，
+当有变更时只需重新编译后重启服务器即可，无需手动复制文件。
+
+**即每次更新只需要更换服务器jar文件重启即可**
+
+
+## 自研轻量级 C/S 数据共享框架
+
+### 接口定义
+
+所有 C/S 交互接口均定义在 shared 模块的 love.yinlin.api.API类中
+
+借助kotlin超强的DSL能力，提供完美的框架语法糖
+
+### 服务端资源引用 ServerRes
+
+
+``` kotlin
+// 示例
+object ServerRes : ResNode("public") {
+	object Activity : ResNode(this, "activity") {
+		fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+	}
+
+	object Assets : ResNode(this, "assets") {
+		val DefaultAvatar = ResNode(this, "default_avatar.webp")
+
+		val DefaultWall = ResNode(this, "default_wall.webp")
+	}
+
+	object Users : ResNode(this, "users") {
+		class User(uid: Int) : ResNode(this, "$uid") {
+			val avatar = ResNode(this, "avatar.webp")
+
+			val wall = ResNode(this, "wall.webp")
+
+			inner class Pics : ResNode(this, "pics") {
+				fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+			}
+		}
+	}
+
+	val Server = ResNode(this, "server.json")
+	val Update = ResNode(this, "update.json")
+	val Photo = ResNode(this, "photo.json")
+}
+
+```
+
+服务端配置或公共文件的配置信息可以按树状object层级依次写出。
+
+路径只需要提供名称，而不需要像其他框架般补全完整路径。
+
+**[例 1]** 访问uid为8的用户的头像
+``` kotlin
+ServerRes.Users.User(8).avatar
+```
+
+**[例 2]** 访问uid为8的用户的图片(图片id是123)
+``` kotlin
+ServerRes.Users.User(8).Pics().pic(123)
+```
+
+### C/S 接口
+
+C/S 接口的定义与数据模型在客户端（Android，IOS，Desktop，Web）与服务端中共享。
+
+#### 公共接口
+
+``` kotlin
+
+object API : APINode(null, "") {
+	object User : APINode(this, "user") {
+		object Profile : APINode(this, "profile") {
+			object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
+
+			object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
+
+			object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
+				@Serializable
+				data class Request(val token: String, val name: String)
+			}
+
+			object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
+				@Serializable
+				data class Files(val avatar: APIFile)
+			}
+
+			object Signin : APIPostRequest<String>(this, "signin")
+		}
+
+		object Topic : APINode(this, "topic") {
+			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
+				@Serializable
+				data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
+				@Serializable
+				data class Request(val token: String, val title: String, val content: String, val section: Int)
+				@Serializable
+				data class Files(val pics: APIFiles)
+				@Serializable
+				data class Response(val tid: Int, val pic: String?)
+			}
+		}
+	}
+}
+
+```
+
+与ServerRes相同，接口定义也是以树状层级写出。
+
+接口路径不需要全写，只需在对应路径内填写名称。
+
+路径中目录定义object继承自APINode，接口定义object继承自APIRoute
+
+其中为方便简写，在三种方式（Get，Post，Form）与三种结构（自定义Request与Response，简单Request，简单Response）中自由组合。
+
+形成数十种别名，如APIGetRequest，APIPostForm等。
+
+对于无body的Request，可以省略Request泛型即使用APIResponse。
+
+对简单Request可以直接使用Int、String作为Request泛型。 而Response同理。
+
+复杂Request或Response可在object内自定义结构并声明@Serializable序列化。
+
+数据模型可附带默认值。
+
+#### 服务端
+
+在ServerAPI中定义
+
+``` kotlin
+
+api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
+     VN.throwEmpty(title, content)
+     VN.throwSection(section)
+     val ngp = NineGridProcessor(pics)
+     val uid = AN.throwExpireToken(token)
+     val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
+     if (!UserPrivilege.topic(privilege) ||
+         (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
+         return@api "无权限".failedData
+     val tid = DB.throwInsertSQLGeneratedKey("""
+         INSERT INTO topic(uid, title, content, pics, section, rawSection) VALUES(?, ?, ?, ?, ?, ?)
+     """, uid, title, content, ngp.jsonString, section, section).toInt()
+     // 复制主题图片
+     val userPics = ServerRes.Users.User(uid).Pics()
+     val pic = ngp.copy { userPics.pic(it) }
+     Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "发表成功")
+}
+
+```
+
+使用api函数可直接引用公共接口的路径object作为参数，其参数，body，表单的文件均自动识别名称及类型。
+
+编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。
+
+#### 客户端
+
+在ClientAPI中定义
+
+``` kotlin
+
+val result = ClientAPI.request(
+   route = API.User.Mail.GetMails,
+   data = API.User.Mail.GetMails.Request(
+       token = config.userToken,
+       offset = offset
+   )
+)
+
+```
+
+客户端可直接使用request函数并引用公共接口的路径object，其参数，data等均自动识别名称及类型。
+
+且接受服务器的响应result也与公共接口中定义的完全一致，自动识别响应数据模型。
+
+编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。

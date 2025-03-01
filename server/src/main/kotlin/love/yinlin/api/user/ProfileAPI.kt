@@ -49,7 +49,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		else "你的银币不够哦".failedData
 	}
 
-	api(API.User.Profile.UpdateAvatar) { (token, avatar) ->
+	api(API.User.Profile.UpdateAvatar) { token, (avatar) ->
 		val uid = AN.throwExpireToken(token)
 		// 保存头像
 		avatar.copy(ServerRes.Users.User(uid).avatar)
@@ -63,7 +63,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.UpdateWall) { (token, wall) ->
+	api(API.User.Profile.UpdateWall) { token, (wall) ->
 		val uid = AN.throwExpireToken(token)
 		// 保存背景墙
 		wall.copy(ServerRes.Users.User(uid).wall)

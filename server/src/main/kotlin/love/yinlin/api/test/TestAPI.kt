@@ -11,7 +11,7 @@ fun Routing.testAPI(implMap: ImplMap) {
 		"".successData
 	}
 
-	api(API.Test.Post) {
-		"${it}".successData
+	api(API.Test.Post) { (a, b), (c, d, e) ->
+		"1".successData
 	}
 }

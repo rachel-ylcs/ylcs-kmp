@@ -1,119 +1,190 @@
 package love.yinlin.api
 
 import androidx.core.uri.UriUtils
-import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.client.request.forms.FormBuilder
-import io.ktor.client.request.forms.InputProvider
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.preparePost
-import io.ktor.client.request.prepareRequest
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
-import love.yinlin.extension.Int
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
-import love.yinlin.extension.StringNull
-import love.yinlin.extension.makeObject
-import love.yinlin.extension.parseJsonValue
-import love.yinlin.extension.to
-import love.yinlin.extension.toJson
+import love.yinlin.extension.*
 import love.yinlin.platform.app
-import kotlin.coroutines.cancellation.CancellationException
+import love.yinlin.platform.safeCallData
+import kotlin.jvm.JvmName
 
 object ClientAPI {
+	@JvmName("processResponse")
 	suspend inline fun <reified Response : Any> processResponse(response: HttpResponse): Data<Response> {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
-		val data = json["data"]
-		return if (code == APICode.SUCCESS) {
-			if (data != null) Data.Success(data.to(), msg)
-			else Data.Success("{}".parseJsonValue()!!, msg)
-		}
-		else Data.Error(RequestError.InvalidArgument, msg)
+		val data = json["data"]!!
+		return if (code == APICode.SUCCESS) Data.Success(data.to(), msg)
+			else Data.Error(RequestError.InvalidArgument, msg)
 	}
 
+	@JvmName("processResponseDefault")
+	suspend fun processResponse(response: HttpResponse) : Data<Response.Default> {
+		val json = response.body<JsonObject>()
+		val code = json["code"].Int
+		val msg = json["msg"].StringNull
+		return if (code == APICode.SUCCESS) Data.Success(Response.Default, msg)
+			else Data.Error(RequestError.InvalidArgument, msg)
+	}
+
+	fun buildGetParameters(argsMap: JsonObject): String {
+		val args = StringBuilder()
+		for ((key, value) in argsMap) args.append("$key=${UriUtils.encode(value.String)}&")
+		return if (args.isNotEmpty()) "?${args.dropLast(1)}" else ""
+	}
+
+	@JvmName("requestGet")
 	suspend inline fun <reified Request : Any, reified Response : Any> request(
-		route: APIRoute<Request, Response>,
+		route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
 		data: Request
-	): Data<Response> {
-		val client = if (route.method == APIMethod.Form) app.fileClient else app.client
-		return try {
-			var url = "${APIConfig.URL}${route.path}"
-			if (route.method == APIMethod.Get) {
-				val args = StringBuilder()
-				val argsMap = if (data !is Default.Request) data.toJson().Object else makeObject { }
-				for ((key, value) in argsMap) args.append("$key=${UriUtils.encode(value.String)}&")
-				if (args.isNotEmpty()) url += "?${args.dropLast(1)}"
-			}
-			client.prepareRequest(urlString = url) {
-				method = when (route.method) {
-					APIMethod.Get -> HttpMethod.Get
-					APIMethod.Post -> HttpMethod.Post
-					APIMethod.Form -> HttpMethod.Post
-				}
-				if (route.method == APIMethod.Post) setBody(data)
-			}.execute { processResponse(it) }
-		}
-		catch (e: HttpRequestTimeoutException) {
-			Data.Error(RequestError.Timeout, "网络连接超时", e)
-		}
-		catch (e: CancellationException) {
-			Data.Error(RequestError.Canceled, "操作取消", e)
-		}
-		catch (e: Exception) {
-			Data.Error(RequestError.ClientError, "未知异常", e)
-		}
+	): Data<Response> = app.client.safeCallData { client ->
+		client.prepareGet(urlString = "${APIConfig.URL}$route${buildGetParameters(data.toJson().Object)}")
+			.execute { processResponse<Response>(it) }
 	}
 
-	class PostFormScope(internal val builder: FormBuilder) {
-		infix fun String.with(text: String) = builder.append(
-			key = this,
-			value = text
-		)
-
-		infix fun String.with(file: Path) = builder.append(
-			key = this,
-			value = InputProvider { SystemFileSystem.source(file).buffered() },
-			headers = Headers.build {
-				append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
-			}
-		)
-
-		infix fun String.with(files: List<Path>) {
-			var index = 0
-			for (file in files) "#$this!${index++}" with file
-		}
+	@JvmName("requestGetRequest")
+	suspend inline fun <reified Request : Any> request(
+		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
+		data: Request
+	) : Data<Response.Default> = app.client.safeCallData { client ->
+		client.prepareGet(urlString = "${APIConfig.URL}$route${buildGetParameters(data.toJson().Object)}")
+			.execute { processResponse(it) }
 	}
 
+	@JvmName("requestGetResponse")
+	suspend inline fun <reified Response : Any> request(
+		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>
+	): Data<Response> = app.client.safeCallData { client ->
+		client.prepareGet(urlString = "${APIConfig.URL}$route")
+			.execute { processResponse<Response>(it) }
+	}
+
+	@JvmName("requestPost")
 	suspend inline fun <reified Request : Any, reified Response : Any> request(
-		route: APIRoute<Request, Response>,
-		crossinline init: PostFormScope.() -> Unit
-	): Data<Response> = try {
-		app.fileClient.preparePost(urlString = route.path) {
+		route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
+		data: Request
+	): Data<Response> = app.client.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(data) }
+			.execute { processResponse<Response>(it) }
+	}
+
+	@JvmName("requestPostRequest")
+	suspend inline fun <reified Request : Any> request(
+		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
+		data: Request
+	): Data<Response.Default> = app.client.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(data) }
+			.execute { processResponse(it) }
+	}
+
+	@JvmName("requestPostResponse")
+	suspend inline fun <reified Response : Any> request(
+		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>
+	): Data<Response> = app.client.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(Request.Default) }
+			.execute { processResponse<Response>(it) }
+	}
+
+	class APIFileScope() {
+		private var index = 0
+		val map = mutableMapOf<String, Any>()
+
+		fun file(value: Path): APIFile {
+			val key = "#${index++}#"
+			map[key] = value
+			return APIFile(key)
+		}
+
+		fun file(values: List<Path>): List<APIFile> {
+			val key = "#${index++}#"
+			map[key] = values
+			return listOf(APIFile(key))
+		}
+	}
+
+	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
+		key = key,
+		value = InputProvider { SystemFileSystem.source(file).buffered() },
+		headers = Headers.build {
+			append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+		}
+	)
+
+	inline fun <reified Files : Any> buildFormFiles(
+		builder: FormBuilder,
+		crossinline files: APIFileScope.() -> Files
+	) {
+		val ignoreFiles = mutableListOf<String>()
+
+		val scope = APIFileScope()
+		val keys = scope.files().toJson().Object
+		for ((name, item) in keys) {
+			if (item is JsonNull) ignoreFiles += name
+			else {
+				val key = item.StringNull
+				if (key != null) builder.addFormFile(name, scope.map[key] as Path)
+				else {
+					var index = 0
+					for (item in scope.map[item.Array.first().String] as List<*>) {
+						builder.addFormFile("#$name!${index++}", item as Path)
+					}
+				}
+			}
+		}
+
+		if (ignoreFiles.isNotEmpty()) {
+			builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
+		}
+	}
+
+	@JvmName("requestForm")
+	suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> request(
+		route: APIRoute<Request, Response, Files, APIMethod.Form>,
+		data: Request,
+		crossinline files: APIFileScope.() -> Files
+	): Data<Response> = app.fileClient.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") {
 			setBody(MultiPartFormDataContent(formData {
-				PostFormScope(this).init()
+				buildFormFiles(this, files)
+				append(key = "#data#", value = data.toJsonString())
+			}))
+		}.execute { processResponse<Response>(it) }
+	}
+
+	@JvmName("requestFormRequest")
+	suspend inline fun <reified Request : Any, reified Files : Any> request(
+		route: APIRoute<Request, Response.Default, Files, APIMethod.Form>,
+		data: Request,
+		crossinline files: APIFileScope.() -> Files
+	): Data<Response.Default> = app.fileClient.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") {
+			setBody(MultiPartFormDataContent(formData {
+				buildFormFiles(this, files)
+				append(key = "#data#", value = data.toJsonString())
 			}))
 		}.execute { processResponse(it) }
 	}
-	catch (e: HttpRequestTimeoutException) {
-		Data.Error(RequestError.Timeout, "网络连接超时", e)
-	}
-	catch (e: CancellationException) {
-		Data.Error(RequestError.Canceled, "操作取消", e)
-	}
-	catch (e: Exception) {
-		Data.Error(RequestError.ClientError, "未知异常", e)
+
+	@JvmName("requestFormResponse")
+	suspend inline fun <reified Response : Any, reified Files : Any> request(
+		route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
+		crossinline files: APIFileScope.() -> Files
+	): Data<Response> = app.fileClient.safeCallData { client ->
+		client.preparePost(urlString = "${APIConfig.URL}$route") {
+			setBody(MultiPartFormDataContent(formData {
+				buildFormFiles(this, files)
+			}))
+		}.execute { processResponse<Response>(it) }
 	}
 }

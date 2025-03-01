@@ -48,10 +48,10 @@ fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
 	}
 }
 
-suspend inline fun <R> HttpClient.safeCall(
-	crossinline block: suspend (HttpClient) -> R
+suspend inline fun <R> HttpClient.safeCallData(
+	crossinline block: suspend (HttpClient) -> Data<R>
 ): Data<R> = try {
-	Data.Success(block(this@safeCall))
+	block(this)
 }
 catch (e: HttpRequestTimeoutException) {
 	Data.Error(RequestError.Timeout, "网络连接超时", e)
@@ -62,6 +62,10 @@ catch (e: CancellationException) {
 catch (e: Exception) {
 	Data.Error(RequestError.ClientError, "未知异常", e)
 }
+
+suspend inline fun <R> HttpClient.safeCall(
+	crossinline block: suspend (HttpClient) -> R
+): Data<R> = this.safeCallData { Data.Success(block(this)) }
 
 suspend inline fun <reified T, R> HttpClient.safeGet(
 	url: String,

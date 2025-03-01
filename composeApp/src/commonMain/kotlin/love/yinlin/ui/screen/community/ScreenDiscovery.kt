@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.api.Default
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.Topic
@@ -75,11 +74,11 @@ class DiscoveryModel(val mainModel: MainModel) {
 		val result = when (currentPage) {
 			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
-				data = Default.PageDescRequest()
+				data = API.User.Topic.GetLatestTopics.Request()
 			)
 			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
 				route = API.User.Topic.GetHotTopics,
-				data = Default.PageDescRequest()
+				data = API.User.Topic.GetHotTopics.Request()
 			)
 			else -> ClientAPI.request(
 				route = API.User.Topic.GetSectionTopics,
@@ -116,11 +115,11 @@ class DiscoveryModel(val mainModel: MainModel) {
 		val result = when (currentPage) {
 			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
-				data = Default.PageDescRequest(offset = offset)
+				data = API.User.Topic.GetLatestTopics.Request(offset = offset)
 			)
 			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
 				route = API.User.Topic.GetHotTopics,
-				data = Default.PageDescRequest(offset = offset)
+				data = API.User.Topic.GetHotTopics.Request(offset = offset)
 			)
 			else -> ClientAPI.request(
 				route = API.User.Topic.GetSectionTopics,

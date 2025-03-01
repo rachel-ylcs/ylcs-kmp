@@ -11,6 +11,7 @@ import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebPage
 import love.yinlin.ui.screen.community.ScreenLogin
+import love.yinlin.ui.screen.community.ScreenMail
 import love.yinlin.ui.screen.community.ScreenTopic
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboAlbum
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
@@ -47,6 +48,8 @@ sealed interface Route {
 	data object Login : Route
 	@Serializable
 	data class Topic(val topic: love.yinlin.data.rachel.Topic) : Route
+	@Serializable
+	data object Mail : Route
 
 	companion object {
 		fun NavGraphBuilder.buildRoute(
@@ -94,6 +97,9 @@ sealed interface Route {
 			composable<Topic>(typeMap = buildNavTypeMap<love.yinlin.data.rachel.Topic>()) {
 				val args = it.toRoute<Topic>()
 				ScreenTopic(appModel, args.topic)
+			}
+			composable<Mail> {
+				ScreenMail(appModel)
 			}
 		}
 	}

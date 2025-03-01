@@ -121,7 +121,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(subComments.to())
 	}
 
-	api(API.User.Topic.SendTopic) { (token, title, content, section, pics) ->
+	api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
 		VN.throwEmpty(title, content)
 		VN.throwSection(section)
 		val ngp = NineGridProcessor(pics)
