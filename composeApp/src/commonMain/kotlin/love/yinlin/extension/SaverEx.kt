@@ -4,6 +4,8 @@ import androidx.compose.runtime.saveable.Saver
 import love.yinlin.ui.component.text.TextInputState
 
 object Saver {
+	fun key(name: String) = Unit to name
+
 	val TextInputState: Saver<TextInputState, Pair<String, Boolean>> = Saver(
 		save = { it.text to it.overflow },
 		restore = {

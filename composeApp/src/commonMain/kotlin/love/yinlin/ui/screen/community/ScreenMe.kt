@@ -19,7 +19,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.data.rachel.UserProfile
@@ -48,10 +51,6 @@ private data class TipButtonInfo(
 
 class MeModel(val mainModel: MainModel) {
 	fun scanQrcode() {
-
-	}
-
-	fun openProfile() {
 
 	}
 
@@ -100,10 +99,6 @@ private fun ToolBar(
 			onClick = { model.scanQrcode() }
 		)
 		ClickIcon(
-			imageVector = Icons.Default.AccountBox,
-			onClick = { model.openProfile() }
-		)
-		ClickIcon(
 			imageVector = Icons.Filled.Settings,
 			onClick = { model.gotoSettings() }
 		)
@@ -135,10 +130,12 @@ private fun TipButton(
 private fun TipButtonContainer(
 	title: String,
 	buttons: List<TipButtonInfo>,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	shape: Shape = RectangleShape
 ) {
 	Surface(
 		modifier = modifier,
+		shape = shape,
 		shadowElevation = 5.dp
 	) {
 		Column(
@@ -168,10 +165,12 @@ private fun TipButtonContainer(
 @Composable
 private fun UserSpaceContainer(
 	model: MeModel,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	shape: Shape = RectangleShape
 ) {
 	TipButtonContainer(
 		modifier = modifier,
+		shape = shape,
 		title = "个人空间",
 		buttons = listOf(
 			TipButtonInfo("签到", Icons.Filled.EventAvailable) { },
@@ -245,6 +244,7 @@ private fun Portrait(
 					WebImage(
 						uri = userProfile.avatarPath,
 						key = config.cacheUserAvatar,
+						contentScale = ContentScale.Crop,
 						circle = true,
 						modifier = Modifier.size(72.dp).shadow(5.dp, CircleShape)
 					)
@@ -302,10 +302,7 @@ private fun Landscape(
 	model: MeModel,
 	userProfile: UserProfile
 ) {
-	Column(
-		modifier = Modifier.fillMaxSize(),
-		verticalArrangement = Arrangement.spacedBy(5.dp)
-	) {
+	Column(modifier = Modifier.fillMaxSize()) {
 		Surface(
 			modifier = Modifier.fillMaxWidth(),
 			shadowElevation = 5.dp
@@ -316,82 +313,76 @@ private fun Landscape(
 			)
 		}
 		Row(modifier = Modifier.fillMaxWidth()) {
-			Column(
-				modifier = Modifier.weight(1f),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+			Surface(
+				modifier = Modifier.width(450.dp).padding(10.dp),
+				shape = MaterialTheme.shapes.large,
+				shadowElevation = 5.dp
 			) {
-				Surface(
+				Column(
 					modifier = Modifier.fillMaxWidth(),
-					shadowElevation = 3.dp
+					verticalArrangement = Arrangement.spacedBy(10.dp)
 				) {
-					Column(
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp),
-						verticalArrangement = Arrangement.spacedBy(10.dp)
+					WebImage(
+						uri = userProfile.wallPath,
+						key = config.cacheUserWall,
+						modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
+					)
+					Row(
+						modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 10.dp),
+						horizontalArrangement = Arrangement.spacedBy(15.dp)
 					) {
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(20.dp)
-						) {
-							Column(
-								horizontalAlignment = Alignment.CenterHorizontally,
-								verticalArrangement = Arrangement.spacedBy(5.dp)
-							) {
-								WebImage(
-									uri = userProfile.avatarPath,
-									key = config.cacheUserAvatar,
-									circle = true,
-									modifier = Modifier.size(100.dp).shadow(5.dp, CircleShape)
-								)
-								UserLabel(
-									label = userProfile.label,
-									level = userProfile.level
-								)
-							}
-							Column(
-								modifier = Modifier.weight(1f).padding(10.dp),
-								verticalArrangement = Arrangement.spacedBy(20.dp)
-							) {
-								Text(
-									text = userProfile.name,
-									style = MaterialTheme.typography.titleLarge,
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis,
-									modifier = Modifier.fillMaxWidth()
-								)
-								Row(
-									modifier = Modifier.fillMaxWidth(),
-									horizontalArrangement = Arrangement.spacedBy(10.dp),
-									verticalAlignment = Alignment.CenterVertically
-								) {
-									PortraitValue(
-										value = userProfile.level.toString(),
-										title = "等级"
-									)
-									PortraitValue(
-										value = userProfile.coin.toString(),
-										title = "银币"
-									)
-								}
-							}
+						Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+							WebImage(
+								uri = userProfile.avatarPath,
+								key = config.cacheUserAvatar,
+								contentScale = ContentScale.Crop,
+								circle = true,
+								modifier = Modifier.matchParentSize().shadow(5.dp, CircleShape)
+							)
 						}
-						Text(
-							text = userProfile.signature,
-							maxLines = 2,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.fillMaxWidth()
-						)
+						Column(
+							modifier = Modifier.weight(1f),
+							verticalArrangement = Arrangement.spacedBy(5.dp)
+						) {
+							Text(
+								text = userProfile.name,
+								style = MaterialTheme.typography.titleLarge,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								modifier = Modifier.fillMaxWidth()
+							)
+							UserLabel(
+								label = userProfile.label,
+								level = userProfile.level
+							)
+						}
+						Row(
+							horizontalArrangement = Arrangement.spacedBy(10.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							PortraitValue(
+								value = userProfile.level.toString(),
+								title = "等级"
+							)
+							PortraitValue(
+								value = userProfile.coin.toString(),
+								title = "银币"
+							)
+						}
 					}
+					Text(
+						text = userProfile.signature,
+						maxLines = 2,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+					)
 				}
-				UserSpaceContainer(
-					model = model,
-					modifier = Modifier.fillMaxWidth()
-				)
 			}
 			Column(modifier = Modifier.weight(1f)) {
-				WebImage(
-					uri = userProfile.wallPath,
-					key = config.cacheUserWall,
-					modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
+				UserSpaceContainer(
+					model = model,
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					shape = MaterialTheme.shapes.large
 				)
 			}
 		}

@@ -7,20 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemScope
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -41,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import love.yinlin.extension.Saver
 import love.yinlin.platform.OS
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
@@ -281,6 +270,7 @@ private fun <T> ClickPaginationColumn(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+	header: (@Composable LazyItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -292,6 +282,11 @@ private fun <T> ClickPaginationColumn(
 		horizontalAlignment = horizontalAlignment,
 		modifier = modifier
 	) {
+		if (header != null) {
+			item(key = Saver.key("Header")) {
+				header()
+			}
+		}
 		items(items = items, key = key, itemContent = itemContent)
 		if (canLoading) {
 			item(key = Unit) {
@@ -322,6 +317,7 @@ private fun <T> ClickPaginationGrid(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -334,6 +330,11 @@ private fun <T> ClickPaginationGrid(
 		horizontalArrangement = horizontalArrangement,
 		modifier = modifier
 	) {
+		if (header != null) {
+			item(key = Saver.key("Header")) {
+				header()
+			}
+		}
 		items(items = items, key = key, itemContent = itemContent)
 		if (canLoading) {
 			item(
@@ -367,6 +368,7 @@ private fun <T> ClickPaginationStaggeredGrid(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalItemSpacing: Dp = 0.dp,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -379,6 +381,11 @@ private fun <T> ClickPaginationStaggeredGrid(
 		horizontalArrangement = horizontalArrangement,
 		modifier = modifier
 	) {
+		if (header != null) {
+			item(key = Saver.key("Header")) {
+				header()
+			}
+		}
 		items(items = items, key = key, itemContent = itemContent)
 		if (canLoading) {
 			item(
@@ -412,6 +419,7 @@ fun <T> PaginationColumn(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+	header: (@Composable LazyItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	if (OS.platform.isPhone) {
@@ -429,6 +437,11 @@ fun <T> PaginationColumn(
 				verticalArrangement = verticalArrangement,
 				horizontalAlignment = horizontalAlignment,
 			) {
+				if (header != null) {
+					item(key = Saver.key("Header")) {
+						header()
+					}
+				}
 				items(items = items, key = key, itemContent = itemContent)
 			}
 		}
@@ -444,6 +457,7 @@ fun <T> PaginationColumn(
 			contentPadding = contentPadding,
 			verticalArrangement = verticalArrangement,
 			horizontalAlignment = horizontalAlignment,
+			header = header,
 			itemContent = itemContent
 		)
 	}
@@ -463,6 +477,7 @@ fun <T> PaginationGrid(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
 	if (OS.platform.isPhone) {
@@ -481,6 +496,11 @@ fun <T> PaginationGrid(
 				verticalArrangement = verticalArrangement,
 				horizontalArrangement = horizontalArrangement,
 			) {
+				if (header != null) {
+					item(key = Saver.key("Header")) {
+						header()
+					}
+				}
 				items(items = items, key = key, itemContent = itemContent)
 			}
 		}
@@ -497,6 +517,7 @@ fun <T> PaginationGrid(
 			contentPadding = contentPadding,
 			verticalArrangement = verticalArrangement,
 			horizontalArrangement = horizontalArrangement,
+			header = header,
 			itemContent = itemContent
 		)
 	}
@@ -516,6 +537,7 @@ fun <T> PaginationStaggeredGrid(
 	contentPadding: PaddingValues = PaddingValues(0.dp),
 	verticalItemSpacing: Dp = 0.dp,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
 	if (OS.platform.isPhone) {
@@ -534,6 +556,11 @@ fun <T> PaginationStaggeredGrid(
 				verticalItemSpacing = verticalItemSpacing,
 				horizontalArrangement = horizontalArrangement
 			) {
+				if (header != null) {
+					item(key = Saver.key("Header")) {
+						header()
+					}
+				}
 				items(items = items, key = key, itemContent = itemContent)
 			}
 		}
@@ -550,6 +577,7 @@ fun <T> PaginationStaggeredGrid(
 			contentPadding = contentPadding,
 			verticalItemSpacing = verticalItemSpacing,
 			horizontalArrangement = horizontalArrangement,
+			header = header,
 			itemContent = itemContent
 		)
 	}

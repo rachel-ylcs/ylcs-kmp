@@ -32,7 +32,10 @@ fun ScreenChaohua(model: MsgModel) {
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
 			verticalItemSpacing = 10.dp
 		) { weibo ->
-			model.WeiboCard(weibo = weibo, modifier = Modifier.fillMaxWidth())
+			model.WeiboCard(
+				weibo = weibo,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
 	}
 

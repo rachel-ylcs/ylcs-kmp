@@ -32,6 +32,7 @@ import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
+import love.yinlin.extension.Saver
 import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.platform.config
@@ -90,8 +91,9 @@ private fun UserInfoCard(
 			WebImage(
 				uri = user.info.avatar,
 				key = DateEx.currentDateString,
-				modifier = Modifier.size(64.dp),
-				circle = true
+				contentScale = ContentScale.Crop,
+				circle = true,
+				modifier = Modifier.size(64.dp)
 			)
 		}
 		Column(
@@ -144,7 +146,6 @@ private fun UserAlbumItem(
 	) {
 		WebImage(
 			uri = album.pic,
-			key = DateEx.currentDateString,
 			modifier = Modifier.size(50.dp)
 		)
 		Column(
@@ -185,10 +186,9 @@ private fun Portrait(
 	onAlbumClick: (WeiboAlbum) -> Unit
 ) {
 	LazyColumn(modifier = Modifier.fillMaxSize()) {
-		item(key = -1) {
+		item(key = Saver.key("UserInfoCard")) {
 			WebImage(
 				uri = user.background,
-				key = DateEx.currentDateString,
 				modifier = Modifier.fillMaxWidth().height(150.dp),
 				contentScale = ContentScale.Crop,
 				alpha = 0.8f
@@ -213,7 +213,7 @@ private fun Portrait(
 				)
 			}
 		}
-		item(key = -2) {
+		item(key = Saver.key("Text")) {
 			Text(
 				text = "最新微博",
 				textAlign = TextAlign.Center,

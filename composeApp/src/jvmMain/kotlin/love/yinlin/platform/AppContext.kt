@@ -6,7 +6,7 @@ import java.awt.GraphicsEnvironment
 
 class AppContext : IAppContext() {
 	companion object {
-		const val IS_PHONE_DEBUG = false
+		const val IS_PHONE_DEBUG = true
 
 		const val SCREEN_PERCENT = 0.85f
 	}

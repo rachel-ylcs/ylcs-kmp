@@ -28,15 +28,25 @@ data class UserProfile(
 	@Stable
 	val level: Int get() = UserLevel.level(coin)
 
+	@Stable
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)
+	@Stable
 	val hasPrivilegeRes: Boolean get() = UserPrivilege.res(privilege)
+	@Stable
 	val hasPrivilegeTopic: Boolean get() = UserPrivilege.topic(privilege)
+	@Stable
 	val hasPrivilegeVIPAccount: Boolean get() = UserPrivilege.vipAccount(privilege)
+	@Stable
 	val hasPrivilegeVIPTopic: Boolean get() = UserPrivilege.vipTopic(privilege)
+	@Stable
 	val hasPrivilegeVIPCalendar: Boolean get() = UserPrivilege.vipCalendar(privilege)
 
+	@Stable
 	fun canUpdateTopicTop(topicUid: Int) = uid == topicUid
+	@Stable
 	fun canDeleteTopic(topicUid: Int) = uid == topicUid || hasPrivilegeVIPTopic
+	@Stable
 	fun canUpdateCommentTop(topicUid: Int) = uid == topicUid || hasPrivilegeVIPTopic
+	@Stable
 	fun canDeleteComment(topicUid: Int, commentUid: Int) = uid == topicUid || uid == commentUid || hasPrivilegeVIPTopic
 }

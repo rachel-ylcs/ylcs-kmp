@@ -17,12 +17,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.ensureActive
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
-import love.yinlin.data.RequestError
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -33,7 +32,6 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.msg.MsgModel
-import kotlin.coroutines.coroutineContext
 
 class WeiboGridData {
 	var state by mutableStateOf(BoxState.EMPTY)
@@ -48,10 +46,6 @@ class WeiboGridData {
 				for (id in users) {
 					val result = WeiboAPI.getUserWeibo(id)
 					if (result is Data.Success) newItems += result.data.associateBy { it.id }
-					else if (result is Data.Error && result.type == RequestError.Canceled) {
-						state = BoxState.EMPTY
-						coroutineContext.ensureActive()
-					}
 				}
 				items = newItems.map { it.value }.sortedDescending()
 				if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
@@ -112,21 +106,24 @@ fun WeiboUserBar(
 	name: String,
 	time: String,
 	location: String,
-	modifier: Modifier = Modifier,
+	padding: PaddingValues,
 	onAvatarClick: () -> Unit
 ) {
 	Row(
-		modifier = modifier,
+		modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(padding),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(10.dp)
 	) {
-		WebImage(
-			uri = avatar,
-			key = DateEx.currentDateString,
-			modifier = Modifier.size(50.dp),
-			circle = true,
-			onClick = onAvatarClick
-		)
+		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+			WebImage(
+				uri = avatar,
+				key = DateEx.currentDateString,
+				contentScale = ContentScale.Crop,
+				circle = true,
+				modifier = Modifier.matchParentSize(),
+				onClick = onAvatarClick
+			)
+		}
 		Column(
 			modifier = Modifier.weight(1f),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -167,11 +164,11 @@ fun WeiboLayout(
 	onVideoClick: (Picture) -> Unit
 ) {
 	WeiboUserBar(
-		modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
 		avatar = weibo.info.avatar,
 		name = weibo.info.name,
 		time = weibo.time,
 		location = weibo.location,
+		padding = PaddingValues(bottom = 10.dp),
 		onAvatarClick = { onAvatarClick(weibo.info) }
 	)
 	RichText(

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,6 +68,7 @@ private fun AccountSettings(
 			else WebImage(
 				uri = userProfile.avatarPath,
 				key = config.cacheUserAvatar,
+				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.size(48.dp).shadow(5.dp, CircleShape)
 			)

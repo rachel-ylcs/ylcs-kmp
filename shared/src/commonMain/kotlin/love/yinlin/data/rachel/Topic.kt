@@ -23,7 +23,10 @@ data class Topic(
 	val name: String, // [用户昵称]
 ) {
 	@Stable
-	val picPath: String get() = pic?.let { "${APIConfig.URL}/${ServerRes.Users.User(uid).Pics().pic(it)}" } ?: ""
+	fun picPath(key: String): String = "${APIConfig.URL}/${ServerRes.Users.User(uid).Pics().pic(key)}"
+
+	@Stable
+	val picPath: String get() = pic?.let { picPath(it) } ?: ""
 
 	@Stable
 	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"

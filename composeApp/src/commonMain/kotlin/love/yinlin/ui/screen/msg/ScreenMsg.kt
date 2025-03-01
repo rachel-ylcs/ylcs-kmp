@@ -69,7 +69,7 @@ class MsgModel(val mainModel: MainModel) {
 			if (grid.state != BoxState.LOADING) {
 				grid.state = BoxState.LOADING
 				canLoading = false
-				val result = WeiboAPI.extractChaohua(sinceId)
+				val result = WeiboAPI.extractChaohua(0L)
 				grid.state = if (result is Data.Success) {
 					val (data, newSinceId) = result.data
 					sinceId = newSinceId
@@ -163,7 +163,7 @@ class MsgModel(val mainModel: MainModel) {
 			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
 			onClick = { onWeiboClick(weibo) }
 		) {
-			Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+			Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
 				WeiboLayout(
 					weibo = weibo,
 					onAvatarClick = ::onWeiboAvatarClick,
@@ -188,7 +188,7 @@ fun ScreenMsg(model: MsgModel) {
 			shadowElevation = 5.dp
 		) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+				modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {

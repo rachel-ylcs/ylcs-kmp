@@ -1,15 +1,26 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.api.API
@@ -18,10 +29,15 @@ import love.yinlin.api.Default
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.Topic
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
+import love.yinlin.platform.app
+import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -46,60 +62,194 @@ class DiscoveryModel(val mainModel: MainModel) {
 	val launchFlag = LaunchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
+	val listState = LazyStaggeredGridState()
+
 	var currentPage by mutableIntStateOf(0)
 	val items = mutableStateListOf<Topic>()
 	var offset: Int = Int.MAX_VALUE
 	var canLoading by mutableStateOf(false)
 
-	fun requestNewData() {
-		mainModel.launch {
-			val section = DiscoveryItem.entries[currentPage].id
-			state = BoxState.LOADING
-			val result = when (currentPage) {
-				DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
-					route = API.User.Topic.GetLatestTopics,
-					data = Default.PageDescRequest()
-				)
-				DiscoveryItem.Hot.ordinal -> ClientAPI.request(
-					route = API.User.Topic.GetHotTopics,
-					data = Default.PageDescRequest()
-				)
-				else -> ClientAPI.request(
-					route = API.User.Topic.GetSectionTopics,
-					data = API.User.Topic.GetSectionTopics.Request(section = section)
-				)
-			}
-			if (result is Data.Success) {
-				val topics = result.data
-				items.replaceAll(topics)
+	suspend fun requestNewData() {
+		val section = DiscoveryItem.entries[currentPage].id
+		state = BoxState.LOADING
+		val result = when (currentPage) {
+			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
+				route = API.User.Topic.GetLatestTopics,
+				data = Default.PageDescRequest()
+			)
+			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
+				route = API.User.Topic.GetHotTopics,
+				data = Default.PageDescRequest()
+			)
+			else -> ClientAPI.request(
+				route = API.User.Topic.GetSectionTopics,
+				data = API.User.Topic.GetSectionTopics.Request(section = section)
+			)
+		}
+		if (result is Data.Success) {
+			val topics = result.data
+			items.replaceAll(topics)
 
+			val last = topics.lastOrNull()
+			offset = when (section) {
+				DiscoveryItem.Lastest.id -> last?.tid
+				DiscoveryItem.Hot.id -> last?.coinNum
+				else -> last?.tid
+			} ?: Int.MAX_VALUE
+
+			if (topics.isEmpty()) {
+				state = BoxState.EMPTY
+				canLoading = false
+			}
+			else {
+				state = BoxState.CONTENT
+				canLoading = true
+			}
+
+			listState.scrollToItem(0)
+		}
+		else state = BoxState.NETWORK_ERROR
+	}
+
+	suspend fun requestMoreData() {
+		val section = DiscoveryItem.entries[currentPage].id
+		val result = when (currentPage) {
+			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
+				route = API.User.Topic.GetLatestTopics,
+				data = Default.PageDescRequest(offset = offset)
+			)
+			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
+				route = API.User.Topic.GetHotTopics,
+				data = Default.PageDescRequest(offset = offset)
+			)
+			else -> ClientAPI.request(
+				route = API.User.Topic.GetSectionTopics,
+				data = API.User.Topic.GetSectionTopics.Request(section = section, offset = offset)
+			)
+		}
+		if (result is Data.Success) {
+			val topics = result.data
+			if (topics.isEmpty()) offset = Int.MAX_VALUE
+			else {
+				items += topics
 				val last = topics.lastOrNull()
 				offset = when (section) {
 					DiscoveryItem.Lastest.id -> last?.tid
 					DiscoveryItem.Hot.id -> last?.coinNum
 					else -> last?.tid
 				} ?: Int.MAX_VALUE
-
-				if (topics.isEmpty()) {
-					state = BoxState.EMPTY
-					canLoading = false
-				}
-				else {
-					state = BoxState.CONTENT
-					canLoading = true
-				}
 			}
-			else state = BoxState.NETWORK_ERROR
+
+			canLoading = offset != Int.MAX_VALUE
 		}
 	}
 
-	fun requestMoreData() {
+	fun onRefresh() {
+		mainModel.launch { requestNewData() }
+	}
+
+	fun onTopicClick(topic: Topic) {
+		mainModel.navigate(Route.Topic(topic))
+	}
+
+	fun onUserAvatarClick(uid: Int) {
 
 	}
 
-	fun onNavigate(index: Int) {
-		currentPage = index
-		requestNewData()
+	@Composable
+	fun TopicCard(
+		topic: Topic,
+		cardWidth: Dp,
+		modifier: Modifier = Modifier
+	) {
+		ElevatedCard(
+			modifier = modifier,
+			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
+			onClick = { onTopicClick(topic) }
+		) {
+			Column(modifier = Modifier.fillMaxWidth().heightIn(min = cardWidth * 0.777777f)) {
+				if (topic.pic != null) {
+					WebImage(
+						uri = topic.picPath,
+						modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
+						contentScale = ContentScale.Crop
+					)
+				}
+				Text(
+					text = topic.title,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)
+				)
+				Spacer(Modifier.weight(1f))
+				Row(
+					modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(5.dp),
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+						WebImage(
+							uri = topic.avatarPath,
+							key = DateEx.currentDateString,
+							contentScale = ContentScale.Crop,
+							circle = true,
+							modifier = Modifier.matchParentSize()
+						)
+					}
+					Column(
+						modifier = Modifier.weight(1f),
+						verticalArrangement = Arrangement.spacedBy(5.dp)
+					) {
+						Text(
+							text = topic.name,
+							style = MaterialTheme.typography.titleSmall,
+							textAlign = TextAlign.Center,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis,
+							modifier = Modifier.fillMaxWidth()
+						)
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(5.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							Row(
+								modifier = Modifier.weight(1f),
+								horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								MiniIcon(
+									imageVector = Icons.AutoMirrored.Outlined.Comment,
+									size = 16.dp
+								)
+								Text(
+									text = topic.commentNum.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis
+								)
+							}
+							Row(
+								modifier = Modifier.weight(1f),
+								horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								MiniIcon(
+									imageVector = Icons.Outlined.Paid,
+									size = 16.dp
+								)
+								Text(
+									text = topic.coinNum.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis
+								)
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -117,26 +267,40 @@ fun ScreenDiscovery(model: DiscoveryModel) {
 				shadowElevation = 5.dp
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+					modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.spacedBy(10.dp)
 				) {
 					TabBar(
 						currentPage = model.currentPage,
-						onNavigate = { model.onNavigate(it) },
+						onNavigate = {
+							model.currentPage = it
+							model.onRefresh()
+						},
 						items = tabItems,
 						modifier = Modifier.weight(1f)
 					)
 					ClickIcon(
+						imageVector = Icons.Filled.Add,
+						onClick = { }
+					)
+					ClickIcon(
+						imageVector = Icons.Filled.Search,
+						onClick = { }
+					)
+					ClickIcon(
 						imageVector = Icons.Filled.Refresh,
-						onClick = { model.requestNewData() }
+						onClick = { model.onRefresh() }
 					)
 				}
 			}
+
+			val cardWidth = remember { if (app.isPortrait) 150.dp else 200.dp }
 			PaginationStaggeredGrid(
 				items = model.items,
 				key = { it.tid },
-				columns = StaggeredGridCells.Adaptive(150.dp),
+				columns = StaggeredGridCells.Adaptive(cardWidth),
+				state = model.listState,
 				canRefresh = true,
 				canLoading = model.canLoading,
 				onRefresh = { model.requestNewData() },
@@ -146,12 +310,16 @@ fun ScreenDiscovery(model: DiscoveryModel) {
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalItemSpacing = 10.dp
 			) { topic ->
-
+				model.TopicCard(
+					topic = topic,
+					cardWidth = cardWidth,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		}
 	}
 
 	LaunchOnce(model.launchFlag) {
-		model.requestNewData()
+		model.onRefresh()
 	}
 }

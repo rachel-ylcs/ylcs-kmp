@@ -25,6 +25,7 @@ import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.LaunchOnce
+import love.yinlin.extension.Saver
 import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.NineGrid
@@ -60,7 +61,7 @@ private fun WeiboCommentCard(
 			name = comment.info.name,
 			location = comment.location,
 			time = comment.time,
-			modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+			padding = PaddingValues(bottom = 5.dp),
 			onAvatarClick = { onAvatarClick(comment.info) }
 		)
 		RichText(
@@ -82,7 +83,7 @@ private fun WeiboCommentCard(
 							name = subComment.info.name,
 							location = subComment.location,
 							time = subComment.time,
-							modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+							padding = PaddingValues(bottom = 5.dp),
 							onAvatarClick = { onAvatarClick(subComment.info) }
 						)
 						RichText(
@@ -107,7 +108,7 @@ private fun Portrait(
 			.background(MaterialTheme.colorScheme.surface)
 			.padding(start = 10.dp, end = 10.dp, top = 5.dp)
 	) {
-		item(key = -1) {
+		item(key = Saver.key("WeiboLayout")) {
 			WeiboLayout(
 				weibo = weibo,
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
@@ -119,7 +120,7 @@ private fun Portrait(
 			)
 		}
 		if (comments != null) {
-			item(key = -2) {
+			item(key = Saver.key("HorizontalDivider")) {
 				HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 			}
 			items(
@@ -148,11 +149,11 @@ private fun Landscape(
 	) {
 		Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
 			WeiboUserBar(
-				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
 				avatar = weibo.info.avatar,
 				name = weibo.info.name,
 				time = weibo.time,
 				location = weibo.location,
+				padding = PaddingValues(bottom = 10.dp),
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(weibo.info) }
 			)
 			RichText(

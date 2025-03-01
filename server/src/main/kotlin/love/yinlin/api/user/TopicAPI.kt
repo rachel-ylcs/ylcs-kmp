@@ -92,11 +92,11 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(tid)
 		val tableName = VN.throwSection(rawSection)
 		val comments = DB.throwQuerySQL("""
-			SELECT cid, pid, user.uid, ts, content, isTop, subCommentNum, name, label, coin
+			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, coin
             FROM $tableName
             LEFT JOIN user
             ON $tableName.uid = user.uid
-            WHERE tid = ? AND pid = NULL AND isDeleted = 0 AND ${
+            WHERE tid = ? AND pid IS NULL AND isDeleted = 0 AND ${
 				if (isTop) "((isTop = 1 AND cid > ?) OR isTop = 0)"
 				else "isTop = 0 AND cid > ?"
 			}
@@ -286,7 +286,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			// 逻辑删除
 			it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE pid = ? AND cid = ? AND isDeleted = 0", pid, cid)
 			// 更新评论楼中楼数
-			it.throwExecuteSQL("UPDATE $tableName SET subCommentNum = subCommentNum - 1 WHERE pid == NULL AND cid = ? AND isDeleted = 0", pid)
+			it.throwExecuteSQL("UPDATE $tableName SET subCommentNum = subCommentNum - 1 WHERE pid IS NULL AND cid = ? AND isDeleted = 0", pid)
 		}
 		"删除成功".successData
 	}

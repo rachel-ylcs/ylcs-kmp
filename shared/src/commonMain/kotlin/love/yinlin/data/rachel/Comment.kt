@@ -9,7 +9,7 @@ import love.yinlin.api.ServerRes
 @Serializable
 data class Comment(
 	val cid: Int, // [评论 ID]
-	val pid: Int, // [父评论 ID]
+	// val pid: Int? [父评论 ID]
 	// tid: Int [主题 ID]
 	val uid: Int, // [用户 ID]
 	val ts: String, // [发布时间]

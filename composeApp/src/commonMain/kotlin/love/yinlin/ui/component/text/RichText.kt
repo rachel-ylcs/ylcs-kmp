@@ -1,6 +1,8 @@
 package love.yinlin.ui.component.text
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.LocalTextStyle
@@ -17,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import love.yinlin.Colors
@@ -154,9 +157,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override fun build(context: RichContext) {
 			val id = context.id
-			context.builder.append(' ')
 			context.builder.appendInlineContent(id, " ")
-			context.builder.append(' ')
 			context.content.put(id, this)
 		}
 
@@ -389,7 +390,7 @@ fun RichText(
 		state.content.mapValues { drawable ->
 			InlineTextContent(
 				placeholder = Placeholder(
-					width = fontSize,
+					width = fontSize * 1.25f,
 					height = fontSize,
 					placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
 				)
