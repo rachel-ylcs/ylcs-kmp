@@ -22,6 +22,7 @@ import love.yinlin.extension.IntNull
 import love.yinlin.extension.String
 import love.yinlin.md5
 import love.yinlin.mkdir
+import love.yinlin.values
 
 fun Routing.accountAPI(implMap: ImplMap) {
 	api(API.User.Account.Login) { (name, pwd, platform) ->
@@ -67,8 +68,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 
 		// 提交申请
 		DB.throwExecuteSQL("""
-            INSERT INTO mail(uid, type, title, content, filter, param1, param2)
-            VALUES(?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
         """, inviter["uid"].Int, Mail.Type.DECISION, "用户注册审核",
 			"小银子\"${name}\"填写你作为邀请人注册，是否同意？",
 			Mail.Filter.REGISTER, name, pwd.md5)
@@ -81,8 +81,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		val registerPwd = it.param2
 		val createTime = currentTS
 		val registerID = DB.throwInsertSQLGeneratedKey("""
-            INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin)
-            VALUES(?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin) ${values(7)}
         """, registerName, registerPwd, inviterID, createTime, createTime, "{}", ByteArray(46)
 		).toInt()
 		if (registerID == 0) return@ImplContext "\"${registerName}\"已注册".failedObject
@@ -122,7 +121,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 			return@api "已提交过审批，请等待邀请人\"${inviterName}\"审核".failedData
 		// 提交申请
 		DB.throwExecuteSQL("""
-            INSERT INTO mail(uid, type, title, content, filter, param1, param2) VALUES(?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
         """, inviterUid, Mail.Type.DECISION, "用户修改密码审核",
 			"\"${name}\"需要修改密码，是否同意？",
 			Mail.Filter.FORGOT_PASSWORD, name, pwd.md5)

@@ -48,20 +48,7 @@ inline fun <T> rememberStateSaveable(vararg keys: Any?, saver: Saver<T, out Any>
 	if (saver == null) rememberSaveable(*keys, saver = autoSaver()) { mutableStateOf(init()) }
 	else rememberSaveable(*keys, stateSaver = saver) { mutableStateOf(init()) }
 @Composable
-fun <T> rememberDerivedState(calculation: () -> T) =
-	remember { derivedStateOf(calculation) }
-@Composable
-fun <T> rememberDerivedState(key1: Any?, calculation: () -> T) =
-	remember(key1) { derivedStateOf(calculation) }
-@Composable
-fun <T> rememberDerivedState(key1: Any?, key2: Any?, calculation: () -> T) =
-	remember(key1, key2) { derivedStateOf(calculation) }
-@Composable
-fun <T> rememberDerivedState(key1: Any?, key2: Any?, key3: Any?, calculation: () -> T) =
-	remember(key1, key2, key3) { derivedStateOf(calculation) }
-@Composable
-fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
-	remember(*keys) { derivedStateOf(calculation) }
+fun <T> rememberDerivedState(calculation: () -> T) = remember { derivedStateOf(calculation) }
 
 // Reference
 

@@ -18,6 +18,7 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
+import love.yinlin.values
 
 fun Routing.topicAPI(implMap: ImplMap) {
 	api(API.User.Topic.GetTopics) { (uid, isTop, offset, num) ->
@@ -131,7 +132,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			(section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
 			return@api "无权限".failedData
 		val tid = DB.throwInsertSQLGeneratedKey("""
-            INSERT INTO topic(uid, title, content, pics, section, rawSection) VALUES(?, ?, ?, ?, ?, ?)
+            INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
         """, uid, title, content, ngp.jsonString, section, section).toInt()
 		// 复制主题图片
 		val userPics = ServerRes.Users.User(uid).Pics()
@@ -211,7 +212,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 				UPDATE topic SET commentNum = commentNum + 1 WHERE tid = ? AND isDeleted = 0
 			""", tid)
 			it.throwInsertSQLGeneratedKey("""
-                INSERT INTO $tableName(tid, uid, content) VALUES(?, ?, ?)
+                INSERT INTO $tableName(tid, uid, content) ${values(3)}
             """, tid, uid, content).toInt()
 		}
 		Data.Success(cid, "发送成功")
@@ -229,7 +230,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 				UPDATE $tableName SET subCommentNum = subCommentNum + 1 WHERE cid = ? AND isDeleted = 0
 			""", cid)
 			it.throwInsertSQLGeneratedKey("""
-                INSERT INTO $tableName(pid, tid, uid, content) VALUES(?, ?, ?, ?)
+                INSERT INTO $tableName(pid, tid, uid, content) ${values(4)}
             """, cid, tid, uid, content).toInt()
 		}
 		Data.Success(cid, "发送成功")

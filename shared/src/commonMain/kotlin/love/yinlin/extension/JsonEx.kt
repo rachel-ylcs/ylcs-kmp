@@ -39,19 +39,19 @@ val Json = kotlinx.serialization.json.Json {
 // Json fetch
 
 val JsonElement?.Boolean: Boolean get() = (this as? JsonPrimitive)?.boolean ?: error("")
-val JsonElement?.BooleanNull: Boolean? get() = (this as? JsonPrimitive)?.booleanOrNull
+val JsonElement?.BooleanNull: Boolean? get() = if (this == null) null else (this as? JsonPrimitive)?.booleanOrNull
 val JsonElement?.Int: Int get() = (this as? JsonPrimitive)?.int ?: error("")
-val JsonElement?.IntNull: Int? get() = (this as? JsonPrimitive)?.intOrNull
+val JsonElement?.IntNull: Int? get() = if (this == null) null else (this as? JsonPrimitive)?.intOrNull
 val JsonElement?.Long: Long get() = (this as? JsonPrimitive)?.long ?: error("")
-val JsonElement?.LongNull: Long? get() = (this as? JsonPrimitive)?.longOrNull
+val JsonElement?.LongNull: Long? get() = if (this == null) null else (this as? JsonPrimitive)?.longOrNull
 val JsonElement?.Float: Float get() = (this as? JsonPrimitive)?.float ?: error("")
-val JsonElement?.FloatNull: Float? get() = (this as? JsonPrimitive)?.floatOrNull
+val JsonElement?.FloatNull: Float? get() = if (this == null) null else (this as? JsonPrimitive)?.floatOrNull
 val JsonElement?.Double: Double get() = (this as? JsonPrimitive)?.double ?: error("")
-val JsonElement?.DoubleNull: Double? get() = (this as? JsonPrimitive)?.doubleOrNull
+val JsonElement?.DoubleNull: Double? get() = if (this == null) null else (this as? JsonPrimitive)?.doubleOrNull
 val JsonElement?.String: String get() = (this as? JsonPrimitive)?.content ?: error("")
-val JsonElement?.StringNull: String? get() = (this as? JsonPrimitive)?.contentOrNull
+val JsonElement?.StringNull: String? get() = if (this == null) null else (this as? JsonPrimitive)?.contentOrNull
 val JsonElement?.Object: JsonObject get() = (this as? JsonObject) ?: error("")
-val JsonElement?.ObjectNull: JsonObject? get() = this as? JsonObject
+val JsonElement?.ObjectNull: JsonObject? get() = if (this == null) null else this as? JsonObject
 val JsonElement?.ObjectEmpty: JsonObject get() = (this as? JsonObject) ?: buildJsonObject { }
 val JsonElement?.Array: JsonArray get() = (this as? JsonArray) ?: error("")
 val JsonElement?.ArrayEmpty: JsonArray get() = (this as? JsonArray) ?: buildJsonArray { }

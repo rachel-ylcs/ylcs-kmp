@@ -6,7 +6,7 @@ import java.awt.GraphicsEnvironment
 
 class AppContext : IAppContext() {
 	companion object {
-		const val IS_PHONE_DEBUG = false
+		const val DEBUG_PORTRAIT = true
 
 		const val SCREEN_PERCENT = 0.85f
 	}
@@ -25,7 +25,7 @@ class AppContext : IAppContext() {
 		val transform = ge.defaultScreenDevice.defaultConfiguration.defaultTransform
 		val scaleX = transform.scaleX.toFloat()
 		val scaleY = transform.scaleY.toFloat()
-		windowWidth = bounds.width * SCREEN_PERCENT / (if (IS_PHONE_DEBUG) 4f else 1f)
+		windowWidth = bounds.width * SCREEN_PERCENT / (if (DEBUG_PORTRAIT) 4f else 1f)
 		windowHeight = bounds.height * SCREEN_PERCENT
 		screenWidth = (windowWidth * scaleX).toInt()
 		screenHeight = (windowHeight * scaleY).toInt()

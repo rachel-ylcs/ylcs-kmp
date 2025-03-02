@@ -170,3 +170,10 @@ object DB {
 		}
 	}
 }
+
+fun values(count: Int): String = if (count > 0) buildString {
+	append(" VALUES(")
+	repeat(count - 1) { append("?, ") }
+	append("?) ")
+}
+else " VALUES() "

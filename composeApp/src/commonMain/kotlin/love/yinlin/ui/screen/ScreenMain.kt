@@ -30,6 +30,9 @@ import love.yinlin.ui.screen.community.ScreenDiscovery
 import love.yinlin.ui.screen.community.ScreenMe
 import love.yinlin.ui.screen.msg.MsgModel
 import love.yinlin.ui.screen.msg.ScreenMsg
+import love.yinlin.ui.screen.music.ScreenMusic
+import love.yinlin.ui.screen.world.ScreenWorld
+import love.yinlin.ui.screen.world.WorldModel
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -56,6 +59,7 @@ class MainModel(val appModel: AppModel) {
 	val msgModel = MsgModel(this)
 	val discoveryModel = DiscoveryModel(this)
 	val meModel = MeModel(this)
+	val worldModel = WorldModel(this)
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
 	fun pop() = appModel.pop()

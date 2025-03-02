@@ -77,11 +77,12 @@ suspend inline fun <reified T, R> HttpClient.safeGet(
 	}
 }
 
-suspend inline fun <reified T, R> HttpClient.safePost(
+suspend inline fun <reified U, reified T, R> HttpClient.safePost(
 	url: String,
+	data: U,
 	crossinline block: @MainThread suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
-	client.preparePost(url).execute { response ->
+	client.preparePost(url) { setBody(data) }.execute { response ->
 		val data = response.body<T>()
 		Coroutines.main { block(data) }
 	}
