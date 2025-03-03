@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,12 +16,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import javafx.application.Platform
+import love.yinlin.extension.rememberStateSaveable
 import love.yinlin.platform.AppContext
 import love.yinlin.platform.app
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.app_name
+
 
 fun main() {
     val context = AppContext()
@@ -43,7 +43,7 @@ fun main() {
             width = context.windowWidth.dp,
             height = context.windowHeight.dp
         )
-        var isOpen by rememberSaveable { mutableStateOf(true) }
+        var isOpen by rememberStateSaveable { true }
         if (isOpen) {
             Window(
                 onCloseRequest = ::exitApplication,

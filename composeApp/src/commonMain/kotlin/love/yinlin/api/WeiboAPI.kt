@@ -5,6 +5,7 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.platform.app
@@ -19,6 +20,7 @@ import love.yinlin.data.weibo.WeiboSubComment
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.ArrayEmpty
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
 import love.yinlin.extension.Long
 import love.yinlin.extension.Object
@@ -31,16 +33,15 @@ import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
-	const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
-	const val WEIBO_PROXY_HOST: String = "weibo.yinlin.love"
-	val WEIBO_HOST: String = if (OS.platform.isWeb) WEIBO_PROXY_HOST else WEIBO_SOURCE_HOST
+	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
+	private const val WEIBO_PROXY_HOST: String = "weibo.yinlin.love"
+	private val WEIBO_HOST: String = if (OS.platform.isWeb) WEIBO_PROXY_HOST else WEIBO_SOURCE_HOST
 
-	fun transferWeiboIconUrl(src: String): String = if (OS.platform.isWeb) {
+	private fun transferWeiboIconUrl(src: String): String = if (OS.platform.isWeb) {
 		src.replace("n.sinaimg.cn", "$WEIBO_PROXY_HOST/icon")
-	}
-	else src
+	} else src
 
-	fun transferWeiboImageUrl(src: String): String = if (OS.platform.isWeb) {
+	private fun transferWeiboImageUrl(src: String): String = if (OS.platform.isWeb) {
 		if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
 		else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
 		else if (src.contains("wx3.")) src.replace("wx3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
@@ -52,14 +53,13 @@ object WeiboAPI {
 		else src
 	} else src
 
-	fun transferWeiboVideoUrl(src: String): String = if (OS.platform.isWeb) {
+	private fun transferWeiboVideoUrl(src: String): String = if (OS.platform.isWeb) {
 		src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video")
-	}
-	else src
+	} else src
 
-	object Container {
+	private object Container {
 		fun searchUser(key: String): String {
-			val encodeName = try { UriUtils.encode(key) } catch (_: Exception) { key }
+			val encodeName = try { UriUtils.encode(key) } catch (_: Throwable) { key }
 			return "api/container/getIndex?containerid=100103type%3D3%26q%3D$encodeName&page_type=searchall"
 		}
 		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
@@ -111,6 +111,8 @@ object WeiboAPI {
 		}
 	}
 
+	private fun weiboTime(time: String) = DateEx.Formatter.weiboDateTime.parse(time).toLocalDateTime()
+
 	private fun getWeiboUserInfo(user: JsonObject): WeiboUserInfo {
 		// 提取名称和头像
 		val userId = user["id"].String
@@ -129,7 +131,7 @@ object WeiboAPI {
 		val blogId = blogs["id"].String
 		val userInfo = getWeiboUserInfo(blogs.obj("user"))
 		// 提取时间
-		val time = Weibo.formatTime(blogs["created_at"].String)
+		val time = weiboTime(blogs["created_at"].String)
 		// 提取IP
 		val location = blogs["region_name"]?.StringNull?.let {
 			val index = it.indexOf(' ')
@@ -185,7 +187,7 @@ object WeiboAPI {
 		// 提取名称和头像
 		val userInfo = getWeiboUserInfo(card.obj("user"))
 		// 提取时间
-		val time = Weibo.formatTime(card["created_at"].String)
+		val time = weiboTime(card["created_at"].String)
 		// 提取IP
 		val location = card["source"]?.StringNull?.removePrefix("来自") ?: "IP未知"
 		// 提取内容
@@ -208,7 +210,7 @@ object WeiboAPI {
 				subComments += WeiboSubComment(
 					id = subCardObj["id"].String,
 					info = getWeiboUserInfo(subCardObj.obj("user")),
-					time = Weibo.formatTime(subCardObj["created_at"].String),
+					time = weiboTime(subCardObj["created_at"].String),
 					location = subCardObj["source"]?.StringNull?.removePrefix("来自") ?: "IP未知",
 					text = weiboHtmlToRichString(subCardObj["text"].String)
 				)
@@ -368,7 +370,7 @@ object WeiboAPI {
 				}
 				else if (cardType == 9) items += getWeibo(card)
 			}
-			catch (_: Exception) { }
+			catch (_: Throwable) { }
 		}
 		items to newSinceId
 	}

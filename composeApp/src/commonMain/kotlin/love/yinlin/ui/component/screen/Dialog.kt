@@ -188,7 +188,7 @@ private fun RachelDialog(
 					Box(
 						modifier = Modifier.fillMaxWidth()
 							.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
-							.condition(scrollable) { verticalScroll(rememberScrollState()) }
+							.verticalScroll(enabled = scrollable, state = rememberScrollState())
 					) {
 						content()
 					}

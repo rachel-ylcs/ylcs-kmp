@@ -1,42 +1,21 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddComment
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Paid
-import androidx.compose.material.icons.filled.VerticalAlignTop
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
@@ -49,11 +28,7 @@ import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.SubComment
 import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.TopicDetails
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.LaunchFlag
-import love.yinlin.extension.LaunchOnce
-import love.yinlin.extension.rememberStateSaveable
-import love.yinlin.extension.replaceAll
+import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.platform.config
 import love.yinlin.ui.Route
@@ -63,10 +38,9 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.SubScreen
-import kotlin.collections.plusAssign
 
 private class TopicModel(private val model: AppModel, topic: Topic) : ViewModel() {
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 
 	var details: TopicDetails? by mutableStateOf(null)
 	var topic: Topic by mutableStateOf(topic)
@@ -210,7 +184,7 @@ private fun UserBar(
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			WebImage(
 				uri = avatar,
-				key = DateEx.currentDateString,
+				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
 				onClick = onAvatarClick,
@@ -272,7 +246,7 @@ private fun TopicLayout(
 	model: TopicModel,
 	modifier: Modifier = Modifier
 ) {
-	val pics = remember(details) { details.pics.map { Picture(model.topic.picPath(it)) } }
+	val pics by rememberDerivedState { details.pics.map { Picture(model.topic.picPath(it)) } }
 
 	Column(
 		modifier = modifier,
@@ -471,7 +445,7 @@ private fun SubCommentLayout(
 ) {
 	val subComments = remember { mutableStateListOf<SubComment>() }
 	var subCommentOffset: Int = remember { 0 }
-	var subCommentCanLoading by rememberSaveable { mutableStateOf(false) }
+	var subCommentCanLoading by rememberStateSaveable { false }
 
 	ModalBottomSheet(
 		onDismissRequest = { model.hideSubComment() },
@@ -610,7 +584,7 @@ fun ScreenTopic(model: AppModel, topic: Topic) {
 		)
 	}
 
-	LaunchOnce(screenModel.launchFlag) {
+	LaunchOnce(screenModel.flagFirstLoad) {
 		screenModel.requestTopic()
 		screenModel.requestNewComments()
 	}

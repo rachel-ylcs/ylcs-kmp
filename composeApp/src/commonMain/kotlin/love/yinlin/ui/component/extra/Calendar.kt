@@ -1,51 +1,88 @@
 package love.yinlin.ui.component.extra
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.isoDayNumber
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import love.yinlin.ThemeColor
+import love.yinlin.common.Resource
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberDerivedState
-import love.yinlin.ui.component.image.ClickIcon
 
-@Stable
-private data class DayItem(
-	val date: LocalDate,
-	val title: String,
-	val type: Type
-) {
-	enum class Type {
-		NORMAL, OTHER_MONTH, WEEKEND, TODAY, EVENT
-	}
-}
+private val lunarFestivalTable = mapOf(
+	101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",
+	707 to "七夕", 715 to "中元", 815 to "中秋", 909 to "重阳",
+	1001 to "寒衣", 1208 to "腊八"
+)
+
+private val solarFestivalTable = mapOf(
+	101 to "元旦", 214 to "情人节", 308 to "妇女节", 401 to "愚人节",
+	501 to "劳动节", 601 to "儿童节", 701 to "建党节", 801 to "建军节",
+	910 to "教师节", 1001 to "国庆节", 1101 to "万圣节", 1225 to "圣诞节"
+)
+
+private val lunarDayTable = arrayOf(
+	"", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"
+)
+private val lunarDaysTable = arrayOf(
+	"初", "十", "廿", "三"
+)
+private val lunarMonthTable = arrayOf(
+	"", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"
+)
+private val solarTermTable = arrayOf(
+	"小寒", "大寒", "立春", "雨水", "惊蛰", "春分",
+	"清明", "谷雨", "立夏", "小满", "芒种", "夏至",
+	"小暑", "大暑", "立秋", "处暑", "白露", "秋分",
+	"寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
+)
+
+private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
+	val solarYear = this.year
+	val solarMonth = this.monthNumber
+	val solarDay = this.dayOfMonth
+	val index = ((solarYear - 2000) * 12 * 31 + (solarMonth - 1) * 31 + (solarDay - 1)) * 2
+	val byte0 = table[index].toInt() and 0xFF
+	val byte1 = table[index + 1].toInt() and 0xFF
+	val combined = (byte1 shl 8) or byte0
+	val isTerm = (combined and 0x01) != 0
+	val isLeap = (combined and 0x02) != 0
+	// val isCurrentYear = (combined and 0x04) != 0
+	val lunarMonth = ((combined ushr 3) and 0x0F) + 1
+	val lunarDay = ((combined ushr 7) and 0x1F) + 1
+	solarFestivalTable[solarMonth * 100 + solarDay] ?: lunarFestivalTable[lunarMonth * 100 + lunarDay] ?:
+		if (isTerm) solarTermTable[(solarMonth - 1) * 2 + solarDay / 16]
+		else buildString(capacity = 8) {
+			when (lunarDay) {
+				1 -> {
+					if (isLeap) append('闰')
+					append(lunarMonthTable[lunarMonth])
+					append('月')
+				}
+				10 -> append("初十")
+				20 -> append("二十")
+				30 -> append("三十")
+				else -> {
+					append(lunarDaysTable[lunarDay / 10])
+					append(lunarDayTable[lunarDay % 10])
+				}
+			}
+		}
+} ?: ""
 
 @Stable
 class CalendarState {
@@ -53,10 +90,8 @@ class CalendarState {
 	val events = mutableStateMapOf<LocalDate, String>()
 }
 
-private val Today: LocalDate get() = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-
 private fun indexShadowDate(index: Int): LocalDate {
-	val today = Today
+	val today = DateEx.Today
 	val value = index - 5 + today.monthNumber
 	return if (value <= 0) LocalDate(year = today.year - 1, monthNumber = value + 12, dayOfMonth = 1)
 	else if (value > 12) LocalDate(year = today.year + 1, monthNumber = value - 12, dayOfMonth = 1)
@@ -65,10 +100,12 @@ private fun indexShadowDate(index: Int): LocalDate {
 
 @Composable
 private fun CalendarHeader(
-	currentDate: LocalDate,
+	state: CalendarState,
 	modifier: Modifier = Modifier,
-	onRefresh: () -> Unit
+	actions: @Composable RowScope.() -> Unit = { }
 ) {
+	val currentDate by rememberDerivedState { indexShadowDate(state.pagerState.settledPage) }
+
 	Row(
 		modifier = modifier.padding(horizontal = 10.dp),
 		horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -81,10 +118,12 @@ private fun CalendarHeader(
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f)
 		)
-		ClickIcon(
-			imageVector = Icons.Default.Refresh,
-			onClick = onRefresh
-		)
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			actions()
+		}
 	}
 }
 
@@ -109,7 +148,8 @@ private fun CalendarWeekGrid(
 @Composable
 private fun CalendarDayGrid(
 	state: CalendarState,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onEventClick: (LocalDate) -> Unit
 ) {
 	HorizontalPager(
 		state = state.pagerState,
@@ -124,45 +164,55 @@ private fun CalendarDayGrid(
 			startDay + endOfMonth.dayOfMonth - 1
 		}
 		val startDate = remember(currentDate, startDay) { currentDate.minus(startDay, DateTimeUnit.DAY) }
-		val today = remember(currentDate) { Today }
+		val today = remember(currentDate) { DateEx.Today }
 
-		FlowRow(
-			maxItemsInEachRow = 7,
-			verticalArrangement = Arrangement.spacedBy(10.dp),
+		LazyVerticalGrid(
+			columns = GridCells.Fixed(7),
+			userScrollEnabled = false,
 			modifier = Modifier.fillMaxWidth()
 		) {
-			repeat(42) { dayIndex ->
+			items(42) { dayIndex ->
 				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
-				Column(
-					modifier = Modifier.weight(1f),
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					val color = when {
-						state.events.contains(date) -> MaterialTheme.colorScheme.primary
-						date == today -> MaterialTheme.colorScheme.secondary
-						dayIndex !in startDay..endDay -> ThemeColor.fade
-						date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
-						else -> LocalTextStyle.current.color
-					}
+				val eventTitle = state.events[date]
+				val color = when {
+					eventTitle != null -> MaterialTheme.colorScheme.primary
+					date == today -> MaterialTheme.colorScheme.onPrimary
+					dayIndex !in startDay..endDay -> ThemeColor.fade
+					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
+					else -> LocalTextStyle.current.color
+				}
+				val text = eventTitle ?: date.lunar
 
-					Text(
-						text = date.dayOfMonth.toString(),
-						color = color,
-						style = MaterialTheme.typography.labelLarge,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Clip,
-						modifier = Modifier.fillMaxWidth()
-					)
-					Text(
-						text = "惊蛰",
-						color = color,
-						style = MaterialTheme.typography.bodyMedium,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Clip,
-						modifier = Modifier.fillMaxWidth()
-					)
+				Box(
+					modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+						.clickable(enabled = eventTitle != null, onClick = { onEventClick(date) }),
+					contentAlignment = Alignment.Center
+				) {
+					if (date == today) {
+						Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+							.padding(2.dp).background(
+							color = MaterialTheme.colorScheme.primary,
+							shape = CircleShape
+						))
+					}
+					Column(horizontalAlignment = Alignment.CenterHorizontally) {
+						Text(
+							text = date.dayOfMonth.toString(),
+							color = color,
+							style = MaterialTheme.typography.labelLarge,
+							textAlign = TextAlign.Center,
+							maxLines = 1,
+							overflow = TextOverflow.Clip
+						)
+						Text(
+							text = text,
+							color = color,
+							style = MaterialTheme.typography.bodyMedium,
+							textAlign = TextAlign.Center,
+							maxLines = 1,
+							overflow = TextOverflow.Clip
+						)
+					}
 				}
 			}
 		}
@@ -173,23 +223,25 @@ private fun CalendarDayGrid(
 fun Calendar(
 	state: CalendarState = remember { CalendarState() },
 	modifier: Modifier = Modifier,
-	onRefresh: () -> Unit = {}
+	actions: @Composable RowScope.() -> Unit,
+	onEventClick: (LocalDate) -> Unit
 ) {
-	val currentDate by rememberDerivedState { indexShadowDate(state.pagerState.currentPage) }
-
 	Column(
 		modifier = modifier,
 		verticalArrangement = Arrangement.spacedBy(10.dp)
 	) {
 		CalendarHeader(
-			currentDate = currentDate,
+			state = state,
 			modifier = Modifier.fillMaxWidth(),
-			onRefresh = onRefresh
+			actions = actions
 		)
-		CalendarWeekGrid(modifier = Modifier.fillMaxWidth())
+		CalendarWeekGrid(
+			modifier = Modifier.fillMaxWidth()
+		)
 		CalendarDayGrid(
 			state = state,
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier.fillMaxWidth(),
+			onEventClick = onEventClick
 		)
 	}
 }

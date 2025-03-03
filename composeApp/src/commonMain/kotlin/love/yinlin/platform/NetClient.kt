@@ -59,7 +59,7 @@ catch (e: HttpRequestTimeoutException) {
 catch (e: CancellationException) {
 	Data.Error(RequestError.Canceled, "操作取消", e)
 }
-catch (e: Exception) {
+catch (e: Throwable) {
 	Data.Error(RequestError.ClientError, "未知异常", e)
 }
 

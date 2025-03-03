@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.extension.Saver
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.OS
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
@@ -150,8 +151,7 @@ private fun SwipePaginationLayout(
 	val (headerHeightPx, footerHeightPx) = with(LocalDensity.current) {
 		headerHeight.toPx() to footerHeight.toPx()
 	}
-	val connection = remember(scope, state, headerHeightPx, footerHeightPx,
-		stickinessLevel, canRefresh, canLoading) { object : NestedScrollConnection {
+	val connection by rememberDerivedState { object : NestedScrollConnection {
 		private fun scroll(canConsumed: Float): Offset = if (canConsumed.absoluteValue > 0.5f) {
 			scope.launch {
 				state.snapOffsetTo(headerHeightPx, footerHeightPx, state.indicatorOffset + canConsumed)

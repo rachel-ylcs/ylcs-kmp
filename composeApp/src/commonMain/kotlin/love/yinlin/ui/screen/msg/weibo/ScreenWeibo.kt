@@ -21,7 +21,7 @@ fun ScreenWeibo(model: MsgModel) {
 		)
 	}
 
-	LaunchOnce(model.weiboState.launchFlag) {
+	LaunchOnce(model.weiboState.flagFirstLoad) {
 		model.weiboState.grid.requestWeibo(config.weiboUsers.map { it.id })
 	}
 }

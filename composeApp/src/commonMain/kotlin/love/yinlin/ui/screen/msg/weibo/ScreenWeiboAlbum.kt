@@ -32,7 +32,7 @@ import love.yinlin.platform.app
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.WeiboAlbum
-import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.launch
 import love.yinlin.ui.component.layout.BoxState
@@ -53,7 +53,7 @@ private class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
 
 	val tip = TipState()
 
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
@@ -164,7 +164,7 @@ fun ScreenWeiboAlbum(model: AppModel, album: WeiboAlbum) {
 		}
 	}
 
-	LaunchOnce(screenModel.launchFlag) {
+	LaunchOnce(screenModel.flagFirstLoad) {
 		screenModel.requestAlbum(1)
 	}
 

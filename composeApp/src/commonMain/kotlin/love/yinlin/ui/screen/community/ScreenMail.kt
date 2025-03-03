@@ -29,7 +29,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Mail
-import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.config
@@ -39,7 +39,7 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
 
 private class MailModel(private val model: AppModel) : ViewModel() {
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val items = mutableStateListOf<Mail>()
@@ -172,7 +172,7 @@ fun ScreenMail(model: AppModel) {
 		}
 	}
 
-	LaunchOnce(screenModel.launchFlag) {
+	LaunchOnce(screenModel.flagFirstLoad) {
 		screenModel.requestNewMails()
 	}
 }

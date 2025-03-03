@@ -29,7 +29,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
@@ -54,11 +54,16 @@ private enum class DiscoveryItem(
 	Notification(Comment.Section.NOTIFICATION, "公告", Icons.Filled.Campaign),
 	Water(Comment.Section.WATER, "水贴", Icons.Filled.WaterDrop),
 	Activity(Comment.Section.ACTIVITY, "活动", Icons.Filled.Celebration),
-	Discussion(Comment.Section.DISCUSSION, "交流", Icons.AutoMirrored.Filled.Chat),
+	Discussion(Comment.Section.DISCUSSION, "交流", Icons.AutoMirrored.Filled.Chat);
+
+	companion object {
+		@Stable
+		val items = DiscoveryItem.entries.map { it.title to it.icon }
+	}
 }
 
 class DiscoveryModel(val mainModel: MainModel) {
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val listState = LazyStaggeredGridState()
@@ -189,7 +194,7 @@ class DiscoveryModel(val mainModel: MainModel) {
 					Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 						WebImage(
 							uri = topic.avatarPath,
-							key = DateEx.currentDateString,
+							key = DateEx.TodayString,
 							contentScale = ContentScale.Crop,
 							circle = true,
 							modifier = Modifier.matchParentSize()
@@ -254,8 +259,6 @@ class DiscoveryModel(val mainModel: MainModel) {
 
 @Composable
 fun ScreenDiscovery(model: DiscoveryModel) {
-	val tabItems = remember { DiscoveryItem.entries.map { it.title to it.icon } }
-
 	StatefulBox(
 		state = model.state,
 		modifier = Modifier.fillMaxSize()
@@ -276,7 +279,7 @@ fun ScreenDiscovery(model: DiscoveryModel) {
 							model.currentPage = it
 							model.onRefresh()
 						},
-						items = tabItems,
+						items = DiscoveryItem.items,
 						modifier = Modifier.weight(1f)
 					)
 					ClickIcon(
@@ -294,7 +297,7 @@ fun ScreenDiscovery(model: DiscoveryModel) {
 				}
 			}
 
-			val cardWidth = remember { if (app.isPortrait) 150.dp else 200.dp }
+			val cardWidth = if (app.isPortrait) 150.dp else 200.dp
 			PaginationStaggeredGrid(
 				items = model.items,
 				key = { it.tid },
@@ -318,7 +321,7 @@ fun ScreenDiscovery(model: DiscoveryModel) {
 		}
 	}
 
-	LaunchOnce(model.launchFlag) {
+	LaunchOnce(model.flagFirstLoad) {
 		model.onRefresh()
 	}
 }

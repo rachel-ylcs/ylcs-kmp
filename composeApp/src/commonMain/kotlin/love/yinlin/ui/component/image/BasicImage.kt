@@ -1,8 +1,9 @@
 package love.yinlin.ui.component.image
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.IndicationNodeFactory
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -145,16 +146,14 @@ fun ClickIcon(
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
+	val localIndication = if (indication) LocalIndication.current else null
+	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
+
 	Icon(
-		modifier = modifier.size(size).clip(CircleShape).condition(value = indication,
-			ifTrue = { clickable(onClick = onClick) },
-			ifFalse = {
-				clickable(
-					onClick = onClick,
-					indication = null,
-					interactionSource = remember { MutableInteractionSource() }
-				)
-			}
+		modifier = modifier.size(size).clip(CircleShape).clickable(
+			onClick = onClick,
+			indication = localIndication,
+			interactionSource = interactionSource
 		),
 		imageVector = imageVector,
 		contentDescription = null,
@@ -170,16 +169,14 @@ fun ClickIcon(
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
+	val localIndication = if (indication) LocalIndication.current else null
+	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
+
 	Icon(
-		modifier = modifier.clip(CircleShape).condition(value = indication,
-			ifTrue = { clickable(onClick = onClick) },
-			ifFalse = {
-				clickable(
-					onClick = onClick,
-					indication = null,
-					interactionSource = remember { MutableInteractionSource() }
-				)
-			}
+		modifier = modifier.clip(CircleShape).clickable(
+			onClick = onClick,
+			indication = localIndication,
+			interactionSource = interactionSource
 		),
 		imageVector = imageVector,
 		contentDescription = null,
@@ -255,7 +252,7 @@ fun WebImage(
 		filterQuality = quality.filterQuality,
 		alpha = alpha,
 		modifier = modifier.condition(circle) { clip(CircleShape) }
-			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+			.clickable(enabled = onClick != null, onClick = onClick ?: {})
 	)
 }
 

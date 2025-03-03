@@ -30,7 +30,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.Saver
 import love.yinlin.launch
@@ -44,7 +44,7 @@ import love.yinlin.ui.component.screen.SubScreen
 
 private class WeiboUserModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	val grid = WeiboGridData()
 	var user: WeiboUser? by mutableStateOf(null)
 	var albums: List<WeiboAlbum>? by mutableStateOf(null)
@@ -90,7 +90,7 @@ private fun UserInfoCard(
 		OffsetLayout(y = (-37).dp) {
 			WebImage(
 				uri = user.info.avatar,
-				key = DateEx.currentDateString,
+				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.size(64.dp)
@@ -252,7 +252,7 @@ private fun Landscape(
 			Column(modifier = Modifier.fillMaxSize()) {
 				WebImage(
 					uri = user.background,
-					key = DateEx.currentDateString,
+					key = DateEx.TodayString,
 					modifier = Modifier.fillMaxWidth().height(150.dp),
 					contentScale = ContentScale.Crop,
 					alpha = 0.8f
@@ -337,7 +337,7 @@ fun ScreenWeiboUser(model: AppModel, id: String) {
 		}
 	}
 
-	LaunchOnce(screenModel.launchFlag) {
+	LaunchOnce(screenModel.flagFirstLoad) {
 		screenModel.init(id)
 	}
 }

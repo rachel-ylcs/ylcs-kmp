@@ -11,27 +11,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import love.yinlin.data.common.Picture
-import love.yinlin.extension.rememberDerivedState
 
 @Composable
-fun Banner(
-	pics: List<Picture>,
-	aspectRatio: Float = 2f,
+fun <T> Banner(
+	pics: List<T>,
 	spacing: Dp = 0.dp,
 	interval: Long = 0L,
 	state: PagerState = rememberPagerState { pics.size },
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	content: @Composable (pic: T, scale: Float) -> Unit
 ) {
-	val autoplay by rememberDerivedState { interval > 0L && pics.size > 1 }
+	val autoplay = remember(pics) { interval > 0L && pics.size > 1 }
 
 	Column(
 		modifier = modifier,
@@ -40,19 +37,12 @@ fun Banner(
 	) {
 		HorizontalPager(
 			state = state,
-			key = { pics[it].image },
 			beyondViewportPageCount = 1,
 			contentPadding = PaddingValues(horizontal = spacing),
 			modifier = Modifier.fillMaxWidth()
 		) {
 			val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
-			WebImage(
-				uri = pics[it].image,
-				contentScale = ContentScale.Crop,
-				modifier = Modifier.fillMaxWidth()
-					.aspectRatio(aspectRatio).scale(scale)
-					.clip(MaterialTheme.shapes.medium)
-			)
+			content(pics[it], scale)
 		}
 		Row(modifier = Modifier.width(20.dp * pics.size).height(5.dp)
 			.clip(MaterialTheme.shapes.extraSmall)

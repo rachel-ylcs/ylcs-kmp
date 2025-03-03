@@ -98,7 +98,7 @@ private fun WeiboUserItem(
 		if (user.avatar.isEmpty()) CircularProgressIndicator(modifier = Modifier.size(32.dp))
 		else WebImage(
 			uri = user.avatar,
-			key = DateEx.currentDateString,
+			key = DateEx.TodayString,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = Modifier.size(32.dp)

@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.AtomicReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -60,18 +61,15 @@ class Reference<T> {
 
 // LaunchFlag
 
-class LaunchFlag(var flag: Unit? = null)
+typealias LaunchFlag = AtomicReference<Boolean>
+fun launchFlag(): LaunchFlag = AtomicReference(false)
 
 @Composable
-inline fun LaunchOnce(ref: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
+inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
 	LaunchedEffect(Unit) {
-		if (ref.flag == null) {
-			ref.flag = Unit
-			block()
-		}
+		if (flag.compareAndSet(false, true)) block()
 	}
 }
-
 
 // Debounce
 

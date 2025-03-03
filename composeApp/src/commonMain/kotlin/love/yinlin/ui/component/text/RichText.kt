@@ -9,6 +9,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +31,7 @@ import love.yinlin.extension.String
 import love.yinlin.extension.json
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.parseJson
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.toJsonString
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.WebImageQuality
@@ -358,7 +360,7 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 				parseElement(data.parseJson, this)
 			}
 		}
-		catch (_: Exception) {
+		catch (_: Throwable) {
 			RichString()
 		}
 	}
@@ -380,13 +382,13 @@ fun RichText(
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
 ) {
-	val state = remember(text) { text.asState(
+	val state by rememberDerivedState { text.asState(
 		onLinkClick = onLinkClick,
 		onTopicClick = onTopicClick,
 		onAtClick = onAtClick
 	) }
 	val fontSize = LocalTextStyle.current.fontSize
-	val inlineTextContent = remember (state, fontSize) {
+	val inlineTextContent by rememberDerivedState {
 		state.content.mapValues { drawable ->
 			InlineTextContent(
 				placeholder = Placeholder(
@@ -399,6 +401,7 @@ fun RichText(
 			}
 		}
 	}
+
 	Text(
 		text = state.text,
 		modifier = modifier,

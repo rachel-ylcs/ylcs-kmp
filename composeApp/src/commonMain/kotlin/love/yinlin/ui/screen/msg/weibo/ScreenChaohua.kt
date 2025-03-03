@@ -39,7 +39,7 @@ fun ScreenChaohua(model: MsgModel) {
 		}
 	}
 
-	LaunchOnce(model.chaohuaState.launchFlag) {
+	LaunchOnce(model.chaohuaState.flagFirstLoad) {
 		model.chaohuaState.requestNewData()
 	}
 }

@@ -23,7 +23,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.data.weibo.WeiboUserInfo
-import love.yinlin.extension.LaunchFlag
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.Saver
 import love.yinlin.launch
@@ -37,7 +37,7 @@ import love.yinlin.ui.component.text.RichText
 private class WeiboDetailsModel(model: AppModel) : ViewModel() {
 	val msgModel = model.mainModel.msgModel
 	val weibo: Weibo? = msgModel.currentWeibo
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	var comments: List<WeiboComment>? by mutableStateOf(null)
 
 	fun init(weibo: Weibo) {
@@ -60,7 +60,7 @@ private fun WeiboCommentCard(
 			avatar = comment.info.avatar,
 			name = comment.info.name,
 			location = comment.location,
-			time = comment.time,
+			time = comment.timeString,
 			padding = PaddingValues(bottom = 5.dp),
 			onAvatarClick = { onAvatarClick(comment.info) }
 		)
@@ -82,7 +82,7 @@ private fun WeiboCommentCard(
 							avatar = subComment.info.avatar,
 							name = subComment.info.name,
 							location = subComment.location,
-							time = subComment.time,
+							time = subComment.timeString,
 							padding = PaddingValues(bottom = 5.dp),
 							onAvatarClick = { onAvatarClick(subComment.info) }
 						)
@@ -151,7 +151,7 @@ private fun Landscape(
 			WeiboUserBar(
 				avatar = weibo.info.avatar,
 				name = weibo.info.name,
-				time = weibo.time,
+				time = weibo.timeString,
 				location = weibo.location,
 				padding = PaddingValues(bottom = 10.dp),
 				onAvatarClick = { model.msgModel.onWeiboAvatarClick(weibo.info) }
@@ -223,7 +223,7 @@ fun ScreenWeiboDetails(model: AppModel) {
 				comments = screenModel.comments
 			)
 
-			LaunchOnce(screenModel.launchFlag) {
+			LaunchOnce(screenModel.flagFirstLoad) {
 				screenModel.init(screenModel.weibo)
 			}
 		}

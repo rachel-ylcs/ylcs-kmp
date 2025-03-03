@@ -23,7 +23,7 @@ actual object OS {
 				application.openURL(uri)
 			}
 		}
-		catch (_: Exception) { }
+		catch (_: Throwable) { }
 	}
 
 	@OptIn(ExperimentalForeignApi::class)

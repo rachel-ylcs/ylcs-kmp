@@ -31,7 +31,7 @@ inline fun <reified T> KV.setJson(key: String, value: T?, expire: Int = KVExpire
 	try {
 		set(key, value.toJsonString(), expire)
 	}
-	catch (e: Exception) {
+	catch (e: Throwable) {
 		e.printStackTrace()
 	}
 }
@@ -40,7 +40,7 @@ fun <T> KV.setJson(serializer: SerializationStrategy<T>, key: String, value: T?,
 	try {
 		set(key, value.toJsonString(serializer), expire)
 	}
-	catch (e: Exception) {
+	catch (e: Throwable) {
 		e.printStackTrace()
 	}
 }
@@ -50,7 +50,7 @@ inline fun <reified T> KV.getJson(key: String, defaultFactory: () -> T): T {
 		val json = get(key, "")
 		if (json.isEmpty()) defaultFactory() else json.parseJsonValue() ?: defaultFactory()
 	}
-	catch (e: Exception) {
+	catch (e: Throwable) {
 		e.printStackTrace()
 		defaultFactory()
 	}
@@ -61,7 +61,7 @@ fun <T> KV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaul
 		val json = get(key, "")
 		if (json.isEmpty()) defaultFactory() else json.parseJsonValue(deserializer) ?: defaultFactory()
 	}
-	catch (e: Exception) {
+	catch (e: Throwable) {
 		e.printStackTrace()
 		defaultFactory()
 	}

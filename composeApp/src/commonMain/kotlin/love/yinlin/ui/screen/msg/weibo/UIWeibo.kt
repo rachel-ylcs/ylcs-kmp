@@ -117,7 +117,7 @@ fun WeiboUserBar(
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			WebImage(
 				uri = avatar,
-				key = DateEx.currentDateString,
+				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.matchParentSize(),
@@ -166,7 +166,7 @@ fun WeiboLayout(
 	WeiboUserBar(
 		avatar = weibo.info.avatar,
 		name = weibo.info.name,
-		time = weibo.time,
+		time = weibo.timeString,
 		location = weibo.location,
 		padding = PaddingValues(bottom = 10.dp),
 		onAvatarClick = { onAvatarClick(weibo.info) }

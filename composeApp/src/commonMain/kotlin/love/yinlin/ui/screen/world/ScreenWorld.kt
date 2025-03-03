@@ -1,33 +1,40 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import io.ktor.utils.io.*
+import kotlinx.coroutines.ensureActive
+import kotlinx.datetime.LocalDate
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
-import love.yinlin.extension.LaunchFlag
-import love.yinlin.extension.LaunchOnce
-import love.yinlin.extension.replaceAll
+import love.yinlin.extension.*
 import love.yinlin.platform.app
+import love.yinlin.platform.config
 import love.yinlin.ui.component.extra.Calendar
+import love.yinlin.ui.component.extra.CalendarState
+import love.yinlin.ui.component.image.Banner
+import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.screen.MainModel
 
 class WorldModel(val mainModel: MainModel) {
-	val launchFlag = LaunchFlag()
+	val flagFirstLoad = launchFlag()
 	val activities = mutableStateListOf<Activity>()
-
-	val pics: List<Picture> by derivedStateOf {
-		val banners = mutableListOf<Picture>()
-		for (activity in activities) {
-			activity.picPath?.let { banners += Picture(it) }
-		}
-		banners
-	}
+	val calendarState = CalendarState()
 
 	fun requestActivity() {
 		mainModel.launch {
@@ -35,9 +42,32 @@ class WorldModel(val mainModel: MainModel) {
 				route = API.User.Activity.GetActivities
 			)
 			if (result is Data.Success) {
-				activities.replaceAll(result.data)
+				val data = result.data
+				activities.replaceAll(data)
+
+				calendarState.events.clear()
+				for (activity in activities) {
+					val ts = activity.ts
+					val title = activity.title
+					if (ts != null && title != null) {
+						try {
+							val date = DateEx.Formatter.standardDate.parse(ts)
+							calendarState.events.put(date, title)
+						}
+						catch (_: CancellationException) { ensureActive() }
+						catch (_: Throwable) { }
+					}
+				}
 			}
 		}
+	}
+
+	fun onRefreshCalendar() {
+
+	}
+
+	fun onCalendarEvent(date: LocalDate) {
+
 	}
 }
 
@@ -45,17 +75,50 @@ class WorldModel(val mainModel: MainModel) {
 private fun Portrait(
 	model: WorldModel
 ) {
-//	Banner(
-//		pics = model.pics,
-//		aspectRatio = 2f,
-//		spacing = 40.dp,
-//		interval = 3000L,
-//		modifier = Modifier.fillMaxWidth()
-//	)
+	Column(
+		modifier = Modifier.fillMaxSize(),
+		verticalArrangement = Arrangement.SpaceBetween
+	) {
+		val pics by rememberDerivedState {
+			val banners = mutableListOf<Picture>()
+			for (activity in model.activities) {
+				activity.picPath?.let { banners += Picture(it) }
+			}
+			banners
+		}
 
-	Calendar(
-		modifier = Modifier.fillMaxWidth().aspectRatio(1f)
-	)
+		Banner(
+			pics = pics,
+			spacing = 40.dp,
+			interval = 3000L,
+			modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
+		) { pic, scale ->
+			WebImage(
+				uri = pic.image,
+				contentScale = ContentScale.Crop,
+				modifier = Modifier.fillMaxWidth().aspectRatio(2f)
+					.scale(scale).clip(MaterialTheme.shapes.medium)
+			)
+		}
+
+		Calendar(
+			state = model.calendarState,
+			modifier = Modifier.fillMaxWidth(),
+			actions = {
+				if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+					ClickIcon(
+						imageVector = Icons.Default.Add,
+						onClick = {}
+					)
+				}
+				ClickIcon(
+					imageVector = Icons.Default.Refresh,
+					onClick = { model.onRefreshCalendar() }
+				)
+			},
+			onEventClick = { model.onCalendarEvent(it) }
+		)
+	}
 }
 
 @Composable
@@ -71,7 +134,7 @@ fun ScreenWorld(model: MainModel) {
 	if (app.isPortrait) Portrait(model = model.worldModel)
 	else Landscape(model = model.worldModel)
 
-	LaunchOnce(model.worldModel.launchFlag) {
+	LaunchOnce(model.worldModel.flagFirstLoad) {
 		model.worldModel.requestActivity()
 	}
 }
