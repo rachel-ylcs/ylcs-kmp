@@ -32,8 +32,7 @@ data class Mail(
 		const val COIN_REWARD = "user#coinReward"
 	}
 
-	@Stable
-	val typeString: String get() = when (type) {
+	val typeString: String = when (type) {
 		Type.INFO -> "通知"
 		Type.CONFIRM -> "确认"
 		Type.DECISION -> "决策"

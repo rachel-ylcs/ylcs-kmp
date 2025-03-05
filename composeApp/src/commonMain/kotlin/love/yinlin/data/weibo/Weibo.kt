@@ -21,6 +21,5 @@ data class Weibo(
 ) : Comparable<Weibo> {
 	override fun compareTo(other: Weibo): Int = this.time.compareTo(other.time)
 
-	@Stable
 	val timeString = time.format(DateEx.Formatter.standardDateTime)
 }

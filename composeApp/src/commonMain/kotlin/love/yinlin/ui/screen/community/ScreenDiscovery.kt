@@ -43,7 +43,6 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.layout.TabBar
 import love.yinlin.ui.screen.MainModel
 
-@Stable
 private enum class DiscoveryItem(
 	val id: Int,
 	val title: String,

@@ -2,7 +2,7 @@ package love.yinlin.data.rachel
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.api.APIConfig
+import love.yinlin.Local
 import love.yinlin.api.ServerRes
 
 @Stable
@@ -16,9 +16,7 @@ data class SubComment(
 	val label: String, // [用户标签]
 	val coin: Int // [用户银币]
 ) {
-	@Stable
-	val level: Int get() = UserLevel.level(coin)
+	val level: Int by lazy { UserLevel.level(coin) }
 
-	@Stable
-	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
+	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
 }

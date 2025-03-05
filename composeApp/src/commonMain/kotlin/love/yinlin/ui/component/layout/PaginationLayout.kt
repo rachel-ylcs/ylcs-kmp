@@ -36,7 +36,6 @@ import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
-@Stable
 private enum class PaginationStatus {
 	IDLE, RUNNING, PULL, RELEASE
 }

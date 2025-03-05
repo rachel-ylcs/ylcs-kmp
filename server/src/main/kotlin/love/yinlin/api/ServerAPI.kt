@@ -17,7 +17,7 @@ import love.yinlin.api.user.userAPI
 import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
-import love.yinlin.data.RequestError
+import love.yinlin.data.Failed
 import love.yinlin.data.rachel.MailEntry
 import love.yinlin.extension.*
 import love.yinlin.logger
@@ -28,8 +28,8 @@ import kotlin.random.Random
 typealias ImplFunc = suspend (MailEntry) -> JsonObject
 typealias ImplMap = MutableMap<String, ImplFunc>
 
-class TokenExpireError(val uid: Int) : Throwable() {
-	override val message: String get() = "TokenExpireError $uid"
+class TokenExpireError(uid: Int) : Throwable() {
+	override val message: String = "TokenExpireError $uid"
 }
 
 val String.successObject: JsonObject get() = makeObject {
@@ -56,17 +56,17 @@ val EmptySuccessData: Data.Success<Response.Default> get() = Data.Success(Respon
 
 val String.successData: Data.Success<Response.Default> get() = Data.Success(Response.Default, this)
 
-val String.failedData: Data.Error get() = Data.Error(RequestError.InvalidArgument, this)
+val String.failedData: Data.Error get() = Data.Error(Failed.RequestError.InvalidArgument, this)
 
 class NineGridProcessor(val mPics: APIFiles) {
 	val mActualPics: List<String>
+	val jsonString: String
 
 	init {
 		if (mPics.size > 9) throw error("NineGrid num error")
 		mActualPics = List(mPics.size) { currentUniqueId(it) }
+		jsonString = mActualPics.toJsonString()
 	}
-
-	val jsonString: String get() = mActualPics.toJsonString()
 
 	inline fun copy(callback: (String) -> ResNode): String? {
 		repeat(mActualPics.size) {
@@ -91,11 +91,11 @@ inline fun <reified Response: Any> Route.safeAPI(
 					"data" with result.data.toJson()
 				})
 				is Data.Error -> when (result.type) {
-					RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
-					RequestError.Timeout -> call.respond("网络连接超时".failedObject)
-					RequestError.Canceled -> call.respond("操作取消".failedObject)
-					RequestError.Unauthorized -> call.respond("登录信息已过期".expireObject)
-					RequestError.InvalidArgument -> call.respond("${result.message}".failedObject)
+					Failed.RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
+					Failed.RequestError.Timeout -> call.respond("网络连接超时".failedObject)
+					Failed.RequestError.Canceled -> call.respond("操作取消".failedObject)
+					Failed.RequestError.Unauthorized -> call.respond("登录信息已过期".expireObject)
+					Failed.RequestError.InvalidArgument -> call.respond("${result.message}".failedObject)
 					else -> call.respond("未知错误: ${result.message}".failedObject)
 				}
 			}

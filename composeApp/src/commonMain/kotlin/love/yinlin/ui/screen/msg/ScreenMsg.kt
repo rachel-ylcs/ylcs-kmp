@@ -34,7 +34,6 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
 import love.yinlin.ui.screen.msg.weibo.WeiboGridData
 import love.yinlin.ui.screen.msg.weibo.WeiboLayout
 
-@Stable
 private enum class MsgTabItem(
 	val title: String,
 	val icon: ImageVector
@@ -44,6 +43,7 @@ private enum class MsgTabItem(
 	PICTURES("美图", Icons.Filled.PhotoLibrary);
 
 	companion object {
+		@Stable
 		val items = MsgTabItem.entries.map { it.title to it.icon }
 	}
 }

@@ -2,7 +2,7 @@ package love.yinlin.data.rachel
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.api.APIConfig
+import love.yinlin.Local
 import love.yinlin.api.ServerRes
 
 @Stable
@@ -14,12 +14,9 @@ data class UserPublicProfile(
 	val label: String,
 	val coin: Int,
 ) {
-	@Stable
-	val level: Int get() = UserLevel.level(coin)
+	val level: Int by lazy { UserLevel.level(coin) }
 
-	@Stable
-	val avatarPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).avatar}"
+	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
 
-	@Stable
-	val wallPath: String get() = "${APIConfig.URL}/${ServerRes.Users.User(uid).wall}"
+	val wallPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).wall}" }
 }

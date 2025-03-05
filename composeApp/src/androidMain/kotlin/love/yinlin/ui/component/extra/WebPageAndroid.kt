@@ -15,12 +15,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.extension.Reference
 import love.yinlin.ui.CustomUI
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-	internal val webview = Reference<WebView>()
+	internal val webview = mutableStateOf<WebView?>(null)
 
 	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl

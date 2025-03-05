@@ -35,8 +35,9 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "cmp" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
+compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
-compose-material3-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
+compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
@@ -61,12 +62,11 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
 
 # JVM
-compose-ui-tooling-preview-desktop = { module = "org.jetbrains.compose.ui:ui-tooling-preview-desktop", version.ref = "cmp" }
-
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
+compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version = "1.7.8" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 

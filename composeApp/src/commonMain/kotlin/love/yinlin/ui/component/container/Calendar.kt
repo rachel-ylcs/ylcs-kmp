@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.extra
+package love.yinlin.ui.component.container
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +21,7 @@ import kotlinx.datetime.*
 import love.yinlin.ThemeColor
 import love.yinlin.common.Resource
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.condition
 import love.yinlin.extension.rememberDerivedState
 
 private val lunarFestivalTable = mapOf(
@@ -66,21 +67,12 @@ private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
 	val lunarDay = ((combined ushr 7) and 0x1F) + 1
 	solarFestivalTable[solarMonth * 100 + solarDay] ?: lunarFestivalTable[lunarMonth * 100 + lunarDay] ?:
 		if (isTerm) solarTermTable[(solarMonth - 1) * 2 + solarDay / 16]
-		else buildString(capacity = 8) {
-			when (lunarDay) {
-				1 -> {
-					if (isLeap) append('闰')
-					append(lunarMonthTable[lunarMonth])
-					append('月')
-				}
-				10 -> append("初十")
-				20 -> append("二十")
-				30 -> append("三十")
-				else -> {
-					append(lunarDaysTable[lunarDay / 10])
-					append(lunarDayTable[lunarDay % 10])
-				}
-			}
+		else when (lunarDay) {
+			1 -> "${if (isLeap) "闰" else ""}${lunarMonthTable[lunarMonth]}月"
+			10 -> "初十"
+			20 -> "二十"
+			30 -> "三十"
+			else -> "${lunarDaysTable[lunarDay / 10]}${lunarDayTable[lunarDay % 10]}"
 		}
 } ?: ""
 
@@ -185,7 +177,7 @@ private fun CalendarDayGrid(
 
 				Box(
 					modifier = Modifier.fillMaxWidth().aspectRatio(1f)
-						.clickable(enabled = eventTitle != null, onClick = { onEventClick(date) }),
+						.condition(eventTitle != null) { clickable(onClick = { onEventClick(date) }) },
 					contentAlignment = Alignment.Center
 				) {
 					if (date == today) {

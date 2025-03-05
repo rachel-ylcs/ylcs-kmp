@@ -51,14 +51,6 @@ inline fun <T> rememberStateSaveable(vararg keys: Any?, saver: Saver<T, out Any>
 @Composable
 fun <T> rememberDerivedState(calculation: () -> T) = remember { derivedStateOf(calculation) }
 
-// Reference
-
-@Stable
-class Reference<T> {
-	var value: T? = null
-}
-
-
 // LaunchFlag
 
 typealias LaunchFlag = AtomicReference<Boolean>
@@ -73,7 +65,6 @@ inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScop
 
 // Debounce
 
-@Stable
 @Composable
 fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
 	var lastTime by rememberStateSaveable(saver = love.yinlin.extension.Saver.Instant) { Instant.fromEpochMilliseconds(0L) }

@@ -12,10 +12,10 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.IOThread
-import love.yinlin.MainThread
+import love.yinlin.extension.IOThread
+import love.yinlin.extension.MainThread
 import love.yinlin.data.Data
-import love.yinlin.data.RequestError
+import love.yinlin.data.Failed
 import love.yinlin.extension.Json
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -54,13 +54,13 @@ suspend inline fun <R> HttpClient.safeCallData(
 	block(this)
 }
 catch (e: HttpRequestTimeoutException) {
-	Data.Error(RequestError.Timeout, "网络连接超时", e)
+	Data.Error(Failed.RequestError.Timeout, "网络连接超时", e)
 }
 catch (e: CancellationException) {
-	Data.Error(RequestError.Canceled, "操作取消", e)
+	Data.Error(Failed.RequestError.Canceled, "操作取消", e)
 }
 catch (e: Throwable) {
-	Data.Error(RequestError.ClientError, "未知异常", e)
+	Data.Error(Failed.RequestError.ClientError, "未知异常", e)
 }
 
 suspend inline fun <R> HttpClient.safeCall(

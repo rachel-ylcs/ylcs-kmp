@@ -1,4 +1,4 @@
-package love.yinlin
+package love.yinlin.extension
 
 @Target(
 	AnnotationTarget.FUNCTION,

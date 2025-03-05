@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -19,8 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.AppModel
 import love.yinlin.ThemeMode
-import love.yinlin.platform.app
 import love.yinlin.launch
+import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space
@@ -38,7 +37,6 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.*
 
-@Stable
 private enum class TabItem(
 	val title: StringResource,
 	val iconNormal: DrawableResource,

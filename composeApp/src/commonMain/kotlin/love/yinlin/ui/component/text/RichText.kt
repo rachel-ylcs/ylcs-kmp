@@ -1,8 +1,6 @@
 package love.yinlin.ui.component.text
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.LocalTextStyle
@@ -10,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -20,19 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import love.yinlin.Colors
-import love.yinlin.extension.Array
-import love.yinlin.extension.Boolean
-import love.yinlin.extension.Int
-import love.yinlin.extension.String
-import love.yinlin.extension.json
-import love.yinlin.extension.makeObject
-import love.yinlin.extension.parseJson
-import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.toJsonString
+import love.yinlin.extension.*
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.WebImageQuality
 
@@ -87,14 +75,12 @@ interface RichItem {
 	fun build(context: RichContext)
 }
 
-@Stable
 abstract class RichObject(protected val type: String) : RichItem {
-	protected open val map: JsonObject get() = makeObject { RICH_ARG_TYPE with type }
+	protected open val map: JsonObject = makeObject { RICH_ARG_TYPE with type }
 
 	override val json: JsonElement get() = map
 }
 
-@Stable
 abstract class RichContainer(type: String) : RichObject(type) {
 	protected val items = mutableListOf<RichItem>()
 
@@ -120,9 +106,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		items += item
 	}
 
-	@Stable
 	protected class Text(private val text: String) : RichItem {
-		override val json: JsonElement get() = text.json
+		override val json: JsonElement = text.json
 
 		override fun build(context: RichContext) {
 			context.builder.append(text)
@@ -130,9 +115,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun text(str: String) = makeItem(Text(str))
 
-	@Stable
 	protected class Emoji(private val id: Int) : RichItem {
-		override val json: JsonElement get() = id.json
+		override val json: JsonElement = id.json
 
 		override fun build(context: RichContext) {
 			TODO()
@@ -140,7 +124,6 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
 
-	@Stable
 	protected class Br : RichItem {
 		override val json: JsonElement = JsonNull
 
@@ -150,9 +133,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun br() = makeItem(Br())
 
-	@Stable
 	protected class Image(private val uri: String) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
-		override val map: JsonObject get() = makeObject {
+		override val map: JsonObject = makeObject {
 			merge(super.map)
 			RICH_ARG_URI with uri
 		}
@@ -174,9 +156,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun image(uri: String) = makeItem(Image(uri))
 
-	@Stable
 	protected class Link(private val uri: String, private val text: String) : RichObject(RICH_TYPE_LINK) {
-		override val map: JsonObject get() = makeObject {
+		override val map: JsonObject = makeObject {
 			merge(super.map)
 			RICH_ARG_URI with uri
 			RICH_ARG_TEXT with text
@@ -200,9 +181,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun link(uri: String, text: String) = makeItem(Link(uri, text))
 
-	@Stable
 	protected class Topic(private val uri: String, private val text: String) : RichObject(RICH_TYPE_TOPIC) {
-		override val map: JsonObject get() = makeObject {
+		override val map: JsonObject = makeObject {
 			merge(super.map)
 			RICH_ARG_URI with uri
 			RICH_ARG_TEXT with text
@@ -226,9 +206,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun topic(uri: String, text: String) = makeItem(Topic(uri, text))
 
-	@Stable
 	protected class At(private val uri: String, private val text: String) : RichObject(RICH_TYPE_AT)  {
-		override val map: JsonObject get() = makeObject {
+		override val map: JsonObject = makeObject {
 			merge(super.map)
 			RICH_ARG_URI with uri
 			RICH_ARG_TEXT with text
@@ -252,7 +231,6 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun at(uri: String, text: String) = makeItem(At(uri, text))
 
-	@Stable
 	protected class Style(
 		private val textSize: TextUnit?,
 		private val color: Color?,
@@ -304,7 +282,6 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	), content)
 }
 
-@Stable
 class RichString : RichContainer(RICH_TYPE_ROOT) {
 	fun asState(
 		onLinkClick: ((String) -> Unit)?,

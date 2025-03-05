@@ -17,6 +17,5 @@ data class WeiboComment (
 	val pic: Picture?, // 图片
 	var subComments: List<WeiboSubComment> // 楼中楼
 ) {
-	@Stable
 	val timeString = time.format(DateEx.Formatter.standardDateTime)
 }

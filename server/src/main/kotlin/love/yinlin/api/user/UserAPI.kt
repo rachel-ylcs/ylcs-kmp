@@ -68,16 +68,16 @@ data class Token(
 		fun keys(uid: Int): List<String> = Platform.entries.map { "token/${it.ordinal}/$uid" }
 	}
 
-	val bytes: ByteArray get() {
+	val bytes: ByteArray by lazy {
 		val buffer = ByteBuffer.allocate(Int.SIZE_BYTES * 3 + Long.SIZE_BYTES)
 		buffer.putInt(uid)
 		buffer.putInt(19911211)
 		buffer.putInt(platform.ordinal)
 		buffer.putLong(timestamp)
-		return buffer.array()
+		buffer.array()
 	}
 
-	val key: String get() = "token/${platform.ordinal}/$uid"
+	val key: String = "token/${platform.ordinal}/$uid"
 }
 
 object AN {

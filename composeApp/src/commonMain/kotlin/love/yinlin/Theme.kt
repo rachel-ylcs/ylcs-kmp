@@ -3,7 +3,6 @@ package love.yinlin
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -121,7 +120,6 @@ object ThemeColor {
 	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Red4
 }
 
-@Stable
 private val LightColorScheme = lightColorScheme(
 	primary = Colors.Steel4,
 	onPrimary = Colors.White,
@@ -145,7 +143,6 @@ private val LightColorScheme = lightColorScheme(
 	onError = Colors.White
 )
 
-@Stable
 private val DarkColorScheme = darkColorScheme(
 	primary = Colors.Red4,
 	onPrimary = Colors.Black,
@@ -170,7 +167,6 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-@Stable
 private fun RachelTextStyle(size: TextUnit, isBold: Boolean = false): TextStyle = TextStyle(
 	fontFamily = FontFamily(Font(Res.font.xwwk)),
 	fontWeight = if (isBold) FontWeight.SemiBold else FontWeight.Light,
@@ -207,10 +203,11 @@ private fun RachelShapes(): Shapes = Shapes(
 	extraLarge = RoundedCornerShape(12.dp)
 )
 
+@Suppress("SimplifyBooleanWithConstants")
 @Composable
 fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = LightColorScheme,
+		colorScheme = if (darkMode && !Local.Client.ALWAYS_LIGHT_MODE) DarkColorScheme else LightColorScheme,
 		shapes = RachelShapes(),
 		typography = RachelTypography(),
 		content = content

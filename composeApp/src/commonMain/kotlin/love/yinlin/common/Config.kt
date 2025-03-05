@@ -66,8 +66,7 @@ class KVConfig(private val kv: KV) {
 		private val listSerializer = ListSerializer(itemSerializer)
 		private val key = "$name$version"
 		protected val state = kv.getJson(listSerializer, key, defaultFactory).toMutableStateList()
-
-		val items: List<T> get() = state
+		val items: List<T> = state
 
 		inline fun <R> map(transform: (T) -> R) = items.map(transform)
 		operator fun iterator() = state.iterator()

@@ -1,8 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
-
-@Stable
 enum class Platform {
 	Android,
 	IOS,
@@ -23,11 +20,7 @@ enum class Platform {
 		}
 	}
 
-	@Stable
 	val isPhone: Boolean get() = this == Android || this == IOS
-	@Stable
 	val isDesktop: Boolean get() = this == Windows || this == Linux || this == MacOS
-	@Stable
 	val isWeb: Boolean get() = this == WebWasm
 }
-

@@ -4,13 +4,13 @@ import android.content.Context
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-import love.yinlin.extension.Reference
 
 @Composable
 fun <T : View> CustomUI(
-	view: Reference<T>,
+	view: MutableState<T?>,
 	modifier: Modifier = Modifier,
 	factory: (Context) -> T,
 	update: ((T) -> Unit)? = null,
@@ -28,10 +28,11 @@ fun <T : View> CustomUI(
 
 	AndroidView(
 		modifier = modifier,
-		factory = {
-			val factoryView = view.value ?: factory(it)
-			view.value = factoryView
-			factoryView
+		factory = { context ->
+			view.value ?: factory(context).let {
+				view.value = it
+				it
+			}
 		},
 		update = { update?.invoke(it) },
 		onReset = reset

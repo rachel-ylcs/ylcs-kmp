@@ -11,7 +11,6 @@ import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.web.WebErrorEvent
 import javafx.scene.web.WebView
-import love.yinlin.extension.Reference
 import love.yinlin.ui.component.CustomUI
 
 @Stable
@@ -20,7 +19,7 @@ inline fun <T> webPageListener(crossinline listener: (T) -> Unit) =
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-	internal val jfxPanel = Reference<JFXPanel>()
+	internal val jfxPanel = mutableStateOf<JFXPanel?>(null)
 	private val webview: WebView? get() = jfxPanel.value?.scene?.root as? WebView
 
 	internal var mUrl: String by mutableStateOf(initUrl)

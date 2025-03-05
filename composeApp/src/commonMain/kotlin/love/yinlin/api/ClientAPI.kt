@@ -11,8 +11,9 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.Local
 import love.yinlin.data.Data
-import love.yinlin.data.RequestError
+import love.yinlin.data.Failed
 import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.platform.safeCallData
@@ -26,7 +27,7 @@ object ClientAPI {
 		val msg = json["msg"].StringNull
 		val data = json["data"]!!
 		return if (code == APICode.SUCCESS) Data.Success(data.to(), msg)
-			else Data.Error(RequestError.InvalidArgument, msg)
+			else Data.Error(Failed.RequestError.InvalidArgument, msg)
 	}
 
 	@JvmName("processResponseDefault")
@@ -35,7 +36,7 @@ object ClientAPI {
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
 		return if (code == APICode.SUCCESS) Data.Success(Response.Default, msg)
-			else Data.Error(RequestError.InvalidArgument, msg)
+			else Data.Error(Failed.RequestError.InvalidArgument, msg)
 	}
 
 	fun buildGetParameters(argsMap: JsonObject): String {
@@ -49,7 +50,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
 		data: Request
 	): Data<Response> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${APIConfig.URL}$route${buildGetParameters(data.toJson().Object)}")
+		client.prepareGet(urlString = "${Local.ClientUrl}$route${buildGetParameters(data.toJson().Object)}")
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -58,7 +59,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
 		data: Request
 	) : Data<Response.Default> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${APIConfig.URL}$route${buildGetParameters(data.toJson().Object)}")
+		client.prepareGet(urlString = "${Local.ClientUrl}$route${buildGetParameters(data.toJson().Object)}")
 			.execute { processResponse(it) }
 	}
 
@@ -66,7 +67,7 @@ object ClientAPI {
 	suspend inline fun <reified Response : Any> request(
 		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>
 	): Data<Response> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${APIConfig.URL}$route")
+		client.prepareGet(urlString = "${Local.ClientUrl}$route")
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -75,7 +76,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
 		data: Request
 	): Data<Response> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(data) }
+		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(data) }
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -84,7 +85,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
 		data: Request
 	): Data<Response.Default> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(data) }
+		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(data) }
 			.execute { processResponse(it) }
 	}
 
@@ -92,7 +93,7 @@ object ClientAPI {
 	suspend inline fun <reified Response : Any> request(
 		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>
 	): Data<Response> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") { setBody(Request.Default) }
+		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(Request.Default) }
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -154,7 +155,7 @@ object ClientAPI {
 		data: Request,
 		crossinline files: APIFileScope.() -> Files
 	): Data<Response> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") {
+		client.preparePost(urlString = "${Local.ClientUrl}$route") {
 			setBody(MultiPartFormDataContent(formData {
 				buildFormFiles(this, files)
 				append(key = "#data#", value = data.toJsonString())
@@ -168,7 +169,7 @@ object ClientAPI {
 		data: Request,
 		crossinline files: APIFileScope.() -> Files
 	): Data<Response.Default> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") {
+		client.preparePost(urlString = "${Local.ClientUrl}$route") {
 			setBody(MultiPartFormDataContent(formData {
 				buildFormFiles(this, files)
 				append(key = "#data#", value = data.toJsonString())
@@ -181,7 +182,7 @@ object ClientAPI {
 		route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
 		crossinline files: APIFileScope.() -> Files
 	): Data<Response> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${APIConfig.URL}$route") {
+		client.preparePost(urlString = "${Local.ClientUrl}$route") {
 			setBody(MultiPartFormDataContent(formData {
 				buildFormFiles(this, files)
 			}))

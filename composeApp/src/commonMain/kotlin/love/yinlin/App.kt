@@ -20,9 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import love.yinlin.common.Resource
-import love.yinlin.extension.LaunchOnce
-import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.Route.Companion.buildRoute
@@ -33,8 +30,6 @@ fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelS
 class AppModel(
 	private val navController: NavController
 ) : ViewModel() {
-	val flagLoadResource = launchFlag()
-
 	val mainModel = MainModel(this)
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
@@ -54,10 +49,6 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 		startDestination = Route.Main,
 	) {
 		buildRoute(appModel)
-	}
-
-	LaunchOnce(appModel.flagLoadResource) {
-		Resource.initialize()
 	}
 }
 

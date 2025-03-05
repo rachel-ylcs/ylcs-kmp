@@ -10,6 +10,6 @@ data class Picture(
 	val source: String = image,
 	val video: String = ""
 ) {
-	val isImage: Boolean get() = video.isEmpty()
-	val isVideo: Boolean get() = video.isNotEmpty()
+	val isImage: Boolean = video.isEmpty()
+	val isVideo: Boolean = video.isNotEmpty()
 }

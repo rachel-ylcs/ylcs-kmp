@@ -67,9 +67,10 @@ kotlin {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
-            implementation(libs.compose.material3.icons.extended)
+            implementation(libs.compose.material3.iconsExtended)
             implementation(libs.compose.ui)
             implementation(libs.compose.ui.backhandler)
+            implementation(libs.compose.components.uiToolingPreview)
             implementation(libs.compose.components.resources)
 
             implementation(libs.kotlinx.coroutines)
@@ -112,7 +113,6 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.compose.ui.tooling.preview.desktop)
             implementation(libs.ktor.okhttp)
 
             "win".let {
@@ -126,6 +126,10 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    debugImplementation(libs.compose.uiTooling)
 }
 
 android {

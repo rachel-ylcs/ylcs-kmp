@@ -13,6 +13,5 @@ data class TopicDetails (
 	val label: String,
 	val coin: Int
 ) {
-	@Stable
-	val level: Int get() = UserLevel.level(coin)
+	val level: Int by lazy { UserLevel.level(coin) }
 }

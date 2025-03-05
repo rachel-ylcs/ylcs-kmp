@@ -111,7 +111,6 @@ data class ColorfulImageVector(
 	val background: Color
 )
 
-@Stable
 @Composable
 fun colorfulImageVector(
 	icon: ImageVector,
@@ -252,7 +251,7 @@ fun WebImage(
 		filterQuality = quality.filterQuality,
 		alpha = alpha,
 		modifier = modifier.condition(circle) { clip(CircleShape) }
-			.clickable(enabled = onClick != null, onClick = onClick ?: {})
+			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
 	)
 }
 

@@ -18,13 +18,6 @@ import love.yinlin.platform.Platform
 // ------------  API 配置  ------------
 
 object APIConfig {
-	const val URL_MODE = 1
-	val URL = when (URL_MODE) {
-		0 -> "http://localhost:1211"
-		1 -> "http://49.235.151.78:1211"
-		else -> "https://yinlin.love"
-	}
-
 	const val MIN_PAGE_NUM = 20
 	const val MAX_PAGE_NUM = 30
 	val Int.coercePageNum: Int get() = this.coerceAtLeast(MIN_PAGE_NUM).coerceAtMost(MAX_PAGE_NUM)

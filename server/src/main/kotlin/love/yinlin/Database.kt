@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter
 
 object Database {
 	private val dataSource = HikariDataSource(HikariConfig().apply {
-		jdbcUrl = "jdbc:mysql://${Config.HOST}:${Config.Mysql.PORT}/${Config.Mysql.NAME}"
+		jdbcUrl = "jdbc:mysql://${Local.ServerHost}:${Config.Mysql.PORT}/${Config.Mysql.NAME}"
 		username = Config.Mysql.USERNAME
 		password = Config.Mysql.PASSWORD
 		isAutoCommit = true

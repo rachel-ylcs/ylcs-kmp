@@ -52,9 +52,7 @@ sealed interface Route {
 	data object Mail : Route
 
 	companion object {
-		fun NavGraphBuilder.buildRoute(
-			appModel: AppModel
-		) {
+		fun NavGraphBuilder.buildRoute(appModel: AppModel) {
 			composable<Main> {
 				ScreenMain(appModel)
 			}

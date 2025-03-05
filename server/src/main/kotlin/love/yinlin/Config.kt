@@ -10,8 +10,6 @@ object Config {
 		stream.close()
 	}
 
-	val HOST: String = prop["host"] as String
-
 	object Mysql {
 		val PORT: Int = (prop["mysql.port"] as String).toInt()
 		val NAME: String = prop["mysql.name"] as String

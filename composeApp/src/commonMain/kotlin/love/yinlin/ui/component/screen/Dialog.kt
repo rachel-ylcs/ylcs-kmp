@@ -57,7 +57,6 @@ sealed interface DialogInfo {
 	}
 
 	companion object {
-		@Stable
 		val instance: DialogInfo get() = if (app.isPortrait) Portrait else Landscape
 	}
 }

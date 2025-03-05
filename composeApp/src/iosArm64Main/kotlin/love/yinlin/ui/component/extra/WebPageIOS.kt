@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.cinterop.ObjCSignatureOverride
-import love.yinlin.extension.Reference
 import platform.Foundation.NSError
 import platform.WebKit.WKNavigation
 import platform.WebKit.WKNavigationDelegateProtocol
@@ -21,7 +20,7 @@ import platform.Foundation.NSURL
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-	internal val webview = Reference<WKWebView>()
+	internal val webview = mutableStateOf<WKWebView?>(null)
 
 	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl

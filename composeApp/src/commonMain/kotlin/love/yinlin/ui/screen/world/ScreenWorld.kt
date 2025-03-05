@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -24,8 +25,8 @@ import love.yinlin.data.rachel.Activity
 import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.platform.config
-import love.yinlin.ui.component.extra.Calendar
-import love.yinlin.ui.component.extra.CalendarState
+import love.yinlin.ui.component.container.Calendar
+import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -100,24 +101,29 @@ private fun Portrait(
 					.scale(scale).clip(MaterialTheme.shapes.medium)
 			)
 		}
-
-		Calendar(
-			state = model.calendarState,
-			modifier = Modifier.fillMaxWidth(),
-			actions = {
-				if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+		Surface(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			shape = MaterialTheme.shapes.extraLarge,
+			shadowElevation = 5.dp
+		) {
+			Calendar(
+				state = model.calendarState,
+				modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+				actions = {
+					if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+						ClickIcon(
+							imageVector = Icons.Default.Add,
+							onClick = {}
+						)
+					}
 					ClickIcon(
-						imageVector = Icons.Default.Add,
-						onClick = {}
+						imageVector = Icons.Default.Refresh,
+						onClick = { model.onRefreshCalendar() }
 					)
-				}
-				ClickIcon(
-					imageVector = Icons.Default.Refresh,
-					onClick = { model.onRefreshCalendar() }
-				)
-			},
-			onEventClick = { model.onCalendarEvent(it) }
-		)
+				},
+				onEventClick = { model.onCalendarEvent(it) }
+			)
+		}
 	}
 }
 
