@@ -1,18 +1,22 @@
 package love.yinlin.extension
 
-import androidx.core.bundle.Bundle
-import androidx.core.uri.UriUtils
 import androidx.navigation.NavType
+import androidx.savedstate.SavedState
+import androidx.savedstate.read
+import androidx.savedstate.write
+import com.eygraber.uri.UriCodec
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 inline fun <reified T> buildNavType(
 	isNullableAllowed: Boolean = false
 ): NavType<T> = object : NavType<T>(isNullableAllowed = isNullableAllowed) {
-	override fun put(bundle: Bundle, key: String, value: T) = bundle.putString(key, value.toJsonString())
-	override fun get(bundle: Bundle, key: String): T? = bundle.getString(key)?.parseJsonValue()
-	override fun parseValue(value: String): T = UriUtils.decode(value).parseJsonValue()!!
-	override fun serializeAsValue(value: T): String = UriUtils.encode(value.toJsonString())
+	override fun put(bundle: SavedState, key: String, value: T) = bundle.write { putString(key, value.toJsonString()) }
+	override fun get(bundle: SavedState, key: String): T? = bundle.read { getString(key).parseJsonValue() }
+
+	override fun parseValue(value: String): T = UriCodec.decode(value).parseJsonValue()!!
+
+	override fun serializeAsValue(value: T): String = UriCodec.encode(value.toJsonString())
 }
 
 val navTypeCaches = mutableMapOf<String, NavType<*>>()

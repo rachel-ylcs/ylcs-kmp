@@ -18,6 +18,7 @@ actual object NetClient {
 
 	actual val file: HttpClient = HttpClient(Js) {
 		useEngine()
+		useJson()
 		useFileTimeout()
 	}
 }

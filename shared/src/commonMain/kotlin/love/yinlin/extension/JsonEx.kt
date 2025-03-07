@@ -93,7 +93,7 @@ object JsonConverter {
 	}
 }
 
-// JsonMaker
+// Json DSL
 
 data class JsonArrayScope(val builder: JsonArrayBuilder) {
 	fun add(value: Nothing?) = builder.add(JsonNull)

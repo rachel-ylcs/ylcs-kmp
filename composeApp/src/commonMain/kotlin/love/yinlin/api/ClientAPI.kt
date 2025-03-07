@@ -1,6 +1,6 @@
 package love.yinlin.api
 
-import androidx.core.uri.UriUtils
+import com.eygraber.uri.UriCodec
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -41,7 +41,7 @@ object ClientAPI {
 
 	fun buildGetParameters(argsMap: JsonObject): String {
 		val args = StringBuilder()
-		for ((key, value) in argsMap) args.append("$key=${UriUtils.encode(value.String)}&")
+		for ((key, value) in argsMap) args.append("$key=${UriCodec.encode(value.String)}&")
 		return if (args.isNotEmpty()) "?${args.dropLast(1)}" else ""
 	}
 
@@ -97,21 +97,9 @@ object ClientAPI {
 			.execute { processResponse<Response>(it) }
 	}
 
-	class APIFileScope() {
-		private var index = 0
-		val map = mutableMapOf<String, Any>()
-
-		fun file(value: Path): APIFile {
-			val key = "#${index++}#"
-			map[key] = value
-			return APIFile(key)
-		}
-
-		fun file(values: List<Path>): List<APIFile> {
-			val key = "#${index++}#"
-			map[key] = values
-			return listOf(APIFile(key))
-		}
+	interface APIFileScope {
+		fun file(value: Path): APIFile
+		fun file(values: List<Path>): List<APIFile>
 	}
 
 	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
@@ -128,7 +116,23 @@ object ClientAPI {
 	) {
 		val ignoreFiles = mutableListOf<String>()
 
-		val scope = APIFileScope()
+		val scope = object : APIFileScope {
+			private var index = 0
+			val map = mutableMapOf<String, Any>()
+
+			override fun file(value: Path): APIFile {
+				val key = "#${index++}#"
+				map[key] = value
+				return APIFile(key)
+			}
+
+			override fun file(values: List<Path>): List<APIFile> {
+				val key = "#${index++}#"
+				map[key] = values
+				return listOf(APIFile(key))
+			}
+		}
+
 		val keys = scope.files().toJson().Object
 		for ((name, item) in keys) {
 			if (item is JsonNull) ignoreFiles += name

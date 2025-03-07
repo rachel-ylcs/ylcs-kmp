@@ -94,6 +94,7 @@ kotlin {
             implementation(libs.sketch.zoom)
 
             implementation(libs.html)
+            implementation(libs.uri)
         }
 
         androidMain.dependencies {

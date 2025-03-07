@@ -23,6 +23,7 @@ actual object NetClient {
 
 	actual val file: HttpClient = HttpClient(OkHttp) {
 		useEngine()
+		useJson()
 		useFileTimeout()
 	}
 }

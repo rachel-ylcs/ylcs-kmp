@@ -37,7 +37,7 @@ object Local {
 
 	// ***********  不可修改处  ***********
 
-	private const val MAIN_HOST: String = "yinlin.love"
+	const val MAIN_HOST: String = "yinlin.love"
 	private const val SECONDARY_HOST: String = "49.235.151.78"
 	private const val LOCAL_HOST: String = "localhost"
 	private const val TEST_PORT: Int = 1211

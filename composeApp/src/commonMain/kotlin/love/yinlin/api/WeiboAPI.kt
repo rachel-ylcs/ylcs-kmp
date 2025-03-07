@@ -1,13 +1,14 @@
 package love.yinlin.api
 
-import androidx.core.uri.UriUtils
+import com.eygraber.uri.Uri
+import com.eygraber.uri.UriCodec
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.Local
 import love.yinlin.platform.app
 import love.yinlin.ui.component.text.RichContainer
 import love.yinlin.ui.component.text.RichString
@@ -34,7 +35,7 @@ import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
 	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
-	private const val WEIBO_PROXY_HOST: String = "weibo.yinlin.love"
+	private const val WEIBO_PROXY_HOST: String = "weibo.${Local.MAIN_HOST}"
 	private val WEIBO_HOST: String = if (OS.platform.isWeb) WEIBO_PROXY_HOST else WEIBO_SOURCE_HOST
 
 	private fun transferWeiboIconUrl(src: String): String = if (OS.platform.isWeb) {
@@ -59,7 +60,7 @@ object WeiboAPI {
 
 	private object Container {
 		fun searchUser(key: String): String {
-			val encodeName = try { UriUtils.encode(key) } catch (_: Throwable) { key }
+			val encodeName = try { UriCodec.encode(key) } catch (_: Throwable) { key }
 			return "api/container/getIndex?containerid=100103type%3D3%26q%3D$encodeName&page_type=searchall"
 		}
 		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
@@ -288,7 +289,7 @@ object WeiboAPI {
 				for (item2 in card.arr("card_group")) {
 					val album = item2.Object
 					if (album["card_type"].Int == 8) {
-						val containerId = UriUtils.parse(album["scheme"].String).getQueryParameters("containerid").first()
+						val containerId = Uri.parse(album["scheme"].String).getQueryParameters("containerid").first()
 						items += WeiboAlbum(
 							containerId = containerId,
 							title = album["title_sub"].String,
