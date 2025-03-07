@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import love.yinlin.extension.LaunchOnce
-import love.yinlin.platform.config
+import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.screen.msg.MsgModel
 
@@ -22,6 +22,6 @@ fun ScreenWeibo(model: MsgModel) {
 	}
 
 	LaunchOnce(model.weiboState.flagFirstLoad) {
-		model.weiboState.grid.requestWeibo(config.weiboUsers.map { it.id })
+		model.weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
 	}
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import love.yinlin.Colors
+import love.yinlin.common.Colors
 import love.yinlin.data.common.Picture
 
 @Composable

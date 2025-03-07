@@ -24,10 +24,9 @@ import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.app_name
 
-
 fun main() {
-    val context = AppContext()
-    app = context.initialize()
+    val context = AppContext().initialize()
+    app = context
 
     // JavaFx
     Platform.startup {

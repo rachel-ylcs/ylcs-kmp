@@ -24,7 +24,6 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
 import love.yinlin.extension.*
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
@@ -110,7 +109,7 @@ private fun Portrait(
 				state = model.calendarState,
 				modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
 				actions = {
-					if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+					if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
 						ClickIcon(
 							imageVector = Icons.Default.Add,
 							onClick = {}

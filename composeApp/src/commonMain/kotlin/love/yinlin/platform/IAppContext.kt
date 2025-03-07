@@ -12,7 +12,7 @@ import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import love.yinlin.ThemeMode
+import love.yinlin.common.ThemeMode
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
 
@@ -42,23 +42,21 @@ abstract class IAppContext {
 
 	// KV
 	abstract val kv: KV
+	lateinit var config: KVConfig
 
 	// HttpClient
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
-	fun initialize(): IAppContext {
+	open fun initialize(): IAppContext {
 		// 加载配置
 		config = KVConfig(kv)
 		CoroutineScope(Dispatchers.Default).launch {
 			// 加载资源
 			Resource.initialize()
 		}
-
 		return this
 	}
 }
 
 lateinit var app: IAppContext
-
-lateinit var config: KVConfig

@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGRectGetHeight
 import platform.CoreGraphics.CGRectGetWidth
@@ -16,5 +15,4 @@ class AppContext : IAppContext() {
 	override val kv: KV = KV()
 }
 
-@Stable
 val appNative: AppContext get() = app as AppContext

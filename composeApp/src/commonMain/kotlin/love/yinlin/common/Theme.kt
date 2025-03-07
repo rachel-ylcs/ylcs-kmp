@@ -1,4 +1,4 @@
-package love.yinlin
+package love.yinlin.common
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import love.yinlin.Local
 import love.yinlin.platform.app
 import org.jetbrains.compose.resources.Font
 import ylcs_kmp.composeapp.generated.resources.Res

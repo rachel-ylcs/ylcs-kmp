@@ -27,7 +27,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.launch
-import love.yinlin.platform.config
+import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -50,7 +50,7 @@ private class WeiboFollowsModel(val model: AppModel) : ViewModel() {
 	fun refreshLocalUser() {
 		isLocal = true
 		launch {
-			val weiboUsers = config.weiboUsers
+			val weiboUsers = app.config.weiboUsers
 			for ((index, user) in weiboUsers.withIndex()) {
 				if (user.avatar.isEmpty()) {
 					val data = WeiboAPI.getWeiboUser(user.id)
@@ -144,7 +144,7 @@ fun ScreenWeiboFollows(model: AppModel) {
 				modifier = Modifier.fillMaxSize()
 			) {
 				items(
-					items = if (screenModel.isLocal) config.weiboUsers.items else screenModel.searchResult,
+					items = if (screenModel.isLocal) app.config.weiboUsers.items else screenModel.searchResult,
 					key = { it.id }
 				) {
 					WeiboUserItem(

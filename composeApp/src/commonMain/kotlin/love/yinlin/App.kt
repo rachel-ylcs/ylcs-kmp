@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import love.yinlin.common.RachelTheme
 import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.Route.Companion.buildRoute

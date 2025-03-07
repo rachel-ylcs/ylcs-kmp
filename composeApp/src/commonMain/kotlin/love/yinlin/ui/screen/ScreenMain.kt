@@ -17,7 +17,7 @@ import androidx.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.AppModel
-import love.yinlin.ThemeMode
+import love.yinlin.common.ThemeMode
 import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon

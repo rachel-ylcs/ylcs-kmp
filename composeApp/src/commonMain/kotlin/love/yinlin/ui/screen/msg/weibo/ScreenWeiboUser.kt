@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.ThemeColor
+import love.yinlin.common.ThemeColor
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
@@ -35,7 +35,6 @@ import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.Saver
 import love.yinlin.launch
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -64,7 +63,7 @@ private class WeiboUserModel(model: AppModel) : ViewModel() {
 	}
 
 	fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
-		val weiboUsers = config.weiboUsers
+		val weiboUsers = app.config.weiboUsers
 		if (isFollow) {
 			if (!weiboUsers.contains { it.id == user.info.id }) weiboUsers += user.info
 		}
@@ -195,7 +194,7 @@ private fun Portrait(
 			)
 			UserInfoCard(
 				user = user,
-				isFollowed = config.weiboUsers.contains { it.id == user.info.id },
+				isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
 				onFollowClick = onFollowClick,
 				modifier = Modifier.fillMaxWidth()
 			)
@@ -259,7 +258,7 @@ private fun Landscape(
 				)
 				UserInfoCard(
 					user = user,
-					isFollowed = config.weiboUsers.contains { it.id == user.info.id },
+					isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
 					onFollowClick = onFollowClick,
 					modifier = Modifier.fillMaxWidth()
 				)

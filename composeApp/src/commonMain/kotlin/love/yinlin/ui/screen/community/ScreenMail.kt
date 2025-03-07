@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.ThemeColor
+import love.yinlin.common.ThemeColor
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
@@ -32,7 +32,7 @@ import love.yinlin.data.rachel.Mail
 import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
-import love.yinlin.platform.config
+import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -51,7 +51,7 @@ private class MailModel(private val model: AppModel) : ViewModel() {
 			state = BoxState.LOADING
 			val result = ClientAPI.request(
 				route = API.User.Mail.GetMails,
-				data = API.User.Mail.GetMails.Request(token = config.userToken)
+				data = API.User.Mail.GetMails.Request(token = app.config.userToken)
 			)
 			if (result is Data.Success) {
 				val data = result.data
@@ -68,7 +68,7 @@ private class MailModel(private val model: AppModel) : ViewModel() {
 		val result = ClientAPI.request(
 			route = API.User.Mail.GetMails,
 			data = API.User.Mail.GetMails.Request(
-				token = config.userToken,
+				token = app.config.userToken,
 				offset = offset
 			)
 		)

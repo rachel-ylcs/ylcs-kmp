@@ -21,9 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
-import love.yinlin.Colors
+import love.yinlin.common.Colors
 import love.yinlin.platform.app
-import love.yinlin.extension.condition
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.image.MiniIcon

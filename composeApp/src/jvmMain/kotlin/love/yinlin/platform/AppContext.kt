@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Density
 import love.yinlin.Local
 import java.awt.GraphicsEnvironment
@@ -26,7 +25,11 @@ class AppContext : IAppContext() {
 		screenWidth = (windowWidth * scaleX).toInt()
 		screenHeight = (windowHeight * scaleY).toInt()
 	}
+
+	override fun initialize(): AppContext {
+		super.initialize()
+		return this
+	}
 }
 
-@Stable
 val appNative: AppContext get() = app as AppContext

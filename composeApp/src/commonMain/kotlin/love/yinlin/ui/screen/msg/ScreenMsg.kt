@@ -22,7 +22,7 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.OS
-import love.yinlin.platform.config
+import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.BoxState
@@ -105,7 +105,7 @@ class MsgModel(val mainModel: MainModel) {
 	fun onRefresh() {
 		when (pagerState.currentPage) {
 			MsgTabItem.WEIBO.ordinal -> mainModel.launch {
-				weiboState.grid.requestWeibo(config.weiboUsers.map { it.id })
+				weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
 			}
 			MsgTabItem.CHAOHUA.ordinal -> mainModel.launch {
 				chaohuaState.requestNewData()

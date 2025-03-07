@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.settings
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,11 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.Colors
-import love.yinlin.ThemeColor
+import love.yinlin.common.Colors
+import love.yinlin.common.ThemeColor
 import love.yinlin.data.rachel.UserProfile
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
@@ -67,7 +65,7 @@ private fun AccountSettings(
 			if (userProfile == null) NoImage()
 			else WebImage(
 				uri = userProfile.avatarPath,
-				key = config.cacheUserAvatar,
+				key = app.config.cacheUserAvatar,
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.size(48.dp).shadow(5.dp, CircleShape)
@@ -91,7 +89,7 @@ private fun AccountSettings(
 			if (userProfile == null) NoImage(width = 96.dp, height = 54.dp)
 			else WebImage(
 				uri = userProfile.wallPath,
-				key = config.cacheUserWall,
+				key = app.config.cacheUserWall,
 				modifier = Modifier.width(96.dp).height(54.dp).shadow(5.dp)
 			)
 		}
@@ -201,7 +199,7 @@ private fun Landscape(
 @Composable
 fun ScreenSettings(model: AppModel) {
 	val screenModel = viewModel { SettingsModel() }
-	val userProfile = config.userProfile
+	val userProfile = app.config.userProfile
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),

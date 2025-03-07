@@ -7,7 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.platform.LocalDensity
-import love.yinlin.Colors
+import love.yinlin.common.Colors
 import love.yinlin.platform.appNative
 import java.awt.Component
 

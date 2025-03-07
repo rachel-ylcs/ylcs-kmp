@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.ThemeColor
+import love.yinlin.common.ThemeColor
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
@@ -30,7 +30,6 @@ import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.TopicDetails
 import love.yinlin.extension.*
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.NineGrid
@@ -294,8 +293,7 @@ private fun TopicLayout(
 				icon = Icons.Filled.Paid,
 				onClick = { model.onSendCoin() }
 			)
-
-			config.userProfile?.let { user ->
+			app.config.userProfile?.let { user ->
 				if (user.canUpdateTopicTop(model.topic.uid)) {
 					CommandButton(
 						text = if (model.topic.isTop) "取消置顶" else "置顶",
@@ -367,7 +365,7 @@ private fun CommentBar(
 				color = MaterialTheme.colorScheme.secondary,
 				modifier = Modifier.clickable(onClick = onSendSubComment)
 			)
-			config.userProfile?.let { user ->
+			app.config.userProfile?.let { user ->
 				if (user.canUpdateCommentTop(topicUid)) {
 					Text(
 						text = if (comment.isTop) "取消置顶" else "置顶",
@@ -415,7 +413,7 @@ private fun SubCommentBar(
 		) {
 			if (subComment.uid == topicUid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
 			if (subComment.uid == commentUid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
-			config.userProfile?.let { user ->
+			app.config.userProfile?.let { user ->
 				if (user.canDeleteComment(topicUid, subComment.uid)) {
 					Row(
 						modifier = Modifier.weight(1f),

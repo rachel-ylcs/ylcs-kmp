@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.data.rachel.UserProfile
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.ClickIcon
@@ -177,7 +176,7 @@ private fun UserSpaceContainer(
 			TipButtonInfo("好友", Icons.Filled.Group) { },
 			TipButtonInfo("主题", Icons.AutoMirrored.Filled.Article) { },
 			TipButtonInfo("邮箱", Icons.Filled.Mail) {
-				if (config.userToken.isNotEmpty()) model.mainModel.navigate(Route.Mail)
+				if (app.config.userToken.isNotEmpty()) model.mainModel.navigate(Route.Mail)
 			},
 			TipButtonInfo("徽章", Icons.Filled.MilitaryTech) { },
 		)
@@ -228,7 +227,7 @@ private fun Portrait(
 	Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
 		WebImage(
 			uri = userProfile.wallPath,
-			key = config.cacheUserWall,
+			key = app.config.cacheUserWall,
 			modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 		)
 		Column(
@@ -245,7 +244,7 @@ private fun Portrait(
 				OffsetLayout(y = (-46).dp) {
 					WebImage(
 						uri = userProfile.avatarPath,
-						key = config.cacheUserAvatar,
+						key = app.config.cacheUserAvatar,
 						contentScale = ContentScale.Crop,
 						circle = true,
 						modifier = Modifier.size(72.dp).shadow(5.dp, CircleShape)
@@ -326,7 +325,7 @@ private fun Landscape(
 				) {
 					WebImage(
 						uri = userProfile.wallPath,
-						key = config.cacheUserWall,
+						key = app.config.cacheUserWall,
 						modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 					)
 					Row(
@@ -336,7 +335,7 @@ private fun Landscape(
 						Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 							WebImage(
 								uri = userProfile.avatarPath,
-								key = config.cacheUserAvatar,
+								key = app.config.cacheUserAvatar,
 								contentScale = ContentScale.Crop,
 								circle = true,
 								modifier = Modifier.matchParentSize().shadow(5.dp, CircleShape)
@@ -393,7 +392,7 @@ private fun Landscape(
 
 @Composable
 fun ScreenMe(model: MeModel) {
-	val userProfile = config.userProfile
+	val userProfile = app.config.userProfile
 	if (userProfile == null) LoginBox(model, Modifier.fillMaxSize())
 	else {
 		if (app.isPortrait) Portrait(model, userProfile)

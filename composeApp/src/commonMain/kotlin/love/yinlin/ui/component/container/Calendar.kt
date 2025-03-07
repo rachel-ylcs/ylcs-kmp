@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.*
-import love.yinlin.ThemeColor
+import love.yinlin.common.ThemeColor
 import love.yinlin.common.Resource
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition

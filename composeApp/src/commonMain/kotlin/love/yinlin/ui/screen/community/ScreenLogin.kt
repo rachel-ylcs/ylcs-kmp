@@ -25,7 +25,6 @@ import love.yinlin.data.rachel.UserConstraint
 import love.yinlin.launch
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.platform.config
 import love.yinlin.ui.component.screen.DialogLoading
 import love.yinlin.ui.component.screen.DialogState
 import love.yinlin.ui.component.screen.SubScreen
@@ -74,10 +73,10 @@ private class LoginModel(private val model: AppModel) : ViewModel() {
 			when (result1) {
 				is Data.Success -> {
 					val token = result1.data
-					config.userToken = token
+					app.config.userToken = token
 					val result2 = ClientAPI.request(API.User.Profile.GetProfile, token)
 					loadingState.isOpen = false
-					if (result2 is Data.Success) config.userProfile = result2.data
+					if (result2 is Data.Success) app.config.userProfile = result2.data
 					model.pop()
 				}
 				is Data.Error -> {

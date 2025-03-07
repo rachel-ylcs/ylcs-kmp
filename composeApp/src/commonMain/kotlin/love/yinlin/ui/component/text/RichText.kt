@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
-import love.yinlin.Colors
+import love.yinlin.common.Colors
 import love.yinlin.extension.*
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.WebImageQuality
