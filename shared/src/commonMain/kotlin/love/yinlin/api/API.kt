@@ -157,11 +157,13 @@ object API : APINode(null, "") {
 		object Activity : APINode(this, "activity") {
 			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.Activity>>(this, "getActivities")
 
-			object AddActivity : APIFormRequest<AddActivity.Request, AddActivity.Files>(this, "addActivity") {
+			object AddActivity : APIForm<AddActivity.Request, AddActivity.Response, AddActivity.Files>(this, "addActivity") {
 				@Serializable
 				data class Request(val token: String, val activity: love.yinlin.data.rachel.Activity)
 				@Serializable
-				data class Files(val pic: APIFile?, val pics: APIFiles)
+				data class Files(val pic: APIFile?, val pics: APIFiles?)
+				@Serializable
+				data class Response(val aid: Int, val pic: String?, val pics: List<String>)
 			}
 
 			object ModifyActivityInfo : APIPostRequest<ModifyActivityInfo.Request>(this, "modifyActivityInfo") {
@@ -304,7 +306,7 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val token: String, val title: String, val content: String, val section: Int)
 				@Serializable
-				data class Files(val pics: APIFiles)
+				data class Files(val pics: APIFiles?)
 				@Serializable
 				data class Response(val tid: Int, val pic: String?)
 			}

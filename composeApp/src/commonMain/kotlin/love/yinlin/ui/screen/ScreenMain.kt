@@ -18,20 +18,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeMode
-import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.screen.community.DiscoveryModel
-import love.yinlin.ui.screen.community.MeModel
+import love.yinlin.ui.screen.community.DiscoveryModelPart
+import love.yinlin.ui.screen.community.MeModelPart
 import love.yinlin.ui.screen.community.ScreenDiscovery
 import love.yinlin.ui.screen.community.ScreenMe
-import love.yinlin.ui.screen.msg.MsgModel
+import love.yinlin.ui.screen.msg.MsgModelPart
 import love.yinlin.ui.screen.msg.ScreenMsg
 import love.yinlin.ui.screen.music.ScreenMusic
 import love.yinlin.ui.screen.world.ScreenWorld
-import love.yinlin.ui.screen.world.WorldModel
+import love.yinlin.ui.screen.world.WorldModelPart
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -49,15 +48,15 @@ private enum class TabItem(
 	ME(Res.string.home_nav_me, Res.drawable.tab_me_normal, Res.drawable.tab_me_active),
 }
 
-class MainModel(val appModel: AppModel) {
+class MainModelPart(val appModel: AppModel) {
 	val pagerState = object : PagerState() {
 		override val pageCount: Int = TabItem.entries.size
 	}
 
-	val msgModel = MsgModel(this)
-	val discoveryModel = DiscoveryModel(this)
-	val meModel = MeModel(this)
-	val worldModel = WorldModel(this)
+	val msgModel = MsgModelPart(this)
+	val discoveryModel = DiscoveryModelPart(this)
+	val meModel = MeModelPart(this)
+	val worldModel = WorldModelPart(this)
 
 	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
 	fun pop() = appModel.pop()
@@ -84,7 +83,7 @@ private fun NavigationItemText(
 
 @Composable
 private fun PageContent(
-	model: MainModel,
+	model: MainModelPart,
 	modifier: Modifier = Modifier
 ) {
 	HorizontalPager (
@@ -169,7 +168,7 @@ private fun LandscapeNavigation(
 
 @Composable
 private fun Portrait(
-	model: MainModel,
+	model: MainModelPart,
 	modifier: Modifier = Modifier
 ) {
 	Scaffold(
@@ -191,7 +190,7 @@ private fun Portrait(
 
 @Composable
 private fun Landscape(
-	model: MainModel,
+	model: MainModelPart,
 	modifier: Modifier = Modifier
 ) {
 	Row(modifier = modifier) {

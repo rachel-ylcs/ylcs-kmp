@@ -8,25 +8,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.data.weibo.WeiboUserInfo
-import love.yinlin.extension.launchFlag
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.Saver
-import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.layout.EmptyBox
@@ -34,35 +27,29 @@ import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
 
-private class WeiboDetailsModel(model: AppModel) : ViewModel() {
+private class WeiboDetailsModel(model: AppModel) : ScreenModel() {
 	val msgModel = model.mainModel.msgModel
 	val weibo: Weibo? = msgModel.currentWeibo
-	val flagFirstLoad = launchFlag()
 	var comments: List<WeiboComment>? by mutableStateOf(null)
 
-	fun init(weibo: Weibo) {
+	override fun initialize() {
 		launch {
-			val data = WeiboAPI.getWeiboDetails(weibo.id)
-			comments = if (data is Data.Success) data.data else emptyList()
+			weibo?.let {
+				val data = WeiboAPI.getWeiboDetails(it.id)
+				comments = if (data is Data.Success) data.data else emptyList()
+			}
 		}
 	}
 }
 
 @Composable
-private fun WeiboCommentCard(
-	onAvatarClick: (WeiboUserInfo) -> Unit,
-	comment: WeiboComment
-) {
-	Column(
-		modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-	) {
+private fun WeiboCommentCard(comment: WeiboComment) {
+	Column(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
 		WeiboUserBar(
-			avatar = comment.info.avatar,
-			name = comment.info.name,
-			location = comment.location,
+			info = comment.info,
 			time = comment.timeString,
-			padding = PaddingValues(bottom = 5.dp),
-			onAvatarClick = { onAvatarClick(comment.info) }
+			location = comment.location,
+			padding = PaddingValues(bottom = 5.dp)
 		)
 		RichText(
 			text = comment.text,
@@ -74,17 +61,13 @@ private fun WeiboCommentCard(
 				modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp),
 				tonalElevation = 3.dp
 			) {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(5.dp)
-				) {
+				Column(modifier = Modifier.fillMaxWidth().padding(5.dp)) {
 					for (subComment in subComments) {
 						WeiboUserBar(
-							avatar = subComment.info.avatar,
-							name = subComment.info.name,
+							info = subComment.info,
 							location = subComment.location,
 							time = subComment.timeString,
-							padding = PaddingValues(bottom = 5.dp),
-							onAvatarClick = { onAvatarClick(subComment.info) }
+							padding = PaddingValues(bottom = 5.dp)
 						)
 						RichText(
 							text = subComment.text,
@@ -99,7 +82,6 @@ private fun WeiboCommentCard(
 
 @Composable
 private fun Portrait(
-	model: WeiboDetailsModel,
 	weibo: Weibo,
 	comments: List<WeiboComment>?
 ) {
@@ -109,15 +91,7 @@ private fun Portrait(
 			.padding(start = 10.dp, end = 10.dp, top = 5.dp)
 	) {
 		item(key = Saver.key("WeiboLayout")) {
-			WeiboLayout(
-				weibo = weibo,
-				onAvatarClick = { model.msgModel.onWeiboAvatarClick(it) },
-				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
-				onTopicClick = { model.msgModel.onWeiboTopicClick(it) },
-				onAtClick = { model.msgModel.onWeiboAtClick(it) },
-				onImageClick = { pics, current -> model.msgModel.onWeiboPicClick(pics, current) },
-				onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
-			)
+			WeiboLayout(weibo = weibo)
 		}
 		if (comments != null) {
 			item(key = Saver.key("HorizontalDivider")) {
@@ -127,10 +101,7 @@ private fun Portrait(
 				items = comments,
 				key = { it.id }
 			) {
-				WeiboCommentCard(
-					onAvatarClick = { info -> model.msgModel.onWeiboAvatarClick(info) },
-					comment = it
-				)
+				WeiboCommentCard(comment = it)
 			}
 		}
 	}
@@ -138,10 +109,10 @@ private fun Portrait(
 
 @Composable
 private fun Landscape(
-	model: WeiboDetailsModel,
 	weibo: Weibo,
 	comments: List<WeiboComment>?
 ) {
+	val processor = LocalWeiboProcessor.current
 	Row(
 		modifier = Modifier.fillMaxSize()
 			.background(MaterialTheme.colorScheme.surface)
@@ -149,20 +120,18 @@ private fun Landscape(
 	) {
 		Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
 			WeiboUserBar(
-				avatar = weibo.info.avatar,
-				name = weibo.info.name,
+				info = weibo.info,
 				time = weibo.timeString,
 				location = weibo.location,
-				padding = PaddingValues(bottom = 10.dp),
-				onAvatarClick = { model.msgModel.onWeiboAvatarClick(weibo.info) }
+				padding = PaddingValues(bottom = 10.dp)
 			)
 			RichText(
 				text = weibo.text,
 				modifier = Modifier.fillMaxWidth().weight(1f),
 				overflow = TextOverflow.Ellipsis,
-				onLinkClick = { model.msgModel.onWeiboLinkClick(it) },
-				onTopicClick = { model.msgModel.onWeiboTopicClick(it) },
-				onAtClick = { model.msgModel.onWeiboAtClick(it) }
+				onLinkClick = { processor.onWeiboLinkClick(it) },
+				onTopicClick = { processor.onWeiboTopicClick(it) },
+				onAtClick = { processor.onWeiboAtClick(it) }
 			)
 		}
 		VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
@@ -177,8 +146,8 @@ private fun Landscape(
 				NineGrid(
 					pics = weibo.pictures,
 					modifier = Modifier.fillMaxWidth(),
-					onImageClick = { model.msgModel.onWeiboPicClick(weibo.pictures, it) },
-					onVideoClick = { model.msgModel.onWeiboVideoClick(it) }
+					onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
+					onVideoClick = { processor.onWeiboVideoClick(it) }
 				)
 			}
 		}
@@ -191,10 +160,7 @@ private fun Landscape(
 					items = comments,
 					key = { it.id }
 				) {
-					WeiboCommentCard(
-						onAvatarClick = { info -> model.msgModel.onWeiboAvatarClick(info) },
-						comment = it
-					)
+					WeiboCommentCard(comment = it)
 				}
 			}
 		}
@@ -203,28 +169,24 @@ private fun Landscape(
 
 @Composable
 fun ScreenWeiboDetails(model: AppModel) {
-	val screenModel = viewModel { WeiboDetailsModel(model) }
+	val screenModel = screen { WeiboDetailsModel(model) }
 
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = "微博详情",
-		onBack = { model.pop() }
-	) {
-		if (screenModel.weibo == null) EmptyBox()
-		else {
-			if (app.isPortrait) Portrait(
-				model = screenModel,
-				weibo = screenModel.weibo,
-				comments = screenModel.comments
-			)
-			else Landscape(
-				model = screenModel,
-				weibo = screenModel.weibo,
-				comments = screenModel.comments
-			)
-
-			LaunchOnce(screenModel.flagFirstLoad) {
-				screenModel.init(screenModel.weibo)
+	CompositionLocalProvider(LocalWeiboProcessor provides model.mainModel.msgModel.processor) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = "微博详情",
+			onBack = { model.pop() }
+		) {
+			if (screenModel.weibo == null) EmptyBox()
+			else {
+				if (app.isPortrait) Portrait(
+					weibo = screenModel.weibo,
+					comments = screenModel.comments
+				)
+				else Landscape(
+					weibo = screenModel.weibo,
+					comments = screenModel.comments
+				)
 			}
 		}
 	}

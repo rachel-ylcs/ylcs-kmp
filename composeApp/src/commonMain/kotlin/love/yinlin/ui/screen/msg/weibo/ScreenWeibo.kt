@@ -6,16 +6,15 @@ import androidx.compose.ui.Modifier
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.screen.msg.MsgModel
+import love.yinlin.ui.screen.msg.MsgModelPart
 
 @Composable
-fun ScreenWeibo(model: MsgModel) {
+fun ScreenWeibo(model: MsgModelPart) {
 	StatefulBox(
 		state = model.weiboState.grid.state,
 		modifier = Modifier.fillMaxSize()
 	) {
 		WeiboGrid(
-			model = model,
 			items = model.weiboState.grid.items,
 			modifier = Modifier.fillMaxSize()
 		)

@@ -25,18 +25,7 @@ fun copyResources(classLoader: ClassLoader, root: String) {
 	if (publicResourceUrl.protocol == "jar") {
 		val jarFile = (publicResourceUrl.openConnection() as JarURLConnection).jarFile
 		val entries = jarFile.entries()
-		if (targetFile.exists()) {
-			while (entries.hasMoreElements()) {
-				val entry = entries.nextElement()
-				if (!entry.isDirectory && entry.name.startsWith(root) && entry.name.endsWith(".json")) {
-					val writeFile = File(targetFile, entry.name.substring(root.length + 1))
-					jarFile.getInputStream(entry).use { input ->
-						Files.copy(input, writeFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-					}
-				}
-			}
-		}
-		else {
+		if (!targetFile.exists()) {
 			targetFile.mkdirs()
 			while (entries.hasMoreElements()) {
 				val entry = entries.nextElement()
@@ -50,19 +39,7 @@ fun copyResources(classLoader: ClassLoader, root: String) {
 			}
 		}
 	}
-	else {
-		val targetSource = File(publicResourceUrl.toURI())
-		if (targetFile.exists()) {
-			targetSource.listFiles{
-				it.isFile && it.extension == "json"
-			}?.let {
-				for (jsonFile in it) {
-					jsonFile.copyTo(File(targetFile, jsonFile.name), true)
-				}
-			}
-		}
-		else copyResourcesFromFile(targetSource, targetFile)
-	}
+	else copyResourcesFromFile(File(publicResourceUrl.toURI()), targetFile)
 }
 
 val ResNode.exists: Boolean get() = File(this.path).exists()

@@ -25,8 +25,7 @@ object ClientAPI {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
-		val data = json["data"]!!
-		return if (code == APICode.SUCCESS) Data.Success(data.to(), msg)
+		return if (code == APICode.SUCCESS) Data.Success(json["data"]!!.to(), msg)
 			else Data.Error(Failed.RequestError.InvalidArgument, msg)
 	}
 
@@ -98,8 +97,8 @@ object ClientAPI {
 	}
 
 	interface APIFileScope {
-		fun file(value: Path): APIFile
-		fun file(values: List<Path>): List<APIFile>
+		fun file(value: Path?): APIFile?
+		fun file(values: List<Path>?): APIFiles?
 	}
 
 	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
@@ -120,16 +119,16 @@ object ClientAPI {
 			private var index = 0
 			val map = mutableMapOf<String, Any>()
 
-			override fun file(value: Path): APIFile {
+			override fun file(value: Path?): APIFile? = value?.let {
 				val key = "#${index++}#"
 				map[key] = value
-				return APIFile(key)
+				APIFile(key)
 			}
 
-			override fun file(values: List<Path>): List<APIFile> {
+			override fun file(values: List<Path>?): APIFiles? = if (values == null || values.isEmpty()) null else {
 				val key = "#${index++}#"
 				map[key] = values
-				return listOf(APIFile(key))
+				listOf(APIFile(key))
 			}
 		}
 

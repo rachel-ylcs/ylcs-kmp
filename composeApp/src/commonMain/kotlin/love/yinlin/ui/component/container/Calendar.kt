@@ -77,10 +77,7 @@ private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
 } ?: ""
 
 @Stable
-class CalendarState {
-	internal val pagerState = object : PagerState(currentPage = 5) { override val pageCount: Int = 12 }
-	val events = mutableStateMapOf<LocalDate, String>()
-}
+class CalendarState : PagerState(currentPage = 5) { override val pageCount: Int = 12 }
 
 private fun indexShadowDate(index: Int): LocalDate {
 	val today = DateEx.Today
@@ -96,7 +93,7 @@ private fun CalendarHeader(
 	modifier: Modifier = Modifier,
 	actions: @Composable RowScope.() -> Unit = { }
 ) {
-	val currentDate by rememberDerivedState { indexShadowDate(state.pagerState.settledPage) }
+	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
 	Row(
 		modifier = modifier.padding(horizontal = 10.dp),
@@ -105,7 +102,7 @@ private fun CalendarHeader(
 	) {
 		Text(
 			text = "${currentDate.year}年${currentDate.monthNumber}月",
-			style = MaterialTheme.typography.titleLarge,
+			style = MaterialTheme.typography.displayMedium,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f)
@@ -140,11 +137,12 @@ private fun CalendarWeekGrid(
 @Composable
 private fun CalendarDayGrid(
 	state: CalendarState,
+	events: Map<LocalDate, String>,
 	modifier: Modifier = Modifier,
 	onEventClick: (LocalDate) -> Unit
 ) {
 	HorizontalPager(
-		state = state.pagerState,
+		state = state,
 		beyondViewportPageCount = 1,
 		modifier = modifier
 	) { pageIndex ->
@@ -165,7 +163,7 @@ private fun CalendarDayGrid(
 		) {
 			items(42) { dayIndex ->
 				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
-				val eventTitle = state.events[date]
+				val eventTitle = events[date]
 				val color = when {
 					eventTitle != null -> MaterialTheme.colorScheme.primary
 					date == today -> MaterialTheme.colorScheme.onPrimary
@@ -199,7 +197,7 @@ private fun CalendarDayGrid(
 						Text(
 							text = text,
 							color = color,
-							style = MaterialTheme.typography.bodyMedium,
+							style = MaterialTheme.typography.bodySmall,
 							textAlign = TextAlign.Center,
 							maxLines = 1,
 							overflow = TextOverflow.Clip
@@ -214,8 +212,9 @@ private fun CalendarDayGrid(
 @Composable
 fun Calendar(
 	state: CalendarState = remember { CalendarState() },
+	events: Map<LocalDate, String> = remember { emptyMap() },
 	modifier: Modifier = Modifier,
-	actions: @Composable RowScope.() -> Unit,
+	actions: @Composable RowScope.() -> Unit = {},
 	onEventClick: (LocalDate) -> Unit
 ) {
 	Column(
@@ -224,7 +223,7 @@ fun Calendar(
 	) {
 		CalendarHeader(
 			state = state,
-			modifier = Modifier.fillMaxWidth(),
+			modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
 			actions = actions
 		)
 		CalendarWeekGrid(
@@ -232,6 +231,7 @@ fun Calendar(
 		)
 		CalendarDayGrid(
 			state = state,
+			events = events,
 			modifier = Modifier.fillMaxWidth(),
 			onEventClick = onEventClick
 		)

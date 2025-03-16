@@ -5,9 +5,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,12 +24,13 @@ import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.TabBar
-import love.yinlin.ui.screen.MainModel
+import love.yinlin.ui.screen.MainModelPart
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
+import love.yinlin.ui.screen.msg.weibo.LocalWeiboProcessor
 import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
 import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
 import love.yinlin.ui.screen.msg.weibo.WeiboGridData
-import love.yinlin.ui.screen.msg.weibo.WeiboLayout
+import love.yinlin.ui.screen.msg.weibo.WeiboProcessor
 
 private enum class MsgTabItem(
 	val title: String,
@@ -48,7 +46,7 @@ private enum class MsgTabItem(
 	}
 }
 
-class MsgModel(val mainModel: MainModel) {
+class MsgModelPart(val mainModel: MainModelPart) {
 	class WeiboState {
 		val flagFirstLoad = launchFlag()
 		val grid = WeiboGridData()
@@ -116,65 +114,43 @@ class MsgModel(val mainModel: MainModel) {
 		}
 	}
 
-	fun onWeiboClick(weibo: Weibo) {
-		currentWeibo = weibo
-		mainModel.navigate(Route.WeiboDetails)
-	}
+	val processor = object : WeiboProcessor {
+		override fun onWeiboClick(weibo: Weibo) {
+			currentWeibo = weibo
+			mainModel.navigate(Route.WeiboDetails)
+		}
 
-	fun onWeiboAvatarClick(info: WeiboUserInfo) {
-		mainModel.navigate(Route.WeiboUser(info.id))
-	}
+		override fun onWeiboAvatarClick(info: WeiboUserInfo) {
+			mainModel.navigate(Route.WeiboUser(info.id))
+		}
 
-	fun onWeiboLinkClick(arg: String) {
-		if (OS.platform.isWeb) OS.openURL(arg)
-		else mainModel.navigate(Route.WebPage(arg))
-	}
+		override fun onWeiboLinkClick(arg: String) {
+			if (OS.platform.isWeb) OS.openURL(arg)
+			else mainModel.navigate(Route.WebPage(arg))
+		}
 
-	fun onWeiboTopicClick(arg: String) {
-		if (OS.platform.isWeb) OS.openURL(arg)
-		else mainModel.navigate(Route.WebPage(arg))
-	}
+		override fun onWeiboTopicClick(arg: String) {
+			if (OS.platform.isWeb) OS.openURL(arg)
+			else mainModel.navigate(Route.WebPage(arg))
+		}
 
-	fun onWeiboAtClick(arg: String) {
-		if (OS.platform.isWeb) OS.openURL(arg)
-		else mainModel.navigate(Route.WebPage(arg))
-	}
+		override fun onWeiboAtClick(arg: String) {
+			if (OS.platform.isWeb) OS.openURL(arg)
+			else mainModel.navigate(Route.WebPage(arg))
+		}
 
-	fun onWeiboPicClick(pics: List<Picture>, current: Int) {
-		mainModel.navigate(Route.ImagePreview(pics, current))
-	}
+		override fun onWeiboPicClick(pics: List<Picture>, current: Int) {
+			mainModel.navigate(Route.ImagePreview(pics, current))
+		}
 
-	fun onWeiboVideoClick(pic: Picture) {
-		TODO()
-	}
-
-	@Composable
-	fun WeiboCard(
-		weibo: Weibo,
-		modifier: Modifier = Modifier
-	) {
-		ElevatedCard(
-			modifier = modifier,
-			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-			onClick = { onWeiboClick(weibo) }
-		) {
-			Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-				WeiboLayout(
-					weibo = weibo,
-					onAvatarClick = ::onWeiboAvatarClick,
-					onLinkClick = ::onWeiboLinkClick,
-					onTopicClick = ::onWeiboTopicClick,
-					onAtClick = ::onWeiboAtClick,
-					onImageClick = ::onWeiboPicClick,
-					onVideoClick = ::onWeiboVideoClick
-				)
-			}
+		override fun onWeiboVideoClick(pic: Picture) {
+			TODO()
 		}
 	}
 }
 
 @Composable
-fun ScreenMsg(model: MsgModel) {
+fun ScreenMsg(model: MsgModelPart) {
 	Column(modifier = Modifier.fillMaxSize()) {
 		Surface(
 			modifier = Modifier.fillMaxWidth().zIndex(5f),
@@ -207,10 +183,12 @@ fun ScreenMsg(model: MsgModel) {
 			userScrollEnabled = false
 		) {
 			Box(modifier = Modifier.fillMaxSize()) {
-				when (it) {
-					MsgTabItem.WEIBO.ordinal -> ScreenWeibo(model)
-					MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(model)
-					MsgTabItem.PICTURES.ordinal -> ScreenPictures()
+				CompositionLocalProvider(LocalWeiboProcessor provides model.processor) {
+					when (it) {
+						MsgTabItem.WEIBO.ordinal -> ScreenWeibo(model)
+						MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(model)
+						MsgTabItem.PICTURES.ordinal -> ScreenPictures()
+					}
 				}
 			}
 		}

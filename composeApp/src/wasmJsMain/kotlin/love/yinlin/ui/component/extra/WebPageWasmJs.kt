@@ -1,18 +1,10 @@
 package love.yinlin.ui.component.extra
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NotificationImportant
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.unit.dp
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.common.UnsupportedComponent
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
@@ -40,20 +32,5 @@ actual fun WebPage(
 	state: WebPageState,
 	modifier: Modifier
 ) {
-	Surface(
-		modifier = modifier,
-		shadowElevation = 5.dp
-	) {
-		Column(
-			modifier = modifier,
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
-		) {
-			MiniIcon(
-				imageVector = Icons.Filled.NotificationImportant,
-				size = 50.dp
-			)
-			Text(text = "该组件或功能未在此平台实现")
-		}
-	}
+	UnsupportedComponent(modifier = modifier)
 }

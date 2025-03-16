@@ -34,7 +34,7 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.screen.MainModel
+import love.yinlin.ui.screen.MainModelPart
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.Res
@@ -48,7 +48,7 @@ private data class TipButtonInfo(
 	val onClick: () -> Unit
 )
 
-class MeModel(val mainModel: MainModel) {
+class MeModelPart(val mainModel: MainModelPart) {
 	fun scanQrcode() {
 
 	}
@@ -85,7 +85,7 @@ private fun PortraitValue(
 
 @Composable
 private fun ToolBar(
-	model: MeModel,
+	model: MeModelPart,
 	modifier: Modifier = Modifier
 ) {
 	Row(
@@ -163,7 +163,7 @@ private fun TipButtonContainer(
 
 @Composable
 private fun UserSpaceContainer(
-	model: MeModel,
+	model: MeModelPart,
 	modifier: Modifier = Modifier,
 	shape: Shape = RectangleShape
 ) {
@@ -185,7 +185,7 @@ private fun UserSpaceContainer(
 
 @Composable
 private fun LoginBox(
-	model: MeModel,
+	model: MeModelPart,
 	modifier: Modifier = Modifier
 ) {
 	Column(modifier = modifier) {
@@ -221,7 +221,7 @@ private fun LoginBox(
 
 @Composable
 private fun Portrait(
-	model: MeModel,
+	model: MeModelPart,
 	userProfile: UserProfile
 ) {
 	Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
@@ -300,7 +300,7 @@ private fun Portrait(
 
 @Composable
 private fun Landscape(
-	model: MeModel,
+	model: MeModelPart,
 	userProfile: UserProfile
 ) {
 	Column(modifier = Modifier.fillMaxSize()) {
@@ -391,7 +391,7 @@ private fun Landscape(
 }
 
 @Composable
-fun ScreenMe(model: MeModel) {
+fun ScreenMe(model: MeModelPart) {
 	val userProfile = app.config.userProfile
 	if (userProfile == null) LoginBox(model, Modifier.fillMaxSize())
 	else {

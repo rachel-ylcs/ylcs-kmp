@@ -41,7 +41,7 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.layout.TabBar
-import love.yinlin.ui.screen.MainModel
+import love.yinlin.ui.screen.MainModelPart
 
 private enum class DiscoveryItem(
 	val id: Int,
@@ -61,7 +61,7 @@ private enum class DiscoveryItem(
 	}
 }
 
-class DiscoveryModel(val mainModel: MainModel) {
+class DiscoveryModelPart(val mainModel: MainModelPart) {
 	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
@@ -257,7 +257,7 @@ class DiscoveryModel(val mainModel: MainModel) {
 }
 
 @Composable
-fun ScreenDiscovery(model: DiscoveryModel) {
+fun ScreenDiscovery(model: DiscoveryModelPart) {
 	StatefulBox(
 		state = model.state,
 		modifier = Modifier.fillMaxSize()

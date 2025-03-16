@@ -2,7 +2,6 @@ package love.yinlin.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +10,9 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.AtomicReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
@@ -77,3 +78,7 @@ fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
 		}
 	}
 }
+
+// Composition Local
+
+fun <T> localComposition() = staticCompositionLocalOf<T> {  error("CompositionLocal not present") }

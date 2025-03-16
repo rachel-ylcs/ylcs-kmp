@@ -7,29 +7,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserConstraint
-import love.yinlin.launch
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.ui.component.screen.DialogLoading
-import love.yinlin.ui.component.screen.DialogState
-import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.screen.Tip
-import love.yinlin.ui.component.screen.TipState
+import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -43,7 +34,7 @@ private enum class Mode {
 	ForgotPassword
 }
 
-private class LoginModel(private val model: AppModel) : ViewModel() {
+private class LoginModel(private val model: AppModel) : ScreenModel() {
 	val tip = TipState()
 	val loadingState = DialogState()
 
@@ -63,18 +54,29 @@ private class LoginModel(private val model: AppModel) : ViewModel() {
 
 	fun login() {
 		launch {
-			val data = API.User.Account.Login.Request(
-				name = loginId.text,
-				pwd = loginPwd.text,
-				platform = OS.platform
-			)
+			val id = loginId.text
+			val pwd = loginPwd.text
+			if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
+				tip.error("ID或密码不合规范")
+				return@launch
+			}
 			loadingState.isOpen = true
-			val result1 = ClientAPI.request(API.User.Account.Login, data)
+			val result1 = ClientAPI.request(
+				route = API.User.Account.Login,
+				data = API.User.Account.Login.Request(
+					name = id,
+					pwd = pwd,
+					platform = OS.platform
+				)
+			)
 			when (result1) {
 				is Data.Success -> {
 					val token = result1.data
 					app.config.userToken = token
-					val result2 = ClientAPI.request(API.User.Profile.GetProfile, token)
+					val result2 = ClientAPI.request(
+						route = API.User.Profile.GetProfile,
+						data = token
+					)
 					loadingState.isOpen = false
 					if (result2 is Data.Success) app.config.userProfile = result2.data
 					model.pop()
@@ -336,7 +338,7 @@ private fun Landscape(
 
 @Composable
 fun ScreenLogin(model: AppModel) {
-	val screenModel = viewModel { LoginModel(model) }
+	val screenModel = screen { LoginModel(model) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),

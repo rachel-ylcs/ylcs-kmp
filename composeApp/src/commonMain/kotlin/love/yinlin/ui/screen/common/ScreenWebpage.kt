@@ -3,21 +3,21 @@ package love.yinlin.ui.screen.common
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.ui.component.extra.WebPage
 import love.yinlin.ui.component.extra.WebPageSettings
 import love.yinlin.ui.component.extra.WebPageState
 import love.yinlin.ui.component.screen.SubScreen
 
-private class WebPageModel(url: String) : ViewModel() {
+private class WebPageModel(url: String) : ScreenModel() {
 	val state = WebPageState(WebPageSettings(), url)
 }
 
 @Composable
 fun ScreenWebPage(model: AppModel, url: String) {
-	val screenModel = viewModel { WebPageModel(url) }
+	val screenModel = screen { WebPageModel(url) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),

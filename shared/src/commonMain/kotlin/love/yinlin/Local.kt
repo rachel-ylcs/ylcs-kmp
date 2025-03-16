@@ -12,7 +12,7 @@ object Local {
 
 		// < ------  始终浅色模式  ------ >
 		// 开启后无视主题设置始终保持浅色
-		const val ALWAYS_LIGHT_MODE = true
+		const val ALWAYS_LIGHT_MODE = false
 
 		// 桌面端配置
 		object Desktop {

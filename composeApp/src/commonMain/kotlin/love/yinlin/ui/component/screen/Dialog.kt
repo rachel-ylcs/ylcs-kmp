@@ -205,18 +205,18 @@ private fun RachelDialog(
 }
 
 @Composable
-private fun DialogButton(
+fun DialogButton(
 	text: String,
 	enabled: Boolean = true,
+	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
 	TextButton(
+		modifier = modifier,
 		enabled = enabled,
 		onClick = onClick
 	) {
-		Text(
-			text = text
-		)
+		Text(text = text)
 	}
 }
 
@@ -249,13 +249,19 @@ fun DialogConfirm(
 		state = state,
 		title = title,
 		actions = {
-			DialogButton(text = stringResource(Res.string.dialog_yes)) {
-				state.isOpen = false
-				onYes()
-			}
-			DialogButton(text = stringResource(Res.string.dialog_no)) {
-				state.isOpen = false
-			}
+			DialogButton(
+				text = stringResource(Res.string.dialog_yes),
+				onClick = {
+					state.isOpen = false
+					onYes()
+				}
+			)
+			DialogButton(
+				text = stringResource(Res.string.dialog_no),
+				onClick = {
+					state.isOpen = false
+				}
+			)
 		}
 	) {
 		Text(
@@ -286,14 +292,18 @@ fun DialogInput(
 		actions = {
 			DialogButton(
 				text = stringResource(Res.string.dialog_yes),
-				enabled = textInputState.ok
-			) {
-				state.isOpen = false
-				onInput(textInputState.text)
-			}
-			DialogButton(text = stringResource(Res.string.dialog_no)) {
-				state.isOpen = false
-			}
+				enabled = textInputState.ok,
+				onClick = {
+					state.isOpen = false
+					onInput(textInputState.text)
+				}
+			)
+			DialogButton(
+				text = stringResource(Res.string.dialog_no),
+				onClick = {
+					state.isOpen = false
+				}
+			)
 		}
 	) {
 		TextInput(
@@ -453,10 +463,11 @@ fun DialogProgress(
 		actions = {
 			DialogButton(
 				text = stringResource(Res.string.dialog_cancel),
-				enabled = state.isOpen
-			) {
-				state.isOpen = false
-			}
+				enabled = state.isOpen,
+				onClick = {
+					state.isOpen = false
+				}
+			)
 		}
 	) {
 		Column(

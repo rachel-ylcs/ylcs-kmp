@@ -58,21 +58,22 @@ val String.successData: Data.Success<Response.Default> get() = Data.Success(Resp
 
 val String.failedData: Data.Error get() = Data.Error(Failed.RequestError.InvalidArgument, this)
 
-class NineGridProcessor(val mPics: APIFiles) {
-	val mActualPics: List<String>
+class NineGridProcessor(pics: APIFiles?) {
+	val sourcePics = pics ?: emptyList()
+	val actualPics: List<String>
 	val jsonString: String
 
 	init {
-		if (mPics.size > 9) throw error("NineGrid num error")
-		mActualPics = List(mPics.size) { currentUniqueId(it) }
-		jsonString = mActualPics.toJsonString()
+		if (sourcePics.size > 9) throw error("NineGrid num error")
+		actualPics = List(sourcePics.size) { currentUniqueId(it) }
+		jsonString = actualPics.toJsonString()
 	}
 
 	inline fun copy(callback: (String) -> ResNode): String? {
-		repeat(mActualPics.size) {
-			mPics[it].copy(callback(mActualPics[it]))
+		repeat(actualPics.size) {
+			sourcePics[it].copy(callback(actualPics[it]))
 		}
-		return mActualPics.firstOrNull()
+		return actualPics.firstOrNull()
 	}
 }
 
@@ -153,7 +154,6 @@ inline fun <reified Response : Any> Route.api(
 
 suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 	val multipartData = this.receiveMultipart()
-
 	var dataString: String? = null
 	val form = makeObject {
 		val tmpDir = System.getProperty("java.io.tmpdir")

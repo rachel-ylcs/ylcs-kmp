@@ -18,16 +18,19 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
 import love.yinlin.ui.screen.settings.ScreenSettings
+import love.yinlin.ui.screen.world.ScreenActivityDetails
+import love.yinlin.ui.screen.world.ScreenAddActivity
+import love.yinlin.ui.screen.world.ScreenModifyActivity
 
 sealed interface Route {
 	@Serializable
-	data object Main: Route
+	data object Main : Route
 
 	// 通用
 	@Serializable
 	data class ImagePreview(val images: List<Picture>, val current: Int) : Route
 	@Serializable
-	data class WebPage(val url: String): Route
+	data class WebPage(val url: String) : Route
 
 	// 设置
 	@Serializable
@@ -35,13 +38,13 @@ sealed interface Route {
 
 	// 微博
 	@Serializable
-	data object WeiboDetails: Route
+	data object WeiboDetails : Route
 	@Serializable
-	data class WeiboUser(val id: String): Route
+	data class WeiboUser(val id: String) : Route
 	@Serializable
-	data object WeiboFollows: Route
+	data object WeiboFollows : Route
 	@Serializable
-	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum): Route
+	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum) : Route
 
 	// 社区
 	@Serializable
@@ -50,6 +53,14 @@ sealed interface Route {
 	data class Topic(val topic: love.yinlin.data.rachel.Topic) : Route
 	@Serializable
 	data object Mail : Route
+
+	// 世界
+	@Serializable
+	data class ActivityDetails(val aid: Int) : Route
+	@Serializable
+	data object AddActivity : Route
+	@Serializable
+	data class ModifyActivity(val aid: Int) : Route
 
 	companion object {
 		fun NavGraphBuilder.buildRoute(appModel: AppModel) {
@@ -98,6 +109,19 @@ sealed interface Route {
 			}
 			composable<Mail> {
 				ScreenMail(appModel)
+			}
+
+			// 世界
+			composable<ActivityDetails> {
+				val args = it.toRoute<ActivityDetails>()
+				ScreenActivityDetails(appModel, args.aid)
+			}
+			composable<AddActivity> {
+				ScreenAddActivity(appModel)
+			}
+			composable<ModifyActivity> {
+				val args = it.toRoute<ModifyActivity>()
+				ScreenModifyActivity(appModel, args.aid)
 			}
 		}
 	}

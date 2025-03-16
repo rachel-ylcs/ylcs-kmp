@@ -16,19 +16,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeColor
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.ThemeColor
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.SubComment
 import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.TopicDetails
-import love.yinlin.extension.*
+import love.yinlin.extension.DateEx
+import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberStateSaveable
+import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.common.UserLabel
@@ -38,9 +41,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.SubScreen
 
-private class TopicModel(private val model: AppModel, topic: Topic) : ViewModel() {
-	val flagFirstLoad = launchFlag()
-
+private class TopicModel(private val model: AppModel, topic: Topic) : ScreenModel() {
 	var details: TopicDetails? by mutableStateOf(null)
 	var topic: Topic by mutableStateOf(topic)
 
@@ -50,6 +51,13 @@ private class TopicModel(private val model: AppModel, topic: Topic) : ViewModel(
 	var commentCanLoading by mutableStateOf(false)
 
 	var currentComment: Comment? by mutableStateOf(null)
+
+	override fun initialize() {
+		launch {
+			requestTopic()
+			requestNewComments()
+		}
+	}
 
 	suspend fun requestTopic() {
 		val result = ClientAPI.request(
@@ -560,7 +568,7 @@ private fun Landscape(
 
 @Composable
 fun ScreenTopic(model: AppModel, topic: Topic) {
-	val screenModel = viewModel { TopicModel(model, topic) }
+	val screenModel = screen { TopicModel(model, topic) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),
@@ -580,10 +588,5 @@ fun ScreenTopic(model: AppModel, topic: Topic) {
 			model = screenModel,
 			details = details
 		)
-	}
-
-	LaunchOnce(screenModel.flagFirstLoad) {
-		screenModel.requestTopic()
-		screenModel.requestNewComments()
 	}
 }

@@ -8,9 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,12 +29,25 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.localComposition
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.screen.msg.MsgModel
+
+@Stable
+interface WeiboProcessor {
+	fun onWeiboClick(weibo: Weibo)
+	fun onWeiboAvatarClick(info: WeiboUserInfo)
+	fun onWeiboLinkClick(arg: String)
+	fun onWeiboTopicClick(arg: String)
+	fun onWeiboAtClick(arg: String)
+	fun onWeiboPicClick(pics: List<Picture>, current: Int)
+	fun onWeiboVideoClick(pic: Picture)
+}
+
+val LocalWeiboProcessor = localComposition<WeiboProcessor>()
 
 class WeiboGridData {
 	var state by mutableStateOf(BoxState.EMPTY)
@@ -102,13 +118,12 @@ fun WeiboDataBar(
 
 @Composable
 fun WeiboUserBar(
-	avatar: String,
-	name: String,
+	info: WeiboUserInfo,
 	time: String,
 	location: String,
-	padding: PaddingValues,
-	onAvatarClick: () -> Unit
+	padding: PaddingValues
 ) {
+	val processor = LocalWeiboProcessor.current
 	Row(
 		modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(padding),
 		verticalAlignment = Alignment.CenterVertically,
@@ -116,12 +131,12 @@ fun WeiboUserBar(
 	) {
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			WebImage(
-				uri = avatar,
+				uri = info.avatar,
 				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.matchParentSize(),
-				onClick = onAvatarClick
+				onClick = { processor.onWeiboAvatarClick(info) }
 			)
 		}
 		Column(
@@ -130,7 +145,7 @@ fun WeiboUserBar(
 		) {
 			Text(
 				modifier = Modifier.fillMaxWidth(),
-				text = name,
+				text = info.name,
 				color = MaterialTheme.colorScheme.primary,
 				style = MaterialTheme.typography.titleMedium
 			)
@@ -154,37 +169,28 @@ fun WeiboUserBar(
 }
 
 @Composable
-fun WeiboLayout(
-	weibo: Weibo,
-	onAvatarClick: (WeiboUserInfo) -> Unit,
-	onLinkClick: (String) -> Unit,
-	onTopicClick: (String) -> Unit,
-	onAtClick: (String) -> Unit,
-	onImageClick: (List<Picture>, Int) -> Unit,
-	onVideoClick: (Picture) -> Unit
-) {
+fun WeiboLayout(weibo: Weibo) {
+	val processor = LocalWeiboProcessor.current
 	WeiboUserBar(
-		avatar = weibo.info.avatar,
-		name = weibo.info.name,
+		info = weibo.info,
 		time = weibo.timeString,
 		location = weibo.location,
-		padding = PaddingValues(bottom = 10.dp),
-		onAvatarClick = { onAvatarClick(weibo.info) }
+		padding = PaddingValues(bottom = 10.dp)
 	)
 	RichText(
 		text = weibo.text,
 		modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
 		overflow = TextOverflow.Ellipsis,
-		onLinkClick = onLinkClick,
-		onTopicClick = onTopicClick,
-		onAtClick = onAtClick
+		onLinkClick = { processor.onWeiboLinkClick(it) },
+		onTopicClick = { processor.onWeiboTopicClick(it) },
+		onAtClick = { processor.onWeiboAtClick(it) }
 	)
 	if (weibo.pictures.isNotEmpty()) {
 		NineGrid(
 			pics = weibo.pictures,
 			modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-			onImageClick = { onImageClick(weibo.pictures, it) },
-			onVideoClick = onVideoClick
+			onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
+			onVideoClick = { processor.onWeiboVideoClick(it) }
 		)
 	}
 	WeiboDataBar(
@@ -196,8 +202,24 @@ fun WeiboLayout(
 }
 
 @Composable
+fun WeiboCard(
+	weibo: Weibo,
+	modifier: Modifier = Modifier
+) {
+	val processor = LocalWeiboProcessor.current
+	ElevatedCard(
+		modifier = modifier,
+		colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
+		onClick = { processor.onWeiboClick(weibo) }
+	) {
+		Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+			WeiboLayout(weibo = weibo)
+		}
+	}
+}
+
+@Composable
 fun WeiboGrid(
-	model: MsgModel,
 	items: List<Weibo>,
 	modifier: Modifier = Modifier
 ) {
@@ -212,7 +234,10 @@ fun WeiboGrid(
 			items = items,
 			key = { it.id }
 		) { weibo ->
-			model.WeiboCard(weibo = weibo, modifier = Modifier.fillMaxWidth())
+			WeiboCard(
+				weibo = weibo,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
 	}
 }

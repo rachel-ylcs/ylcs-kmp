@@ -118,8 +118,8 @@ redis和mysql配置可在resources中的config.properties配置
 
 #### 更新
 
-每次启动服务器时会自动更新resources下的如server.json类的文件，
-当有变更时只需重新编译后重启服务器即可，无需手动复制文件。
+服务器resources下的如server.json类的文件只是初始配置文件，
+当有变更时手动更新服务器文件，重启服务器即可，无需重新编译服务器代码。
 
 **即每次更新只需要更换服务器jar文件重启即可**
 

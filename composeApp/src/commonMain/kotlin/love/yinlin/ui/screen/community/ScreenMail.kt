@@ -1,36 +1,24 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeColor
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.ThemeColor
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Mail
-import love.yinlin.extension.launchFlag
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
@@ -38,13 +26,18 @@ import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
 
-private class MailModel(private val model: AppModel) : ViewModel() {
-	val flagFirstLoad = launchFlag()
+private class MailModel(private val model: AppModel) : ScreenModel() {
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val items = mutableStateListOf<Mail>()
 	var offset: Long = Long.MAX_VALUE
 	var canLoading by mutableStateOf(false)
+
+	override fun initialize() {
+		launch {
+			requestNewMails()
+		}
+	}
 
 	suspend fun requestNewMails() {
 		if (state != BoxState.LOADING) {
@@ -140,7 +133,7 @@ private fun MailItem(
 
 @Composable
 fun ScreenMail(model: AppModel) {
-	val screenModel = viewModel { MailModel(model) }
+	val screenModel = screen { MailModel(model) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),
@@ -170,9 +163,5 @@ fun ScreenMail(model: AppModel) {
 				)
 			}
 		}
-	}
-
-	LaunchOnce(screenModel.flagFirstLoad) {
-		screenModel.requestNewMails()
 	}
 }

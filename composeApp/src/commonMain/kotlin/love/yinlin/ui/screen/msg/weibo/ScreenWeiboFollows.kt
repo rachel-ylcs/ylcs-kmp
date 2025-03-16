@@ -19,14 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
@@ -37,7 +36,7 @@ import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.DialogState
 import love.yinlin.ui.component.screen.SubScreen
 
-private class WeiboFollowsModel(val model: AppModel) : ViewModel() {
+private class WeiboFollowsModel(val model: AppModel) : ScreenModel() {
 	var isLocal by mutableStateOf(true)
 	val searchDialog = DialogState()
 	var state by mutableStateOf(BoxState.CONTENT)
@@ -113,7 +112,7 @@ private fun WeiboUserItem(
 
 @Composable
 fun ScreenWeiboFollows(model: AppModel) {
-	val screenModel = viewModel { WeiboFollowsModel(model) }
+	val screenModel = screen { WeiboFollowsModel(model) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),
@@ -122,12 +121,12 @@ fun ScreenWeiboFollows(model: AppModel) {
 		actions = {
 			ClickIcon(
 				imageVector = Icons.Filled.Search,
-				modifier = Modifier.padding(end = 5.dp),
+				modifier = Modifier.padding(end = 10.dp),
 				onClick = { screenModel.openSearch() }
 			)
 			ClickIcon(
 				imageVector = Icons.Filled.Refresh,
-				modifier = Modifier.padding(end = 5.dp),
+				modifier = Modifier.padding(end = 10.dp),
 				onClick = { screenModel.refreshLocalUser() }
 			)
 		}

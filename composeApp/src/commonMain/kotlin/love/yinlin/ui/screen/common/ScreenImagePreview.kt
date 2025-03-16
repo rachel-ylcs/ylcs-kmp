@@ -18,12 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
-import love.yinlin.launch
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
@@ -41,7 +40,7 @@ private class PreviewPicture(val pic: Picture) {
 private class ImagePreviewModel(
 	images: List<Picture>,
 	current: Int
-) : ViewModel() {
+) : ScreenModel() {
 	val previews: List<PreviewPicture> = images.map { PreviewPicture(it) }
 	var current: Int by mutableIntStateOf(current)
 
@@ -157,10 +156,7 @@ private fun Landscape(model: ImagePreviewModel) {
 
 @Composable
 fun ScreenImagePreview(model: AppModel, images: List<Picture>, current: Int) {
-	val screenModel = viewModel { ImagePreviewModel(
-		images = images,
-		current = current
-	) }
+	val screenModel = screen { ImagePreviewModel(images = images, current = current) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),

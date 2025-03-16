@@ -1,12 +1,6 @@
 package love.yinlin.ui.screen.msg.weibo
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -15,37 +9,30 @@ import androidx.compose.material.icons.automirrored.filled.LastPage
 import androidx.compose.material.icons.filled.FirstPage
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.platform.app
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.WeiboAlbum
-import love.yinlin.extension.launchFlag
-import love.yinlin.extension.LaunchOnce
-import love.yinlin.launch
-import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.Tip
 import love.yinlin.ui.component.screen.TipState
-import love.yinlin.ui.component.image.WebImage
 
 private data class AlbumCache(val count: Int, val items: List<Picture>)
 
-private class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
+private class WeiboAlbumModel(val album: WeiboAlbum) : ScreenModel() {
 	companion object {
 		const val PIC_LIMIT = 24
 		const val PIC_MAX_LIMIT = 1000
@@ -53,13 +40,18 @@ private class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
 
 	val tip = TipState()
 
-	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
 	var num by mutableIntStateOf(0)
 	var current by mutableIntStateOf(0)
 	var maxNum = 0
+
+	override fun initialize() {
+		launch {
+			requestAlbum(1)
+		}
+	}
 
 	fun requestAlbum(page: Int) {
 		launch {
@@ -106,7 +98,7 @@ private class WeiboAlbumModel(val album: WeiboAlbum) : ViewModel() {
 
 @Composable
 fun ScreenWeiboAlbum(model: AppModel, album: WeiboAlbum) {
-	val screenModel = viewModel { WeiboAlbumModel(album) }
+	val screenModel = screen { WeiboAlbumModel(album) }
 
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),
@@ -162,10 +154,6 @@ fun ScreenWeiboAlbum(model: AppModel, album: WeiboAlbum) {
 				)
 			}
 		}
-	}
-
-	LaunchOnce(screenModel.flagFirstLoad) {
-		screenModel.requestAlbum(1)
 	}
 
 	Tip(state = screenModel.tip)

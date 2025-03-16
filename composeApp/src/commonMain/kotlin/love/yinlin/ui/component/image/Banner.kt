@@ -23,17 +23,18 @@ import kotlinx.coroutines.delay
 fun <T> Banner(
 	pics: List<T>,
 	spacing: Dp = 0.dp,
+	gap: Dp = 10.dp,
 	interval: Long = 0L,
 	state: PagerState = rememberPagerState { pics.size },
 	modifier: Modifier = Modifier,
-	content: @Composable (pic: T, scale: Float) -> Unit
+	content: @Composable (pic: T, index: Int, scale: Float) -> Unit
 ) {
 	val autoplay = remember(pics) { interval > 0L && pics.size > 1 }
 
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(10.dp)
+		verticalArrangement = Arrangement.spacedBy(gap)
 	) {
 		HorizontalPager(
 			state = state,
@@ -42,7 +43,7 @@ fun <T> Banner(
 			modifier = Modifier.fillMaxWidth()
 		) {
 			val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
-			content(pics[it], scale)
+			content(pics[it], it, scale)
 		}
 		Row(modifier = Modifier.width(20.dp * pics.size).height(5.dp)
 			.clip(MaterialTheme.shapes.extraSmall)

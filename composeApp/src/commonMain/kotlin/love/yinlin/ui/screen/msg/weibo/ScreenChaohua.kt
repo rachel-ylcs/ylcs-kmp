@@ -11,10 +11,10 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.screen.msg.MsgModel
+import love.yinlin.ui.screen.msg.MsgModelPart
 
 @Composable
-fun ScreenChaohua(model: MsgModel) {
+fun ScreenChaohua(model: MsgModelPart) {
 	StatefulBox(
 		state = model.chaohuaState.grid.state,
 		modifier = Modifier.fillMaxSize()
@@ -32,7 +32,7 @@ fun ScreenChaohua(model: MsgModel) {
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
 			verticalItemSpacing = 10.dp
 		) { weibo ->
-			model.WeiboCard(
+			WeiboCard(
 				weibo = weibo,
 				modifier = Modifier.fillMaxWidth()
 			)

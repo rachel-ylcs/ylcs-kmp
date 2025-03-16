@@ -42,6 +42,7 @@ import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeColor
 import love.yinlin.extension.condition
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -142,6 +143,7 @@ fun ClickIcon(
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	size: Dp = DEFAULT_ICON_SIZE,
 	indication: Boolean = true,
+	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
@@ -152,11 +154,12 @@ fun ClickIcon(
 		modifier = modifier.size(size).clip(CircleShape).clickable(
 			onClick = onClick,
 			indication = localIndication,
-			interactionSource = interactionSource
+			interactionSource = interactionSource,
+			enabled = enabled
 		),
 		imageVector = imageVector,
 		contentDescription = null,
-		tint = color,
+		tint = if (enabled) color else ThemeColor.fade,
 	)
 }
 
@@ -165,6 +168,7 @@ fun ClickIcon(
 	imageVector: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	indication: Boolean = true,
+	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 ) {
@@ -175,11 +179,12 @@ fun ClickIcon(
 		modifier = modifier.clip(CircleShape).clickable(
 			onClick = onClick,
 			indication = localIndication,
-			interactionSource = interactionSource
+			interactionSource = interactionSource,
+			enabled = enabled
 		),
 		imageVector = imageVector,
 		contentDescription = null,
-		tint = color,
+		tint = if (enabled) color else ThemeColor.fade,
 	)
 }
 
@@ -187,10 +192,23 @@ fun ClickIcon(
 fun MiniImage(
 	res: DrawableResource,
 	size: Dp = DEFAULT_ICON_SIZE,
-	modifier: Modifier = Modifier,
+	modifier: Modifier = Modifier
 ) {
 	Image(
 		modifier = modifier.size(size),
+		painter = painterResource(res),
+		contentDescription = null
+	)
+}
+
+@Composable
+fun ClickImage(
+	res: DrawableResource,
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit
+) {
+	Image(
+		modifier = modifier.clickable(onClick = onClick),
 		painter = painterResource(res),
 		contentDescription = null
 	)

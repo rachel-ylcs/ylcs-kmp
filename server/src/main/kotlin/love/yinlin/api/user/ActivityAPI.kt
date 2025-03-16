@@ -28,15 +28,20 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
-		if (DB.throwInsertSQLDuplicateKey("""
+		// 插入活动
+		val aid = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO activity(ts, title, content, pic, pics, showstart, damai, maoyan, link) ${values(9)}
         """, activity.ts, activity.title, activity.content, picName, ngp.jsonString,
-				activity.showstart, activity.damai, activity.maoyan, activity.link))
-			return@api "该日期已添加活动".failedData
+			activity.showstart, activity.damai, activity.maoyan, activity.link).toInt()
+
 		// 复制活动图片与海报
 		if (pic != null && picName != null) pic.copy(ServerRes.Activity.activity(picName))
 		ngp.copy { ServerRes.Activity.activity(it) }
-		"添加成功".successData
+		Data.Success(API.User.Activity.AddActivity.Response(
+			aid = aid,
+			pic = picName,
+			pics = ngp.actualPics
+		))
 	}
 
 	api(API.User.Activity.ModifyActivityInfo) { (token, activity) ->

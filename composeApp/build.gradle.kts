@@ -102,6 +102,8 @@ kotlin {
             implementation(libs.compose.activity)
             implementation(libs.ktor.okhttp)
             implementation(libs.mmkv.android)
+            implementation(libs.image.crop)
+            implementation(libs.image.compress)
         }
 
         iosArm64Main.dependencies {
@@ -321,7 +323,7 @@ afterEvaluate {
         dependsOn(desktopCopyLibs)
     }
 
-    val wasmJsBrowserRun = tasks.named("wasmJsBrowserRun")
+    val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")
     val wasmJsBrowserDistribution = tasks.named("wasmJsBrowserDistribution")
 
     val webCopyDir by tasks.registering {
@@ -336,7 +338,7 @@ afterEvaluate {
 
     // 运行 Web 应用程序
     val webRun by tasks.registering {
-        dependsOn(wasmJsBrowserRun)
+        dependsOn(wasmJsBrowserDevelopmentRun)
     }
 
     // 发布 Web 应用程序

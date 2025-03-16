@@ -1,37 +1,25 @@
 package love.yinlin.ui.screen.settings
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Draw
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.RocketLaunch
-import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import love.yinlin.AppModel
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
 import love.yinlin.common.Colors
+import love.yinlin.common.ScreenModel
 import love.yinlin.common.ThemeColor
+import love.yinlin.common.screen
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserProfile
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.NoImage
@@ -43,8 +31,19 @@ import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.default_name
 import ylcs_kmp.composeapp.generated.resources.default_signature
 
-private class SettingsModel : ViewModel() {
-
+private class SettingsModel : ScreenModel() {
+	fun logoff(token: String) {
+		launch {
+			val result = ClientAPI.request(
+				route = API.User.Account.Logoff,
+				data = token
+			)
+			if (result is Data.Success) {
+				app.config.userToken = ""
+				app.config.userProfile = null
+			}
+		}
+	}
 }
 
 @Composable
@@ -102,7 +101,10 @@ private fun AccountSettings(
 			icon = colorfulImageVector(icon = Icons.AutoMirrored.Filled.Logout, background = ThemeColor.warning),
 			color = ThemeColor.warning,
 			hasDivider = false,
-			onClick = {}
+			onClick = {
+				val token = app.config.userToken
+				if (token.isNotEmpty()) model.logoff(token)
+			}
 		)
 	}
 }
@@ -198,7 +200,7 @@ private fun Landscape(
 
 @Composable
 fun ScreenSettings(model: AppModel) {
-	val screenModel = viewModel { SettingsModel() }
+	val screenModel = screen { SettingsModel() }
 	val userProfile = app.config.userProfile
 
 	SubScreen(

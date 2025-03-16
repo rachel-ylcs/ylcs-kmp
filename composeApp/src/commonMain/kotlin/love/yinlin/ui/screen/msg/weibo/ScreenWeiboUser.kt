@@ -11,29 +11,24 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeColor
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.ScreenModel
+import love.yinlin.common.ThemeColor
+import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.launchFlag
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.Saver
-import love.yinlin.launch
 import love.yinlin.platform.app
 import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
@@ -41,14 +36,16 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 
-private class WeiboUserModel(model: AppModel) : ViewModel() {
+private class WeiboUserModel(
+	model: AppModel,
+	private val id: String
+) : ScreenModel() {
 	val msgModel = model.mainModel.msgModel
-	val flagFirstLoad = launchFlag()
 	val grid = WeiboGridData()
 	var user: WeiboUser? by mutableStateOf(null)
 	var albums: List<WeiboAlbum>? by mutableStateOf(null)
 
-	fun init(id: String) {
+	override fun initialize() {
 		launch {
 			val data = WeiboAPI.getWeiboUser(id)
 			user = if (data is Data.Success) data.data else null
@@ -180,9 +177,7 @@ private fun Portrait(
 	model: WeiboUserModel,
 	user: WeiboUser,
 	albums: List<WeiboAlbum>?,
-	grid: WeiboGridData,
-	onFollowClick: (Boolean) -> Unit,
-	onAlbumClick: (WeiboAlbum) -> Unit
+	grid: WeiboGridData
 ) {
 	LazyColumn(modifier = Modifier.fillMaxSize()) {
 		item(key = Saver.key("UserInfoCard")) {
@@ -195,7 +190,7 @@ private fun Portrait(
 			UserInfoCard(
 				user = user,
 				isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
-				onFollowClick = onFollowClick,
+				onFollowClick = { model.onFollowClick(user, it) },
 				modifier = Modifier.fillMaxWidth()
 			)
 			HorizontalDivider(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp))
@@ -207,7 +202,7 @@ private fun Portrait(
 			) {
 				UserAlbumItem(
 					album = it,
-					onAlbumClick = { onAlbumClick(it) },
+					onAlbumClick = { model.onAlbumClick(it) },
 					modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
 				)
 			}
@@ -226,7 +221,7 @@ private fun Portrait(
 			items = grid.items,
 			key = { it.id }
 		) { weibo ->
-			model.msgModel.WeiboCard(
+			WeiboCard(
 				weibo = weibo,
 				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
 			)
@@ -239,9 +234,7 @@ private fun Landscape(
 	model: WeiboUserModel,
 	user: WeiboUser,
 	albums: List<WeiboAlbum>?,
-	grid: WeiboGridData,
-	onFollowClick: (Boolean) -> Unit,
-	onAlbumClick: (WeiboAlbum) -> Unit
+	grid: WeiboGridData
 ) {
 	Row(modifier = Modifier.fillMaxSize()) {
 		Surface(
@@ -259,7 +252,7 @@ private fun Landscape(
 				UserInfoCard(
 					user = user,
 					isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
-					onFollowClick = onFollowClick,
+					onFollowClick = { model.onFollowClick(user, it) },
 					modifier = Modifier.fillMaxWidth()
 				)
 				HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
@@ -278,7 +271,7 @@ private fun Landscape(
 							) {
 								UserAlbumItem(
 									album = it,
-									onAlbumClick = { onAlbumClick(it) },
+									onAlbumClick = { model.onAlbumClick(it) },
 									modifier = Modifier.fillMaxWidth()
 								)
 							}
@@ -297,7 +290,6 @@ private fun Landscape(
 				modifier = Modifier.fillMaxSize()
 			) {
 				WeiboGrid(
-					model = model.msgModel,
 					modifier = Modifier.fillMaxSize(),
 					items = grid.items
 				)
@@ -308,35 +300,29 @@ private fun Landscape(
 
 @Composable
 fun ScreenWeiboUser(model: AppModel, id: String) {
-	val screenModel = viewModel { WeiboUserModel(model) }
+	val screenModel = screen { WeiboUserModel(model, id) }
 
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = screenModel.user?.info?.name ?: "",
-		onBack = { model.pop() }
-	) {
-		if (screenModel.user == null) LoadingBox()
-		else screenModel.user?.let { user ->
-			if (app.isPortrait) Portrait(
-				model = screenModel,
-				user = user,
-				albums = screenModel.albums,
-				grid = screenModel.grid,
-				onFollowClick = { screenModel.onFollowClick(user, it) },
-				onAlbumClick = { screenModel.onAlbumClick(it) }
-			)
-			else Landscape(
-				model = screenModel,
-				user = user,
-				albums = screenModel.albums,
-				grid = screenModel.grid,
-				onFollowClick = { screenModel.onFollowClick(user, it) },
-				onAlbumClick = { screenModel.onAlbumClick(it) }
-			)
+	CompositionLocalProvider(LocalWeiboProcessor provides model.mainModel.msgModel.processor) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = screenModel.user?.info?.name ?: "",
+			onBack = { model.pop() }
+		) {
+			if (screenModel.user == null) LoadingBox()
+			else screenModel.user?.let { user ->
+				if (app.isPortrait) Portrait(
+					model = screenModel,
+					user = user,
+					albums = screenModel.albums,
+					grid = screenModel.grid
+				)
+				else Landscape(
+					model = screenModel,
+					user = user,
+					albums = screenModel.albums,
+					grid = screenModel.grid
+				)
+			}
 		}
-	}
-
-	LaunchOnce(screenModel.flagFirstLoad) {
-		screenModel.init(id)
 	}
 }
