@@ -9,28 +9,23 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeMode
 import love.yinlin.platform.app
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.screen.community.DiscoveryModelPart
-import love.yinlin.ui.screen.community.MeModelPart
-import love.yinlin.ui.screen.community.ScreenDiscovery
-import love.yinlin.ui.screen.community.ScreenMe
-import love.yinlin.ui.screen.msg.MsgModelPart
-import love.yinlin.ui.screen.msg.ScreenMsg
-import love.yinlin.ui.screen.music.ScreenMusic
-import love.yinlin.ui.screen.world.ScreenWorld
-import love.yinlin.ui.screen.world.WorldModelPart
+import love.yinlin.ui.screen.community.ScreenPartDiscovery
+import love.yinlin.ui.screen.community.ScreenPartMe
+import love.yinlin.ui.screen.msg.ScreenPartMsg
+import love.yinlin.ui.screen.music.ScreenPartMusic
+import love.yinlin.ui.screen.world.ScreenPartWorld
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -48,25 +43,6 @@ private enum class TabItem(
 	ME(Res.string.home_nav_me, Res.drawable.tab_me_normal, Res.drawable.tab_me_active),
 }
 
-class MainModelPart(val appModel: AppModel) {
-	val pagerState = object : PagerState() {
-		override val pageCount: Int = TabItem.entries.size
-	}
-
-	val msgModel = MsgModelPart(this)
-	val discoveryModel = DiscoveryModelPart(this)
-	val meModel = MeModelPart(this)
-	val worldModel = WorldModelPart(this)
-
-	fun <T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = appModel.navigate(route, options, extras)
-	fun pop() = appModel.pop()
-	fun launch(block: suspend CoroutineScope.() -> Unit): Job = appModel.launch(block = block)
-
-	fun onNavigate(index: Int) {
-		launch { pagerState.scrollToPage(index) }
-	}
-}
-
 @Composable
 private fun NavigationItemText(
 	item: TabItem,
@@ -79,27 +55,6 @@ private fun NavigationItemText(
 		style = MaterialTheme.typography.titleMedium,
 		color = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
 	)
-}
-
-@Composable
-private fun PageContent(
-	model: MainModelPart,
-	modifier: Modifier = Modifier
-) {
-	HorizontalPager (
-		state = model.pagerState,
-		modifier = modifier
-	) {
-		Box(modifier = Modifier.fillMaxSize()) {
-			when (it) {
-				TabItem.WORLD.ordinal -> ScreenWorld(model)
-				TabItem.MSG.ordinal -> ScreenMsg(model.msgModel)
-				TabItem.MUSIC.ordinal -> ScreenMusic()
-				TabItem.DISCOVERY.ordinal -> ScreenDiscovery(model.discoveryModel)
-				TabItem.ME.ordinal -> ScreenMe(model.meModel)
-			}
-		}
-	}
 }
 
 @Composable
@@ -166,56 +121,72 @@ private fun LandscapeNavigation(
 	}
 }
 
-@Composable
-private fun Portrait(
-	model: MainModelPart,
-	modifier: Modifier = Modifier
-) {
-	Scaffold(
-		modifier = modifier,
-		bottomBar = {
-			PortraitNavigation(
-				modifier = Modifier.fillMaxWidth(),
-				currentPage = model.pagerState.currentPage,
-				onNavigate = { model.onNavigate(it) }
-			)
+@Stable
+@Serializable
+data object ScreenMain : Screen<ScreenMain.Model> {
+	class Model(model: AppModel) : Screen.Model(model) {
+		val pagerState = object : PagerState() {
+			override val pageCount: Int = TabItem.entries.size
 		}
-	) {
-		PageContent(
-			model = model,
-			modifier = Modifier.fillMaxSize().padding(it)
-		)
-	}
-}
 
-@Composable
-private fun Landscape(
-	model: MainModelPart,
-	modifier: Modifier = Modifier
-) {
-	Row(modifier = modifier) {
-		LandscapeNavigation(
-			modifier = Modifier.fillMaxHeight(),
-			currentPage = model.pagerState.currentPage,
-			onNavigate = { model.onNavigate(it) }
-		)
-		Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
-			PageContent(
-				model = model,
-				modifier = Modifier.fillMaxSize().padding(it)
-			)
+		fun onPageChanged(index: Int) {
+			launch { pagerState.scrollToPage(index) }
+		}
+
+		@Composable
+		private fun PageContent(modifier: Modifier = Modifier) {
+			HorizontalPager (
+				state = pagerState,
+				modifier = modifier
+			) {
+				Box(modifier = Modifier.fillMaxSize()) {
+					when (it) {
+						TabItem.WORLD.ordinal -> part<ScreenPartWorld>().content()
+						TabItem.MSG.ordinal -> part<ScreenPartMsg>().content()
+						TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().content()
+						TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().content()
+						TabItem.ME.ordinal -> part<ScreenPartMe>().content()
+					}
+				}
+			}
+		}
+
+		@Composable
+		fun Portrait(modifier: Modifier = Modifier) {
+			Scaffold(
+				modifier = modifier,
+				bottomBar = {
+					PortraitNavigation(
+						modifier = Modifier.fillMaxWidth(),
+						currentPage = pagerState.currentPage,
+						onNavigate = { onPageChanged(it) }
+					)
+				}
+			) {
+				PageContent(modifier = Modifier.fillMaxSize().padding(it))
+			}
+		}
+
+		@Composable
+		fun Landscape(modifier: Modifier = Modifier) {
+			Row(modifier = modifier) {
+				LandscapeNavigation(
+					modifier = Modifier.fillMaxHeight(),
+					currentPage = pagerState.currentPage,
+					onNavigate = { onPageChanged(it) }
+				)
+				Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
+					PageContent(modifier = Modifier.fillMaxSize().padding(it))
+				}
+			}
 		}
 	}
-}
 
-@Composable
-fun ScreenMain(model: AppModel) {
-	if (app.isPortrait) Portrait(
-		model = model.mainModel,
-		modifier = Modifier.fillMaxSize()
-	)
-	else Landscape(
-		model = model.mainModel,
-		modifier = Modifier.fillMaxSize()
-	)
+	override fun model(model: AppModel): Model = Model(model)
+
+	@Composable
+	override fun content(model: Model) {
+		if (app.isPortrait) model.Portrait(modifier = Modifier.fillMaxSize())
+		else model.Landscape(modifier = Modifier.fillMaxSize())
+	}
 }

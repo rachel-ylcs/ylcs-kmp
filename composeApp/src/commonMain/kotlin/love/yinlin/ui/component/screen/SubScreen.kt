@@ -3,7 +3,7 @@ package love.yinlin.ui.component.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -38,7 +38,7 @@ fun SubScreen(
 						if (onBack != null) {
 							ClickIcon(
 								modifier = Modifier.padding(horizontal = 5.dp),
-								imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+								imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
 								onClick = onBack
 							)
 						}

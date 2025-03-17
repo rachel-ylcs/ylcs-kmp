@@ -1,15 +1,9 @@
 package love.yinlin.ui.component.input
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +16,6 @@ import kotlinx.datetime.toLocalDateTime
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.DEFAULT_ICON_SIZE
 import love.yinlin.ui.component.layout.ExpandableLayout
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,11 +62,11 @@ fun DockedDatePicker(
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					ClickIcon(
-						imageVector = Icons.Default.DateRange,
+						imageVector = Icons.Outlined.DateRange,
 						onClick = { isShow = !isShow }
 					)
 					ClickIcon(
-						imageVector = Icons.Default.Close,
+						imageVector = Icons.Outlined.Close,
 						onClick = { datePickerState.selectedDateMillis = null }
 					)
 				}

@@ -6,11 +6,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,15 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ScreenModel
-import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
-import love.yinlin.ui.Route
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
@@ -35,52 +35,6 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.DialogState
 import love.yinlin.ui.component.screen.SubScreen
-
-private class WeiboFollowsModel(val model: AppModel) : ScreenModel() {
-	var isLocal by mutableStateOf(true)
-	val searchDialog = DialogState()
-	var state by mutableStateOf(BoxState.CONTENT)
-	var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
-
-	init {
-		refreshLocalUser()
-	}
-
-	fun refreshLocalUser() {
-		isLocal = true
-		launch {
-			val weiboUsers = app.config.weiboUsers
-			for ((index, user) in weiboUsers.withIndex()) {
-				if (user.avatar.isEmpty()) {
-					val data = WeiboAPI.getWeiboUser(user.id)
-					if (data is Data.Success) weiboUsers[index] = data.data.info
-				}
-			}
-		}
-	}
-
-	fun onUserClick(info: WeiboUserInfo) {
-		model.navigate(Route.WeiboUser(info.id))
-	}
-
-	fun openSearch() {
-		searchDialog.isOpen = true
-	}
-
-	fun onSearchWeiboUser(key: String) {
-		launch {
-			state = BoxState.LOADING
-			val result = WeiboAPI.searchWeiboUser(key)
-			isLocal = false
-			if (result is Data.Success) {
-				val data = result.data
-				searchResult = data
-				state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-			}
-			else state = BoxState.NETWORK_ERROR
-		}
-	}
-}
 
 @Composable
 private fun WeiboUserItem(
@@ -110,59 +64,107 @@ private fun WeiboUserItem(
 	}
 }
 
-@Composable
-fun ScreenWeiboFollows(model: AppModel) {
-	val screenModel = screen { WeiboFollowsModel(model) }
+@Stable
+@Serializable
+data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
+	class Model(model: AppModel) : Screen.Model(model) {
+		var isLocal by mutableStateOf(true)
+		val searchDialog = DialogState()
+		var state by mutableStateOf(BoxState.CONTENT)
+		var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = if (screenModel.isLocal) "微博关注" else "搜索结果",
-		onBack = { model.pop() },
-		actions = {
-			ClickIcon(
-				imageVector = Icons.Filled.Search,
-				modifier = Modifier.padding(end = 10.dp),
-				onClick = { screenModel.openSearch() }
-			)
-			ClickIcon(
-				imageVector = Icons.Filled.Refresh,
-				modifier = Modifier.padding(end = 10.dp),
-				onClick = { screenModel.refreshLocalUser() }
-			)
-		}
-	) {
-		StatefulBox(
-			state = screenModel.state,
-			modifier = Modifier.fillMaxSize()
-		) {
-			LazyVerticalGrid(
-				columns = GridCells.Adaptive(300.dp),
-				contentPadding = PaddingValues(5.dp),
-				horizontalArrangement = Arrangement.spacedBy(5.dp),
-				verticalArrangement = Arrangement.spacedBy(5.dp),
-				modifier = Modifier.fillMaxSize()
-			) {
-				items(
-					items = if (screenModel.isLocal) app.config.weiboUsers.items else screenModel.searchResult,
-					key = { it.id }
-				) {
-					WeiboUserItem(
-						user = it,
-						contentPadding = PaddingValues(5.dp),
-						modifier = Modifier.fillMaxWidth(),
-						onClick = { screenModel.onUserClick(it) }
-					)
+		fun refreshLocalUser() {
+			isLocal = true
+			launch {
+				val weiboUsers = app.config.weiboUsers
+				for ((index, user) in weiboUsers.withIndex()) {
+					if (user.avatar.isEmpty()) {
+						val data = WeiboAPI.getWeiboUser(user.id)
+						if (data is Data.Success) weiboUsers[index] = data.data.info
+					}
 				}
+			}
+		}
+
+		fun onUserClick(info: WeiboUserInfo) {
+			navigate(ScreenWeiboUser(info.id))
+		}
+
+		fun openSearch() {
+			searchDialog.isOpen = true
+		}
+
+		fun onSearchWeiboUser(key: String) {
+			launch {
+				state = BoxState.LOADING
+				val result = WeiboAPI.searchWeiboUser(key)
+				isLocal = false
+				if (result is Data.Success) {
+					val data = result.data
+					searchResult = data
+					state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+				}
+				else state = BoxState.NETWORK_ERROR
 			}
 		}
 	}
 
-	if (screenModel.searchDialog.isOpen) {
-		DialogInput(
-			state = screenModel.searchDialog,
-			hint = "输入微博用户昵称关键字",
-			maxLength = 16,
-			onInput = { screenModel.onSearchWeiboUser(it) }
-		)
+	override fun model(model: AppModel): Model = Model(model).apply {
+		refreshLocalUser()
+	}
+
+	@Composable
+	override fun content(model: Model) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = if (model.isLocal) "微博关注" else "搜索结果",
+			onBack = { model.pop() },
+			actions = {
+				ClickIcon(
+					imageVector = Icons.Outlined.Search,
+					modifier = Modifier.padding(end = 10.dp),
+					onClick = { model.openSearch() }
+				)
+				ClickIcon(
+					imageVector = Icons.Outlined.Refresh,
+					modifier = Modifier.padding(end = 10.dp),
+					onClick = { model.refreshLocalUser() }
+				)
+			}
+		) {
+			StatefulBox(
+				state = model.state,
+				modifier = Modifier.fillMaxSize()
+			) {
+				LazyVerticalGrid(
+					columns = GridCells.Adaptive(300.dp),
+					contentPadding = PaddingValues(5.dp),
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalArrangement = Arrangement.spacedBy(5.dp),
+					modifier = Modifier.fillMaxSize()
+				) {
+					items(
+						items = if (model.isLocal) app.config.weiboUsers.items else model.searchResult,
+						key = { it.id }
+					) {
+						WeiboUserItem(
+							user = it,
+							contentPadding = PaddingValues(5.dp),
+							modifier = Modifier.fillMaxWidth(),
+							onClick = { model.onUserClick(it) }
+						)
+					}
+				}
+			}
+		}
+
+		if (model.searchDialog.isOpen) {
+			DialogInput(
+				state = model.searchDialog,
+				hint = "输入微博用户昵称关键字",
+				maxLength = 16,
+				onInput = { model.onSearchWeiboUser(it) }
+			)
+		}
 	}
 }

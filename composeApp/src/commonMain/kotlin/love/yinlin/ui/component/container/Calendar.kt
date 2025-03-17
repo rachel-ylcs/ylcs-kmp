@@ -165,8 +165,8 @@ private fun CalendarDayGrid(
 				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
 				val eventTitle = events[date]
 				val color = when {
-					eventTitle != null -> MaterialTheme.colorScheme.primary
 					date == today -> MaterialTheme.colorScheme.onPrimary
+					eventTitle != null -> MaterialTheme.colorScheme.primary
 					dayIndex !in startDay..endDay -> ThemeColor.fade
 					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
 					else -> LocalTextStyle.current.color

@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -48,12 +48,12 @@ fun AppTopBar(
 				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
 				ClickIcon(
-					imageVector = Icons.Filled.Remove,
+					imageVector = Icons.Outlined.Remove,
 					color = MaterialTheme.colorScheme.onPrimary,
 					onClick = onMinimized
 				)
 				ClickIcon(
-					imageVector = Icons.Filled.Close,
+					imageVector = Icons.Outlined.Close,
 					color = MaterialTheme.colorScheme.onPrimary,
 					onClick = onClosed
 				)

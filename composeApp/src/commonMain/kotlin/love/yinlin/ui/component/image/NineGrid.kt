@@ -2,7 +2,7 @@ package love.yinlin.ui.component.image
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SmartDisplay
+import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ fun NineGrid(
 			)
 			if (pic.isVideo) {
 				MiniIcon(
-					imageVector = Icons.Filled.SmartDisplay,
+					imageVector = Icons.Outlined.SmartDisplay,
 					size = 48.dp,
 					color = Colors.Red4,
 					modifier = Modifier.zIndex(2f)

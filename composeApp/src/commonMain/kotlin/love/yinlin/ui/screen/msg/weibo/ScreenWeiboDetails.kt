@@ -12,35 +12,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ScreenModel
-import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.extension.Saver
 import love.yinlin.platform.app
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
-
-private class WeiboDetailsModel(model: AppModel) : ScreenModel() {
-	val msgModel = model.mainModel.msgModel
-	val weibo: Weibo? = msgModel.currentWeibo
-	var comments: List<WeiboComment>? by mutableStateOf(null)
-
-	override fun initialize() {
-		launch {
-			weibo?.let {
-				val data = WeiboAPI.getWeiboDetails(it.id)
-				comments = if (data is Data.Success) data.data else emptyList()
-			}
-		}
-	}
-}
+import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Composable
 private fun WeiboCommentCard(comment: WeiboComment) {
@@ -167,26 +153,42 @@ private fun Landscape(
 	}
 }
 
-@Composable
-fun ScreenWeiboDetails(model: AppModel) {
-	val screenModel = screen { WeiboDetailsModel(model) }
+@Stable
+@Serializable
+data object ScreenWeiboDetails : Screen<ScreenWeiboDetails.Model> {
+	class Model(model: AppModel) : Screen.Model(model) {
+		val weibo: Weibo? = part<ScreenPartMsg>().currentWeibo
+		var comments: List<WeiboComment>? by mutableStateOf(null)
+	}
 
-	CompositionLocalProvider(LocalWeiboProcessor provides model.mainModel.msgModel.processor) {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "微博详情",
-			onBack = { model.pop() }
-		) {
-			if (screenModel.weibo == null) EmptyBox()
-			else {
-				if (app.isPortrait) Portrait(
-					weibo = screenModel.weibo,
-					comments = screenModel.comments
-				)
-				else Landscape(
-					weibo = screenModel.weibo,
-					comments = screenModel.comments
-				)
+	override fun model(model: AppModel): Model = Model(model).apply {
+		weibo?.let {
+			launch {
+				val data = WeiboAPI.getWeiboDetails(it.id)
+				comments = if (data is Data.Success) data.data else emptyList()
+			}
+		}
+	}
+
+	@Composable
+	override fun content(model: Model) {
+		CompositionLocalProvider(LocalWeiboProcessor provides model.part<ScreenPartMsg>().processor) {
+			SubScreen(
+				modifier = Modifier.fillMaxSize(),
+				title = "微博详情",
+				onBack = { model.pop() }
+			) {
+				if (model.weibo == null) EmptyBox()
+				else {
+					if (app.isPortrait) Portrait(
+						weibo = model.weibo,
+						comments = model.comments
+					)
+					else Landscape(
+						weibo = model.weibo,
+						comments = model.comments
+					)
+				}
 			}
 		}
 	}

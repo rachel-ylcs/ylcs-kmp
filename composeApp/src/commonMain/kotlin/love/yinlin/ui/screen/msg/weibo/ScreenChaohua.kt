@@ -11,22 +11,22 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.screen.msg.MsgModelPart
+import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Composable
-fun ScreenChaohua(model: MsgModelPart) {
+fun ScreenChaohua(part: ScreenPartMsg) {
 	StatefulBox(
-		state = model.chaohuaState.grid.state,
+		state = part.chaohuaState.grid.state,
 		modifier = Modifier.fillMaxSize()
 	) {
 		PaginationStaggeredGrid(
-			items = model.chaohuaState.grid.items,
+			items = part.chaohuaState.grid.items,
 			key = { it.id },
 			columns = StaggeredGridCells.Adaptive(300.dp),
 			canRefresh = true,
-			canLoading = model.chaohuaState.canLoading,
-			onRefresh = { model.chaohuaState.requestNewData() },
-			onLoading = { model.chaohuaState.requestMoreData() },
+			canLoading = part.chaohuaState.canLoading,
+			onRefresh = { part.chaohuaState.requestNewData() },
+			onLoading = { part.chaohuaState.requestMoreData() },
 			modifier = Modifier.fillMaxSize(),
 			contentPadding = PaddingValues(10.dp),
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -39,7 +39,7 @@ fun ScreenChaohua(model: MsgModelPart) {
 		}
 	}
 
-	LaunchOnce(model.chaohuaState.flagFirstLoad) {
-		model.chaohuaState.requestNewData()
+	LaunchOnce(part.chaohuaState.flagFirstLoad) {
+		part.chaohuaState.requestNewData()
 	}
 }

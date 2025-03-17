@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import love.yinlin.AppModel
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.screen.SubScreen
 
@@ -30,7 +30,7 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun UnsupportedScreen(model: AppModel) {
+fun <M : Screen.Model> UnsupportedScreen(model: M) {
 	SubScreen(
 		modifier = Modifier.fillMaxSize(),
 		title = "该组件或功能未在此平台实现",

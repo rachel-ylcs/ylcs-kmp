@@ -7,7 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import love.yinlin.AppModel
+import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
@@ -33,7 +38,6 @@ import love.yinlin.extension.launchFlag
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.Route
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
@@ -41,7 +45,6 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.layout.TabBar
-import love.yinlin.ui.screen.MainModelPart
 
 private enum class DiscoveryItem(
 	val id: Int,
@@ -61,7 +64,7 @@ private enum class DiscoveryItem(
 	}
 }
 
-class DiscoveryModelPart(val mainModel: MainModelPart) {
+class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
@@ -148,11 +151,11 @@ class DiscoveryModelPart(val mainModel: MainModelPart) {
 	}
 
 	fun onRefresh() {
-		mainModel.launch { requestNewData() }
+		launch { requestNewData() }
 	}
 
 	fun onTopicClick(topic: Topic) {
-		mainModel.navigate(Route.Topic(topic))
+		navigate(ScreenTopic(topic))
 	}
 
 	fun onUserAvatarClick(uid: Int) {
@@ -254,73 +257,73 @@ class DiscoveryModelPart(val mainModel: MainModelPart) {
 			}
 		}
 	}
-}
 
-@Composable
-fun ScreenDiscovery(model: DiscoveryModelPart) {
-	StatefulBox(
-		state = model.state,
-		modifier = Modifier.fillMaxSize()
-	) {
-		Column(modifier = Modifier.fillMaxSize()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(5f),
-				shadowElevation = 5.dp
-			) {
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(10.dp)
+	@Composable
+	override fun content() {
+		StatefulBox(
+			state = state,
+			modifier = Modifier.fillMaxSize()
+		) {
+			Column(modifier = Modifier.fillMaxSize()) {
+				Surface(
+					modifier = Modifier.fillMaxWidth().zIndex(5f),
+					shadowElevation = 5.dp
 				) {
-					TabBar(
-						currentPage = model.currentPage,
-						onNavigate = {
-							model.currentPage = it
-							model.onRefresh()
-						},
-						items = DiscoveryItem.items,
-						modifier = Modifier.weight(1f)
-					)
-					ClickIcon(
-						imageVector = Icons.Filled.Add,
-						onClick = { }
-					)
-					ClickIcon(
-						imageVector = Icons.Filled.Search,
-						onClick = { }
-					)
-					ClickIcon(
-						imageVector = Icons.Filled.Refresh,
-						onClick = { model.onRefresh() }
+					Row(
+						modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.spacedBy(10.dp)
+					) {
+						TabBar(
+							currentPage = currentPage,
+							onNavigate = {
+								currentPage = it
+								onRefresh()
+							},
+							items = DiscoveryItem.items,
+							modifier = Modifier.weight(1f)
+						)
+						ClickIcon(
+							imageVector = Icons.Outlined.Add,
+							onClick = { }
+						)
+						ClickIcon(
+							imageVector = Icons.Outlined.Search,
+							onClick = { }
+						)
+						ClickIcon(
+							imageVector = Icons.Outlined.Refresh,
+							onClick = { onRefresh() }
+						)
+					}
+				}
+
+				val cardWidth = if (app.isPortrait) 150.dp else 200.dp
+				PaginationStaggeredGrid(
+					items = items,
+					key = { it.tid },
+					columns = StaggeredGridCells.Adaptive(cardWidth),
+					state = listState,
+					canRefresh = true,
+					canLoading = canLoading,
+					onRefresh = { requestNewData() },
+					onLoading = { requestMoreData() },
+					modifier = Modifier.fillMaxWidth().weight(1f),
+					contentPadding = PaddingValues(10.dp),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalItemSpacing = 10.dp
+				) { topic ->
+					TopicCard(
+						topic = topic,
+						cardWidth = cardWidth,
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}
-
-			val cardWidth = if (app.isPortrait) 150.dp else 200.dp
-			PaginationStaggeredGrid(
-				items = model.items,
-				key = { it.tid },
-				columns = StaggeredGridCells.Adaptive(cardWidth),
-				state = model.listState,
-				canRefresh = true,
-				canLoading = model.canLoading,
-				onRefresh = { model.requestNewData() },
-				onLoading = { model.requestMoreData() },
-				modifier = Modifier.fillMaxWidth().weight(1f),
-				contentPadding = PaddingValues(10.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalItemSpacing = 10.dp
-			) { topic ->
-				model.TopicCard(
-					topic = topic,
-					cardWidth = cardWidth,
-					modifier = Modifier.fillMaxWidth()
-				)
-			}
 		}
-	}
 
-	LaunchOnce(model.flagFirstLoad) {
-		model.onRefresh()
+		LaunchOnce(flagFirstLoad) {
+			onRefresh()
+		}
 	}
 }

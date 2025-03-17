@@ -16,12 +16,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ScreenModel
 import love.yinlin.common.ThemeColor
-import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Comment
@@ -33,147 +32,14 @@ import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberStateSaveable
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.Route
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.SubScreen
-
-private class TopicModel(private val model: AppModel, topic: Topic) : ScreenModel() {
-	var details: TopicDetails? by mutableStateOf(null)
-	var topic: Topic by mutableStateOf(topic)
-
-	val comments = mutableStateListOf<Comment>()
-	var commentOffset: Int = 0
-	var commentIsTop: Boolean = true
-	var commentCanLoading by mutableStateOf(false)
-
-	var currentComment: Comment? by mutableStateOf(null)
-
-	override fun initialize() {
-		launch {
-			requestTopic()
-			requestNewComments()
-		}
-	}
-
-	suspend fun requestTopic() {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopicDetails,
-			data = topic.tid
-		)
-		if (result is Data.Success) details = result.data
-	}
-
-	suspend fun requestNewComments() {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopicComments,
-			data = API.User.Topic.GetTopicComments.Request(
-				tid = topic.tid,
-				rawSection = topic.rawSection
-			)
-		)
-		if (result is Data.Success) {
-			val data = result.data
-			comments.replaceAll(data)
-
-			val last = data.lastOrNull()
-			commentOffset = last?.cid ?: 0
-			commentIsTop = last?.isTop ?: true
-
-			commentCanLoading = data.isNotEmpty()
-		}
-	}
-
-	suspend fun requestMoreComments() {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopicComments,
-			data = API.User.Topic.GetTopicComments.Request(
-				tid = topic.tid,
-				rawSection = topic.rawSection,
-				offset = commentOffset,
-				isTop = commentIsTop
-			)
-		)
-		if (result is Data.Success) {
-			val data = result.data
-			if (data.isEmpty()) {
-				commentOffset = 0
-				commentIsTop = true
-			}
-			else {
-				comments += data
-				val last = data.lastOrNull()
-				commentOffset = last?.cid ?: 0
-				commentIsTop = last?.isTop ?: true
-			}
-
-			commentCanLoading = commentOffset != 0
-		}
-	}
-
-	suspend fun requestSubComments(cid: Int, offset: Int): List<SubComment>? {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopicSubComments,
-			data = API.User.Topic.GetTopicSubComments.Request(
-				cid = cid,
-				rawSection = topic.rawSection,
-				offset = offset
-			)
-		)
-		return if (result is Data.Success) result.data else null
-	}
-
-	fun onAvatarClick(uid: Int) {
-		model.mainModel.discoveryModel.onUserAvatarClick(uid)
-	}
-
-	fun showSubComment(comment: Comment) {
-		currentComment = comment
-	}
-
-	fun hideSubComment() {
-		currentComment = null
-	}
-
-	fun onImageClick(images: List<Picture>, current: Int) {
-		model.mainModel.navigate(Route.ImagePreview(images, current))
-	}
-
-	fun onSendComment() {
-
-	}
-
-	fun onSendCoin() {
-
-	}
-
-	fun onSendSubComment(cid: Int) {
-
-	}
-
-	fun onChangeTopicIsTop(value: Boolean) {
-
-	}
-
-	fun onDeleteTopic() {
-
-	}
-
-	fun onChangeCommentIsTop(cid: Int, value: Boolean) {
-
-	}
-
-	fun onDeleteComment(cid: Int) {
-
-	}
-
-	fun onDeleteSubComment(cid: Int) {
-
-	}
-}
+import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
 private fun UserBar(
@@ -244,80 +110,6 @@ private fun CommandButton(
 			)
 		}
 		Text(text = text)
-	}
-}
-
-@Composable
-private fun TopicLayout(
-	details: TopicDetails,
-	model: TopicModel,
-	modifier: Modifier = Modifier
-) {
-	val pics by rememberDerivedState { details.pics.map { Picture(model.topic.picPath(it)) } }
-
-	Column(
-		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(5.dp)
-	) {
-		UserBar(
-			avatar = model.topic.avatarPath,
-			name = model.topic.name,
-			time = details.ts,
-			label = details.label,
-			level = details.level,
-			onAvatarClick = { model.onAvatarClick(model.topic.uid) }
-		)
-		Text(
-			text = model.topic.title,
-			style = MaterialTheme.typography.titleMedium,
-			maxLines = 2,
-			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.fillMaxWidth()
-		)
-		Text(
-			text = details.content,
-			modifier = Modifier.fillMaxWidth()
-		)
-		if (pics.isNotEmpty()) {
-			NineGrid(
-				modifier = Modifier.fillMaxWidth(),
-				pics = pics,
-				onImageClick = { model.onImageClick(pics, it) },
-				onVideoClick = {}
-			)
-		}
-		Row(
-			modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-			horizontalArrangement = Arrangement.SpaceAround,
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			CommandButton(
-				text = "评论",
-				icon = Icons.Filled.AddComment,
-				onClick = { model.onSendComment() }
-			)
-			CommandButton(
-				text = "投币",
-				icon = Icons.Filled.Paid,
-				onClick = { model.onSendCoin() }
-			)
-			app.config.userProfile?.let { user ->
-				if (user.canUpdateTopicTop(model.topic.uid)) {
-					CommandButton(
-						text = if (model.topic.isTop) "取消置顶" else "置顶",
-						icon = if (model.topic.isTop) Icons.Filled.Close else Icons.Filled.VerticalAlignTop,
-						onClick = { model.onChangeTopicIsTop(!model.topic.isTop) }
-					)
-				}
-				if (user.canDeleteTopic(model.topic.uid)) {
-					CommandButton(
-						text = "删除",
-						icon = Icons.Filled.Delete,
-						onClick = { model.onSendCoin() }
-					)
-				}
-			}
-		}
 	}
 }
 
@@ -442,151 +234,344 @@ private fun SubCommentBar(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SubCommentLayout(
-	model: TopicModel,
-	comment: Comment,
-	modifier: Modifier = Modifier,
-) {
-	val subComments = remember { mutableStateListOf<SubComment>() }
-	var subCommentOffset: Int = remember { 0 }
-	var subCommentCanLoading by rememberStateSaveable { false }
+@Stable
+@Serializable
+data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
+	inner class Model(model: AppModel) : Screen.Model(model) {
+		var details: TopicDetails? by mutableStateOf(null)
+		var topic: Topic by mutableStateOf(currentTopic)
 
-	ModalBottomSheet(
-		onDismissRequest = { model.hideSubComment() },
-		dragHandle = null,
-		modifier = modifier
-	) {
-		PaginationColumn(
-			items = subComments,
-			key = { it.cid },
-			canRefresh = false,
-			canLoading = subCommentCanLoading,
-			onLoading = {
-				model.requestSubComments(
+		val comments = mutableStateListOf<Comment>()
+		var commentOffset: Int = 0
+		var commentIsTop: Boolean = true
+		var commentCanLoading by mutableStateOf(false)
+
+		var currentComment: Comment? by mutableStateOf(null)
+
+		suspend fun requestTopic() {
+			val result = ClientAPI.request(
+				route = API.User.Topic.GetTopicDetails,
+				data = topic.tid
+			)
+			if (result is Data.Success) details = result.data
+		}
+
+		suspend fun requestNewComments() {
+			val result = ClientAPI.request(
+				route = API.User.Topic.GetTopicComments,
+				data = API.User.Topic.GetTopicComments.Request(
+					tid = topic.tid,
+					rawSection = topic.rawSection
+				)
+			)
+			if (result is Data.Success) {
+				val data = result.data
+				comments.replaceAll(data)
+
+				val last = data.lastOrNull()
+				commentOffset = last?.cid ?: 0
+				commentIsTop = last?.isTop ?: true
+
+				commentCanLoading = data.isNotEmpty()
+			}
+		}
+
+		suspend fun requestMoreComments() {
+			val result = ClientAPI.request(
+				route = API.User.Topic.GetTopicComments,
+				data = API.User.Topic.GetTopicComments.Request(
+					tid = topic.tid,
+					rawSection = topic.rawSection,
+					offset = commentOffset,
+					isTop = commentIsTop
+				)
+			)
+			if (result is Data.Success) {
+				val data = result.data
+				if (data.isEmpty()) {
+					commentOffset = 0
+					commentIsTop = true
+				}
+				else {
+					comments += data
+					val last = data.lastOrNull()
+					commentOffset = last?.cid ?: 0
+					commentIsTop = last?.isTop ?: true
+				}
+
+				commentCanLoading = commentOffset != 0
+			}
+		}
+
+		suspend fun requestSubComments(cid: Int, offset: Int): List<SubComment>? {
+			val result = ClientAPI.request(
+				route = API.User.Topic.GetTopicSubComments,
+				data = API.User.Topic.GetTopicSubComments.Request(
+					cid = cid,
+					rawSection = topic.rawSection,
+					offset = offset
+				)
+			)
+			return if (result is Data.Success) result.data else null
+		}
+
+		fun onAvatarClick(uid: Int) {
+			part<ScreenPartDiscovery>().onUserAvatarClick(uid)
+		}
+
+		fun showSubComment(comment: Comment) {
+			currentComment = comment
+		}
+
+		fun hideSubComment() {
+			currentComment = null
+		}
+
+		fun onImageClick(images: List<Picture>, current: Int) {
+			navigate(ScreenImagePreview(images, current))
+		}
+
+		fun onSendComment() {
+
+		}
+
+		fun onSendCoin() {
+
+		}
+
+		fun onSendSubComment(cid: Int) {
+
+		}
+
+		fun onChangeTopicIsTop(value: Boolean) {
+
+		}
+
+		fun onDeleteTopic() {
+
+		}
+
+		fun onChangeCommentIsTop(cid: Int, value: Boolean) {
+
+		}
+
+		fun onDeleteComment(cid: Int) {
+
+		}
+
+		fun onDeleteSubComment(cid: Int) {
+
+		}
+
+		@Composable
+		private fun TopicLayout(
+			details: TopicDetails,
+			modifier: Modifier = Modifier
+		) {
+			val pics by rememberDerivedState { details.pics.map { Picture(topic.picPath(it)) } }
+
+			Column(
+				modifier = modifier,
+				verticalArrangement = Arrangement.spacedBy(5.dp)
+			) {
+				UserBar(
+					avatar = topic.avatarPath,
+					name = topic.name,
+					time = details.ts,
+					label = details.label,
+					level = details.level,
+					onAvatarClick = { onAvatarClick(topic.uid) }
+				)
+				Text(
+					text = topic.title,
+					style = MaterialTheme.typography.titleMedium,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+				Text(
+					text = details.content,
+					modifier = Modifier.fillMaxWidth()
+				)
+				if (pics.isNotEmpty()) {
+					NineGrid(
+						modifier = Modifier.fillMaxWidth(),
+						pics = pics,
+						onImageClick = { onImageClick(pics, it) },
+						onVideoClick = {}
+					)
+				}
+				Row(
+					modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+					horizontalArrangement = Arrangement.SpaceAround,
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					CommandButton(
+						text = "评论",
+						icon = Icons.Filled.AddComment,
+						onClick = { onSendComment() }
+					)
+					CommandButton(
+						text = "投币",
+						icon = Icons.Filled.Paid,
+						onClick = { onSendCoin() }
+					)
+					app.config.userProfile?.let { user ->
+						if (user.canUpdateTopicTop(topic.uid)) {
+							CommandButton(
+								text = if (topic.isTop) "取消置顶" else "置顶",
+								icon = if (topic.isTop) Icons.Filled.Close else Icons.Filled.VerticalAlignTop,
+								onClick = { onChangeTopicIsTop(!topic.isTop) }
+							)
+						}
+						if (user.canDeleteTopic(topic.uid)) {
+							CommandButton(
+								text = "删除",
+								icon = Icons.Filled.Delete,
+								onClick = { onSendCoin() }
+							)
+						}
+					}
+				}
+			}
+		}
+
+		@OptIn(ExperimentalMaterial3Api::class)
+		@Composable
+		private fun SubCommentLayout(
+			comment: Comment,
+			modifier: Modifier = Modifier,
+		) {
+			val subComments = remember { mutableStateListOf<SubComment>() }
+			var subCommentOffset: Int = remember { 0 }
+			var subCommentCanLoading by rememberStateSaveable { false }
+
+			ModalBottomSheet(
+				onDismissRequest = { hideSubComment() },
+				dragHandle = null,
+				modifier = modifier
+			) {
+				PaginationColumn(
+					items = subComments,
+					key = { it.cid },
+					canRefresh = false,
+					canLoading = subCommentCanLoading,
+					onLoading = {
+						requestSubComments(
+							cid = comment.cid,
+							offset = subCommentOffset
+						)?.let { data ->
+							if (data.isEmpty()) subCommentOffset = 0
+							else {
+								subComments += data
+								val last = data.lastOrNull()
+								subCommentOffset = last?.cid ?: 0
+							}
+
+							subCommentCanLoading = subCommentOffset != 0
+						}
+					},
+					contentPadding = PaddingValues(top = 10.dp),
+					modifier = Modifier.fillMaxWidth()
+				) {
+					HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+					SubCommentBar(
+						subComment = it,
+						topicUid = topic.uid,
+						commentUid = comment.uid,
+						onAvatarClick = { onAvatarClick(it.uid) },
+						onDelete = { onDeleteSubComment(it.cid) },
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+					)
+				}
+			}
+
+			LaunchedEffect(Unit) {
+				requestSubComments(
 					cid = comment.cid,
 					offset = subCommentOffset
 				)?.let { data ->
-					if (data.isEmpty()) subCommentOffset = 0
-					else {
-						subComments += data
-						val last = data.lastOrNull()
-						subCommentOffset = last?.cid ?: 0
-					}
+					subComments.replaceAll(data)
 
-					subCommentCanLoading = subCommentOffset != 0
+					val last = data.lastOrNull()
+					subCommentOffset = last?.cid ?: 0
+
+					subCommentCanLoading = data.isNotEmpty()
 				}
-			},
-			contentPadding = PaddingValues(top = 10.dp),
-			modifier = Modifier.fillMaxWidth()
+			}
+		}
+
+		@Composable
+		fun Portrait(details: TopicDetails) {
+			PaginationColumn(
+				items = comments,
+				key = { it.cid },
+				canRefresh = false,
+				canLoading = commentCanLoading,
+				onLoading = { requestMoreComments() },
+				modifier = Modifier.fillMaxSize(),
+				header = {
+					TopicLayout(
+						details = details,
+						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp)
+					)
+				}
+			) {
+				HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+				CommentBar(
+					comment = it,
+					topicUid = topic.uid,
+					onAvatarClick = { onAvatarClick(it.uid) },
+					onSubCommentClick = { showSubComment(it) },
+					onSendSubComment = { onSendSubComment(it.cid) },
+					onChangeIsTop = { onChangeCommentIsTop(it.cid, !it.isTop) },
+					onDelete = { onDeleteComment(it.cid) },
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+				)
+			}
+
+			currentComment?.let {
+				SubCommentLayout(
+					comment = it,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
+		}
+
+		@Composable
+		fun Landscape(details: TopicDetails) {
+			Row(modifier = Modifier.fillMaxSize()) {
+				TopicLayout(
+					modifier = Modifier.width(400.dp).fillMaxHeight()
+						.verticalScroll(rememberScrollState()),
+					details = details
+				)
+				VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
+			}
+		}
+	}
+
+	override fun model(model: AppModel): Model = Model(model).apply {
+		launch {
+			requestTopic()
+			requestNewComments()
+		}
+	}
+
+	@Composable
+	override fun content(model: Model) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = "主题",
+			onBack = {
+				if (model.currentComment != null) model.hideSubComment()
+				else model.pop()
+			}
 		) {
-			HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-			SubCommentBar(
-				subComment = it,
-				topicUid = model.topic.uid,
-				commentUid = comment.uid,
-				onAvatarClick = { model.onAvatarClick(it.uid) },
-				onDelete = { model.onDeleteSubComment(it.cid) },
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
-			)
+			val details = model.details
+			if (details == null) EmptyBox()
+			else if (app.isPortrait) model.Portrait(details = details)
+			else model.Landscape(details = details)
 		}
-	}
-
-	LaunchedEffect(Unit) {
-		model.requestSubComments(
-			cid = comment.cid,
-			offset = subCommentOffset
-		)?.let { data ->
-			subComments.replaceAll(data)
-
-			val last = data.lastOrNull()
-			subCommentOffset = last?.cid ?: 0
-
-			subCommentCanLoading = data.isNotEmpty()
-		}
-	}
-}
-
-@Composable
-private fun Portrait(
-	model: TopicModel,
-	details: TopicDetails
-) {
-	PaginationColumn(
-		items = model.comments,
-		key = { it.cid },
-		canRefresh = false,
-		canLoading = model.commentCanLoading,
-		onLoading = { model.requestMoreComments() },
-		modifier = Modifier.fillMaxSize(),
-		header = {
-			TopicLayout(
-				model = model,
-				details = details,
-				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp)
-			)
-		}
-	) {
-		HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-		CommentBar(
-			comment = it,
-			topicUid = model.topic.uid,
-			onAvatarClick = { model.onAvatarClick(it.uid) },
-			onSubCommentClick = { model.showSubComment(it) },
-			onSendSubComment = { model.onSendSubComment(it.cid) },
-			onChangeIsTop = { model.onChangeCommentIsTop(it.cid, !it.isTop) },
-			onDelete = { model.onDeleteComment(it.cid) },
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
-		)
-	}
-
-	model.currentComment?.let {
-		SubCommentLayout(
-			model = model,
-			comment = it,
-			modifier = Modifier.fillMaxSize()
-		)
-	}
-}
-
-@Composable
-private fun Landscape(
-	model: TopicModel,
-	details: TopicDetails
-) {
-	Row(modifier = Modifier.fillMaxSize()) {
-		TopicLayout(
-			modifier = Modifier.width(400.dp).fillMaxHeight()
-				.verticalScroll(rememberScrollState()),
-			model = model,
-			details = details
-		)
-		VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
-	}
-}
-
-@Composable
-fun ScreenTopic(model: AppModel, topic: Topic) {
-	val screenModel = screen { TopicModel(model, topic) }
-
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = "主题",
-		onBack = {
-			if (screenModel.currentComment != null) screenModel.hideSubComment()
-			else model.pop()
-		}
-	) {
-		val details = screenModel.details
-		if (details == null) EmptyBox()
-		else if (app.isPortrait) Portrait(
-			model = screenModel,
-			details = details
-		)
-		else Landscape(
-			model = screenModel,
-			details = details
-		)
 	}
 }

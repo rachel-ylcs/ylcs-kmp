@@ -1,15 +1,24 @@
 package love.yinlin.ui
 
-import androidx.navigation.NavGraphBuilder
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import love.yinlin.AppModel
+import love.yinlin.ScreenPart
 import love.yinlin.data.common.Picture
+import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.common.ScreenImagePreview
-import love.yinlin.ui.screen.common.ScreenWebPage
+import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.community.ScreenMail
 import love.yinlin.ui.screen.community.ScreenTopic
@@ -20,109 +29,60 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityDetails
 import love.yinlin.ui.screen.world.ScreenAddActivity
-import love.yinlin.ui.screen.world.ScreenModifyActivity
+import kotlin.jvm.JvmSuppressWildcards
+import kotlin.reflect.KType
 
-sealed interface Route {
-	@Serializable
-	data object Main : Route
+@Stable
+interface Screen<M : Screen.Model> {
+	open class Model(private val model: AppModel) : ViewModel() {
+		fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
+		fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+		fun pop() = model.pop()
 
-	// 通用
-	@Serializable
-	data class ImagePreview(val images: List<Picture>, val current: Int) : Route
-	@Serializable
-	data class WebPage(val url: String) : Route
-
-	// 设置
-	@Serializable
-	data object Settings : Route
-
-	// 微博
-	@Serializable
-	data object WeiboDetails : Route
-	@Serializable
-	data class WeiboUser(val id: String) : Route
-	@Serializable
-	data object WeiboFollows : Route
-	@Serializable
-	data class WeiboAlbum(val album: love.yinlin.data.weibo.WeiboAlbum) : Route
-
-	// 社区
-	@Serializable
-	data object Login : Route
-	@Serializable
-	data class Topic(val topic: love.yinlin.data.rachel.Topic) : Route
-	@Serializable
-	data object Mail : Route
-
-	// 世界
-	@Serializable
-	data class ActivityDetails(val aid: Int) : Route
-	@Serializable
-	data object AddActivity : Route
-	@Serializable
-	data class ModifyActivity(val aid: Int) : Route
-
-	companion object {
-		fun NavGraphBuilder.buildRoute(appModel: AppModel) {
-			composable<Main> {
-				ScreenMain(appModel)
-			}
-
-			// 通用
-			composable<WebPage> {
-				val args = it.toRoute<WebPage>()
-				ScreenWebPage(appModel, args.url)
-			}
-
-			// 设置
-			composable<Settings> {
-				ScreenSettings(appModel)
-			}
-
-			// 微博
-			composable<WeiboDetails> {
-				ScreenWeiboDetails(appModel)
-			}
-			composable<WeiboUser> {
-				val args = it.toRoute<WeiboUser>()
-				ScreenWeiboUser(appModel, args.id)
-			}
-			composable<WeiboFollows> {
-				ScreenWeiboFollows(appModel)
-			}
-			composable<WeiboAlbum>(typeMap = buildNavTypeMap<love.yinlin.data.weibo.WeiboAlbum>()) {
-				val args = it.toRoute<WeiboAlbum>()
-				ScreenWeiboAlbum(appModel, args.album)
-			}
-			composable<ImagePreview>(typeMap = buildNavTypeMap<List<Picture>>()) {
-				val args = it.toRoute<ImagePreview>()
-				ScreenImagePreview(appModel, args.images, args.current)
-			}
-
-			// 社区
-			composable<Login> {
-				ScreenLogin(appModel)
-			}
-			composable<Topic>(typeMap = buildNavTypeMap<love.yinlin.data.rachel.Topic>()) {
-				val args = it.toRoute<Topic>()
-				ScreenTopic(appModel, args.topic)
-			}
-			composable<Mail> {
-				ScreenMail(appModel)
-			}
-
-			// 世界
-			composable<ActivityDetails> {
-				val args = it.toRoute<ActivityDetails>()
-				ScreenActivityDetails(appModel, args.aid)
-			}
-			composable<AddActivity> {
-				ScreenAddActivity(appModel)
-			}
-			composable<ModifyActivity> {
-				val args = it.toRoute<ModifyActivity>()
-				ScreenModifyActivity(appModel, args.aid)
-			}
-		}
+		@Suppress("PropertyName")
+		val _model: AppModel get() = model
+		inline fun <reified P : ScreenPart> part(): P = _model.part()
 	}
+
+	fun model(model: AppModel): M
+
+	@Composable
+	fun content(model: M)
+}
+
+private data class ScreenRouteScope(
+	val builder: NavGraphBuilder,
+	val model: AppModel
+)
+
+private inline fun <reified S : Screen<M>, reified M : Screen.Model> ScreenRouteScope.screen(
+	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
+) {
+	builder.composable<S>(typeMap = typeMap) {
+		val args = remember(it) { it.toRoute<S>() }
+		val screenModel = viewModel { args.model(model) }
+		args.content(screenModel)
+	}
+}
+
+fun NavGraphBuilder.buildRoute(appModel: AppModel) = with(ScreenRouteScope(this, appModel)) {
+	// 主页
+	screen<ScreenMain, ScreenMain.Model>()
+	// 通用
+	screen<ScreenWebpage, ScreenWebpage.Model>()
+	screen<ScreenImagePreview, ScreenImagePreview.Model>(buildNavTypeMap<List<Picture>>())
+	// 设置
+	screen<ScreenSettings, ScreenSettings.Model>()
+	// 微博
+	screen<ScreenWeiboDetails, ScreenWeiboDetails.Model>()
+	screen<ScreenWeiboUser, ScreenWeiboUser.Model>()
+	screen<ScreenWeiboFollows, ScreenWeiboFollows.Model>()
+	screen<ScreenWeiboAlbum, ScreenWeiboAlbum.Model>()
+	// 社区
+	screen<ScreenLogin, ScreenLogin.Model>()
+	screen<ScreenTopic, ScreenTopic.Model>(buildNavTypeMap<Topic>())
+	screen<ScreenMail, ScreenMail.Model>()
+	// 世界
+	screen<ScreenActivityDetails, ScreenActivityDetails.Model>()
+	screen<ScreenAddActivity, ScreenAddActivity.Model>()
 }

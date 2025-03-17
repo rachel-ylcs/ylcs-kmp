@@ -11,72 +11,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ScreenModel
 import love.yinlin.common.ThemeColor
-import love.yinlin.common.screen
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Mail
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
-
-private class MailModel(private val model: AppModel) : ScreenModel() {
-	var state by mutableStateOf(BoxState.EMPTY)
-
-	val items = mutableStateListOf<Mail>()
-	var offset: Long = Long.MAX_VALUE
-	var canLoading by mutableStateOf(false)
-
-	override fun initialize() {
-		launch {
-			requestNewMails()
-		}
-	}
-
-	suspend fun requestNewMails() {
-		if (state != BoxState.LOADING) {
-			state = BoxState.LOADING
-			val result = ClientAPI.request(
-				route = API.User.Mail.GetMails,
-				data = API.User.Mail.GetMails.Request(token = app.config.userToken)
-			)
-			if (result is Data.Success) {
-				val data = result.data
-				items.replaceAll(data)
-				offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
-				state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-				canLoading = offset != Long.MAX_VALUE
-			}
-			else state = BoxState.NETWORK_ERROR
-		}
-	}
-
-	suspend fun requestMoreMails() {
-		val result = ClientAPI.request(
-			route = API.User.Mail.GetMails,
-			data = API.User.Mail.GetMails.Request(
-				token = app.config.userToken,
-				offset = offset
-			)
-		)
-		if (result is Data.Success) {
-			val data = result.data
-			items += data
-			offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
-			canLoading = offset != Long.MAX_VALUE
-		}
-	}
-
-	fun onMailClick(mail: Mail) {
-
-	}
-}
 
 @Composable
 private fun MailItem(
@@ -109,7 +57,7 @@ private fun MailItem(
 				)
 				Text(
 					text = mail.title,
-					style = MaterialTheme.typography.titleLarge,
+					style = MaterialTheme.typography.titleMedium,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
@@ -131,36 +79,90 @@ private fun MailItem(
 	}
 }
 
-@Composable
-fun ScreenMail(model: AppModel) {
-	val screenModel = screen { MailModel(model) }
+@Stable
+@Serializable
+data object ScreenMail : Screen<ScreenMail.Model> {
+	class Model(model: AppModel) : Screen.Model(model) {
+		var state by mutableStateOf(BoxState.EMPTY)
 
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = "邮箱",
-		onBack = { model.pop() }
-	) {
-		StatefulBox(
-			state = screenModel.state,
-			modifier = Modifier.fillMaxSize()
-		) {
-			PaginationGrid(
-				items = screenModel.items,
-				key = { it.mid },
-				columns = GridCells.Adaptive(300.dp),
-				canRefresh = true,
-				canLoading = screenModel.canLoading,
-				onRefresh = { screenModel.requestNewMails() },
-				onLoading = { screenModel.requestMoreMails() },
-				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(10.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				MailItem(
-					mail = it,
-					onClick = { screenModel.onMailClick(it) }
+		val items = mutableStateListOf<Mail>()
+		var offset: Long = Long.MAX_VALUE
+		var canLoading by mutableStateOf(false)
+
+		suspend fun requestNewMails() {
+			if (state != BoxState.LOADING) {
+				state = BoxState.LOADING
+				val result = ClientAPI.request(
+					route = API.User.Mail.GetMails,
+					data = API.User.Mail.GetMails.Request(token = app.config.userToken)
 				)
+				if (result is Data.Success) {
+					val data = result.data
+					items.replaceAll(data)
+					offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
+					state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+					canLoading = offset != Long.MAX_VALUE
+				}
+				else state = BoxState.NETWORK_ERROR
+			}
+		}
+
+		suspend fun requestMoreMails() {
+			val result = ClientAPI.request(
+				route = API.User.Mail.GetMails,
+				data = API.User.Mail.GetMails.Request(
+					token = app.config.userToken,
+					offset = offset
+				)
+			)
+			if (result is Data.Success) {
+				val data = result.data
+				items += data
+				offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
+				canLoading = offset != Long.MAX_VALUE
+			}
+		}
+
+		fun onMailClick(mail: Mail) {
+
+		}
+	}
+
+	override fun model(model: AppModel): Model = Model(model).apply {
+		launch {
+			requestNewMails()
+		}
+	}
+
+	@Composable
+	override fun content(model: Model) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = "邮箱",
+			onBack = { model.pop() }
+		) {
+			StatefulBox(
+				state = model.state,
+				modifier = Modifier.fillMaxSize()
+			) {
+				PaginationGrid(
+					items = model.items,
+					key = { it.mid },
+					columns = GridCells.Adaptive(300.dp),
+					canRefresh = true,
+					canLoading = model.canLoading,
+					onRefresh = { model.requestNewMails() },
+					onLoading = { model.requestMoreMails() },
+					modifier = Modifier.fillMaxSize(),
+					contentPadding = PaddingValues(10.dp),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					MailItem(
+						mail = it,
+						onClick = { model.onMailClick(it) }
+					)
+				}
 			}
 		}
 	}

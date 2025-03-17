@@ -10,9 +10,9 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -84,7 +84,7 @@ private fun DefaultSwipePaginationHeader(
 			color = MaterialTheme.colorScheme.onPrimary
 		)
 		else MiniIcon(
-			imageVector = Icons.Filled.ArrowDownward,
+			imageVector = Icons.Outlined.ArrowDownward,
 			size = 32.dp,
 			color = MaterialTheme.colorScheme.onPrimary
 		)
@@ -115,7 +115,7 @@ private fun DefaultSwipePaginationFooter(
 			color = MaterialTheme.colorScheme.onPrimary
 		)
 		else MiniIcon(
-			imageVector = Icons.Filled.ArrowUpward,
+			imageVector = Icons.Outlined.ArrowUpward,
 			size = 32.dp,
 			color = MaterialTheme.colorScheme.onPrimary
 		)

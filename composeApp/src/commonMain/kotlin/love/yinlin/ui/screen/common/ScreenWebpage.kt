@@ -2,34 +2,39 @@ package love.yinlin.ui.screen.common
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.ScreenModel
-import love.yinlin.common.screen
+import love.yinlin.ui.Screen
 import love.yinlin.ui.component.extra.WebPage
 import love.yinlin.ui.component.extra.WebPageSettings
 import love.yinlin.ui.component.extra.WebPageState
 import love.yinlin.ui.component.screen.SubScreen
 
-private class WebPageModel(url: String) : ScreenModel() {
-	val state = WebPageState(WebPageSettings(), url)
-}
+@Stable
+@Serializable
+data class ScreenWebpage(val url: String) : Screen<ScreenWebpage.Model> {
+	inner class Model(model: AppModel) : Screen.Model(model) {
+		val state = WebPageState(WebPageSettings(), url)
+	}
 
-@Composable
-fun ScreenWebPage(model: AppModel, url: String) {
-	val screenModel = screen { WebPageModel(url) }
+	override fun model(model: AppModel): Model = Model(model)
 
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = screenModel.state.title,
-		onBack = {
-			if (screenModel.state.canGoBack) screenModel.state.goBack()
-			else model.pop()
+	@Composable
+	override fun content(model: Model) {
+		SubScreen(
+			modifier = Modifier.fillMaxSize(),
+			title = model.state.title,
+			onBack = {
+				if (model.state.canGoBack) model.state.goBack()
+				else model.pop()
+			}
+		) {
+			WebPage(
+				state = model.state,
+				modifier = Modifier.fillMaxSize()
+			)
 		}
-	) {
-		WebPage(
-			state = screenModel.state,
-			modifier = Modifier.fillMaxSize()
-		)
 	}
 }

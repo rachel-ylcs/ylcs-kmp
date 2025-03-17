@@ -2,7 +2,7 @@ package love.yinlin.ui.component.text
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -65,7 +65,7 @@ fun TextInput(
 		trailingIcon = if (clearButton) {
 			{
 				ClickIcon(
-					imageVector = Icons.Filled.Clear,
+					imageVector = Icons.Outlined.Clear,
 					onClick = {
 						state.text = ""
 						state.overflow = false

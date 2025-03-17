@@ -1,7 +1,18 @@
 package love.yinlin.ui.screen.world
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.ui.Screen
 
-@Composable
-expect fun ScreenModifyActivity(model: AppModel, aid: Int)
+@Stable
+@Serializable
+expect class ScreenModifyActivity : Screen<ScreenModifyActivity.Model> {
+	class Model : Screen.Model
+
+	override fun model(model: AppModel): Model
+
+	@Composable
+	override fun content(model: Model)
+}

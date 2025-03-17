@@ -3,7 +3,7 @@ package love.yinlin.ui.screen.settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -106,7 +106,7 @@ object SettingsScope {
 			hasDivider = hasDivider,
 			onClick = onClick
 		) {
-			MiniIcon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
+			MiniIcon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight)
 		}
 	}
 
@@ -137,7 +137,7 @@ object SettingsScope {
 					maxLines = maxLines,
 					overflow = TextOverflow.Ellipsis
 				)
-				MiniIcon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
+				MiniIcon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight)
 			}
 		}
 	}
