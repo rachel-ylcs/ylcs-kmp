@@ -80,6 +80,7 @@
 ### 编译与运行环境
 
 - IntelliJ IDEA 2025.1 EAP (Ultimate Edition)
+- JDK 21
 - Clion 2025.1
 - Windows(可编译Android/Windows/Web/Server)
 - Mac(可编译Android/IOS/Mac/Web/Server)
