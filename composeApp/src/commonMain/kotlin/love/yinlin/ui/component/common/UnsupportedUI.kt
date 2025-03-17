@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.screen.SubScreen
 

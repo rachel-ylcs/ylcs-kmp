@@ -23,8 +23,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.common.RachelTheme
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
-import love.yinlin.ui.buildRoute
+import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.buildRoute
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
 import love.yinlin.ui.screen.community.ScreenPartMe

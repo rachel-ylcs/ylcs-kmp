@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -359,13 +360,13 @@ fun RichText(
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
 ) {
-	val state by rememberDerivedState { text.asState(
+	val state = remember(text) { text.asState(
 		onLinkClick = onLinkClick,
 		onTopicClick = onTopicClick,
 		onAtClick = onAtClick
 	) }
 	val fontSize = LocalTextStyle.current.fontSize
-	val inlineTextContent by rememberDerivedState {
+	val inlineTextContent = remember(state) {
 		state.content.mapValues { drawable ->
 			InlineTextContent(
 				placeholder = Placeholder(

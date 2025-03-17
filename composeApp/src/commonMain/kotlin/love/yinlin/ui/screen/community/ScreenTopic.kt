@@ -29,10 +29,10 @@ import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberStateSaveable
+import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
@@ -444,7 +444,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		) {
 			val subComments = remember { mutableStateListOf<SubComment>() }
 			var subCommentOffset: Int = remember { 0 }
-			var subCommentCanLoading by rememberStateSaveable { false }
+			var subCommentCanLoading by rememberState { false }
 
 			ModalBottomSheet(
 				onDismissRequest = { hideSubComment() },

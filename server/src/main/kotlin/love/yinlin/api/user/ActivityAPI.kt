@@ -122,14 +122,12 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Activity.DeleteActivity) { (token, ts) ->
-		VN.throwEmpty(ts)
+	api(API.User.Activity.DeleteActivity) { (token, aid) ->
+		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
-		val activity = DB.querySQLSingle("SELECT pic, pics FROM activity WHERE ts = ?", ts)
-		if (activity == null) return@api "该活动不存在".failedData
-		DB.throwExecuteSQL("DELETE FROM activity WHERE ts = ?", ts)
+		if (!DB.deleteSQL("DELETE FROM activity WHERE aid = ?", aid)) return@api "该活动不存在".failedData
 		"删除成功".successData
 	}
 }

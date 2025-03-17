@@ -24,7 +24,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage

@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import javafx.application.Platform
-import love.yinlin.extension.rememberStateSaveable
+import love.yinlin.extension.rememberState
 import love.yinlin.platform.AppContext
 import love.yinlin.platform.app
 import love.yinlin.ui.component.AppTopBar
@@ -42,7 +42,7 @@ fun main() {
             width = context.windowWidth.dp,
             height = context.windowHeight.dp
         )
-        var isOpen by rememberStateSaveable { true }
+        var isOpen by rememberState { true }
         if (isOpen) {
             Window(
                 onCloseRequest = ::exitApplication,

@@ -22,7 +22,7 @@ import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserProfile
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector

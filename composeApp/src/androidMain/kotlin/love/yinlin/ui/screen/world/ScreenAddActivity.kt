@@ -29,7 +29,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.*
 import love.yinlin.ui.component.input.DockedDatePicker
 import love.yinlin.ui.component.layout.EmptyBox

@@ -204,7 +204,7 @@ object API : APINode(null, "") {
 
 			object DeleteActivity : APIPostRequest<DeleteActivity.Request>(this, "deleteActivity") {
 				@Serializable
-				data class Request(val token: String, val ts: String)
+				data class Request(val token: String, val aid: Int)
 			}
 		}
 

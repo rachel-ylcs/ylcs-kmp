@@ -18,9 +18,9 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.extension.Saver
+import love.yinlin.extension.itemKey
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
@@ -76,11 +76,11 @@ private fun Portrait(
 			.background(MaterialTheme.colorScheme.surface)
 			.padding(start = 10.dp, end = 10.dp, top = 5.dp)
 	) {
-		item(key = Saver.key("WeiboLayout")) {
+		item(key = "WeiboLayout".itemKey) {
 			WeiboLayout(weibo = weibo)
 		}
 		if (comments != null) {
-			item(key = Saver.key("HorizontalDivider")) {
+			item(key = "HorizontalDivider".itemKey) {
 				HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 			}
 			items(

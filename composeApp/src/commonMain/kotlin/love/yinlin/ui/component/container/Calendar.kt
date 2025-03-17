@@ -146,9 +146,9 @@ private fun CalendarDayGrid(
 		beyondViewportPageCount = 1,
 		modifier = modifier
 	) { pageIndex ->
-		val currentDate = remember { indexShadowDate(pageIndex) }
-		val startDay = currentDate.dayOfWeek.isoDayNumber - 1
-		val endDay = remember(currentDate) {
+		val currentDate = remember(pageIndex) { indexShadowDate(pageIndex) }
+		val startDay = remember(currentDate) { currentDate.dayOfWeek.isoDayNumber - 1 }
+		val endDay = remember(currentDate, startDay) {
 			val tmp = currentDate.plus(1, DateTimeUnit.MONTH)
 			val endOfMonth = LocalDate(tmp.year, tmp.month, 1).minus(1, DateTimeUnit.DAY)
 			startDay + endOfMonth.dayOfMonth - 1

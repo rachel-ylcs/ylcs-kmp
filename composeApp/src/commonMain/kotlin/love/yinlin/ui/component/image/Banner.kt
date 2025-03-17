@@ -18,6 +18,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import love.yinlin.extension.rememberDerivedState
+
+@Composable
+private fun BannerIndicator(
+	num: Int,
+	current: Int,
+	width: Dp,
+) {
+	val offsetX by animateDpAsState(targetValue = width * current)
+	val height = width / 4f
+
+	Row(
+		modifier = Modifier.width(width * num).height(height)
+			.clip(MaterialTheme.shapes.extraSmall)
+			.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+	) {
+		Box(modifier = Modifier.width(width).fillMaxHeight()
+			.offset(x = offsetX).clip(MaterialTheme.shapes.extraSmall)
+			.background(MaterialTheme.colorScheme.onBackground))
+	}
+}
 
 @Composable
 fun <T> Banner(
@@ -29,7 +50,7 @@ fun <T> Banner(
 	modifier: Modifier = Modifier,
 	content: @Composable (pic: T, index: Int, scale: Float) -> Unit
 ) {
-	val autoplay = remember(pics) { interval > 0L && pics.size > 1 }
+	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }
 
 	Column(
 		modifier = modifier,
@@ -38,22 +59,17 @@ fun <T> Banner(
 	) {
 		HorizontalPager(
 			state = state,
-			beyondViewportPageCount = 1,
 			contentPadding = PaddingValues(horizontal = spacing),
 			modifier = Modifier.fillMaxWidth()
 		) {
 			val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
 			content(pics[it], it, scale)
 		}
-		Row(modifier = Modifier.width(20.dp * pics.size).height(5.dp)
-			.clip(MaterialTheme.shapes.extraSmall)
-			.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
-		) {
-			val offsetX by animateDpAsState(targetValue = 20.dp * state.currentPage)
-			Box(modifier = Modifier.width(16.dp).height(5.dp)
-				.offset(x = offsetX).clip(MaterialTheme.shapes.extraSmall)
-				.background(MaterialTheme.colorScheme.onBackground))
-		}
+		BannerIndicator(
+			num = pics.size,
+			current = state.currentPage,
+			width = 20.dp
+		)
 	}
 
 	if (autoplay) {

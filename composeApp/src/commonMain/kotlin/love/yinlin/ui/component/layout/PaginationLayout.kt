@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import love.yinlin.extension.Saver
+import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.OS
 import love.yinlin.ui.component.image.MiniIcon
@@ -282,7 +282,7 @@ private fun <T> ClickPaginationColumn(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = Saver.key("Header")) {
+			item(key = "Header".itemKey) {
 				header()
 			}
 		}
@@ -330,7 +330,7 @@ private fun <T> ClickPaginationGrid(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = Saver.key("Header")) {
+			item(key = "Header".itemKey) {
 				header()
 			}
 		}
@@ -381,7 +381,7 @@ private fun <T> ClickPaginationStaggeredGrid(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = Saver.key("Header")) {
+			item(key = "Header".itemKey) {
 				header()
 			}
 		}
@@ -437,7 +437,7 @@ fun <T> PaginationColumn(
 				horizontalAlignment = horizontalAlignment,
 			) {
 				if (header != null) {
-					item(key = Saver.key("Header")) {
+					item(key = "Header".itemKey) {
 						header()
 					}
 				}
@@ -496,7 +496,7 @@ fun <T> PaginationGrid(
 				horizontalArrangement = horizontalArrangement,
 			) {
 				if (header != null) {
-					item(key = Saver.key("Header")) {
+					item(key = "Header".itemKey) {
 						header()
 					}
 				}
@@ -556,7 +556,7 @@ fun <T> PaginationStaggeredGrid(
 				horizontalArrangement = horizontalArrangement
 			) {
 				if (header != null) {
-					item(key = Saver.key("Header")) {
+					item(key = "Header".itemKey) {
 						header()
 					}
 				}

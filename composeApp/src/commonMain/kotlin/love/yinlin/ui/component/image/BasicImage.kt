@@ -1,18 +1,8 @@
 package love.yinlin.ui.component.image
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.IndicationNodeFactory
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -21,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.AsyncImageState
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageOptions
@@ -231,14 +221,24 @@ enum class WebImageQuality {
 }
 
 @Composable
-private fun rememberWebImageKeyUrl(
-	uri: String,
-	key: Any? = null
-): String = rememberSaveable(uri, key) {
+private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(uri, key) {
 	if (key == null) uri
 	else if (uri.contains("?")) "$uri&_cacheKey=$key"
 	else "$uri?_cacheKey=$key"
 }
+
+@Composable
+fun rememberWebImageState(
+	quality: WebImageQuality,
+	placeholder: DrawableResource,
+	isCrossfade: Boolean
+) = rememberAsyncImageState(ComposableImageOptions {
+	downloadCachePolicy(CachePolicy.ENABLED)
+	memoryCachePolicy(CachePolicy.ENABLED)
+	sizeMultiplier(quality.sizeMultiplier)
+	placeholder(rememberIconPainterStateImage(placeholder))
+	if (isCrossfade) crossfade()
+})
 
 @Composable
 fun WebImage(
@@ -251,15 +251,9 @@ fun WebImage(
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	placeholder: DrawableResource = Res.drawable.placeholder_pic,
+	state: AsyncImageState = rememberWebImageState(quality, placeholder, true),
 	onClick: (() -> Unit)? = null
 ) {
-	val state = rememberAsyncImageState(ComposableImageOptions {
-		downloadCachePolicy(CachePolicy.ENABLED)
-		memoryCachePolicy(CachePolicy.ENABLED)
-		sizeMultiplier(quality.sizeMultiplier)
-		placeholder(rememberIconPainterStateImage(placeholder))
-		crossfade()
-	})
 	AsyncImage(
 		uri = rememberWebImageKeyUrl(uri, key),
 		contentDescription = null,
@@ -283,14 +277,9 @@ fun ZoomWebImage(
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
-	placeholder: DrawableResource = Res.drawable.placeholder_pic
+	placeholder: DrawableResource = Res.drawable.placeholder_pic,
+	state: AsyncImageState = rememberWebImageState(quality, placeholder, false)
 ) {
-	val state = rememberAsyncImageState(ComposableImageOptions {
-		downloadCachePolicy(CachePolicy.ENABLED)
-		memoryCachePolicy(CachePolicy.ENABLED)
-		sizeMultiplier(quality.sizeMultiplier)
-		placeholder(rememberIconPainterStateImage(placeholder))
-	})
 	SketchZoomAsyncImage(
 		uri = rememberWebImageKeyUrl(uri, key),
 		contentDescription = null,

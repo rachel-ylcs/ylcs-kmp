@@ -28,7 +28,7 @@ import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.rememberTextInputState
+import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ylcs_kmp.composeapp.generated.resources.*
@@ -282,7 +282,7 @@ fun DialogInput(
 	clearButton: Boolean = true,
 	onInput: (String) -> Unit
 ) {
-	val textInputState = rememberTextInputState()
+	val textInputState = remember { TextInputState() }
 
 	RachelDialog(
 		state = state,

@@ -26,9 +26,9 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.Saver
+import love.yinlin.extension.itemKey
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
@@ -162,7 +162,7 @@ data class ScreenWeiboUser(val id: String) : Screen<ScreenWeiboUser.Model> {
 			grid: WeiboGridData
 		) {
 			LazyColumn(modifier = Modifier.fillMaxSize()) {
-				item(key = Saver.key("UserInfoCard")) {
+				item(key = "UserInfoCard".itemKey) {
 					WebImage(
 						uri = user.background,
 						modifier = Modifier.fillMaxWidth().height(150.dp),
@@ -189,7 +189,7 @@ data class ScreenWeiboUser(val id: String) : Screen<ScreenWeiboUser.Model> {
 						)
 					}
 				}
-				item(key = Saver.key("Text")) {
+				item(key = "Text".itemKey) {
 					Text(
 						text = "最新微博",
 						textAlign = TextAlign.Center,

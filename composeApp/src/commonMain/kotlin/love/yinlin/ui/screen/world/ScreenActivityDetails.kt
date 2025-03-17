@@ -17,18 +17,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
+import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.Tip
+import love.yinlin.ui.component.screen.TipState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.img_damai
@@ -85,8 +90,28 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 	inner class Model(model: AppModel, activity: Activity?) : Screen.Model(model) {
 		var activity: Activity? by mutableStateOf(activity)
 
+		val tip = TipState()
+
 		fun onPicClick(pics: List<Picture>, index: Int) {
 			navigate(ScreenImagePreview(pics, index))
+		}
+
+		fun deleteActivity() {
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Activity.DeleteActivity,
+					data = API.User.Activity.DeleteActivity.Request(
+						token = app.config.userToken,
+						aid = aid
+					)
+				)
+				if (result is Data.Success) {
+					val activities = part<ScreenPartWorld>().activities
+					activities.find { it.aid == aid }?.let { activities -= it }
+					pop()
+				}
+				else if (result is Data.Error) tip.error(result.message)
+			}
 		}
 
 		@Composable
@@ -167,12 +192,12 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 					ClickIcon(
 						imageVector = Icons.Outlined.Edit,
 						modifier = Modifier.padding(end = 10.dp),
-						onClick = {}
+						onClick = { model.navigate(ScreenModifyActivity(aid)) }
 					)
 					ClickIcon(
 						imageVector = Icons.Outlined.Delete,
 						modifier = Modifier.padding(end = 10.dp),
-						onClick = {}
+						onClick = { model.deleteActivity() }
 					)
 				}
 			}
@@ -209,5 +234,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 				}
 			}
 		}
+
+		Tip(state = model.tip)
 	}
 }

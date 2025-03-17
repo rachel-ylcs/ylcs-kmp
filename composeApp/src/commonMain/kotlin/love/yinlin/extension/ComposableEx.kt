@@ -1,25 +1,16 @@
 package love.yinlin.extension
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.autoSaver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.AtomicReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
+
 // condition Modifier
+
 
 inline fun Modifier.condition(value: Boolean, callback: Modifier.() -> Modifier): Modifier =
 	if (value) this.callback() else this
@@ -29,6 +20,7 @@ inline fun Modifier.condition(value: Boolean, ifTrue: Modifier.() -> Modifier, i
 
 
 // rememberState
+
 
 @Composable
 inline fun <T> rememberState(crossinline init: () -> T) =
@@ -46,13 +38,28 @@ inline fun <T> rememberState(key1: Any?, key2: Any?, key3: Any?, crossinline ini
 inline fun <T> rememberState(vararg keys: Any?, crossinline init: () -> T) =
 	remember(*keys) { mutableStateOf(init()) }
 @Composable
-inline fun <T> rememberStateSaveable(vararg keys: Any?, saver: Saver<T, out Any>? = null, crossinline init: () -> T) =
-	if (saver == null) rememberSaveable(*keys, saver = autoSaver()) { mutableStateOf(init()) }
-	else rememberSaveable(*keys, stateSaver = saver) { mutableStateOf(init()) }
+fun <T> rememberDerivedState(calculation: () -> T) =
+	remember { derivedStateOf(calculation) }
 @Composable
-fun <T> rememberDerivedState(calculation: () -> T) = remember { derivedStateOf(calculation) }
+fun <T> rememberDerivedState(key1: Any?, calculation: () -> T) =
+	remember(key1) { derivedStateOf(calculation) }
+@Composable
+fun <T> rememberDerivedState(key1: Any?, key2: Any?, calculation: () -> T) =
+	remember(key1, key2) { derivedStateOf(calculation) }
+@Composable
+fun <T> rememberDerivedState(key1: Any?, key2: Any?, key3: Any?, calculation: () -> T) =
+	remember(key1, key2, key3) { derivedStateOf(calculation) }
+@Composable
+fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
+	remember(*keys) { derivedStateOf(calculation) }
+
+// itemKey
+
+val String.itemKey get() = Unit to this
+
 
 // LaunchFlag
+
 
 typealias LaunchFlag = AtomicReference<Boolean>
 fun launchFlag(): LaunchFlag = AtomicReference(false)
@@ -64,11 +71,13 @@ inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScop
 	}
 }
 
+
 // Debounce
+
 
 @Composable
 fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
-	var lastTime by rememberStateSaveable(saver = love.yinlin.extension.Saver.Instant) { Instant.fromEpochMilliseconds(0L) }
+	var lastTime = remember { Instant.fromEpochMilliseconds(0L) }
 	return {
 		val currentTime = Clock.System.now()
 		val diff = currentTime - lastTime
@@ -79,6 +88,8 @@ fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
 	}
 }
 
+
 // Composition Local
 
-fun <T> localComposition() = staticCompositionLocalOf<T> {  error("CompositionLocal not present") }
+
+fun <T> localComposition() = staticCompositionLocalOf<T> { error("CompositionLocal not present") }

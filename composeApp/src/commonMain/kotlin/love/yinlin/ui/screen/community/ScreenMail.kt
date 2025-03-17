@@ -20,7 +20,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.Mail
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox

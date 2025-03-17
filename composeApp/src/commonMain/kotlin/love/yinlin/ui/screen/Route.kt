@@ -1,4 +1,4 @@
-package love.yinlin.ui
+package love.yinlin.ui.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -16,7 +16,6 @@ import love.yinlin.ScreenPart
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.buildNavTypeMap
-import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.community.ScreenLogin
@@ -29,6 +28,7 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityDetails
 import love.yinlin.ui.screen.world.ScreenAddActivity
+import love.yinlin.ui.screen.world.ScreenModifyActivity
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 
@@ -85,4 +85,5 @@ fun NavGraphBuilder.buildRoute(appModel: AppModel) = with(ScreenRouteScope(this,
 	// 世界
 	screen<ScreenActivityDetails, ScreenActivityDetails.Model>()
 	screen<ScreenAddActivity, ScreenAddActivity.Model>()
+	screen<ScreenModifyActivity, ScreenModifyActivity.Model>()
 }

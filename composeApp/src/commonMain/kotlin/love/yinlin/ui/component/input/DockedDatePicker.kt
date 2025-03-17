@@ -15,6 +15,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ExpandableLayout
 
@@ -25,7 +26,7 @@ fun DockedDatePicker(
 	onDateSelected: (LocalDate?) -> Unit,
 	modifier: Modifier = Modifier
 ) {
-	var isShow by remember { mutableStateOf(false) }
+	var isShow by rememberState { false }
 	val datePickerState = rememberDatePickerState()
 	val text by rememberDerivedState {
 		datePickerState.selectedDateMillis?.let {

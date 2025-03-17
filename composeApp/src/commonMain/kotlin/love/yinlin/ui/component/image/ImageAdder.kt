@@ -35,8 +35,7 @@ fun ImageAdder(
 	onDelete: (Int) -> Unit,
 	onClick: (Int) -> Unit
 ) {
-	val actualPics by rememberDerivedState { pics.take(maxNum) }
-	val canAdd by rememberDerivedState { actualPics.size < maxNum }
+	val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
 
 	FlowRow(
 		modifier = modifier,
@@ -63,7 +62,7 @@ fun ImageAdder(
 				)
 			}
 		}
-		if (canAdd) {
+		if (actualPics.size < maxNum) {
 			Box(
 				modifier = Modifier.size(size)
 					.clip(MaterialTheme.shapes.small)

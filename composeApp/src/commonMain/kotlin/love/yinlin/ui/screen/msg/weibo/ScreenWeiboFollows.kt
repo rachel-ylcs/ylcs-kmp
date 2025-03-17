@@ -27,7 +27,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState

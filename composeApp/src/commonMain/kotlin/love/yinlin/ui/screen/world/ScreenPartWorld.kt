@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -23,7 +24,6 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
 import love.yinlin.extension.*
 import love.yinlin.platform.app
@@ -68,18 +68,14 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		requestActivity()
 	}
 
+	@OptIn(ExperimentalMaterial3Api::class)
 	@Composable
 	private fun BannerLayout(
 		spacing: Dp,
 		gap: Dp,
 		modifier: Modifier = Modifier
 	) {
-		val activities by rememberDerivedState {
-			activities.filter { it.pic != null }
-		}
-		val pics = remember(activities) {
-			activities.map { Picture(it.picPath ?: "") }
-		}
+		val pics by rememberDerivedState { activities.filter { it.pic != null } }
 
 		Banner(
 			pics = pics,
@@ -89,21 +85,19 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			modifier = modifier
 		) { pic, index, scale ->
 			WebImage(
-				uri = pic.image,
+				uri = pic.picPath ?: "",
 				contentScale = ContentScale.Crop,
 				modifier = Modifier.fillMaxWidth().aspectRatio(2f)
 					.scale(scale).clip(MaterialTheme.shapes.medium),
 				onClick = {
-					showActivityDetails(activities[index].aid)
+					showActivityDetails(pic.aid)
 				}
 			)
 		}
 	}
 
 	@Composable
-	private fun CalendarLayout(
-		modifier: Modifier = Modifier
-	) {
+	private fun CalendarLayout(modifier: Modifier = Modifier) {
 		val events: Map<LocalDate, String> by rememberDerivedState {
 			val events = mutableMapOf<LocalDate, String>()
 			for (activity in activities) {

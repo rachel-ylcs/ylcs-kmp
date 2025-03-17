@@ -17,7 +17,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeMode
 import love.yinlin.platform.app
-import love.yinlin.ui.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space

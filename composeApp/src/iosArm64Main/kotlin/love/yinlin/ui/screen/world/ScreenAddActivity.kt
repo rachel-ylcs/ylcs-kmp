@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.ui.Screen
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.common.UnsupportedScreen
 
 @Stable
