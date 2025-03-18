@@ -97,8 +97,9 @@ object ClientAPI {
 	}
 
 	interface APIFileScope {
-		fun file(value: Path?): APIFile?
-		fun file(values: List<Path>?): APIFiles?
+		fun file(value: Path): APIFile
+		fun optionFile(value: Path?): APIFile?
+		fun file(values: List<Path>?): APIFiles
 	}
 
 	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
@@ -119,17 +120,19 @@ object ClientAPI {
 			private var index = 0
 			val map = mutableMapOf<String, Any>()
 
-			override fun file(value: Path?): APIFile? = value?.let {
+			override fun file(value: Path): APIFile {
 				val key = "#${index++}#"
 				map[key] = value
-				APIFile(key)
+				return APIFile(key)
 			}
 
-			override fun file(values: List<Path>?): APIFiles? = if (values == null || values.isEmpty()) null else {
+			override fun file(values: List<Path>?): APIFiles = if (values == null || values.isEmpty()) emptyList() else {
 				val key = "#${index++}#"
 				map[key] = values
 				listOf(APIFile(key))
 			}
+
+			override fun optionFile(value: Path?): APIFile? = value?.let { file(it) }
 		}
 
 		val keys = scope.files().toJson().Object

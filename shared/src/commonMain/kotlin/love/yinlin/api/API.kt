@@ -161,7 +161,7 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val token: String, val activity: love.yinlin.data.rachel.Activity)
 				@Serializable
-				data class Files(val pic: APIFile?, val pics: APIFiles?)
+				data class Files(val pic: APIFile?, val pics: APIFiles)
 				@Serializable
 				data class Response(val aid: Int, val pic: String?, val pics: List<String>)
 			}
@@ -306,7 +306,7 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val token: String, val title: String, val content: String, val section: Int)
 				@Serializable
-				data class Files(val pics: APIFiles?)
+				data class Files(val pics: APIFiles)
 				@Serializable
 				data class Response(val tid: Int, val pic: String?)
 			}

@@ -101,7 +101,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						aid = aid
 					),
 					files = { API.User.Activity.ModifyActivityPicture.Files(
-						pic = file(Path(file.absolutePath))!!
+						pic = file(Path(file.absolutePath))
 					) }
 				)
 				when (result) {
@@ -157,7 +157,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						aid = aid
 					),
 					files = { API.User.Activity.AddActivityPictures.Files(
-						pics = file(files.map { Path(it.absolutePath) })!!
+						pics = file(files.map { Path(it.absolutePath) })
 					) }
 				)
 				when (result) {
@@ -191,7 +191,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						index = index
 					),
 					files = { API.User.Activity.ModifyActivityPictures.Files(
-						pic = file(Path(file.absolutePath))!!
+						pic = file(Path(file.absolutePath))
 					) }
 				)
 				when (result) {

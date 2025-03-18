@@ -82,7 +82,7 @@ actual data object ScreenAddActivity : Screen<ScreenAddActivity.Model> {
 						activity = activity
 					),
 					files = { API.User.Activity.AddActivity.Files(
-						pic = file(input.pic?.let { Path(it.image) }) ,
+						pic = optionFile(input.pic?.let { Path(it.image) }) ,
 						pics = file(input.pics.map { Path(it.image) })
 					) }
 				)

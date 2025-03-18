@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import love.yinlin.common.RachelTheme
-import love.yinlin.ui.component.button.loadingButton
+import love.yinlin.ui.component.image.LoadingIcon
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -18,9 +18,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun preview() {
 	RachelTheme(darkMode = false) {
 		Box(modifier = Modifier.width(200.dp).height(400.dp)) {
-			loadingButton(
-				text = "登录",
-				icon = Icons.Default.Download,
+			LoadingIcon(
+				imageVector = Icons.Default.Download,
 				onClick = {
 					delay(2000L)
 				}

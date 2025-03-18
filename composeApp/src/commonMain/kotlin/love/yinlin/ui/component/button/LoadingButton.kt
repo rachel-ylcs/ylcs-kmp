@@ -23,7 +23,7 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable
-fun loadingButton(
+fun LoadingButton(
 	text: String,
 	icon: ImageVector? = null,
 	enabled: Boolean = true,

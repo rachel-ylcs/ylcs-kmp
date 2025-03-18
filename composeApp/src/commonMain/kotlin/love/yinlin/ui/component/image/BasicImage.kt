@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,15 +35,18 @@ import com.github.panpf.sketch.state.rememberIconPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.condition
+import love.yinlin.extension.rememberState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.placeholder_pic
 
-val DEFAULT_ICON_SIZE = 28.dp
+val DEFAULT_ICON_SIZE = 24.dp
 
 @Composable
 fun MiniIcon(
@@ -135,7 +142,7 @@ fun ClickIcon(
 	indication: Boolean = true,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
-	onClick: () -> Unit,
+	onClick: () -> Unit
 ) {
 	val localIndication = if (indication) LocalIndication.current else null
 	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
@@ -160,7 +167,7 @@ fun ClickIcon(
 	indication: Boolean = true,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
-	onClick: () -> Unit,
+	onClick: () -> Unit
 ) {
 	val localIndication = if (indication) LocalIndication.current else null
 	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
@@ -176,6 +183,43 @@ fun ClickIcon(
 		contentDescription = null,
 		tint = if (enabled) color else ThemeColor.fade,
 	)
+}
+
+@Composable
+fun LoadingIcon(
+	imageVector: ImageVector,
+	size: Dp = DEFAULT_ICON_SIZE,
+	color: Color = MaterialTheme.colorScheme.onSurface,
+	onClick: suspend CoroutineScope.() -> Unit
+) {
+	val scope = rememberCoroutineScope()
+	var isLoading by rememberState { false }
+
+	if (isLoading) {
+		Box(
+			modifier = Modifier.size(size),
+			contentAlignment = Alignment.Center
+		) {
+			CircularProgressIndicator(
+				modifier = Modifier.fillMaxSize(fraction = 0.75f),
+				color = color
+			)
+		}
+	}
+	else {
+		Icon(
+			modifier = Modifier.size(size).clip(CircleShape).clickable {
+				scope.launch {
+					isLoading = true
+					onClick()
+					isLoading = false
+				}
+			},
+			imageVector = imageVector,
+			contentDescription = null,
+			tint = color,
+		)
+	}
 }
 
 @Composable
