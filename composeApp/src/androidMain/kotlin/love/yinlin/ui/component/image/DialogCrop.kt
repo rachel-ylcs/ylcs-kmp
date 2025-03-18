@@ -13,7 +13,7 @@ import io.moyuru.cropify.Cropify
 import io.moyuru.cropify.CropifyOption
 import io.moyuru.cropify.CropifySize
 import io.moyuru.cropify.CropifyState
-import love.yinlin.ui.component.screen.DialogButton
+import love.yinlin.ui.component.button.RachelButton
 
 class DialogCropState {
 	var uri: Uri? by mutableStateOf(null)
@@ -57,7 +57,7 @@ fun DialogCrop(
 						state.uri = null
 					}
 				)
-				DialogButton(
+				RachelButton(
 					text = "裁剪",
 					modifier = Modifier.align(Alignment.BottomEnd).zIndex(2f),
 					onClick = { state.cropState.crop() }

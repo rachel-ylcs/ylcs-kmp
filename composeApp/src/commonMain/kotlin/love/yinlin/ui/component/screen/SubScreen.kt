@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
@@ -20,6 +21,8 @@ fun SubScreen(
 	title: @Composable () -> Unit,
 	actions: @Composable (RowScope.() -> Unit) = { },
 	onBack: (() -> Unit)? = null,
+	tip: TipState = remember { TipState() },
+	loading: DialogState = remember { DialogState() },
 	content: @Composable () -> Unit
 ) {
 	BackHandler { onBack?.invoke() }
@@ -56,6 +59,12 @@ fun SubScreen(
 			content()
 		}
 	}
+
+	Tip(state = tip)
+
+	if (loading.isOpen) {
+		DialogLoading(state = loading)
+	}
 }
 
 @Composable
@@ -64,6 +73,8 @@ fun SubScreen(
 	title: String = "",
 	actions: @Composable (RowScope.() -> Unit) = { },
 	onBack: () -> Unit,
+	tip: TipState = remember { TipState() },
+	loading: DialogState = remember { DialogState() },
 	content: @Composable () -> Unit
 ) {
 	SubScreen(
@@ -77,6 +88,8 @@ fun SubScreen(
 		},
 		actions = actions,
 		onBack = onBack,
+		tip = tip,
+		loading = loading,
 		content = content
 	)
 }

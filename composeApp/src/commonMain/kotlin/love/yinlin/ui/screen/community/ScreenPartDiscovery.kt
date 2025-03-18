@@ -11,11 +11,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Paid
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
@@ -34,8 +31,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.launchFlag
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
@@ -65,7 +60,6 @@ private enum class DiscoveryItem(
 }
 
 class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
-	val flagFirstLoad = launchFlag()
 	var state by mutableStateOf(BoxState.EMPTY)
 
 	val listState = LazyStaggeredGridState()
@@ -321,9 +315,9 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
+	}
 
-		LaunchOnce(flagFirstLoad) {
-			onRefresh()
-		}
+	override fun CoroutineScope.initialize() {
+		onRefresh()
 	}
 }

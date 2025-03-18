@@ -140,11 +140,11 @@ data object ScreenMain : Screen<ScreenMain.Model> {
 			) {
 				Box(modifier = Modifier.fillMaxSize()) {
 					when (it) {
-						TabItem.WORLD.ordinal -> part<ScreenPartWorld>().content()
-						TabItem.MSG.ordinal -> part<ScreenPartMsg>().content()
-						TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().content()
-						TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().content()
-						TabItem.ME.ordinal -> part<ScreenPartMe>().content()
+						TabItem.WORLD.ordinal -> part<ScreenPartWorld>().partContent()
+						TabItem.MSG.ordinal -> part<ScreenPartMsg>().partContent()
+						TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().partContent()
+						TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().partContent()
+						TabItem.ME.ordinal -> part<ScreenPartMe>().partContent()
 					}
 				}
 			}

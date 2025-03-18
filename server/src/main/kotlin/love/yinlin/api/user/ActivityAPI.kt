@@ -51,9 +51,9 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
 		DB.throwExecuteSQL("""
 			UPDATE activity
-			SET ts = ? AND title = ? AND content = ? AND showstart = ? AND damai = ? AND maoyan = ? AND link = ?
+			SET ts = ? , title = ? , content = ? , showstart = ? , damai = ? , maoyan = ? , link = ?
 			WHERE aid = ?
-		""", activity.ts, activity.title, activity.content,
+		""",activity.ts, activity.title, activity.content,
 			activity.showstart, activity.damai, activity.maoyan, activity.link,
 			activity.aid)
 		"修改成功".successData
@@ -67,7 +67,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		val picName = currentUniqueId()
 		DB.throwExecuteSQL("UPDATE activity SET pic = ? WHERE aid = ?", picName, aid)
 		pic.copy(ServerRes.Activity.activity(picName))
-		"修改成功".successData
+		Data.Success(picName)
 	}
 
 	api(API.User.Activity.DeleteActivityPicture) { (token, aid) ->
@@ -79,19 +79,19 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Activity.AddActivityPictures) { (token, aid), (pic) ->
+	api(API.User.Activity.AddActivityPictures) { (token, aid), (pics) ->
 		VN.throwId(aid)
+		val ngp = NineGridProcessor(pics)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
 		val activities = DB.throwQuerySQLSingle("SELECT pics FROM activity WHERE aid = ?", aid)
-		val pics = activities["pics"]!!.to<MutableList<String>>()
-		VN.throwIf(pics.size >= 9)
-		val picName = currentUniqueId()
-		pics += picName
-		DB.throwExecuteSQL("UPDATE activity SET pics = ? WHERE aid = ?", pics.toJsonString(), aid)
-		pic.copy(ServerRes.Activity.activity(picName))
-		"添加成功".successData
+		val oldPics = activities["pics"]!!.to<MutableList<String>>()
+		VN.throwIf(pics.isEmpty(), oldPics.size + pics.size > 9)
+		oldPics += ngp.actualPics
+		DB.throwExecuteSQL("UPDATE activity SET pics = ? WHERE aid = ?", oldPics.toJsonString(), aid)
+		ngp.copy { ServerRes.Activity.activity(it) }
+		Data.Success(ngp.actualPics)
 	}
 
 	api(API.User.Activity.ModifyActivityPictures) { (token, aid, index), (pic) ->
@@ -106,7 +106,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		pics[index] = picName
 		DB.throwExecuteSQL("UPDATE activity SET pics = ? WHERE aid = ?", pics.toJsonString(), aid)
 		pic.copy(ServerRes.Activity.activity(picName))
-		"修改成功".successData
+		Data.Success(picName)
 	}
 
 	api(API.User.Activity.DeleteActivityPictures) { (token, aid, index) ->

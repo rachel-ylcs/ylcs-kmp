@@ -38,9 +38,6 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 	}
 
 	class Model(model: AppModel) : Screen.Model(model) {
-		val tip = TipState()
-		val loadingState = DialogState()
-
 		var mode by mutableStateOf(Mode.Login)
 		val loginId = TextInputState()
 		val loginPwd = TextInputState()
@@ -63,7 +60,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 					tip.error("ID或密码不合规范")
 					return@launch
 				}
-				loadingState.isOpen = true
+				loading.isOpen = true
 				val result1 = ClientAPI.request(
 					route = API.User.Account.Login,
 					data = API.User.Account.Login.Request(
@@ -80,12 +77,12 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 							route = API.User.Profile.GetProfile,
 							data = token
 						)
-						loadingState.isOpen = false
+						loading.isOpen = false
 						if (result2 is Data.Success) app.config.userProfile = result2.data
 						pop()
 					}
 					is Data.Error -> {
-						loadingState.isOpen = false
+						loading.isOpen = false
 						tip.error(result1.message)
 					}
 				}
@@ -144,7 +141,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 						text = "忘记密码?",
 						color = MaterialTheme.colorScheme.primary,
 						modifier = Modifier.clickable {
-							mode = ScreenLogin.Mode.ForgotPassword
+							mode = Mode.ForgotPassword
 							forgotPasswordId.text = loginId.text
 							forgotPasswordPwd.text = ""
 						}
@@ -319,16 +316,12 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				Mode.Register -> "注册"
 				Mode.ForgotPassword -> "忘记密码"
 			},
-			onBack = { model.pop() }
+			onBack = { model.pop() },
+			tip = model.tip,
+			loading = model.loading
 		) {
 			if (app.isPortrait) model.Portrait()
 			else model.Landscape()
 		}
-
-		if (model.loadingState.isOpen) {
-			DialogLoading(state = model.loadingState)
-		}
-
-		Tip(state = model.tip)
 	}
 }

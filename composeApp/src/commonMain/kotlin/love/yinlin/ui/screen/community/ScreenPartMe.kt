@@ -141,9 +141,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun ToolBar(
-		modifier: Modifier = Modifier
-	) {
+	private fun ToolBar(modifier: Modifier = Modifier) {
 		Row(
 			modifier = modifier,
 			horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
@@ -182,9 +180,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun LoginBox(
-		modifier: Modifier = Modifier
-	) {
+	private fun LoginBox(modifier: Modifier = Modifier) {
 		Column(modifier = modifier) {
 			Row(
 				modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -217,9 +213,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun Portrait(
-		userProfile: UserProfile
-	) {
+	private fun Portrait(userProfile: UserProfile) {
 		Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
 			WebImage(
 				uri = userProfile.wallPath,
@@ -294,9 +288,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun Landscape(
-		userProfile: UserProfile
-	) {
+	private fun Landscape(userProfile: UserProfile) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
 				modifier = Modifier.fillMaxWidth(),

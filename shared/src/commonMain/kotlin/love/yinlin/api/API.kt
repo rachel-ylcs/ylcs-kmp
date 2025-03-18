@@ -171,7 +171,7 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val activity: love.yinlin.data.rachel.Activity)
 			}
 
-			object ModifyActivityPicture : APIFormRequest<ModifyActivityPicture.Request, ModifyActivityPicture.Files>(this, "modifyActivityPicture") {
+			object ModifyActivityPicture : APIForm<ModifyActivityPicture.Request, String, ModifyActivityPicture.Files>(this, "modifyActivityPicture") {
 				@Serializable
 				data class Request(val token: String, val aid: Int)
 				@Serializable
@@ -183,14 +183,14 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val aid: Int)
 			}
 
-			object AddActivityPictures : APIFormRequest<AddActivityPictures.Request, AddActivityPictures.Files>(this, "addActivityPictures") {
+			object AddActivityPictures : APIForm<AddActivityPictures.Request, List<String>, AddActivityPictures.Files>(this, "addActivityPictures") {
 				@Serializable
 				data class Request(val token: String, val aid: Int)
 				@Serializable
-				data class Files(val pic: APIFile)
+				data class Files(val pics: APIFiles)
 			}
 
-			object ModifyActivityPictures : APIFormRequest<ModifyActivityPictures.Request, ModifyActivityPictures.Files>(this, "modifyActivityPictures") {
+			object ModifyActivityPictures : APIForm<ModifyActivityPictures.Request, String, ModifyActivityPictures.Files>(this, "modifyActivityPictures") {
 				@Serializable
 				data class Request(val token: String, val aid: Int, val index: Int)
 				@Serializable

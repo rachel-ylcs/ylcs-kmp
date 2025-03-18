@@ -16,6 +16,8 @@ import love.yinlin.ScreenPart
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.buildNavTypeMap
+import love.yinlin.ui.component.screen.DialogState
+import love.yinlin.ui.component.screen.TipState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.community.ScreenLogin
@@ -42,6 +44,9 @@ interface Screen<M : Screen.Model> {
 		@Suppress("PropertyName")
 		val _model: AppModel get() = model
 		inline fun <reified P : ScreenPart> part(): P = _model.part()
+
+		val tip = TipState()
+		val loading = DialogState()
 	}
 
 	fun model(model: AppModel): M

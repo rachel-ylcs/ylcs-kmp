@@ -10,7 +10,7 @@ import love.yinlin.ui.component.common.UnsupportedScreen
 @Stable
 @Serializable
 actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen<ScreenModifyActivity.Model> {
-	actual class Model(model: AppModel) : Screen.Model(model)
+	actual inner class Model(model: AppModel) : Screen.Model(model)
 
 	actual override fun model(model: AppModel): Model = Model(model)
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.LastPage
 import androidx.compose.material.icons.outlined.FirstPage
@@ -20,14 +21,13 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.platform.app
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.screen.Tip
-import love.yinlin.ui.component.screen.TipState
+import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
 @Serializable
@@ -40,8 +40,6 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 	data class AlbumCache(val count: Int, val items: List<Picture>)
 
 	inner class Model(model: AppModel) : Screen.Model(model) {
-		val tip = TipState()
-
 		var state by mutableStateOf(BoxState.EMPTY)
 
 		val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
@@ -86,10 +84,6 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 				}
 			}
 		}
-
-		fun onPictureClick(pic: Picture) {
-			TODO()
-		}
 	}
 
 	override fun model(model: AppModel): Model = Model(model).apply {
@@ -103,7 +97,8 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "$title - 共 ${model.num} 张",
-			onBack = { model.pop() }
+			onBack = { model.pop() },
+			tip = model.tip
 		) {
 			Column(
 				modifier = Modifier.fillMaxSize().padding(10.dp),
@@ -120,14 +115,14 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 						verticalArrangement = Arrangement.spacedBy(10.dp),
 						modifier = Modifier.fillMaxSize()
 					) {
-						items(
+						itemsIndexed(
 							items = data.items,
-							key = { it.image }
-						){
+							key = { index, pic -> pic.image }
+						){ index, pic ->
 							WebImage(
-								uri = it.image,
+								uri = pic.image,
 								modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-								onClick = { model.onPictureClick(it) }
+								onClick = { model.navigate(ScreenImagePreview(data.items, index)) }
 							)
 						}
 					}
@@ -155,7 +150,5 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 				}
 			}
 		}
-
-		Tip(state = model.tip)
 	}
 }

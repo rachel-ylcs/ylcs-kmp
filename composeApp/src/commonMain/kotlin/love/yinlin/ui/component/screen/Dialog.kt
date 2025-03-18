@@ -23,6 +23,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
 import love.yinlin.platform.app
+import love.yinlin.ui.component.button.RachelButton
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.image.MiniIcon
@@ -96,9 +97,9 @@ fun Tip(state: TipState) {
 	) {
 		Box(
 			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.BottomCenter
+			contentAlignment = Alignment.TopCenter
 		) {
-			Row(modifier = Modifier.padding(bottom = 100.dp).size(width = 300.dp, height = 150.dp)) {
+			Row(modifier = Modifier.padding(top = 50.dp).size(width = 300.dp, height = 150.dp)) {
 				OffsetLayout(x = 10.dp) {
 					Image(
 						painter = painterResource(Res.drawable.img_toast_rachel),
@@ -205,22 +206,6 @@ private fun RachelDialog(
 }
 
 @Composable
-fun DialogButton(
-	text: String,
-	enabled: Boolean = true,
-	modifier: Modifier = Modifier,
-	onClick: () -> Unit
-) {
-	TextButton(
-		modifier = modifier,
-		enabled = enabled,
-		onClick = onClick
-	) {
-		Text(text = text)
-	}
-}
-
-@Composable
 fun DialogInfo(
 	state: DialogState,
 	title: String = stringResource(Res.string.dialog_info),
@@ -249,14 +234,14 @@ fun DialogConfirm(
 		state = state,
 		title = title,
 		actions = {
-			DialogButton(
+			RachelButton(
 				text = stringResource(Res.string.dialog_yes),
 				onClick = {
 					state.isOpen = false
 					onYes()
 				}
 			)
-			DialogButton(
+			RachelButton(
 				text = stringResource(Res.string.dialog_no),
 				onClick = {
 					state.isOpen = false
@@ -290,7 +275,7 @@ fun DialogInput(
 		dismissOnClickOutside = false,
 		scrollable = false,
 		actions = {
-			DialogButton(
+			RachelButton(
 				text = stringResource(Res.string.dialog_yes),
 				enabled = textInputState.ok,
 				onClick = {
@@ -298,7 +283,7 @@ fun DialogInput(
 					onInput(textInputState.text)
 				}
 			)
-			DialogButton(
+			RachelButton(
 				text = stringResource(Res.string.dialog_no),
 				onClick = {
 					state.isOpen = false
@@ -461,7 +446,7 @@ fun DialogProgress(
 		scrollable = false,
 		title = title,
 		actions = {
-			DialogButton(
+			RachelButton(
 				text = stringResource(Res.string.dialog_cancel),
 				enabled = state.isOpen,
 				onClick = {

@@ -14,6 +14,22 @@ import java.io.File
 private val WebpFormat = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
 	Bitmap.CompressFormat.WEBP_LOSSY else Bitmap.CompressFormat.WEBP
 
+suspend fun compressImage(
+	lifecycle: LifecycleOwner,
+	image: Uri,
+	maxFileSize: Int = 150,
+	quality: Int = 90
+): File = withContext(Dispatchers.Default) {
+	Luban.with(lifecycle).load(image)
+		.concurrent(true)
+		.rename { it.substringBeforeLast('.') + ".webp" }
+		.useDownSample(true)
+		.format(WebpFormat)
+		.ignoreBy(maxFileSize.toLong())
+		.quality(quality)
+		.get()
+}
+
 suspend fun compressImages(
 	lifecycle: LifecycleOwner,
 	images: List<Uri>,

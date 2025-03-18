@@ -32,8 +32,6 @@ import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.screen.Tip
-import love.yinlin.ui.component.screen.TipState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import ylcs_kmp.composeapp.generated.resources.Res
 import ylcs_kmp.composeapp.generated.resources.img_damai
@@ -87,10 +85,10 @@ private fun ActivityInfoLayout(
 @Stable
 @Serializable
 data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Model> {
-	inner class Model(model: AppModel, activity: Activity?) : Screen.Model(model) {
-		var activity: Activity? by mutableStateOf(activity)
-
-		val tip = TipState()
+	inner class Model(model: AppModel) : Screen.Model(model) {
+		val activity: Activity? by derivedStateOf {
+			part<ScreenPartWorld>().activities.find { it.aid == aid }
+		}
 
 		fun onPicClick(pics: List<Picture>, index: Int) {
 			navigate(ScreenImagePreview(pics, index))
@@ -174,10 +172,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(
-		model = model,
-		activity = model.part<ScreenPartWorld>().activities.find { it.aid == aid }
-	)
+	override fun model(model: AppModel): Model = Model(model)
 
 	@Composable
 	override fun content(model: Model) {
@@ -200,7 +195,8 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 						onClick = { model.deleteActivity() }
 					)
 				}
-			}
+			},
+			tip = model.tip
 		) {
 			model.activity?.let { activity ->
 				if (app.isPortrait) {
@@ -234,7 +230,5 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 				}
 			}
 		}
-
-		Tip(state = model.tip)
 	}
 }

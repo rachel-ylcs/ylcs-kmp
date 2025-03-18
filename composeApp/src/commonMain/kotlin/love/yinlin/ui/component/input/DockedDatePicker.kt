@@ -5,17 +5,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ExpandableLayout
 
@@ -23,16 +28,30 @@ import love.yinlin.ui.component.layout.ExpandableLayout
 @Composable
 fun DockedDatePicker(
 	hint: String,
+	initDate: LocalDate? = null,
 	onDateSelected: (LocalDate?) -> Unit,
 	modifier: Modifier = Modifier
 ) {
 	var isShow by rememberState { false }
-	val datePickerState = rememberDatePickerState()
+	val datePickerState = rememberDatePickerState(selectableDates = remember {
+		val today = DateEx.Today
+		val start = today.minus(6, DateTimeUnit.MONTH)
+		val end = today.plus(6, DateTimeUnit.MONTH)
+		object : SelectableDates {
+			override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis.toLocalDate?.let {
+				it >= start && it <= end
+			} ?: false
+			override fun isSelectableYear(year: Int): Boolean = year >= start.year && year <= end.year
+		}
+	})
 	val text by rememberDerivedState {
-		datePickerState.selectedDateMillis?.let {
-			val date = Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault()).date
-			DateEx.Formatter.standardDate.format(date)
+		datePickerState.selectedDateMillis?.toLocalDate?.let {
+			DateEx.Formatter.standardDate.format(it)
 		} ?: "未选择"
+	}
+
+	LaunchedEffect(initDate) {
+		datePickerState.selectedDateMillis = initDate?.toLong
 	}
 
 	LaunchedEffect(datePickerState.selectedDateMillis) {

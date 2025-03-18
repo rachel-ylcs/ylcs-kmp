@@ -22,6 +22,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.common.RachelTheme
+import love.yinlin.extension.LaunchOnce
+import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.buildRoute
@@ -34,12 +36,22 @@ import love.yinlin.ui.screen.world.ScreenPartWorld
 
 @Stable
 abstract class ScreenPart(private val model: AppModel) {
+	private val firstLoad = launchFlag()
+
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 	fun pop() = model.pop()
 
 	@Composable
-	abstract fun content()
+	protected abstract fun content()
+
+	protected open fun CoroutineScope.initialize() {}
+
+	@Composable
+	fun partContent() {
+		content()
+		LaunchOnce(firstLoad) { initialize() }
+	}
 }
 
 class AppModel(

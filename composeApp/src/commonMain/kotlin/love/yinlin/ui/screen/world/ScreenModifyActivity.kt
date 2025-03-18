@@ -9,7 +9,7 @@ import love.yinlin.ui.screen.Screen
 @Stable
 @Serializable
 expect class ScreenModifyActivity : Screen<ScreenModifyActivity.Model> {
-	class Model : Screen.Model
+	inner class Model : Screen.Model
 
 	constructor(aid: Int)
 
