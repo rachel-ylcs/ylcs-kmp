@@ -25,6 +25,8 @@ data class UserProfile(
 
 	val level: Int by lazy { UserLevel.level(coin) }
 
+	val publicProfile: UserPublicProfile get() = UserPublicProfile(uid, name, signature, label, coin)
+
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)
 
 	val hasPrivilegeRes: Boolean get() = UserPrivilege.res(privilege)

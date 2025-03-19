@@ -15,7 +15,7 @@ sketch = "4.0.4"
 mmkv = "2.1.0"
 
 # Desktop
-javafx = "17.0.9" #noinspection GradleDependency
+javafx = "21.0.7-ea+1" #noinspection GradleDependency
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }

@@ -7,10 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Paid
-import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
@@ -33,8 +31,8 @@ import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
+import love.yinlin.ui.component.button.RachelText
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
@@ -97,14 +95,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 				else -> last?.tid
 			} ?: Int.MAX_VALUE
 
-			if (topics.isEmpty()) {
-				state = BoxState.EMPTY
-				canLoading = false
-			}
-			else {
-				state = BoxState.CONTENT
-				canLoading = true
-			}
+			state = if (topics.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+			canLoading = topics.size == APIConfig.MIN_PAGE_NUM
 
 			listState.scrollToItem(0)
 		}
@@ -140,7 +132,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 				} ?: Int.MAX_VALUE
 			}
 
-			canLoading = offset != Int.MAX_VALUE
+			canLoading = offset != Int.MAX_VALUE && topics.size == APIConfig.MIN_PAGE_NUM
 		}
 	}
 
@@ -153,7 +145,9 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	}
 
 	fun onUserAvatarClick(uid: Int) {
-
+		launch {
+			navigate(ScreenUserCard(uid))
+		}
 	}
 
 	@Composable
@@ -193,7 +187,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 							key = DateEx.TodayString,
 							contentScale = ContentScale.Crop,
 							circle = true,
-							modifier = Modifier.matchParentSize()
+							modifier = Modifier.matchParentSize(),
+							onClick = { onUserAvatarClick(topic.uid) }
 						)
 					}
 					Column(
@@ -213,38 +208,16 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 							horizontalArrangement = Arrangement.spacedBy(5.dp),
 							verticalAlignment = Alignment.CenterVertically
 						) {
-							Row(
-								modifier = Modifier.weight(1f),
-								horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								MiniIcon(
-									imageVector = Icons.AutoMirrored.Outlined.Comment,
-									size = 16.dp
-								)
-								Text(
-									text = topic.commentNum.toString(),
-									style = MaterialTheme.typography.bodyMedium,
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis
-								)
-							}
-							Row(
-								modifier = Modifier.weight(1f),
-								horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								MiniIcon(
-									imageVector = Icons.Outlined.Paid,
-									size = 16.dp
-								)
-								Text(
-									text = topic.coinNum.toString(),
-									style = MaterialTheme.typography.bodyMedium,
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis
-								)
-							}
+							RachelText(
+								text = topic.commentNum.toString(),
+								icon = Icons.AutoMirrored.Outlined.Comment,
+								modifier = Modifier.weight(1f)
+							)
+							RachelText(
+								text = topic.coinNum.toString(),
+								icon = Icons.Outlined.Paid,
+								modifier = Modifier.weight(1f)
+							)
 						}
 					}
 				}

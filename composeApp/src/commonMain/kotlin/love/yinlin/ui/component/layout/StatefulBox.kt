@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.WifiOff
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import love.yinlin.ui.component.button.LoadingButton
 import love.yinlin.ui.component.image.MiniIcon
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -142,7 +143,7 @@ fun EmptyBox() {
 }
 
 @Composable
-fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
+fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 	Box(
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
@@ -170,9 +171,10 @@ fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
 				)
 			}
 			if (retry != null) {
-				Button(onClick = { retry() }) {
-					Text(text = stringResource(Res.string.network_error_retry_string))
-				}
+				LoadingButton(
+					text = stringResource(Res.string.network_error_retry_string),
+					onClick = { retry() }
+				)
 			}
 		}
 	}
@@ -181,7 +183,7 @@ fun NetWorkErrorBox(retry: (() -> Unit)? = null) {
 @Composable
 fun StatefulBox(
 	state: BoxState,
-	retry: (() -> Unit)? = null,
+	retry: (suspend CoroutineScope.() -> Unit)? = null,
 	modifier: Modifier = Modifier,
 	content: @Composable () -> Unit
 ) {

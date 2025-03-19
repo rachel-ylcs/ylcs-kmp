@@ -9,6 +9,7 @@ import javafx.concurrent.Worker
 import javafx.embed.swing.JFXPanel
 import javafx.event.EventHandler
 import javafx.scene.Scene
+import javafx.scene.layout.StackPane
 import javafx.scene.web.WebErrorEvent
 import javafx.scene.web.WebView
 import love.yinlin.ui.component.CustomUI
@@ -20,7 +21,7 @@ inline fun <T> webPageListener(crossinline listener: (T) -> Unit) =
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	internal val jfxPanel = mutableStateOf<JFXPanel?>(null)
-	private val webview: WebView? get() = jfxPanel.value?.scene?.root as? WebView
+	internal var webview: WebView? = null
 
 	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl
@@ -97,37 +98,45 @@ actual fun WebPage(
 		factory = {
 			val jfxPanel = JFXPanel()
 			Platform.runLater {
-				val webview = WebView()
-				webview.engine?.apply {
-					isJavaScriptEnabled = state.settings.enableJavaScript
+				state.webview = WebView().apply {
+					engine?.apply {
+						isJavaScriptEnabled = state.settings.enableJavaScript
 
-					loadWorker.apply {
-						stateProperty().addListener(state.loadingStateListener)
-						progressProperty().addListener(state.progressListener)
+						loadWorker.apply {
+							stateProperty().addListener(state.loadingStateListener)
+							progressProperty().addListener(state.progressListener)
+						}
+						history.currentIndexProperty().addListener(state.historyListener)
+						titleProperty().addListener(state.titleListener)
+						onError = state.errorListener
+
+						if (state.mUrl.isNotEmpty()) load(state.mUrl)
 					}
-					history.currentIndexProperty().addListener(state.historyListener)
-					onError = state.errorListener
-					titleProperty().addListener(state.titleListener)
-
-					if (state.mUrl.isNotEmpty()) load(state.mUrl)
+					jfxPanel.scene = Scene(StackPane(this))
 				}
-				jfxPanel.scene = Scene(webview)
 				jfxPanel.background = java.awt.Color.WHITE
 			}
 			jfxPanel
 		},
-		release = {
+		release = { jfxPanel, onRelease ->
 			Platform.runLater {
-				(it.scene?.root as? WebView)?.engine?.apply {
-					loadWorker.apply {
-						stateProperty().removeListener(state.loadingStateListener)
-						progressProperty().removeListener(state.progressListener)
+				state.webview?.let { webview ->
+					webview.engine?.apply {
+						loadWorker.apply {
+							stateProperty().removeListener(state.loadingStateListener)
+							progressProperty().removeListener(state.progressListener)
+							cancel()
+						}
+						history.currentIndexProperty().removeListener(state.historyListener)
+						titleProperty().removeListener(state.titleListener)
+						onError = EventHandler { }
+						load(null)
 					}
-					history.currentIndexProperty().removeListener(state.historyListener)
-					onError = EventHandler { }
-					titleProperty().removeListener(state.titleListener)
+					(jfxPanel.scene?.root as? StackPane)?.children?.clear()
+					state.webview = null
 				}
-				it.scene = null
+				jfxPanel.scene = null
+				onRelease()
 			}
 		}
 	)

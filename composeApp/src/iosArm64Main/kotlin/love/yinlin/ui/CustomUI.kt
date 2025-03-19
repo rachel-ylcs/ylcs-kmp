@@ -18,13 +18,14 @@ fun <T : UIView> CustomUI(
 	factory: () -> T,
 	update: ((T) -> Unit)? = null,
 	reset: ((T) -> Unit)? = null,
-	release: ((T) -> Unit)? = null
+	release: (T, () -> Unit) -> Unit = { _, onRelease -> onRelease() }
 ) {
 	DisposableEffect(Unit) {
 		onDispose {
 			view.value?.let {
-				release?.invoke(it)
-				view.value = null
+				release(it) {
+					view.value = null
+				}
 			}
 		}
 	}

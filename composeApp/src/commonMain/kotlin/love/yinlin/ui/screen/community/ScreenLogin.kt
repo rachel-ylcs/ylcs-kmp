@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -19,6 +18,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserConstraint
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
+import love.yinlin.ui.component.button.LoadingButton
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
@@ -52,53 +52,44 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 		val canRegister by derivedStateOf { registerId.ok && registerPwd.ok && registerPwd2.ok }
 		val canForgotPassword by derivedStateOf { forgotPasswordId.ok && forgotPasswordPwd.ok }
 
-		fun login() {
-			launch {
-				val id = loginId.text
-				val pwd = loginPwd.text
-				if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
-					tip.error("ID或密码不合规范")
-					return@launch
-				}
-				loading.isOpen = true
-				val result1 = ClientAPI.request(
-					route = API.User.Account.Login,
-					data = API.User.Account.Login.Request(
-						name = id,
-						pwd = pwd,
-						platform = OS.platform
-					)
+		suspend fun login() {
+			val id = loginId.text
+			val pwd = loginPwd.text
+			if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
+				tip.error("ID或密码不合规范")
+				return
+			}
+			val result1 = ClientAPI.request(
+				route = API.User.Account.Login,
+				data = API.User.Account.Login.Request(
+					name = id,
+					pwd = pwd,
+					platform = OS.platform
 				)
-				when (result1) {
-					is Data.Success -> {
-						val token = result1.data
-						app.config.userToken = token
-						val result2 = ClientAPI.request(
-							route = API.User.Profile.GetProfile,
-							data = token
-						)
-						loading.isOpen = false
-						if (result2 is Data.Success) app.config.userProfile = result2.data
-						pop()
-					}
-					is Data.Error -> {
-						loading.isOpen = false
-						tip.error(result1.message)
-					}
+			)
+			when (result1) {
+				is Data.Success -> {
+					val token = result1.data
+					app.config.userToken = token
+					val result2 = ClientAPI.request(
+						route = API.User.Profile.GetProfile,
+						data = token
+					)
+					if (result2 is Data.Success) app.config.userProfile = result2.data
+					pop()
+				}
+				is Data.Error -> {
+					tip.error(result1.message)
 				}
 			}
 		}
 
-		fun register() {
-			launch {
-				TODO()
-			}
+		suspend fun register() {
+			TODO()
 		}
 
-		fun forgotPassword() {
-			launch {
-				TODO()
-			}
+		suspend fun forgotPassword() {
+			TODO()
 		}
 
 		@Composable
@@ -147,13 +138,12 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 						}
 					)
 				}
-				Button(
+				LoadingButton(
 					modifier = Modifier.fillMaxWidth(),
+					text = "登录",
 					enabled = canLogin,
 					onClick = { login() }
-				) {
-					Text(text = "登录")
-				}
+				)
 			}
 		}
 
@@ -199,13 +189,12 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 						loginPwd.text = ""
 					}
 				)
-				Button(
+				LoadingButton(
 					modifier = Modifier.fillMaxWidth(),
+					text = "注册",
 					enabled = canRegister,
 					onClick = { register() }
-				) {
-					Text(text = "注册")
-				}
+				)
 			}
 		}
 
@@ -238,13 +227,12 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 						loginPwd.text = ""
 					}
 				)
-				Button(
+				LoadingButton(
 					modifier = Modifier.fillMaxWidth(),
+					text = "提交申请",
 					enabled = canForgotPassword,
 					onClick = { forgotPassword() }
-				) {
-					Text(text = "提交申请")
-				}
+				)
 			}
 		}
 
@@ -317,8 +305,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				Mode.ForgotPassword -> "忘记密码"
 			},
 			onBack = { model.pop() },
-			tip = model.tip,
-			loading = model.loading
+			tip = model.tip
 		) {
 			if (app.isPortrait) model.Portrait()
 			else model.Landscape()

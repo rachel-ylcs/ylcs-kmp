@@ -7,7 +7,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -335,7 +334,10 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 
 		fun parse(data: String): RichString = try {
 			buildRichString {
-				parseElement(data.parseJson, this)
+				if (data.startsWith('{') && data.endsWith('}')) {
+					parseElement(data.parseJson, this)
+				}
+				else text(data)
 			}
 		}
 		catch (_: Throwable) {

@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
@@ -32,6 +32,7 @@ import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
+import love.yinlin.ui.component.button.RachelButton
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.NineGrid
@@ -39,6 +40,8 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.text.RichString
+import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -84,153 +87,7 @@ private fun UserBar(
 				modifier = Modifier.fillMaxWidth()
 			)
 		}
-		UserLabel(
-			label = label,
-			level = level
-		)
-	}
-}
-
-@Composable
-private fun CommandButton(
-	text: String,
-	icon: ImageVector,
-	onClick: () -> Unit
-) {
-	Row(
-		modifier = Modifier.height(IntrinsicSize.Min).clickable(onClick = onClick).padding(horizontal = 10.dp, vertical = 5.dp),
-		horizontalArrangement = Arrangement.spacedBy(5.dp),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
-			Icon(
-				imageVector = icon,
-				contentDescription = null,
-				modifier = Modifier.matchParentSize()
-			)
-		}
-		Text(text = text)
-	}
-}
-
-@Composable
-private fun CommentBar(
-	comment: Comment,
-	topicUid: Int,
-	onAvatarClick: () -> Unit,
-	onSubCommentClick: () -> Unit,
-	onSendSubComment: () -> Unit,
-	onChangeIsTop: () -> Unit,
-	onDelete: () -> Unit,
-	modifier: Modifier = Modifier
-) {
-	Column(
-		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(3.dp)
-	) {
-		UserBar(
-			avatar = comment.avatarPath,
-			name = comment.name,
-			time = comment.ts,
-			label = comment.label,
-			level = comment.level,
-			onAvatarClick = onAvatarClick
-		)
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(5.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
-			if (comment.uid == topicUid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
-		}
-		Text(text = comment.content)
-		Row(
-			modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-			horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			if (comment.subCommentNum > 0) {
-				Box(modifier = Modifier.weight(1f)) {
-					Text(
-						text = ">> 查看${comment.subCommentNum}条回复",
-						style = MaterialTheme.typography.labelLarge,
-						color = MaterialTheme.colorScheme.primary,
-						modifier = Modifier.clickable(onClick = onSubCommentClick)
-					)
-				}
-			}
-			Text(
-				text = "回复",
-				style = MaterialTheme.typography.labelLarge,
-				color = MaterialTheme.colorScheme.secondary,
-				modifier = Modifier.clickable(onClick = onSendSubComment)
-			)
-			app.config.userProfile?.let { user ->
-				if (user.canUpdateCommentTop(topicUid)) {
-					Text(
-						text = if (comment.isTop) "取消置顶" else "置顶",
-						style = MaterialTheme.typography.labelLarge,
-						modifier = Modifier.clickable(onClick = onChangeIsTop)
-					)
-				}
-				if (user.canDeleteComment(topicUid, comment.uid)) {
-					Text(
-						text = "删除",
-						style = MaterialTheme.typography.labelLarge,
-						modifier = Modifier.clickable(onClick = onDelete)
-					)
-				}
-			}
-		}
-	}
-}
-
-@Composable
-private fun SubCommentBar(
-	subComment: SubComment,
-	topicUid: Int,
-	commentUid: Int,
-	onAvatarClick: () -> Unit,
-	onDelete: () -> Unit,
-	modifier: Modifier = Modifier
-) {
-	Column(
-		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(3.dp)
-	) {
-		UserBar(
-			avatar = subComment.avatarPath,
-			name = subComment.name,
-			time = subComment.ts,
-			label = subComment.label,
-			level = subComment.level,
-			onAvatarClick = onAvatarClick
-		)
-		Row(
-			modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-			horizontalArrangement = Arrangement.spacedBy(5.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			if (subComment.uid == topicUid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
-			if (subComment.uid == commentUid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
-			app.config.userProfile?.let { user ->
-				if (user.canDeleteComment(topicUid, subComment.uid)) {
-					Row(
-						modifier = Modifier.weight(1f),
-						horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = "删除",
-							textAlign = TextAlign.End,
-							style = MaterialTheme.typography.labelLarge,
-							modifier = Modifier.clickable(onClick = onDelete)
-						)
-					}
-				}
-			}
-		}
-		Text(text = subComment.content)
+		UserLabel(label = label, level = level)
 	}
 }
 
@@ -272,7 +129,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				commentOffset = last?.cid ?: 0
 				commentIsTop = last?.isTop ?: true
 
-				commentCanLoading = data.isNotEmpty()
+				commentCanLoading = data.size == APIConfig.MIN_PAGE_NUM
 			}
 		}
 
@@ -299,7 +156,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					commentIsTop = last?.isTop ?: true
 				}
 
-				commentCanLoading = commentOffset != 0
+				commentCanLoading = commentOffset != 0 && data.size == APIConfig.MIN_PAGE_NUM
 			}
 		}
 
@@ -364,10 +221,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		}
 
 		@Composable
-		private fun TopicLayout(
-			details: TopicDetails,
-			modifier: Modifier = Modifier
-		) {
+		private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
 			val pics by rememberDerivedState { details.pics.map { Picture(topic.picPath(it)) } }
 
 			Column(
@@ -389,8 +243,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.fillMaxWidth()
 				)
-				Text(
-					text = details.content,
+				RichText(
+					text = remember(details) { RichString.parse(details.content) },
 					modifier = Modifier.fillMaxWidth()
 				)
 				if (pics.isNotEmpty()) {
@@ -406,26 +260,26 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					horizontalArrangement = Arrangement.SpaceAround,
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					CommandButton(
+					RachelButton(
 						text = "评论",
 						icon = Icons.Filled.AddComment,
 						onClick = { onSendComment() }
 					)
-					CommandButton(
+					RachelButton(
 						text = "投币",
 						icon = Icons.Filled.Paid,
 						onClick = { onSendCoin() }
 					)
 					app.config.userProfile?.let { user ->
 						if (user.canUpdateTopicTop(topic.uid)) {
-							CommandButton(
+							RachelButton(
 								text = if (topic.isTop) "取消置顶" else "置顶",
 								icon = if (topic.isTop) Icons.Filled.Close else Icons.Filled.VerticalAlignTop,
 								onClick = { onChangeTopicIsTop(!topic.isTop) }
 							)
 						}
 						if (user.canDeleteTopic(topic.uid)) {
-							CommandButton(
+							RachelButton(
 								text = "删除",
 								icon = Icons.Filled.Delete,
 								onClick = { onSendCoin() }
@@ -436,12 +290,127 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
+		@Composable
+		private fun CommentBar(comment: Comment, modifier: Modifier = Modifier) {
+			Column(
+				modifier = modifier,
+				verticalArrangement = Arrangement.spacedBy(3.dp)
+			) {
+				UserBar(
+					avatar = comment.avatarPath,
+					name = comment.name,
+					time = comment.ts,
+					label = comment.label,
+					level = comment.level,
+					onAvatarClick = { onAvatarClick(comment.uid) }
+				)
+				Row(
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
+					if (comment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+				}
+				RichText(
+					text = remember(comment) { RichString.parse(comment.content) },
+					modifier = Modifier.fillMaxWidth()
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (comment.subCommentNum > 0) {
+						Box(modifier = Modifier.weight(1f)) {
+							Text(
+								text = ">> 查看${comment.subCommentNum}条回复",
+								style = MaterialTheme.typography.labelLarge,
+								color = MaterialTheme.colorScheme.primary,
+								modifier = Modifier.clickable { showSubComment(comment) }.padding(2.dp)
+							)
+						}
+					}
+					Text(
+						text = "回复",
+						style = MaterialTheme.typography.labelLarge,
+						color = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier.clickable { onSendSubComment(comment.cid) }.padding(2.dp)
+					)
+					app.config.userProfile?.let { user ->
+						if (user.canUpdateCommentTop(topic.uid)) {
+							Text(
+								text = if (comment.isTop) "取消置顶" else "置顶",
+								style = MaterialTheme.typography.labelLarge,
+								modifier = Modifier.clickable { onChangeCommentIsTop(comment.cid, !comment.isTop) }.padding(2.dp)
+							)
+						}
+						if (user.canDeleteComment(topic.uid, comment.uid)) {
+							Text(
+								text = "删除",
+								style = MaterialTheme.typography.labelLarge,
+								modifier = Modifier.clickable { onDeleteComment(comment.cid) } .padding(2.dp)
+							)
+						}
+					}
+				}
+			}
+		}
+
+		@Composable
+		private fun SubCommentBar(
+			subComment: SubComment,
+			commentUid: Int,
+			modifier: Modifier = Modifier
+		) {
+			Column(
+				modifier = modifier,
+				verticalArrangement = Arrangement.spacedBy(3.dp)
+			) {
+				UserBar(
+					avatar = subComment.avatarPath,
+					name = subComment.name,
+					time = subComment.ts,
+					label = subComment.label,
+					level = subComment.level,
+					onAvatarClick = {
+						hideSubComment()
+						onAvatarClick(subComment.uid)
+					}
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+					if (subComment.uid == commentUid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
+					app.config.userProfile?.let { user ->
+						if (user.canDeleteComment(topic.uid, subComment.uid)) {
+							Row(
+								modifier = Modifier.weight(1f),
+								horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+								verticalAlignment = Alignment.CenterVertically
+							) {
+								Text(
+									text = "删除",
+									textAlign = TextAlign.End,
+									style = MaterialTheme.typography.labelLarge,
+									modifier = Modifier.clickable { onDeleteSubComment(subComment.cid) }.padding(2.dp)
+								)
+							}
+						}
+					}
+				}
+				RichText(
+					text = remember(subComment) { RichString.parse(subComment.content) },
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+
 		@OptIn(ExperimentalMaterial3Api::class)
 		@Composable
-		private fun SubCommentLayout(
-			comment: Comment,
-			modifier: Modifier = Modifier,
-		) {
+		fun SubCommentLayout(comment: Comment, modifier: Modifier = Modifier) {
 			val subComments = remember { mutableStateListOf<SubComment>() }
 			var subCommentOffset: Int = remember { 0 }
 			var subCommentCanLoading by rememberState { false }
@@ -468,19 +437,16 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 								subCommentOffset = last?.cid ?: 0
 							}
 
-							subCommentCanLoading = subCommentOffset != 0
+							subCommentCanLoading = subCommentOffset != 0 && data.size == APIConfig.MIN_PAGE_NUM
 						}
 					},
 					contentPadding = PaddingValues(top = 10.dp),
+					itemDivider = PaddingValues(vertical = 8.dp),
 					modifier = Modifier.fillMaxWidth()
 				) {
-					HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 					SubCommentBar(
 						subComment = it,
-						topicUid = topic.uid,
 						commentUid = comment.uid,
-						onAvatarClick = { onAvatarClick(it.uid) },
-						onDelete = { onDeleteSubComment(it.cid) },
 						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
 					)
 				}
@@ -496,7 +462,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					val last = data.lastOrNull()
 					subCommentOffset = last?.cid ?: 0
 
-					subCommentCanLoading = data.isNotEmpty()
+					subCommentCanLoading = data.size == APIConfig.MIN_PAGE_NUM
 				}
 			}
 		}
@@ -513,27 +479,15 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				header = {
 					TopicLayout(
 						details = details,
-						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 10.dp)
+						modifier = Modifier.fillMaxWidth().padding(10.dp)
 					)
-				}
+					HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
+				},
+				itemDivider = PaddingValues(vertical = 8.dp)
 			) {
-				HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 				CommentBar(
 					comment = it,
-					topicUid = topic.uid,
-					onAvatarClick = { onAvatarClick(it.uid) },
-					onSubCommentClick = { showSubComment(it) },
-					onSendSubComment = { onSendSubComment(it.cid) },
-					onChangeIsTop = { onChangeCommentIsTop(it.cid, !it.isTop) },
-					onDelete = { onDeleteComment(it.cid) },
 					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
-				)
-			}
-
-			currentComment?.let {
-				SubCommentLayout(
-					comment = it,
-					modifier = Modifier.fillMaxSize()
 				)
 			}
 		}
@@ -542,11 +496,25 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		fun Landscape(details: TopicDetails) {
 			Row(modifier = Modifier.fillMaxSize()) {
 				TopicLayout(
-					modifier = Modifier.width(400.dp).fillMaxHeight()
+					modifier = Modifier.width(400.dp).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
 						.verticalScroll(rememberScrollState()),
 					details = details
 				)
-				VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
+				VerticalDivider()
+				PaginationColumn(
+					items = comments,
+					key = { it.cid },
+					canRefresh = false,
+					canLoading = commentCanLoading,
+					onLoading = { requestMoreComments() },
+					itemDivider = PaddingValues(vertical = 8.dp),
+					modifier = Modifier.weight(1f).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
+				) {
+					CommentBar(
+						comment = it,
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+					)
+				}
 			}
 		}
 	}
@@ -572,6 +540,19 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			if (details == null) EmptyBox()
 			else if (app.isPortrait) model.Portrait(details = details)
 			else model.Landscape(details = details)
+		}
+
+		model.currentComment?.let {
+			model.SubCommentLayout(
+				comment = it,
+				modifier = Modifier.fillMaxSize()
+			)
+		}
+
+		DisposableEffect(Unit) {
+			onDispose {
+				model.hideSubComment()
+			}
 		}
 	}
 }

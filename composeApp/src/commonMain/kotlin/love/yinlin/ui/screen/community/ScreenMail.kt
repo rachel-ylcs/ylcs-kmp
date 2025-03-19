@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
@@ -101,7 +102,7 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 					items.replaceAll(data)
 					offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
 					state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-					canLoading = offset != Long.MAX_VALUE
+					canLoading = data.size == APIConfig.MIN_PAGE_NUM
 				}
 				else state = BoxState.NETWORK_ERROR
 			}
@@ -119,7 +120,7 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 				val data = result.data
 				items += data
 				offset = data.lastOrNull()?.mid ?: Long.MAX_VALUE
-				canLoading = offset != Long.MAX_VALUE
+				canLoading = offset != Long.MAX_VALUE && data.size == APIConfig.MIN_PAGE_NUM
 			}
 		}
 

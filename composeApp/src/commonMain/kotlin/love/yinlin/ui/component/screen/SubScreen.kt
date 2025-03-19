@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import love.yinlin.ui.component.image.ClickIcon
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -31,7 +32,7 @@ fun SubScreen(
 		modifier = modifier,
 		topBar = {
 			Surface(
-				modifier = Modifier.fillMaxWidth(),
+				modifier = Modifier.fillMaxWidth().zIndex(520f),
 				shadowElevation = 5.dp
 			) {
 				CenterAlignedTopAppBar(

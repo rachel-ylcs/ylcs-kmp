@@ -145,8 +145,9 @@ actual fun WebPage(
 			if (state.mUrl.isNotEmpty()) webview.loadUrl(state.mUrl)
 			webview
 		},
-		release = { webview ->
+		release = { webview, onRelease ->
 			webview.destroy()
+			onRelease()
 		}
 	)
 }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -270,6 +271,7 @@ private fun <T> ClickPaginationColumn(
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	header: (@Composable LazyItemScope.() -> Unit)? = null,
+	itemDivider: PaddingValues? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -286,7 +288,10 @@ private fun <T> ClickPaginationColumn(
 				header()
 			}
 		}
-		items(items = items, key = key, itemContent = itemContent)
+		itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
+			if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
+			itemContent(item)
+		}
 		if (canLoading) {
 			item(key = Unit) {
 				indicator(status) {
@@ -330,7 +335,10 @@ private fun <T> ClickPaginationGrid(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = "Header".itemKey) {
+			item(
+				key = "Header".itemKey,
+				span = { GridItemSpan(maxLineSpan) }
+			) {
 				header()
 			}
 		}
@@ -381,7 +389,10 @@ private fun <T> ClickPaginationStaggeredGrid(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = "Header".itemKey) {
+			item(
+				key = "Header".itemKey,
+				span = StaggeredGridItemSpan.FullLine
+			) {
 				header()
 			}
 		}
@@ -419,6 +430,7 @@ fun <T> PaginationColumn(
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	header: (@Composable LazyItemScope.() -> Unit)? = null,
+	itemDivider: PaddingValues? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	if (OS.platform.isPhone) {
@@ -441,7 +453,10 @@ fun <T> PaginationColumn(
 						header()
 					}
 				}
-				items(items = items, key = key, itemContent = itemContent)
+				itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
+					if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
+					itemContent(item)
+				}
 			}
 		}
 	}
@@ -457,6 +472,7 @@ fun <T> PaginationColumn(
 			verticalArrangement = verticalArrangement,
 			horizontalAlignment = horizontalAlignment,
 			header = header,
+			itemDivider = itemDivider,
 			itemContent = itemContent
 		)
 	}
@@ -496,7 +512,10 @@ fun <T> PaginationGrid(
 				horizontalArrangement = horizontalArrangement,
 			) {
 				if (header != null) {
-					item(key = "Header".itemKey) {
+					item(
+						key = "Header".itemKey,
+						span = { GridItemSpan(maxLineSpan) }
+					) {
 						header()
 					}
 				}
@@ -556,7 +575,10 @@ fun <T> PaginationStaggeredGrid(
 				horizontalArrangement = horizontalArrangement
 			) {
 				if (header != null) {
-					item(key = "Header".itemKey) {
+					item(
+						key = "Header".itemKey,
+						span = StaggeredGridItemSpan.FullLine
+					) {
 						header()
 					}
 				}
