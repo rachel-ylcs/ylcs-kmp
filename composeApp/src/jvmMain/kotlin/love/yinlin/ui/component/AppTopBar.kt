@@ -16,9 +16,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.app_name
-import ylcs_kmp.composeapp.generated.resources.img_logo
+import love.yinlin.resources.*
 
 @Composable
 fun AppTopBar(

@@ -131,6 +131,10 @@ kotlin {
     }
 }
 
+compose.resources {
+    packageOfResClass = "${rootProject.extra["appPackageName"] as String}.resources"
+}
+
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 }

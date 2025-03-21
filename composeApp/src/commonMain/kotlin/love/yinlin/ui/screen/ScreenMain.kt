@@ -28,7 +28,7 @@ import love.yinlin.ui.screen.world.ScreenPartWorld
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.*
+import love.yinlin.resources.*
 
 private enum class TabItem(
 	val title: StringResource,

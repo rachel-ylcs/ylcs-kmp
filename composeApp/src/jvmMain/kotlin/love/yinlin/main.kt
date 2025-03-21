@@ -21,8 +21,8 @@ import love.yinlin.platform.AppContext
 import love.yinlin.platform.app
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.app_name
+import love.yinlin.resources.Res
+import love.yinlin.resources.app_name
 
 fun main() {
     val context = AppContext().initialize()

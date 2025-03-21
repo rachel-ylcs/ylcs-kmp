@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.common.Colors
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import ylcs_kmp.composeapp.generated.resources.*
+import love.yinlin.resources.*
 
 private object UserLabelMeta {
 	private val labelNameFromLevel = arrayOf("BUG",

@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import ylcs_kmp.composeapp.generated.resources.Res
+import love.yinlin.resources.Res
 
 object Resource {
 	var lunar: ByteArray? by mutableStateOf(null)

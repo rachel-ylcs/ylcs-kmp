@@ -43,8 +43,8 @@ import love.yinlin.extension.condition
 import love.yinlin.extension.rememberState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.placeholder_pic
+import love.yinlin.resources.Res
+import love.yinlin.resources.placeholder_pic
 
 val DEFAULT_ICON_SIZE = 24.dp
 

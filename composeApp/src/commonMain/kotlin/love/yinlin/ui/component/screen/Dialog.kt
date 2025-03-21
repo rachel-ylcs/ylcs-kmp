@@ -32,7 +32,7 @@ import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.*
+import love.yinlin.resources.*
 import kotlin.math.roundToInt
 
 @Stable

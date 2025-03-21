@@ -33,9 +33,7 @@ import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.image_not_login
-import ylcs_kmp.composeapp.generated.resources.login
+import love.yinlin.resources.*
 
 @Composable
 private fun TipButtonContainer(

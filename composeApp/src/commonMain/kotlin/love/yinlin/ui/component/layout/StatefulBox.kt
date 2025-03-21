@@ -23,7 +23,7 @@ import love.yinlin.ui.component.button.LoadingButton
 import love.yinlin.ui.component.image.MiniIcon
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.*
+import love.yinlin.resources.*
 
 enum class BoxState {
 	LOADING,

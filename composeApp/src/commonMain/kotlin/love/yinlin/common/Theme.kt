@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.sp
 import love.yinlin.Local
 import love.yinlin.platform.app
 import org.jetbrains.compose.resources.Font
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.xwwk
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
 
 enum class ThemeMode {
 	SYSTEM, LIGHT, DARK;

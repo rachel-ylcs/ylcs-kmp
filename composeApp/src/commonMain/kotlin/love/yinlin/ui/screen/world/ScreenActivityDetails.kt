@@ -33,10 +33,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.img_damai
-import ylcs_kmp.composeapp.generated.resources.img_maoyan
-import ylcs_kmp.composeapp.generated.resources.img_showstart
+import love.yinlin.resources.*
 
 @Composable
 private fun ActivityInfoLayout(

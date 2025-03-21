@@ -25,8 +25,8 @@ import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.img_logo
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_logo
 
 @Stable
 @Serializable

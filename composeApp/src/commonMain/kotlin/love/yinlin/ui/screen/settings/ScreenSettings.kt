@@ -28,9 +28,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.screen.SubScreen
 import org.jetbrains.compose.resources.stringResource
-import ylcs_kmp.composeapp.generated.resources.Res
-import ylcs_kmp.composeapp.generated.resources.default_name
-import ylcs_kmp.composeapp.generated.resources.default_signature
+import love.yinlin.resources.*
 
 @Stable
 @Serializable
