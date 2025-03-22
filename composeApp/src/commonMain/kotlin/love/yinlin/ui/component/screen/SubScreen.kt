@@ -20,7 +20,8 @@ import love.yinlin.ui.component.image.ClickIcon
 fun SubScreen(
 	modifier: Modifier = Modifier,
 	title: @Composable () -> Unit,
-	actions: @Composable (RowScope.() -> Unit) = { },
+	actions: @Composable (RowScope.() -> Unit) = {},
+	bottomBar: @Composable () -> Unit = {},
 	onBack: (() -> Unit)? = null,
 	tip: TipState = remember { TipState() },
 	loading: DialogState = remember { DialogState() },
@@ -51,6 +52,14 @@ fun SubScreen(
 					actions = actions
 				)
 			}
+		},
+		bottomBar = {
+			Surface(
+				modifier = Modifier.fillMaxWidth().zIndex(520f),
+				shadowElevation = 5.dp
+			) {
+				bottomBar()
+			}
 		}
 	) {
 		Box(modifier = Modifier.fillMaxSize()
@@ -72,7 +81,8 @@ fun SubScreen(
 fun SubScreen(
 	modifier: Modifier = Modifier,
 	title: String = "",
-	actions: @Composable (RowScope.() -> Unit) = { },
+	actions: @Composable (RowScope.() -> Unit) = {},
+	bottomBar: @Composable () -> Unit = {},
 	onBack: () -> Unit,
 	tip: TipState = remember { TipState() },
 	loading: DialogState = remember { DialogState() },
@@ -88,6 +98,7 @@ fun SubScreen(
 			)
 		},
 		actions = actions,
+		bottomBar = bottomBar,
 		onBack = onBack,
 		tip = tip,
 		loading = loading,

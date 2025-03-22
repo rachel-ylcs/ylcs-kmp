@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.ui.component.button.LoadingButton
+import love.yinlin.ui.component.input.LoadingButton
 import love.yinlin.ui.component.image.MiniIcon
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

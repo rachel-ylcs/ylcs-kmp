@@ -13,7 +13,7 @@ import io.moyuru.cropify.Cropify
 import io.moyuru.cropify.CropifyOption
 import io.moyuru.cropify.CropifySize
 import io.moyuru.cropify.CropifyState
-import love.yinlin.ui.component.button.RachelButton
+import love.yinlin.ui.component.input.RachelButton
 
 class DialogCropState {
 	var uri: Uri? by mutableStateOf(null)

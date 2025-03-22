@@ -4,8 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,16 +34,23 @@ import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.component.button.RachelButton
+import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.ui.component.input.RachelRadioButton
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.common.UserLabel
+import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationColumn
+import love.yinlin.ui.component.screen.BooleanSheetState
+import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.SheetState
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -103,7 +112,15 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		var commentIsTop: Boolean = true
 		var commentCanLoading by mutableStateOf(false)
 
-		var currentComment: Comment? by mutableStateOf(null)
+		val subCommentSheet = SheetState<Comment>()
+		var sendCoinSheet = BooleanSheetState()
+		var sendCommentSheet = SheetState<Pair<Boolean, Int>>()
+
+		fun hideAllSheet() {
+			subCommentSheet.hide()
+			sendCoinSheet.hide()
+			sendCommentSheet.hide()
+		}
 
 		suspend fun requestTopic() {
 			val result = ClientAPI.request(
@@ -176,28 +193,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			part<ScreenPartDiscovery>().onUserAvatarClick(uid)
 		}
 
-		fun showSubComment(comment: Comment) {
-			currentComment = comment
-		}
-
-		fun hideSubComment() {
-			currentComment = null
-		}
-
 		fun onImageClick(images: List<Picture>, current: Int) {
 			navigate(ScreenImagePreview(images, current))
-		}
-
-		fun onSendComment() {
-
-		}
-
-		fun onSendCoin() {
-
-		}
-
-		fun onSendSubComment(cid: Int) {
-
 		}
 
 		fun onChangeTopicIsTop(value: Boolean) {
@@ -263,12 +260,12 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					RachelButton(
 						text = "评论",
 						icon = Icons.Filled.AddComment,
-						onClick = { onSendComment() }
+						onClick = { sendCommentSheet.open(true to currentTopic.tid) }
 					)
 					RachelButton(
 						text = "投币",
 						icon = Icons.Filled.Paid,
-						onClick = { onSendCoin() }
+						onClick = { sendCoinSheet.open() }
 					)
 					app.config.userProfile?.let { user ->
 						if (user.canUpdateTopicTop(topic.uid)) {
@@ -282,7 +279,9 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 							RachelButton(
 								text = "删除",
 								icon = Icons.Filled.Delete,
-								onClick = { onSendCoin() }
+								onClick = {
+
+								}
 							)
 						}
 					}
@@ -326,7 +325,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 								text = ">> 查看${comment.subCommentNum}条回复",
 								style = MaterialTheme.typography.labelLarge,
 								color = MaterialTheme.colorScheme.primary,
-								modifier = Modifier.clickable { showSubComment(comment) }.padding(2.dp)
+								modifier = Modifier.clickable { subCommentSheet.open(comment) }.padding(2.dp)
 							)
 						}
 					}
@@ -334,7 +333,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 						text = "回复",
 						style = MaterialTheme.typography.labelLarge,
 						color = MaterialTheme.colorScheme.secondary,
-						modifier = Modifier.clickable { onSendSubComment(comment.cid) }.padding(2.dp)
+						modifier = Modifier.clickable { sendCommentSheet.open(false to comment.cid) }.padding(2.dp)
 					)
 					app.config.userProfile?.let { user ->
 						if (user.canUpdateCommentTop(topic.uid)) {
@@ -373,7 +372,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					label = subComment.label,
 					level = subComment.level,
 					onAvatarClick = {
-						hideSubComment()
+						hideAllSheet()
 						onAvatarClick(subComment.uid)
 					}
 				)
@@ -408,18 +407,13 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
-		@OptIn(ExperimentalMaterial3Api::class)
 		@Composable
-		fun SubCommentLayout(comment: Comment, modifier: Modifier = Modifier) {
+		fun SubCommentLayout(comment: Comment) {
 			val subComments = remember { mutableStateListOf<SubComment>() }
 			var subCommentOffset: Int = remember { 0 }
 			var subCommentCanLoading by rememberState { false }
 
-			ModalBottomSheet(
-				onDismissRequest = { hideSubComment() },
-				dragHandle = null,
-				modifier = modifier
-			) {
+			BottomSheet(state = subCommentSheet) {
 				PaginationColumn(
 					items = subComments,
 					key = { it.cid },
@@ -463,6 +457,77 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					subCommentOffset = last?.cid ?: 0
 
 					subCommentCanLoading = data.size == APIConfig.MIN_PAGE_NUM
+				}
+			}
+		}
+
+		@Composable
+		fun SendCoinLayout() {
+			var selectedIndex by rememberState { 0 }
+			val selectItems = remember { arrayOf(
+				"1银币",
+				"2银币",
+				"3银币 (对方将获得1银币奖励)"
+			) }
+
+			BottomSheet(state = sendCoinSheet) {
+				Column(
+					modifier = Modifier.fillMaxWidth().padding(10.dp).selectableGroup(),
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							text = "银币: ${app.config.userProfile?.coin ?: 0}",
+							style = MaterialTheme.typography.titleMedium,
+							modifier = Modifier.weight(1f)
+						)
+						ClickIcon(
+							imageVector = Icons.AutoMirrored.Filled.Send,
+							onClick = {
+
+							}
+						)
+					}
+					selectItems.forEachIndexed { index, text ->
+						RachelRadioButton(
+							checked = index == selectedIndex,
+							text = text,
+							onCheck = { selectedIndex = index },
+							modifier = Modifier.fillMaxWidth()
+						)
+					}
+				}
+			}
+		}
+
+        @Composable
+		fun SendCommentLayout(data: Pair<Boolean, Int>) {
+			val state = remember { TextInputState() }
+
+			BottomSheet(state =  sendCommentSheet) {
+				Column(
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					horizontalAlignment = Alignment.End,
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					ClickIcon(
+						imageVector = Icons.AutoMirrored.Filled.Send,
+						onClick = {
+
+						}
+					)
+					TextInput(
+						state = state,
+						hint = "回复内容",
+						maxLength = 1024,
+						maxLines = 10,
+						clearButton = false,
+						modifier = Modifier.fillMaxWidth()
+					)
 				}
 			}
 		}
@@ -531,8 +596,11 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主题",
+			bottomBar = {
+				Text(text = "123")
+			},
 			onBack = {
-				if (model.currentComment != null) model.hideSubComment()
+				if (model.subCommentSheet.isOpen) model.subCommentSheet.hide()
 				else model.pop()
 			}
 		) {
@@ -542,17 +610,16 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			else model.Landscape(details = details)
 		}
 
-		model.currentComment?.let {
-			model.SubCommentLayout(
-				comment = it,
-				modifier = Modifier.fillMaxSize()
-			)
+		model.subCommentSheet.withOpen {
+			model.SubCommentLayout(it)
 		}
 
-		DisposableEffect(Unit) {
-			onDispose {
-				model.hideSubComment()
-			}
+		model.sendCoinSheet.withOpen {
+			model.SendCoinLayout()
+		}
+
+		model.sendCommentSheet.withOpen {
+			model.SendCommentLayout(it)
 		}
 	}
 }

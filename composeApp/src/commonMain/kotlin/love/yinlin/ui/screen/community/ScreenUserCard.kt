@@ -27,7 +27,7 @@ import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.UserPublicProfile
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.component.button.RachelText
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.screen.SubScreen
@@ -157,7 +157,7 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 			onBack = { model.pop() }
 		) {
 			model.profile?.let { profile ->
-				val cardWidth = if (app.isPortrait) 150.dp else 200.dp
+				val cardWidth = if (app.isPortrait) 150.dp else 180.dp
 				if (app.isPortrait) {
 					PaginationStaggeredGrid(
 						items = model.items,
@@ -168,8 +168,6 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 						canLoading = model.canLoading,
 						onLoading = { model.requestMoreTopics() },
 						modifier = Modifier.fillMaxSize(),
-						contentPadding = PaddingValues(10.dp),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
 						verticalItemSpacing = 10.dp,
 						header = {
 							Column(modifier = Modifier.fillMaxWidth()) {
@@ -183,12 +181,36 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 						model.TopicCard(
 							topic = topic,
 							cardWidth = cardWidth,
-							modifier = Modifier.fillMaxWidth()
+							modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
 						)
 					}
 				}
 				else {
-
+					Row(modifier = Modifier.fillMaxSize()) {
+						LandscapeUserProfileCard(
+							profile = profile,
+							owner = false,
+							modifier = Modifier.width(350.dp).padding(10.dp)
+						)
+						PaginationStaggeredGrid(
+							items = model.items,
+							key = { it.tid },
+							columns = StaggeredGridCells.Adaptive(cardWidth),
+							state = model.listState,
+							canRefresh = false,
+							canLoading = model.canLoading,
+							onLoading = { model.requestMoreTopics() },
+							modifier = Modifier.weight(1f).fillMaxHeight(),
+							contentPadding = PaddingValues(10.dp),
+							verticalItemSpacing = 10.dp
+						) {  topic ->
+							model.TopicCard(
+								topic = topic,
+								cardWidth = cardWidth,
+								modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
+							)
+						}
+					}
 				}
 			}
 		}

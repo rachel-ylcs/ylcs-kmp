@@ -7,14 +7,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -143,6 +148,79 @@ internal fun ColumnScope.PortraitUserProfileCard(
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.fillMaxWidth()
 		)
+	}
+}
+
+@Composable
+internal fun LandscapeUserProfileCard(
+	profile: UserPublicProfile,
+	owner: Boolean,
+	modifier: Modifier = Modifier
+) {
+	Surface(
+		modifier = modifier,
+		shape = MaterialTheme.shapes.large,
+		shadowElevation = 5.dp
+	) {
+		Column(
+			modifier = Modifier.fillMaxWidth(),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			WebImage(
+				uri = profile.wallPath,
+				key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
+				modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 10.dp),
+				horizontalArrangement = Arrangement.spacedBy(15.dp)
+			) {
+				Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+					WebImage(
+						uri = profile.avatarPath,
+						key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
+						contentScale = ContentScale.Crop,
+						circle = true,
+						modifier = Modifier.matchParentSize().shadow(5.dp, CircleShape)
+					)
+				}
+				Column(
+					modifier = Modifier.weight(1f),
+					verticalArrangement = Arrangement.spacedBy(5.dp)
+				) {
+					Text(
+						text = profile.name,
+						style = MaterialTheme.typography.titleLarge,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.fillMaxWidth()
+					)
+					UserLabel(
+						label = profile.label,
+						level = profile.level
+					)
+				}
+				Row(
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					PortraitValue(
+						value = profile.level.toString(),
+						title = "等级"
+					)
+					PortraitValue(
+						value = profile.coin.toString(),
+						title = "银币"
+					)
+				}
+			}
+			Text(
+				text = profile.signature,
+				maxLines = 2,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+			)
+		}
 	}
 }
 

@@ -18,7 +18,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserConstraint
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.ui.component.button.LoadingButton
+import love.yinlin.ui.component.input.LoadingButton
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType

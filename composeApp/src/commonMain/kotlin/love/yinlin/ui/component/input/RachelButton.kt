@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.button
+package love.yinlin.ui.component.input
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,13 +24,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.extension.rememberState
-import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable
@@ -207,5 +207,29 @@ fun LoadingButton(
 			icon = icon,
 			color = LocalContentColor.current
 		)
+	}
+}
+
+@Composable
+fun RachelRadioButton(
+	checked: Boolean,
+	text: String,
+	onCheck: () -> Unit,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		modifier = modifier.height(IntrinsicSize.Min).selectable(
+			selected = checked,
+			onClick = onCheck,
+			role = Role.RadioButton
+		).padding(horizontal = 10.dp, vertical = 5.dp),
+		horizontalArrangement = Arrangement.spacedBy(15.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		RadioButton(
+			selected = checked,
+			onClick = null
+		)
+		Text(text = text)
 	}
 }

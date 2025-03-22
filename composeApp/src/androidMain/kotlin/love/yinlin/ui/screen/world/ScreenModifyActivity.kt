@@ -21,7 +21,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
 import love.yinlin.platform.app
-import love.yinlin.ui.component.button.RachelButton
+import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.image.PictureSelector
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
