@@ -19,41 +19,38 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
-import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Comment
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.screen.ActionScope
 
 private enum class DiscoveryItem(
 	val id: Int,
-	val title: String,
 	val icon: ImageVector
 ) {
-	Lastest(Comment.Section.LATEST, "最新", Icons.Filled.NewReleases),
-	Hot(Comment.Section.HOT, "热门", Icons.Filled.LocalFireDepartment),
-	Notification(Comment.Section.NOTIFICATION, "公告", Icons.Filled.Campaign),
-	Water(Comment.Section.WATER, "水贴", Icons.Filled.WaterDrop),
-	Activity(Comment.Section.ACTIVITY, "活动", Icons.Filled.Celebration),
-	Discussion(Comment.Section.DISCUSSION, "交流", Icons.AutoMirrored.Filled.Chat);
+	Lastest(Comment.Section.LATEST, Icons.Filled.NewReleases),
+	Hot(Comment.Section.HOT, Icons.Filled.LocalFireDepartment),
+	Notification(Comment.Section.NOTIFICATION, Icons.Filled.Campaign),
+	Water(Comment.Section.WATER, Icons.Filled.WaterDrop),
+	Activity(Comment.Section.ACTIVITY, Icons.Filled.Celebration),
+	Discussion(Comment.Section.DISCUSSION, Icons.AutoMirrored.Filled.Chat);
 
 	companion object {
 		@Stable
-		val items = DiscoveryItem.entries.map { it.title to it.icon }
+		val items = DiscoveryItem.entries.map { Comment.Section.sectionName(it.id) to it.icon }
 	}
 }
 
@@ -63,81 +60,80 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	val listState = LazyStaggeredGridState()
 
 	var currentPage by mutableIntStateOf(0)
-	val items = mutableStateListOf<Topic>()
-	var offset: Int = Int.MAX_VALUE
-	var canLoading by mutableStateOf(false)
+	val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
+
+	class DiscoveryPagination : Pagination<Topic, Int>(Int.MAX_VALUE) {
+		var section = Comment.Section.LATEST
+		override fun offset(item: Topic): Int = when (section) {
+			DiscoveryItem.Lastest.id -> item.tid
+			DiscoveryItem.Hot.id -> item.coinNum
+			else -> item.tid
+		}
+	}
+	val page = DiscoveryPagination()
 
 	suspend fun requestNewData() {
-		val section = DiscoveryItem.entries[currentPage].id
 		state = BoxState.LOADING
-		val result = when (currentPage) {
-			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
+		val section = currentSection
+		val result = when (section) {
+			DiscoveryItem.Lastest.id -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
-				data = API.User.Topic.GetLatestTopics.Request()
+				data = API.User.Topic.GetLatestTopics.Request(
+					num = page.pageNum
+				)
 			)
-			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
+			DiscoveryItem.Hot.id -> ClientAPI.request(
 				route = API.User.Topic.GetHotTopics,
-				data = API.User.Topic.GetHotTopics.Request()
+				data = API.User.Topic.GetHotTopics.Request(
+					num = page.pageNum
+				)
 			)
 			else -> ClientAPI.request(
 				route = API.User.Topic.GetSectionTopics,
-				data = API.User.Topic.GetSectionTopics.Request(section = section)
+				data = API.User.Topic.GetSectionTopics.Request(
+					section = section,
+					num = page.pageNum
+				)
 			)
 		}
 		if (result is Data.Success) {
-			val topics = result.data
-			items.replaceAll(topics)
-
-			val last = topics.lastOrNull()
-			offset = when (section) {
-				DiscoveryItem.Lastest.id -> last?.tid
-				DiscoveryItem.Hot.id -> last?.coinNum
-				else -> last?.tid
-			} ?: Int.MAX_VALUE
-
-			state = if (topics.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-			canLoading = topics.size == APIConfig.MIN_PAGE_NUM
-
+			page.section = section
+			state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
 			listState.scrollToItem(0)
 		}
 		else state = BoxState.NETWORK_ERROR
 	}
 
 	suspend fun requestMoreData() {
-		val section = DiscoveryItem.entries[currentPage].id
-		val result = when (currentPage) {
-			DiscoveryItem.Lastest.ordinal -> ClientAPI.request(
+		val section = currentSection
+		val result = when (section) {
+			DiscoveryItem.Lastest.id -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
-				data = API.User.Topic.GetLatestTopics.Request(offset = offset)
+				data = API.User.Topic.GetLatestTopics.Request(
+					offset = page.offset,
+					num = page.pageNum
+				)
 			)
-			DiscoveryItem.Hot.ordinal -> ClientAPI.request(
+			DiscoveryItem.Hot.id -> ClientAPI.request(
 				route = API.User.Topic.GetHotTopics,
-				data = API.User.Topic.GetHotTopics.Request(offset = offset)
+				data = API.User.Topic.GetHotTopics.Request(
+					offset = page.offset,
+					num = page.pageNum
+				)
 			)
 			else -> ClientAPI.request(
 				route = API.User.Topic.GetSectionTopics,
-				data = API.User.Topic.GetSectionTopics.Request(section = section, offset = offset)
+				data = API.User.Topic.GetSectionTopics.Request(
+					section = section,
+					offset = page.offset,
+					num = page.pageNum
+				)
 			)
 		}
 		if (result is Data.Success) {
-			val topics = result.data
-			if (topics.isEmpty()) offset = Int.MAX_VALUE
-			else {
-				items += topics
-				val last = topics.lastOrNull()
-				offset = when (section) {
-					DiscoveryItem.Lastest.id -> last?.tid
-					DiscoveryItem.Hot.id -> last?.coinNum
-					else -> last?.tid
-				} ?: Int.MAX_VALUE
-			}
-
-			canLoading = offset != Int.MAX_VALUE && topics.size == APIConfig.MIN_PAGE_NUM
+			page.section = section
+			page.moreData(result.data)
 		}
-	}
-
-	fun onRefresh() {
-		launch { requestNewData() }
 	}
 
 	fun onTopicClick(topic: Topic) {
@@ -237,42 +233,36 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 					shadowElevation = 5.dp
 				) {
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(10.dp)
+						modifier = Modifier.fillMaxWidth(),
+						verticalAlignment = Alignment.CenterVertically
 					) {
 						TabBar(
 							currentPage = currentPage,
 							onNavigate = {
 								currentPage = it
-								onRefresh()
+								launch { requestNewData() }
 							},
 							items = DiscoveryItem.items,
-							modifier = Modifier.weight(1f)
+							modifier = Modifier.weight(1f).padding(end = 10.dp)
 						)
-						ClickIcon(
-							imageVector = Icons.Outlined.Add,
-							onClick = { }
-						)
-						ClickIcon(
-							imageVector = Icons.Outlined.Search,
-							onClick = { }
-						)
-						ClickIcon(
-							imageVector = Icons.Outlined.Refresh,
-							onClick = { onRefresh() }
-						)
+						ActionScope.Right.actions {
+							action(
+								icon = Icons.Outlined.Add,
+								color = MaterialTheme.colorScheme.primary,
+								onClick = { navigate(ScreenAddTopic) }
+							)
+						}
 					}
 				}
 
 				val cardWidth = if (app.isPortrait) 150.dp else 200.dp
 				PaginationStaggeredGrid(
-					items = items,
+					items = page.items,
 					key = { it.tid },
 					columns = StaggeredGridCells.Adaptive(cardWidth),
 					state = listState,
 					canRefresh = true,
-					canLoading = canLoading,
+					canLoading = page.canLoading,
 					onRefresh = { requestNewData() },
 					onLoading = { requestMoreData() },
 					modifier = Modifier.fillMaxWidth().weight(1f),
@@ -290,7 +280,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	override fun CoroutineScope.initialize() {
-		onRefresh()
+	override suspend fun initialize() {
+		requestNewData()
 	}
 }

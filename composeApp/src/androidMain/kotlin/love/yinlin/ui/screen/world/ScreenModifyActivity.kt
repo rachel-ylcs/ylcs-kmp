@@ -2,10 +2,11 @@ package love.yinlin.ui.screen.world
 
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LifecycleOwner
@@ -20,8 +21,8 @@ import love.yinlin.common.compressImages
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
+import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.image.PictureSelector
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -33,61 +34,54 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 		val activities = part<ScreenPartWorld>().activities
 		val input = ActivityInputState(activities.find { it.aid == aid })
 
-		private fun processActivity(block: (Activity) -> Activity) {
-			val index = activities.indexOfFirst { it.aid == aid }
-			if (index != -1) activities[index] = block(activities[index])
-		}
-
-		fun modifyActivity() {
-			launch {
-				val ts = input.ts
-				val title = input.titleString
-				val content = input.contentString
-				val showstart = input.showstartString
-				val damai = input.damaiString
-				val maoyan = input.maoyanString
-				val link = input.linkString
-				val result = ClientAPI.request(
-					route = API.User.Activity.ModifyActivityInfo,
-					data = API.User.Activity.ModifyActivityInfo.Request(
-						token = app.config.userToken,
-						activity = Activity(
-							aid = aid,
+		suspend fun modifyActivity() {
+			val ts = input.ts
+			val title = input.titleString
+			val content = input.contentString
+			val showstart = input.showstartString
+			val damai = input.damaiString
+			val maoyan = input.maoyanString
+			val link = input.linkString
+			val result = ClientAPI.request(
+				route = API.User.Activity.ModifyActivityInfo,
+				data = API.User.Activity.ModifyActivityInfo.Request(
+					token = app.config.userToken,
+					activity = Activity(
+						aid = aid,
+						ts = ts,
+						title = title,
+						content = content,
+						pic = null,
+						pics = emptyList(),
+						showstart = showstart,
+						damai = damai,
+						maoyan = maoyan,
+						link = link
+					)
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					activities.findAssign(predicate = { it.aid == aid }) {
+						it.copy(
 							ts = ts,
 							title = title,
 							content = content,
-							pic = null,
-							pics = emptyList(),
 							showstart = showstart,
 							damai = damai,
 							maoyan = maoyan,
 							link = link
 						)
-					)
-				)
-				when (result) {
-					is Data.Success -> {
-						processActivity {
-							it.copy(
-								ts = ts,
-								title = title,
-								content = content,
-								showstart = showstart,
-								damai = damai,
-								maoyan = maoyan,
-								link = link
-							)
-						}
-						tip.success(result.message)
 					}
-					is Data.Error -> tip.error(result.message)
+					slot.tip.success(result.message)
 				}
+				is Data.Error -> slot.tip.error(result.message)
 			}
 		}
 
 		fun modifyPicture(lifecycle: LifecycleOwner, image: ImageBitmap) {
 			launch {
-				loading.isOpen = true
+				slot.loading.open()
 				val file = compressImage(
 					lifecycle = lifecycle,
 					image = image,
@@ -105,22 +99,20 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 					) }
 				)
 				when (result) {
-					is Data.Success -> {
-						processActivity {
-							val newPic = result.data
-							input.pic = Picture(it.picPath(newPic))
-							it.copy(pic = newPic)
-						}
+					is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+						val newPic = result.data
+						input.pic = Picture(it.picPath(newPic))
+						it.copy(pic = newPic)
 					}
-					is Data.Error -> tip.error(result.message)
+					is Data.Error -> slot.tip.error(result.message)
 				}
-				loading.isOpen = false
+				slot.loading.hide()
 			}
 		}
 
 		fun deletePicture() {
 			launch {
-				loading.isOpen = true
+				slot.loading.open()
 				val result = ClientAPI.request(
 					route = API.User.Activity.DeleteActivityPicture,
 					data = API.User.Activity.DeleteActivityPicture.Request(
@@ -129,21 +121,19 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 					)
 				)
 				when (result) {
-					is Data.Success -> {
-						processActivity {
-							input.pic = null
-							it.copy(pic = null)
-						}
+					is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+						input.pic = null
+						it.copy(pic = null)
 					}
-					is Data.Error -> tip.error(result.message)
+					is Data.Error -> slot.tip.error(result.message)
 				}
-				loading.isOpen = false
+				slot.loading.hide()
 			}
 		}
 
 		fun addPictures(lifecycle: LifecycleOwner, items: List<Uri>) {
 			launch {
-				loading.isOpen = true
+				slot.loading.open()
 				val files = compressImages(
 					lifecycle = lifecycle,
 					images = items,
@@ -161,22 +151,20 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 					) }
 				)
 				when (result) {
-					is Data.Success -> {
-						processActivity { oldActivity ->
-							val newPics = result.data
-							input.pics += newPics.map { Picture(oldActivity.picPath(it)) }
-							oldActivity.copy(pics = oldActivity.pics + newPics)
-						}
+					is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+						val newPics = result.data
+						input.pics += newPics.map { pic -> Picture(it.picPath(pic)) }
+						it.copy(pics = it.pics + newPics)
 					}
-					is Data.Error -> tip.error(result.message)
+					is Data.Error -> slot.tip.error(result.message)
 				}
-				loading.isOpen = false
+				slot.loading.hide()
 			}
 		}
 
 		fun modifyPictures(lifecycle: LifecycleOwner, index: Int, uri: Uri) {
 			launch {
-				loading.isOpen = true
+				slot.loading.open()
 				val file = compressImage(
 					lifecycle = lifecycle,
 					image = uri,
@@ -195,21 +183,20 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 					) }
 				)
 				when (result) {
-					is Data.Success -> {
-						processActivity { oldActivity ->
-							val newPic = result.data
-							input.pics[index] = Picture(oldActivity.picPath(newPic))
-							oldActivity.copy(pics = oldActivity.pics.toMutableList().also { it[index] = newPic })
-						}
+					is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+						val newPic = result.data
+						input.pics[index] = Picture(it.picPath(newPic))
+						it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
 					}
-					is Data.Error -> tip.error(result.message)
+					is Data.Error -> slot.tip.error(result.message)
 				}
+				slot.loading.hide()
 			}
 		}
 
 		fun deletePictures(index: Int) {
 			launch {
-				loading.isOpen = true
+				slot.loading.open()
 				val result = ClientAPI.request(
 					route = API.User.Activity.DeleteActivityPictures,
 					data = API.User.Activity.DeleteActivityPictures.Request(
@@ -219,15 +206,13 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 					)
 				)
 				when (result) {
-					is Data.Success -> {
-						processActivity { oldActivity ->
-							input.pics.removeAt(index)
-							oldActivity.copy(pics = oldActivity.pics.toMutableList().also { it.removeAt(index) })
-						}
+					is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+						input.pics.removeAt(index)
+						it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
 					}
-					is Data.Error -> tip.error(result.message)
+					is Data.Error -> slot.tip.error(result.message)
 				}
-				loading.isOpen = false
+				slot.loading.hide()
 			}
 		}
 	}
@@ -242,8 +227,12 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 			modifier = Modifier.fillMaxSize(),
 			title = "修改活动",
 			onBack = { model.pop() },
-			tip = model.tip,
-			loading = model.loading
+			actions = {
+				actionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+					model.modifyActivity()
+				}
+			},
+			slot = model.slot
 		) {
 			var selectIndex = remember { -1 }
 			val picker = PictureSelector {
@@ -252,13 +241,6 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 
 			ActivityInfoLayout(
 				input = model.input,
-				content = {
-					RachelButton(
-						text = "更新内容",
-						modifier = Modifier.align(Alignment.CenterHorizontally),
-						onClick = { model.modifyActivity() }
-					)
-				},
 				onPicCrop = { model.modifyPicture(lifecycle, it) },
 				onPicDelete = { model.deletePicture() },
 				onPicsAdd = { model.addPictures(lifecycle, it) },

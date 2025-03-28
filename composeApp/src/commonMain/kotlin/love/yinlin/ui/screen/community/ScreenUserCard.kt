@@ -20,15 +20,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
-import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Topic
 import love.yinlin.data.rachel.UserPublicProfile
-import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.input.RachelText
+import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -41,10 +40,10 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 
 		val listState = LazyStaggeredGridState()
 
-		val items = mutableStateListOf<Topic>()
-		var isTop: Boolean = true
-		var offset: Int = Int.MAX_VALUE
-		var canLoading by mutableStateOf(false)
+		val page = object : PaginationArgs<Topic, Int, Boolean>(Int.MAX_VALUE, true) {
+			override fun offset(item: Topic): Int = item.tid
+			override fun arg1(item: Topic): Boolean = item.isTop
+		}
 
 		fun requestUserProfile() {
 			launch {
@@ -62,15 +61,10 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 					route = API.User.Topic.GetTopics,
 					data = API.User.Topic.GetTopics.Request(
 						uid = uid,
-						isTop = isTop
+						num = page.pageNum
 					)
 				)
-				if (result is Data.Success) {
-					val topics = result.data
-					items.replaceAll(topics)
-					offset = topics.lastOrNull()?.tid ?: Int.MAX_VALUE
-					canLoading = topics.size == APIConfig.MIN_PAGE_NUM
-				}
+				if (result is Data.Success) page.newData(result.data)
 			}
 		}
 
@@ -80,16 +74,12 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 					route = API.User.Topic.GetTopics,
 					data = API.User.Topic.GetTopics.Request(
 						uid = uid,
-						isTop = isTop,
-						offset = offset
+						isTop = page.arg1,
+						offset = page.offset,
+						num = page.pageNum
 					)
 				)
-				if (result is Data.Success) {
-					val topics = result.data
-					items += topics
-					offset = topics.lastOrNull()?.tid ?: Int.MAX_VALUE
-					canLoading = offset != Int.MAX_VALUE && topics.size == APIConfig.MIN_PAGE_NUM
-				}
+				if (result is Data.Success) page.moreData(result.data)
 			}
 		}
 
@@ -115,6 +105,15 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 							modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
 							contentScale = ContentScale.Crop
 						)
+					}
+					if (topic.isTop) {
+						Row(
+							modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp),
+							horizontalArrangement = Arrangement.spacedBy(10.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
+						}
 					}
 					Text(
 						text = topic.title,
@@ -154,20 +153,22 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主页",
-			onBack = { model.pop() }
+			onBack = { model.pop() },
+			slot = model.slot
 		) {
 			model.profile?.let { profile ->
 				val cardWidth = if (app.isPortrait) 150.dp else 180.dp
 				if (app.isPortrait) {
 					PaginationStaggeredGrid(
-						items = model.items,
+						items = model.page.items,
 						key = { it.tid },
 						columns = StaggeredGridCells.Adaptive(cardWidth),
 						state = model.listState,
 						canRefresh = false,
-						canLoading = model.canLoading,
+						canLoading = model.page.canLoading,
 						onLoading = { model.requestMoreTopics() },
 						modifier = Modifier.fillMaxSize(),
+						contentPadding = PaddingValues(bottom = 10.dp),
 						verticalItemSpacing = 10.dp,
 						header = {
 							Column(modifier = Modifier.fillMaxWidth()) {
@@ -193,12 +194,12 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 							modifier = Modifier.width(350.dp).padding(10.dp)
 						)
 						PaginationStaggeredGrid(
-							items = model.items,
+							items = model.page.items,
 							key = { it.tid },
 							columns = StaggeredGridCells.Adaptive(cardWidth),
 							state = model.listState,
 							canRefresh = false,
-							canLoading = model.canLoading,
+							canLoading = model.page.canLoading,
 							onLoading = { model.requestMoreTopics() },
 							modifier = Modifier.weight(1f).fillMaxHeight(),
 							contentPadding = PaddingValues(10.dp),

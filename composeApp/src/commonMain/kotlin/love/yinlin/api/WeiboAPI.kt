@@ -112,7 +112,7 @@ object WeiboAPI {
 		}
 	}
 
-	private fun weiboTime(time: String) = DateEx.Formatter.weiboDateTime.parse(time).toLocalDateTime()
+	private fun weiboTime(time: String) = DateEx.Formatter.weiboDateTime.parse(time)!!.toLocalDateTime()
 
 	private fun getWeiboUserInfo(user: JsonObject): WeiboUserInfo {
 		// 提取名称和头像

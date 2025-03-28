@@ -9,65 +9,75 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.UtcOffset
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.jvm.JvmInline
 
 object DateEx {
-	object Formatter {
-		val weiboDateTime = DateTimeComponents.Format {
-			dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
-			char(' ')
-			monthName(MonthNames.ENGLISH_ABBREVIATED)
-			char(' ')
-			dayOfMonth()
-			char(' ')
-			hour()
-			char(':')
-			minute()
-			char(':')
-			second()
-			char(' ')
-			offset(UtcOffset.Formats.FOUR_DIGITS)
-			char(' ')
-			year()
-		}
+	@JvmInline
+	value class Formatter<T> private constructor(private val factory: DateTimeFormat<T>) {
+		fun parse(input: CharSequence): T? = factory.parseOrNull(input)
+		fun format(value: T): String? = try { factory.format(value) } catch (_: Throwable) { null }
 
-		val standardDateTime = LocalDateTime.Format {
-			year()
-			char('-')
-			monthNumber(padding = Padding.ZERO)
-			char('-')
-			dayOfMonth(padding = Padding.ZERO)
-			char(' ')
-			hour()
-			char(':')
-			minute()
-			char(':')
-			second()
-		}
+		companion object {
+			val weiboDateTime = Formatter(DateTimeComponents.Format {
+				dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
+				char(' ')
+				monthName(MonthNames.ENGLISH_ABBREVIATED)
+				char(' ')
+				dayOfMonth()
+				char(' ')
+				hour()
+				char(':')
+				minute()
+				char(':')
+				second()
+				char(' ')
+				offset(UtcOffset.Formats.FOUR_DIGITS)
+				char(' ')
+				year()
+			})
 
-		val standardDate = LocalDate.Format {
-			year()
-			char('-')
-			monthNumber(padding = Padding.ZERO)
-			char('-')
-			dayOfMonth(padding = Padding.ZERO)
+			val standardDateTime = Formatter(LocalDateTime.Format {
+				year()
+				char('-')
+				monthNumber(padding = Padding.ZERO)
+				char('-')
+				dayOfMonth(padding = Padding.ZERO)
+				char(' ')
+				hour()
+				char(':')
+				minute()
+				char(':')
+				second()
+			})
+
+			val standardDate = Formatter(LocalDate.Format {
+				year()
+				char('-')
+				monthNumber(padding = Padding.ZERO)
+				char('-')
+				dayOfMonth(padding = Padding.ZERO)
+			})
 		}
 	}
 
-	val Today: LocalDate get() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+	val Current: LocalDateTime get() = Clock.System.now().toLocalDateTime!!
 
-	val TodayString: String = Today.format(Formatter.standardDate)
+	val CurrentString: String = Formatter.standardDateTime.format(Current)!!
+
+	val Today: LocalDate get() = Current.date
+
+	val TodayString: String = Formatter.standardDate.format(Today)!!
 }
 
-val Long.toLocalDateTime: LocalDateTime? get() = try {
-	Instant.fromEpochMilliseconds(this).toLocalDateTime(TimeZone.currentSystemDefault())
-}
-catch (_: Throwable) { null }
+val Instant.toLocalDateTime: LocalDateTime? get() = try { this.toLocalDateTime(TimeZone.currentSystemDefault()) } catch (_: Throwable) { null }
+val Long.toLocalDateTime: LocalDateTime? get() = Instant.fromEpochMilliseconds(this).toLocalDateTime
 val Long.toLocalDate: LocalDate? get() = this.toLocalDateTime?.date
 val LocalDateTime.toLong: Long get() = this.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 val LocalDate.toLong: Long get() = this.toLocalDateTime.toLong

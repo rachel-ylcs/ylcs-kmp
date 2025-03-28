@@ -23,9 +23,9 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
@@ -162,24 +162,23 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				shadowElevation = 5.dp
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(10.dp)
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
 				) {
 					TabBar(
 						currentPage = pagerState.currentPage,
 						onNavigate = { onPageChanged(it) },
 						items = MsgTabItem.items,
-						modifier = Modifier.weight(1f)
+						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
-					ClickIcon(
-						imageVector = Icons.Outlined.Refresh,
-						onClick = { onRefresh() }
-					)
-					ClickIcon(
-						imageVector = Icons.Filled.AccountCircle,
-						onClick = { navigate(ScreenWeiboFollows) }
-					)
+					ActionScope.Right.actions {
+						action(icon = Icons.Outlined.Refresh) {
+							onRefresh()
+						}
+						action(icon = Icons.Filled.AccountCircle) {
+							navigate(ScreenWeiboFollows)
+						}
+					}
 				}
 			}
 			HorizontalPager(

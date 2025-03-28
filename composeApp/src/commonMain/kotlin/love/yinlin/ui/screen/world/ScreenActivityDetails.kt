@@ -23,6 +23,8 @@ import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Activity
+import love.yinlin.extension.findModify
+import love.yinlin.extension.findRun
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
@@ -91,22 +93,19 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 			navigate(ScreenImagePreview(pics, index))
 		}
 
-		fun deleteActivity() {
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Activity.DeleteActivity,
-					data = API.User.Activity.DeleteActivity.Request(
-						token = app.config.userToken,
-						aid = aid
-					)
+		suspend fun deleteActivity() {
+			val result = ClientAPI.request(
+				route = API.User.Activity.DeleteActivity,
+				data = API.User.Activity.DeleteActivity.Request(
+					token = app.config.userToken,
+					aid = aid
 				)
-				if (result is Data.Success) {
-					val activities = part<ScreenPartWorld>().activities
-					activities.find { it.aid == aid }?.let { activities -= it }
-					pop()
-				}
-				else if (result is Data.Error) tip.error(result.message)
+			)
+			if (result is Data.Success) {
+				part<ScreenPartWorld>().activities.findModify(predicate = { it.aid == aid }) { this -= it }
+				pop()
 			}
+			else if (result is Data.Error) slot.tip.error(result.message)
 		}
 
 		@Composable
@@ -181,19 +180,15 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 			onBack = { model.pop() },
 			actions = {
 				if (hasPrivilegeVIPCalendar) {
-					ClickIcon(
-						imageVector = Icons.Outlined.Edit,
-						modifier = Modifier.padding(end = 10.dp),
-						onClick = { model.navigate(ScreenModifyActivity(aid)) }
-					)
-					ClickIcon(
-						imageVector = Icons.Outlined.Delete,
-						modifier = Modifier.padding(end = 10.dp),
-						onClick = { model.deleteActivity() }
-					)
+					action(icon = Icons.Outlined.Edit) {
+						model.navigate(ScreenModifyActivity(aid))
+					}
+					actionSuspend(icon = Icons.Outlined.Delete) {
+						model.deleteActivity()
+					}
 				}
 			},
-			tip = model.tip
+			slot = model.slot
 		) {
 			model.activity?.let { activity ->
 				if (app.isPortrait) {

@@ -190,7 +190,8 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "设置",
-			onBack = { model.pop() }
+			onBack = { model.pop() },
+			slot = model.slot
 		) {
 			if (app.isPortrait) model.Portrait(userProfile)
 			else model.Landscape(userProfile)

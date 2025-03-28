@@ -29,7 +29,8 @@ data class ScreenWebpage(val url: String) : Screen<ScreenWebpage.Model> {
 			onBack = {
 				if (model.state.canGoBack) model.state.goBack()
 				else model.pop()
-			}
+			},
+			slot = model.slot
 		) {
 			WebPage(
 				state = model.state,

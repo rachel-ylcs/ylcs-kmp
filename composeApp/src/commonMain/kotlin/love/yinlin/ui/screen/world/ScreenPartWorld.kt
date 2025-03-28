@@ -10,14 +10,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.LocalDate
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
@@ -25,26 +23,27 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.Activity
-import love.yinlin.extension.*
+import love.yinlin.extension.DateEx
+import love.yinlin.extension.findSelf
+import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
-import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.screen.ActionScope
 
 class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	val activities = mutableStateListOf<Activity>()
 
 	val calendarState = CalendarState()
 
-	fun requestActivity() {
-		launch {
-			val result = ClientAPI.request(
-				route = API.User.Activity.GetActivities
-			)
-			if (result is Data.Success) activities.replaceAll(result.data)
-		}
+	suspend fun requestActivity() {
+		val result = ClientAPI.request(
+			route = API.User.Activity.GetActivities
+		)
+		if (result is Data.Success) activities.replaceAll(result.data)
 	}
 
 	fun showActivityDetails(aid: Int) {
@@ -52,19 +51,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	fun onDateClick(date: LocalDate) {
-		val ts = try {
-			DateEx.Formatter.standardDate.format(date)
-		} catch (_: Throwable) { null }
-		val activity = ts?.let { activities.find { it.ts == ts } }
-		if (activity != null) {
-			launch {
-				showActivityDetails(activity.aid)
-			}
-		}
-	}
-
-	fun onRefreshCalendar() {
-		requestActivity()
+		DateEx.Formatter.standardDate.format(date)
+			?.findSelf(activities) { it.ts }
+				?.let { showActivityDetails(it.aid) }
 	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
@@ -103,11 +92,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				val ts = activity.ts
 				val title = activity.title
 				if (ts != null && title != null) {
-					try {
-						val date = DateEx.Formatter.standardDate.parse(ts)
+					DateEx.Formatter.standardDate.parse(ts)?.let { date ->
 						events.put(date, title)
 					}
-					catch (_: Throwable) { }
 				}
 			}
 			events
@@ -137,19 +124,17 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				shadowElevation = 5.dp
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
+					modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+					horizontalArrangement = Arrangement.End,
 				) {
-					if (hasPrivilegeVIPCalendar) {
-						ClickIcon(
-							imageVector = Icons.Outlined.Add,
-							onClick = { navigate(ScreenAddActivity) }
-						)
+					ActionScope.Right.actions {
+						if (hasPrivilegeVIPCalendar) action(icon = Icons.Outlined.Add) {
+							navigate(ScreenAddActivity)
+						}
+						actionSuspend(icon = Icons.Outlined.Refresh) {
+							requestActivity()
+						}
 					}
-					ClickIcon(
-						imageVector = Icons.Outlined.Refresh,
-						onClick = { onRefreshCalendar() }
-					)
 				}
 			}
 			Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
@@ -184,7 +169,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	override fun CoroutineScope.initialize() {
+	override suspend fun initialize() {
 		requestActivity()
 	}
 }

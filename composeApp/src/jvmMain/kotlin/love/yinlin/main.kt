@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -60,8 +64,18 @@ fun main() {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                             AppTopBar(
                                 modifier = Modifier.fillMaxWidth().height(50.dp),
-                                onMinimized = { state.isMinimized = true },
-                                onClosed = { isOpen = false }
+                                actions = {
+                                    action(
+                                        icon = Icons.Outlined.Remove,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        onClick = { state.isMinimized = true }
+                                    )
+                                    action(
+                                        icon = Icons.Outlined.Close,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        onClick = { isOpen = false }
+                                    )
+                                }
                             )
                         }
                         App(modifier = Modifier.fillMaxWidth().weight(1f))

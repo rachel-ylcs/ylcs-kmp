@@ -30,12 +30,71 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import love.yinlin.api.APIConfig
 import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+
+// 分页数据实现
+@Stable
+abstract class Pagination<E, T>(
+	private val default: T,
+	val pageNum: Int = APIConfig.MIN_PAGE_NUM
+) {
+	val items = mutableStateListOf<E>()
+	var canLoading by mutableStateOf(false)
+
+	private var mOffset: T = default
+	abstract fun offset(item: E): T
+	val offset: T get() = mOffset
+
+	open fun processArgs(last: E?) {}
+
+	fun newData(newItems: List<E>): Boolean {
+		items.replaceAll(newItems)
+		val last = newItems.lastOrNull()
+		mOffset = last?.let { offset(it) } ?: default
+		processArgs(last)
+		canLoading = newItems.size == pageNum
+		return newItems.isNotEmpty()
+	}
+
+	fun moreData(newItems: List<E>): Boolean {
+		if (newItems.isEmpty()) {
+			mOffset = default
+			processArgs(null)
+		}
+		else {
+			items += newItems
+			val last = newItems.lastOrNull()
+			mOffset = last?.let { offset(it) } ?: default
+			processArgs(last)
+		}
+		canLoading = offset != default && newItems.size == pageNum
+		return newItems.isNotEmpty()
+	}
+}
+
+@Stable
+abstract class PaginationArgs<E, T, A1>(
+	default: T,
+	private val default1: A1,
+	pageNum: Int = APIConfig.MIN_PAGE_NUM
+) : Pagination<E, T>(default, pageNum) {
+	private var mArg1: A1 = default1
+	abstract fun arg1(item: E): A1
+	val arg1: A1 get() = mArg1
+
+	override fun processArgs(last: E?) {
+		mArg1 = last?.let { arg1(it) } ?: default1
+	}
+}
+
+// 分页 UI 实现
 
 private enum class PaginationStatus {
 	IDLE, RUNNING, PULL, RELEASE

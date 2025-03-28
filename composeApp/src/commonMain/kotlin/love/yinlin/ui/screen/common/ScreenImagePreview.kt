@@ -25,7 +25,6 @@ import love.yinlin.extension.condition
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
-import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
 import love.yinlin.ui.component.screen.DialogProgress
@@ -44,11 +43,11 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 		val previews: List<PreviewPicture> = images.map { PreviewPicture(it) }
 		var current: Int by mutableIntStateOf(index)
 
-		val dialogState = DialogProgressState()
+		val downloadDialog = DialogProgressState()
 		fun downloadPicture() {
 			val preview = previews[current]
 			val url = if (preview.isSource) preview.pic.source else preview.pic.image
-			launch { OS.downloadImage(url, dialogState) }
+			launch { OS.downloadImage(url, downloadDialog) }
 		}
 
 		@Composable
@@ -159,20 +158,20 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 			modifier = Modifier.fillMaxSize(),
 			title = "${model.current + 1} / ${model.previews.size}",
 			actions = {
-				ClickIcon(
-					imageVector = Icons.Filled.Download,
-					modifier = Modifier.padding(end = 5.dp),
+				action(
+					icon = Icons.Filled.Download,
 					onClick = { model.downloadPicture() }
 				)
 			},
-			onBack = { model.pop() }
+			onBack = { model.pop() },
+			slot = model.slot
 		) {
 			if (app.isPortrait) model.Portrait()
 			else model.Landscape()
 		}
 
-		if (model.dialogState.isOpen) {
-			DialogProgress(state = model.dialogState)
+		if (model.downloadDialog.isOpen) {
+			DialogProgress(state = model.downloadDialog)
 		}
 	}
 }

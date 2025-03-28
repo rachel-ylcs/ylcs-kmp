@@ -3,7 +3,6 @@ package love.yinlin.ui.screen.msg.weibo
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.LastPage
@@ -71,7 +70,7 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 			if (state != BoxState.LOADING) {
 				if (current > 1) requestAlbum(current - 1)
 				else launch {
-					tip.warning("已经是第一页啦")
+					slot.tip.warning("已经是第一页啦")
 				}
 			}
 		}
@@ -80,7 +79,7 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 			if (state != BoxState.LOADING) {
 				if ((maxNum == 0 || current < maxNum) && current < PIC_MAX_LIMIT - 2) requestAlbum(current + 1)
 				else launch {
-					tip.warning("已经是最后一页啦")
+					slot.tip.warning("已经是最后一页啦")
 				}
 			}
 		}
@@ -98,7 +97,7 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 			modifier = Modifier.fillMaxSize(),
 			title = "$title - 共 ${model.num} 张",
 			onBack = { model.pop() },
-			tip = model.tip
+			slot = model.slot
 		) {
 			Column(
 				modifier = Modifier.fillMaxSize().padding(10.dp),

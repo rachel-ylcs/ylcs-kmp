@@ -181,7 +181,7 @@ fun ClickIcon(
 		),
 		imageVector = imageVector,
 		contentDescription = null,
-		tint = if (enabled) color else ThemeColor.fade,
+		tint = if (enabled) color else ThemeColor.fade
 	)
 }
 
@@ -190,6 +190,8 @@ fun LoadingIcon(
 	imageVector: ImageVector,
 	size: Dp = DEFAULT_ICON_SIZE,
 	color: Color = MaterialTheme.colorScheme.onSurface,
+	enabled: Boolean = true,
+	modifier: Modifier = Modifier,
 	onClick: suspend CoroutineScope.() -> Unit
 ) {
 	val scope = rememberCoroutineScope()
@@ -197,7 +199,7 @@ fun LoadingIcon(
 
 	if (isLoading) {
 		Box(
-			modifier = Modifier.size(size),
+			modifier = modifier.size(size),
 			contentAlignment = Alignment.Center
 		) {
 			CircularProgressIndicator(
@@ -208,16 +210,19 @@ fun LoadingIcon(
 	}
 	else {
 		Icon(
-			modifier = Modifier.size(size).clip(CircleShape).clickable {
-				scope.launch {
-					isLoading = true
-					onClick()
-					isLoading = false
+			modifier = modifier.size(size).clip(CircleShape).clickable(
+				enabled = enabled,
+				onClick = {
+					scope.launch {
+						isLoading = true
+						onClick()
+						isLoading = false
+					}
 				}
-			},
+			),
 			imageVector = imageVector,
 			contentDescription = null,
-			tint = color,
+			tint = if (enabled) color else ThemeColor.fade
 		)
 	}
 }

@@ -37,7 +37,7 @@ actual object OS {
 			val resolver = appNative.context.contentResolver
 			val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
 
-			state.isOpen = true
+			state.open()
 			app.fileClient.safeDownload(
 				url = url,
 				isCancel = { !state.isOpen },
@@ -50,7 +50,7 @@ actual object OS {
 				onWriteChannel = { it.asByteWriteChannel() },
 				onWriteEnd = { it.close() }
 			)
-			state.isOpen = false
+			state.hide()
 		}
 		catch (e: Exception) {
 			e.printStackTrace()

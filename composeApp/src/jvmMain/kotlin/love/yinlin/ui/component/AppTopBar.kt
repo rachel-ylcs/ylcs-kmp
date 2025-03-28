@@ -2,27 +2,24 @@ package love.yinlin.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.resources.Res
+import love.yinlin.resources.app_name
+import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.screen.ActionScope
 import org.jetbrains.compose.resources.stringResource
-import love.yinlin.resources.*
 
 @Composable
 fun AppTopBar(
 	modifier: Modifier = Modifier,
-	onMinimized: () -> Unit,
-	onClosed: () -> Unit
+	actions: @Composable ActionScope.() -> Unit = {}
 ) {
 	TopAppBar(
 		modifier = modifier,
@@ -40,22 +37,6 @@ fun AppTopBar(
 				)
 			}
 		},
-		actions = {
-			Row(
-				modifier = Modifier.padding(horizontal = 10.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				ClickIcon(
-					imageVector = Icons.Outlined.Remove,
-					color = MaterialTheme.colorScheme.onPrimary,
-					onClick = onMinimized
-				)
-				ClickIcon(
-					imageVector = Icons.Outlined.Close,
-					color = MaterialTheme.colorScheme.onPrimary,
-					onClick = onClosed
-				)
-			}
-		}
+		actions = { ActionScope.Right.actions() }
 	)
 }

@@ -1,18 +1,20 @@
 package love.yinlin.ui.component.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowRight
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,19 +23,99 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import love.yinlin.common.Colors
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.OffsetLayout
+import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import love.yinlin.resources.*
+import kotlin.coroutines.coroutineContext
 import kotlin.math.roundToInt
+
+@Stable
+open class TipState {
+	enum class Type {
+		INFO, SUCCESS, WARNING, ERROR,
+	}
+
+	val host = SnackbarHostState()
+	var type by mutableStateOf(Type.INFO)
+		private set
+
+	suspend fun show(text: String?, type: Type) {
+		// showSnackbar会阻塞当前协程, 应该在当前上下文启动新的协程
+		CoroutineScope(coroutineContext).launch {
+			host.currentSnackbarData?.dismiss()
+			this@TipState.type = type
+			host.showSnackbar(
+				message = text ?: "",
+				duration = SnackbarDuration.Short
+			)
+		}
+	}
+
+	suspend fun info(text: String?) = show(text, Type.INFO)
+	suspend fun success(text: String?) = show(text, Type.SUCCESS)
+	suspend fun warning(text: String?) = show(text, Type.WARNING)
+	suspend fun error(text: String?) = show(text, Type.ERROR)
+}
+
+@Composable
+fun Tip(state: TipState) {
+	SnackbarHost(
+		hostState = state.host,
+		modifier = Modifier.fillMaxWidth().zIndex(Float.MAX_VALUE)
+	) {
+		Box(
+			modifier = Modifier.padding(20.dp).fillMaxWidth()
+				.clickable(indication = null, interactionSource = null) { }
+				.background(
+					brush = remember(state.type) { Brush.horizontalGradient(
+						colors = when (state.type) {
+							TipState.Type.INFO -> listOf(Colors.Gray5, Colors.Gray4, Colors.Gray5)
+							TipState.Type.SUCCESS -> listOf(Colors.Green5, Colors.Green4, Colors.Green5)
+							TipState.Type.WARNING -> listOf(Colors.Yellow5, Colors.Yellow4, Colors.Yellow5)
+							TipState.Type.ERROR -> listOf(Colors.Red5, Colors.Red4, Colors.Red5)
+						},
+						startX = 0f,
+						endX = Float.POSITIVE_INFINITY
+					) },
+					shape = MaterialTheme.shapes.extraLarge
+				)
+		) {
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				horizontalArrangement = Arrangement.spacedBy(15.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				MiniIcon(
+					imageVector = when (state.type) {
+						TipState.Type.INFO -> Icons.Outlined.Lightbulb
+						TipState.Type.SUCCESS -> Icons.Outlined.Check
+						TipState.Type.WARNING -> Icons.Outlined.Warning
+						TipState.Type.ERROR -> Icons.Outlined.Error
+					},
+					color = Colors.White
+				)
+				Text(
+					text = it.visuals.message,
+					color = Colors.White,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.weight(1f)
+				)
+			}
+		}
+	}
+}
 
 @Stable
 sealed interface DialogInfo {
@@ -61,96 +143,39 @@ sealed interface DialogInfo {
 	}
 }
 
-open class DialogState {
-	open var isOpen: Boolean by mutableStateOf(false)
+@Stable
+abstract class DialogState {
+	var isOpen: Boolean by mutableStateOf(false)
+		protected set
+
+	open val dismissOnBackPress: Boolean get() = true
+	open val dismissOnClickOutside: Boolean get() = true
+
+	open fun open() { isOpen = true }
+	open fun hide() { isOpen = false }
 }
 
-open class TipState {
-	enum class Type {
-		INFO, SUCCESS, WARNING, ERROR,
-	}
-
-	val host = SnackbarHostState()
-	var type by mutableStateOf(Type.INFO)
-		private set
-
-	suspend fun show(text: String?, type: Type = Type.INFO) {
-		host.currentSnackbarData?.dismiss()
-		this.type = type
-		host.showSnackbar(
-			message = text ?: "",
-			duration = SnackbarDuration.Short
-		)
-	}
-
-	suspend fun info(text: String?) = show(text, Type.INFO)
-	suspend fun success(text: String?) = show(text, Type.SUCCESS)
-	suspend fun warning(text: String?) = show(text, Type.WARNING)
-	suspend fun error(text: String?) = show(text, Type.ERROR)
-}
-
-@Composable
-fun Tip(state: TipState) {
-	SnackbarHost(
-		hostState = state.host,
-		modifier = Modifier.fillMaxSize().zIndex(Float.MAX_VALUE)
-	) {
-		Box(
-			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.TopCenter
-		) {
-			Row(modifier = Modifier.padding(top = 50.dp).size(width = 300.dp, height = 150.dp)) {
-				OffsetLayout(x = 10.dp) {
-					Image(
-						painter = painterResource(Res.drawable.img_toast_rachel),
-						contentDescription = null,
-						modifier = Modifier.width(75.dp).fillMaxHeight()
-					)
-				}
-				Surface(
-					shape = MaterialTheme.shapes.extraLarge,
-					shadowElevation = 5.dp,
-					color = when (state.type) {
-						TipState.Type.INFO -> MaterialTheme.colorScheme.surface
-						TipState.Type.SUCCESS -> Colors.Green4
-						TipState.Type.WARNING -> Colors.Yellow4
-						TipState.Type.ERROR -> Colors.Red4
-					},
-					modifier = Modifier.weight(1f).fillMaxHeight()
-						.padding(top = 40.dp, bottom = 20.dp)
-				) {
-					Text(
-						text = it.visuals.message,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.fillMaxSize()
-							.padding(top = 5.dp, bottom = 5.dp, start = 25.dp, end = 5.dp)
-					)
-				}
-			}
-		}
-	}
+abstract class RachelDialogState : DialogState() {
+	open val scrollable: Boolean get() = true
+	abstract val title: String?
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun RachelDialog(
-	state: DialogState,
-	dismissOnBackPress: Boolean = true,
-	dismissOnClickOutside: Boolean = true,
-	scrollable: Boolean = true,
-	title: String? = null,
+	state: RachelDialogState,
 	actions: (@Composable RowScope.() -> Unit)? = null,
 	content: @Composable () -> Unit
 ) {
 	val info = DialogInfo.instance
 
-	BackHandler(!dismissOnBackPress) {}
+	BackHandler(!state.dismissOnBackPress) {}
 
 	Dialog(
-		onDismissRequest = { state.isOpen = false },
+		onDismissRequest = { state.hide() },
 		properties = DialogProperties(
-			dismissOnBackPress = dismissOnBackPress,
-			dismissOnClickOutside = dismissOnClickOutside,
+			dismissOnBackPress = state.dismissOnBackPress,
+			dismissOnClickOutside = state.dismissOnClickOutside,
 			usePlatformDefaultWidth = true
 		)
 	) {
@@ -174,9 +199,9 @@ private fun RachelDialog(
 					modifier = Modifier.fillMaxWidth().padding(15.dp),
 					verticalArrangement = Arrangement.spacedBy(15.dp)
 				) {
-					if (title != null) {
+					state.title?.let {
 						Text(
-							text = title,
+							text = it,
 							style = MaterialTheme.typography.titleLarge,
 							color = MaterialTheme.colorScheme.primary,
 							maxLines = 1,
@@ -187,7 +212,7 @@ private fun RachelDialog(
 					Box(
 						modifier = Modifier.fillMaxWidth()
 							.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
-							.verticalScroll(enabled = scrollable, state = rememberScrollState())
+							.verticalScroll(enabled = state.scrollable, state = rememberScrollState())
 					) {
 						content()
 					}
@@ -205,131 +230,189 @@ private fun RachelDialog(
 	}
 }
 
+open class DialogInfoState(
+	title: String = "提示",
+	content: String = ""
+) : RachelDialogState() {
+	override var title: String? by mutableStateOf(title)
+		protected set
+	var content: String by mutableStateOf(content)
+		protected set
+
+	fun open(title: String = "提示", content: String) {
+		this.title = title
+		this.content = content
+		super.open()
+	}
+}
+
 @Composable
-fun DialogInfo(
-	state: DialogState,
-	title: String = stringResource(Res.string.dialog_info),
-	content: String
-) {
-	RachelDialog(
-		state = state,
-		title = title
-	) {
+fun DialogInfo(state: DialogInfoState) {
+	RachelDialog(state = state) {
 		Text(
-			text = content,
+			text = state.content,
 			style = MaterialTheme.typography.bodyLarge,
 			modifier = Modifier.fillMaxWidth()
 		)
 	}
 }
 
+open class DialogConfirmState(
+	title: String = "确认",
+	content: String = "",
+	onYes: (() -> Unit)? = null
+) : RachelDialogState() {
+	override var title: String? by mutableStateOf(title)
+		protected set
+	var content: String by mutableStateOf(content)
+		protected set
+	var onYes = onYes
+		protected set
+
+	fun open(title: String = "确认", content: String, onYes: () -> Unit) {
+		this.title = title
+		this.content = content
+		this.onYes = onYes
+		super.open()
+	}
+}
+
 @Composable
-fun DialogConfirm(
-	state: DialogState,
-	title: String = stringResource(Res.string.dialog_confirm),
-	content: String,
-	onYes: () -> Unit
-) {
+fun DialogConfirm(state: DialogConfirmState) {
 	RachelDialog(
 		state = state,
-		title = title,
 		actions = {
 			RachelButton(
 				text = stringResource(Res.string.dialog_yes),
 				onClick = {
-					state.isOpen = false
-					onYes()
+					state.hide()
+					state.onYes?.invoke()
 				}
 			)
 			RachelButton(
 				text = stringResource(Res.string.dialog_no),
-				onClick = {
-					state.isOpen = false
-				}
+				onClick = { state.hide() }
 			)
 		}
 	) {
 		Text(
-			text = content,
+			text = state.content,
 			style = MaterialTheme.typography.bodyLarge,
 			modifier = Modifier.fillMaxWidth()
 		)
 	}
 }
 
+abstract class DialogInputState(
+	val hint: String = "",
+	val inputType: InputType = InputType.COMMON,
+	val maxLength: Int = 0,
+	val maxLines: Int = 1,
+	val clearButton: Boolean = true,
+) : RachelDialogState() {
+	final override val dismissOnBackPress: Boolean = false
+	final override val dismissOnClickOutside: Boolean = false
+	final override val scrollable: Boolean = false
+
+	override val title: String? = null
+
+	abstract fun onInput(text: String)
+}
+
 @Composable
-fun DialogInput(
-	state: DialogState,
-	hint: String,
-	inputType: InputType = InputType.COMMON,
-	maxLength: Int = 0,
-	maxLines: Int = 1,
-	clearButton: Boolean = true,
-	onInput: (String) -> Unit
-) {
+fun DialogInput(state: DialogInputState) {
 	val textInputState = remember { TextInputState() }
 
 	RachelDialog(
 		state = state,
-		dismissOnBackPress = false,
-		dismissOnClickOutside = false,
-		scrollable = false,
 		actions = {
 			RachelButton(
 				text = stringResource(Res.string.dialog_yes),
 				enabled = textInputState.ok,
 				onClick = {
-					state.isOpen = false
-					onInput(textInputState.text)
+					state.hide()
+					state.onInput(textInputState.text)
 				}
 			)
 			RachelButton(
 				text = stringResource(Res.string.dialog_no),
-				onClick = {
-					state.isOpen = false
-				}
+				onClick = { state.hide() }
 			)
 		}
 	) {
 		TextInput(
 			state = textInputState,
-			hint = hint,
-			inputType = inputType,
-			maxLength = maxLength,
-			maxLines = maxLines,
-			clearButton = clearButton,
+			hint = state.hint,
+			inputType = state.inputType,
+			maxLength = state.maxLength,
+			maxLines = state.maxLines,
+			clearButton = state.clearButton,
 			modifier = Modifier.fillMaxWidth()
 		)
 	}
 }
 
+abstract class DialogChoiceState(
+	val num: Int,
+    override val title: String? = null
+) : RachelDialogState() {
+	final override val dismissOnClickOutside: Boolean = false
+
+	abstract fun name(index: Int): String
+	abstract fun icon(index: Int): ImageVector
+    abstract fun onSelected(index: Int, text: String)
+
+	companion object {
+		fun fromItems(
+			items: List<String>,
+			title: String? = null,
+			onSelected: (Int, String) -> Unit
+		) = object : DialogChoiceState(items.size, title) {
+			override fun name(index: Int): String = items[index]
+			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+			override fun onSelected(index: Int, text: String) = onSelected(index, text)
+		}
+
+		fun fromItems(
+			items: List<Pair<String, (Int, String) -> Unit>>,
+			title: String? = null
+		) = object : DialogChoiceState(items.size, title) {
+			override fun name(index: Int): String = items[index].first
+			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+			override fun onSelected(index: Int, text: String) = items[index].second(index, text)
+		}
+
+		fun fromIconItems(
+			items: List<Pair<String, ImageVector>>,
+			title: String? = null,
+			onSelected: (Int, String) -> Unit
+		) = object : DialogChoiceState(items.size, title) {
+			override fun name(index: Int): String = items[index].first
+			override fun icon(index: Int): ImageVector = items[index].second
+			override fun onSelected(index: Int, text: String) = onSelected(index, text)
+		}
+	}
+}
+
 @Composable
-fun DialogChoiceWithIcon(
-	state: DialogState,
-	title: String? = null,
-	items: List<Pair<String, ImageVector>>,
-	onSelected: (String) -> Unit
-) {
-	RachelDialog(
-		state = state,
-		dismissOnClickOutside = false,
-		title = title
-	) {
+fun DialogChoice(state: DialogChoiceState) {
+	RachelDialog(state = state) {
 		Column(
 			modifier = Modifier.fillMaxWidth(),
 			verticalArrangement = Arrangement.spacedBy(5.dp)
 		) {
-			for ((name, icon) in items) {
+			repeat(state.num) { index ->
+				val name = state.name(index)
 				Row(
 					modifier = Modifier.fillMaxWidth().clickable {
-						state.isOpen = false
-						onSelected(name)
+						state.hide()
+						state.onSelected(index, name)
 					}.padding(5.dp),
 					horizontalArrangement = Arrangement.spacedBy(10.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					MiniIcon(
-						imageVector = icon,
+						imageVector = state.icon(index),
 						size = 24.dp
 					)
 					Text(
@@ -342,116 +425,34 @@ fun DialogChoiceWithIcon(
 	}
 }
 
-@Composable
-fun DialogChoice(
-	state: DialogState,
-	title: String? = null,
-	items: List<String>,
-	onSelected: (String) -> Unit
-) {
-	RachelDialog(
-		state = state,
-		dismissOnClickOutside = false,
-		title = title
-	) {
-		Column(
-			modifier = Modifier.fillMaxWidth(),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
-		) {
-			for (name in items) {
-				Row(
-					modifier = Modifier.fillMaxWidth().clickable {
-						state.isOpen = false
-						onSelected(name)
-					}.padding(5.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					MiniIcon(
-						imageVector = Icons.AutoMirrored.Outlined.ArrowRight,
-						size = 24.dp
-					)
-					Text(
-						text = name,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
-	}
-}
-
-@Composable
-fun DialogChoice(
-	state: DialogState,
-	title: String? = null,
-	items: List<Pair<String, () -> Unit>>
-) {
-	RachelDialog(
-		state = state,
-		dismissOnClickOutside = false,
-		title = title
-	) {
-		Column(
-			modifier = Modifier.fillMaxWidth(),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
-		) {
-			for ((name, onSelected) in items) {
-				Row(
-					modifier = Modifier.fillMaxWidth().clickable {
-						state.isOpen = false
-						onSelected()
-					}.padding(5.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					MiniIcon(
-						imageVector = Icons.AutoMirrored.Outlined.ArrowRight,
-						size = 24.dp
-					)
-					Text(
-						text = name,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
-	}
-}
-
-open class DialogProgressState : DialogState() {
-	override var isOpen: Boolean
-		get() = super.isOpen
-		set(value) {
-			super.isOpen = value
-			current = "0"
-			total = "0"
-			progress = 0f
-		}
-
+open class DialogProgressState() : RachelDialogState() {
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
 	var progress by mutableFloatStateOf(0f)
+
+	final override val dismissOnBackPress: Boolean get() = false
+	final override val dismissOnClickOutside: Boolean get() = false
+	final override val scrollable: Boolean get() = false
+
+	override val title: String? = "下载中..."
+
+	override fun open() {
+		current = "0"
+		total = "0"
+		progress = 0f
+		super.open()
+	}
 }
 
 @Composable
-fun DialogProgress(
-	state: DialogProgressState,
-	title: String = stringResource(Res.string.dialog_progress)
-) {
+fun DialogProgress(state: DialogProgressState) {
 	RachelDialog(
 		state = state,
-		dismissOnBackPress = false,
-		dismissOnClickOutside = false,
-		scrollable = false,
-		title = title,
 		actions = {
 			RachelButton(
 				text = stringResource(Res.string.dialog_cancel),
 				enabled = state.isOpen,
-				onClick = {
-					state.isOpen = false
-				}
+				onClick = { state.hide() }
 			)
 		}
 	) {
@@ -489,18 +490,21 @@ fun DialogProgress(
 	}
 }
 
+class DialogLoadingState : DialogState() {
+	override val dismissOnBackPress: Boolean = false
+	override val dismissOnClickOutside: Boolean = false
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun DialogLoading(
-	state: DialogState
-) {
+fun DialogLoading(state: DialogLoadingState) {
 	BackHandler {}
 
 	Dialog(
-		onDismissRequest = { state.isOpen = false },
+		onDismissRequest = { state.hide() },
 		properties = DialogProperties(
-			dismissOnBackPress = false,
-			dismissOnClickOutside = false,
+			dismissOnBackPress = state.dismissOnBackPress,
+			dismissOnClickOutside = state.dismissOnClickOutside,
 			usePlatformDefaultWidth = true
 		)
 	) {

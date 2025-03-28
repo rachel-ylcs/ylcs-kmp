@@ -32,11 +32,21 @@ data class Mail(
 		const val COIN_REWARD = "user#coinReward"
 	}
 
-	val typeString: String = when (type) {
-		Type.INFO -> "通知"
-		Type.CONFIRM -> "确认"
-		Type.DECISION -> "决策"
-		Type.INPUT -> "回执"
-		else -> "未知"
+	val typeString: String by lazy {
+		when (type) {
+			Type.INFO -> "通知"
+			Type.CONFIRM -> "确认"
+			Type.DECISION -> "决策"
+			Type.INPUT -> "回执"
+			else -> "未知"
+		}
+	}
+
+	val withYes: Boolean by lazy {
+		!processed && (type == Type.CONFIRM || type == Type.DECISION)
+	}
+
+	val withNo: Boolean by lazy {
+		!processed && type == Type.DECISION
 	}
 }

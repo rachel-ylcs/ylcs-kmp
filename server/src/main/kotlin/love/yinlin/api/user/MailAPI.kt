@@ -17,13 +17,16 @@ import love.yinlin.extension.String
 import love.yinlin.extension.to
 
 fun Routing.mailAPI(implMap: ImplMap) {
-	api(API.User.Mail.GetMails) { (token, offset, num) ->
+	api(API.User.Mail.GetMails) { (token, isProcessed, offset, num) ->
 		val uid = AN.throwExpireToken(token)
 		val mails = DB.throwQuerySQL("""
 			SELECT mid, uid, ts, type, processed, title, content
 			FROM mail
-			WHERE uid = ? AND mid < ?
-			ORDER BY ts DESC
+			WHERE uid = ? AND ${
+				if (isProcessed) "processed = 1 AND mid < ?"
+				else "((processed = 0 AND mid < ?) OR processed = 1)"
+			}
+			ORDER BY processed ASC, mid DESC
 			LIMIT ?
 		""", uid, offset, num.coercePageNum)
 		Data.Success(mails.to())

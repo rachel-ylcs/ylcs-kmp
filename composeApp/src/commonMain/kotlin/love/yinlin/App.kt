@@ -45,12 +45,14 @@ abstract class ScreenPart(private val model: AppModel) {
 	@Composable
 	protected abstract fun content()
 
-	protected open fun CoroutineScope.initialize() {}
+	protected open suspend fun initialize() {}
 
 	@Composable
 	fun partContent() {
 		content()
-		LaunchOnce(firstLoad) { initialize() }
+		LaunchOnce(firstLoad) {
+			launch { initialize() }
+		}
 	}
 }
 

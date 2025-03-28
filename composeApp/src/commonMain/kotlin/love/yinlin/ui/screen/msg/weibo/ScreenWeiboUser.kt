@@ -300,7 +300,8 @@ data class ScreenWeiboUser(val id: String) : Screen<ScreenWeiboUser.Model> {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = model.user?.info?.name ?: "",
-				onBack = { model.pop() }
+				onBack = { model.pop() },
+				slot = model.slot
 			) {
 				if (model.user == null) LoadingBox()
 				else model.user?.let { user ->

@@ -28,137 +28,132 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 
-@Composable
-private fun WeiboCommentCard(comment: WeiboComment) {
-	Column(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
-		WeiboUserBar(
-			info = comment.info,
-			time = comment.timeString,
-			location = comment.location,
-			padding = PaddingValues(bottom = 5.dp)
-		)
-		RichText(
-			text = comment.text,
-			modifier = Modifier.fillMaxWidth()
-		)
-		val subComments = comment.subComments
-		if (subComments.isNotEmpty()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp),
-				tonalElevation = 3.dp
-			) {
-				Column(modifier = Modifier.fillMaxWidth().padding(5.dp)) {
-					for (subComment in subComments) {
-						WeiboUserBar(
-							info = subComment.info,
-							location = subComment.location,
-							time = subComment.timeString,
-							padding = PaddingValues(bottom = 5.dp)
-						)
-						RichText(
-							text = subComment.text,
-							modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp)
-						)
-					}
-				}
-			}
-		}
-	}
-}
-
-@Composable
-private fun Portrait(
-	weibo: Weibo,
-	comments: List<WeiboComment>?
-) {
-	LazyColumn(
-		modifier = Modifier.fillMaxSize()
-			.background(MaterialTheme.colorScheme.surface)
-			.padding(start = 10.dp, end = 10.dp, top = 5.dp)
-	) {
-		item(key = "WeiboLayout".itemKey) {
-			WeiboLayout(weibo = weibo)
-		}
-		if (comments != null) {
-			item(key = "HorizontalDivider".itemKey) {
-				HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
-			}
-			items(
-				items = comments,
-				key = { it.id }
-			) {
-				WeiboCommentCard(comment = it)
-			}
-		}
-	}
-}
-
-@Composable
-private fun Landscape(
-	weibo: Weibo,
-	comments: List<WeiboComment>?
-) {
-	val processor = LocalWeiboProcessor.current
-	Row(
-		modifier = Modifier.fillMaxSize()
-			.background(MaterialTheme.colorScheme.surface)
-			.padding(10.dp)
-	) {
-		Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
-			WeiboUserBar(
-				info = weibo.info,
-				time = weibo.timeString,
-				location = weibo.location,
-				padding = PaddingValues(bottom = 10.dp)
-			)
-			RichText(
-				text = weibo.text,
-				modifier = Modifier.fillMaxWidth().weight(1f),
-				overflow = TextOverflow.Ellipsis,
-				onLinkClick = { processor.onWeiboLinkClick(it) },
-				onTopicClick = { processor.onWeiboTopicClick(it) },
-				onAtClick = { processor.onWeiboAtClick(it) }
-			)
-		}
-		VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
-		Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
-			WeiboDataBar(
-				like = weibo.likeNum,
-				comment = weibo.commentNum,
-				repost = weibo.repostNum,
-				modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-			)
-			if (weibo.pictures.isNotEmpty()) {
-				NineGrid(
-					pics = weibo.pictures,
-					modifier = Modifier.fillMaxWidth(),
-					onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
-					onVideoClick = { processor.onWeiboVideoClick(it) }
-				)
-			}
-		}
-		VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
-		Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-			if (comments == null) LoadingBox()
-			else if (comments.isEmpty()) EmptyBox()
-			else LazyColumn(modifier = Modifier.fillMaxSize()) {
-				items(
-					items = comments,
-					key = { it.id }
-				) {
-					WeiboCommentCard(comment = it)
-				}
-			}
-		}
-	}
-}
-
 @Stable
 @Serializable
 data object ScreenWeiboDetails : Screen<ScreenWeiboDetails.Model> {
 	class Model(model: AppModel) : Screen.Model(model) {
 		val weibo: Weibo? = part<ScreenPartMsg>().currentWeibo
 		var comments: List<WeiboComment>? by mutableStateOf(null)
+
+		@Composable
+		private fun WeiboCommentCard(comment: WeiboComment) {
+			Column(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
+				WeiboUserBar(
+					info = comment.info,
+					time = comment.timeString,
+					location = comment.location,
+					padding = PaddingValues(bottom = 5.dp)
+				)
+				RichText(
+					text = comment.text,
+					modifier = Modifier.fillMaxWidth()
+				)
+				val subComments = comment.subComments
+				if (subComments.isNotEmpty()) {
+					Surface(
+						modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp),
+						tonalElevation = 3.dp
+					) {
+						Column(modifier = Modifier.fillMaxWidth().padding(5.dp)) {
+							for (subComment in subComments) {
+								WeiboUserBar(
+									info = subComment.info,
+									location = subComment.location,
+									time = subComment.timeString,
+									padding = PaddingValues(bottom = 5.dp)
+								)
+								RichText(
+									text = subComment.text,
+									modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp)
+								)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@Composable
+		fun Portrait(weibo: Weibo) {
+			LazyColumn(
+				modifier = Modifier.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface)
+					.padding(start = 10.dp, end = 10.dp, top = 10.dp)
+			) {
+				item(key = "WeiboLayout".itemKey) {
+					WeiboLayout(weibo = weibo)
+				}
+				comments?.let { weiboComments ->
+					item(key = "HorizontalDivider".itemKey) {
+						HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
+					}
+					items(
+						items = weiboComments,
+						key = { it.id }
+					) {
+						WeiboCommentCard(comment = it)
+					}
+				}
+			}
+		}
+
+		@Composable
+		fun Landscape(weibo: Weibo) {
+			val processor = LocalWeiboProcessor.current
+			Row(
+				modifier = Modifier.fillMaxSize()
+					.background(MaterialTheme.colorScheme.surface)
+					.padding(10.dp)
+			) {
+				Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
+					WeiboUserBar(
+						info = weibo.info,
+						time = weibo.timeString,
+						location = weibo.location,
+						padding = PaddingValues(bottom = 10.dp)
+					)
+					RichText(
+						text = weibo.text,
+						modifier = Modifier.fillMaxWidth().weight(1f),
+						overflow = TextOverflow.Ellipsis,
+						onLinkClick = { processor.onWeiboLinkClick(it) },
+						onTopicClick = { processor.onWeiboTopicClick(it) },
+						onAtClick = { processor.onWeiboAtClick(it) }
+					)
+				}
+				VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
+				Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
+					WeiboDataBar(
+						like = weibo.likeNum,
+						comment = weibo.commentNum,
+						repost = weibo.repostNum,
+						modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+					)
+					if (weibo.pictures.isNotEmpty()) {
+						NineGrid(
+							pics = weibo.pictures,
+							modifier = Modifier.fillMaxWidth(),
+							onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
+							onVideoClick = { processor.onWeiboVideoClick(it) }
+						)
+					}
+				}
+				VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
+				Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+					val weiboComments = comments
+					if (weiboComments == null) LoadingBox()
+					else if (weiboComments.isEmpty()) EmptyBox()
+					else LazyColumn(modifier = Modifier.fillMaxSize()) {
+						items(
+							items = weiboComments,
+							key = { it.id }
+						) {
+							WeiboCommentCard(comment = it)
+						}
+					}
+				}
+			}
+		}
 	}
 
 	override fun model(model: AppModel): Model = Model(model).apply {
@@ -176,18 +171,13 @@ data object ScreenWeiboDetails : Screen<ScreenWeiboDetails.Model> {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = "微博详情",
-				onBack = { model.pop() }
+				onBack = { model.pop() },
+				slot = model.slot
 			) {
 				if (model.weibo == null) EmptyBox()
 				else {
-					if (app.isPortrait) Portrait(
-						weibo = model.weibo,
-						comments = model.comments
-					)
-					else Landscape(
-						weibo = model.weibo,
-						comments = model.comments
-					)
+					if (app.isPortrait) model.Portrait(weibo = model.weibo)
+					else model.Landscape(weibo = model.weibo)
 				}
 			}
 		}

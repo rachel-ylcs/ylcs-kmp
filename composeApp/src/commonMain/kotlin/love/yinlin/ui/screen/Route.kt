@@ -16,10 +16,10 @@ import love.yinlin.ScreenPart
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.Topic
 import love.yinlin.extension.buildNavTypeMap
-import love.yinlin.ui.component.screen.DialogState
-import love.yinlin.ui.component.screen.TipState
+import love.yinlin.ui.component.screen.SubScreenSlot
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage
+import love.yinlin.ui.screen.community.ScreenAddTopic
 import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.community.ScreenMail
 import love.yinlin.ui.screen.community.ScreenTopic
@@ -46,8 +46,7 @@ interface Screen<M : Screen.Model> {
 		val _model: AppModel get() = model
 		inline fun <reified P : ScreenPart> part(): P = _model.part()
 
-		val tip = TipState()
-		val loading = DialogState()
+		val slot = SubScreenSlot()
 	}
 
 	fun model(model: AppModel): M
@@ -89,6 +88,7 @@ fun NavGraphBuilder.buildRoute(appModel: AppModel) = with(ScreenRouteScope(this,
 	screen<ScreenUserCard, ScreenUserCard.Model>()
 	screen<ScreenTopic, ScreenTopic.Model>(buildNavTypeMap<Topic>())
 	screen<ScreenMail, ScreenMail.Model>()
+	screen<ScreenAddTopic, ScreenAddTopic.Model>()
 	// 世界
 	screen<ScreenActivityDetails, ScreenActivityDetails.Model>()
 	screen<ScreenAddActivity, ScreenAddActivity.Model>()

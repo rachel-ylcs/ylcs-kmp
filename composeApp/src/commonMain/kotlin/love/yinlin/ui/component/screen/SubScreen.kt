@@ -6,25 +6,80 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.LoadingIcon
+
+sealed class ActionScope(private val ltr: Boolean) {
+	object Left : ActionScope(true)
+	object Right : ActionScope(false)
+
+	@Composable
+	fun action(
+		icon: ImageVector,
+		color: Color = MaterialTheme.colorScheme.onSurface,
+		enabled: Boolean = true,
+		onClick: () -> Unit
+	) {
+		val padding = if (ltr) 10.dp else 0.dp
+
+		ClickIcon(
+			imageVector = icon,
+			color = color,
+			enabled = enabled,
+			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
+			onClick = onClick
+		)
+	}
+
+	@Composable
+	fun actionSuspend(
+		icon: ImageVector,
+		color: Color = MaterialTheme.colorScheme.onSurface,
+		enabled: Boolean = true,
+		onClick: suspend CoroutineScope.() -> Unit
+	) {
+		val padding = if (ltr) 10.dp else 0.dp
+
+		LoadingIcon(
+			imageVector = icon,
+			color = color,
+			enabled = enabled,
+			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
+			onClick = onClick
+		)
+	}
+
+	@Composable
+	inline fun actions(block: @Composable ActionScope.() -> Unit) = block()
+}
+
+@Stable
+class SubScreenSlot {
+	val tip: TipState = TipState()
+	val info: DialogInfoState = DialogInfoState()
+	val confirm: DialogConfirmState = DialogConfirmState()
+	val loading: DialogLoadingState = DialogLoadingState()
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SubScreen(
 	modifier: Modifier = Modifier,
 	title: @Composable () -> Unit,
-	actions: @Composable (RowScope.() -> Unit) = {},
+	actions: @Composable (ActionScope.() -> Unit) = {},
 	bottomBar: @Composable () -> Unit = {},
 	onBack: (() -> Unit)? = null,
-	tip: TipState = remember { TipState() },
-	loading: DialogState = remember { DialogState() },
+	slot: SubScreenSlot,
 	content: @Composable () -> Unit
 ) {
 	BackHandler { onBack?.invoke() }
@@ -49,7 +104,7 @@ fun SubScreen(
 						}
 					},
 					expandedHeight = 48.dp,
-					actions = actions
+					actions = { ActionScope.Right.actions() }
 				)
 			}
 		},
@@ -70,10 +125,11 @@ fun SubScreen(
 		}
 	}
 
-	Tip(state = tip)
-
-	if (loading.isOpen) {
-		DialogLoading(state = loading)
+	with(slot) {
+		Tip(state = tip)
+		if (info.isOpen) DialogInfo(state = info)
+		if (confirm.isOpen) DialogConfirm(state = confirm)
+		if (loading.isOpen) DialogLoading(state = loading)
 	}
 }
 
@@ -81,11 +137,10 @@ fun SubScreen(
 fun SubScreen(
 	modifier: Modifier = Modifier,
 	title: String = "",
-	actions: @Composable (RowScope.() -> Unit) = {},
+	actions: @Composable (ActionScope.() -> Unit) = {},
 	bottomBar: @Composable () -> Unit = {},
 	onBack: () -> Unit,
-	tip: TipState = remember { TipState() },
-	loading: DialogState = remember { DialogState() },
+	slot: SubScreenSlot,
 	content: @Composable () -> Unit
 ) {
 	SubScreen(
@@ -100,8 +155,7 @@ fun SubScreen(
 		actions = actions,
 		bottomBar = bottomBar,
 		onBack = onBack,
-		tip = tip,
-		loading = loading,
+		slot = slot,
 		content = content
 	)
 }

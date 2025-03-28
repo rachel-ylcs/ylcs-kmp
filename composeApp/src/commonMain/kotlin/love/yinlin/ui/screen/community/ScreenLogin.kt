@@ -56,7 +56,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 			val id = loginId.text
 			val pwd = loginPwd.text
 			if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
-				tip.error("ID或密码不合规范")
+				slot.tip.error("ID或密码不合规范")
 				return
 			}
 			val result1 = ClientAPI.request(
@@ -78,9 +78,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 					if (result2 is Data.Success) app.config.userProfile = result2.data
 					pop()
 				}
-				is Data.Error -> {
-					tip.error(result1.message)
-				}
+				is Data.Error -> slot.tip.error(result1.message)
 			}
 		}
 
@@ -305,7 +303,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				Mode.ForgotPassword -> "忘记密码"
 			},
 			onBack = { model.pop() },
-			tip = model.tip
+			slot = model.slot
 		) {
 			if (app.isPortrait) model.Portrait()
 			else model.Landscape()

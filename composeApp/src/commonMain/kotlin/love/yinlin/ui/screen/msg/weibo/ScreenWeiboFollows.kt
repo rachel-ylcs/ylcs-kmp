@@ -28,12 +28,11 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
-import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.DialogInput
-import love.yinlin.ui.component.screen.DialogState
+import love.yinlin.ui.component.screen.DialogInputState
 import love.yinlin.ui.component.screen.SubScreen
 
 @Composable
@@ -69,7 +68,12 @@ private fun WeiboUserItem(
 data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 	class Model(model: AppModel) : Screen.Model(model) {
 		var isLocal by mutableStateOf(true)
-		val searchDialog = DialogState()
+		val searchDialog = object : DialogInputState(
+			hint = "输入微博用户昵称关键字",
+			maxLength = 16
+		) {
+			override fun onInput(text: String) = onSearchWeiboUser(text)
+		}
 		var state by mutableStateOf(BoxState.CONTENT)
 		var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
@@ -84,14 +88,6 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 					}
 				}
 			}
-		}
-
-		fun onUserClick(info: WeiboUserInfo) {
-			navigate(ScreenWeiboUser(info.id))
-		}
-
-		fun openSearch() {
-			searchDialog.isOpen = true
 		}
 
 		fun onSearchWeiboUser(key: String) {
@@ -120,17 +116,16 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			title = if (model.isLocal) "微博关注" else "搜索结果",
 			onBack = { model.pop() },
 			actions = {
-				ClickIcon(
-					imageVector = Icons.Outlined.Search,
-					modifier = Modifier.padding(end = 10.dp),
-					onClick = { model.openSearch() }
+				action(
+					icon = Icons.Outlined.Search,
+					onClick = { model.searchDialog.open() }
 				)
-				ClickIcon(
-					imageVector = Icons.Outlined.Refresh,
-					modifier = Modifier.padding(end = 10.dp),
+				action(
+					icon = Icons.Outlined.Refresh,
 					onClick = { model.refreshLocalUser() }
 				)
-			}
+			},
+			slot = model.slot
 		) {
 			StatefulBox(
 				state = model.state,
@@ -151,7 +146,7 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 							user = it,
 							contentPadding = PaddingValues(5.dp),
 							modifier = Modifier.fillMaxWidth(),
-							onClick = { model.onUserClick(it) }
+							onClick = { model.navigate(ScreenWeiboUser(it.id)) }
 						)
 					}
 				}
@@ -159,12 +154,7 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 		}
 
 		if (model.searchDialog.isOpen) {
-			DialogInput(
-				state = model.searchDialog,
-				hint = "输入微博用户昵称关键字",
-				maxLength = 16,
-				onInput = { model.onSearchWeiboUser(it) }
-			)
+			DialogInput(state = model.searchDialog)
 		}
 	}
 }

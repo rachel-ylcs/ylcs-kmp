@@ -21,5 +21,5 @@ data class Weibo(
 ) : Comparable<Weibo> {
 	override fun compareTo(other: Weibo): Int = this.time.compareTo(other.time)
 
-	val timeString = time.format(DateEx.Formatter.standardDateTime)
+	val timeString: String = DateEx.Formatter.standardDateTime.format(time) ?: ""
 }

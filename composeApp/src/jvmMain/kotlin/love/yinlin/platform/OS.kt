@@ -38,12 +38,11 @@ actual object OS {
 			fileDialog.isMultipleMode = false
 			fileDialog.file = filename
 			fileDialog.isVisible = true
-			fileDialog.filenameFilter
 			continuation.resume(fileDialog.files?.firstOrNull()) { _, _, _ -> fileDialog.dispose() }
 		}
 
 		if (saveFile != null) {
-			state.isOpen = true
+			state.open()
 			app.fileClient.safeDownload(
 				url = url,
 				file = Path(saveFile.path),
@@ -53,7 +52,7 @@ actual object OS {
 				state.current = current.fileSizeString
 				if (total != 0L) state.progress = current / total.toFloat()
 			}
-			state.isOpen = false
+			state.hide()
 		}
 	}
 }

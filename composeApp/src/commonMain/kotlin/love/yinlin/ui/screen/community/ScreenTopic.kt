@@ -1,14 +1,15 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Paid
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,37 +21,27 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
-import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Comment
-import love.yinlin.data.rachel.SubComment
-import love.yinlin.data.rachel.Topic
-import love.yinlin.data.rachel.TopicDetails
+import love.yinlin.data.rachel.*
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberState
-import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.input.RachelRadioButton
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.common.UserLabel
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.PaginationColumn
-import love.yinlin.ui.component.screen.BooleanSheetState
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.layout.*
+import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.screen.SheetState
-import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -100,6 +91,45 @@ private fun UserBar(
 	}
 }
 
+@Composable
+private fun CoinLayout(
+	num: Int,
+	modifier: Modifier = Modifier,
+	onClick: (Int) -> Unit
+) {
+	Surface(
+		modifier = modifier,
+		shape = MaterialTheme.shapes.large,
+		tonalElevation = 3.dp,
+		shadowElevation = 3.dp
+	) {
+		Column(
+			modifier = Modifier.clickable{ onClick(num) }.padding(10.dp),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(5.dp)
+		) {
+			Row (
+				modifier = Modifier.fillMaxWidth().weight(1f),
+				horizontalArrangement = Arrangement.Center
+			) {
+				repeat(num) {
+					MiniIcon(
+						imageVector = Icons.Filled.Paid,
+						color = when (num) {
+							1 -> MaterialTheme.colorScheme.tertiary
+							2 -> MaterialTheme.colorScheme.secondary
+							else -> MaterialTheme.colorScheme.primary
+						},
+						modifier = Modifier.size(32.dp - 1.5.dp * num)
+					)
+				}
+			}
+			if (num == UserConstraint.MIN_COIN_REWARD) Text(text = "作者获赠1银币", color = ThemeColor.fade, style = MaterialTheme.typography.bodyMedium)
+			Text(text = "$num 银币", style = MaterialTheme.typography.bodyLarge)
+		}
+	}
+}
+
 @Stable
 @Serializable
 data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
@@ -107,19 +137,22 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		var details: TopicDetails? by mutableStateOf(null)
 		var topic: Topic by mutableStateOf(currentTopic)
 
-		val comments = mutableStateListOf<Comment>()
-		var commentOffset: Int = 0
-		var commentIsTop: Boolean = true
-		var commentCanLoading by mutableStateOf(false)
+		val commentPage = object : PaginationArgs<Comment, Int, Boolean>(0, true) {
+			override fun offset(item: Comment): Int = item.cid
+			override fun arg1(item: Comment): Boolean = item.isTop
+		}
+		val commentState = LazyListState()
+
+		var currentSendComment: Comment? by mutableStateOf(null)
 
 		val subCommentSheet = SheetState<Comment>()
-		var sendCoinSheet = BooleanSheetState()
-		var sendCommentSheet = SheetState<Pair<Boolean, Int>>()
+		val sendCoinSheet = BooleanSheetState()
 
-		fun hideAllSheet() {
-			subCommentSheet.hide()
-			sendCoinSheet.hide()
-			sendCommentSheet.hide()
+		val moveTopicDialog = DialogChoiceState.fromItems(
+			items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
+			title = "移动主题板块"
+		) { index, _ ->
+			onMoveTopic(Comment.Section.MovableSection[index])
 		}
 
 		suspend fun requestTopic() {
@@ -135,19 +168,11 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				route = API.User.Topic.GetTopicComments,
 				data = API.User.Topic.GetTopicComments.Request(
 					tid = topic.tid,
-					rawSection = topic.rawSection
+					rawSection = topic.rawSection,
+					num = commentPage.pageNum
 				)
 			)
-			if (result is Data.Success) {
-				val data = result.data
-				comments.replaceAll(data)
-
-				val last = data.lastOrNull()
-				commentOffset = last?.cid ?: 0
-				commentIsTop = last?.isTop ?: true
-
-				commentCanLoading = data.size == APIConfig.MIN_PAGE_NUM
-			}
+			if (result is Data.Success) commentPage.newData(result.data)
 		}
 
 		suspend fun requestMoreComments() {
@@ -156,34 +181,21 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				data = API.User.Topic.GetTopicComments.Request(
 					tid = topic.tid,
 					rawSection = topic.rawSection,
-					offset = commentOffset,
-					isTop = commentIsTop
+					offset = commentPage.offset,
+					isTop = commentPage.arg1
 				)
 			)
-			if (result is Data.Success) {
-				val data = result.data
-				if (data.isEmpty()) {
-					commentOffset = 0
-					commentIsTop = true
-				}
-				else {
-					comments += data
-					val last = data.lastOrNull()
-					commentOffset = last?.cid ?: 0
-					commentIsTop = last?.isTop ?: true
-				}
-
-				commentCanLoading = commentOffset != 0 && data.size == APIConfig.MIN_PAGE_NUM
-			}
+			if (result is Data.Success) commentPage.moreData(result.data)
 		}
 
-		suspend fun requestSubComments(cid: Int, offset: Int): List<SubComment>? {
+		suspend fun requestSubComments(cid: Int, offset: Int, num: Int): List<SubComment>? {
 			val result = ClientAPI.request(
 				route = API.User.Topic.GetTopicSubComments,
 				data = API.User.Topic.GetTopicSubComments.Request(
 					cid = cid,
 					rawSection = topic.rawSection,
-					offset = offset
+					offset = offset,
+					num = num
 				)
 			)
 			return if (result is Data.Success) result.data else null
@@ -198,23 +210,229 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		}
 
 		fun onChangeTopicIsTop(value: Boolean) {
-
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Topic.UpdateTopicTop,
+					data = API.User.Topic.UpdateTopicTop.Request(
+						token = app.config.userToken,
+						tid = topic.tid,
+						isTop = value
+					)
+				)
+				when (result) {
+					is Data.Success -> topic = topic.copy(isTop = value)
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
 		}
 
 		fun onDeleteTopic() {
-
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Topic.DeleteTopic,
+					data =  API.User.Topic.DeleteTopic.Request(
+						token = app.config.userToken,
+						tid = topic.tid
+					)
+				)
+				when (result) {
+					is Data.Success -> {
+						part<ScreenPartDiscovery>().page.items.removeAll { it.tid == topic.tid }
+						pop()
+					}
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
 		}
 
-		fun onChangeCommentIsTop(cid: Int, value: Boolean) {
+		fun onMoveTopic(newSection: Int) {
+			details?.let { oldDetails ->
+				val oldSection = oldDetails.section
+				launch {
+					if (newSection == oldSection) {
+						slot.tip.warning("不能与原板块相同哦")
+						return@launch
+					}
+					val result = ClientAPI.request(
+						route = API.User.Topic.MoveTopic,
+						data = API.User.Topic.MoveTopic.Request(
+							token = app.config.userToken,
+							tid = topic.tid,
+							section = newSection
+						)
+					)
+					when (result) {
+						is Data.Success -> {
+							val part = part<ScreenPartDiscovery>()
+							if (part.currentSection == oldSection) part.page.items.removeAll { it.tid == topic.tid }
+							details = oldDetails.copy(section = newSection)
+							slot.tip.success(result.message)
+						}
+						is Data.Error -> slot.tip.error(result.message)
+					}
+				}
+			}
+		}
 
+		fun onSendCoin(num: Int) {
+			launch {
+				if (app.config.userProfile?.uid == topic.uid) {
+					slot.tip.warning("不能给自己投币哦")
+					return@launch
+				}
+				val result = ClientAPI.request(
+					route = API.User.Topic.SendCoin,
+					data = API.User.Topic.SendCoin.Request(
+						token = app.config.userToken,
+						uid = topic.uid,
+						tid = topic.tid,
+						value = num
+					)
+				)
+				when (result) {
+					is Data.Success -> {
+						part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+							it.copy(coinNum = it.coinNum + num)
+						}
+						app.config.userProfile?.let {
+							app.config.userProfile = it.copy(coin = it.coin - num)
+						}
+						slot.tip.success(result.message)
+					}
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
+		}
+
+		suspend fun onSendComment(content: String): Boolean {
+			val user = app.config.userProfile
+			if (user != null) {
+				// 回复主题
+				val target = currentSendComment
+				if (target == null) {
+					val result = ClientAPI.request(
+						route = API.User.Topic.SendComment,
+						data = API.User.Topic.SendComment.Request(
+							token = app.config.userToken,
+							tid = topic.tid,
+							rawSection = topic.rawSection,
+							content = content
+						)
+					)
+					when (result) {
+						is Data.Success -> {
+							part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+								it.copy(commentNum = it.commentNum + 1)
+							}
+							commentPage.items += Comment(
+								cid = result.data,
+								uid = user.uid,
+								ts = DateEx.CurrentString,
+								content = content,
+								isTop = false,
+								subCommentNum = 0,
+								name = user.name,
+								label = user.label,
+								coin = user.coin
+							)
+							commentState.animateScrollToItem(commentPage.items.size - 1)
+							return true
+						}
+						is Data.Error -> slot.tip.error(result.message)
+					}
+				}
+				else { // 回复评论
+					val result = ClientAPI.request(
+						route = API.User.Topic.SendSubComment,
+						data = API.User.Topic.SendSubComment.Request(
+							token = app.config.userToken,
+							tid = topic.tid,
+							cid = target.cid,
+							rawSection = topic.rawSection,
+							content = content
+						)
+					)
+					when (result) {
+						is Data.Success -> {
+							commentPage.items.findAssign(predicate = { it.cid == target.cid }) {
+								it.copy(subCommentNum = it.subCommentNum + 1)
+							}
+							currentSendComment = null
+							return true
+						}
+						is Data.Error -> slot.tip.error(result.message)
+					}
+				}
+			}
+			else slot.tip.error("请先登录")
+			return false
+		}
+
+		fun onChangeCommentIsTop(cid: Int, isTop: Boolean) {
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Topic.UpdateCommentTop,
+					data = API.User.Topic.UpdateCommentTop.Request(
+						token = app.config.userToken,
+						tid = topic.tid,
+						cid = cid,
+						rawSection = topic.rawSection,
+						isTop = isTop
+					)
+				)
+				when (result) {
+					is Data.Success -> {
+						commentPage.items.findAssign(predicate = { it.cid == cid }) {
+							it.copy(isTop = isTop)
+						}
+						commentPage.items.sort()
+						commentState.scrollToItem(commentPage.items.indexOfFirst { it.cid == cid })
+					}
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
 		}
 
 		fun onDeleteComment(cid: Int) {
-
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Topic.DeleteComment,
+					data = API.User.Topic.DeleteComment.Request(
+						token = app.config.userToken,
+						tid = topic.tid,
+						cid = cid,
+						rawSection = topic.rawSection
+					)
+				)
+				when (result) {
+					is Data.Success -> {
+						part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+							it.copy(commentNum = it.commentNum - 1)
+						}
+						commentPage.items.removeAll { it.cid == cid }
+					}
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
 		}
 
-		fun onDeleteSubComment(cid: Int) {
-
+		fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Topic.DeleteSubComment,
+					data = API.User.Topic.DeleteSubComment.Request(
+						token = app.config.userToken,
+						tid = topic.tid,
+						pid = pid,
+						rawSection = topic.rawSection,
+						cid = cid
+					)
+				)
+				when (result) {
+					is Data.Success -> onDelete()
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
 		}
 
 		@Composable
@@ -251,40 +469,6 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 						onImageClick = { onImageClick(pics, it) },
 						onVideoClick = {}
 					)
-				}
-				Row(
-					modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-					horizontalArrangement = Arrangement.SpaceAround,
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					RachelButton(
-						text = "评论",
-						icon = Icons.Filled.AddComment,
-						onClick = { sendCommentSheet.open(true to currentTopic.tid) }
-					)
-					RachelButton(
-						text = "投币",
-						icon = Icons.Filled.Paid,
-						onClick = { sendCoinSheet.open() }
-					)
-					app.config.userProfile?.let { user ->
-						if (user.canUpdateTopicTop(topic.uid)) {
-							RachelButton(
-								text = if (topic.isTop) "取消置顶" else "置顶",
-								icon = if (topic.isTop) Icons.Filled.Close else Icons.Filled.VerticalAlignTop,
-								onClick = { onChangeTopicIsTop(!topic.isTop) }
-							)
-						}
-						if (user.canDeleteTopic(topic.uid)) {
-							RachelButton(
-								text = "删除",
-								icon = Icons.Filled.Delete,
-								onClick = {
-
-								}
-							)
-						}
-					}
 				}
 			}
 		}
@@ -333,7 +517,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 						text = "回复",
 						style = MaterialTheme.typography.labelLarge,
 						color = MaterialTheme.colorScheme.secondary,
-						modifier = Modifier.clickable { sendCommentSheet.open(false to comment.cid) }.padding(2.dp)
+						modifier = Modifier.clickable { currentSendComment = comment }.padding(2.dp)
 					)
 					app.config.userProfile?.let { user ->
 						if (user.canUpdateCommentTop(topic.uid)) {
@@ -347,7 +531,11 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 							Text(
 								text = "删除",
 								style = MaterialTheme.typography.labelLarge,
-								modifier = Modifier.clickable { onDeleteComment(comment.cid) } .padding(2.dp)
+								modifier = Modifier.clickable {
+									slot.confirm.open(content = "删除回复(楼中楼会同步删除)") {
+										onDeleteComment(comment.cid)
+									}
+								}.padding(2.dp)
 							)
 						}
 					}
@@ -358,8 +546,9 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		@Composable
 		private fun SubCommentBar(
 			subComment: SubComment,
-			commentUid: Int,
-			modifier: Modifier = Modifier
+			parentComment: Comment,
+			modifier: Modifier = Modifier,
+			onDelete: () -> Unit
 		) {
 			Column(
 				modifier = modifier,
@@ -372,7 +561,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					label = subComment.label,
 					level = subComment.level,
 					onAvatarClick = {
-						hideAllSheet()
+						subCommentSheet.hide()
 						onAvatarClick(subComment.uid)
 					}
 				)
@@ -382,7 +571,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
-					if (subComment.uid == commentUid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
+					if (subComment.uid == parentComment.uid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
 					app.config.userProfile?.let { user ->
 						if (user.canDeleteComment(topic.uid, subComment.uid)) {
 							Row(
@@ -394,7 +583,11 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 									text = "删除",
 									textAlign = TextAlign.End,
 									style = MaterialTheme.typography.labelLarge,
-									modifier = Modifier.clickable { onDeleteSubComment(subComment.cid) }.padding(2.dp)
+									modifier = Modifier.clickable {
+										slot.confirm.open(content = "删除回复") {
+											onDeleteSubComment(parentComment.cid, subComment.cid, onDelete)
+										}
+									}.padding(2.dp)
 								)
 							}
 						}
@@ -409,39 +602,39 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 
 		@Composable
 		fun SubCommentLayout(comment: Comment) {
-			val subComments = remember { mutableStateListOf<SubComment>() }
-			var subCommentOffset: Int = remember { 0 }
-			var subCommentCanLoading by rememberState { false }
+			val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
+				override fun offset(item: SubComment): Int = item.cid
+			} }
 
 			BottomSheet(state = subCommentSheet) {
 				PaginationColumn(
-					items = subComments,
+					items = page.items,
 					key = { it.cid },
 					canRefresh = false,
-					canLoading = subCommentCanLoading,
+					canLoading = page.canLoading,
 					onLoading = {
 						requestSubComments(
 							cid = comment.cid,
-							offset = subCommentOffset
-						)?.let { data ->
-							if (data.isEmpty()) subCommentOffset = 0
-							else {
-								subComments += data
-								val last = data.lastOrNull()
-								subCommentOffset = last?.cid ?: 0
-							}
-
-							subCommentCanLoading = subCommentOffset != 0 && data.size == APIConfig.MIN_PAGE_NUM
-						}
+							offset = page.offset,
+							num = page.pageNum
+						)?.let { page.moreData(it) }
 					},
-					contentPadding = PaddingValues(top = 10.dp),
+					contentPadding = PaddingValues(vertical = 10.dp),
 					itemDivider = PaddingValues(vertical = 8.dp),
 					modifier = Modifier.fillMaxWidth()
-				) {
+				) { subComment ->
 					SubCommentBar(
-						subComment = it,
-						commentUid = comment.uid,
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+						subComment = subComment,
+						parentComment = comment,
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+						onDelete = {
+							page.items -= subComment
+							commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
+								it.copy(subCommentNum = it.subCommentNum - 1)
+							}
+							// 楼中楼最后一条回复删除后隐藏楼中楼
+							if (page.items.isEmpty()) subCommentSheet.hide()
+						}
 					)
 				}
 			}
@@ -449,103 +642,110 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			LaunchedEffect(Unit) {
 				requestSubComments(
 					cid = comment.cid,
-					offset = subCommentOffset
-				)?.let { data ->
-					subComments.replaceAll(data)
-
-					val last = data.lastOrNull()
-					subCommentOffset = last?.cid ?: 0
-
-					subCommentCanLoading = data.size == APIConfig.MIN_PAGE_NUM
-				}
+					offset = page.offset,
+					num = page.pageNum
+				)?.let { page.newData(it) }
 			}
 		}
 
 		@Composable
 		fun SendCoinLayout() {
-			var selectedIndex by rememberState { 0 }
-			val selectItems = remember { arrayOf(
-				"1银币",
-				"2银币",
-				"3银币 (对方将获得1银币奖励)"
-			) }
-
 			BottomSheet(state = sendCoinSheet) {
 				Column(
-					modifier = Modifier.fillMaxWidth().padding(10.dp).selectableGroup(),
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
 					verticalArrangement = Arrangement.spacedBy(10.dp)
 				) {
+					Text(
+						text = "银币: ${app.config.userProfile?.coin ?: 0}",
+						style = MaterialTheme.typography.titleLarge,
+						textAlign = TextAlign.Center,
+						modifier = Modifier.fillMaxWidth()
+					)
 					Row(
 						modifier = Modifier.fillMaxWidth(),
 						horizontalArrangement = Arrangement.spacedBy(10.dp),
 						verticalAlignment = Alignment.CenterVertically
 					) {
-						Text(
-							text = "银币: ${app.config.userProfile?.coin ?: 0}",
-							style = MaterialTheme.typography.titleMedium,
-							modifier = Modifier.weight(1f)
-						)
-						ClickIcon(
-							imageVector = Icons.AutoMirrored.Filled.Send,
-							onClick = {
-
-							}
-						)
-					}
-					selectItems.forEachIndexed { index, text ->
-						RachelRadioButton(
-							checked = index == selectedIndex,
-							text = text,
-							onCheck = { selectedIndex = index },
-							modifier = Modifier.fillMaxWidth()
-						)
+						repeat(3) {
+							CoinLayout(
+								num = it + 1,
+								modifier = Modifier.weight(1f).aspectRatio(1f),
+								onClick = { num ->
+									sendCoinSheet.hide()
+									onSendCoin(num)
+								}
+							)
+						}
 					}
 				}
 			}
 		}
 
-        @Composable
-		fun SendCommentLayout(data: Pair<Boolean, Int>) {
-			val state = remember { TextInputState() }
+		@Composable
+		fun BottomLayout(modifier: Modifier = Modifier) {
+			val state = remember(currentSendComment) { TextInputState() }
 
-			BottomSheet(state =  sendCommentSheet) {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
-					horizontalAlignment = Alignment.End,
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					ClickIcon(
-						imageVector = Icons.AutoMirrored.Filled.Send,
-						onClick = {
-
-						}
-					)
-					TextInput(
-						state = state,
-						hint = "回复内容",
-						maxLength = 1024,
-						maxLines = 10,
-						clearButton = false,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+			Column(
+				modifier = modifier,
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(5.dp)
+			) {
+				SplitActionLayout(
+					modifier = Modifier.fillMaxWidth(),
+					left = {
+						action(
+							icon = Icons.Filled.Home,
+							enabled = currentSendComment != null,
+							onClick = { currentSendComment = null }
+						)
+					},
+					right = {
+						action(
+							icon = Icons.Filled.Paid,
+							onClick = { sendCoinSheet.open() }
+						)
+						actionSuspend(
+							icon = Icons.AutoMirrored.Filled.Send,
+							enabled = state.text.isNotEmpty(),
+							onClick = {
+								if (onSendComment(state.text)) {
+									state.text = ""
+								}
+							}
+						)
+					}
+				)
+				TextInput(
+					state = state,
+					hint = remember(currentSendComment) { "回复 @${currentSendComment?.name ?: "主题"}" },
+					maxLines = 5,
+					maxLength = 1024,
+					clearButton = false,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		}
 
 		@Composable
 		fun Portrait(details: TopicDetails) {
 			PaginationColumn(
-				items = comments,
+				items = commentPage.items,
 				key = { it.cid },
+				state = commentState,
 				canRefresh = false,
-				canLoading = commentCanLoading,
+				canLoading = commentPage.canLoading,
 				onLoading = { requestMoreComments() },
 				modifier = Modifier.fillMaxSize(),
 				header = {
-					TopicLayout(
-						details = details,
-						modifier = Modifier.fillMaxWidth().padding(10.dp)
-					)
+					Surface(
+						modifier = Modifier.fillMaxWidth(),
+						tonalElevation = 1.dp
+					) {
+						TopicLayout(
+							details = details,
+							modifier = Modifier.fillMaxWidth().padding(10.dp)
+						)
+					}
 					HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
 				},
 				itemDivider = PaddingValues(vertical = 8.dp)
@@ -560,17 +760,23 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		@Composable
 		fun Landscape(details: TopicDetails) {
 			Row(modifier = Modifier.fillMaxSize()) {
-				TopicLayout(
-					modifier = Modifier.width(400.dp).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
+				Surface(
+					modifier = Modifier.width(400.dp).fillMaxHeight()
 						.verticalScroll(rememberScrollState()),
-					details = details
-				)
+					tonalElevation = 1.dp
+				) {
+					TopicLayout(
+						modifier = Modifier.fillMaxWidth().padding(10.dp),
+						details = details
+					)
+				}
 				VerticalDivider()
 				PaginationColumn(
-					items = comments,
+					items = commentPage.items,
 					key = { it.cid },
+					state = commentState,
 					canRefresh = false,
-					canLoading = commentCanLoading,
+					canLoading = commentPage.canLoading,
 					onLoading = { requestMoreComments() },
 					itemDivider = PaddingValues(vertical = 8.dp),
 					modifier = Modifier.weight(1f).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
@@ -596,13 +802,39 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主题",
+			actions = {
+				if (model.details != null) {
+					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(model.topic.uid) == true }
+					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(model.topic.uid) == true }
+					val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
+					if (canUpdateTopicTop) action(
+						icon = if (model.topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
+						onClick = { model.onChangeTopicIsTop(!model.topic.isTop) }
+					)
+					if (canMoveTopic) action(
+						icon = Icons.Outlined.MoveUp,
+						onClick = { model.moveTopicDialog.open() }
+					)
+					if (canDeleteTopic) action(
+						icon = Icons.Outlined.Delete,
+						onClick = {
+							model.slot.confirm.open(content = "删除主题?") {
+								model.onDeleteTopic()
+							}
+						}
+					)
+				}
+			},
 			bottomBar = {
-				Text(text = "123")
+				if (model.details != null) {
+					model.BottomLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+				}
 			},
 			onBack = {
 				if (model.subCommentSheet.isOpen) model.subCommentSheet.hide()
 				else model.pop()
-			}
+			},
+			slot = model.slot
 		) {
 			val details = model.details
 			if (details == null) EmptyBox()
@@ -618,8 +850,6 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			model.SendCoinLayout()
 		}
 
-		model.sendCommentSheet.withOpen {
-			model.SendCommentLayout(it)
-		}
+		if (model.moveTopicDialog.isOpen) DialogChoice(state = model.moveTopicDialog)
 	}
 }

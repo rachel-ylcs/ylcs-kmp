@@ -9,6 +9,7 @@ import io.ktor.http.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
@@ -114,45 +115,46 @@ object ClientAPI {
 		builder: FormBuilder,
 		crossinline files: APIFileScope.() -> Files
 	) {
+		val ignoreFile = mutableListOf<String>()
 		val ignoreFiles = mutableListOf<String>()
 
 		val scope = object : APIFileScope {
 			private var index = 0
-			val map = mutableMapOf<String, Any>()
+			val map = mutableMapOf<String, Any?>()
 
-			override fun file(value: Path): APIFile {
+			private fun buildFile(value: Path?): APIFile {
 				val key = "#${index++}#"
 				map[key] = value
 				return APIFile(key)
 			}
 
-			override fun file(values: List<Path>?): APIFiles = if (values == null || values.isEmpty()) emptyList() else {
+			override fun file(value: Path): APIFile = buildFile(value)
+			override fun optionFile(value: Path?): APIFile? = buildFile(value)
+			override fun file(values: List<Path>?): APIFiles = buildList {
 				val key = "#${index++}#"
-				map[key] = values
-				listOf(APIFile(key))
+				map[key] = values?.ifEmpty { null }
+				add(APIFile(key))
 			}
-
-			override fun optionFile(value: Path?): APIFile? = value?.let { file(it) }
 		}
 
 		val keys = scope.files().toJson().Object
 		for ((name, item) in keys) {
-			if (item is JsonNull) ignoreFiles += name
-			else {
-				val key = item.StringNull
-				if (key != null) builder.addFormFile(name, scope.map[key] as Path)
-				else {
-					var index = 0
-					for (item in scope.map[item.Array.first().String] as List<*>) {
-						builder.addFormFile("#$name!${index++}", item as Path)
-					}
+			if (item is JsonArray) {
+				val value = scope.map[item.first().String]
+				if (value == null) ignoreFiles += name
+				else (value as List<*>).forEachIndexed { index, item ->
+					builder.addFormFile("#$name!$index", item as Path)
 				}
+			}
+			else {
+				val value = scope.map[item.String]
+				if (value == null) ignoreFile += name
+				else builder.addFormFile(name, value as Path)
 			}
 		}
 
-		if (ignoreFiles.isNotEmpty()) {
-			builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
-		}
+		if (ignoreFile.isNotEmpty()) builder.append(key = "#ignoreFile#", value = ignoreFile.toJsonString())
+		if (ignoreFiles.isNotEmpty()) builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
 	}
 
 	@JvmName("requestForm")

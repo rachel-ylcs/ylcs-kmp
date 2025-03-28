@@ -58,16 +58,9 @@ val String.successData: Data.Success<Response.Default> get() = Data.Success(Resp
 
 val String.failedData: Data.Error get() = Data.Error(Failed.RequestError.InvalidArgument, this)
 
-class NineGridProcessor(pics: APIFiles?) {
-	val sourcePics = pics ?: emptyList()
-	val actualPics: List<String>
-	val jsonString: String
-
-	init {
-		if (sourcePics.size > 9) throw error("NineGrid num error")
-		actualPics = List(sourcePics.size) { currentUniqueId(it) }
-		jsonString = actualPics.toJsonString()
-	}
+class NineGridProcessor(val sourcePics: APIFiles) {
+	val actualPics: List<String> = if (sourcePics.size > 9) throw error("NineGrid invalid num") else List(sourcePics.size) { currentUniqueId(it) }
+	val jsonString: String = actualPics.toJsonString()
 
 	inline fun copy(callback: (String) -> ResNode): String? {
 		repeat(actualPics.size) {
@@ -165,11 +158,17 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 				val name: String = part.name ?: return@forEachPart
 				when (part) {
 					is PartData.FormItem -> {
-						if (name == "#data#") dataString = part.value
-						else if (name == "#ignoreFiles#") {
-							val ignoreFiles = part.value.parseJsonValue<List<String>>()!!
-							for (ignoreFile in ignoreFiles) ignoreFile with null
-						}
+                        when (name) {
+                            "#data#" -> dataString = part.value
+                            "#ignoreFile#" -> {
+                                val ignoreFile = part.value.parseJsonValue<List<String>>()!!
+                                for (file in ignoreFile) file with null
+                            }
+                            "#ignoreFiles#" -> {
+                                val ignoreFiles = part.value.parseJsonValue<List<String>>()!!
+                                for (file in ignoreFiles) multiFiles[file] = mutableListOf()
+                            }
+                        }
 					}
 					is PartData.FileItem -> {
 						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"

@@ -40,10 +40,7 @@ import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ActivityInputState(initActivity: Activity? = null) {
-	val initDate = initActivity?.ts?.let {
-		try { DateEx.Formatter.standardDate.parse(it) }
-		catch (_: Throwable) { null }
-	}
+	val initDate = initActivity?.ts?.let { DateEx.Formatter.standardDate.parse(it) }
 
 	internal val title = TextInputState(initActivity?.title ?: "")
 	internal var date: LocalDate? by mutableStateOf(initDate)
@@ -80,7 +77,6 @@ class ActivityInputState(initActivity: Activity? = null) {
 @Composable
 fun ActivityInfoLayout(
 	input: ActivityInputState,
-	content: (@Composable ColumnScope.() -> Unit)? = null,
 	onPicCrop: (ImageBitmap) -> Unit,
 	onPicDelete: () -> Unit,
 	onPicsAdd: (List<Uri>) -> Unit,
@@ -140,7 +136,6 @@ fun ActivityInfoLayout(
 			maxLength = 256,
 			modifier = Modifier.fillMaxWidth()
 		)
-		if (content != null) content()
 		Text(
 			text = "轮播图(可空)",
 			style = MaterialTheme.typography.titleMedium

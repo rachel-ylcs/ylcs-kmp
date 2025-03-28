@@ -14,5 +14,5 @@ data class WeiboSubComment(
 	val location: String, // 定位
 	val text: RichString, // 内容
 ) {
-	val timeString = time.format(DateEx.Formatter.standardDateTime)
+	val timeString: String = DateEx.Formatter.standardDateTime.format(time) ?: ""
 }
