@@ -146,7 +146,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		var currentSendComment: Comment? by mutableStateOf(null)
 
 		val subCommentSheet = SheetState<Comment>()
-		val sendCoinSheet = BooleanSheetState()
+		val sendCoinSheet = CommonSheetState()
 
 		val moveTopicDialog = DialogChoiceState.fromItems(
 			items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },

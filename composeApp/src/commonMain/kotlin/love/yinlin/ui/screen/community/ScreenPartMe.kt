@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen.community
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,19 +8,33 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.UserProfile
+import love.yinlin.extension.DateEx
+import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.LoadingButton
 import love.yinlin.ui.component.image.ClickIcon
@@ -28,6 +43,9 @@ import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.*
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.CommonSheetState
 
 @Composable
 private fun TipButtonContainer(
@@ -66,6 +84,8 @@ private fun TipButtonContainer(
 }
 
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
+	val signinSheet = CommonSheetState()
+
 	fun scanQrcode() {
 
 	}
@@ -106,7 +126,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			shape = shape,
 			title = "个人空间",
 			buttons = listOf(
-				TipButtonInfo("签到", Icons.Filled.EventAvailable) { },
+				TipButtonInfo("签到", Icons.Filled.EventAvailable) { signinSheet.open() },
 				TipButtonInfo("好友", Icons.Filled.Group) { },
 				TipButtonInfo("主题", Icons.AutoMirrored.Filled.Article) {
 					app.config.userProfile?.let { navigate(ScreenUserCard(it.uid)) }
@@ -117,6 +137,80 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				TipButtonInfo("徽章", Icons.Filled.MilitaryTech) { },
 			)
 		)
+	}
+
+	@Composable
+	private fun SigninLayout() {
+		var data by rememberState { BooleanArray(8) { false } }
+		var todayIndex: Int by rememberState { -1 }
+		var todaySignin by rememberState { true }
+		val today = remember { DateEx.Today }
+
+		BottomSheet(state = signinSheet) {
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(20.dp)
+			) {
+				Text(
+					text = "签到记录",
+					style = MaterialTheme.typography.titleLarge
+				)
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					repeat(2) { row ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(10.dp)
+						) {
+							repeat(4) { col ->
+								val index = row * 4 + col
+								Surface(
+									modifier = Modifier.weight(1f),
+									shape = MaterialTheme.shapes.medium,
+									shadowElevation = 1.dp,
+									border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+								) {
+									Column(
+										modifier = Modifier.fillMaxWidth().padding(10.dp),
+										horizontalAlignment = Alignment.CenterHorizontally,
+										verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+									) {
+										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
+
+										MiniIcon(
+											imageVector = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
+										)
+										Text(
+											text = "${date.monthNumber}月${date.dayOfMonth}日",
+											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
+										)
+									}
+								}
+							}
+						}
+					}
+				}
+				Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
+			}
+		}
+
+		LaunchedEffect(Unit) {
+			val result = ClientAPI.request(
+				route = API.User.Profile.Signin,
+				data = app.config.userToken
+			)
+			if (result is Data.Success) {
+				with(result.data) {
+					todaySignin = status
+					todayIndex = index
+					data = BooleanArray(8) { ((value shr it) and 1) == 1 }
+				}
+			}
+		}
 	}
 
 	@Composable
@@ -200,6 +294,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		else {
 			if (app.isPortrait) Portrait(userProfile)
 			else Landscape(userProfile)
+
+			signinSheet.withOpen {
+				SigninLayout()
+			}
 		}
 	}
 }

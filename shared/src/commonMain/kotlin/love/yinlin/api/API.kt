@@ -140,7 +140,10 @@ object API : APINode(null, "") {
 				data class Files(val wall: APIFile)
 			}
 
-			object Signin : APIPostRequest<String>(this, "signin")
+			object Signin : APIPost<String, Signin.Response>(this, "signin") {
+				@Serializable
+				data class Response(val status: Boolean, val value: Int, val index: Int)
+			}
 		}
 
 		object Topic : APINode(this, "topic") {

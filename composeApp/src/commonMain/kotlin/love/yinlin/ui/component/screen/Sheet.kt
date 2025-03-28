@@ -30,7 +30,7 @@ class SheetState<T>(default: T? = null) : BaseSheetState<T> {
     override fun hide() { state.value = null }
 }
 
-class BooleanSheetState(status: Boolean = false) : BaseSheetState<Unit> {
+class CommonSheetState(status: Boolean = false) : BaseSheetState<Unit> {
     private val state: MutableState<Boolean> = mutableStateOf(status)
 
     @Composable override fun withOpen(block: @Composable (Unit) -> Unit) {

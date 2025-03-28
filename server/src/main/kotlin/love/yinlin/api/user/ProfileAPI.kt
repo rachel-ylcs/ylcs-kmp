@@ -80,12 +80,14 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		val dayIndex = ChronoUnit.DAYS.between(firstDayOfYear, currentDate).toInt()
 		val byteIndex = dayIndex / 8
 		val bitIndex = dayIndex % 8
-		val byteValue = signin[byteIndex].toInt()
-		val bitValue = (byteValue shr bitIndex) and 1
-		if (bitValue == 1) return@api "今天已经签到!".failedData
-		signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
-		// 更新签到值，银币增加
-		DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
-		"签到成功, 银币+1".successData
+		var byteValue = signin[byteIndex].toInt()
+		val isSignin = ((byteValue shr bitIndex) and 1) == 1
+		if (!isSignin) {
+			// 更新签到值，银币增加
+			byteValue = byteValue or (1 shl bitIndex)
+			signin[byteIndex] = byteValue.toByte()
+			DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
+		}
+		Data.Success(API.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
 	}
 }
