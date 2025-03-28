@@ -104,7 +104,7 @@ actual data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
                     val part = part<ScreenPartDiscovery>()
                     val currentSection = part.currentSection
                     if (currentSection == Comment.Section.LATEST || currentSection == section) {
-                        part.items.add(0, Topic(
+                        part.page.items.add(0, Topic(
                             tid = tid,
                             uid = profile.uid,
                             title = title,
