@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.datetime.LocalDate
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Activity
+import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.DialogCrop

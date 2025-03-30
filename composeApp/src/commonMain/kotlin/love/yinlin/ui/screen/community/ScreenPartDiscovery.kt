@@ -24,8 +24,8 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Comment
-import love.yinlin.data.rachel.Topic
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.RachelText
@@ -245,8 +245,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 							items = DiscoveryItem.items,
 							modifier = Modifier.weight(1f).padding(end = 10.dp)
 						)
-						ActionScope.Right.actions {
-							action(
+						ActionScope.Right.Actions {
+							Action(
 								icon = Icons.Outlined.Add,
 								color = MaterialTheme.colorScheme.primary,
 								onClick = { navigate(ScreenAddTopic) }

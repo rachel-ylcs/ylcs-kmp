@@ -32,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.rememberState
+import love.yinlin.ui.component.image.StaticLoadingIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable
@@ -87,14 +88,14 @@ fun RachelButton(
 					Icon(
 						modifier = Modifier.matchParentSize(),
 						imageVector = it,
-						tint = color,
+						tint = if (enabled) color else ThemeColor.fade,
 						contentDescription = null
 					)
 				}
 			}
 			Text(
 				text = text,
-				color = color,
+				color = if (enabled) color else ThemeColor.fade,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
@@ -120,10 +121,7 @@ private fun LoadingButtonContent(
 				modifier = Modifier.fillMaxHeight().aspectRatio(1f),
 				contentAlignment = Alignment.Center
 			) {
-				LoadingAnimation(
-					size = 24.dp,
-					color = color
-				)
+				LoadingAnimation(size = 24.dp, color = color)
 			}
 		}
 		else {

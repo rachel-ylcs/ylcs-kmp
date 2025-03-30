@@ -10,13 +10,13 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.extension.*
 import love.yinlin.platform.app
+import love.yinlin.platform.safeCall
 import love.yinlin.platform.safeCallData
 import kotlin.jvm.JvmName
 
@@ -195,5 +195,10 @@ object ClientAPI {
 				buildFormFiles(this, files)
 			}))
 		}.execute { processResponse<Response>(it) }
+	}
+
+	@JvmName("requestServerResource")
+	suspend inline fun <reified Response : Any> request(route: ResNode): Data<Response> = app.client.safeCall { client ->
+		client.prepareGet(urlString = "${Local.ClientUrl}/$route").execute { it.body() }
 	}
 }

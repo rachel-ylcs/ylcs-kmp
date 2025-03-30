@@ -11,7 +11,7 @@ import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.api.successObject
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.MailEntry
+import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.to

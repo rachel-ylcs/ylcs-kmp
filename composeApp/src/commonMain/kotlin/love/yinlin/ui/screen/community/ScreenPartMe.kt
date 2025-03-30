@@ -13,12 +13,7 @@ import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -26,26 +21,25 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.UserProfile
+import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.LoadingButton
+import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import love.yinlin.resources.*
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.screen.BottomSheet
-import love.yinlin.ui.component.screen.CommonSheetState
 
 @Composable
 private fun TipButtonContainer(
@@ -90,14 +84,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	}
 
-	fun gotoLogin() {
-		navigate(ScreenLogin)
-	}
-
-	fun gotoSettings() {
-		navigate(ScreenSettings)
-	}
-
 	@Composable
 	private fun ToolBar(modifier: Modifier = Modifier) {
 		Row(
@@ -111,7 +97,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			)
 			ClickIcon(
 				imageVector = Icons.Filled.Settings,
-				onClick = { gotoSettings() }
+				onClick = { navigate(ScreenSettings) }
 			)
 		}
 	}
@@ -222,7 +208,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			) {
 				ClickIcon(
 					imageVector = Icons.Filled.Settings,
-					onClick = { gotoSettings() }
+					onClick = { navigate(ScreenSettings) }
 				)
 			}
 			Box(
@@ -238,9 +224,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 						painter = painterResource(Res.drawable.image_not_login),
 						contentDescription = null
 					)
-					LoadingButton(
+					RachelButton(
 						text = stringResource(Res.string.login),
-						onClick = { gotoLogin() }
+						onClick = { navigate(ScreenLogin) }
 					)
 				}
 			}

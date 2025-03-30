@@ -7,9 +7,9 @@ import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.ui.screen.Screen
-import love.yinlin.ui.component.extra.WebPage
-import love.yinlin.ui.component.extra.WebPageSettings
-import love.yinlin.ui.component.extra.WebPageState
+import love.yinlin.ui.component.platform.WebPage
+import love.yinlin.ui.component.platform.WebPageSettings
+import love.yinlin.ui.component.platform.WebPageState
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable

@@ -36,7 +36,7 @@ val sharedDir by extra(dirProject.dir("shared").dir("src"))
 // Common
 val commonR8File by extra(dirComposeApp.file("R8Common.pro"))
 
-// JVM
+// Desktop
 val composeStabilityFile by extra(dirConfig.file("stability.conf"))
 val r8OptimizeFilename by extra("proguard-android-optimize.txt")
 
@@ -57,7 +57,7 @@ val androidOutputFileName by extra("ylcs.apk")
 val iosDir by extra(dirSrc.dir("iosArm64Main"))
 
 // Desktop
-val desktopDir by extra(dirSrc.dir("jvmMain"))
+val desktopDir by extra(dirSrc.dir("desktopMain"))
 val desktopCurrentDir by extra(dirBuild.dir("desktopRun"))
 val desktopR8File by extra(dirComposeApp.file("R8Desktop.pro"))
 val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/app/ylcs")

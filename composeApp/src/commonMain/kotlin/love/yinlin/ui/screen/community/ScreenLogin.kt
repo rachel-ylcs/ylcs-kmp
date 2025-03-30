@@ -15,7 +15,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.UserConstraint
+import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.LoadingButton
@@ -56,7 +56,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 			val id = loginId.text
 			val pwd = loginPwd.text
 			if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
-				slot.tip.error("ID或密码不合规范")
+				slot.tip.error("昵称或密码不合规范")
 				return
 			}
 			val result1 = ClientAPI.request(
@@ -83,11 +83,60 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 		}
 
 		suspend fun register() {
-			TODO()
+			val id = registerId.text
+			val pwd = registerPwd.text
+			val pwd2 = registerPwd2.text
+			val inviter = registerInviter.text
+			if (!UserConstraint.checkName(id, inviter) || !UserConstraint.checkPassword(pwd, pwd2)) {
+				slot.tip.error("昵称或密码不合规范")
+				return
+			}
+			if (pwd != pwd2) {
+				slot.tip.error("两次输入的密码不相同")
+				return
+			}
+			val result = ClientAPI.request(
+				route = API.User.Account.Register,
+				data = API.User.Account.Register.Request(
+					name = id,
+					pwd = pwd,
+					inviterName = inviter
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					launch { slot.tip.success(result.message) }
+					mode = Mode.Login
+					loginId.text = id
+					loginPwd.text = ""
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
 		}
 
 		suspend fun forgotPassword() {
-			TODO()
+			val id = forgotPasswordId.text
+			val pwd = forgotPasswordPwd.text
+			if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd)) {
+				slot.tip.error("昵称或密码不合规范")
+				return
+			}
+			val result = ClientAPI.request(
+				route = API.User.Account.ForgotPassword,
+				data = API.User.Account.ForgotPassword.Request(
+					name = id,
+					pwd = pwd
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					launch { slot.tip.success(result.message) }
+					mode = Mode.Login
+					loginId.text = id
+					loginPwd.text = ""
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
 		}
 
 		@Composable
@@ -100,13 +149,13 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = loginId,
-					hint = "请输入ID",
+					hint = "输入昵称",
 					maxLength = UserConstraint.MAX_NAME_LENGTH
 				)
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = loginPwd,
-					hint = "请输入密码",
+					hint = "输入密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH
 				)
@@ -155,27 +204,27 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = registerId,
-					hint = "请输入注册昵称",
+					hint = "输入注册昵称",
 					maxLength = UserConstraint.MAX_NAME_LENGTH
 				)
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = registerPwd,
-					hint = "请输入密码",
+					hint = "输入密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH
 				)
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = registerPwd2,
-					hint = "请再确认一次密码",
+					hint = "再确认一次密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH
 				)
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = registerInviter,
-					hint = "请输入邀请人昵称",
+					hint = "输入邀请人昵称",
 					maxLength = UserConstraint.MAX_NAME_LENGTH
 				)
 				Text(
@@ -206,13 +255,13 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = forgotPasswordId,
-					hint = "请输入昵称",
+					hint = "输入昵称",
 					maxLength = UserConstraint.MAX_NAME_LENGTH
 				)
 				TextInput(
 					modifier = Modifier.fillMaxWidth(),
 					state = forgotPasswordPwd,
-					hint = "请输入新密码",
+					hint = "输入修改后的新密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH
 				)

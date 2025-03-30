@@ -11,9 +11,9 @@ import love.yinlin.api.api
 import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Comment
-import love.yinlin.data.rachel.UserConstraint
-import love.yinlin.data.rachel.UserPrivilege
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.throwExecuteSQL

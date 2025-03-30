@@ -35,9 +35,9 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.compressImages
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Comment
-import love.yinlin.data.rachel.Topic
-import love.yinlin.data.rachel.UserProfile
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.MiniIcon
@@ -166,7 +166,7 @@ actual data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
             title = "发表主题",
             onBack = { model.pop() },
             actions = {
-                actionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+                ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
                     if (profile != null) model.addTopic(profile = profile)
                     else model.slot.tip.warning("请先登录")
                 }

@@ -1,14 +1,16 @@
 package love.yinlin.ui.component.screen
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Stable
 interface BaseSheetState<T> {
@@ -51,7 +53,18 @@ fun <T> BottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = { state.hide() },
-        dragHandle = null,
+        shape = MaterialTheme.shapes.extraLarge,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp,
+        dragHandle = {
+            Surface(
+                modifier = Modifier.padding(vertical = 15.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                Box(Modifier.size(width = 32.dp, height = 4.dp))
+            }
+        },
         modifier = Modifier.fillMaxWidth()
     ) {
         content()

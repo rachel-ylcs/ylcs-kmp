@@ -22,9 +22,8 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Activity
+import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
-import love.yinlin.extension.findRun
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
@@ -180,10 +179,10 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 			onBack = { model.pop() },
 			actions = {
 				if (hasPrivilegeVIPCalendar) {
-					action(icon = Icons.Outlined.Edit) {
+					Action(icon = Icons.Outlined.Edit) {
 						model.navigate(ScreenModifyActivity(aid))
 					}
-					actionSuspend(icon = Icons.Outlined.Delete) {
+					ActionSuspend(icon = Icons.Outlined.Delete) {
 						model.deleteActivity()
 					}
 				}

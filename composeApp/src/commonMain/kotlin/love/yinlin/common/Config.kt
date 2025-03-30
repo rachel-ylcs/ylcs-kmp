@@ -7,7 +7,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
-import love.yinlin.data.rachel.UserProfile
+import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson

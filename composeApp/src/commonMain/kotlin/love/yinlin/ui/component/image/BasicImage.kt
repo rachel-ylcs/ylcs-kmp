@@ -186,6 +186,32 @@ fun ClickIcon(
 }
 
 @Composable
+fun StaticLoadingIcon(
+	isLoading: Boolean,
+	imageVector: ImageVector,
+	size: Dp = DEFAULT_ICON_SIZE,
+	color: Color = MaterialTheme.colorScheme.onSurface,
+	enabled: Boolean = true,
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier.size(size),
+		contentAlignment = Alignment.Center
+	) {
+		if (isLoading) CircularProgressIndicator(
+			modifier = Modifier.fillMaxSize(fraction = 0.75f),
+			color = color
+		)
+		else Icon(
+			modifier = Modifier.fillMaxSize(),
+			imageVector = imageVector,
+			contentDescription = null,
+			tint = if (enabled) color else ThemeColor.fade
+		)
+	}
+}
+
+@Composable
 fun LoadingIcon(
 	imageVector: ImageVector,
 	size: Dp = DEFAULT_ICON_SIZE,
@@ -197,34 +223,23 @@ fun LoadingIcon(
 	val scope = rememberCoroutineScope()
 	var isLoading by rememberState { false }
 
-	if (isLoading) {
-		Box(
-			modifier = modifier.size(size),
-			contentAlignment = Alignment.Center
-		) {
-			CircularProgressIndicator(
-				modifier = Modifier.fillMaxSize(fraction = 0.75f),
-				color = color
-			)
-		}
-	}
-	else {
-		Icon(
-			modifier = modifier.size(size).clip(CircleShape).clickable(
-				enabled = enabled,
-				onClick = {
-					scope.launch {
-						isLoading = true
-						onClick()
-						isLoading = false
-					}
+	StaticLoadingIcon(
+		isLoading = isLoading,
+		imageVector = imageVector,
+		size = size,
+		color = color,
+		enabled = enabled,
+		modifier = modifier.clip(CircleShape).clickable(
+			enabled = enabled && !isLoading,
+			onClick = {
+				scope.launch {
+					isLoading = true
+					onClick()
+					isLoading = false
 				}
-			),
-			imageVector = imageVector,
-			contentDescription = null,
-			tint = if (enabled) color else ThemeColor.fade
+			}
 		)
-	}
+	)
 }
 
 @Composable

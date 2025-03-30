@@ -14,8 +14,8 @@ import love.yinlin.api.successObject
 import love.yinlin.copy
 import love.yinlin.currentTS
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Mail
-import love.yinlin.data.rachel.UserPrivilege
+import love.yinlin.data.rachel.mail.Mail
+import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.deleteRecursively
 import love.yinlin.extension.Int
 import love.yinlin.extension.IntNull

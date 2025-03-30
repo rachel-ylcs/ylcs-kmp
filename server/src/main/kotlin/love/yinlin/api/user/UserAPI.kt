@@ -5,8 +5,8 @@ import love.yinlin.DB
 import love.yinlin.Redis
 import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
-import love.yinlin.data.rachel.Comment
-import love.yinlin.data.rachel.UserConstraint
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.Platform
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

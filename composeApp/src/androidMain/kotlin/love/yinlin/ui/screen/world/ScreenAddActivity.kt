@@ -19,7 +19,7 @@ import love.yinlin.common.compressImage
 import love.yinlin.common.compressImages
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Activity
+import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -108,7 +108,7 @@ actual data object ScreenAddActivity : Screen<ScreenAddActivity.Model> {
 			title = "添加活动",
 			onBack = { model.pop() },
 			actions = {
-				actionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+				ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
 					model.addActivity()
 				}
 			},

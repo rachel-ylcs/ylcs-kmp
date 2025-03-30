@@ -153,6 +153,12 @@ abstract class DialogState {
 
 	open fun open() { isOpen = true }
 	open fun hide() { isOpen = false }
+
+	@Composable protected abstract fun dialogContent()
+	@Composable fun withOpen() {
+		if (isOpen) dialogContent()
+		DisposableEffect(Unit) { onDispose { hide() } }
+	}
 }
 
 abstract class RachelDialogState : DialogState() {
@@ -244,16 +250,16 @@ open class DialogInfoState(
 		this.content = content
 		super.open()
 	}
-}
 
-@Composable
-fun DialogInfo(state: DialogInfoState) {
-	RachelDialog(state = state) {
-		Text(
-			text = state.content,
-			style = MaterialTheme.typography.bodyLarge,
-			modifier = Modifier.fillMaxWidth()
-		)
+	@Composable
+	override fun dialogContent() {
+		RachelDialog(state = this) {
+			Text(
+				text = content,
+				style = MaterialTheme.typography.bodyLarge,
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
 	}
 }
 
@@ -275,31 +281,31 @@ open class DialogConfirmState(
 		this.onYes = onYes
 		super.open()
 	}
-}
 
-@Composable
-fun DialogConfirm(state: DialogConfirmState) {
-	RachelDialog(
-		state = state,
-		actions = {
-			RachelButton(
-				text = stringResource(Res.string.dialog_yes),
-				onClick = {
-					state.hide()
-					state.onYes?.invoke()
-				}
-			)
-			RachelButton(
-				text = stringResource(Res.string.dialog_no),
-				onClick = { state.hide() }
+	@Composable
+	override fun dialogContent() {
+		RachelDialog(
+			state = this,
+			actions = {
+				RachelButton(
+					text = stringResource(Res.string.dialog_yes),
+					onClick = {
+						hide()
+						onYes?.invoke()
+					}
+				)
+				RachelButton(
+					text = stringResource(Res.string.dialog_no),
+					onClick = { hide() }
+				)
+			}
+		) {
+			Text(
+				text = content,
+				style = MaterialTheme.typography.bodyLarge,
+				modifier = Modifier.fillMaxWidth()
 			)
 		}
-	) {
-		Text(
-			text = state.content,
-			style = MaterialTheme.typography.bodyLarge,
-			modifier = Modifier.fillMaxWidth()
-		)
 	}
 }
 
@@ -308,7 +314,7 @@ abstract class DialogInputState(
 	val inputType: InputType = InputType.COMMON,
 	val maxLength: Int = 0,
 	val maxLines: Int = 1,
-	val clearButton: Boolean = true,
+	val clearButton: Boolean = maxLines == 1,
 ) : RachelDialogState() {
 	final override val dismissOnBackPress: Boolean = false
 	final override val dismissOnClickOutside: Boolean = false
@@ -316,39 +322,44 @@ abstract class DialogInputState(
 
 	override val title: String? = null
 
+	val textInputState = TextInputState()
+
 	abstract fun onInput(text: String)
-}
 
-@Composable
-fun DialogInput(state: DialogInputState) {
-	val textInputState = remember { TextInputState() }
+	fun open(initText: String) {
+		textInputState.text = initText
+		super.open()
+	}
 
-	RachelDialog(
-		state = state,
-		actions = {
-			RachelButton(
-				text = stringResource(Res.string.dialog_yes),
-				enabled = textInputState.ok,
-				onClick = {
-					state.hide()
-					state.onInput(textInputState.text)
-				}
-			)
-			RachelButton(
-				text = stringResource(Res.string.dialog_no),
-				onClick = { state.hide() }
+	@Composable
+	override fun dialogContent() {
+		RachelDialog(
+			state = this,
+			actions = {
+				RachelButton(
+					text = stringResource(Res.string.dialog_yes),
+					enabled = textInputState.ok,
+					onClick = {
+						hide()
+						onInput(textInputState.text)
+					}
+				)
+				RachelButton(
+					text = stringResource(Res.string.dialog_no),
+					onClick = { hide() }
+				)
+			}
+		) {
+			TextInput(
+				state = textInputState,
+				hint = hint,
+				inputType = inputType,
+				maxLength = maxLength,
+				maxLines = maxLines,
+				clearButton = clearButton,
+				modifier = Modifier.fillMaxWidth()
 			)
 		}
-	) {
-		TextInput(
-			state = textInputState,
-			hint = state.hint,
-			inputType = state.inputType,
-			maxLength = state.maxLength,
-			maxLines = state.maxLines,
-			clearButton = state.clearButton,
-			modifier = Modifier.fillMaxWidth()
-		)
 	}
 }
 
@@ -361,6 +372,37 @@ abstract class DialogChoiceState(
 	abstract fun name(index: Int): String
 	abstract fun icon(index: Int): ImageVector
     abstract fun onSelected(index: Int, text: String)
+
+	@Composable
+	override fun dialogContent() {
+		RachelDialog(state = this) {
+			Column(
+				modifier = Modifier.fillMaxWidth(),
+				verticalArrangement = Arrangement.spacedBy(5.dp)
+			) {
+				repeat(num) { index ->
+					val nameString = name(index)
+					Row(
+						modifier = Modifier.fillMaxWidth().clickable {
+							hide()
+							onSelected(index, nameString)
+						}.padding(5.dp),
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						MiniIcon(
+							imageVector = icon(index),
+							size = 24.dp
+						)
+						Text(
+							text = nameString,
+							modifier = Modifier.fillMaxWidth()
+						)
+					}
+				}
+			}
+		}
+	}
 
 	companion object {
 		fun fromItems(
@@ -394,37 +436,6 @@ abstract class DialogChoiceState(
 	}
 }
 
-@Composable
-fun DialogChoice(state: DialogChoiceState) {
-	RachelDialog(state = state) {
-		Column(
-			modifier = Modifier.fillMaxWidth(),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
-		) {
-			repeat(state.num) { index ->
-				val name = state.name(index)
-				Row(
-					modifier = Modifier.fillMaxWidth().clickable {
-						state.hide()
-						state.onSelected(index, name)
-					}.padding(5.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					MiniIcon(
-						imageVector = state.icon(index),
-						size = 24.dp
-					)
-					Text(
-						text = name,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
-	}
-}
-
 open class DialogProgressState() : RachelDialogState() {
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
@@ -442,49 +453,49 @@ open class DialogProgressState() : RachelDialogState() {
 		progress = 0f
 		super.open()
 	}
-}
 
-@Composable
-fun DialogProgress(state: DialogProgressState) {
-	RachelDialog(
-		state = state,
-		actions = {
-			RachelButton(
-				text = stringResource(Res.string.dialog_cancel),
-				enabled = state.isOpen,
-				onClick = { state.hide() }
-			)
-		}
-	) {
-		Column(
-			modifier = Modifier.fillMaxWidth(),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
+	@Composable
+	override fun dialogContent() {
+		RachelDialog(
+			state = this,
+			actions = {
+				RachelButton(
+					text = stringResource(Res.string.dialog_cancel),
+					enabled = isOpen,
+					onClick = { hide() }
+				)
+			}
 		) {
-			LinearProgressIndicator(
-				progress = { state.progress },
-				modifier = Modifier.fillMaxWidth().height(6.dp),
-				gapSize = 0.dp,
-				drawStopIndicator = {}
-			)
-			Row(
+			Column(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(20.dp),
-				verticalAlignment = Alignment.CenterVertically
+				verticalArrangement = Arrangement.spacedBy(5.dp)
 			) {
-				Text(
-					text = "${(state.progress * 100).roundToInt()}%",
-					textAlign = TextAlign.Start,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.weight(1f)
+				LinearProgressIndicator(
+					progress = { progress },
+					modifier = Modifier.fillMaxWidth().height(6.dp),
+					gapSize = 0.dp,
+					drawStopIndicator = {}
 				)
-				Text(
-					text = "${state.current} / ${state.total}",
-					textAlign = TextAlign.End,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.weight(1f)
-				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(20.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(
+						text = "${(progress * 100).roundToInt()}%",
+						textAlign = TextAlign.Start,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.weight(1f)
+					)
+					Text(
+						text = "$current / $total",
+						textAlign = TextAlign.End,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.weight(1f)
+					)
+				}
 			}
 		}
 	}
@@ -493,27 +504,27 @@ fun DialogProgress(state: DialogProgressState) {
 class DialogLoadingState : DialogState() {
 	override val dismissOnBackPress: Boolean = false
 	override val dismissOnClickOutside: Boolean = false
-}
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun DialogLoading(state: DialogLoadingState) {
-	BackHandler {}
+	@OptIn(ExperimentalComposeUiApi::class)
+	@Composable
+	override fun dialogContent() {
+		BackHandler {}
 
-	Dialog(
-		onDismissRequest = { state.hide() },
-		properties = DialogProperties(
-			dismissOnBackPress = state.dismissOnBackPress,
-			dismissOnClickOutside = state.dismissOnClickOutside,
-			usePlatformDefaultWidth = true
-		)
-	) {
-		Surface(
-			shape = MaterialTheme.shapes.extraLarge,
-			shadowElevation = 5.dp,
-			modifier = Modifier.size(300.dp)
+		Dialog(
+			onDismissRequest = { hide() },
+			properties = DialogProperties(
+				dismissOnBackPress = dismissOnBackPress,
+				dismissOnClickOutside = dismissOnClickOutside,
+				usePlatformDefaultWidth = true
+			)
 		) {
-			LoadingBox()
+			Surface(
+				shape = MaterialTheme.shapes.extraLarge,
+				shadowElevation = 5.dp,
+				modifier = Modifier.size(300.dp)
+			) {
+				LoadingBox()
+			}
 		}
 	}
 }

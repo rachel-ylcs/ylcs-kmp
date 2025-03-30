@@ -6,7 +6,7 @@ import love.yinlin.api.*
 import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.UserPrivilege
+import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString

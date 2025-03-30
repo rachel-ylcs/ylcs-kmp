@@ -22,8 +22,8 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Topic
-import love.yinlin.data.rachel.UserPublicProfile
+import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText

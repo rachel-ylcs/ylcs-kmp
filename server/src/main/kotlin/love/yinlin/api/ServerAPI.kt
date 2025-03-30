@@ -18,7 +18,7 @@ import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
-import love.yinlin.data.rachel.MailEntry
+import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.*
 import love.yinlin.logger
 import java.io.File

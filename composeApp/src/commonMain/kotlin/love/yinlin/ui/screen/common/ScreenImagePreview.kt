@@ -27,7 +27,6 @@ import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
-import love.yinlin.ui.component.screen.DialogProgress
 import love.yinlin.ui.component.screen.DialogProgressState
 import love.yinlin.ui.component.screen.SubScreen
 
@@ -47,7 +46,7 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 		fun downloadPicture() {
 			val preview = previews[current]
 			val url = if (preview.isSource) preview.pic.source else preview.pic.image
-			launch { OS.downloadImage(url, downloadDialog) }
+			launch { OS.Net.downloadImage(url, downloadDialog) }
 		}
 
 		@Composable
@@ -158,7 +157,7 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 			modifier = Modifier.fillMaxSize(),
 			title = "${model.current + 1} / ${model.previews.size}",
 			actions = {
-				action(
+				Action(
 					icon = Icons.Filled.Download,
 					onClick = { model.downloadPicture() }
 				)
@@ -170,8 +169,6 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 			else model.Landscape()
 		}
 
-		if (model.downloadDialog.isOpen) {
-			DialogProgress(state = model.downloadDialog)
-		}
+		model.downloadDialog.withOpen()
 	}
 }

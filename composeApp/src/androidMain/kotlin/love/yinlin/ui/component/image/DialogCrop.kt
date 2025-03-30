@@ -31,6 +31,7 @@ fun DialogCrop(
 		if (aspectRatio == null || aspectRatio == 0f) null
 		else CropifySize.FixedAspectRatio(1 / aspectRatio)
 	}
+
 	Dialog(
 		onDismissRequest = { state.uri = null },
 		properties = DialogProperties(

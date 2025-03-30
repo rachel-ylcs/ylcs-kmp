@@ -25,7 +25,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Mail
+import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.RachelButton

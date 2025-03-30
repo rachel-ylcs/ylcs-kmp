@@ -24,7 +24,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 	object Right : ActionScope(false)
 
 	@Composable
-	fun action(
+	fun Action(
 		icon: ImageVector,
 		color: Color = MaterialTheme.colorScheme.onSurface,
 		enabled: Boolean = true,
@@ -42,7 +42,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 	}
 
 	@Composable
-	fun actionSuspend(
+	fun ActionSuspend(
 		icon: ImageVector,
 		color: Color = MaterialTheme.colorScheme.onSurface,
 		enabled: Boolean = true,
@@ -60,7 +60,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 	}
 
 	@Composable
-	inline fun actions(block: @Composable ActionScope.() -> Unit) = block()
+	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()
 }
 
 @Stable
@@ -127,9 +127,9 @@ fun SubScreen(
 
 	with(slot) {
 		Tip(state = tip)
-		if (info.isOpen) DialogInfo(state = info)
-		if (confirm.isOpen) DialogConfirm(state = confirm)
-		if (loading.isOpen) DialogLoading(state = loading)
+		info.withOpen()
+		confirm.withOpen()
+		loading.withOpen()
 	}
 }
 

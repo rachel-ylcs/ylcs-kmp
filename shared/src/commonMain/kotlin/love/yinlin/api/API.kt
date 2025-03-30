@@ -2,7 +2,11 @@ package love.yinlin.api
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.data.rachel.*
+import love.yinlin.data.rachel.profile.UserProfile
+import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.topic.SubComment
+import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
 
 object API : APINode(null, "") {
@@ -29,11 +33,11 @@ object API : APINode(null, "") {
 		}
 
 		object Activity : APINode(this, "activity") {
-			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.Activity>>(this, "getActivities")
+			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.activity.Activity>>(this, "getActivities")
 
 			object AddActivity : APIForm<AddActivity.Request, AddActivity.Response, AddActivity.Files>(this, "addActivity") {
 				@Serializable
-				data class Request(val token: String, val activity: love.yinlin.data.rachel.Activity)
+				data class Request(val token: String, val activity: love.yinlin.data.rachel.activity.Activity)
 				@Serializable
 				data class Files(val pic: APIFile?, val pics: APIFiles)
 				@Serializable
@@ -42,7 +46,7 @@ object API : APINode(null, "") {
 
 			object ModifyActivityInfo : APIPostRequest<ModifyActivityInfo.Request>(this, "modifyActivityInfo") {
 				@Serializable
-				data class Request(val token: String, val activity: love.yinlin.data.rachel.Activity)
+				data class Request(val token: String, val activity: love.yinlin.data.rachel.activity.Activity)
 			}
 
 			object ModifyActivityPicture : APIForm<ModifyActivityPicture.Request, String, ModifyActivityPicture.Files>(this, "modifyActivityPicture") {
@@ -99,7 +103,7 @@ object API : APINode(null, "") {
 		}
 
 		object Mail : APINode(this, "mail") {
-			object GetMails : APIPost<GetMails.Request, List<love.yinlin.data.rachel.Mail>>(this, "getMails") {
+			object GetMails : APIPost<GetMails.Request, List<love.yinlin.data.rachel.mail.Mail>>(this, "getMails") {
 				@Serializable
 				data class Request(val token: String, val isProcessed: Boolean = false, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
@@ -147,22 +151,22 @@ object API : APINode(null, "") {
 		}
 
 		object Topic : APINode(this, "topic") {
-			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
+			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getTopics") {
 				@Serializable
 				data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetLatestTopics : APIPost<GetLatestTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getLatestTopics") {
+			object GetLatestTopics : APIPost<GetLatestTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopics") {
 				@Serializable
 				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getHotTopics") {
+			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getHotTopics") {
 				@Serializable
 				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetSectionTopics : APIPost<GetSectionTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getSectionTopics") {
+			object GetSectionTopics : APIPost<GetSectionTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getSectionTopics") {
 				@Serializable
 				data class Request(val section: Int, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}

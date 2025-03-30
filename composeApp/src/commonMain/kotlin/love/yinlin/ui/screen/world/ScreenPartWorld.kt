@@ -22,7 +22,7 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.Activity
+import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.rememberDerivedState
@@ -127,11 +127,11 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
 					horizontalArrangement = Arrangement.End,
 				) {
-					ActionScope.Right.actions {
-						if (hasPrivilegeVIPCalendar) action(icon = Icons.Outlined.Add) {
+					ActionScope.Right.Actions {
+						if (hasPrivilegeVIPCalendar) Action(icon = Icons.Outlined.Add) {
 							navigate(ScreenAddActivity)
 						}
-						actionSuspend(icon = Icons.Outlined.Refresh) {
+						ActionSuspend(icon = Icons.Outlined.Refresh) {
 							requestActivity()
 						}
 					}

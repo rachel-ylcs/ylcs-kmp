@@ -25,7 +25,11 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.*
+import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.topic.SubComment
+import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberDerivedState
@@ -325,16 +329,16 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 								it.copy(commentNum = it.commentNum + 1)
 							}
 							commentPage.items += Comment(
-								cid = result.data,
-								uid = user.uid,
-								ts = DateEx.CurrentString,
-								content = content,
-								isTop = false,
-								subCommentNum = 0,
-								name = user.name,
-								label = user.label,
-								coin = user.coin
-							)
+                                cid = result.data,
+                                uid = user.uid,
+                                ts = DateEx.CurrentString,
+                                content = content,
+                                isTop = false,
+                                subCommentNum = 0,
+                                name = user.name,
+                                label = user.label,
+                                coin = user.coin
+                            )
 							commentState.animateScrollToItem(commentPage.items.size - 1)
 							return true
 						}
@@ -545,10 +549,10 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 
 		@Composable
 		private fun SubCommentBar(
-			subComment: SubComment,
-			parentComment: Comment,
-			modifier: Modifier = Modifier,
-			onDelete: () -> Unit
+            subComment: SubComment,
+            parentComment: Comment,
+            modifier: Modifier = Modifier,
+            onDelete: () -> Unit
 		) {
 			Column(
 				modifier = modifier,
@@ -693,18 +697,18 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				SplitActionLayout(
 					modifier = Modifier.fillMaxWidth(),
 					left = {
-						action(
+						Action(
 							icon = Icons.Filled.Home,
 							enabled = currentSendComment != null,
 							onClick = { currentSendComment = null }
 						)
 					},
 					right = {
-						action(
+						Action(
 							icon = Icons.Filled.Paid,
 							onClick = { sendCoinSheet.open() }
 						)
-						actionSuspend(
+						ActionSuspend(
 							icon = Icons.AutoMirrored.Filled.Send,
 							enabled = state.text.isNotEmpty(),
 							onClick = {
@@ -807,15 +811,15 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(model.topic.uid) == true }
 					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(model.topic.uid) == true }
 					val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
-					if (canUpdateTopicTop) action(
+					if (canUpdateTopicTop) Action(
 						icon = if (model.topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
 						onClick = { model.onChangeTopicIsTop(!model.topic.isTop) }
 					)
-					if (canMoveTopic) action(
+					if (canMoveTopic) Action(
 						icon = Icons.Outlined.MoveUp,
 						onClick = { model.moveTopicDialog.open() }
 					)
-					if (canDeleteTopic) action(
+					if (canDeleteTopic) Action(
 						icon = Icons.Outlined.Delete,
 						onClick = {
 							model.slot.confirm.open(content = "删除主题?") {
@@ -850,6 +854,6 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			model.SendCoinLayout()
 		}
 
-		if (model.moveTopicDialog.isOpen) DialogChoice(state = model.moveTopicDialog)
+		model.moveTopicDialog.withOpen()
 	}
 }

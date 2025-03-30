@@ -53,13 +53,13 @@ fun SplitActionLayout(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(space, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically,
-            content = { ActionScope.Left.actions(block = left) }
+            content = { ActionScope.Left.Actions(block = left) }
         )
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.spacedBy(space, Alignment.End),
             verticalAlignment = Alignment.CenterVertically,
-            content = { ActionScope.Right.actions(block = right) }
+            content = { ActionScope.Right.Actions(block = right) }
         )
     }
 }

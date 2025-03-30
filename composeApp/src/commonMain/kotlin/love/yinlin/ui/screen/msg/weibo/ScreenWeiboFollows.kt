@@ -31,7 +31,6 @@ import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.DialogInputState
 import love.yinlin.ui.component.screen.SubScreen
 
@@ -116,11 +115,11 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			title = if (model.isLocal) "微博关注" else "搜索结果",
 			onBack = { model.pop() },
 			actions = {
-				action(
+				Action(
 					icon = Icons.Outlined.Search,
 					onClick = { model.searchDialog.open() }
 				)
-				action(
+				Action(
 					icon = Icons.Outlined.Refresh,
 					onClick = { model.refreshLocalUser() }
 				)
@@ -153,8 +152,6 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			}
 		}
 
-		if (model.searchDialog.isOpen) {
-			DialogInput(state = model.searchDialog)
-		}
+		model.searchDialog.withOpen()
 	}
 }

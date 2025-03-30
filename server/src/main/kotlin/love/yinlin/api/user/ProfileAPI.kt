@@ -11,7 +11,7 @@ import love.yinlin.api.successData
 import love.yinlin.copy
 import love.yinlin.currentTS
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.UserConstraint
+import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.to
 import java.time.LocalDate

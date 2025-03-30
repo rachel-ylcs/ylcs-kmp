@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Topic
+import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.component.screen.SubScreenSlot
 import love.yinlin.ui.screen.common.ScreenImagePreview

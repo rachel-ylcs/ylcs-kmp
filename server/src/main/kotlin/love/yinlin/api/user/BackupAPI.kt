@@ -8,7 +8,7 @@ import love.yinlin.api.api
 import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
-import love.yinlin.data.rachel.UserPrivilege
+import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
 import love.yinlin.extension.toJsonString

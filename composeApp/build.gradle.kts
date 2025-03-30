@@ -13,6 +13,16 @@ plugins {
 
 val appVersionName: String by rootProject.extra
 
+enum class GradlePlatform {
+    Windows, Linux, Mac;
+}
+
+val desktopPlatform = System.getProperty("os.name").let { when {
+    it.lowercase().startsWith("windows") -> GradlePlatform.Windows
+    it.lowercase().startsWith("mac") -> GradlePlatform.Mac
+    else -> GradlePlatform.Linux
+} }
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -35,7 +45,7 @@ kotlin {
         }
     }
 
-    jvm {
+    jvm("desktop") {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
         }
@@ -62,70 +72,139 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(projects.shared)
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.material3.iconsExtended)
-            implementation(libs.compose.ui)
-            implementation(libs.compose.ui.backhandler)
-            implementation(libs.compose.components.uiToolingPreview)
-            implementation(libs.compose.components.resources)
+        val commonMain by getting {
+            dependencies {
+                implementation(projects.shared)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.material3.iconsExtended)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.ui.backhandler)
+                implementation(libs.compose.components.uiToolingPreview)
+                implementation(libs.compose.components.resources)
 
-            implementation(libs.kotlinx.coroutines)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.io)
-            implementation(libs.kotlinx.json)
+                implementation(libs.kotlinx.coroutines)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.io)
+                implementation(libs.kotlinx.json)
 
-            implementation(libs.runtime.navigation)
-            implementation(libs.runtime.viewmodel)
-            implementation(libs.runtime.lifecycle)
+                implementation(libs.runtime.navigation)
+                implementation(libs.runtime.viewmodel)
+                implementation(libs.runtime.lifecycle)
 
-            implementation(libs.ktor.client)
-            implementation(libs.ktor.client.negotiation)
-            implementation(libs.ktor.json)
+                implementation(libs.ktor.client)
+                implementation(libs.ktor.client.negotiation)
+                implementation(libs.ktor.json)
 
-            implementation(libs.sketch)
-            implementation(libs.sketch.http)
-            implementation(libs.sketch.resources)
-            implementation(libs.sketch.gif)
-            implementation(libs.sketch.webp)
-            implementation(libs.sketch.zoom)
+                implementation(libs.sketch)
+                implementation(libs.sketch.http)
+                implementation(libs.sketch.resources)
+                implementation(libs.sketch.gif)
+                implementation(libs.sketch.webp)
+                implementation(libs.sketch.zoom)
 
-            implementation(libs.html)
-            implementation(libs.uri)
+                implementation(libs.html)
+                implementation(libs.uri)
+            }
         }
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.compose.activity)
-            implementation(libs.ktor.okhttp)
-            implementation(libs.mmkv.android)
-            implementation(libs.image.crop)
-            implementation(libs.image.compress)
+        val nonAndroidMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
         }
 
-        iosArm64Main.dependencies {
-            implementation(libs.ktor.apple)
+        val nonWasmJsMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
         }
 
-        wasmJsMain.dependencies {
-            implementation(libs.ktor.js)
+        val appleMain = appleMain.get().apply {
+            dependsOn(nonAndroidMain)
+            dependsOn(nonWasmJsMain)
+            dependencies {
+                implementation(libs.ktor.apple)
+            }
         }
 
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.ktor.okhttp)
+        val jvmMain by creating {
+            dependsOn(nonWasmJsMain)
+            dependencies {
+                implementation(libs.ktor.okhttp)
+            }
+        }
 
-            "win".let {
-                implementation(libs.javafx.base.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.graphics.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.controls.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.fxml.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.media.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.swing.get()) { artifact { classifier = it } }
-                implementation(libs.javafx.web.get()) { artifact { classifier = it } }
+        androidMain.get().apply {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.compose.activity)
+                implementation(libs.mmkv.android)
+                implementation(libs.image.crop)
+                implementation(libs.image.compress)
+            }
+        }
+
+        val desktopMain by getting {
+            when (desktopPlatform) {
+                GradlePlatform.Windows -> {
+                    val windowsMain by creating {
+                        dependsOn(nonAndroidMain)
+                        dependsOn(jvmMain)
+                        dependencies {
+                            val javafxClassifier = "win"
+                            implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.controls.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.fxml.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.media.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.swing.get()) { artifact { classifier = javafxClassifier } }
+                            implementation(libs.javafx.web.get()) { artifact { classifier = javafxClassifier } }
+                        }
+                    }
+                    dependsOn(windowsMain)
+                }
+                GradlePlatform.Linux -> {
+                    val linuxMain by creating {
+                        dependsOn(nonAndroidMain)
+                        dependsOn(jvmMain)
+                        dependencies {
+
+                        }
+                    }
+                    dependsOn(linuxMain)
+                }
+                GradlePlatform.Mac -> {
+                    val macMain by creating {
+                        dependsOn(jvmMain)
+                        dependsOn(appleMain)
+                        dependencies {
+
+                        }
+                    }
+                    dependsOn(macMain)
+                }
+            }
+            dependencies {
+                implementation(compose.desktop.currentOs)
+            }
+        }
+
+        iosArm64Main.get().apply {
+            dependsOn(appleMain)
+            dependencies {
+
+            }
+        }
+
+        wasmJsMain.get().apply {
+            dependsOn(nonAndroidMain)
+            dependencies {
+                implementation(libs.ktor.js)
             }
         }
     }

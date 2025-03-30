@@ -40,7 +40,6 @@ abstract class ScreenPart(private val model: AppModel) {
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
-	fun pop() = model.pop()
 
 	@Composable
 	protected abstract fun content()

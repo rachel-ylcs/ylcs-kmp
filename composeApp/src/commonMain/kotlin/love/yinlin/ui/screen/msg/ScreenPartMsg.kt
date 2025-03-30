@@ -131,17 +131,17 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 
 		override fun onWeiboLinkClick(arg: String) {
-			if (OS.platform.isWeb) OS.openURL(arg)
+			if (OS.platform.isWeb) OS.Net.openUrl(arg)
 			else navigate(ScreenWebpage(arg))
 		}
 
 		override fun onWeiboTopicClick(arg: String) {
-			if (OS.platform.isWeb) OS.openURL(arg)
+			if (OS.platform.isWeb) OS.Net.openUrl(arg)
 			else navigate(ScreenWebpage(arg))
 		}
 
 		override fun onWeiboAtClick(arg: String) {
-			if (OS.platform.isWeb) OS.openURL(arg)
+			if (OS.platform.isWeb) OS.Net.openUrl(arg)
 			else navigate(ScreenWebpage(arg))
 		}
 
@@ -171,11 +171,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 						items = MsgTabItem.items,
 						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
-					ActionScope.Right.actions {
-						action(icon = Icons.Outlined.Refresh) {
+					ActionScope.Right.Actions {
+						Action(icon = Icons.Outlined.Refresh) {
 							onRefresh()
 						}
-						action(icon = Icons.Filled.AccountCircle) {
+						Action(icon = Icons.Filled.AccountCircle) {
 							navigate(ScreenWeiboFollows)
 						}
 					}

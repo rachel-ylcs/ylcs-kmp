@@ -20,7 +20,7 @@ import love.yinlin.common.compressImage
 import love.yinlin.common.compressImages
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.Activity
+import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.PictureSelector
@@ -228,7 +228,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 			title = "修改活动",
 			onBack = { model.pop() },
 			actions = {
-				actionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+				ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
 					model.modifyActivity()
 				}
 			},
