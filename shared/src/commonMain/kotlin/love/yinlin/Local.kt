@@ -12,7 +12,7 @@ object Local {
 		// 当客户端处于开发环境时, 若协同服务器请求 localhost 否则请求副机
 		// 当客户端处于生产环境时, 请求主机
 		const val DEVELOPMENT: Boolean = true
-		const val WITH_SERVER: Boolean = false
+		const val WITH_SERVER: Boolean = true
 
 		// < ------  始终浅色模式  ------ >
 		// 开启后无视主题设置始终保持浅色
@@ -22,7 +22,7 @@ object Local {
 		object Desktop {
 			// < ------  竖屏模式  ------ >
 			// 开启后桌面端将保持竖屏用于调试
-			const val ALWAYS_PORTRAIT = true
+			const val ALWAYS_PORTRAIT = false
 
 			// < ------  屏幕比  ------ >
 			// 桌面端窗口占屏幕的比例

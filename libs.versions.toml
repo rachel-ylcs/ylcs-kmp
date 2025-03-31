@@ -96,6 +96,7 @@ ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }

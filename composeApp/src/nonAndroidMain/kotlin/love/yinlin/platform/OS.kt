@@ -12,18 +12,18 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
 import org.jetbrains.skia.impl.use
 
-actual val osCacheSize: Long get() {
+actual val osStorageCacheSize: Long get() {
     val sketch = SingletonSketch.get()
     return sketch.downloadCache.size + sketch.resultCache.size
 }
 
-actual fun osClearCache() {
+actual fun osStorageClearCache() {
     val sketch = SingletonSketch.get()
     sketch.downloadCache.clear()
     sketch.resultCache.clear()
 }
 
-actual fun osCrop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int): ImageBitmap {
+actual fun osImageCrop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int): ImageBitmap {
     val src = bitmap.asSkiaBitmap()
     val des = createBitmap(src.imageInfo.withWidthHeight(width = width, height = height))
     val canvas = Canvas(des)

@@ -98,10 +98,19 @@ object ClientAPI {
 	}
 
 	interface APIFileScope {
+		fun file(value: ByteArray): APIFile
 		fun file(value: Path): APIFile
 		fun optionFile(value: Path?): APIFile?
 		fun file(values: List<Path>?): APIFiles
 	}
+
+	fun FormBuilder.addByteArrayFile(key: String, file: ByteArray) = this.append(
+		key = key,
+		value = file,
+		headers = Headers.build {
+			append(HttpHeaders.ContentDisposition, "filename=\"${key}\"")
+		}
+	)
 
 	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
 		key = key,
@@ -128,6 +137,11 @@ object ClientAPI {
 				return APIFile(key)
 			}
 
+			override fun file(value: ByteArray): APIFile {
+				val key = "#${index++}#"
+				map[key] = value
+				return APIFile(key)
+			}
 			override fun file(value: Path): APIFile = buildFile(value)
 			override fun optionFile(value: Path?): APIFile? = buildFile(value)
 			override fun file(values: List<Path>?): APIFiles = buildList {
@@ -149,7 +163,10 @@ object ClientAPI {
 			else {
 				val value = scope.map[item.String]
 				if (value == null) ignoreFile += name
-				else builder.addFormFile(name, value as Path)
+				else {
+					if (value is Path) builder.addFormFile(name, value)
+					else if (value is ByteArray) builder.addByteArrayFile(name, value)
+				}
 			}
 		}
 

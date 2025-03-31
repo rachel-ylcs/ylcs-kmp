@@ -249,7 +249,7 @@ object API : APINode(null, "") {
 			@Serializable
 			data class Request(val a: String, val b: Int)
 			@Serializable
-			data class Files(val c: APIFile, val d: APIFiles, val e: APIFile?)
+			data class Files(val c: APIFile)
 		}
 	}
 }

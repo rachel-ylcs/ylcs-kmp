@@ -18,7 +18,7 @@ import love.yinlin.ui.component.screen.DialogProgressState
 
 actual val osPlatform: Platform = Platform.Android
 
-actual fun osOpenUrl(url: String) {
+actual fun osNetOpenUrl(url: String) {
 	try {
 		val uri = Uri.parse(url)
 		val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -28,7 +28,7 @@ actual fun osOpenUrl(url: String) {
 	catch (_: Exception) { }
 }
 
-actual suspend fun osDownloadImage(url: String, state: DialogProgressState) {
+actual suspend fun osNetDownloadImage(url: String, state: DialogProgressState) {
 	try {
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		val values = ContentValues()
@@ -58,17 +58,17 @@ actual suspend fun osDownloadImage(url: String, state: DialogProgressState) {
 	}
 }
 
-actual val osCacheSize: Long get() {
+actual val osStorageCacheSize: Long get() {
 	val sketch = SingletonSketch.get(appNative.context)
 	return sketch.downloadCache.size + sketch.resultCache.size
 }
 
-actual fun osClearCache() {
+actual fun osStorageClearCache() {
 	val sketch = SingletonSketch.get(appNative.context)
 	sketch.downloadCache.clear()
 	sketch.resultCache.clear()
 }
 
-actual fun osCrop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int): ImageBitmap {
+actual fun osImageCrop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int): ImageBitmap {
 	return Bitmap.createBitmap(bitmap.asAndroidBitmap(), startX, startY, width, height).asImageBitmap()
 }

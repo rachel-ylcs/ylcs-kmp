@@ -18,12 +18,13 @@ dependencies {
 
     implementation(libs.kotlinx.json)
 
+    implementation(libs.ktor.json)
     implementation(libs.ktor.server)
     implementation(libs.ktor.server.host)
     implementation(libs.ktor.server.config)
     implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.json)
     implementation(libs.ktor.server.negotiation)
+    implementation(libs.ktor.server.cors)
 
     implementation(libs.logback)
     implementation(libs.mysql)

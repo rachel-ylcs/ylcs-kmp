@@ -19,7 +19,7 @@ actual val osPlatform: Platform = System.getProperty("os.name").let {
 	}
 }
 
-actual fun osOpenUrl(url: String) {
+actual fun osNetOpenUrl(url: String) {
 	try {
 		val desktop = Desktop.getDesktop()
 		if (desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -29,7 +29,7 @@ actual fun osOpenUrl(url: String) {
 	catch (_: Exception) { }
 }
 
-actual suspend fun osDownloadImage(url: String, state: DialogProgressState) {
+actual suspend fun osNetDownloadImage(url: String, state: DialogProgressState) {
 	val saveFile = suspendCancellableCoroutine { continuation ->
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		val fileDialog = FileDialog(null as? Frame?, "保存到", FileDialog.SAVE)

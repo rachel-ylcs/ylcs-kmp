@@ -1,10 +1,13 @@
 package love.yinlin
 
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.routing.*
 import love.yinlin.api.initAPI
 import love.yinlin.extension.Json
@@ -13,6 +16,13 @@ import java.io.File
 
 @Suppress("unused")
 fun Application.module() {
+    install(CORS) {
+        anyHost()
+        anyMethod()
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+    }
+
     install(ContentNegotiation) { json(Json) }
     install(IPMonitor)
 

@@ -161,7 +161,7 @@ private fun DrawScope.drawCorner(
     frameColor: Color,
     frameAlpha: Float
 ) {
-    val width = 2.dp.toPx() // option.frameWidth.toPx()
+    val width = 2.dp.toPx()
     val offsetFromVertex = 4.dp.toPx()
     rect.topLeft.translate(offsetFromVertex, offsetFromVertex).let { start ->
         drawLine(
@@ -234,7 +234,7 @@ private fun DrawScope.drawGrid(
     gridColor: Color,
     gridAlpha: Float
 ) {
-    val width = 1.dp.toPx() // option.gridWidth
+    val width = 1.dp.toPx()
     val widthOneThird = rect.size.width / 3
     val widthTwoThird = widthOneThird * 2
     drawLine(
@@ -275,9 +275,10 @@ fun CropImage(
     onCropped: (ImageBitmap) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
     var touchRegion: TouchRegion? by rememberState { null }
-    val scope = rememberCoroutineScope()
+    var isCropping = remember(state.bitmap) { false }
 
     BoxWithConstraints(
         modifier = modifier.pointerInput(state.bitmap, state.aspectRatio) {
@@ -310,12 +311,12 @@ fun CropImage(
     ) {
         // Image
         Canvas(modifier = Modifier.matchParentSize()) {
-            drawRect(Colors.Black) // option.background
+            drawRect(color = Colors.Black)
             state.bitmap?.let { bitmap ->
                 drawImage(
                     image = bitmap,
                     dstSize = state.imageRect.size.toIntSize(),
-                    dstOffset = state.imageRect.topLeft.run { IntOffset(x.toInt(), y.toInt()) }
+                    dstOffset = state.imageRect.topLeft.let { IntOffset(it.x.toInt(), it.y.toInt()) }
                 )
             }
         }
@@ -325,10 +326,14 @@ fun CropImage(
             Canvas(modifier = Modifier.matchParentSize().pointerInput(bitmap) {
                 detectTapGestures(
                     onDoubleTap = {
-                        scope.launch {
-                            state.cropImage()?.let {
-                                onCropped(it)
-                                state.bitmap = null
+                        if (!isCropping) {
+                            scope.launch {
+                                isCropping = true
+                                state.cropImage()?.let {
+                                    onCropped(it)
+                                    state.bitmap = null
+                                }
+                                isCropping = false
                             }
                         }
                     }
@@ -337,10 +342,7 @@ fun CropImage(
                 // Mask
                 drawIntoCanvas { canvas ->
                     canvas.saveLayer(Rect(0f, 0f, size.width, size.height), Paint())
-                    drawRect(
-                        color = Colors.Black, // option.maskColor
-                        alpha = 0.5f, // option.maskAlpha
-                    )
+                    drawRect(color = Colors.Black, alpha = 0.5f)
                     drawRect(
                         color = Colors.Transparent,
                         topLeft = state.frameRect.topLeft,
@@ -351,24 +353,24 @@ fun CropImage(
                 }
                 // Frame
                 drawRect(
-                    color = Colors.White, // option.frameColor
-                    alpha = 0.8f, // option.frameAlpha
+                    color = Colors.White,
+                    alpha = 0.8f,
                     topLeft = state.frameRect.topLeft,
                     size = state.frameRect.size,
-                    style = Stroke(2.dp.toPx()) // option.frameWidth.toPx()
+                    style = Stroke(2.dp.toPx())
                 )
                 // Corner
                 drawCorner(
                     rect = state.frameRect,
                     cornerLength = tolerance / 2,
-                    frameColor = Colors.White, // option.frameColor
-                    frameAlpha = 0.8f // option.frameAlpha
+                    frameColor = Colors.White,
+                    frameAlpha = 0.8f
                 )
                 // Grid
                 drawGrid(
                     rect = state.frameRect,
-                    gridColor = Colors.White, // option.gridColor
-                    gridAlpha = 0.6f // option.gridAlpha
+                    gridColor = Colors.White,
+                    gridAlpha = 0.6f
                 )
             }
         }
@@ -376,22 +378,27 @@ fun CropImage(
         LaunchedEffect(state.bitmap, state.aspectRatio, constraints) {
             state.bitmap?.let { bitmap ->
                 val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
-
                 val newSize = Size(canvasSize.width, canvasSize.width * bitmap.height / bitmap.width.toFloat())
-                val imageSize = if (newSize.height > canvasSize.height)
+                val imageSize = if (newSize.height > canvasSize.height) {
                     (canvasSize.height / newSize.height).let { Size(newSize.width * it, newSize.height * it) }
-                else newSize
-                state.imageRect = Rect(
-                    Offset((canvasSize.width - imageSize.width) / 2, (canvasSize.height - imageSize.height) / 2),
-                    imageSize
+                } else newSize
+                val aspectRatio = state.aspectRatio
+                val imageRect = Rect(
+                    offset = Offset((canvasSize.width - imageSize.width) / 2, (canvasSize.height - imageSize.height) / 2),
+                    size = imageSize
                 )
-                val shortSide = min(state.imageRect.width, state.imageRect.height)
-                val size = if (state.aspectRatio == 0f) Size(state.imageRect.width, state.imageRect.height)
-                else {
-                    val scale = shortSide / max(state.imageRect.width, state.imageRect.width / state.aspectRatio)
-                    Size(state.imageRect.width * scale * 0.8f, state.imageRect.width * scale / state.aspectRatio * 0.8f)
+                val size = if (aspectRatio == 0f) {
+                    Size(imageRect.width, imageRect.height)
+                } else {
+                    val scale = min(imageRect.width, imageRect.height) / max(imageRect.width, imageRect.width / aspectRatio)
+                    Size(imageRect.width * scale * 0.8f, imageRect.width * scale / aspectRatio * 0.8f)
                 }
-                state.frameRect = Rect(Offset((canvasSize.width - size.width) / 2, (canvasSize.height - size.height) / 2), size)
+                val frameRect = Rect(
+                    offset = Offset((canvasSize.width - size.width) / 2, (canvasSize.height - size.height) / 2),
+                    size = size
+                )
+                state.imageRect = imageRect
+                state.frameRect = frameRect
             }
         }
     }

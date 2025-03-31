@@ -9,7 +9,7 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageWriteToSavedPhotosAlbum
 
-actual fun osOpenUrl(url: String) {
+actual fun osNetOpenUrl(url: String) {
     try {
         val application = UIApplication.sharedApplication
         val uri = NSURL(string = url)
@@ -21,7 +21,7 @@ actual fun osOpenUrl(url: String) {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-actual suspend fun osDownloadImage(url: String, state: DialogProgressState) {
+actual suspend fun osNetDownloadImage(url: String, state: DialogProgressState) {
     Coroutines.io {
         val data = NSData.dataWithContentsOfURL(url = NSURL(string = url))
         if (data != null) {
