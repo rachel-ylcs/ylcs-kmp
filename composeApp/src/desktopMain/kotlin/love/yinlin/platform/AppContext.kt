@@ -1,3 +1,4 @@
+@file:JvmName("AppContextDesktop")
 package love.yinlin.platform
 
 import androidx.compose.ui.unit.Density
@@ -5,7 +6,7 @@ import love.yinlin.Local
 import love.yinlin.extension.DateEx
 import java.awt.GraphicsEnvironment
 
-class AppContext : AppContextBase() {
+class ActualAppContext : AppContext() {
 	var rawDensity: Density? = null
 	val windowWidth: Float
 	val windowHeight: Float
@@ -27,7 +28,7 @@ class AppContext : AppContextBase() {
 		screenHeight = (windowHeight * scaleY).toInt()
 	}
 
-	override fun initialize(): AppContext {
+	override fun initialize(): ActualAppContext {
 		super.initialize()
 		// 注册异常回调
 		Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -37,4 +38,4 @@ class AppContext : AppContextBase() {
 	}
 }
 
-val appNative: AppContext get() = app as AppContext
+val appNative: ActualAppContext get() = app as ActualAppContext

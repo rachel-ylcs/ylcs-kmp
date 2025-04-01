@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -20,6 +21,7 @@ import love.yinlin.common.compressImages
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
+import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -78,8 +80,8 @@ actual data object ScreenAddActivity : Screen<ScreenAddActivity.Model> {
 					activity = activity
 				),
 				files = { API.User.Activity.AddActivity.Files(
-					pic = optionFile(input.pic?.let { Path(it.image) }) ,
-					pics = file(input.pics.map { Path(it.image) })
+					pic = file(input.pic?.let { SystemFileSystem.source(Path(it.image)) }) ,
+					pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
 				) }
 			)
 			when (result) {

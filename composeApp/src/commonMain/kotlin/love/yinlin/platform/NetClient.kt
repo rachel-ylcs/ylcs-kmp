@@ -10,13 +10,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import love.yinlin.extension.IOThread
-import love.yinlin.extension.MainThread
+import kotlinx.io.Sink
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.extension.Json
+import love.yinlin.extension.MainThread
 import kotlin.coroutines.cancellation.CancellationException
 
 expect object NetClient {
@@ -90,56 +88,28 @@ suspend inline fun <reified U, reified T, R> HttpClient.safePost(
 
 const val TRANSFER_BUFFER_SIZE = 1024 * 64L
 
-suspend inline fun <T> HttpClient.safeDownload(
-	url: String,
-	crossinline isCancel: @MainThread suspend () -> Boolean,
-	crossinline onStart: @MainThread suspend (Long) -> Unit,
-	crossinline onTick: @MainThread suspend (Long, Long) -> Unit,
-	crossinline onWriteBegin: @IOThread suspend () -> T?,
-	crossinline onWriteChannel: @IOThread suspend (T) -> ByteWriteChannel,
-	crossinline onWriteEnd: @IOThread suspend (T) -> Unit,
-) {
-	this.safeCall { client ->
-		var downloadedBytes = 0L
-		var totalBytes = 0L
-		client.prepareGet(url) {
-			onDownload { current, total ->
-				if (isCancel()) throw CancellationException()
-				if (current - downloadedBytes > TRANSFER_BUFFER_SIZE) {
-					downloadedBytes = current
-					onTick(downloadedBytes, totalBytes)
-				}
-				if (totalBytes != total && total != null) {
-					totalBytes = total
-					onStart(totalBytes)
-				}
-			}
-		}.execute { response ->
-			val sink = onWriteBegin()
-			if (sink != null) {
-				try {
-					response.bodyAsChannel().copyAndClose(onWriteChannel(sink))
-				}
-				finally {
-					onWriteEnd(sink)
-				}
-			}
-		}
-	}
-}
-
 suspend inline fun HttpClient.safeDownload(
 	url: String,
-	file: Path,
-	crossinline isCancel: @MainThread suspend () -> Boolean,
-	crossinline onStart: @MainThread suspend (Long) -> Unit,
-	crossinline onTick: @MainThread suspend (Long, Long) -> Unit
-) = this.safeDownload(
-	url = url,
-	isCancel = isCancel,
-	onStart = onStart,
-	onTick = onTick,
-	onWriteBegin = { SystemFileSystem.sink(file) },
-	onWriteChannel = { it.asByteWriteChannel() },
-	onWriteEnd = { it.close() }
-)
+	sink: Sink,
+	crossinline isCancel: suspend () -> Boolean,
+	crossinline onGetSize: suspend (Long) -> Unit,
+	crossinline onTick: suspend (Long, Long) -> Unit,
+): Boolean = (this.safeCall { client ->
+	var downloadedBytes = 0L
+	var totalBytes = 0L
+	client.prepareGet(url) {
+		onDownload { current, total ->
+			if (isCancel()) throw CancellationException()
+			if (current - downloadedBytes > TRANSFER_BUFFER_SIZE) {
+				downloadedBytes = current
+				onTick(downloadedBytes, totalBytes)
+			}
+			if (totalBytes != total && total != null) {
+				totalBytes = total
+				onGetSize(totalBytes)
+			}
+		}
+	}.execute { response ->
+		response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+	}
+} as? Data.Success)?.data == true

@@ -6,9 +6,8 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.io.RawSource
 import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
@@ -98,73 +97,73 @@ object ClientAPI {
 	}
 
 	interface APIFileScope {
-		fun file(value: ByteArray): APIFile
-		fun file(value: Path): APIFile
-		fun optionFile(value: Path?): APIFile?
-		fun file(values: List<Path>?): APIFiles
+		fun file(value: Nothing?): APIFile
+		fun file(value: ByteArray?): APIFile
+		fun file(value: RawSource?): APIFile
+		fun file(values: Sources<RawSource>?): APIFiles
 	}
 
 	fun FormBuilder.addByteArrayFile(key: String, file: ByteArray) = this.append(
 		key = key,
 		value = file,
 		headers = Headers.build {
-			append(HttpHeaders.ContentDisposition, "filename=\"${key}\"")
+			append(HttpHeaders.ContentDisposition, "filename=\"$key\"")
 		}
 	)
 
-	fun FormBuilder.addFormFile(key: String, file: Path) = this.append(
+	fun FormBuilder.addFormFile(key: String, source: RawSource) = this.append(
 		key = key,
-		value = InputProvider { SystemFileSystem.source(file).buffered() },
+		value = InputProvider { source.buffered() },
 		headers = Headers.build {
-			append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+			append(HttpHeaders.ContentDisposition, "filename=\"$key\"")
 		}
 	)
+
+	class ActualAPIFileScope : APIFileScope {
+		private var index = 0
+		val map = mutableMapOf<String, Any?>()
+		val sources = Sources<RawSource>()
+
+		private fun addFile(value: Any?): APIFile {
+			val key = "#${index++}#"
+			map[key] = value
+			return key
+		}
+
+		override fun file(value: Nothing?): APIFile = addFile(value)
+		override fun file(value: ByteArray?): APIFile = addFile(value)
+		override fun file(value: RawSource?): APIFile {
+			if (value != null) sources += value
+			return addFile(value)
+		}
+		override fun file(values: Sources<RawSource>?): APIFiles = listOf(addFile(values?.let { v ->
+			v.forEach { sources += it }
+			if (v.isEmpty) null else v
+		}))
+	}
 
 	inline fun <reified Files : Any> buildFormFiles(
+		fileScope: ActualAPIFileScope,
 		builder: FormBuilder,
 		crossinline files: APIFileScope.() -> Files
 	) {
 		val ignoreFile = mutableListOf<String>()
 		val ignoreFiles = mutableListOf<String>()
 
-		val scope = object : APIFileScope {
-			private var index = 0
-			val map = mutableMapOf<String, Any?>()
-
-			private fun buildFile(value: Path?): APIFile {
-				val key = "#${index++}#"
-				map[key] = value
-				return APIFile(key)
-			}
-
-			override fun file(value: ByteArray): APIFile {
-				val key = "#${index++}#"
-				map[key] = value
-				return APIFile(key)
-			}
-			override fun file(value: Path): APIFile = buildFile(value)
-			override fun optionFile(value: Path?): APIFile? = buildFile(value)
-			override fun file(values: List<Path>?): APIFiles = buildList {
-				val key = "#${index++}#"
-				map[key] = values?.ifEmpty { null }
-				add(APIFile(key))
-			}
-		}
-
-		val keys = scope.files().toJson().Object
+		val keys = fileScope.files().toJson().Object
 		for ((name, item) in keys) {
 			if (item is JsonArray) {
-				val value = scope.map[item.first().String]
+				val value = fileScope.map[item.first().String]
 				if (value == null) ignoreFiles += name
-				else (value as List<*>).forEachIndexed { index, item ->
-					builder.addFormFile("#$name!$index", item as Path)
+				else (value as? Sources<*>)?.forEachIndexed { index, item ->
+					builder.addFormFile("#$name!$index", item)
 				}
 			}
 			else {
-				val value = scope.map[item.String]
+				val value = fileScope.map[item.String]
 				if (value == null) ignoreFile += name
 				else {
-					if (value is Path) builder.addFormFile(name, value)
+					if (value is RawSource) builder.addFormFile(name, value)
 					else if (value is ByteArray) builder.addByteArrayFile(name, value)
 				}
 			}
@@ -174,45 +173,43 @@ object ClientAPI {
 		if (ignoreFiles.isNotEmpty()) builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
 	}
 
+	suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> buildFormAndClean(
+		route: APIRoute<Request, Response, Files, APIMethod.Form>,
+		data: Request?,
+		crossinline files: APIFileScope.() -> Files,
+        crossinline responseBuilder: suspend (HttpResponse) -> Data<Response>
+	): Data<Response> = app.fileClient.safeCallData { client ->
+		val fileScope = ActualAPIFileScope()
+		fileScope.sources.use {
+			val formParts = formData {
+				buildFormFiles(fileScope, this, files)
+				if (data != null) append(key = "#data#", value = data.toJsonString())
+			}
+			client.preparePost(urlString = "${Local.ClientUrl}$route") {
+				setBody(MultiPartFormDataContent(formParts))
+			}.execute { responseBuilder(it) }
+		}
+	}
+
 	@JvmName("requestForm")
 	suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> request(
 		route: APIRoute<Request, Response, Files, APIMethod.Form>,
 		data: Request,
 		crossinline files: APIFileScope.() -> Files
-	): Data<Response> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") {
-			setBody(MultiPartFormDataContent(formData {
-				buildFormFiles(this, files)
-				append(key = "#data#", value = data.toJsonString())
-			}))
-		}.execute { processResponse<Response>(it) }
-	}
+	): Data<Response> = buildFormAndClean(route = route, data = data, files = files) { processResponse<Response>(it) }
 
 	@JvmName("requestFormRequest")
 	suspend inline fun <reified Request : Any, reified Files : Any> request(
 		route: APIRoute<Request, Response.Default, Files, APIMethod.Form>,
 		data: Request,
 		crossinline files: APIFileScope.() -> Files
-	): Data<Response.Default> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") {
-			setBody(MultiPartFormDataContent(formData {
-				buildFormFiles(this, files)
-				append(key = "#data#", value = data.toJsonString())
-			}))
-		}.execute { processResponse(it) }
-	}
+	): Data<Response.Default> = buildFormAndClean(route = route, data = data, files = files) { processResponse(it) }
 
 	@JvmName("requestFormResponse")
 	suspend inline fun <reified Response : Any, reified Files : Any> request(
 		route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
 		crossinline files: APIFileScope.() -> Files
-	): Data<Response> = app.fileClient.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") {
-			setBody(MultiPartFormDataContent(formData {
-				buildFormFiles(this, files)
-			}))
-		}.execute { processResponse<Response>(it) }
-	}
+	): Data<Response> = buildFormAndClean(route = route, data = null, files = files) { processResponse<Response>(it) }
 
 	@JvmName("requestServerResource")
 	suspend inline fun <reified Response : Any> request(route: ResNode): Data<Response> = app.client.safeCall { client ->

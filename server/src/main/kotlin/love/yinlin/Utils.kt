@@ -47,7 +47,7 @@ fun ResNode.delete() = File(this.path).delete()
 fun ResNode.deleteRecursively() = File(this.path).deleteRecursively()
 fun ResNode.mkdir() = File(this.path).mkdirs()
 fun ResNode.copy(other: ResNode) = File(this.path).copyTo(File(other.path), true)
-fun APIFile.copy(other: ResNode) = File(this.toString()).copyTo(File(other.path), true)
+fun APIFile.copy(other: ResNode) = File(this).copyTo(File(other.path), true)
 
 val String.md5: String get() = try {
 	val md = MessageDigest.getInstance("MD5")

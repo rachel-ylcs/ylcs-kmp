@@ -135,6 +135,8 @@ kotlin {
             dependsOn(nonWasmJsMain)
             dependencies {
                 implementation(libs.ktor.okhttp)
+
+                implementation(fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar"))))
             }
         }
 
@@ -146,6 +148,8 @@ kotlin {
                 implementation(libs.mmkv.android)
                 implementation(libs.image.crop)
                 implementation(libs.image.compress)
+
+                implementation(fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar"))))
             }
         }
 
@@ -156,14 +160,7 @@ kotlin {
                         dependsOn(nonAndroidMain)
                         dependsOn(jvmMain)
                         dependencies {
-                            val javafxClassifier = "win"
-                            implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.controls.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.fxml.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.media.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.swing.get()) { artifact { classifier = javafxClassifier } }
-                            implementation(libs.javafx.web.get()) { artifact { classifier = javafxClassifier } }
+
                         }
                     }
                     dependsOn(windowsMain)
@@ -191,6 +188,21 @@ kotlin {
             }
             dependencies {
                 implementation(compose.desktop.currentOs)
+
+                val javafxClassifier = when (desktopPlatform) {
+                    GradlePlatform.Windows -> "win"
+                    GradlePlatform.Linux -> "linux"
+                    GradlePlatform.Mac -> "mac"
+                }
+                implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.controls.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.fxml.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.media.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.swing.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.web.get()) { artifact { classifier = javafxClassifier } }
+
+                implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }
         }
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -22,6 +23,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
+import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.PictureSelector
 import love.yinlin.ui.component.screen.SubScreen
@@ -95,7 +97,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						aid = aid
 					),
 					files = { API.User.Activity.ModifyActivityPicture.Files(
-						pic = file(Path(file.absolutePath))
+						pic = file(SystemFileSystem.source(Path(file.absolutePath)))
 					) }
 				)
 				when (result) {
@@ -147,7 +149,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						aid = aid
 					),
 					files = { API.User.Activity.AddActivityPictures.Files(
-						pics = file(files.map { Path(it.absolutePath) })
+						pics = file(files.safeToSources { SystemFileSystem.source(Path(it.absolutePath)) })
 					) }
 				)
 				when (result) {
@@ -179,7 +181,7 @@ actual data class ScreenModifyActivity actual constructor(val aid: Int) : Screen
 						index = index
 					),
 					files = { API.User.Activity.ModifyActivityPictures.Files(
-						pic = file(Path(file.absolutePath))
+						pic = file(SystemFileSystem.source(Path(file.absolutePath)))
 					) }
 				)
 				when (result) {

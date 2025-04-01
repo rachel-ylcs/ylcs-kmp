@@ -36,7 +36,7 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.AppContextBase
+import love.yinlin.platform.AppContext
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
@@ -235,7 +235,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		@Composable
 		fun CrashLogLayout() {
 			val text = remember {
-				app.kv.get(AppContextBase.CRASH_KEY, "无崩溃日志")
+				app.kv.get(AppContext.CRASH_KEY, "无崩溃日志")
 					.replace("\t", "  ")
 			}
 			BottomSheet(state = crashLogSheet) {

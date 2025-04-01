@@ -1,15 +1,19 @@
+@file:JvmName("AppContextAndroid")
 package love.yinlin.platform
 
 import android.content.Context
+import androidx.activity.result.ActivityResultRegistry
 import love.yinlin.extension.DateEx
 
-class AppContext(val context: Context) : AppContextBase() {
+class ActualAppContext(val context: Context) : AppContext() {
 	override val screenWidth: Int = context.resources.displayMetrics.widthPixels
 	override val screenHeight: Int = context.resources.displayMetrics.heightPixels
 	override val fontScale: Float = 1f
 	override val kv: KV = KV(context)
 
-	override fun initialize(): AppContext {
+	var activityResultRegistry: ActivityResultRegistry? = null
+
+	override fun initialize(): ActualAppContext {
 		super.initialize()
 		// 注册异常回调
 		Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -19,4 +23,4 @@ class AppContext(val context: Context) : AppContextBase() {
 	}
 }
 
-val appNative: AppContext get() = app as AppContext
+val appNative: ActualAppContext get() = app as ActualAppContext

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -38,6 +39,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserProfile
+import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.MiniIcon
@@ -94,7 +96,7 @@ actual data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
                 ),
                 files = {
                     API.User.Topic.SendTopic.Files(
-                        pics = file(input.pics.map { Path(it.image) })
+                        pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
                     )
                 }
             )

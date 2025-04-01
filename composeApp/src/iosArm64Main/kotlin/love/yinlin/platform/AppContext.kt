@@ -12,7 +12,7 @@ import platform.Foundation.NSUncaughtExceptionHandler
 import platform.UIKit.UIScreen
 
 @OptIn(ExperimentalForeignApi::class)
-class AppContext : AppContextBase() {
+class ActualAppContext : AppContext() {
 	private val screenBounds = UIScreen.mainScreen.bounds
 
 	override val screenWidth: Int = CGRectGetWidth(screenBounds).toInt()
@@ -27,7 +27,7 @@ class AppContext : AppContextBase() {
 		}
 	}.objcPtr())
 
-	override fun initialize(): AppContextBase {
+	override fun initialize(): AppContext {
 		super.initialize()
 		// 注册异常回调
 		NSSetUncaughtExceptionHandler(exceptionHandler.ptr)
@@ -35,4 +35,4 @@ class AppContext : AppContextBase() {
 	}
 }
 
-val appNative: AppContext get() = app as AppContext
+val appNative: ActualAppContext get() = app as ActualAppContext

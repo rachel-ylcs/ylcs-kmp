@@ -2,13 +2,7 @@
 
 package love.yinlin.platform
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.io.files.Path
-import love.yinlin.extension.fileSizeString
-import love.yinlin.ui.component.screen.DialogProgressState
 import java.awt.Desktop
-import java.awt.FileDialog
-import java.awt.Frame
 import java.net.URI
 
 actual val osPlatform: Platform = System.getProperty("os.name").let {
@@ -27,29 +21,4 @@ actual fun osNetOpenUrl(url: String) {
 		}
 	}
 	catch (_: Exception) { }
-}
-
-actual suspend fun osNetDownloadImage(url: String, state: DialogProgressState) {
-	val saveFile = suspendCancellableCoroutine { continuation ->
-		val filename = url.substringAfterLast('/').substringBefore('?')
-		val fileDialog = FileDialog(null as? Frame?, "保存到", FileDialog.SAVE)
-		fileDialog.isMultipleMode = false
-		fileDialog.file = filename
-		fileDialog.isVisible = true
-		continuation.resume(fileDialog.files?.firstOrNull()) { _, _, _ -> fileDialog.dispose() }
-	}
-
-	if (saveFile != null) {
-		state.open()
-		app.fileClient.safeDownload(
-			url = url,
-			file = Path(saveFile.path),
-			isCancel = { !state.isOpen },
-			onStart = { state.total = it.fileSizeString }
-		) { current, total ->
-			state.current = current.fileSizeString
-			if (total != 0L) state.progress = current / total.toFloat()
-		}
-		state.hide()
-	}
 }

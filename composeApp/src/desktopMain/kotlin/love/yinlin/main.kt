@@ -21,15 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import javafx.application.Platform
 import love.yinlin.extension.rememberState
-import love.yinlin.platform.AppContext
+import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
-import love.yinlin.ui.component.AppTopBar
-import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
+import love.yinlin.ui.component.AppTopBar
+import org.jetbrains.compose.resources.stringResource
 
 fun main() {
-    val context = AppContext().initialize()
+    val context = ActualAppContext().initialize()
     app = context
 
     // JavaFx

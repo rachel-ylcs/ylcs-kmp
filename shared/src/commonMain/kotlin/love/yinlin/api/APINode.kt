@@ -1,12 +1,6 @@
 package love.yinlin.api
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
 object APICode {
     const val SUCCESS = 0
@@ -22,17 +16,7 @@ sealed interface APIMethod {
     data object Form : APIMethod
 }
 
-@Serializable(with = APIFile.APIFileSerializer::class)
-data class APIFile(private val path: String) {
-    object APIFileSerializer : KSerializer<APIFile> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.APIFile", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: APIFile) = encoder.encodeString(value.path)
-        override fun deserialize(decoder: Decoder) = APIFile(decoder.decodeString())
-    }
-
-    override fun toString(): String = path
-}
-
+typealias APIFile = String
 typealias APIFiles = List<APIFile>
 
 object Request {

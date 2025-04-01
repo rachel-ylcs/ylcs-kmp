@@ -174,7 +174,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
 						val output = File(tmpDir, filename)
 						if (part.provider().copyAndClose(output.writeChannel()) > 0) {
-							val file = APIFile(output.absolutePath)
+							val file: APIFile = output.absolutePath
 							val newName = if (name.startsWith('#') && name.contains('!')) {
 								val fetchName = name.substringAfter('#').substringBeforeLast('!')
 								val fetchIndex = name.substringAfter('!')

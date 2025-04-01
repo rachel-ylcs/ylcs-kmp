@@ -17,7 +17,7 @@ import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
 
 @Stable
-abstract class AppContextBase {
+abstract class AppContext {
 	// 屏幕宽度
 	abstract val screenWidth: Int
 	// 屏幕高度
@@ -48,7 +48,7 @@ abstract class AppContextBase {
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
-	open fun initialize(): AppContextBase {
+	open fun initialize(): AppContext {
 		// 加载配置
 		config = KVConfig(kv)
 		CoroutineScope(Dispatchers.Default).launch {
@@ -63,4 +63,4 @@ abstract class AppContextBase {
 	}
 }
 
-lateinit var app: AppContextBase
+lateinit var app: AppContext

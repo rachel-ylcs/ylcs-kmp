@@ -42,7 +42,7 @@ compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:mat
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.0" }
-kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-alpha15" }
 runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }

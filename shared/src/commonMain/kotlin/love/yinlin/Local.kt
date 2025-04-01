@@ -12,7 +12,7 @@ object Local {
 		// 当客户端处于开发环境时, 若协同服务器请求 localhost 否则请求副机
 		// 当客户端处于生产环境时, 请求主机
 		const val DEVELOPMENT: Boolean = true
-		const val WITH_SERVER: Boolean = true
+		const val WITH_SERVER: Boolean = false
 
 		// < ------  始终浅色模式  ------ >
 		// 开启后无视主题设置始终保持浅色
@@ -47,6 +47,7 @@ object Local {
 	private const val TEST_PORT: Int = 1211
 
 	val ServerHost: String = if (Server.DEVELOPMENT) SECONDARY_HOST else LOCAL_HOST
+
 	val ClientHost: String = if (!Client.DEVELOPMENT) MAIN_HOST else if (Client.WITH_SERVER) LOCAL_HOST else SECONDARY_HOST
 	@Suppress("HttpUrlsUsage")
 	val ClientUrl: String = if (Client.DEVELOPMENT) "http://$ClientHost:$TEST_PORT" else "https://$ClientHost"

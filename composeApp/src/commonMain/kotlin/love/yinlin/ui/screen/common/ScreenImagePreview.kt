@@ -22,8 +22,10 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
-import love.yinlin.platform.OS
+import love.yinlin.extension.fileSizeString
+import love.yinlin.platform.PicturePicker
 import love.yinlin.platform.app
+import love.yinlin.platform.safeDownload
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
@@ -46,7 +48,28 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 		fun downloadPicture() {
 			val preview = previews[current]
 			val url = if (preview.isSource) preview.pic.source else preview.pic.image
-			launch { OS.Net.downloadImage(url, downloadDialog) }
+			val filename = url.substringAfterLast('/').substringBefore('?')
+			launch {
+				PicturePicker.prepareSave(filename)?.let { (origin, sink) ->
+					downloadDialog.open()
+					val result = sink.use {
+						val result = app.fileClient.safeDownload(
+							url = url,
+							sink = it,
+							isCancel = { !downloadDialog.isOpen },
+							onGetSize = { total -> downloadDialog.total = total.fileSizeString },
+							onTick = { current, total ->
+								downloadDialog.current = current.fileSizeString
+								if (total != 0L) downloadDialog.progress = current / total.toFloat()
+							}
+						)
+						if (result) PicturePicker.actualSave(filename, origin, sink)
+						result
+					}
+					PicturePicker.cleanSave(origin, result)
+					downloadDialog.hide()
+				}
+			}
 		}
 
 		@Composable
