@@ -2,7 +2,9 @@
 
 package love.yinlin.platform
 
+import love.yinlin.Local
 import java.awt.Desktop
+import java.io.File
 import java.net.URI
 
 actual val osPlatform: Platform = System.getProperty("os.name").let {
@@ -22,3 +24,5 @@ actual fun osNetOpenUrl(url: String) {
 	}
 	catch (_: Exception) { }
 }
+
+actual val osStorageCachePath: String get() = "${System.getProperty("java.io.tmpdir")}${File.separatorChar}${Local.APP_NAME}"

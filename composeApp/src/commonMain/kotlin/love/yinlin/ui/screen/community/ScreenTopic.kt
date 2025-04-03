@@ -152,7 +152,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		val subCommentSheet = SheetState<Comment>()
 		val sendCoinSheet = CommonSheetState()
 
-		val moveTopicDialog = DialogChoiceState.fromItems(
+		val moveTopicDialog = DialogChoice.fromItems(
 			items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
 			title = "移动主题板块"
 		) { index, _ ->

@@ -49,7 +49,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.screen.BottomSheet
 import love.yinlin.ui.component.screen.CommonSheetState
-import love.yinlin.ui.component.screen.DialogInputState
+import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -65,7 +65,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		val privacyPolicySheet = CommonSheetState()
 		val aboutSheet = CommonSheetState()
 
-		val idModifyDialog = object : DialogInputState(
+		val idModifyDialog = object : DialogInput(
 			hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
 			maxLength = UserConstraint.MAX_NAME_LENGTH
 		) {
@@ -92,7 +92,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 			}
 		}
 
-		val signatureModifyDialog = object : DialogInputState(
+		val signatureModifyDialog = object : DialogInput(
 			hint = "修改个性签名",
 			maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
 			maxLines = 3,

@@ -4,10 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowRight
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material.icons.outlined.Lightbulb
-import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -118,32 +115,6 @@ fun Tip(state: TipState) {
 }
 
 @Stable
-sealed interface DialogInfo {
-	val rachelWidth: Dp
-	val minContentHeight: Dp
-	val maxContentHeight: Dp
-	val width: Dp
-
-	data object Portrait : DialogInfo {
-		override val rachelWidth: Dp = 140.dp
-		override val minContentHeight: Dp = 50.dp
-		override val maxContentHeight: Dp = 260.dp
-		override val width: Dp = 300.dp
-	}
-
-	data object Landscape : DialogInfo {
-		override val rachelWidth: Dp = 140.dp
-		override val minContentHeight: Dp = 40.dp
-		override val maxContentHeight: Dp = 280.dp
-		override val width: Dp = 500.dp
-	}
-
-	companion object {
-		val instance: DialogInfo get() = if (app.isPortrait) Portrait else Landscape
-	}
-}
-
-@Stable
 abstract class DialogState {
 	var isOpen: Boolean by mutableStateOf(false)
 		protected set
@@ -154,80 +125,110 @@ abstract class DialogState {
 	open fun open() { isOpen = true }
 	open fun hide() { isOpen = false }
 
-	@Composable protected abstract fun dialogContent()
-	@Composable fun withOpen() {
+	@Composable
+	protected abstract fun dialogContent()
+
+	@Composable
+	fun withOpen() {
 		if (isOpen) dialogContent()
 		DisposableEffect(Unit) { onDispose { hide() } }
+	}
+
+	@OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+	protected fun BaseDialog(content: @Composable () -> Unit) {
+		BackHandler(!dismissOnBackPress) {}
+
+		Dialog(
+			onDismissRequest = { hide() },
+			properties = DialogProperties(
+				dismissOnBackPress = dismissOnBackPress,
+				dismissOnClickOutside = dismissOnClickOutside,
+				usePlatformDefaultWidth = true
+			),
+			content = content
+		)
 	}
 }
 
 abstract class RachelDialogState : DialogState() {
+	@Stable
+	sealed interface DialogInfo {
+		val rachelWidth: Dp
+		val minContentHeight: Dp
+		val maxContentHeight: Dp
+		val width: Dp
+
+		data object Portrait : DialogInfo {
+			override val rachelWidth: Dp = 140.dp
+			override val minContentHeight: Dp = 50.dp
+			override val maxContentHeight: Dp = 260.dp
+			override val width: Dp = 300.dp
+		}
+
+		data object Landscape : DialogInfo {
+			override val rachelWidth: Dp = 140.dp
+			override val minContentHeight: Dp = 40.dp
+			override val maxContentHeight: Dp = 280.dp
+			override val width: Dp = 500.dp
+		}
+	}
+
 	open val scrollable: Boolean get() = true
 	abstract val title: String?
-}
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun RachelDialog(
-	state: RachelDialogState,
-	actions: (@Composable RowScope.() -> Unit)? = null,
-	content: @Composable () -> Unit
-) {
-	val info = DialogInfo.instance
+	private val info: DialogInfo = if (app.isPortrait) DialogInfo.Portrait else DialogInfo.Landscape
 
-	BackHandler(!state.dismissOnBackPress) {}
-
-	Dialog(
-		onDismissRequest = { state.hide() },
-		properties = DialogProperties(
-			dismissOnBackPress = state.dismissOnBackPress,
-			dismissOnClickOutside = state.dismissOnClickOutside,
-			usePlatformDefaultWidth = true
-		)
+	@Composable
+	protected fun RachelDialog(
+		actions: (@Composable RowScope.() -> Unit)? = null,
+		content: @Composable () -> Unit
 	) {
-		Column(
-			modifier = Modifier.width(info.width),
-			horizontalAlignment = Alignment.CenterHorizontally
-		) {
-			OffsetLayout(y = info.rachelWidth / 15.5f) {
-				Image(
-					painter = painterResource(Res.drawable.img_dialog_rachel),
-					contentDescription = null,
-					modifier = Modifier.size(info.rachelWidth)
-				)
-			}
-			Surface(
-				shape = MaterialTheme.shapes.extraLarge,
-				shadowElevation = 5.dp,
-				modifier = Modifier.fillMaxWidth()
+		BaseDialog {
+			Column(
+				modifier = Modifier.width(info.width),
+				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(15.dp),
-					verticalArrangement = Arrangement.spacedBy(15.dp)
+				OffsetLayout(y = info.rachelWidth / 15.5f) {
+					Image(
+						painter = painterResource(Res.drawable.img_dialog_rachel),
+						contentDescription = null,
+						modifier = Modifier.size(info.rachelWidth)
+					)
+				}
+				Surface(
+					shape = MaterialTheme.shapes.extraLarge,
+					shadowElevation = 5.dp,
+					modifier = Modifier.fillMaxWidth()
 				) {
-					state.title?.let {
-						Text(
-							text = it,
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
-						)
-					}
-					Box(
-						modifier = Modifier.fillMaxWidth()
-							.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
-							.verticalScroll(enabled = state.scrollable, state = rememberScrollState())
+					Column(
+						modifier = Modifier.fillMaxWidth().padding(15.dp),
+						verticalArrangement = Arrangement.spacedBy(15.dp)
 					) {
-						content()
-					}
-					if (actions != null) {
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
+						title?.let {
+							Text(
+								text = it,
+								style = MaterialTheme.typography.titleLarge,
+								color = MaterialTheme.colorScheme.primary,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
+							)
+						}
+						Box(
+							modifier = Modifier.fillMaxWidth()
+								.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
+								.verticalScroll(enabled = scrollable, state = rememberScrollState())
 						) {
-							actions()
+							content()
+						}
+						if (actions != null) {
+							Row(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
+							) {
+								actions()
+							}
 						}
 					}
 				}
@@ -236,7 +237,7 @@ private fun RachelDialog(
 	}
 }
 
-open class DialogInfoState(
+open class DialogInfo(
 	title: String = "提示",
 	content: String = ""
 ) : RachelDialogState() {
@@ -253,7 +254,7 @@ open class DialogInfoState(
 
 	@Composable
 	override fun dialogContent() {
-		RachelDialog(state = this) {
+		RachelDialog {
 			Text(
 				text = content,
 				style = MaterialTheme.typography.bodyLarge,
@@ -263,16 +264,14 @@ open class DialogInfoState(
 	}
 }
 
-open class DialogConfirmState(
+open class DialogConfirm(
 	title: String = "确认",
 	content: String = "",
-	onYes: (() -> Unit)? = null
+	protected var onYes: (() -> Unit)? = null
 ) : RachelDialogState() {
 	override var title: String? by mutableStateOf(title)
 		protected set
 	var content: String by mutableStateOf(content)
-		protected set
-	var onYes = onYes
 		protected set
 
 	fun open(title: String = "确认", content: String, onYes: () -> Unit) {
@@ -285,7 +284,6 @@ open class DialogConfirmState(
 	@Composable
 	override fun dialogContent() {
 		RachelDialog(
-			state = this,
 			actions = {
 				RachelButton(
 					text = stringResource(Res.string.dialog_yes),
@@ -309,7 +307,7 @@ open class DialogConfirmState(
 	}
 }
 
-abstract class DialogInputState(
+abstract class DialogInput(
 	val hint: String = "",
 	val inputType: InputType = InputType.COMMON,
 	val maxLength: Int = 0,
@@ -334,7 +332,6 @@ abstract class DialogInputState(
 	@Composable
 	override fun dialogContent() {
 		RachelDialog(
-			state = this,
 			actions = {
 				RachelButton(
 					text = stringResource(Res.string.dialog_yes),
@@ -363,7 +360,7 @@ abstract class DialogInputState(
 	}
 }
 
-abstract class DialogChoiceState(
+abstract class DialogChoice(
 	val num: Int,
     override val title: String? = null
 ) : RachelDialogState() {
@@ -375,7 +372,7 @@ abstract class DialogChoiceState(
 
 	@Composable
 	override fun dialogContent() {
-		RachelDialog(state = this) {
+		RachelDialog {
 			Column(
 				modifier = Modifier.fillMaxWidth(),
 				verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -409,7 +406,7 @@ abstract class DialogChoiceState(
 			items: List<String>,
 			title: String? = null,
 			onSelected: (Int, String) -> Unit
-		) = object : DialogChoiceState(items.size, title) {
+		) = object : DialogChoice(items.size, title) {
 			override fun name(index: Int): String = items[index]
 			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
 			override fun onSelected(index: Int, text: String) = onSelected(index, text)
@@ -418,7 +415,7 @@ abstract class DialogChoiceState(
 		fun fromItems(
 			items: List<Pair<String, (Int, String) -> Unit>>,
 			title: String? = null
-		) = object : DialogChoiceState(items.size, title) {
+		) = object : DialogChoice(items.size, title) {
 			override fun name(index: Int): String = items[index].first
 			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
 			override fun onSelected(index: Int, text: String) = items[index].second(index, text)
@@ -428,7 +425,7 @@ abstract class DialogChoiceState(
 			items: List<Pair<String, ImageVector>>,
 			title: String? = null,
 			onSelected: (Int, String) -> Unit
-		) = object : DialogChoiceState(items.size, title) {
+		) = object : DialogChoice(items.size, title) {
 			override fun name(index: Int): String = items[index].first
 			override fun icon(index: Int): ImageVector = items[index].second
 			override fun onSelected(index: Int, text: String) = onSelected(index, text)
@@ -436,7 +433,7 @@ abstract class DialogChoiceState(
 	}
 }
 
-open class DialogProgressState() : RachelDialogState() {
+open class DialogProgress : RachelDialogState() {
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
 	var progress by mutableFloatStateOf(0f)
@@ -457,7 +454,6 @@ open class DialogProgressState() : RachelDialogState() {
 	@Composable
 	override fun dialogContent() {
 		RachelDialog(
-			state = this,
 			actions = {
 				RachelButton(
 					text = stringResource(Res.string.dialog_cancel),
@@ -501,23 +497,14 @@ open class DialogProgressState() : RachelDialogState() {
 	}
 }
 
-class DialogLoadingState : DialogState() {
+class DialogLoading : DialogState() {
 	override val dismissOnBackPress: Boolean = false
 	override val dismissOnClickOutside: Boolean = false
 
 	@OptIn(ExperimentalComposeUiApi::class)
 	@Composable
 	override fun dialogContent() {
-		BackHandler {}
-
-		Dialog(
-			onDismissRequest = { hide() },
-			properties = DialogProperties(
-				dismissOnBackPress = dismissOnBackPress,
-				dismissOnClickOutside = dismissOnClickOutside,
-				usePlatformDefaultWidth = true
-			)
-		) {
+		BaseDialog {
 			Surface(
 				shape = MaterialTheme.shapes.extraLarge,
 				shadowElevation = 5.dp,

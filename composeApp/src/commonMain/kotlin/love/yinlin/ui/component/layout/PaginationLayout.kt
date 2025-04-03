@@ -41,7 +41,7 @@ import kotlin.math.absoluteValue
 
 // 分页数据实现
 @Stable
-abstract class Pagination<E, T>(
+abstract class Pagination<E, out T>(
 	private val default: T,
 	val pageNum: Int = APIConfig.MIN_PAGE_NUM
 ) {
@@ -80,7 +80,7 @@ abstract class Pagination<E, T>(
 }
 
 @Stable
-abstract class PaginationArgs<E, T, A1>(
+abstract class PaginationArgs<E, out T, out A1>(
 	default: T,
 	private val default1: A1,
 	pageNum: Int = APIConfig.MIN_PAGE_NUM

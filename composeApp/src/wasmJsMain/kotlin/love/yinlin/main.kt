@@ -10,7 +10,9 @@ import love.yinlin.platform.app
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    app = ActualAppContext().initialize()
+    val context = ActualAppContext()
+    app = context
+    context.initialize()
 
     try {
         ComposeViewport(document.body!!) {

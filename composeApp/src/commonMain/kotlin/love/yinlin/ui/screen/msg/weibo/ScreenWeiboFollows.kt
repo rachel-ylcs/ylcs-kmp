@@ -31,7 +31,7 @@ import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.DialogInputState
+import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 
 @Composable
@@ -67,7 +67,7 @@ private fun WeiboUserItem(
 data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 	class Model(model: AppModel) : Screen.Model(model) {
 		var isLocal by mutableStateOf(true)
-		val searchDialog = object : DialogInputState(
+		val searchDialog = object : DialogInput(
 			hint = "输入微博用户昵称关键字",
 			maxLength = 16
 		) {

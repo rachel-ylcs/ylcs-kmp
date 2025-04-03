@@ -2,6 +2,7 @@ package love.yinlin
 
 // 本地全局配置
 object Local {
+	const val APP_NAME: String = "ylcs"
 	const val NAME: String = "银临茶舍"
 	const val VERSION: Int = 300
 	const val VERSION_NAME: String = "3.0.0"

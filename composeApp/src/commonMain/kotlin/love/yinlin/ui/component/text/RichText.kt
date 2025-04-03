@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
 import love.yinlin.extension.*
+import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.WebImageQuality
 
 // RichString DSL
 
@@ -149,7 +149,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		override fun draw() {
 			WebImage(
 				uri = uri,
-				quality = WebImageQuality.Low,
+				quality = ImageQuality.Low,
 				modifier = Modifier.fillMaxSize()
 			)
 		}

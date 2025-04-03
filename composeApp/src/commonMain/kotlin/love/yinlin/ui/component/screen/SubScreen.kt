@@ -66,9 +66,9 @@ sealed class ActionScope(private val ltr: Boolean) {
 @Stable
 class SubScreenSlot {
 	val tip: TipState = TipState()
-	val info: DialogInfoState = DialogInfoState()
-	val confirm: DialogConfirmState = DialogConfirmState()
-	val loading: DialogLoadingState = DialogLoadingState()
+	val info: DialogInfo = DialogInfo()
+	val confirm: DialogConfirm = DialogConfirm()
+	val loading: DialogLoading = DialogLoading()
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)

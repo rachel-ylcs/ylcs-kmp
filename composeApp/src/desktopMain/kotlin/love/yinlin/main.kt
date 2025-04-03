@@ -29,8 +29,9 @@ import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.stringResource
 
 fun main() {
-    val context = ActualAppContext().initialize()
+    val context = ActualAppContext()
     app = context
+    context.initialize()
 
     // JavaFx
     Platform.startup {

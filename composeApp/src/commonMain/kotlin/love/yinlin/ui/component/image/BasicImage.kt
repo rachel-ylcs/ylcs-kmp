@@ -9,28 +9,19 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
-import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.AsyncImageState
-import com.github.panpf.sketch.cache.CachePolicy
-import com.github.panpf.sketch.rememberAsyncImageState
-import com.github.panpf.sketch.request.ComposableImageOptions
+import com.github.panpf.sketch.*
+import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
@@ -41,10 +32,11 @@ import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.condition
 import love.yinlin.extension.rememberState
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
+import love.yinlin.platform.ImageQuality
 import love.yinlin.resources.Res
 import love.yinlin.resources.placeholder_pic
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 val DEFAULT_ICON_SIZE = 24.dp
 
@@ -268,21 +260,7 @@ fun ClickImage(
 	)
 }
 
-enum class WebImageQuality {
-	Low, Medium, High;
 
-	val sizeMultiplier: Float get() = when (this) {
-		Low -> 1f
-		Medium -> 2f
-		High -> 4f
-	}
-
-	val filterQuality: FilterQuality get() = when (this) {
-		Low -> FilterQuality.Low
-		Medium -> FilterQuality.Medium
-		High -> FilterQuality.High
-	}
-}
 
 @Composable
 private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(uri, key) {
@@ -293,16 +271,21 @@ private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = reme
 
 @Composable
 fun rememberWebImageState(
-	quality: WebImageQuality,
-	placeholder: DrawableResource,
-	isCrossfade: Boolean
-) = rememberAsyncImageState(ComposableImageOptions {
-	downloadCachePolicy(CachePolicy.ENABLED)
-	memoryCachePolicy(CachePolicy.ENABLED)
-	sizeMultiplier(quality.sizeMultiplier)
-	placeholder(rememberIconPainterStateImage(placeholder))
-	if (isCrossfade) crossfade()
-})
+	quality: ImageQuality,
+	placeholder: DrawableResource? = null,
+	isCrossfade: Boolean = true
+): AsyncImageState {
+	val context = LocalPlatformContext.current
+	val holder = placeholder?.let { rememberIconPainterStateImage(it) }
+	val options = remember(quality, holder, isCrossfade) {
+		ImageOptions.Builder().apply {
+			sizeMultiplier(quality.sizeMultiplier)
+			placeholder(holder)
+			if (isCrossfade) crossfade()
+		}.merge(SingletonSketch.get(context).globalImageOptions).build()
+	}
+	return rememberAsyncImageState(options)
+}
 
 @Composable
 fun WebImage(
@@ -310,7 +293,7 @@ fun WebImage(
 	key: Any? = null,
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
-	quality: WebImageQuality = WebImageQuality.Medium,
+	quality: ImageQuality = ImageQuality.Medium,
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
@@ -337,7 +320,7 @@ fun ZoomWebImage(
 	key: Any? = null,
 	zoomState: SketchZoomState = rememberSketchZoomState(),
 	modifier: Modifier = Modifier,
-	quality: WebImageQuality = WebImageQuality.Medium,
+	quality: ImageQuality = ImageQuality.High,
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,

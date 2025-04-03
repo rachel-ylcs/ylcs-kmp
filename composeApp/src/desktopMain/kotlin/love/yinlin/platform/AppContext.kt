@@ -2,8 +2,15 @@
 package love.yinlin.platform
 
 import androidx.compose.ui.unit.Density
+import com.github.panpf.sketch.PlatformContext
+import com.github.panpf.sketch.Sketch
+import com.github.panpf.sketch.cache.CachePolicy
+import com.github.panpf.sketch.cache.DiskCache
+import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.util.Logger
 import love.yinlin.Local
 import love.yinlin.extension.DateEx
+import okio.Path.Companion.toPath
 import java.awt.GraphicsEnvironment
 
 class ActualAppContext : AppContext() {
@@ -28,13 +35,34 @@ class ActualAppContext : AppContext() {
 		screenHeight = (windowHeight * scaleY).toInt()
 	}
 
-	override fun initialize(): ActualAppContext {
+	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
+		logger(level = Logger.Level.Error)
+		downloadCacheOptions {
+			DiskCache.Options(
+				appCacheDirectory = OS.Storage.cachePath.toPath(),
+				maxSize = 500 * 1024 * 1024
+			)
+		}
+		resultCacheOptions {
+			DiskCache.Options(
+				appCacheDirectory = OS.Storage.cachePath.toPath(),
+				maxSize = 500 * 1024 * 1024
+			)
+		}
+		globalImageOptions(ImageOptions {
+			downloadCachePolicy(CachePolicy.ENABLED)
+			resultCachePolicy(CachePolicy.ENABLED)
+			memoryCachePolicy(CachePolicy.ENABLED)
+			sizeMultiplier(ImageQuality.Medium.sizeMultiplier)
+		})
+	}.build()
+
+	override fun initialize() {
 		super.initialize()
 		// 注册异常回调
 		Thread.setDefaultUncaughtExceptionHandler { _, e ->
 			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
 		}
-        return this
 	}
 }
 

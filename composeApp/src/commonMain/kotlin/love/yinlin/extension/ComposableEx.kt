@@ -2,12 +2,17 @@ package love.yinlin.extension
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.AtomicReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
+
+// BaseValue
+
+fun Offset.translate(x: Float = 0f, y: Float = 0f) = copy(x = this.x + x, y = this.y + y)
 
 // condition Modifier
 
@@ -72,6 +77,12 @@ inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScop
 }
 
 
+// Composition Local
+
+
+fun <T> localComposition() = staticCompositionLocalOf<T> { error("CompositionLocal not present") }
+
+
 // Debounce
 
 
@@ -87,9 +98,3 @@ fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
 		}
 	}
 }
-
-
-// Composition Local
-
-
-fun <T> localComposition() = staticCompositionLocalOf<T> { error("CompositionLocal not present") }

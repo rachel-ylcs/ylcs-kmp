@@ -1,7 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.ui.graphics.ImageBitmap
-
 object OS {
 	val platform: Platform = osPlatform // 平台
 
@@ -10,12 +8,9 @@ object OS {
 	}
 
 	object Storage {
+		val cachePath: String by lazy { osStorageCachePath }
 		val cacheSize get() = osStorageCacheSize
 		fun clearCache() = osStorageClearCache()
-	}
-
-	object Image {
-		fun crop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int) = osImageCrop(bitmap, startX, startY, width, height)
 	}
 }
 
@@ -29,9 +24,6 @@ internal expect fun osNetOpenUrl(url: String)
 
 // ------------  Storage
 
+internal expect val osStorageCachePath: String
 internal expect val osStorageCacheSize: Long
 internal expect fun osStorageClearCache()
-
-// ------------  Image
-
-internal expect fun osImageCrop(bitmap: ImageBitmap, startX: Int, startY: Int, width: Int, height: Int): ImageBitmap

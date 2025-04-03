@@ -1,9 +1,16 @@
 package love.yinlin.platform
 
+import com.github.panpf.sketch.PlatformContext
+import com.github.panpf.sketch.Sketch
+import com.github.panpf.sketch.cache.CachePolicy
+import com.github.panpf.sketch.cache.DiskCache
+import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.util.Logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.ptr
 import love.yinlin.extension.DateEx
+import okio.Path.Companion.toPath
 import platform.CoreGraphics.CGRectGetHeight
 import platform.CoreGraphics.CGRectGetWidth
 import platform.Foundation.NSException
@@ -27,11 +34,32 @@ class ActualAppContext : AppContext() {
 		}
 	}.objcPtr())
 
-	override fun initialize(): AppContext {
+	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
+		logger(level = Logger.Level.Error)
+		downloadCacheOptions {
+			DiskCache.Options(
+				appCacheDirectory = OS.Storage.cachePath.toPath(),
+				maxSize = 300 * 1024 * 1024
+			)
+		}
+		resultCacheOptions {
+			DiskCache.Options(
+				appCacheDirectory = OS.Storage.cachePath.toPath(),
+				maxSize = 300 * 1024 * 1024
+			)
+		}
+		globalImageOptions(ImageOptions {
+			downloadCachePolicy(CachePolicy.ENABLED)
+			resultCachePolicy(CachePolicy.ENABLED)
+			memoryCachePolicy(CachePolicy.ENABLED)
+			sizeMultiplier(ImageQuality.Medium.sizeMultiplier)
+		})
+	}.build()
+
+	override fun initialize() {
 		super.initialize()
 		// 注册异常回调
 		NSSetUncaughtExceptionHandler(exceptionHandler.ptr)
-		return this
 	}
 }
 

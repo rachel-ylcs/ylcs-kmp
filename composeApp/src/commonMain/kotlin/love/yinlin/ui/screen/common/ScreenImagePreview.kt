@@ -29,7 +29,7 @@ import love.yinlin.platform.safeDownload
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
-import love.yinlin.ui.component.screen.DialogProgressState
+import love.yinlin.ui.component.screen.DialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
@@ -44,7 +44,7 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 		val previews: List<PreviewPicture> = images.map { PreviewPicture(it) }
 		var current: Int by mutableIntStateOf(index)
 
-		val downloadDialog = DialogProgressState()
+		val downloadDialog = DialogProgress()
 		fun downloadPicture() {
 			val preview = previews[current]
 			val url = if (preview.isSource) preview.pic.source else preview.pic.image

@@ -8,9 +8,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
 actual object Coroutines {
-    actual suspend fun <T> main(block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.Main, block)
-    actual suspend fun <T> cpu(block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.Default, block)
-    actual suspend fun <T> io( block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.IO, block)
-    actual suspend fun <T> wait(block: suspend CoroutineScope.() -> T): T = withContext(NonCancellable, block)
-    actual suspend fun <T> timeout(limit: Long, block: suspend CoroutineScope.() -> T): T = withTimeout(limit, block)
+    actual suspend inline fun <T> main(noinline block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.Main, block)
+    actual suspend inline fun <T> cpu(noinline block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.Default, block)
+    actual suspend inline fun <T> io(noinline block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.IO, block)
+    actual suspend inline fun <T> wait(noinline block: suspend CoroutineScope.() -> T): T = withContext(NonCancellable, block)
+    actual suspend inline fun <T> timeout(limit: Int, noinline block: suspend CoroutineScope.() -> T): T = withTimeout(limit.toLong(), block)
 }

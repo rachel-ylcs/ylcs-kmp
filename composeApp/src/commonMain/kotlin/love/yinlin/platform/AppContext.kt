@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.github.panpf.sketch.SingletonSketch
+import com.github.panpf.sketch.Sketch
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +20,10 @@ import love.yinlin.common.Resource
 
 @Stable
 abstract class AppContext {
+	companion object {
+		const val CRASH_KEY = "crash_key"
+	}
+
 	// 屏幕宽度
 	abstract val screenWidth: Int
 	// 屏幕高度
@@ -48,18 +54,18 @@ abstract class AppContext {
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
-	open fun initialize(): AppContext {
+	// ImageLoader
+	abstract fun initializeSketch(): Sketch
+
+	open fun initialize() {
+		// 初始化图片加载器
+		SingletonSketch.setSafe { initializeSketch() }
 		// 加载配置
 		config = KVConfig(kv)
 		CoroutineScope(Dispatchers.Default).launch {
 			// 加载资源
 			Resource.initialize()
 		}
-		return this
-	}
-
-	companion object {
-		const val CRASH_KEY = "crash_key"
 	}
 }
 

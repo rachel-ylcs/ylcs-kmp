@@ -5,7 +5,9 @@ import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
 
 fun MainViewController() {
-	app = ActualAppContext().initialize()
+	val context = ActualAppContext()
+	app = context
+	context.initialize()
 	ComposeUIViewController {
 		AppWrapper {
 			App()
