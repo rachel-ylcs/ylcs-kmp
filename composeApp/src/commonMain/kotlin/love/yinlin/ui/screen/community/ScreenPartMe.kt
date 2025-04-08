@@ -44,7 +44,6 @@ import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @Composable
@@ -96,7 +95,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		val token = app.config.userToken
 		val lastUpdateTime = app.config.userTokenUpdate
 		val currentTime = DateEx.CurrentLong
-		if (token.isNotEmpty() && currentTime - lastUpdateTime > 5.seconds.toLong(DurationUnit.MILLISECONDS)) launch {
+		if (token.isNotEmpty() && currentTime - lastUpdateTime > 5.days.toLong(DurationUnit.MILLISECONDS)) launch {
 			val result = ClientAPI.request(
 				route = API.User.Account.UpdateToken,
 				data = token
