@@ -82,7 +82,7 @@ afterEvaluate {
     buildFatJar.get().mustRunAfter(cleanFatJar)
 
     // 发布服务端
-    val serverPublish: Task by tasks.creating {
+    val serverPublish by tasks.registering {
         dependsOn(cleanFatJar)
         dependsOn(buildFatJar)
     }
