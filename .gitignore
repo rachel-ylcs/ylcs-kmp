@@ -10,7 +10,7 @@ kotlin-js-store/
 
 # Gradle
 .gradle/
-gradle/
+
 
 # IOS
 *.xcodeproj/*
@@ -31,3 +31,4 @@ cpp/libs
 
 # 本地配置
 *.properties
+!**/gradle-wrapper.properties
