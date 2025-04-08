@@ -1,6 +1,5 @@
 package love.yinlin.api
 
-import com.eygraber.uri.UriCodec
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -40,7 +39,7 @@ object ClientAPI {
 
 	fun buildGetParameters(argsMap: JsonObject): String {
 		val args = StringBuilder()
-		for ((key, value) in argsMap) args.append("$key=${UriCodec.encode(value.String)}&")
+		for ((key, value) in argsMap) args.append("$key=${UriEx.encode(value.String)}&")
 		return if (args.isNotEmpty()) "?${args.dropLast(1)}" else ""
 	}
 

@@ -37,7 +37,7 @@ import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.resources.*
 
 @Composable
-private fun ActivityInfoLayout(
+private fun ActivityDetailsLayout(
 	activity: Activity,
 	modifier: Modifier = Modifier
 ) {
@@ -196,7 +196,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 							.verticalScroll(rememberScrollState()),
 						verticalArrangement = Arrangement.spacedBy(10.dp)
 					) {
-						ActivityInfoLayout(
+						ActivityDetailsLayout(
 							activity = activity,
 							modifier = Modifier.fillMaxWidth()
 						)
@@ -208,7 +208,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 				}
 				else {
 					Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
-						ActivityInfoLayout(
+						ActivityDetailsLayout(
 							activity = activity,
 							modifier = Modifier.weight(2f)
 						)

@@ -67,12 +67,10 @@ private fun WeiboUserItem(
 data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 	class Model(model: AppModel) : Screen.Model(model) {
 		var isLocal by mutableStateOf(true)
-		val searchDialog = object : DialogInput(
+		val searchDialog = DialogInput(
 			hint = "输入微博用户昵称关键字",
 			maxLength = 16
-		) {
-			override fun onInput(text: String) = onSearchWeiboUser(text)
-		}
+		)
 		var state by mutableStateOf(BoxState.CONTENT)
 		var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
@@ -89,8 +87,8 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			}
 		}
 
-		fun onSearchWeiboUser(key: String) {
-			launch {
+		suspend fun onSearchWeiboUser() {
+			searchDialog.open()?.let { key ->
 				state = BoxState.LOADING
 				val result = WeiboAPI.searchWeiboUser(key)
 				isLocal = false
@@ -117,7 +115,7 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			actions = {
 				Action(
 					icon = Icons.Outlined.Search,
-					onClick = { model.searchDialog.open() }
+					onClick = { model.launch { model.onSearchWeiboUser() } }
 				)
 				Action(
 					icon = Icons.Outlined.Refresh,

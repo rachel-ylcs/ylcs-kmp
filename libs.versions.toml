@@ -11,7 +11,7 @@ agp = "8.7.3"
 # Common
 lifecycle = "2.9.0-alpha05"
 ktor = "3.1.2"
-sketch = "4.0.4"
+sketch = "4.0.5"
 mmkv = "2.1.0"
 
 # Desktop
@@ -61,8 +61,6 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 
 html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
 
-uri = { module = "com.eygraber:uri-kmp", version = "0.0.19" }
-
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
@@ -71,9 +69,6 @@ compose-activity = { module = "androidx.activity:activity-compose", version = "1
 compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version = "1.7.8" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-
-image-crop = { module = "com.github.moyuruaizawa:cropify", version = "0.5.1" }
-image-compress = { module = "com.github.forJrking:KLuban", version = "1.1.0" }
 
 # Apple
 ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }

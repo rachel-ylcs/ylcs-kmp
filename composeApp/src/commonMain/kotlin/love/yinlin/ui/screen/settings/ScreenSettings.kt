@@ -65,11 +65,20 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		val privacyPolicySheet = CommonSheetState()
 		val aboutSheet = CommonSheetState()
 
-		val idModifyDialog = object : DialogInput(
+		val idModifyDialog = DialogInput(
 			hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
 			maxLength = UserConstraint.MAX_NAME_LENGTH
-		) {
-			override fun onInput(text: String) {
+		)
+
+		val signatureModifyDialog = DialogInput(
+			hint = "修改个性签名",
+			maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
+			maxLines = 3,
+			clearButton = false
+		)
+
+		suspend fun modifyUserId(initText: String) {
+			idModifyDialog.open(initText)?.let { text ->
 				val profile = app.config.userProfile
 				if (profile != null) launch {
 					val result = ClientAPI.request(
@@ -92,13 +101,8 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 			}
 		}
 
-		val signatureModifyDialog = object : DialogInput(
-			hint = "修改个性签名",
-			maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
-			maxLines = 3,
-			clearButton = false
-		) {
-			override fun onInput(text: String) {
+		suspend fun modifyUserSignature(initText: String) {
+			signatureModifyDialog.open(initText)?.let { text ->
 				val profile = app.config.userProfile
 				if (profile != null) launch {
 					val result = ClientAPI.request(
@@ -194,7 +198,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					title = "ID",
 					text = userProfile?.name ?: stringResource(Res.string.default_name),
 					onClick = {
-						if (userProfile != null) idModifyDialog.open(userProfile.name)
+						if (userProfile != null) launch { modifyUserId(userProfile.name) }
 					}
 				)
 				ItemText(
@@ -202,7 +206,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					text = userProfile?.signature ?: stringResource(Res.string.default_signature),
 					maxLines = 2,
 					onClick = {
-						if (userProfile != null) signatureModifyDialog.open(userProfile.signature)
+						if (userProfile != null) launch { modifyUserSignature(userProfile.signature) }
 					}
 				)
 				Item(

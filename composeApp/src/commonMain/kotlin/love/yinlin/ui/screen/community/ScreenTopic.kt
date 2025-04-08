@@ -155,9 +155,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 		val moveTopicDialog = DialogChoice.fromItems(
 			items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
 			title = "移动主题板块"
-		) { index, _ ->
-			onMoveTopic(Comment.Section.MovableSection[index])
-		}
+		)
 
 		suspend fun requestTopic() {
 			val result = ClientAPI.request(
@@ -230,8 +228,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
-		fun onDeleteTopic() {
-			launch {
+		suspend fun onDeleteTopic() {
+			if (slot.confirm.open(content = "删除主题?")) {
 				val result = ClientAPI.request(
 					route = API.User.Topic.DeleteTopic,
 					data =  API.User.Topic.DeleteTopic.Request(
@@ -249,13 +247,14 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
-		fun onMoveTopic(newSection: Int) {
-			details?.let { oldDetails ->
-				val oldSection = oldDetails.section
-				launch {
+		suspend fun onMoveTopic() {
+			moveTopicDialog.open()?.let { index ->
+				val newSection = Comment.Section.MovableSection[index]
+				details?.let { oldDetails ->
+					val oldSection = oldDetails.section
 					if (newSection == oldSection) {
 						slot.tip.warning("不能与原板块相同哦")
-						return@launch
+						return
 					}
 					val result = ClientAPI.request(
 						route = API.User.Topic.MoveTopic,
@@ -397,8 +396,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
-		fun onDeleteComment(cid: Int) {
-			launch {
+		suspend fun onDeleteComment(cid: Int) {
+			if (slot.confirm.open(content = "删除回复(楼中楼会同步删除)")) {
 				val result = ClientAPI.request(
 					route = API.User.Topic.DeleteComment,
 					data = API.User.Topic.DeleteComment.Request(
@@ -420,8 +419,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 			}
 		}
 
-		fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
-			launch {
+		suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
+			if (slot.confirm.open(content = "删除回复")) {
 				val result = ClientAPI.request(
 					route = API.User.Topic.DeleteSubComment,
 					data = API.User.Topic.DeleteSubComment.Request(
@@ -536,9 +535,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 								text = "删除",
 								style = MaterialTheme.typography.labelLarge,
 								modifier = Modifier.clickable {
-									slot.confirm.open(content = "删除回复(楼中楼会同步删除)") {
-										onDeleteComment(comment.cid)
-									}
+									launch { onDeleteComment(comment.cid) }
 								}.padding(2.dp)
 							)
 						}
@@ -588,9 +585,7 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 									textAlign = TextAlign.End,
 									style = MaterialTheme.typography.labelLarge,
 									modifier = Modifier.clickable {
-										slot.confirm.open(content = "删除回复") {
-											onDeleteSubComment(parentComment.cid, subComment.cid, onDelete)
-										}
+										launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
 									}.padding(2.dp)
 								)
 							}
@@ -817,15 +812,11 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					)
 					if (canMoveTopic) Action(
 						icon = Icons.Outlined.MoveUp,
-						onClick = { model.moveTopicDialog.open() }
+						onClick = { model.launch { model.onMoveTopic() } }
 					)
 					if (canDeleteTopic) Action(
 						icon = Icons.Outlined.Delete,
-						onClick = {
-							model.slot.confirm.open(content = "删除主题?") {
-								model.onDeleteTopic()
-							}
-						}
+						onClick = { model.launch { model.onDeleteTopic() } }
 					)
 				}
 			},

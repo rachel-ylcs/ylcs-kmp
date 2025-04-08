@@ -105,7 +105,6 @@ kotlin {
                 implementation(libs.sketch.zoom)
 
                 implementation(libs.html)
-                implementation(libs.uri)
             }
         }
 
@@ -146,8 +145,6 @@ kotlin {
                 implementation(compose.preview)
                 implementation(libs.compose.activity)
                 implementation(libs.mmkv.android)
-                implementation(libs.image.crop)
-                implementation(libs.image.compress)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar"))))
             }

@@ -80,8 +80,8 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 			if (result is Data.Success) page.moreData(result.data)
 		}
 
-		private fun onProcessMail(mid: Long, value: Boolean) {
-			launch {
+		private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
+			if (slot.confirm.open(content = text)) {
 				slot.loading.open()
 				val result = ClientAPI.request(
 					route = API.User.Mail.ProcessMail,
@@ -104,8 +104,8 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 			}
 		}
 
-		fun onDeleteMail(mid: Long) {
-			launch {
+		suspend fun onDeleteMail(mid: Long) {
+			if (slot.confirm.open(content = "删除此邮件?")) {
 				slot.loading.open()
 				val result = ClientAPI.request(
 					route = API.User.Mail.DeleteMail,
@@ -204,7 +204,7 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 							text = "接受",
 							icon = Icons.Outlined.CheckCircle,
 							onClick = {
-								slot.confirm.open(content = "接受此邮件结果?") { onProcessMail(mail.mid, true) }
+								launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
 							}
 						)
 						if (mail.withNo) RachelButton(
@@ -212,7 +212,7 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 							icon = Icons.Outlined.Cancel,
 							color = MaterialTheme.colorScheme.error,
 							onClick = {
-								slot.confirm.open(content = "拒绝此邮件结果?") { onProcessMail(mail.mid, false) }
+								launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
 							}
 						)
 						if (mail.processed) RachelButton(
@@ -220,7 +220,7 @@ data object ScreenMail : Screen<ScreenMail.Model> {
 							icon = Icons.Outlined.Delete,
 							color = MaterialTheme.colorScheme.secondary,
 							onClick = {
-								slot.confirm.open(content = "删除此邮件?") { onDeleteMail(mail.mid) }
+								launch { onDeleteMail(mail.mid) }
 							}
 						)
 					}

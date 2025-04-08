@@ -14,7 +14,6 @@ import kotlinx.io.Sink
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.extension.Json
-import love.yinlin.extension.MainThread
 import kotlin.coroutines.cancellation.CancellationException
 
 expect object NetClient {
@@ -67,7 +66,7 @@ suspend inline fun <R> HttpClient.safeCall(
 
 suspend inline fun <reified T, R> HttpClient.safeGet(
 	url: String,
-	crossinline block: @MainThread suspend (T) -> R
+	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
 	client.prepareGet(url).execute { response ->
 		val data = response.body<T>()
@@ -78,7 +77,7 @@ suspend inline fun <reified T, R> HttpClient.safeGet(
 suspend inline fun <reified U, reified T, R> HttpClient.safePost(
 	url: String,
 	data: U,
-	crossinline block: @MainThread suspend (T) -> R
+	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
 	client.preparePost(url) { setBody(data) }.execute { response ->
 		val data = response.body<T>()

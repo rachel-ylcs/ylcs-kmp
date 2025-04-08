@@ -1,67 +1,102 @@
 package love.yinlin.platform
 
-import androidx.compose.ui.graphics.toSkiaRect
-import com.github.panpf.sketch.createBitmap
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
 
-private typealias ComposeRect = androidx.compose.ui.geometry.Rect
-
-val ImageQuality.samplingMode: SamplingMode get() = when (this) {
+private val ImageQuality.samplingMode: SamplingMode get() = when (this) {
     ImageQuality.Low -> SamplingMode.DEFAULT
     ImageQuality.Medium -> SamplingMode.LINEAR
     ImageQuality.High, ImageQuality.Full -> SamplingMode.MITCHELL
 }
 
-actual object ImageProcessor {
-    actual fun compress(source: Source, sink: Sink): Boolean = try {
-        Image.makeFromEncoded(source.readByteArray()).use { image ->
-            val info = ScaleQualityInfo.calculate(image.width, image.height)
-            if (info.scale) createBitmap(image.imageInfo.withWidthHeight(info.width, info.height)).use { bitmap ->
-                Canvas(bitmap).use { canvas ->
-                    canvas.drawImageRect(
-                        image = image,
-                        src = Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-                        dst = Rect.makeWH(info.width.toFloat(), info.height.toFloat()),
-                        samplingMode = info.quality.samplingMode,
-                        paint = null,
-                        strict = true
-                    )
-                }
-                Image.makeFromBitmap(bitmap).use { scaleImage ->
-                    scaleImage.encodeToData(EncodedImageFormat.WEBP, info.quality.value)?.use { data ->
-                        sink.write(data.bytes)
-                    } != null
-                }
+private fun Bitmap.Companion.create(width: Int, height: Int, colorInfo: ColorInfo): Bitmap = Bitmap().apply {
+    allocPixels(ImageInfo(colorInfo, width, height))
+}
+
+private fun Canvas.drawBitmap(
+    @ImmutableImage bitmap: Bitmap,
+    src: Rect = Rect.makeWH(bitmap.width.toFloat(), bitmap.height.toFloat()),
+    dst: Rect,
+    samplingMode: SamplingMode = SamplingMode.LINEAR
+) {
+    Image.makeFromBitmap(bitmap).use { image ->
+        this.drawImageRect(
+            image = image,
+            src = src,
+            dst = dst,
+            samplingMode = samplingMode,
+            paint = null,
+            strict = true
+        )
+    }
+}
+
+actual typealias ImageOwner = Bitmap
+
+actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean = Coroutines.cpu {
+    var bitmap: Bitmap? = null
+    try {
+        val bytes = Coroutines.io { source.readByteArray() }
+        bitmap = Image.makeFromEncoded(bytes).use { image ->
+            Bitmap.makeFromImage(image)
+        }
+        bitmap.setImmutable()
+        for (op in items) {
+            val result = op.process(bitmap!!, quality)
+            if (result != null) {
+                if (!bitmap.isClosed) bitmap.close()
+                result.setImmutable()
+                bitmap = result
             }
-            else image.encodeToData(EncodedImageFormat.WEBP, info.quality.value)?.use { data ->
-                sink.write(data.bytes)
+        }
+        Image.makeFromBitmap(bitmap).use { image ->
+            image.encodeToData(EncodedImageFormat.WEBP, quality.value)?.use { data ->
+                Coroutines.io { sink.write(data.bytes) }
             } != null
         }
-    } catch (_: Throwable) { false }
+    } catch (_: Throwable) {
+        false
+    } finally {
+        if (bitmap != null && !bitmap.isClosed) bitmap.close()
+    }
+}
 
-    actual fun crop(source: Source, sink: Sink, rect: ComposeRect): Boolean = try {
-        Image.makeFromEncoded(source.readByteArray()).use { image ->
-            createBitmap(image.imageInfo.withWidthHeight(width = rect.width.toInt(), height = rect.height.toInt())).use { bitmap ->
-                Canvas(bitmap).use { canvas ->
-                    canvas.drawImageRect(
-                        image = image,
-                        src = rect.toSkiaRect(),
-                        dst = Rect.makeWH(rect.width, rect.height),
-                        samplingMode = SamplingMode.MITCHELL,
-                        paint = null,
-                        strict = true
-                    )
-                }
-                Image.makeFromBitmap(bitmap).use { croppedImage ->
-                    croppedImage.encodeToData(EncodedImageFormat.WEBP, ImageQuality.Full.value)?.use { data ->
-                        sink.write(data.bytes)
-                    } != null
-                }
+actual data object ImageCompress : ImageOp {
+    actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
+        val info = ScaleQualityInfo.calculate(owner.width, owner.height)
+        if (info.scale) {
+            val result = Bitmap.create(info.width, info.height, owner.colorInfo)
+            Canvas(result).use { canvas ->
+                canvas.drawBitmap(
+                    bitmap = owner,
+                    dst = Rect.makeWH(info.width.toFloat(), info.height.toFloat()),
+                    samplingMode = quality.samplingMode
+                )
             }
+            return result
         }
-    } catch (_: Throwable) { false }
+        return null
+    }
+}
+
+actual data class ImageCrop actual constructor(val rect: CropResult): ImageOp {
+    actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
+        val actualX = rect.xPercent * owner.width
+        val actualY = rect.yPercent * owner.height
+        val actualWidth = rect.widthPercent * owner.width
+        val actualHeight = rect.heightPercent * owner.height
+        val result = Bitmap.create(actualWidth.toInt(), actualHeight.toInt(), owner.colorInfo)
+        Canvas(result).use { canvas ->
+            canvas.drawBitmap(
+                bitmap = owner,
+                src = Rect(actualX, actualY, actualX + actualWidth, actualY + actualHeight),
+                dst = Rect.makeWH(actualWidth, actualHeight),
+                samplingMode = SamplingMode.MITCHELL
+            )
+        }
+        return result
+    }
 }

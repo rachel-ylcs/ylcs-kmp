@@ -69,11 +69,13 @@ object DateEx {
 
 	val Current: LocalDateTime get() = Clock.System.now().toLocalDateTime!!
 
-	val CurrentString: String = Formatter.standardDateTime.format(Current)!!
+	val CurrentString: String get() = Formatter.standardDateTime.format(Current)!!
+
+	val CurrentLong: Long get() = Clock.System.now().toEpochMilliseconds()
 
 	val Today: LocalDate get() = Current.date
 
-	val TodayString: String = Formatter.standardDate.format(Today)!!
+	val TodayString: String get() = Formatter.standardDate.format(Today)!!
 }
 
 val Instant.toLocalDateTime: LocalDateTime? get() = try { this.toLocalDateTime(TimeZone.currentSystemDefault()) } catch (_: Throwable) { null }

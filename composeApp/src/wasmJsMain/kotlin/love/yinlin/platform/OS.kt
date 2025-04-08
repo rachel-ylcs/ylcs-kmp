@@ -8,4 +8,4 @@ actual fun osNetOpenUrl(url: String) {
 	window.open(url, "_blank")
 }
 
-actual val osStorageCachePath: String get() = ""
+actual val osStorageCachePath: String get() = error("wasmJs not supported")

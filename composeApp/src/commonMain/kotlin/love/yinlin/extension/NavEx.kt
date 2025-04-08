@@ -4,7 +4,6 @@ import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
-import com.eygraber.uri.UriCodec
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -14,9 +13,9 @@ inline fun <reified T> buildNavType(
 	override fun put(bundle: SavedState, key: String, value: T) = bundle.write { putString(key, value.toJsonString()) }
 	override fun get(bundle: SavedState, key: String): T? = bundle.read { getString(key).parseJsonValue() }
 
-	override fun parseValue(value: String): T = UriCodec.decode(value).parseJsonValue()!!
+	override fun parseValue(value: String): T = UriEx.decode(value).parseJsonValue()!!
 
-	override fun serializeAsValue(value: T): String = UriCodec.encode(value.toJsonString())
+	override fun serializeAsValue(value: T): String = UriEx.encode(value.toJsonString())
 }
 
 val navTypeCaches = mutableMapOf<String, NavType<*>>()

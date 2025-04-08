@@ -4,16 +4,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -33,8 +25,10 @@ import love.yinlin.common.Colors
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.translate
+import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.screen.DialogState
+import kotlin.coroutines.resume
 import kotlin.math.max
 import kotlin.math.min
 
@@ -165,7 +159,7 @@ fun CropImage(
     url: String?,
     aspectRatio: Float = 0f,
     modifier: Modifier = Modifier,
-    onCropped: (Rect) -> Unit
+    onCrop: (CropResult) -> Unit
 ) {
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
     val imageState = rememberWebImageState(quality = ImageQuality.High)
@@ -324,16 +318,11 @@ fun CropImage(
                 detectTapGestures(onDoubleTap = {
                     // 在裁剪框内双击触发
                     if (frameRect.contains(it)) {
-                        val scale = actualSize.width / imageRect.width
-                        onCropped(Rect(
-                            offset = Offset(
-                                x = (frameRect.left - imageRect.left) * scale,
-                                y = (frameRect.top - imageRect.top) * scale
-                            ),
-                            size = Size(
-                                width = (frameRect.width * scale).coerceIn(1f .. actualSize.width.toFloat()),
-                                height = (frameRect.height * scale).coerceIn(1f .. actualSize.height.toFloat())
-                            )
+                        onCrop(CropResult(
+                            xPercent = (frameRect.left - imageRect.left) / imageRect.width,
+                            yPercent = (frameRect.top - imageRect.top) / imageRect.height,
+                            widthPercent = frameRect.width / imageRect.width,
+                            heightPercent = frameRect.height / imageRect.height
                         ))
                     }
                 })
@@ -376,16 +365,14 @@ fun CropImage(
     }
 }
 
-class DialogCrop : DialogState() {
+class DialogCrop : DialogState<CropResult>() {
     private var url: String? by mutableStateOf(null)
     private var aspectRatio: Float by mutableStateOf(0f)
-    private var onCropped: ((Rect) -> Unit)? = null
 
-    fun open(url: String, aspectRatio: Float = 0f, onCropped: (Rect) -> Unit) {
+    suspend fun open(url: String, aspectRatio: Float = 0f): CropResult? {
         this.url = url
         this.aspectRatio = aspectRatio
-        this.onCropped = onCropped
-        super.open()
+        return awaitResult()
     }
 
     @Composable
@@ -394,10 +381,7 @@ class DialogCrop : DialogState() {
             CropImage(
                 url = url,
                 aspectRatio = aspectRatio,
-                onCropped = {
-                    hide()
-                    onCropped?.invoke(it)
-                },
+                onCrop = { continuation?.resume(it) },
                 modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().aspectRatio(1f)
             )
         }

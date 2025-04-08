@@ -1,7 +1,5 @@
 package love.yinlin.api
 
-import com.eygraber.uri.Uri
-import com.eygraber.uri.UriCodec
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
@@ -27,6 +25,7 @@ import love.yinlin.extension.Long
 import love.yinlin.extension.Object
 import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
+import love.yinlin.extension.UriEx
 import love.yinlin.extension.arr
 import love.yinlin.extension.obj
 import love.yinlin.platform.OS
@@ -59,10 +58,7 @@ object WeiboAPI {
 	} else src
 
 	private object Container {
-		fun searchUser(key: String): String {
-			val encodeName = try { UriCodec.encode(key) } catch (_: Throwable) { key }
-			return "api/container/getIndex?containerid=100103type%3D3%26q%3D$encodeName&page_type=searchall"
-		}
+		fun searchUser(key: String): String = "api/container/getIndex?containerid=100103type%3D3%26q%3D${UriEx.encode(key)}&page_type=searchall"
 		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
 		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
 		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
@@ -289,7 +285,7 @@ object WeiboAPI {
 				for (item2 in card.arr("card_group")) {
 					val album = item2.Object
 					if (album["card_type"].Int == 8) {
-						val containerId = Uri.parse(album["scheme"].String).getQueryParameters("containerid").first()
+						val containerId = UriEx.parameters(album["scheme"].String)["containerid"]!!
 						items += WeiboAlbum(
 							containerId = containerId,
 							title = album["title_sub"].String,

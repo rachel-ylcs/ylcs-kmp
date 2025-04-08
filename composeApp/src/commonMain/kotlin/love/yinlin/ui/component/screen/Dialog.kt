@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Colors
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -34,7 +36,9 @@ import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
 @Stable
@@ -48,7 +52,6 @@ open class TipState {
 		private set
 
 	suspend fun show(text: String?, type: Type) {
-		// showSnackbar会阻塞当前协程, 应该在当前上下文启动新的协程
 		CoroutineScope(coroutineContext).launch {
 			host.currentSnackbarData?.dismiss()
 			this@TipState.type = type
@@ -115,15 +118,39 @@ fun Tip(state: TipState) {
 }
 
 @Stable
-abstract class DialogState {
+abstract class DialogState<R> {
 	var isOpen: Boolean by mutableStateOf(false)
 		protected set
+	protected var continuation: CancellableContinuation<R?>? = null
 
 	open val dismissOnBackPress: Boolean get() = true
 	open val dismissOnClickOutside: Boolean get() = true
 
-	open fun open() { isOpen = true }
-	open fun hide() { isOpen = false }
+	protected fun cancel() {
+		continuation = null
+		isOpen = false
+	}
+
+	protected suspend fun awaitResult(): R? = try {
+		val result = suspendCancellableCoroutine { cont ->
+			cont.invokeOnCancellation { cancel() }
+			continuation?.cancel(CancellationException())
+			continuation = cont
+			isOpen = true
+		}
+		if (result != null) cancel()
+		result
+	}
+	catch (_: CancellationException) { null }
+
+	protected suspend fun openAsync() {
+		CoroutineScope(coroutineContext).launch { awaitResult() }
+	}
+
+	open fun hide() {
+		continuation?.resume(null)
+		cancel()
+	}
 
 	@Composable
 	protected abstract fun dialogContent()
@@ -151,7 +178,7 @@ abstract class DialogState {
 	}
 }
 
-abstract class RachelDialogState : DialogState() {
+abstract class RachelDialogState<R> : DialogState<R>() {
 	@Stable
 	sealed interface DialogInfo {
 		val rachelWidth: Dp
@@ -240,16 +267,16 @@ abstract class RachelDialogState : DialogState() {
 open class DialogInfo(
 	title: String = "提示",
 	content: String = ""
-) : RachelDialogState() {
+) : RachelDialogState<Unit>() {
 	override var title: String? by mutableStateOf(title)
 		protected set
 	var content: String by mutableStateOf(content)
 		protected set
 
-	fun open(title: String = "提示", content: String) {
+	suspend fun open(title: String = "提示", content: String) {
 		this.title = title
 		this.content = content
-		super.open()
+		awaitResult()
 	}
 
 	@Composable
@@ -266,19 +293,17 @@ open class DialogInfo(
 
 open class DialogConfirm(
 	title: String = "确认",
-	content: String = "",
-	protected var onYes: (() -> Unit)? = null
-) : RachelDialogState() {
+	content: String = ""
+) : RachelDialogState<Boolean>() {
 	override var title: String? by mutableStateOf(title)
 		protected set
 	var content: String by mutableStateOf(content)
 		protected set
 
-	fun open(title: String = "确认", content: String, onYes: () -> Unit) {
+	suspend fun open(title: String = "确认", content: String): Boolean {
 		this.title = title
 		this.content = content
-		this.onYes = onYes
-		super.open()
+		return awaitResult() ?: false
 	}
 
 	@Composable
@@ -287,10 +312,7 @@ open class DialogConfirm(
 			actions = {
 				RachelButton(
 					text = stringResource(Res.string.dialog_yes),
-					onClick = {
-						hide()
-						onYes?.invoke()
-					}
+					onClick = { continuation?.resume(true) }
 				)
 				RachelButton(
 					text = stringResource(Res.string.dialog_no),
@@ -307,13 +329,13 @@ open class DialogConfirm(
 	}
 }
 
-abstract class DialogInput(
+open class DialogInput(
 	val hint: String = "",
 	val inputType: InputType = InputType.COMMON,
 	val maxLength: Int = 0,
 	val maxLines: Int = 1,
-	val clearButton: Boolean = maxLines == 1,
-) : RachelDialogState() {
+	val clearButton: Boolean = maxLines == 1
+) : RachelDialogState<String>() {
 	final override val dismissOnBackPress: Boolean = false
 	final override val dismissOnClickOutside: Boolean = false
 	final override val scrollable: Boolean = false
@@ -322,11 +344,9 @@ abstract class DialogInput(
 
 	val textInputState = TextInputState()
 
-	abstract fun onInput(text: String)
-
-	fun open(initText: String) {
+	suspend fun open(initText: String = ""): String? {
 		textInputState.text = initText
-		super.open()
+		return awaitResult()
 	}
 
 	@Composable
@@ -336,10 +356,7 @@ abstract class DialogInput(
 				RachelButton(
 					text = stringResource(Res.string.dialog_yes),
 					enabled = textInputState.ok,
-					onClick = {
-						hide()
-						onInput(textInputState.text)
-					}
+					onClick = { continuation?.resume(textInputState.text) }
 				)
 				RachelButton(
 					text = stringResource(Res.string.dialog_no),
@@ -363,12 +380,13 @@ abstract class DialogInput(
 abstract class DialogChoice(
 	val num: Int,
     override val title: String? = null
-) : RachelDialogState() {
+) : RachelDialogState<Int>() {
 	final override val dismissOnClickOutside: Boolean = false
 
 	abstract fun name(index: Int): String
 	abstract fun icon(index: Int): ImageVector
-    abstract fun onSelected(index: Int, text: String)
+
+	suspend fun open(): Int? = awaitResult()
 
 	@Composable
 	override fun dialogContent() {
@@ -381,8 +399,7 @@ abstract class DialogChoice(
 					val nameString = name(index)
 					Row(
 						modifier = Modifier.fillMaxWidth().clickable {
-							hide()
-							onSelected(index, nameString)
+							continuation?.resume(index)
 						}.padding(5.dp),
 						horizontalArrangement = Arrangement.spacedBy(10.dp),
 						verticalAlignment = Alignment.CenterVertically
@@ -402,38 +419,19 @@ abstract class DialogChoice(
 	}
 
 	companion object {
-		fun fromItems(
-			items: List<String>,
-			title: String? = null,
-			onSelected: (Int, String) -> Unit
-		) = object : DialogChoice(items.size, title) {
+		fun fromItems(items: List<String>, title: String? = null) = object : DialogChoice(items.size, title) {
 			override fun name(index: Int): String = items[index]
 			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
-			override fun onSelected(index: Int, text: String) = onSelected(index, text)
 		}
 
-		fun fromItems(
-			items: List<Pair<String, (Int, String) -> Unit>>,
-			title: String? = null
-		) = object : DialogChoice(items.size, title) {
-			override fun name(index: Int): String = items[index].first
-			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
-			override fun onSelected(index: Int, text: String) = items[index].second(index, text)
-		}
-
-		fun fromIconItems(
-			items: List<Pair<String, ImageVector>>,
-			title: String? = null,
-			onSelected: (Int, String) -> Unit
-		) = object : DialogChoice(items.size, title) {
+		fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : DialogChoice(items.size, title) {
 			override fun name(index: Int): String = items[index].first
 			override fun icon(index: Int): ImageVector = items[index].second
-			override fun onSelected(index: Int, text: String) = onSelected(index, text)
 		}
 	}
 }
 
-open class DialogProgress : RachelDialogState() {
+open class DialogProgress : RachelDialogState<Unit>() {
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
 	var progress by mutableFloatStateOf(0f)
@@ -444,11 +442,11 @@ open class DialogProgress : RachelDialogState() {
 
 	override val title: String? = "下载中..."
 
-	override fun open() {
+	suspend fun open() {
 		current = "0"
 		total = "0"
 		progress = 0f
-		super.open()
+		openAsync()
 	}
 
 	@Composable
@@ -497,11 +495,12 @@ open class DialogProgress : RachelDialogState() {
 	}
 }
 
-class DialogLoading : DialogState() {
+class DialogLoading : DialogState<Unit>() {
 	override val dismissOnBackPress: Boolean = false
 	override val dismissOnClickOutside: Boolean = false
 
-	@OptIn(ExperimentalComposeUiApi::class)
+	suspend fun open() = openAsync()
+
 	@Composable
 	override fun dialogContent() {
 		BaseDialog {

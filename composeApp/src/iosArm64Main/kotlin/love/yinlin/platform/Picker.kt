@@ -14,8 +14,8 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageWriteToSavedPhotosAlbum
 
 actual object PicturePicker {
-    actual suspend fun pick(): Source? = null
-    actual suspend fun pick(maxNum: Int): Sources<Source>? = null
+    actual suspend fun pick(): Source? = TODO()
+    actual suspend fun pick(maxNum: Int): Sources<Source>? = TODO()
 
     actual suspend fun prepareSave(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()
