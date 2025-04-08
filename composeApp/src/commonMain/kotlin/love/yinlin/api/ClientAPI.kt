@@ -137,7 +137,7 @@ object ClientAPI {
 		}
 		override fun file(values: Sources<RawSource>?): APIFiles = listOf(addFile(values?.let { v ->
 			v.forEach { sources += it }
-			if (v.isEmpty) null else v
+			if (v.isEmpty()) null else v
 		}))
 	}
 
