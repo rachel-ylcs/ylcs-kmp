@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
@@ -27,6 +30,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.Colors
+import love.yinlin.common.KVConfig
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -37,12 +41,18 @@ import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.AppContext
+import love.yinlin.platform.ImageCompress
+import love.yinlin.platform.ImageCrop
+import love.yinlin.platform.ImageProcessor
+import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
+import love.yinlin.platform.PicturePicker
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_privacy_policy
 import love.yinlin.resources.default_name
 import love.yinlin.resources.default_signature
+import love.yinlin.ui.component.image.DialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
@@ -54,6 +64,7 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.community.ScreenPartMe
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
@@ -64,6 +75,8 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		val feedbackSheet = CommonSheetState()
 		val privacyPolicySheet = CommonSheetState()
 		val aboutSheet = CommonSheetState()
+
+		val cropDialog = DialogCrop()
 
 		val idModifyDialog = DialogInput(
 			hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
@@ -76,6 +89,56 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 			maxLines = 3,
 			clearButton = false
 		)
+
+		private suspend fun pickPicture(aspectRatio: Float): Path? {
+			return PicturePicker.pick()?.use { source ->
+				OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+			}?.let { path ->
+				cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
+					OS.Storage.createTempFile { sink ->
+						SystemFileSystem.source(path).buffered().use { source ->
+							ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
+						}
+					}
+				}
+			}
+		}
+
+		suspend fun modifyUserAvatar() {
+			pickPicture(1f)?.let { path ->
+				val result = ClientAPI.request(
+					route = API.User.Profile.UpdateAvatar,
+					data = app.config.userToken,
+					files = {
+						API.User.Profile.UpdateAvatar.Files(
+							avatar = file(SystemFileSystem.source(path))
+						)
+					}
+				)
+				when (result) {
+					is Data.Success -> app.config.cacheUserAvatar = KVConfig.CacheState.UPDATE
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
+		}
+
+		suspend fun modifyUserWall() {
+			pickPicture(1.77777f)?.let { path ->
+				val result = ClientAPI.request(
+					route = API.User.Profile.UpdateWall,
+					data = app.config.userToken,
+					files = {
+						API.User.Profile.UpdateWall.Files(
+							wall = file(SystemFileSystem.source(path))
+						)
+					}
+				)
+				when (result) {
+					is Data.Success -> app.config.cacheUserWall = KVConfig.CacheState.UPDATE
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
+		}
 
 		suspend fun modifyUserId(initText: String) {
 			idModifyDialog.open(initText)?.let { text ->
@@ -132,8 +195,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					data = token
 				)
 				// 不论是否成功均从本地设备退出登录
-				app.config.userToken = ""
-				app.config.userProfile = null
+				part<ScreenPartMe>().logoff()
 			}
 		}
 
@@ -182,7 +244,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 				Item(
 					title = "头像",
 					onClick = {
-
+						if (userProfile != null) launch { modifyUserAvatar() }
 					}
 				) {
 					if (userProfile == null) NoImage()
@@ -212,7 +274,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 				Item(
 					title = "背景墙",
 					onClick = {
-
+						if (userProfile != null) launch { modifyUserWall() }
 					}
 				) {
 					if (userProfile == null) NoImage(width = 96.dp, height = 54.dp)
@@ -429,6 +491,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 			model.AboutLayout()
 		}
 
+		model.cropDialog.withOpen()
 		model.idModifyDialog.withOpen()
 		model.signatureModifyDialog.withOpen()
 	}

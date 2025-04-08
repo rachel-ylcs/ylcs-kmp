@@ -3,12 +3,12 @@ package love.yinlin.common
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
-import kotlinx.datetime.Clock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.serializer
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.extension.DateEx
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
@@ -37,7 +37,7 @@ class KVConfig(private val kv: KV) {
 		}
 	}
 
-	class CacheState(private val kv: KV) : ReadWriteProperty<Any?, Long> {
+	class CacheState(private val kv: KV, private val default: Long = 0L) : ReadWriteProperty<Any?, Long> {
 		companion object {
 			const val UPDATE: Long = Long.MAX_VALUE
 		}
@@ -45,12 +45,12 @@ class KVConfig(private val kv: KV) {
 		private var state: MutableState<Long>? = null
 
 		override fun getValue(thisRef: Any?, property: KProperty<*>): Long {
-			if (state == null) state = mutableStateOf(kv.get(property.name, 0L))
+			if (state == null) state = mutableStateOf(kv.get(property.name, default))
 			return state!!.value
 		}
 
 		override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) {
-			val newCacheValue = Clock.System.now().toEpochMilliseconds()
+			val newCacheValue = DateEx.CurrentLong
 			if (state == null) state = mutableStateOf(newCacheValue)
 			else state!!.value = newCacheValue
 			kv.set(property.name, newCacheValue)
@@ -163,6 +163,8 @@ class KVConfig(private val kv: KV) {
 
 	// 用户 Token
 	var userToken: String by stringState("")
+	// Token更新
+	var userTokenUpdate: Long by CacheState(kv, Long.MAX_VALUE)
 	// 用户 信息
 	var userProfile: UserProfile? by jsonState { null }
 	// 用户 头像缓存键

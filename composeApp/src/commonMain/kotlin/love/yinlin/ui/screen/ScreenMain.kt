@@ -181,7 +181,9 @@ data object ScreenMain : Screen<ScreenMain.Model> {
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model)
+	override fun model(model: AppModel): Model = Model(model).apply {
+		model.mePart.updateUserToken()
+	}
 
 	@Composable
 	override fun content(model: Model) {

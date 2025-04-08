@@ -25,10 +25,13 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.KVConfig
 import love.yinlin.data.Data
+import love.yinlin.data.Failed
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
+import love.yinlin.extension.toLocalDate
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickIcon
@@ -40,6 +43,9 @@ import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 @Composable
 private fun TipButtonContainer(
@@ -79,6 +85,36 @@ private fun TipButtonContainer(
 
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	val signinSheet = CommonSheetState()
+
+	fun logoff() {
+		app.config.userToken = ""
+		app.config.userTokenUpdate = 0L
+		app.config.userProfile = null
+	}
+
+	fun updateUserToken() {
+		val token = app.config.userToken
+		val lastUpdateTime = app.config.userTokenUpdate
+		val currentTime = DateEx.CurrentLong
+		if (token.isNotEmpty() && currentTime - lastUpdateTime > 5.seconds.toLong(DurationUnit.MILLISECONDS)) launch {
+			val result = ClientAPI.request(
+				route = API.User.Account.UpdateToken,
+				data = token
+			)
+			when (result) {
+				is Data.Success -> {
+					app.config.userToken = result.data
+					app.config.userTokenUpdate = KVConfig.CacheState.UPDATE
+				}
+				is Data.Error -> {
+					if (result.type == Failed.RequestError.Unauthorized) {
+						logoff()
+						navigate(ScreenLogin)
+					}
+				}
+			}
+		}
+	}
 
 	fun scanQrcode() {
 
