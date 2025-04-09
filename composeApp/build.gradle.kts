@@ -75,6 +75,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.shared)
+                implementation(projects.music)
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)

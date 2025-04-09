@@ -33,6 +33,9 @@ val appMainClass by extra("${appPackageName}.MainKt")
 // Shared
 val sharedDir by extra(dirProject.dir("shared").dir("src"))
 
+// Music
+val musicDir by extra(dirProject.dir("music").dir("src"))
+
 // Common
 val commonR8File by extra(dirComposeApp.file("R8Common.pro"))
 

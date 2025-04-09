@@ -25,16 +25,13 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
-
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.json)
+            implementation(projects.shared)
         }
     }
 }
 
 android {
-    namespace = "${rootProject.extra["appPackageName"]}.shared"
+    namespace = "${rootProject.extra["appPackageName"]}.music"
     compileSdk = rootProject.extra["androidBuildSDK"] as Int
 
     defaultConfig {
