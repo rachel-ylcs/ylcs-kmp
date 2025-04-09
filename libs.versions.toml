@@ -4,7 +4,7 @@
 kotlin = "2.1.20"
 cmp = "1.8.0-beta01"
 cmp-stable = "1.7.3"
-agp = "8.7.3"
+agp = "8.9.0"
 
 # Libs #
 
