@@ -31,7 +31,7 @@
 
 ## 源代码集依赖
 
-![项目依赖结构](docs/markdown/structure.png)
+![项目依赖结构](docs/pics/structure.png)
 
 ## 工程目录
 
@@ -304,3 +304,8 @@ val result = ClientAPI.request(
 且接受服务器的响应result也与公共接口中定义的完全一致，自动识别响应数据模型。
 
 编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。
+
+
+## Music模组协议
+
+[Music模组协议文档](docs/markdown/music.md)
