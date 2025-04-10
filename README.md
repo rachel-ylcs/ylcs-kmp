@@ -308,4 +308,16 @@ val result = ClientAPI.request(
 
 ## Music模组协议
 
-[Music模组协议文档](docs/markdown/music.md)
+### MOD 核心模块 music
+
+与MOD相关的模块为music和modManager
+
+music模块是应用MOD存储协议及序列化与反序列化的核心实现, 为多平台APP端和MOD管理器调用
+
+具体协议可参看 [Music模组协议文档](docs/markdown/music.md)
+
+### MOD 管理器 modManager
+
+MOD管理器是方便桌面客户端创建, 解析, 预览MOD的简易工具
+
+![MOD管理器](docs/pics/mod_manager.png)
