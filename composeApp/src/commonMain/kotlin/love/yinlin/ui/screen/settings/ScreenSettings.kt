@@ -302,7 +302,6 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 		fun CrashLogLayout() {
 			val text = remember {
 				app.kv.get(AppContext.CRASH_KEY, "无崩溃日志")
-					.replace("\t", "  ")
 			}
 			BottomSheet(state = crashLogSheet) {
 				Box(

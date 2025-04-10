@@ -1,0 +1,472 @@
+package love.yinlin.music
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastJoinToString
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.singleWindowApplication
+import kotlinx.coroutines.launch
+import kotlinx.io.files.Path
+import love.yinlin.data.Data
+import love.yinlin.extension.fileSizeString
+import love.yinlin.platform.Coroutines
+import java.awt.datatransfer.DataFlavor
+import java.io.File
+
+sealed interface Status {
+    val message: String
+    val color: Color
+
+    data object Idle : Status {
+        override val message: String = "空闲"
+        override val color: Color = Color.Magenta
+    }
+
+    data class Running(override val message: String) : Status {
+        override val color: Color = Color.Blue
+    }
+
+    data class Error(override val message: String) : Status {
+        override val color: Color = Color.Red
+    }
+
+    data object Completed : Status {
+        override val message: String = "完成"
+        override val color: Color = Color.Green
+    }
+}
+
+@Composable
+fun StatusUI(
+    status: Status,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = "状态: ${status.message}",
+        color = status.color,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ClickButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    Button(onClick = onClick) {
+        Text(text = text)
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun DragTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    title: String,
+    maxLines: Int = 1,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(text = title) },
+        maxLines = maxLines,
+        modifier = modifier.dragAndDropTarget(
+            shouldStartDragAndDrop = {
+                it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+            },
+            target = remember {
+                object : DragAndDropTarget {
+                    override fun onDrop(event: DragAndDropEvent): Boolean {
+                        val list = event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                        val newValue = list.map { (it as File).toString() }.fastJoinToString("\n")
+                        onValueChange(newValue)
+                        return true
+                    }
+                }
+            }
+        )
+    )
+}
+
+@Composable
+fun MergeUI(
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var input by remember { mutableStateOf("") }
+    var output by remember { mutableStateOf("") }
+    val filters = remember { ModResourceType.entries.map { false }.toMutableStateList() }
+
+    val reset = {
+        status = Status.Idle
+        input = ""
+        output = ""
+        filters.fill(false)
+    }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(text = "从目录创建MOD", style = MaterialTheme.typography.titleLarge)
+        StatusUI(status = status, modifier = Modifier.fillMaxWidth())
+        Text(text = "每行包括一个媒体目录, 目录名为ID, 目录内包含若干资源")
+        DragTextField(
+            value = input,
+            onValueChange = { input = it },
+            title = "媒体目录",
+            maxLines = 5,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(text = "一个单文件的具体路径, 会直接覆盖已有文件")
+        DragTextField(
+            value = output,
+            onValueChange = { output = it },
+            title = "保存文件路径",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(text = "过滤器")
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            itemVerticalAlignment = Alignment.CenterVertically,
+            maxItemsInEachRow = 5
+        ) {
+            ModResourceType.entries.forEach { type ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.selectable(
+                        selected = filters[type.ordinal],
+                        onClick = { filters[type.ordinal] = !filters[type.ordinal] }
+                    )
+                ) {
+                    RadioButton(
+                        selected = filters[type.ordinal],
+                        onClick = null
+                    )
+                    Text(text = type.name)
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ClickButton("运行") {
+                if (status !is Status.Idle) {
+                    status = Status.Error("请先重置")
+                    return@ClickButton
+                }
+                val paths = input.split('\n')
+                if (paths.isEmpty() || output.isEmpty()) {
+                    status = Status.Error("媒体目录或保存路径为空")
+                    return@ClickButton
+                }
+                val mediaPaths = paths.map { Path(it) }
+                val savePath = Path(output)
+                val filter = buildList {
+                    filters.forEachIndexed { index, v ->
+                        if (v) add(ModResourceType.entries[index])
+                    }
+                }
+
+                scope.launch {
+                    val result = ModFactory.Merge(
+                        mediaPaths = mediaPaths,
+                        savePath = savePath
+                    ).process(
+                        filter = filter
+                    ) { progress, total, name ->
+                        status = Status.Running("运行中($progress/$total -> $name)")
+                    }
+                    status = when (result) {
+                        is Data.Success -> Status.Completed
+                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                    }
+                }
+            }
+            ClickButton("重置", reset)
+        }
+    }
+}
+
+@Composable
+fun ReleaseUI(
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var input by remember { mutableStateOf("") }
+    var output by remember { mutableStateOf("") }
+
+    val reset = {
+        status = Status.Idle
+        input = ""
+        output = ""
+    }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(text = "从MOD解析资源", style = MaterialTheme.typography.titleLarge)
+        StatusUI(status = status, modifier = Modifier.fillMaxWidth())
+        DragTextField(
+            value = input,
+            onValueChange = { input = it },
+            title = "MOD文件路径",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Text(text = "导出目录, 每个媒体会单独在这个目录里创建子目录并释放资源")
+        DragTextField(
+            value = output,
+            onValueChange = { output = it },
+            title = "导出目录",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ClickButton("运行") {
+                if (status !is Status.Idle) {
+                    status = Status.Error("请先重置")
+                    return@ClickButton
+                }
+                if (input.isEmpty() || output.isEmpty()) {
+                    status = Status.Error("MOD路径或导出目录为空")
+                    return@ClickButton
+                }
+
+                scope.launch {
+                    val result = ModFactory.Release(
+                        modPath = Path(input),
+                        savePath = Path(output)
+                    ).process { progress, total, name ->
+                        status = Status.Running("运行中($progress/$total -> $name)")
+                    }
+                    status = when (result) {
+                        is Data.Success -> Status.Completed
+                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                    }
+                }
+            }
+            ClickButton("重置", reset)
+        }
+    }
+}
+
+@Composable
+fun ModPreview(
+    preview: ModFactory.Preview.PreviewItem,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item(-2) {
+            val metadata = preview.metadata
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = 5.dp,
+                border = BorderStroke(width = 1.dp, color = Color.LightGray)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        text = "MOD元信息",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Text(text = "MOD版本: ${metadata.version}")
+                    Text(text = "媒体数: ${metadata.mediaNum}")
+                    val info = metadata.info
+                    Text(text = "作者: ${info.author}")
+                }
+            }
+        }
+        items(
+            items = preview.medias,
+            key = { it.id }
+        ) { mediaItem ->
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = 5.dp,
+                border = BorderStroke(width = 1.dp, color = Color.LightGray)
+            ) {
+                Column(
+                    modifier = Modifier.padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    val config = mediaItem.config
+                    if (config != null) {
+                        Text(
+                            text = "媒体配置",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Text(text = "版本: ${config.version}")
+                        Text(text = "作者: ${config.author}")
+                        Text(text = "ID: ${config.id}")
+                        Text(text = "名称: ${config.name}")
+                        Text(text = "演唱: ${config.singer}")
+                        Text(text = "作词: ${config.lyricist}")
+                        Text(text = "作曲: ${config.composer}")
+                        Text(text = "专辑: ${config.album}")
+                        Text(text = "副歌点: ${config.chorus}")
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                    Text(
+                        text = "资源表",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    for (resourceItem in mediaItem.resources) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().border(1.dp, Color.LightGray).padding(5.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        ) {
+                            Text(
+                                text = "${resourceItem.type.description}(${resourceItem.name})",
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(text = resourceItem.length.toLong().fileSizeString)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PreviewUI(
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var input by remember { mutableStateOf("") }
+    var preview: ModFactory.Preview.PreviewItem? by remember { mutableStateOf(null) }
+
+    val reset = {
+        status = Status.Idle
+        input = ""
+        preview = null
+    }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(text = "预览MOD", style = MaterialTheme.typography.titleLarge)
+        StatusUI(status = status, modifier = Modifier.fillMaxWidth())
+        DragTextField(
+            value = input,
+            onValueChange = { input = it },
+            title = "MOD文件路径",
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ClickButton("预览") {
+                if (status !is Status.Idle) {
+                    status = Status.Error("请先重置")
+                    return@ClickButton
+                }
+                if (input.isEmpty()) {
+                    status = Status.Error("MOD路径为空")
+                    return@ClickButton
+                }
+
+                scope.launch {
+                    val result = ModFactory.Preview(
+                        modPath = Path(input)
+                    ).process()
+                    status = when (result) {
+                        is Data.Success -> {
+                            preview = result.data
+                            Status.Completed
+                        }
+                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                    }
+                }
+            }
+            ClickButton("重置", reset)
+        }
+        preview?.let {
+            ModPreview(
+                preview = it,
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun MainUI() {
+    Row (
+        modifier = Modifier.fillMaxSize().padding(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        MergeUI(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()))
+        VerticalDivider()
+        ReleaseUI(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()))
+        VerticalDivider()
+        PreviewUI(modifier = Modifier.weight(1f).fillMaxHeight())
+    }
+}
+
+fun main() = singleWindowApplication(
+    title = "Mod管理器",
+    state = WindowState(
+        position = WindowPosition(Alignment.Center),
+        size = DpSize(1200.dp, 800.dp)
+    )
+) {
+    MainUI()
+}

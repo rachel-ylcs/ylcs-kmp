@@ -26,6 +26,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ylcs-kmp"
-include("composeApp", "server", "shared", "music")
+include("composeApp", "server", "shared", "music", "modManager")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

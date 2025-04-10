@@ -79,6 +79,7 @@ kotlin {
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
+                implementation(libs.compose.material3.icons)
                 implementation(libs.compose.material3.iconsExtended)
                 implementation(libs.compose.ui)
                 implementation(libs.compose.ui.backhandler)
@@ -144,6 +145,7 @@ kotlin {
             dependsOn(jvmMain)
             dependencies {
                 implementation(compose.preview)
+                implementation(libs.kotlinx.coroutines.android)
                 implementation(libs.compose.activity)
                 implementation(libs.mmkv.android)
 
@@ -185,6 +187,7 @@ kotlin {
                 }
             }
             dependencies {
+                implementation(libs.kotlinx.coroutines.swing)
                 implementation(compose.desktop.currentOs)
 
                 val javafxClassifier = when (desktopPlatform) {

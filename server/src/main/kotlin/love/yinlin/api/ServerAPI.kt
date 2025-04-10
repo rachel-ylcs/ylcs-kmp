@@ -8,8 +8,6 @@ import io.ktor.server.routing.*
 import io.ktor.util.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.api.common.commonAPI
 import love.yinlin.api.test.testAPI
@@ -21,6 +19,7 @@ import love.yinlin.data.Failed
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.*
 import love.yinlin.logger
+import love.yinlin.platform.Coroutines
 import java.io.File
 import kotlin.math.abs
 import kotlin.random.Random
@@ -77,8 +76,7 @@ inline fun <reified Response: Any> Route.safeAPI(
 ): Route = route(path = path, method = method) {
 	handle {
 		try {
-			val result = withContext(Dispatchers.IO) { body(call) }
-			when (result) {
+			when (val result = Coroutines.io { body(call) }) {
 				is Data.Success -> call.respond(makeObject {
 					"code" with APICode.SUCCESS
 					result.message?.let { "msg" with it }

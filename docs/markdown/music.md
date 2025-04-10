@@ -20,8 +20,7 @@ class ModMetadata(
     val magic: Int,                 // 魔数           [4 Bytes]
     val version: Int,               // MOD版本        [4 Bytes]
     val mediaNum: Int,              // 媒体数         [4 Bytes]
-    val resourceNum: Int,           // 资源总数       [4 Bytes]
-    val config: LengthString,       // Json配置      [*]
+    val info: LengthString,         // Json信息      [*]
 )
 
 // MOD资源类型(见解压形式)
@@ -35,7 +34,7 @@ class ModResource(
 )
 
 class ModMedia(
-    val id: Int,                     // 资源ID
+    val id: LengthString,            // 媒体ID
     val resources: List<ModResource> // 资源集
 )
 
@@ -46,7 +45,7 @@ class Mod(
 ```
 
  - MOD以常规二进制形式存储
- - 数字为小端序
+ - 数字为大端序
  - 文本为UTF-8, 长度前由前4字节的值指定
  - 资源二进制数据每interval=64KB间会插入一个随机字节
  - 意味着相同的MOD可能有不同的二进制数据表示, 所以提供独立的摘要算法
@@ -82,17 +81,17 @@ class Mod(
 
 媒体配置记录了一个媒体的元信息, 各字段与要求如下表所示:
 
-| 字段名      | 类型                                     | 含义      | 是否必需 | 备注                      |
-|----------|----------------------------------------|---------|------|-------------------------|
-| version  | String                                 | 歌曲版本    | √    |                         |
-| author   | String                                 | 作者      | √    |                         |
-| id       | Int                                    | 唯一ID    | √    |                         |
-| name     | String                                 | 歌名      | √    |                         |
-| singer   | String                                 | 歌手      | √    |                         |
-| lyricist | String                                 | 作词      | √    |                         |
-| composer | String                                 | 作曲      | √    |                         |
-| album    | String                                 | 所属专辑    | √    |                         |
-| chorus   | Array&lt;Int&gt;                       | 副歌点     | ×    | 单位为毫秒，如果没有这个字段歌曲就不能快进副歌 |
+| 字段名      | 类型               | 含义      | 非空 | 备注                     |
+|----------|------------------|---------|----|------------------------|
+| version  | String           | 歌曲版本    | √  |                        |
+| author   | String           | 作者      | √  |                        |
+| id       | String           | 唯一ID    | √  |                        |
+| name     | String           | 歌名      | √  |                        |
+| singer   | String           | 歌手      | √  |                        |
+| lyricist | String           | 作词      | √  |                        |
+| composer | String           | 作曲      | √  |                        |
+| album    | String           | 所属专辑    | √  |                        |
+| chorus   | Array&lt;Int&gt; | 副歌点     | ×  | 单位为毫秒，如果为null歌曲就不能快进副歌 |
 
 一个简单的配置示例如下所示:
 
@@ -100,7 +99,7 @@ class Mod(
 {
     "version": "1.0",
     "author": "官方",
-    "id": 1,
+    "id": "1",
     "name": "棠梨煎雪",
     "singer": "银临",
     "lyricist": "商连",
@@ -144,9 +143,9 @@ class Mod(
 
 ### ★ 动画
 
-| ModResourceType | 是否必需 | 实体类型 | 默认名 | 备注 |
-|-----------------|------|------|-----|----|
-| 22              | ×    | webp |     |    |
+| ModResourceType | 是否必需 | 实体类型 | 默认名       | 备注 |
+|-----------------|------|------|-----------|----|
+| 22              | ×    | webp | animation |    |
 
 媒体的动态背景, 以webp图片形式存储
 

@@ -16,7 +16,11 @@ kotlin {
 
     iosArm64()
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -26,6 +30,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.shared)
+
+            implementation(libs.compose.runtime)
+            implementation(libs.kotlinx.json)
             implementation(libs.kotlinx.io)
         }
     }

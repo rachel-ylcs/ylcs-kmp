@@ -8,6 +8,10 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
@@ -16,7 +20,11 @@ kotlin {
 
     iosArm64()
 
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+    }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -24,11 +32,48 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(libs.compose.runtime)
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.compose.runtime)
 
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.json)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.json)
+            }
+        }
+
+        val nonWasmJsMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
+        }
+
+        androidMain.get().apply {
+            dependsOn(nonWasmJsMain)
+            dependencies {
+
+            }
+        }
+
+        iosArm64Main.get().apply {
+            dependsOn(nonWasmJsMain)
+            dependencies {
+
+            }
+        }
+
+        jvmMain.get().apply {
+            dependsOn(nonWasmJsMain)
+            dependencies {
+
+            }
+        }
+
+        wasmJsMain.get().apply {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
         }
     }
 }

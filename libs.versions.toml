@@ -2,17 +2,18 @@
 
 # Plugins #
 kotlin = "2.1.20"
-cmp = "1.8.0-beta01"
+cmp = "1.8.0-beta02"
 cmp-stable = "1.7.3"
 agp = "8.9.0"
 
 # Libs #
 
 # Common
-lifecycle = "2.9.0-alpha05"
+lifecycle = "2.9.0-alpha06"
 ktor = "3.1.2"
 sketch = "4.0.5"
 mmkv = "2.1.0"
+coroutines = "1.10.2"
 
 # Desktop
 javafx = "21.0.7-ea+1" #noinspection GradleDependency
@@ -37,14 +38,17 @@ compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", v
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
+compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "cmp-stable" }
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
 
-kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.2" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 
-runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-alpha15" }
+runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-alpha16" }
 runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
