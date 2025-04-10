@@ -79,6 +79,14 @@
 
 共享数据与代码目录 `shared`
 
+### `music`
+
+MOD核心实现 `music`
+
+### `modManager`
+
+MOD管理器(桌面版) `modManager`
+
 ## 部署
 
 ### 编译与运行环境
