@@ -23,6 +23,7 @@ kotlin-js-store/
 **/build/
 **/cmake-build-debug/
 **/cmake-build-release/
+**/desktop-mapping.txt
 
 # 输出目录
 **/outputs/
