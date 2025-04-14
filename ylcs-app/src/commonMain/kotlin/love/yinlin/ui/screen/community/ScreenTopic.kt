@@ -118,7 +118,7 @@ private fun CoinLayout(
 			) {
 				repeat(num) {
 					MiniIcon(
-						imageVector = Icons.Filled.Paid,
+						icon = Icons.Filled.Paid,
 						color = when (num) {
 							1 -> MaterialTheme.colorScheme.tertiary
 							2 -> MaterialTheme.colorScheme.secondary

@@ -177,7 +177,7 @@ fun ActivityInfoLayout(
                 contentAlignment = Alignment.Center
             ) {
                 ClickIcon(
-                    imageVector = Icons.Outlined.Cancel,
+                    icon = Icons.Outlined.Cancel,
                     color = MaterialTheme.colorScheme.error,
                     size = 32.dp,
                     modifier = Modifier.padding(5.dp).align(Alignment.TopEnd).zIndex(2f),

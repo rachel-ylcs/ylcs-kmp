@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -10,7 +11,9 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.serialization.Serializable
@@ -29,6 +32,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.*
+import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.ui.component.layout.equalItem
 
 private enum class TabItem(
 	val title: StringResource,
@@ -43,17 +48,32 @@ private enum class TabItem(
 }
 
 @Composable
-private fun NavigationItemText(
-	item: TabItem,
-	selected: Boolean,
-	modifier: Modifier = Modifier
+private fun NavigationIcon(
+	current: Int,
+	index: Int,
+	onClick: () -> Unit
 ) {
-	Text(
-		modifier = modifier,
-		text = stringResource(item.title),
-		style = MaterialTheme.typography.titleMedium,
-		color = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
-	)
+	val isSelected = index == current
+	val tabItem = TabItem.entries[index]
+	Column(
+		modifier = Modifier
+			.width(IntrinsicSize.Min)
+			.wrapContentSize()
+			.clip(MaterialTheme.shapes.medium)
+			.clickable(onClick = onClick)
+			.padding(horizontal = 10.dp, vertical = 5.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		MiniImage(
+			res = if (isSelected) tabItem.iconActive else tabItem.iconNormal,
+			modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(5.dp)
+		)
+		Text(
+			text = stringResource(tabItem.title),
+			style = MaterialTheme.typography.labelMedium,
+			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+		)
+	}
 }
 
 @Composable
@@ -63,18 +83,19 @@ private fun PortraitNavigation(
 	modifier: Modifier = Modifier
 ) {
 	Surface(
-		modifier = modifier.zIndex(5f),
+		modifier = modifier,
+		tonalElevation = 1.dp,
 		shadowElevation = 5.dp
 	) {
-		NavigationBar(modifier = Modifier.fillMaxWidth()) {
-			TabItem.entries.forEachIndexed { index, tabItem ->
-				val isSelected = index == currentPage
-				NavigationBarItem(
-					selected = isSelected,
-					icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
-					label = { NavigationItemText(tabItem, isSelected) },
-					onClick = { onNavigate(index) }
-				)
+		EqualRow(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+			for (index in TabItem.entries.indices) {
+				equalItem {
+					NavigationIcon(
+						index = index,
+						current = currentPage,
+						onClick = { onNavigate(index) }
+					)
+				}
 			}
 		}
 	}
@@ -87,32 +108,30 @@ private fun LandscapeNavigation(
 	modifier: Modifier = Modifier
 ) {
 	Surface(
-		modifier = modifier.zIndex(5f),
+		modifier = modifier,
+		tonalElevation = 1.dp,
 		shadowElevation = 5.dp
 	) {
-		NavigationRail(
-			modifier = Modifier.fillMaxHeight(),
-			header = {
-				Space(10.dp)
-				ClickIcon(
-					imageVector = when (app.theme) {
-						ThemeMode.SYSTEM -> Icons.Filled.Contrast
-						ThemeMode.LIGHT -> Icons.Filled.LightMode
-						ThemeMode.DARK -> Icons.Filled.DarkMode
-					},
-					color = MaterialTheme.colorScheme.primary,
-					onClick = {
-						app.theme = app.theme.next
-					}
-				)
-			}
+		Column(
+			modifier = Modifier.fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp),
+			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			TabItem.entries.forEachIndexed { index, tabItem ->
-				val isSelected = index == currentPage
-				NavigationRailItem(
-					selected = isSelected,
-					icon = { MiniImage(if (isSelected) tabItem.iconActive else tabItem.iconNormal) },
-					label = { NavigationItemText(tabItem, isSelected) },
+			ClickIcon(
+				icon = when (app.theme) {
+					ThemeMode.SYSTEM -> Icons.Filled.Contrast
+					ThemeMode.LIGHT -> Icons.Filled.LightMode
+					ThemeMode.DARK -> Icons.Filled.DarkMode
+				},
+				color = MaterialTheme.colorScheme.primary,
+				onClick = {
+					app.theme = app.theme.next
+				}
+			)
+			Space(10.dp)
+			for (index in TabItem.entries.indices) {
+				NavigationIcon(
+					index = index,
+					current = currentPage,
 					onClick = { onNavigate(index) }
 				)
 			}
@@ -156,7 +175,7 @@ data object ScreenMain : Screen<ScreenMain.Model> {
 				modifier = modifier,
 				bottomBar = {
 					PortraitNavigation(
-						modifier = Modifier.fillMaxWidth(),
+						modifier = Modifier.fillMaxWidth().zIndex(5f),
 						currentPage = pagerState.currentPage,
 						onNavigate = { onPageChanged(it) }
 					)
@@ -170,7 +189,7 @@ data object ScreenMain : Screen<ScreenMain.Model> {
 		fun Landscape(modifier: Modifier = Modifier) {
 			Row(modifier = modifier) {
 				LandscapeNavigation(
-					modifier = Modifier.fillMaxHeight(),
+					modifier = Modifier.fillMaxHeight().zIndex(5f),
 					currentPage = pagerState.currentPage,
 					onNavigate = { onPageChanged(it) }
 				)

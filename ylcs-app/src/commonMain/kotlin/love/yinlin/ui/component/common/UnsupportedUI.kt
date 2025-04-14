@@ -22,7 +22,7 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 		verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
 	) {
 		MiniIcon(
-			imageVector = Icons.Filled.NotificationImportant,
+			icon = Icons.Filled.NotificationImportant,
 			size = 50.dp
 		)
 		Text(text = "该组件或功能未在此平台实现")

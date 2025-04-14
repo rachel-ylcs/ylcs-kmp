@@ -102,7 +102,7 @@ private fun CalendarHeader(
 	) {
 		Text(
 			text = "${currentDate.year}年${currentDate.monthNumber}月",
-			style = MaterialTheme.typography.displayMedium,
+			style = MaterialTheme.typography.displaySmall,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f)

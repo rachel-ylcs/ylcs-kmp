@@ -133,7 +133,7 @@ data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
                         label = { Text(text = Comment.Section.sectionName(section)) },
                         leadingIcon = if (section == input.section) {
                             {
-                                MiniIcon(imageVector = Icons.Filled.Done)
+                                MiniIcon(icon = Icons.Filled.Done)
                             }
                         } else null,
                         elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = 0.dp)

@@ -116,7 +116,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					}
 				)
 				when (result) {
-					is Data.Success -> app.config.cacheUserAvatar = KVConfig.CacheState.UPDATE
+					is Data.Success -> app.config.cacheUserAvatar = KVConfig.UPDATE
 					is Data.Error -> slot.tip.error(result.message)
 				}
 			}
@@ -134,7 +134,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					}
 				)
 				when (result) {
-					is Data.Success -> app.config.cacheUserWall = KVConfig.CacheState.UPDATE
+					is Data.Success -> app.config.cacheUserWall = KVConfig.UPDATE
 					is Data.Error -> slot.tip.error(result.message)
 				}
 			}
@@ -329,7 +329,7 @@ data object ScreenSettings : Screen<ScreenSettings.Model> {
 					verticalArrangement = Arrangement.spacedBy(10.dp),
 				) {
 					LoadingIcon(
-						imageVector = Icons.Outlined.Check,
+						icon = Icons.Outlined.Check,
 						enabled = state.ok,
 						onClick = { sendFeedback(state.text) }
 					)

@@ -162,7 +162,7 @@ fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 				horizontalArrangement = Arrangement.spacedBy(20.dp)
 			) {
 				MiniIcon(
-					imageVector = Icons.Filled.WifiOff,
+					icon = Icons.Filled.WifiOff,
 					color = MaterialTheme.colorScheme.error
 				)
 				Text(

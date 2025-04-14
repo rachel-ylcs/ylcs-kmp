@@ -50,7 +50,7 @@ APP不需要任何文件存储读写权限，所有数据和文件均存储在AP
     <string name="home_nav_msg">资讯</string>
     <string name="home_nav_music">听歌</string>
     <string name="home_nav_discovery">发现</string>
-    <string name="home_nav_me">小银子</string>
+    <string name="home_nav_me">银子</string>
 
     <string name="default_playlist_name">试听列表</string>
     <string name="no_audio_source">无音源</string>

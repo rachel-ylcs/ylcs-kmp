@@ -38,7 +38,7 @@ fun NineGrid(
 			)
 			if (pic.isVideo) {
 				MiniIcon(
-					imageVector = Icons.Outlined.SmartDisplay,
+					icon = Icons.Outlined.SmartDisplay,
 					size = 48.dp,
 					color = Colors.Red4,
 					modifier = Modifier.zIndex(2f)

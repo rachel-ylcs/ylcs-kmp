@@ -81,6 +81,7 @@ object DateEx {
 val Instant.toLocalDateTime: LocalDateTime? get() = try { this.toLocalDateTime(TimeZone.currentSystemDefault()) } catch (_: Throwable) { null }
 val Long.toLocalDateTime: LocalDateTime? get() = Instant.fromEpochMilliseconds(this).toLocalDateTime
 val Long.toLocalDate: LocalDate? get() = this.toLocalDateTime?.date
+val Long.toLocalTime: LocalTime? get() = try { LocalTime.fromMillisecondOfDay(this.toInt()) } catch (_: Throwable) { null }
 val LocalDateTime.toLong: Long get() = this.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 val LocalDate.toLong: Long get() = this.toLocalDateTime.toLong
 val LocalDate.toLocalDateTime: LocalDateTime get() = LocalDateTime(this, LocalTime(8, 0, 0))

@@ -44,12 +44,12 @@ fun RachelText(
 ) {
 	Row(
 		modifier = modifier.height(IntrinsicSize.Min),
-		horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+		horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			Icon(
-				modifier = Modifier.matchParentSize().padding(2.dp),
+				modifier = Modifier.matchParentSize(),
 				imageVector = icon,
 				tint = color,
 				contentDescription = null
@@ -57,6 +57,7 @@ fun RachelText(
 		}
 		Text(
 			text = text,
+			style = MaterialTheme.typography.bodyMedium,
 			color = color,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis

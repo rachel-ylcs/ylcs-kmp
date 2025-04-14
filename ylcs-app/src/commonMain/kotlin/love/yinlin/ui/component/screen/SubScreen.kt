@@ -33,7 +33,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 		val padding = if (ltr) 10.dp else 0.dp
 
 		ClickIcon(
-			imageVector = icon,
+			icon = icon,
 			color = color,
 			enabled = enabled,
 			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
@@ -51,7 +51,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 		val padding = if (ltr) 10.dp else 0.dp
 
 		LoadingIcon(
-			imageVector = icon,
+			icon = icon,
 			color = color,
 			enabled = enabled,
 			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
@@ -98,7 +98,7 @@ fun SubScreen(
 						if (onBack != null) {
 							ClickIcon(
 								modifier = Modifier.padding(horizontal = 5.dp),
-								imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+								icon = Icons.AutoMirrored.Outlined.ArrowBack,
 								onClick = onBack
 							)
 						}

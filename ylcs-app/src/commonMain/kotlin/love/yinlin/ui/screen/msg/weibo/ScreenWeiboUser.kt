@@ -70,7 +70,7 @@ private fun UserInfoCard(
 					modifier = Modifier.weight(1f)
 				)
 				ClickIcon(
-					imageVector = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+					icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
 					color = MaterialTheme.colorScheme.primary,
 					size = 24.dp,
 					onClick = { onFollowClick(!isFollowed) }

@@ -57,7 +57,6 @@ catch (e: CancellationException) {
 	Data.Error(Failed.RequestError.Canceled, "操作取消", e)
 }
 catch (e: Throwable) {
-	e.printStackTrace()
 	Data.Error(Failed.RequestError.ClientError, "未知异常", e)
 }
 

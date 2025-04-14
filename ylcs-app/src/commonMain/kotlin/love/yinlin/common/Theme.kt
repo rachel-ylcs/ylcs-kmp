@@ -178,12 +178,12 @@ private fun RachelTextStyle(size: TextUnit, isBold: Boolean = false): TextStyle 
 
 @Composable
 private fun RachelTypography(): Typography = Typography(
-	displayLarge = RachelTextStyle(20.sp, true),
-	displayMedium = RachelTextStyle(18.sp, true),
-	displaySmall = RachelTextStyle(16.sp, true),
-	headlineLarge = RachelTextStyle(20.sp, false),
-	headlineMedium = RachelTextStyle(18.sp, false),
-	headlineSmall = RachelTextStyle(16.sp, false),
+	displayLarge = RachelTextStyle(26.sp, true),
+	displayMedium = RachelTextStyle(22.sp, true),
+	displaySmall = RachelTextStyle(18.sp, true),
+	headlineLarge = RachelTextStyle(26.sp, false),
+	headlineMedium = RachelTextStyle(22.sp, false),
+	headlineSmall = RachelTextStyle(18.sp, false),
 	titleLarge = RachelTextStyle(16.sp, true),
 	titleMedium = RachelTextStyle(14.sp, true),
 	titleSmall = RachelTextStyle(12.sp, true),

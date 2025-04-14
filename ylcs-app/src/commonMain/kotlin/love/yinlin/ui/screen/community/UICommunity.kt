@@ -24,8 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +39,9 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.OffsetLayout
+import love.yinlin.ui.component.layout.equalItem
 
 @Composable
 internal fun BoxText(
@@ -231,22 +236,48 @@ internal data class TipButtonInfo(
 )
 
 @Composable
-internal fun TipButton(
-	info: TipButtonInfo,
-	modifier: Modifier = Modifier
+internal fun TipButtonContainer(
+	title: String,
+	buttons: List<TipButtonInfo>,
+	modifier: Modifier = Modifier,
+	shape: Shape = RectangleShape
 ) {
-	Column(
-		modifier = modifier.clickable(onClick = info.onClick).padding(3.dp),
-		verticalArrangement = Arrangement.spacedBy(3.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
+	Surface(
+		modifier = modifier,
+		shape = shape,
+		shadowElevation = 5.dp
 	) {
-		MiniIcon(
-			imageVector = info.icon,
-			color = MaterialTheme.colorScheme.onSurface
-		)
-		Text(
-			text = info.text,
-			color = MaterialTheme.colorScheme.onSurface
-		)
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Text(
+				text = title,
+				style = MaterialTheme.typography.titleLarge
+			)
+			EqualRow(modifier = Modifier.fillMaxWidth()) {
+				for (button in buttons) {
+					equalItem {
+						Column(
+							modifier = Modifier
+								.clip(MaterialTheme.shapes.medium)
+								.clickable(onClick = button.onClick)
+								.padding(horizontal = 10.dp, vertical = 5.dp),
+							verticalArrangement = Arrangement.spacedBy(3.dp),
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
+							MiniIcon(
+								icon = button.icon,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+							Text(
+								text = button.text,
+								color = MaterialTheme.colorScheme.onSurface
+							)
+						}
+					}
+				}
+			}
+		}
 	}
 }

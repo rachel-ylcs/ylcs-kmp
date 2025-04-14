@@ -1,5 +1,11 @@
 package love.yinlin.extension
 
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+
+//  ----------  Data Transfer  ----------
+
+fun <K, V> Map<K, V>.toMutableStateMap() = SnapshotStateMap<K, V>().also { it.putAll(this) }
+
 //  ----------  Data Change  ----------
 
 // 将容器替换为另一个容器

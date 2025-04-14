@@ -82,11 +82,11 @@ fun DockedDatePicker(
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					ClickIcon(
-						imageVector = Icons.Outlined.DateRange,
+						icon = Icons.Outlined.DateRange,
 						onClick = { isShow = !isShow }
 					)
 					ClickIcon(
-						imageVector = Icons.Outlined.Close,
+						icon = Icons.Outlined.Close,
 						onClick = { datePickerState.selectedDateMillis = null }
 					)
 				}

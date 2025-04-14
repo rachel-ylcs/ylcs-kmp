@@ -144,7 +144,7 @@ private fun DefaultSwipePaginationHeader(
 			color = MaterialTheme.colorScheme.onPrimary
 		)
 		else MiniIcon(
-			imageVector = Icons.Outlined.ArrowDownward,
+			icon = Icons.Outlined.ArrowDownward,
 			size = 32.dp,
 			color = MaterialTheme.colorScheme.onPrimary
 		)
@@ -175,7 +175,7 @@ private fun DefaultSwipePaginationFooter(
 			color = MaterialTheme.colorScheme.onPrimary
 		)
 		else MiniIcon(
-			imageVector = Icons.Outlined.ArrowUpward,
+			icon = Icons.Outlined.ArrowUpward,
 			size = 32.dp,
 			color = MaterialTheme.colorScheme.onPrimary
 		)
@@ -311,7 +311,7 @@ private fun DefaultClickPaginationIndicator(
 			horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
 		) {
 			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = 32.dp)
-			else MiniIcon(imageVector = Icons.Filled.Update, size = 32.dp)
+			else MiniIcon(icon = Icons.Filled.Update, size = 32.dp)
 			Text(text = if (status == PaginationStatus.RUNNING) "加载中..." else "加载更多")
 		}
 	}

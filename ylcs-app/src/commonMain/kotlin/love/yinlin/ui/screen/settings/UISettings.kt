@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,8 +24,6 @@ import love.yinlin.common.ThemeColor
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
-import love.yinlin.ui.component.image.DEFAULT_ICON_SIZE
-import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.StaticLoadingIcon
 import love.yinlin.ui.component.layout.Space
@@ -56,7 +53,7 @@ object SettingsScope {
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			if (icon != null) ColorfulIcon(imageVector = icon)
+			if (icon != null) ColorfulIcon(icon = icon)
 			Text(
 				text = title,
 				style = MaterialTheme.typography.labelLarge,
@@ -134,7 +131,7 @@ object SettingsScope {
 						overflow = TextOverflow.Ellipsis
 					)
 				}
-				MiniIcon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight)
+				MiniIcon(icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight)
 			}
 		}
 	}
@@ -180,7 +177,7 @@ object SettingsScope {
 				}
 				StaticLoadingIcon(
 					isLoading = isLoading,
-					imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+					icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
 					color = color,
 					enabled = enabled
 				)
@@ -208,12 +205,12 @@ fun SettingsLayout(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				MiniIcon(
-					imageVector = icon,
+					icon = icon,
 					color = MaterialTheme.colorScheme.primary
 				)
 				Text(
 					text = title,
-					style = MaterialTheme.typography.displayMedium,
+					style = MaterialTheme.typography.displaySmall,
 					color = MaterialTheme.colorScheme.primary,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis

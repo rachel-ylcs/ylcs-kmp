@@ -33,7 +33,7 @@ fun AppTopBar(
 				Text(
 					text = stringResource(Res.string.app_name),
 					color = MaterialTheme.colorScheme.onSecondaryContainer,
-					style = MaterialTheme.typography.headlineLarge
+					style = MaterialTheme.typography.headlineSmall
 				)
 			}
 		},

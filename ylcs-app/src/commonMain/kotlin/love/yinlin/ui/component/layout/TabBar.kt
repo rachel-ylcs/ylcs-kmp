@@ -47,7 +47,7 @@ fun TabBar(
 				}.padding(horizontal = 15.dp, vertical = 10.dp)
 			) {
 				MiniIcon(
-					imageVector = icon,
+					icon = icon,
 					size = 20.dp,
 					color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
 				)

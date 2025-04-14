@@ -97,7 +97,7 @@ fun Tip(state: TipState) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				MiniIcon(
-					imageVector = when (state.type) {
+					icon = when (state.type) {
 						TipState.Type.INFO -> Icons.Outlined.Lightbulb
 						TipState.Type.SUCCESS -> Icons.Outlined.Check
 						TipState.Type.WARNING -> Icons.Outlined.Warning
@@ -405,7 +405,7 @@ abstract class DialogChoice(
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						MiniIcon(
-							imageVector = icon(index),
+							icon = icon(index),
 							size = 24.dp
 						)
 						Text(

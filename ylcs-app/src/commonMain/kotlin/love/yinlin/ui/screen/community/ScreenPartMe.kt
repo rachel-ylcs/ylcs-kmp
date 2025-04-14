@@ -32,7 +32,9 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_not_login
+import love.yinlin.resources.login
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
@@ -44,42 +46,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
-
-@Composable
-private fun TipButtonContainer(
-	title: String,
-	buttons: List<TipButtonInfo>,
-	modifier: Modifier = Modifier,
-	shape: Shape = RectangleShape
-) {
-	Surface(
-		modifier = modifier,
-		shape = shape,
-		shadowElevation = 5.dp
-	) {
-		Column(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			Text(
-				text = title,
-				style = MaterialTheme.typography.titleLarge
-			)
-			Row(
-				modifier = modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				for (button in buttons) {
-					TipButton(
-						info = button,
-						modifier = Modifier.weight(1f)
-					)
-				}
-			}
-		}
-	}
-}
 
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	val signinSheet = CommonSheetState()
@@ -102,7 +68,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			when (result) {
 				is Data.Success -> {
 					app.config.userToken = result.data
-					app.config.userTokenUpdate = KVConfig.CacheState.UPDATE
+					app.config.userTokenUpdate = KVConfig.UPDATE
 				}
 				is Data.Error -> {
 					if (result.type == Failed.RequestError.Unauthorized) {
@@ -126,11 +92,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			ClickIcon(
-				imageVector = Icons.Filled.CropFree,
+				icon = Icons.Filled.CropFree,
 				onClick = { scanQrcode() }
 			)
 			ClickIcon(
-				imageVector = Icons.Filled.Settings,
+				icon = Icons.Filled.Settings,
 				onClick = { navigate(ScreenSettings) }
 			)
 		}
@@ -201,7 +167,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
 										MiniIcon(
-											imageVector = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
 											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
 										)
 										Text(
@@ -241,7 +207,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				horizontalArrangement = Arrangement.End
 			) {
 				ClickIcon(
-					imageVector = Icons.Filled.Settings,
+					icon = Icons.Filled.Settings,
 					onClick = { navigate(ScreenSettings) }
 				)
 			}
@@ -255,7 +221,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				) {
 					Image(
 						modifier = Modifier.size(200.dp),
-						painter = painterResource(Res.drawable.image_not_login),
+						painter = painterResource(Res.drawable.img_not_login),
 						contentDescription = null
 					)
 					RachelButton(
@@ -276,9 +242,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				toolbar = { ToolBar() }
 			)
 			Space(10.dp)
-			UserSpaceContainer(
-				modifier = Modifier.fillMaxWidth()
-			)
+			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
 		}
 	}
 

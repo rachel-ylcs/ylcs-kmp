@@ -123,7 +123,7 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 					)
 					Spacer(Modifier.weight(1f))
 					Row(
-						modifier = Modifier.fillMaxWidth(),
+						modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
 						horizontalArrangement = Arrangement.spacedBy(5.dp),
 						verticalAlignment = Alignment.CenterVertically
 					) {

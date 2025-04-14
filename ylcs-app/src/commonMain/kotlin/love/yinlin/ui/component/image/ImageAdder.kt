@@ -48,7 +48,7 @@ fun ImageAdder(
 				contentAlignment = Alignment.TopEnd
 			) {
 				ClickIcon(
-					imageVector = Icons.Outlined.Cancel,
+					icon = Icons.Outlined.Cancel,
 					color = MaterialTheme.colorScheme.error,
 					size = size / 3.5f,
 					modifier = Modifier.zIndex(2f),
@@ -71,7 +71,7 @@ fun ImageAdder(
 				contentAlignment = Alignment.Center
 			) {
 				MiniIcon(
-					imageVector = Icons.Outlined.Add,
+					icon = Icons.Outlined.Add,
 					size = size / 2
 				)
 			}

@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -14,14 +15,48 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.parseJsonValue
 
+@Stable
 abstract class MusicFactory {
+    companion object {
+        const val UPDATE_INTERVAL: Long = 150L
+
+        @Stable
+        val MusicInfo.audioPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.defaultFilename)
+        @Stable
+        val MusicInfo.recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
+        @Stable
+        val MusicInfo.backgroundPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.defaultFilename)
+        @Stable
+        val MusicInfo.lyricsPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.defaultFilename)
+    }
+
     // 初始化
     abstract val isInit: Boolean
     abstract suspend fun init()
 
+    // 当前状态
+    abstract val error: Throwable?
+    abstract val playMode: MusicPlayMode
+    abstract val isPlaying: Boolean
+    abstract val currentPosition: Long
+    abstract val currentDuration: Long
+    abstract val musicList: List<MusicInfo>
+
+    // 接口
+    abstract suspend fun updatePlayMode(musicPlayMode: MusicPlayMode)
+    abstract suspend fun play()
+    abstract suspend fun pause()
+    abstract suspend fun stop()
+    abstract suspend fun gotoPrevious()
+    abstract suspend fun gotoNext()
+    abstract suspend fun seekTo(position: Long)
+    abstract suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?)
+    abstract suspend fun addMedia(media: MusicInfo)
+    abstract suspend fun removeMedia(index: Int)
+    abstract suspend fun moveMedia(start: Int, end: Int)
+
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()
-    val playlistLibrary = mutableStateMapOf<String, MusicPlaylist>()
 
     protected suspend fun initLibrary() {
         Coroutines.io {
@@ -34,21 +69,32 @@ abstract class MusicFactory {
                 }
                 catch (_: Throwable) { }
             }
-            playlistLibrary.put("测试", MusicPlaylist("测试", listOf("1", "2", "3", "4")))
         }
     }
 
-    // 当前状态
-    var currentPlayMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
-        protected set
     var currentPlaylist: MusicPlaylist? by mutableStateOf(null)
         protected set
     var currentMusic: MusicInfo? by mutableStateOf(null)
         protected set
 
-    // 接口
-    abstract suspend fun start(playlist: MusicPlaylist, startId: String? = null)
-    abstract suspend fun play()
-    abstract suspend fun pause()
-    abstract suspend fun stop()
+    // 通用操作
+    suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null) {
+        if (isInit && currentPlaylist != playlist) {
+            val actualMusicList = mutableListOf<MusicInfo>()
+            for (id in playlist.items) {
+                musicLibrary[id]?.let { actualMusicList += it }
+            }
+            stop()
+            if (actualMusicList.isNotEmpty()) {
+                currentPlaylist = playlist
+                val index = if (startId != null) actualMusicList.indexOfFirst { it.id == startId } else -1
+                prepareMedias(actualMusicList, if (index != -1) index else null)
+                play()
+            }
+        }
+    }
+
+    suspend fun switchPlayMode() {
+        if (isInit) updatePlayMode(playMode.next)
+    }
 }

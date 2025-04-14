@@ -68,11 +68,11 @@ private fun ActivityDetailsLayout(
 			) {
 				Text(
 					text = activity.title ?: "未知活动",
-					style = MaterialTheme.typography.displayMedium
+					style = MaterialTheme.typography.displaySmall
 				)
 				Text(
 					text = activity.ts ?: "未知时间",
-					style = MaterialTheme.typography.headlineMedium,
+					style = MaterialTheme.typography.headlineSmall,
 					color = ThemeColor.fade
 				)
 			}
@@ -147,7 +147,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 					}
 					if (activity.link != null) {
 						ClickIcon(
-							imageVector = Icons.Outlined.Link,
+							icon = Icons.Outlined.Link,
 							size = 32.dp,
 							onClick = {}
 						)

@@ -38,19 +38,19 @@ import love.yinlin.resources.placeholder_pic
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-val DEFAULT_ICON_SIZE = 24.dp
+private val DEFAULT_ICON_SIZE = 24.dp
 
 @Composable
 fun MiniIcon(
-	imageVector: ImageVector? = null,
+	icon: ImageVector? = null,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	size: Dp = DEFAULT_ICON_SIZE,
 	modifier: Modifier = Modifier
 ) {
-	if (imageVector != null) {
+	if (icon != null) {
 		Icon(
 			modifier = modifier.size(size),
-			imageVector = imageVector,
+			imageVector = icon,
 			contentDescription = null,
 			tint = color,
 		)
@@ -110,25 +110,28 @@ fun colorfulImageVector(
 
 @Composable
 fun ColorfulIcon(
-	imageVector: ColorfulImageVector,
+	icon: ColorfulImageVector,
 	size: Dp = DEFAULT_ICON_SIZE
 ) {
 	Box(
-		modifier = Modifier.size(size).clip(CircleShape).background(imageVector.background).padding(4.dp),
+		modifier = Modifier.size(size)
+			.clip(CircleShape)
+			.background(icon.background)
+			.padding(3.dp),
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
 			modifier = Modifier.fillMaxSize(),
-			imageVector = imageVector.icon,
+			imageVector = icon.icon,
 			contentDescription = null,
-			tint = imageVector.color,
+			tint = icon.color,
 		)
 	}
 }
 
 @Composable
 fun ClickIcon(
-	imageVector: ImageVector,
+	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	size: Dp = DEFAULT_ICON_SIZE,
 	indication: Boolean = true,
@@ -140,72 +143,54 @@ fun ClickIcon(
 	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
 
 	Icon(
-		modifier = modifier.size(size).clip(CircleShape).clickable(
-			onClick = onClick,
-			indication = localIndication,
-			interactionSource = interactionSource,
-			enabled = enabled
-		),
-		imageVector = imageVector,
+		modifier = modifier.size(size + 6.dp)
+			.clip(MaterialTheme.shapes.small)
+			.clickable(
+				onClick = onClick,
+				indication = localIndication,
+				interactionSource = interactionSource,
+				enabled = enabled
+			).padding(3.dp),
+		imageVector = icon,
 		contentDescription = null,
 		tint = if (enabled) color else ThemeColor.fade,
 	)
 }
 
 @Composable
-fun ClickIcon(
-	imageVector: ImageVector,
-	color: Color = MaterialTheme.colorScheme.onSurface,
-	indication: Boolean = true,
-	enabled: Boolean = true,
-	modifier: Modifier = Modifier,
-	onClick: () -> Unit
-) {
-	val localIndication = if (indication) LocalIndication.current else null
-	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
-
-	Icon(
-		modifier = modifier.clip(CircleShape).clickable(
-			onClick = onClick,
-			indication = localIndication,
-			interactionSource = interactionSource,
-			enabled = enabled
-		),
-		imageVector = imageVector,
-		contentDescription = null,
-		tint = if (enabled) color else ThemeColor.fade
-	)
-}
-
-@Composable
 fun StaticLoadingIcon(
 	isLoading: Boolean,
-	imageVector: ImageVector,
+	icon: ImageVector,
 	size: Dp = DEFAULT_ICON_SIZE,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	iconModifier: Modifier = Modifier.fillMaxSize(),
 ) {
 	Box(
 		modifier = modifier.size(size),
 		contentAlignment = Alignment.Center
 	) {
-		if (isLoading) CircularProgressIndicator(
-			modifier = Modifier.fillMaxSize(fraction = 0.75f),
-			color = color
-		)
-		else Icon(
-			modifier = Modifier.fillMaxSize(),
-			imageVector = imageVector,
-			contentDescription = null,
-			tint = if (enabled) color else ThemeColor.fade
-		)
+		if (isLoading) {
+			CircularProgressIndicator(
+				modifier = Modifier.fillMaxSize(fraction = 0.75f),
+				color = color
+			)
+		}
+		else {
+			Icon(
+				modifier = iconModifier,
+				imageVector = icon,
+				contentDescription = null,
+				tint = if (enabled) color else ThemeColor.fade
+			)
+		}
 	}
 }
 
 @Composable
 fun LoadingIcon(
-	imageVector: ImageVector,
+	icon: ImageVector,
 	size: Dp = DEFAULT_ICON_SIZE,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
@@ -217,20 +202,23 @@ fun LoadingIcon(
 
 	StaticLoadingIcon(
 		isLoading = isLoading,
-		imageVector = imageVector,
-		size = size,
+		icon = icon,
+		size = size + 6.dp,
 		color = color,
 		enabled = enabled,
-		modifier = modifier.clip(CircleShape).clickable(
-			enabled = enabled && !isLoading,
-			onClick = {
-				scope.launch {
-					isLoading = true
-					onClick()
-					isLoading = false
+		modifier = modifier,
+		iconModifier = Modifier.fillMaxSize()
+			.clip(MaterialTheme.shapes.small)
+			.clickable(
+				enabled = enabled && !isLoading,
+				onClick = {
+					scope.launch {
+						isLoading = true
+						onClick()
+						isLoading = false
+					}
 				}
-			}
-		)
+			).padding(3.dp),
 	)
 }
 
@@ -254,13 +242,14 @@ fun ClickImage(
 	onClick: () -> Unit
 ) {
 	Image(
-		modifier = modifier.clickable(onClick = onClick),
+		modifier = modifier
+			.clip(MaterialTheme.shapes.small)
+			.clickable(onClick = onClick)
+			.padding(3.dp),
 		painter = painterResource(res),
 		contentDescription = null
 	)
 }
-
-
 
 @Composable
 private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(uri, key) {

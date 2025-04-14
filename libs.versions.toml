@@ -16,7 +16,7 @@ mmkv = "2.1.0"
 coroutines = "1.10.2"
 
 # Android
-media3 = "1.6.0"
+media3 = "1.6.1"
 
 # Desktop
 javafx = "21.0.7-ea+1" #noinspection GradleDependency
@@ -66,7 +66,8 @@ sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.r
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.1.0" }
 
-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
+tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.5.3" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

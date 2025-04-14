@@ -132,17 +132,17 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					ClickIcon(
-						imageVector = Icons.Outlined.FirstPage,
+						icon = Icons.Outlined.FirstPage,
 						size = 32.dp,
 						onClick = { model.onPrevious() }
 					)
 					Text(
 						text = "第 ${model.current} 页",
-						style = MaterialTheme.typography.headlineSmall,
+						style = MaterialTheme.typography.bodyLarge,
 						textAlign = TextAlign.Center
 					)
 					ClickIcon(
-						imageVector = Icons.AutoMirrored.Outlined.LastPage,
+						icon = Icons.AutoMirrored.Outlined.LastPage,
 						size = 32.dp,
 						onClick = { model.onNext() }
 					)

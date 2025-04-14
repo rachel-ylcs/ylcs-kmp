@@ -72,7 +72,7 @@ data object ScreenLogin : Screen<ScreenLogin.Model> {
 				is Data.Success -> {
 					val token = result1.data
 					app.config.userToken = token
-					app.config.userTokenUpdate = KVConfig.CacheState.UPDATE
+					app.config.userTokenUpdate = KVConfig.UPDATE
 					val result2 = ClientAPI.request(
 						route = API.User.Profile.GetProfile,
 						data = token

@@ -2,13 +2,19 @@ package love.yinlin.common
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
+import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
+import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.toMutableStateMap
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
@@ -16,32 +22,120 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 class KVConfig(private val kv: KV) {
+	companion object {
+		const val UPDATE: Long = Long.MAX_VALUE
+	}
+
 	/* ----------------  持久化存储  ---------------- */
 
-	abstract class ValueState<T>(private val version: String? = null) : ReadWriteProperty<Any?, T> {
+	private abstract class ValueState<T>(private val version: String? = null) : ReadWriteProperty<Any?, T> {
 		abstract fun kvGet(key: String): T
 		abstract fun kvSet(key: String, value: T)
 
-		private fun key(property: KProperty<*>): String = "${property.name}${version}"
+		private val KProperty<*>.storageKey: String get() = "${this.name}${version}"
 		private var state: MutableState<T>? = null
 
 		final override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-			if (state == null) state = mutableStateOf(kvGet(key(property)))
+			if (state == null) state = mutableStateOf(kvGet(property.storageKey))
 			return state!!.value
 		}
 
 		final override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
 			if (state == null) state = mutableStateOf(value)
 			else state!!.value = value
-			kvSet(key(property), value)
+			kvSet(property.storageKey, value)
 		}
 	}
 
-	class CacheState(private val kv: KV, private val default: Long = 0L) : ReadWriteProperty<Any?, Long> {
-		companion object {
-			const val UPDATE: Long = Long.MAX_VALUE
+	abstract inner class CollectionState<C, RC : C>(
+		name: String,
+		version: String? = null,
+		private val serializer: KSerializer<C>,
+		stateFactory: (C) -> RC,
+		defaultFactory: () -> C
+	) {
+		protected val storageKey = "$name$version"
+		protected val state: RC = stateFactory(kv.getJson(serializer, storageKey, defaultFactory))
+		val items: C = state
+
+		protected fun save() { kv.setJson(serializer, storageKey, state) }
+
+		abstract val size: Int
+	}
+
+	open inner class ListState<T>(
+		name: String,
+		version: String?,
+		itemSerializer: KSerializer<T>,
+		defaultFactory: () -> List<T>
+	) : CollectionState<List<T>, SnapshotStateList<T>>(
+		name = name,
+		version = version,
+		serializer = ListSerializer(itemSerializer),
+		stateFactory = { it.toMutableStateList() },
+		defaultFactory = defaultFactory
+	) {
+		override val size: Int get() = state.size
+
+		operator fun set(index: Int, item: T) {
+			state[index] = item
+			save()
 		}
 
+		operator fun get(index: Int): T = state[index]
+
+		inline fun <R> map(transform: (T) -> R): List<R> = items.map(transform)
+
+		operator fun iterator(): Iterator<T> = state.iterator()
+
+		fun withIndex(): Iterable<IndexedValue<T>> = state.withIndex()
+
+		inline fun contains(predicate: (T) -> Boolean): Boolean = items.find(predicate) != null
+
+		operator fun plusAssign(item: T) {
+			state += item
+			save()
+		}
+
+		operator fun minusAssign(item: T) {
+			state -= item
+			save()
+		}
+	}
+
+	open inner class MapState<K, V>(
+		name: String,
+		version: String?,
+		keySerializer: KSerializer<K>,
+		valueSerializer: KSerializer<V>,
+		defaultFactory: () -> Map<K, V>
+	) : CollectionState<Map<K, V>, SnapshotStateMap<K, V>>(
+		name = name,
+		version = version,
+		serializer = MapSerializer(keySerializer, valueSerializer),
+		stateFactory = { it.toMutableStateMap() },
+		defaultFactory = defaultFactory
+	){
+		override val size: Int get() = state.size
+
+		operator fun set(key: K, value: V) {
+			state[key] = value
+			save()
+		}
+
+		operator fun get(key: K): V? = state[key]
+
+		inline fun <R> map(transform: (K, V) -> R): List<R> = items.map { transform(it.key, it.value) }
+
+		operator fun iterator(): Iterator<Map.Entry<K, V>> = state.iterator()
+
+		operator fun plusAssign(items: Map<K, V>) {
+			state.putAll(items)
+			save()
+		}
+	}
+
+	private class CacheState(private val kv: KV, private val default: Long = 0L) : ReadWriteProperty<Any?, Long> {
 		private var state: MutableState<Long>? = null
 
 		override fun getValue(thisRef: Any?, property: KProperty<*>): Long {
@@ -54,38 +148,6 @@ class KVConfig(private val kv: KV) {
 			if (state == null) state = mutableStateOf(newCacheValue)
 			else state!!.value = newCacheValue
 			kv.set(property.name, newCacheValue)
-		}
-	}
-
-	open inner class ListState<T>(
-		itemSerializer: KSerializer<T>,
-		name: String,
-		version: String?,
-		defaultFactory: () -> List<T>
-	) {
-		private val listSerializer = ListSerializer(itemSerializer)
-		private val key = "$name$version"
-		protected val state = kv.getJson(listSerializer, key, defaultFactory).toMutableStateList()
-		val items: List<T> = state
-
-		inline fun <R> map(transform: (T) -> R) = items.map(transform)
-		operator fun iterator() = state.iterator()
-		fun withIndex() = state.withIndex()
-		fun contains(predicate: (T) -> Boolean): Boolean = state.find(predicate) != null
-
-		operator fun set(index: Int, item: T) {
-			state[index] = item
-			kv.setJson(listSerializer, key, items)
-		}
-
-		operator fun plusAssign(item: T) {
-			state += item
-			kv.setJson(listSerializer, key, items)
-		}
-
-		operator fun minusAssign(item: T) {
-			state -= item
-			kv.setJson(listSerializer, key, items)
 		}
 	}
 
@@ -150,16 +212,35 @@ class KVConfig(private val kv: KV) {
 		version: String? = null,
 		noinline defaultFactory: () -> List<T> = { emptyList() }
 	) = ListState(
-		itemSerializer = serializer<T>(),
 		name = name,
 		version = version,
+		itemSerializer = serializer<T>(),
 		defaultFactory = defaultFactory
 	)
 
-	/* ------------------  配置  ------------------ */
+	private inline fun <reified K, reified V> mapState(
+		name: String,
+		version: String? = null,
+		noinline defaultFactory: () -> Map<K, V> = { emptyMap() }
+	) = MapState(
+		name = name,
+		version = version,
+		keySerializer = serializer<K>(),
+		valueSerializer = serializer<V>(),
+		defaultFactory = defaultFactory
+	)
+
+	/* ------------------  微博  ------------------ */
 
 	// 微博用户
-	val weiboUsers = listState("weiboUsers", "2") { WeiboUserInfo.DEFAULT }
+	val weiboUsers = listState("weiboUsers") { WeiboUserInfo.DEFAULT }
+
+	/* ------------------  听歌  ------------------ */
+
+	// 歌单
+	val playlistLibrary = mapState<String, MusicPlaylist>("playlistLibrary")
+
+	/* ------------------  社区  ------------------ */
 
 	// 用户 Token
 	var userToken: String by stringState("")

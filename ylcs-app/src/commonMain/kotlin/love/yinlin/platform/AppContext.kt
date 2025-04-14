@@ -70,7 +70,7 @@ abstract class AppContext {
 		Coroutines.startIO { Resource.initialize() }
 		// 初始化音乐播放器
 		musicFactory = initializeMusicFactory()
-		Coroutines.startIO {
+		Coroutines.startCPU {
 			if (!musicFactory.isInit) musicFactory.init()
 		}
 	}

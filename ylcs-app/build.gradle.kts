@@ -106,7 +106,8 @@ kotlin {
                 implementation(libs.sketch.webp)
                 implementation(libs.sketch.zoom)
 
-                implementation(libs.html)
+                implementation(libs.tool.html)
+                implementation(libs.tool.blur)
             }
         }
 

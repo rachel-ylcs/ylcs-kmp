@@ -60,7 +60,7 @@ fun TextInput(
 		trailingIcon = if (clearButton) {
 			{
 				ClickIcon(
-					imageVector = Icons.Outlined.Clear,
+					icon = Icons.Outlined.Clear,
 					onClick = {
 						state.text = ""
 						state.overflow = false

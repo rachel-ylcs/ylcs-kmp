@@ -81,7 +81,7 @@ private fun WeiboIconValue(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally)
 	) {
-		MiniIcon(imageVector = icon, size = 16.dp)
+		MiniIcon(icon = icon, size = 16.dp)
 		Text(text = text)
 	}
 }

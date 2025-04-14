@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.community
+ package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -223,38 +223,38 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	override fun content() {
-		StatefulBox(
-			state = state,
-			modifier = Modifier.fillMaxSize()
-		) {
-			Column(modifier = Modifier.fillMaxSize()) {
-				Surface(
-					modifier = Modifier.fillMaxWidth().zIndex(5f),
-					shadowElevation = 5.dp
+		Column(modifier = Modifier.fillMaxSize()) {
+			Surface(
+				modifier = Modifier.fillMaxWidth().zIndex(5f),
+				shadowElevation = 5.dp
+			) {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
 				) {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						TabBar(
-							currentPage = currentPage,
-							onNavigate = {
-								currentPage = it
-								launch { requestNewData() }
-							},
-							items = DiscoveryItem.items,
-							modifier = Modifier.weight(1f).padding(end = 10.dp)
+					TabBar(
+						currentPage = currentPage,
+						onNavigate = {
+							currentPage = it
+							launch { requestNewData() }
+						},
+						items = DiscoveryItem.items,
+						modifier = Modifier.weight(1f).padding(end = 10.dp)
+					)
+					ActionScope.Right.Actions {
+						Action(
+							icon = Icons.Outlined.Add,
+							color = MaterialTheme.colorScheme.primary,
+							onClick = { navigate(ScreenAddTopic) }
 						)
-						ActionScope.Right.Actions {
-							Action(
-								icon = Icons.Outlined.Add,
-								color = MaterialTheme.colorScheme.primary,
-								onClick = { navigate(ScreenAddTopic) }
-							)
-						}
 					}
 				}
+			}
 
+			StatefulBox(
+				state = state,
+				modifier = Modifier.fillMaxSize()
+			) {
 				val cardWidth = if (app.isPortrait) 150.dp else 200.dp
 				PaginationStaggeredGrid(
 					items = page.items,
