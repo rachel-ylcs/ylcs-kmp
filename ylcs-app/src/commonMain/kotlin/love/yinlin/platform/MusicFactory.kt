@@ -37,10 +37,11 @@ abstract class MusicFactory {
     // 当前状态
     abstract val error: Throwable?
     abstract val playMode: MusicPlayMode
+    abstract val musicList: List<MusicInfo>
+    abstract val isReady: Boolean
     abstract val isPlaying: Boolean
     abstract val currentPosition: Long
     abstract val currentDuration: Long
-    abstract val musicList: List<MusicInfo>
 
     // 接口
     abstract suspend fun updatePlayMode(musicPlayMode: MusicPlayMode)

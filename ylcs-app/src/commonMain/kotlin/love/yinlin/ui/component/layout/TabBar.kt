@@ -34,11 +34,13 @@ private fun <T> TabBar(
 		selectedTabIndex = currentPage,
 		edgePadding = 0.dp,
 		indicator = { tabPositions ->
-			TabRowDefaults.SecondaryIndicator(
-				modifier = Modifier.tabIndicatorOffset(tabPositions[currentPage]),
-				height = 3.dp,
-				color = MaterialTheme.colorScheme.primary
-			)
+			if (currentPage < tabPositions.size) {
+				TabRowDefaults.SecondaryIndicator(
+					modifier = Modifier.tabIndicatorOffset(tabPositions[currentPage]),
+					height = 3.dp,
+					color = MaterialTheme.colorScheme.primary
+				)
+			}
 		},
 		divider = {}
 	) {
@@ -50,7 +52,7 @@ private fun <T> TabBar(
 						if (!isSelected) onNavigate(index)
 					},
 					onLongClick = {
-						onLongClick?.invoke(index)
+						if (currentPage == index) onLongClick?.invoke(index)
 					}
 				).padding(horizontal = 15.dp, vertical = 10.dp),
 				contentAlignment = Alignment.Center

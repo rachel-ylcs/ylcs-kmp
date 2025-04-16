@@ -1,6 +1,6 @@
 package love.yinlin.ui.screen.music
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -21,10 +21,12 @@ import love.yinlin.AppModel
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.extension.moveItem
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.TabBar
 import love.yinlin.ui.component.screen.DialogChoice
 import love.yinlin.ui.component.screen.DialogInput
@@ -49,13 +51,17 @@ data class MusicStatusPreview(
 private fun ReorderableCollectionItemScope.MusicStatusCard(
     musicInfo: MusicStatusPreview,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    enabledDrag: Boolean,
     onDragStart: () -> Unit,
     onDragEnd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick)
-            .padding(horizontal = 15.dp, vertical = 10.dp),
+        modifier = modifier.combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick
+        ).padding(horizontal = 15.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -78,6 +84,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         ClickIcon(
             icon = Icons.Outlined.DragHandle,
             modifier = Modifier.draggableHandle(
+                enabled = enabledDrag,
                 onDragStarted = { onDragStart() },
                 onDragStopped = onDragEnd
             ),
@@ -110,8 +117,8 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
         suspend fun addPlaylist() {
             val name = inputPlaylistNameDialog.open()
             if (name != null) {
-                if (app.config.playlistLibrary[name] == null) {
-                    app.config.playlistLibrary[name] = MusicPlaylist(name, emptyList())
+                if (playlistLibrary[name] == null) {
+                    playlistLibrary[name] = MusicPlaylist(name, emptyList())
                     currentPage = tabs.indexOf(name)
                 }
                 else slot.tip.warning("歌单已存在")
@@ -124,8 +131,8 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                     val oldName = tabs[index]
                     val newName = inputPlaylistNameDialog.open(oldName)
                     if (newName != null) {
-                        if (app.config.playlistLibrary[newName] == null) {
-                            app.config.playlistLibrary.renameKey(oldName, newName) {
+                        if (playlistLibrary[newName] == null) {
+                            playlistLibrary.renameKey(oldName, newName) {
                                 it.copy(name = newName)
                             }
                             currentPage = tabs.indexOf(newName)
@@ -136,7 +143,8 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                 1 -> {
                     val name = tabs[index]
                     if (slot.confirm.open(content = "删除歌单\"$name\"")) {
-                        app.config.playlistLibrary -= name
+                        playlistLibrary -= name
+                        if (currentPage == tabs.size) currentPage = if (tabs.isEmpty()) -1 else currentPage - 1
                         // TODO: Music需要检查当前歌单是否在播放
                     }
                 }
@@ -145,20 +153,33 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
 
         suspend fun playPlaylist() {
             val name = tabs[currentPage]
-            val playlist = app.config.playlistLibrary[name]
+            val playlist = playlistLibrary[name]
             if (playlist != null) app.musicFactory.startPlaylist(playlist)
         }
 
-        private fun deleteMusicFromPlaylist(index: Int) {
-            launch {
-                if (slot.confirm.open(title = "删除", content = "从歌单\"${tabs[currentPage]}\"中删除\"${library[index].name}\"")) {
-
+        private suspend fun deleteMusicFromPlaylist(index: Int) {
+            val name = tabs[currentPage]
+            val musicInfo = library[index]
+            if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
+                val playlist = playlistLibrary[name]
+                if (playlist != null) {
+                    val newItems = playlist.items.toMutableList()
+                    newItems -= musicInfo.id
+                    playlistLibrary[name] = playlist.copy(items = newItems)
+                    library.removeAt(index)
+                    // TODO: Music需要检查当前歌曲是否在播放
                 }
             }
         }
 
         private fun moveMusicFromPlaylist(fromIndex: Int, toIndex: Int) {
-
+            val name = tabs[currentPage]
+            val playlist = playlistLibrary[name]
+            if (playlist != null) {
+                val newItems = playlist.items.toMutableList()
+                newItems.moveItem(fromIndex, toIndex)
+                playlistLibrary[name] = playlist.copy(items = newItems)
+            }
         }
 
         @Composable
@@ -174,6 +195,7 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                     modifier = modifier
                 )
             }
+            else EmptyBox()
         }
 
         @Composable
@@ -184,13 +206,13 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
             val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
                 if (dragStartIndex == -1) dragStartIndex = from.index
                 dragEndIndex = to.index
-                library.add(to.index, library.removeAt(from.index))
+                library.moveItem(from.index, to.index)
             }
 
             LaunchedEffect(currentPage, tabs) {
                 if (currentPage == -1) library.clear()
                 else {
-                    val playlist = app.config.playlistLibrary[tabs[currentPage]]
+                    val playlist = playlistLibrary[tabs[currentPage]]
                     if (playlist != null) {
                         val musicLibrary = app.musicFactory.musicLibrary
                         library.replaceAll(playlist.items.map {
@@ -217,7 +239,13 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                     ) {
                         MusicStatusCard(
                             musicInfo = item,
-                            onClick = { deleteMusicFromPlaylist(index) },
+                            onClick = { },
+                            onLongClick = {
+                                launch {
+                                    deleteMusicFromPlaylist(index)
+                                }
+                            },
+                            enabledDrag = !app.musicFactory.isReady,
                             onDragStart = {
                                 dragStartIndex = -1
                                 dragEndIndex = -1
@@ -244,14 +272,14 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
             title = "歌单",
             onBack = { model.pop() },
             actions = {
-                Action(Icons.Outlined.Add) {
-                    model.launch {
-                        model.addPlaylist()
-                    }
-                }
                 if (model.currentPage != -1) {
                     ActionSuspend(Icons.Outlined.PlayArrow) {
                         model.playPlaylist()
+                    }
+                }
+                Action(Icons.Outlined.Add) {
+                    model.launch {
+                        model.addPlaylist()
                     }
                 }
             },

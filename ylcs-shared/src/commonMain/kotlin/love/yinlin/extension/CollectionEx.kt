@@ -8,6 +8,12 @@ fun <K, V> Map<K, V>.toMutableStateMap() = SnapshotStateMap<K, V>().also { it.pu
 
 //  ----------  Data Change  ----------
 
+fun <T> MutableList<T>.moveItem(fromIndex: Int, toIndex: Int) {
+	if (fromIndex in 0 ..< this.size && toIndex in 0 ..<  this.size) {
+		add(toIndex, removeAt(fromIndex))
+	}
+}
+
 // 将容器替换为另一个容器
 fun <T> MutableCollection<T>.replaceAll(other: Collection<T>) {
 	this.clear()

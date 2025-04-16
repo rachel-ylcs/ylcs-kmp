@@ -12,10 +12,11 @@ class ActualMusicFactory : MusicFactory() {
 
     override val error: Throwable? = null
     override val playMode: MusicPlayMode get() = MusicPlayMode.ORDER
+    override val musicList: List<MusicInfo> = emptyList()
+    override val isReady: Boolean = false
     override val isPlaying: Boolean = false
     override val currentPosition: Long = 0L
     override val currentDuration: Long = 0L
-    override val musicList: List<MusicInfo> = emptyList()
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
 

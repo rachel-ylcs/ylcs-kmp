@@ -108,10 +108,11 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
     override var error: Throwable? by mutableStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
+    override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
+    override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
-    override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
 
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = Any()
