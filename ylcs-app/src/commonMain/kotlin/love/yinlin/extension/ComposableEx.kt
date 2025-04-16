@@ -7,6 +7,9 @@ import androidx.lifecycle.AtomicReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.jvm.JvmInline
 import kotlin.time.Duration
 
 
@@ -65,14 +68,18 @@ val String.itemKey get() = Unit to this
 
 // LaunchFlag
 
+@OptIn(ExperimentalAtomicApi::class)
+@JvmInline
+value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {}
 
-typealias LaunchFlag = AtomicReference<Boolean>
-fun launchFlag(): LaunchFlag = AtomicReference(false)
+@OptIn(ExperimentalAtomicApi::class)
+fun launchFlag(): LaunchFlag = LaunchFlag()
 
+@OptIn(ExperimentalAtomicApi::class)
 @Composable
 inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
 	LaunchedEffect(Unit) {
-		if (flag.compareAndSet(false, true)) block()
+		if (flag.value.compareAndSet(false, true)) block()
 	}
 }
 

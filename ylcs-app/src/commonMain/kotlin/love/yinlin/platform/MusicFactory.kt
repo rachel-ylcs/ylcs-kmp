@@ -58,7 +58,7 @@ abstract class MusicFactory {
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()
 
-    protected suspend fun initLibrary() {
+    suspend fun initLibrary() {
         Coroutines.io {
             val musicPath = OS.Storage.musicPath
             SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->

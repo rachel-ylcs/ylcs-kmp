@@ -16,9 +16,11 @@ import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
@@ -57,7 +59,6 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.lyrics.LyricsLrcState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -65,7 +66,7 @@ import kotlin.math.abs
 class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val factory = app.musicFactory
 
-	private var lyricsState = LyricsLrcState()
+	private var lyrics = LyricsLrc()
 
 	private val blurState = HazeState()
 
@@ -76,11 +77,15 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			left = {
 				Action(
 					icon = Icons.Outlined.LibraryMusic,
-					onClick = { }
+					onClick = {
+						navigate(ScreenMusicLibrary)
+					}
 				)
 				Action(
 					icon = Icons.AutoMirrored.Outlined.QueueMusic,
-					onClick = { }
+					onClick = {
+						navigate(ScreenPlaylistLibrary)
+					}
 				)
 				Action(
 					icon = Icons.Outlined.Lyrics,
@@ -450,14 +455,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
-		val state = remember { LyricsLrcState() }
-
 		LaunchedEffect(factory.currentMusic) {
+			lyrics.reset()
 			factory.currentMusic?.lyricsPath?.let { path ->
 				try {
 					Coroutines.io {
-						SystemFileSystem.source(path).buffered().use {
-							lyricsState.parseLrcString(it.readText())
+						SystemFileSystem.source(path).buffered().use { source ->
+							lyrics.parseLrcString(source.readText())
 						}
 					}
 				}
@@ -465,11 +469,18 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			}
 		}
 
+		LaunchedEffect(factory.currentPosition) {
+			lyrics.updateIndex(factory.currentPosition)
+		}
+
 		Box(modifier = modifier) {
-			LyricsLrc(
-				position = factory.currentPosition,
-				state = state,
-				modifier = Modifier.fillMaxSize()
+			lyrics.content(
+				modifier = Modifier.fillMaxSize(),
+				onLyricsClick = {
+					launch {
+						factory.seekTo(it)
+					}
+				}
 			)
 		}
 	}
@@ -487,12 +498,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-    @Composable
-	override fun content() {
+	@Composable
+	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
 			Box(modifier = Modifier
 				.fillMaxSize()
-				.background(MaterialTheme.colorScheme.background)
+				.background(MaterialTheme.colorScheme.onBackground)
 				.hazeSource(state = blurState)
 				.zIndex(1f)
 			) {
@@ -501,6 +512,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						uri = uri,
 						quality = ImageQuality.Full,
 						contentScale = ContentScale.Crop,
+						alpha = 0.7f,
 						modifier = Modifier.fillMaxSize()
 					)
 				}
@@ -521,7 +533,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.padding(10.dp)
 				)
 				LyricsLayout(modifier = Modifier
-					.padding(10.dp)
+					.padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 50.dp)
 					.fillMaxWidth()
 					.weight(1f)
 				)
@@ -539,5 +551,30 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 			}
 		}
+	}
+
+	@Composable
+	private fun Landscape() {
+		Column(
+			modifier = Modifier.fillMaxSize()
+		) {
+			Surface(
+				modifier = Modifier.fillMaxWidth(),
+				shadowElevation = 5.dp
+			) {
+				ToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
+			}
+			Row(
+				modifier = Modifier.weight(1f)
+			) {
+
+			}
+		}
+	}
+
+    @Composable
+	override fun content() {
+		if (app.isPortrait) Portrait()
+		else Landscape()
 	}
 }

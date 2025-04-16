@@ -79,7 +79,6 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
     override suspend fun init() {
         Coroutines.main {
-            initLibrary()
             val mediaController = Coroutines.io {
                 val sessionToken = SessionToken(context, ComponentName(context, MusicService::class.java))
                 MediaController.Builder(context, sessionToken).buildAsync().get()

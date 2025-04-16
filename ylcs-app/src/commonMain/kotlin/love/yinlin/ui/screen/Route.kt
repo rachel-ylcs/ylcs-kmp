@@ -28,6 +28,8 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeiboAlbum
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
 import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
+import love.yinlin.ui.screen.music.ScreenMusicLibrary
+import love.yinlin.ui.screen.music.ScreenPlaylistLibrary
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityDetails
 import love.yinlin.ui.screen.world.ScreenAddActivity
@@ -83,6 +85,9 @@ fun NavGraphBuilder.buildRoute(appModel: AppModel) = with(ScreenRouteScope(this,
 	screen<ScreenWeiboUser, ScreenWeiboUser.Model>()
 	screen<ScreenWeiboFollows, ScreenWeiboFollows.Model>()
 	screen<ScreenWeiboAlbum, ScreenWeiboAlbum.Model>()
+	// 听歌
+	screen<ScreenMusicLibrary, ScreenMusicLibrary.Model>()
+	screen<ScreenPlaylistLibrary, ScreenPlaylistLibrary.Model>()
 	// 社区
 	screen<ScreenLogin, ScreenLogin.Model>()
 	screen<ScreenUserCard, ScreenUserCard.Model>()

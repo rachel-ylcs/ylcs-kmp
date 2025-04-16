@@ -119,6 +119,9 @@ object Colors {
 object ThemeColor {
 	val fade: Color @Composable get() = if (app.isDarkMode) Colors.Gray4 else Colors.Gray5
 	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Red4
+	val primaryGradient: List<Color> @Composable get() =
+		if (app.isDarkMode) listOf(Colors.Red4, Colors.Orange4, Colors.Red4)
+		else listOf(Colors.Steel4, Colors.Purple4, Colors.Steel4)
 }
 
 private val LightColorScheme = lightColorScheme(

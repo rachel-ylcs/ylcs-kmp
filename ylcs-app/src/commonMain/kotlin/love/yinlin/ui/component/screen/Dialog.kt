@@ -354,12 +354,12 @@ open class DialogInput(
 		RachelDialog(
 			actions = {
 				RachelButton(
-					text = stringResource(Res.string.dialog_yes),
+					text = stringResource(Res.string.dialog_ok),
 					enabled = textInputState.ok,
 					onClick = { continuation?.resume(textInputState.text) }
 				)
 				RachelButton(
-					text = stringResource(Res.string.dialog_no),
+					text = stringResource(Res.string.dialog_cancel),
 					onClick = { hide() }
 				)
 			}
