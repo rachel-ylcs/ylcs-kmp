@@ -1,12 +1,9 @@
 package love.yinlin.ui.screen.music
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
@@ -18,7 +15,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,7 +25,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
-import love.yinlin.extension.condition
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
@@ -122,7 +117,7 @@ data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
             private set
 
         val searchDialog = DialogInput(
-            hint = "搜索歌曲",
+            hint = "歌曲名",
             maxLength = 32
         )
 
@@ -199,23 +194,18 @@ data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
             },
             actions = {
                 if (model.isManaging) {
-                    ActionSuspend(
-                        icon = Icons.AutoMirrored.Outlined.PlaylistAdd,
-                        onClick = { model.onMusicAdd() }
-                    )
-                    ActionSuspend(
-                        icon = Icons.Outlined.Delete,
-                        onClick = { model.onMusicDelete() }
-                    )
+                    ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+                        model.onMusicAdd()
+                    }
+                    ActionSuspend(Icons.Outlined.Delete) {
+                        model.onMusicDelete()
+                    }
                 }
                 else {
-                    ActionSuspend(
-                        icon = if (model.isSearching) Icons.Outlined.Close else Icons.Outlined.Search,
-                        onClick = {
-                            if (model.isSearching) model.closeSearch()
-                            else model.openSearch()
-                        }
-                    )
+                    ActionSuspend(if (model.isSearching) Icons.Outlined.Close else Icons.Outlined.Search) {
+                        if (model.isSearching) model.closeSearch()
+                        else model.openSearch()
+                    }
                 }
             },
             slot = model.slot
@@ -229,10 +219,10 @@ data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
             ) {
                 itemsIndexed(
                     items = model.library,
-                    key = { index, musicInfo -> musicInfo.id }
-                ) { index, musicInfo ->
+                    key = { index, item -> item.id }
+                ) { index, item ->
                     MusicCard(
-                        musicInfo = musicInfo,
+                        musicInfo = item,
                         enableLongClick = !model.isManaging,
                         onLongClick = { model.onCardLongClick(index) },
                         onClick = { model.onCardClick(index) },

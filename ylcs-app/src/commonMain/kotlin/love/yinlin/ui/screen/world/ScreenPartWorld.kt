@@ -128,10 +128,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					horizontalArrangement = Arrangement.End,
 				) {
 					ActionScope.Right.Actions {
-						if (hasPrivilegeVIPCalendar) Action(icon = Icons.Outlined.Add) {
-							navigate(ScreenAddActivity)
+						if (hasPrivilegeVIPCalendar) {
+							Action(Icons.Outlined.Add) {
+								navigate(ScreenAddActivity)
+							}
 						}
-						ActionSuspend(icon = Icons.Outlined.Refresh) {
+						ActionSuspend(Icons.Outlined.Refresh) {
 							requestActivity()
 						}
 					}

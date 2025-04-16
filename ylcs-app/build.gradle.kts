@@ -108,6 +108,7 @@ kotlin {
 
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
+                implementation(libs.tool.reorder)
             }
         }
 

@@ -694,24 +694,23 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					left = {
 						Action(
 							icon = Icons.Filled.Home,
-							enabled = currentSendComment != null,
-							onClick = { currentSendComment = null }
-						)
+							enabled = currentSendComment != null
+						) {
+							currentSendComment = null
+						}
 					},
 					right = {
-						Action(
-							icon = Icons.Filled.Paid,
-							onClick = { sendCoinSheet.open() }
-						)
+						Action(Icons.Filled.Paid) {
+							sendCoinSheet.open()
+						}
 						ActionSuspend(
 							icon = Icons.AutoMirrored.Filled.Send,
-							enabled = state.text.isNotEmpty(),
-							onClick = {
-								if (onSendComment(state.text)) {
-									state.text = ""
-								}
+							enabled = state.text.isNotEmpty()
+						) {
+							if (onSendComment(state.text)) {
+								state.text = ""
 							}
-						)
+						}
 					}
 				)
 				TextInput(
@@ -806,18 +805,21 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(model.topic.uid) == true }
 					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(model.topic.uid) == true }
 					val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
-					if (canUpdateTopicTop) Action(
-						icon = if (model.topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
-						onClick = { model.onChangeTopicIsTop(!model.topic.isTop) }
-					)
-					if (canMoveTopic) Action(
-						icon = Icons.Outlined.MoveUp,
-						onClick = { model.launch { model.onMoveTopic() } }
-					)
-					if (canDeleteTopic) Action(
-						icon = Icons.Outlined.Delete,
-						onClick = { model.launch { model.onDeleteTopic() } }
-					)
+					if (canUpdateTopicTop) {
+						Action(if (model.topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
+							model.onChangeTopicIsTop(!model.topic.isTop)
+						}
+					}
+					if (canMoveTopic) {
+						Action(Icons.Outlined.MoveUp) {
+							model.launch { model.onMoveTopic() }
+						}
+					}
+					if (canDeleteTopic) {
+						Action(Icons.Outlined.Delete) {
+							model.launch { model.onDeleteTopic() }
+						}
+					}
 				}
 			},
 			bottomBar = {

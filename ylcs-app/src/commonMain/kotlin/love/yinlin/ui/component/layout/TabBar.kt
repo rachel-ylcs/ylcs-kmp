@@ -2,6 +2,7 @@ package love.yinlin.ui.component.layout
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -16,13 +17,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import love.yinlin.ui.component.image.MiniIcon
+import kotlin.jvm.JvmName
 
 @Composable
-fun TabBar(
+private fun <T> TabBar(
 	currentPage: Int,
 	onNavigate: (Int) -> Unit,
-	items: List<Pair<String, ImageVector>>,
-	modifier: Modifier = Modifier
+	items: List<T>,
+	modifier: Modifier = Modifier,
+	content: @Composable (Boolean, T) -> Unit,
 ) {
 	ScrollableTabRow(
 		modifier = modifier,
@@ -37,27 +40,71 @@ fun TabBar(
 		},
 		divider = {}
 	) {
-		items.forEachIndexed { index, (title, icon) ->
+		items.forEachIndexed { index, item ->
 			val isSelected = currentPage == index
-			Row(
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalAlignment = Alignment.CenterVertically,
+			Box(
 				modifier = Modifier.clickable {
-					if (currentPage != index) onNavigate(index)
-				}.padding(horizontal = 15.dp, vertical = 10.dp)
+					if (!isSelected) onNavigate(index)
+				}.padding(horizontal = 15.dp, vertical = 10.dp),
+				contentAlignment = Alignment.Center
 			) {
-				MiniIcon(
-					icon = icon,
-					size = 20.dp,
-					color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-				)
-				Text(
-					text = title,
-					color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-					style = if (isSelected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge,
-					textAlign = TextAlign.Center
-				)
+				content(isSelected, item)
 			}
 		}
+	}
+}
+
+@JvmName("TabBarWithIcon")
+@Composable
+fun TabBar(
+	currentPage: Int,
+	onNavigate: (Int) -> Unit,
+	items: List<Pair<String, ImageVector>>,
+	modifier: Modifier = Modifier
+) {
+	TabBar(
+		currentPage = currentPage,
+		onNavigate = onNavigate,
+		items = items,
+		modifier = modifier
+	) { isSelected, (title, icon) ->
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			MiniIcon(
+				icon = icon,
+				size = 20.dp,
+				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+			)
+			Text(
+				text = title,
+				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+				style = if (isSelected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge,
+				textAlign = TextAlign.Center
+			)
+		}
+	}
+}
+
+@Composable
+fun TabBar(
+	currentPage: Int,
+	onNavigate: (Int) -> Unit,
+	items: List<String>,
+	modifier: Modifier = Modifier
+) {
+	TabBar(
+		currentPage = currentPage,
+		onNavigate = onNavigate,
+		items = items,
+		modifier = modifier
+	) { isSelected, title ->
+		Text(
+			text = title,
+			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+			style = if (isSelected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge,
+			textAlign = TextAlign.Center
+		)
 	}
 }

@@ -76,7 +76,10 @@ data object ScreenAddActivity : Screen<ScreenAddActivity.Model> {
 			title = "添加活动",
 			onBack = { model.pop() },
 			actions = {
-				ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+				ActionSuspend(
+					icon = Icons.Outlined.Check,
+					enabled = model.input.canSubmit
+				) {
 					model.addActivity()
 				}
 			},

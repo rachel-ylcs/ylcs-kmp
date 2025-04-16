@@ -65,14 +65,16 @@ fun main() {
                                 actions = {
                                     Action(
                                         icon = Icons.Outlined.Remove,
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { state.isMinimized = true }
-                                    )
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    ) {
+                                        state.isMinimized = true
+                                    }
                                     Action(
                                         icon = Icons.Outlined.Close,
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        onClick = { isOpen = false }
-                                    )
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    ) {
+                                        isOpen = false
+                                    }
                                 }
                             )
                         }

@@ -172,10 +172,10 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
 					ActionScope.Right.Actions {
-						Action(icon = Icons.Outlined.Refresh) {
+						Action(Icons.Outlined.Refresh) {
 							onRefresh()
 						}
-						Action(icon = Icons.Filled.AccountCircle) {
+						Action(Icons.Filled.AccountCircle) {
 							navigate(ScreenWeiboFollows)
 						}
 					}

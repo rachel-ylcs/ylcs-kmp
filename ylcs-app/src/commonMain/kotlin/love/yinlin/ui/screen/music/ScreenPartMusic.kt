@@ -75,32 +75,23 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		SplitActionLayout(
 			modifier = modifier,
 			left = {
-				Action(
-					icon = Icons.Outlined.LibraryMusic,
-					onClick = {
-						navigate(ScreenMusicLibrary)
-					}
-				)
-				Action(
-					icon = Icons.AutoMirrored.Outlined.QueueMusic,
-					onClick = {
-						navigate(ScreenPlaylistLibrary)
-					}
-				)
-				Action(
-					icon = Icons.Outlined.Lyrics,
-					onClick = { }
-				)
+				Action(Icons.Outlined.LibraryMusic) {
+					navigate(ScreenMusicLibrary)
+				}
+				Action(Icons.AutoMirrored.Outlined.QueueMusic) {
+					navigate(ScreenPlaylistLibrary)
+				}
+				Action(Icons.Outlined.Lyrics) {
+
+				}
 			},
 			right = {
-				Action(
-					icon = Icons.Outlined.Extension,
-					onClick = { }
-				)
-				Action(
-					icon = Icons.Outlined.AlarmOn,
-					onClick = { }
-				)
+				Action(Icons.Outlined.Extension) {
+
+				}
+				Action(Icons.Outlined.AlarmOn) {
+
+				}
 			}
 		)
 	}

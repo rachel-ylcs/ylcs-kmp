@@ -198,7 +198,10 @@ data class ScreenModifyActivity(val aid: Int) : Screen<ScreenModifyActivity.Mode
 			title = "修改活动",
 			onBack = { model.pop() },
 			actions = {
-				ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+				ActionSuspend(
+					icon = Icons.Outlined.Check,
+					enabled = model.input.canSubmit
+				) {
 					model.modifyActivity()
 				}
 			},

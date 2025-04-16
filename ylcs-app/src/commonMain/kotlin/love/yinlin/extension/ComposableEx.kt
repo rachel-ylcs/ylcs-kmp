@@ -45,6 +45,19 @@ inline fun <T> rememberState(key1: Any?, key2: Any?, key3: Any?, crossinline ini
 @Composable
 inline fun <T> rememberState(vararg keys: Any?, crossinline init: () -> T) =
 	remember(*keys) { mutableStateOf(init()) }
+
+@Composable
+fun rememberValueState(value: Int, vararg keys: Any?) = remember(*keys) { mutableIntStateOf(value) }
+
+@Composable
+fun rememberValueState(value: Long, vararg keys: Any?) = remember(*keys) { mutableLongStateOf(value) }
+
+@Composable
+fun rememberValueState(value: Float, vararg keys: Any?) = remember(*keys) { mutableFloatStateOf(value) }
+
+@Composable
+fun rememberValueState(value: Double, vararg keys: Any?) = remember(*keys) { mutableDoubleStateOf(value) }
+
 @Composable
 fun <T> rememberDerivedState(calculation: () -> T) =
 	remember { derivedStateOf(calculation) }

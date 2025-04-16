@@ -154,7 +154,10 @@ data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
             title = "发表主题",
             onBack = { model.pop() },
             actions = {
-                ActionSuspend(icon = Icons.Outlined.Check, enabled = model.input.canSubmit) {
+                ActionSuspend(
+                    icon = Icons.Outlined.Check,
+                    enabled = model.input.canSubmit
+                ) {
                     if (profile != null) model.addTopic(profile = profile)
                     else model.slot.tip.warning("请先登录")
                 }

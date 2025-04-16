@@ -244,9 +244,10 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 					ActionScope.Right.Actions {
 						Action(
 							icon = Icons.Outlined.Add,
-							color = MaterialTheme.colorScheme.primary,
-							onClick = { navigate(ScreenAddTopic) }
-						)
+							color = MaterialTheme.colorScheme.primary
+						) {
+							navigate(ScreenAddTopic)
+						}
 					}
 				}
 			}

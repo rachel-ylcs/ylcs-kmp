@@ -113,14 +113,12 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 			title = if (model.isLocal) "微博关注" else "搜索结果",
 			onBack = { model.pop() },
 			actions = {
-				Action(
-					icon = Icons.Outlined.Search,
-					onClick = { model.launch { model.onSearchWeiboUser() } }
-				)
-				Action(
-					icon = Icons.Outlined.Refresh,
-					onClick = { model.refreshLocalUser() }
-				)
+				Action(Icons.Outlined.Search) {
+					model.launch { model.onSearchWeiboUser() }
+				}
+				Action(Icons.Outlined.Refresh) {
+					model.refreshLocalUser()
+				}
 			},
 			slot = model.slot
 		) {

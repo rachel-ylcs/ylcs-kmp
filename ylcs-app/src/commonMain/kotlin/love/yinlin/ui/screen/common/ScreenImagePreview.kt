@@ -180,10 +180,9 @@ data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Scree
 			modifier = Modifier.fillMaxSize(),
 			title = "${model.current + 1} / ${model.previews.size}",
 			actions = {
-				Action(
-					icon = Icons.Filled.Download,
-					onClick = { model.downloadPicture() }
-				)
+				Action(Icons.Filled.Download) {
+					model.downloadPicture()
+				}
 			},
 			onBack = { model.pop() },
 			slot = model.slot

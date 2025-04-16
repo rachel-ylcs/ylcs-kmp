@@ -129,6 +129,11 @@ class KVConfig(private val kv: KV) {
 
 		operator fun iterator(): Iterator<Map.Entry<K, V>> = state.iterator()
 
+		operator fun plusAssign(item: Pair<K, V>) {
+			state += item
+			save()
+		}
+
 		operator fun plusAssign(items: Map<K, V>) {
 			state.putAll(items)
 			save()

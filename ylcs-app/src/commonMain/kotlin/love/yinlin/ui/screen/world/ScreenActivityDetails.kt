@@ -179,10 +179,10 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 			onBack = { model.pop() },
 			actions = {
 				if (hasPrivilegeVIPCalendar) {
-					Action(icon = Icons.Outlined.Edit) {
+					Action(Icons.Outlined.Edit) {
 						model.navigate(ScreenModifyActivity(aid))
 					}
-					ActionSuspend(icon = Icons.Outlined.Delete) {
+					ActionSuspend(Icons.Outlined.Delete) {
 						model.deleteActivity()
 					}
 				}
