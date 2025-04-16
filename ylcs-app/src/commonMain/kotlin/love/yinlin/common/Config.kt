@@ -4,7 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.runtime.snapshots.StateObject
 import androidx.compose.runtime.toMutableStateList
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
@@ -137,6 +136,19 @@ class KVConfig(private val kv: KV) {
 		operator fun plusAssign(items: Map<K, V>) {
 			state.putAll(items)
 			save()
+		}
+
+		operator fun minusAssign(key: K) {
+			state.remove(key)
+			save()
+		}
+
+		fun renameKey(key: K, newKey: K, block: (V) -> V = { it }) {
+			val value = state.remove(key)
+			if (value != null) {
+				state += newKey to block(value)
+				save()
+			}
 		}
 	}
 

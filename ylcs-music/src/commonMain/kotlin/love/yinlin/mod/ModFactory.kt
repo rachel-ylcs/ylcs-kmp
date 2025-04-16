@@ -131,7 +131,7 @@ object ModFactory {
     ): BaseRelease(modPath) {
         private suspend fun Source.readResource(mediaPath: Path) = Coroutines.io {
             val resType = readInt() // 读资源类型
-            require(MusicResourceType.Companion.fromInt(resType) != null) { "不支持的资源类型 $resType" }
+            require(MusicResourceType.fromInt(resType) != null) { "不支持的资源类型 $resType" }
             val resName = readLengthString() // 读资源名称
             require(resName.length in 1..256) { "资源名称非法 Length: ${resName.length}"}
             val resLength = readInt() // 读资源长度
@@ -197,7 +197,7 @@ object ModFactory {
 
         private suspend fun Source.previewResource(): Pair<ResourceItem, MusicInfo?> = Coroutines.io {
             val resType = readInt() // 读资源类型
-            val resourceType = MusicResourceType.Companion.fromInt(resType)
+            val resourceType = MusicResourceType.fromInt(resType)
             require(resourceType != null) { "不支持的资源类型 $resType" }
             val resName = readLengthString() // 读资源名称
             require(resName.length in 1..256) { "资源名称非法 Length: ${resName.length}"}

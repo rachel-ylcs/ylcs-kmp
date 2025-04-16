@@ -1,6 +1,7 @@
 package love.yinlin.ui.component.layout
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import kotlin.jvm.JvmName
 private fun <T> TabBar(
 	currentPage: Int,
 	onNavigate: (Int) -> Unit,
+	onLongClick: ((Int) -> Unit)? = null,
 	items: List<T>,
 	modifier: Modifier = Modifier,
 	content: @Composable (Boolean, T) -> Unit,
@@ -43,9 +45,14 @@ private fun <T> TabBar(
 		items.forEachIndexed { index, item ->
 			val isSelected = currentPage == index
 			Box(
-				modifier = Modifier.clickable {
-					if (!isSelected) onNavigate(index)
-				}.padding(horizontal = 15.dp, vertical = 10.dp),
+				modifier = Modifier.combinedClickable(
+					onClick = {
+						if (!isSelected) onNavigate(index)
+					},
+					onLongClick = {
+						onLongClick?.invoke(index)
+					}
+				).padding(horizontal = 15.dp, vertical = 10.dp),
 				contentAlignment = Alignment.Center
 			) {
 				content(isSelected, item)
@@ -59,12 +66,14 @@ private fun <T> TabBar(
 fun TabBar(
 	currentPage: Int,
 	onNavigate: (Int) -> Unit,
+	onLongClick: ((Int) -> Unit)? = null,
 	items: List<Pair<String, ImageVector>>,
 	modifier: Modifier = Modifier
 ) {
 	TabBar(
 		currentPage = currentPage,
 		onNavigate = onNavigate,
+		onLongClick = onLongClick,
 		items = items,
 		modifier = modifier
 	) { isSelected, (title, icon) ->
@@ -91,12 +100,14 @@ fun TabBar(
 fun TabBar(
 	currentPage: Int,
 	onNavigate: (Int) -> Unit,
+	onLongClick: ((Int) -> Unit)? = null,
 	items: List<String>,
 	modifier: Modifier = Modifier
 ) {
 	TabBar(
 		currentPage = currentPage,
 		onNavigate = onNavigate,
+		onLongClick = onLongClick,
 		items = items,
 		modifier = modifier
 	) { isSelected, title ->

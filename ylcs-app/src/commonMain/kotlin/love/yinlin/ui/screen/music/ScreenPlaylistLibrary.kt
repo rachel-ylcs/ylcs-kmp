@@ -20,11 +20,13 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeColor
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.screen.DialogChoice
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -88,20 +90,55 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 @Serializable
 data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
     class Model(model: AppModel) : Screen.Model(model) {
-        val tabs by derivedStateOf { app.config.playlistLibrary.map { key, _ -> key } }
+        val playlistLibrary = app.config.playlistLibrary
+        val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
         var currentPage: Int by mutableStateOf(if (tabs.isEmpty()) -1 else 0)
         val library = mutableStateListOf<MusicStatusPreview>()
 
-        val addPlaylistDialog = DialogInput(
+        val inputPlaylistNameDialog = DialogInput(
             hint = "歌单名",
             maxLength = 16
         )
 
-        fun addPlaylist() {
-            launch {
-                val name = addPlaylistDialog.open()
-                if (name != null) {
+        val processPlaylistDialog = DialogChoice.fromIconItems(
+            items = listOf(
+                "重命名" to Icons.Outlined.Edit,
+                "删除" to Icons.Outlined.Delete
+            )
+        )
 
+        suspend fun addPlaylist() {
+            val name = inputPlaylistNameDialog.open()
+            if (name != null) {
+                if (app.config.playlistLibrary[name] == null) {
+                    app.config.playlistLibrary[name] = MusicPlaylist(name, emptyList())
+                    currentPage = tabs.indexOf(name)
+                }
+                else slot.tip.warning("歌单已存在")
+            }
+        }
+
+        suspend fun processPlaylist(index: Int) {
+            when (processPlaylistDialog.open()) {
+                0 -> {
+                    val oldName = tabs[index]
+                    val newName = inputPlaylistNameDialog.open(oldName)
+                    if (newName != null) {
+                        if (app.config.playlistLibrary[newName] == null) {
+                            app.config.playlistLibrary.renameKey(oldName, newName) {
+                                it.copy(name = newName)
+                            }
+                            currentPage = tabs.indexOf(newName)
+                        }
+                        else slot.tip.warning("歌单已存在")
+                    }
+                }
+                1 -> {
+                    val name = tabs[index]
+                    if (slot.confirm.open(content = "删除歌单\"$name\"")) {
+                        app.config.playlistLibrary -= name
+                        // TODO: Music需要检查当前歌单是否在播放
+                    }
                 }
             }
         }
@@ -130,6 +167,9 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                 TabBar(
                     currentPage = currentPage,
                     onNavigate = { currentPage = it },
+                    onLongClick = {
+                        launch { processPlaylist(it) }
+                    },
                     items = tabs,
                     modifier = modifier
                 )
@@ -147,7 +187,7 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
                 library.add(to.index, library.removeAt(from.index))
             }
 
-            LaunchedEffect(currentPage) {
+            LaunchedEffect(currentPage, tabs) {
                 if (currentPage == -1) library.clear()
                 else {
                     val playlist = app.config.playlistLibrary[tabs[currentPage]]
@@ -205,7 +245,9 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
             onBack = { model.pop() },
             actions = {
                 Action(Icons.Outlined.Add) {
-                    model.addPlaylist()
+                    model.launch {
+                        model.addPlaylist()
+                    }
                 }
                 if (model.currentPage != -1) {
                     ActionSuspend(Icons.Outlined.PlayArrow) {
@@ -221,6 +263,7 @@ data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
             }
         }
 
-        model.addPlaylistDialog.withOpen()
+        model.inputPlaylistNameDialog.withOpen()
+        model.processPlaylistDialog.withOpen()
     }
 }

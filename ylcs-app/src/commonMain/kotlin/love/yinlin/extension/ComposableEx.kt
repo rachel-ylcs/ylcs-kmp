@@ -83,7 +83,7 @@ val String.itemKey get() = Unit to this
 
 @OptIn(ExperimentalAtomicApi::class)
 @JvmInline
-value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {}
+value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false))
 
 @OptIn(ExperimentalAtomicApi::class)
 fun launchFlag(): LaunchFlag = LaunchFlag()
@@ -92,7 +92,7 @@ fun launchFlag(): LaunchFlag = LaunchFlag()
 @Composable
 inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
 	LaunchedEffect(Unit) {
-		if (flag.value.compareAndSet(false, true)) block()
+		if (flag.value.compareAndSet(expectedValue = false, newValue = true)) block()
 	}
 }
 
