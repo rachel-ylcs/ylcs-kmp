@@ -37,20 +37,20 @@ import love.yinlin.ui.component.screen.ActionScope
 class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	val activities = mutableStateListOf<Activity>()
 
-	val calendarState = CalendarState()
+	private val calendarState = CalendarState()
 
-	suspend fun requestActivity() {
+	private suspend fun requestActivity() {
 		val result = ClientAPI.request(
 			route = API.User.Activity.GetActivities
 		)
 		if (result is Data.Success) activities.replaceAll(result.data)
 	}
 
-	fun showActivityDetails(aid: Int) {
-		navigate(ScreenActivityDetails(aid))
+	private fun showActivityDetails(aid: Int) {
+		navigate(ScreenActivityDetails.Args(aid))
 	}
 
-	fun onDateClick(date: LocalDate) {
+	private fun onDateClick(date: LocalDate) {
 		DateEx.Formatter.standardDate.format(date)
 			?.findSelf(activities) { it.ts }
 				?.let { showActivityDetails(it.aid) }
@@ -130,7 +130,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					ActionScope.Right.Actions {
 						if (hasPrivilegeVIPCalendar) {
 							Action(Icons.Outlined.Add) {
-								navigate(ScreenAddActivity)
+								navigate(ScreenAddActivity.Args)
 							}
 						}
 						ActionSuspend(Icons.Outlined.Refresh) {

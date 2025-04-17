@@ -1,8 +1,6 @@
 package love.yinlin.ui.screen
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,89 +11,60 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
-import love.yinlin.data.common.Picture
-import love.yinlin.data.rachel.topic.Topic
-import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.component.screen.SubScreenSlot
-import love.yinlin.ui.screen.common.ScreenImagePreview
-import love.yinlin.ui.screen.common.ScreenWebpage
-import love.yinlin.ui.screen.community.ScreenAddTopic
-import love.yinlin.ui.screen.community.ScreenLogin
-import love.yinlin.ui.screen.community.ScreenMail
-import love.yinlin.ui.screen.community.ScreenTopic
-import love.yinlin.ui.screen.community.ScreenUserCard
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboAlbum
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
-import love.yinlin.ui.screen.music.ScreenMusicLibrary
-import love.yinlin.ui.screen.music.ScreenPlaylistLibrary
-import love.yinlin.ui.screen.settings.ScreenSettings
-import love.yinlin.ui.screen.world.ScreenActivityDetails
-import love.yinlin.ui.screen.world.ScreenAddActivity
-import love.yinlin.ui.screen.world.ScreenModifyActivity
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 
 @Stable
-interface Screen<M : Screen.Model> {
-	open class Model(private val model: AppModel) : ViewModel() {
-		fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
-		fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
-		fun pop() = model.pop()
+abstract class Screen<A : Screen.Args>(val model: AppModel) : ViewModel() {
+	@Stable
+	interface Args
 
-		@Suppress("PropertyName")
-		val _model: AppModel get() = model
-		inline fun <reified P : ScreenPart> part(): P = _model.part()
+	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
+	fun navigate(route: Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	fun pop() = model.pop()
 
-		val slot = SubScreenSlot()
-	}
+	inline fun <reified P : ScreenPart> part(): P = model.part()
 
-	fun model(model: AppModel): M
+	val slot = SubScreenSlot(viewModelScope)
+
+	open suspend fun initialize() {}
 
 	@Composable
-	fun content(model: M)
+	abstract fun content()
 }
 
-private data class ScreenRouteScope(
+data class ScreenRouteScope(
 	val builder: NavGraphBuilder,
 	val model: AppModel
 )
 
-private inline fun <reified S : Screen<M>, reified M : Screen.Model> ScreenRouteScope.screen(
-	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
+inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
+    crossinline factory: (AppModel, A) -> Screen<A>
 ) {
-	builder.composable<S>(typeMap = typeMap) {
-		val args = remember(it) { it.toRoute<S>() }
-		val screenModel = viewModel { args.model(model) }
-		args.content(screenModel)
+	val appModel = this.model
+	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
+		val screen = viewModel {
+			factory(appModel, backStackEntry.toRoute<A>()).also {
+				it.launch { it.initialize() }
+			}
+		}
+		screen.content()
 	}
 }
 
-fun NavGraphBuilder.buildRoute(appModel: AppModel) = with(ScreenRouteScope(this, appModel)) {
-	// 主页
-	screen<ScreenMain, ScreenMain.Model>()
-	// 通用
-	screen<ScreenWebpage, ScreenWebpage.Model>()
-	screen<ScreenImagePreview, ScreenImagePreview.Model>(buildNavTypeMap<List<Picture>>())
-	// 设置
-	screen<ScreenSettings, ScreenSettings.Model>()
-	// 微博
-	screen<ScreenWeiboDetails, ScreenWeiboDetails.Model>()
-	screen<ScreenWeiboUser, ScreenWeiboUser.Model>()
-	screen<ScreenWeiboFollows, ScreenWeiboFollows.Model>()
-	screen<ScreenWeiboAlbum, ScreenWeiboAlbum.Model>()
-	// 听歌
-	screen<ScreenMusicLibrary, ScreenMusicLibrary.Model>()
-	screen<ScreenPlaylistLibrary, ScreenPlaylistLibrary.Model>()
-	// 社区
-	screen<ScreenLogin, ScreenLogin.Model>()
-	screen<ScreenUserCard, ScreenUserCard.Model>()
-	screen<ScreenTopic, ScreenTopic.Model>(buildNavTypeMap<Topic>())
-	screen<ScreenMail, ScreenMail.Model>()
-	screen<ScreenAddTopic, ScreenAddTopic.Model>()
-	// 世界
-	screen<ScreenActivityDetails, ScreenActivityDetails.Model>()
-	screen<ScreenAddActivity, ScreenAddActivity.Model>()
-	screen<ScreenModifyActivity, ScreenModifyActivity.Model>()
+inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
+	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
+	crossinline factory: (AppModel) -> Screen<A>
+) {
+	val appModel = this.model
+	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
+		val screen = viewModel {
+			factory(appModel).also {
+				it.launch { it.initialize() }
+			}
+		}
+		screen.content()
+	}
 }

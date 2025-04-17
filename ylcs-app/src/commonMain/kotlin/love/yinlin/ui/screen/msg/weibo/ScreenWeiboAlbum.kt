@@ -29,85 +29,84 @@ import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-@Serializable
-data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen<ScreenWeiboAlbum.Model> {
+class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Args>(model) {
+	@Stable
+	@Serializable
+	data class Args(val containerId: String, val title: String) : Screen.Args
+
+	private data class AlbumCache(val count: Int, val items: List<Picture>)
+
 	companion object {
-		const val PIC_LIMIT = 24
-		const val PIC_MAX_LIMIT = 1000
+		private const val PIC_LIMIT = 24
+		private const val PIC_MAX_LIMIT = 1000
 	}
 
-	data class AlbumCache(val count: Int, val items: List<Picture>)
+	private val title = args.title
+	private val containerId = args.containerId
+	private var state by mutableStateOf(BoxState.EMPTY)
 
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		var state by mutableStateOf(BoxState.EMPTY)
+	private val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
+	private var num by mutableIntStateOf(0)
+	private var current by mutableIntStateOf(0)
+	private var maxNum = 0
 
-		val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
-		var num by mutableIntStateOf(0)
-		var current by mutableIntStateOf(0)
-		var maxNum = 0
-
-		fun requestAlbum(page: Int) {
-			launch {
-				if (caches[page] == null) { // 无缓存
-					state = BoxState.LOADING
-					val result = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)
-					if (result is Data.Success) {
-						val (data, count) = result.data
-						caches[page] = AlbumCache(count, data)
-					}
-					state = BoxState.CONTENT
-				}
-				val currentAlbum = caches[page]
-				if (currentAlbum != null) {
-					num = currentAlbum.count
-					current = page
-				}
-				else maxNum = page - 1
+	private suspend fun requestAlbum(page: Int) {
+		if (caches[page] == null) { // 无缓存
+			state = BoxState.LOADING
+			val result = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)
+			if (result is Data.Success) {
+				val (data, count) = result.data
+				caches[page] = AlbumCache(count, data)
 			}
+			state = BoxState.CONTENT
 		}
-
-		fun onPrevious() {
-			if (state != BoxState.LOADING) {
-				if (current > 1) requestAlbum(current - 1)
-				else launch {
-					slot.tip.warning("已经是第一页啦")
-				}
-			}
+		val currentAlbum = caches[page]
+		if (currentAlbum != null) {
+			num = currentAlbum.count
+			current = page
 		}
+		else maxNum = page - 1
+	}
 
-		fun onNext() {
-			if (state != BoxState.LOADING) {
-				if ((maxNum == 0 || current < maxNum) && current < PIC_MAX_LIMIT - 2) requestAlbum(current + 1)
-				else launch {
-					slot.tip.warning("已经是最后一页啦")
-				}
+	private fun onPrevious() {
+		if (state != BoxState.LOADING) {
+			if (current > 1) {
+				launch { requestAlbum(current - 1) }
 			}
+			else slot.tip.warning("已经是第一页啦")
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
-		launch {
-			requestAlbum(1)
+	private fun onNext() {
+		if (state != BoxState.LOADING) {
+			if ((maxNum == 0 || current < maxNum) && current < PIC_MAX_LIMIT - 2) {
+				launch { requestAlbum(current + 1) }
+			}
+			else slot.tip.warning("已经是最后一页啦")
 		}
+	}
+
+	override suspend fun initialize() {
+		requestAlbum(1)
 	}
 
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = "$title - 共 ${model.num} 张",
-			onBack = { model.pop() },
-			slot = model.slot
+			title = "$title - 共 $num 张",
+			onBack = { pop() },
+			slot = slot
 		) {
 			Column(
 				modifier = Modifier.fillMaxSize().padding(10.dp),
 				verticalArrangement = Arrangement.spacedBy(10.dp),
 			) {
 				StatefulBox(
-					state = model.state,
+					state = state,
 					modifier = Modifier.fillMaxWidth().weight(1f)
 				) {
-					val data = model.caches[model.current]
+					val data = caches[current]
 					if (data != null) LazyVerticalGrid(
 						columns = GridCells.Adaptive(if (app.isPortrait) 75.dp else 120.dp),
 						horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -121,7 +120,7 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 							WebImage(
 								uri = pic.image,
 								modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-								onClick = { model.navigate(ScreenImagePreview(data.items, index)) }
+								onClick = { navigate(ScreenImagePreview.Args(data.items, index)) }
 							)
 						}
 					}
@@ -134,17 +133,17 @@ data class ScreenWeiboAlbum(val containerId: String, val title: String) : Screen
 					ClickIcon(
 						icon = Icons.Outlined.FirstPage,
 						size = 32.dp,
-						onClick = { model.onPrevious() }
+						onClick = { onPrevious() }
 					)
 					Text(
-						text = "第 ${model.current} 页",
+						text = "第 $current 页",
 						style = MaterialTheme.typography.bodyLarge,
 						textAlign = TextAlign.Center
 					)
 					ClickIcon(
 						icon = Icons.AutoMirrored.Outlined.LastPage,
 						size = 32.dp,
-						onClick = { model.onNext() }
+						onClick = { onNext() }
 					)
 				}
 			}

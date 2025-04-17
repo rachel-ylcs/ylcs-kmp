@@ -39,239 +39,236 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
 @Stable
-@Serializable
-data object ScreenMail : Screen<ScreenMail.Model> {
-	class Model(model: AppModel) : Screen.Model(model) {
-		var state by mutableStateOf(BoxState.EMPTY)
+class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
+	@Stable
+	@Serializable
+	data object Args : Screen.Args
 
-		val page = object : PaginationArgs<Mail, Long, Boolean>(Long.MAX_VALUE, false) {
-			override fun offset(item: Mail): Long = item.mid
-			override fun arg1(item: Mail): Boolean = item.processed
-		}
+	private var state by mutableStateOf(BoxState.EMPTY)
 
-		val mailDetailsSheet = SheetState<Mail>()
+	private val page = object : PaginationArgs<Mail, Long, Boolean>(Long.MAX_VALUE, false) {
+		override fun offset(item: Mail): Long = item.mid
+		override fun arg1(item: Mail): Boolean = item.processed
+	}
 
-		suspend fun requestNewMails() {
-			if (state != BoxState.LOADING) {
-				state = BoxState.LOADING
-				val result = ClientAPI.request(
-					route = API.User.Mail.GetMails,
-					data = API.User.Mail.GetMails.Request(
-						token = app.config.userToken,
-						num = page.pageNum
-					)
-				)
-				state = if (result is Data.Success) {
-					if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-				} else BoxState.NETWORK_ERROR
-			}
-		}
+	private val mailDetailsSheet = SheetState<Mail>()
 
-		suspend fun requestMoreMails() {
+	private suspend fun requestNewMails() {
+		if (state != BoxState.LOADING) {
+			state = BoxState.LOADING
 			val result = ClientAPI.request(
 				route = API.User.Mail.GetMails,
 				data = API.User.Mail.GetMails.Request(
 					token = app.config.userToken,
-					isProcessed = page.arg1,
-					offset = page.offset,
 					num = page.pageNum
 				)
 			)
-			if (result is Data.Success) page.moreData(result.data)
-		}
-
-		private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
-			if (slot.confirm.open(content = text)) {
-				slot.loading.open()
-				val result = ClientAPI.request(
-					route = API.User.Mail.ProcessMail,
-					data = API.User.Mail.ProcessMail.Request(
-						token = app.config.userToken,
-						mid = mid,
-						confirm = value
-					)
-				)
-				when (result) {
-					is Data.Success -> {
-						page.items.findAssign(predicate = { it.mid == mid }) {
-							it.copy(processed = true)
-						}
-						mailDetailsSheet.hide()
-					}
-					is Data.Error -> slot.tip.error(result.message)
-				}
-				slot.loading.hide()
-			}
-		}
-
-		suspend fun onDeleteMail(mid: Long) {
-			if (slot.confirm.open(content = "删除此邮件?")) {
-				slot.loading.open()
-				val result = ClientAPI.request(
-					route = API.User.Mail.DeleteMail,
-					data = API.User.Mail.DeleteMail.Request(
-						token = app.config.userToken,
-						mid = mid
-					)
-				)
-				when (result) {
-					is Data.Success -> {
-						page.items.removeAll { it.mid == mid }
-						mailDetailsSheet.hide()
-					}
-					is Data.Error -> slot.tip.error(result.message)
-				}
-				slot.loading.hide()
-			}
-		}
-
-		@Composable
-		fun MailItem(
-			mail: Mail,
-			modifier: Modifier = Modifier
-		) {
-			Surface(
-				modifier = modifier,
-				shadowElevation = 3.dp,
-				border = if (mail.processed) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-			) {
-				Column(
-					modifier = Modifier.fillMaxWidth().clickable{ mailDetailsSheet.open(mail) }.padding(10.dp),
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						BoxText(
-							text = mail.typeString,
-							color = when (mail.type) {
-								Mail.Type.INFO -> MaterialTheme.colorScheme.primary
-								Mail.Type.CONFIRM -> MaterialTheme.colorScheme.secondary
-								Mail.Type.DECISION -> MaterialTheme.colorScheme.tertiary
-								else -> MaterialTheme.colorScheme.onSurface
-							}
-						)
-						Text(
-							text = mail.title,
-							style = MaterialTheme.typography.titleMedium,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.weight(1f)
-						)
-						Text(
-							text = mail.ts,
-							color = ThemeColor.fade,
-							style = MaterialTheme.typography.bodyMedium
-						)
-					}
-					Text(
-						text = mail.content,
-						color = ThemeColor.fade,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
-
-		@Composable
-		fun MailDetailsLayout(mail: Mail) {
-			BottomSheet(state = mailDetailsSheet) {
-				Column(
-					modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
-						.padding(10.dp)
-						.verticalScroll(rememberScrollState()),
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					Text(
-						text = mail.title,
-						style = MaterialTheme.typography.titleLarge,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.fillMaxWidth()
-					)
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						if (mail.withYes) RachelButton(
-							text = "接受",
-							icon = Icons.Outlined.CheckCircle,
-							onClick = {
-								launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
-							}
-						)
-						if (mail.withNo) RachelButton(
-							text = "拒绝",
-							icon = Icons.Outlined.Cancel,
-							color = MaterialTheme.colorScheme.error,
-							onClick = {
-								launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
-							}
-						)
-						if (mail.processed) RachelButton(
-							text = "删除",
-							icon = Icons.Outlined.Delete,
-							color = MaterialTheme.colorScheme.secondary,
-							onClick = {
-								launch { onDeleteMail(mail.mid) }
-							}
-						)
-					}
-					Text(
-						text = mail.content,
-						style = MaterialTheme.typography.bodyMedium,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
+			state = if (result is Data.Success) {
+				if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+			} else BoxState.NETWORK_ERROR
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
-		launch {
-			requestNewMails()
+	private suspend fun requestMoreMails() {
+		val result = ClientAPI.request(
+			route = API.User.Mail.GetMails,
+			data = API.User.Mail.GetMails.Request(
+				token = app.config.userToken,
+				isProcessed = page.arg1,
+				offset = page.offset,
+				num = page.pageNum
+			)
+		)
+		if (result is Data.Success) page.moreData(result.data)
+	}
+
+	private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
+		if (slot.confirm.open(content = text)) {
+			slot.loading.open()
+			val result = ClientAPI.request(
+				route = API.User.Mail.ProcessMail,
+				data = API.User.Mail.ProcessMail.Request(
+					token = app.config.userToken,
+					mid = mid,
+					confirm = value
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					page.items.findAssign(predicate = { it.mid == mid }) {
+						it.copy(processed = true)
+					}
+					mailDetailsSheet.hide()
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
+			slot.loading.hide()
+		}
+	}
+
+	private suspend fun onDeleteMail(mid: Long) {
+		if (slot.confirm.open(content = "删除此邮件?")) {
+			slot.loading.open()
+			val result = ClientAPI.request(
+				route = API.User.Mail.DeleteMail,
+				data = API.User.Mail.DeleteMail.Request(
+					token = app.config.userToken,
+					mid = mid
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					page.items.removeAll { it.mid == mid }
+					mailDetailsSheet.hide()
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
+			slot.loading.hide()
 		}
 	}
 
 	@Composable
-	override fun content(model: Model) {
+	private fun MailItem(
+		mail: Mail,
+		modifier: Modifier = Modifier
+	) {
+		Surface(
+			modifier = modifier,
+			shadowElevation = 3.dp,
+			border = if (mail.processed) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+		) {
+			Column(
+				modifier = Modifier.fillMaxWidth().clickable{ mailDetailsSheet.open(mail) }.padding(10.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					BoxText(
+						text = mail.typeString,
+						color = when (mail.type) {
+							Mail.Type.INFO -> MaterialTheme.colorScheme.primary
+							Mail.Type.CONFIRM -> MaterialTheme.colorScheme.secondary
+							Mail.Type.DECISION -> MaterialTheme.colorScheme.tertiary
+							else -> MaterialTheme.colorScheme.onSurface
+						}
+					)
+					Text(
+						text = mail.title,
+						style = MaterialTheme.typography.titleMedium,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.weight(1f)
+					)
+					Text(
+						text = mail.ts,
+						color = ThemeColor.fade,
+						style = MaterialTheme.typography.bodyMedium
+					)
+				}
+				Text(
+					text = mail.content,
+					color = ThemeColor.fade,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+	}
+
+	@Composable
+	private fun MailDetailsLayout(mail: Mail) {
+		BottomSheet(state = mailDetailsSheet) {
+			Column(
+				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
+					.padding(10.dp)
+					.verticalScroll(rememberScrollState()),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				Text(
+					text = mail.title,
+					style = MaterialTheme.typography.titleLarge,
+					textAlign = TextAlign.Center,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (mail.withYes) RachelButton(
+						text = "接受",
+						icon = Icons.Outlined.CheckCircle,
+						onClick = {
+							launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
+						}
+					)
+					if (mail.withNo) RachelButton(
+						text = "拒绝",
+						icon = Icons.Outlined.Cancel,
+						color = MaterialTheme.colorScheme.error,
+						onClick = {
+							launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
+						}
+					)
+					if (mail.processed) RachelButton(
+						text = "删除",
+						icon = Icons.Outlined.Delete,
+						color = MaterialTheme.colorScheme.secondary,
+						onClick = {
+							launch { onDeleteMail(mail.mid) }
+						}
+					)
+				}
+				Text(
+					text = mail.content,
+					style = MaterialTheme.typography.bodyMedium,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+	}
+
+	override suspend fun initialize() {
+		requestNewMails()
+	}
+
+	@Composable
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "邮箱",
-			onBack = { model.pop() },
-			slot = model.slot
+			onBack = { pop() },
+			slot = slot
 		) {
 			StatefulBox(
-				state = model.state,
+				state = state,
 				modifier = Modifier.fillMaxSize()
 			) {
 				PaginationGrid(
-					items = model.page.items,
+					items = page.items,
 					key = { it.mid },
 					columns = GridCells.Adaptive(300.dp),
 					canRefresh = true,
-					canLoading = model.page.canLoading,
-					onRefresh = { model.requestNewMails() },
-					onLoading = { model.requestMoreMails() },
+					canLoading = page.canLoading,
+					onRefresh = { requestNewMails() },
+					onLoading = { requestMoreMails() },
 					modifier = Modifier.fillMaxSize(),
 					contentPadding = PaddingValues(10.dp),
 					horizontalArrangement = Arrangement.spacedBy(10.dp),
 					verticalArrangement = Arrangement.spacedBy(10.dp)
 				) {
-					model.MailItem(mail = it)
+					MailItem(mail = it)
 				}
 			}
 		}
 
-		model.mailDetailsSheet.withOpen {
-			model.MailDetailsLayout(it)
-		}
+		mailDetailsSheet.withOpen { MailDetailsLayout(it) }
 	}
 }

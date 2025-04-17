@@ -32,7 +32,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.rememberState
-import love.yinlin.ui.component.image.StaticLoadingIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable

@@ -42,127 +42,126 @@ import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-@Serializable
-data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
+class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
     @Stable
-    internal class InputState {
-        internal val title = TextInputState()
-        internal val content = TextInputState()
-        internal var section by mutableIntStateOf(Comment.Section.WATER)
-        internal val pics = mutableStateListOf<Picture>()
+    @Serializable
+    data object Args : Screen.Args
+
+    @Stable
+    private class InputState {
+        val title = TextInputState()
+        val content = TextInputState()
+        var section by mutableIntStateOf(Comment.Section.WATER)
+        val pics = mutableStateListOf<Picture>()
 
         val canSubmit by derivedStateOf { title.ok && content.ok }
     }
 
-    class Model(model: AppModel) : Screen.Model(model) {
-        internal val input = InputState()
+    private val input = InputState()
 
-        suspend fun pickPictures() {
-            PicturePicker.pick((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
-                for (source in sources) {
-                    OS.Storage.createTempFile { sink ->
-                        ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
-                    }?.let {
-                        input.pics += Picture(it.toString())
-                    }
-                }
-            }
-        }
-
-        fun deletePic(index: Int) {
-            input.pics.removeAt(index)
-        }
-
-        suspend fun addTopic(profile: UserProfile) {
-            val title = input.title.text
-            val section = input.section
-            val result = ClientAPI.request(
-                route = API.User.Topic.SendTopic,
-                data = API.User.Topic.SendTopic.Request(
-                    token = app.config.userToken,
-                    title = title,
-                    content = input.content.text,
-                    section = section
-                ),
-                files = {
-                    API.User.Topic.SendTopic.Files(
-                        pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
-                    )
-                }
-            )
-            when (result) {
-                is Data.Success -> {
-                    val (tid, pic) = result.data
-                    val part = part<ScreenPartDiscovery>()
-                    val currentSection = part.currentSection
-                    if (currentSection == Comment.Section.LATEST || currentSection == section) {
-                        part.page.items.add(0, Topic(
-                            tid = tid,
-                            uid = profile.uid,
-                            title = title,
-                            pic = pic,
-                            isTop = false,
-                            coinNum = 0,
-                            commentNum = 0,
-                            rawSection = section,
-                            name = profile.name
-                        ))
-                    }
-                    pop()
-                }
-                is Data.Error -> slot.tip.error(result.message)
-            }
-        }
-
-        @Composable
-        fun SectionSelectLayout(
-            profile: UserProfile,
-            modifier: Modifier = Modifier
-        ) {
-            FlowRow(
-                modifier = modifier,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                itemVerticalAlignment = Alignment.CenterVertically
-            ) {
-                for (section in Comment.Section.MovableSection) {
-                    // 管理员才有发布公告权限
-                    FilterChip(
-                        selected = section == input.section,
-                        onClick = { input.section = section },
-                        enabled = section != Comment.Section.NOTIFICATION || profile.hasPrivilegeVIPTopic,
-                        label = { Text(text = Comment.Section.sectionName(section)) },
-                        leadingIcon = if (section == input.section) {
-                            {
-                                MiniIcon(icon = Icons.Filled.Done)
-                            }
-                        } else null,
-                        elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = 0.dp)
-                    )
+    private suspend fun pickPictures() {
+        PicturePicker.pick((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
+            for (source in sources) {
+                OS.Storage.createTempFile { sink ->
+                    ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
+                }?.let {
+                    input.pics += Picture(it.toString())
                 }
             }
         }
     }
 
-    override fun model(model: AppModel): Model = Model(model)
+    private fun deletePic(index: Int) {
+        input.pics.removeAt(index)
+    }
+
+    private suspend fun addTopic(profile: UserProfile) {
+        val title = input.title.text
+        val section = input.section
+        val result = ClientAPI.request(
+            route = API.User.Topic.SendTopic,
+            data = API.User.Topic.SendTopic.Request(
+                token = app.config.userToken,
+                title = title,
+                content = input.content.text,
+                section = section
+            ),
+            files = {
+                API.User.Topic.SendTopic.Files(
+                    pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
+                )
+            }
+        )
+        when (result) {
+            is Data.Success -> {
+                val (tid, pic) = result.data
+                val part = part<ScreenPartDiscovery>()
+                val currentSection = part.currentSection
+                if (currentSection == Comment.Section.LATEST || currentSection == section) {
+                    part.page.items.add(0, Topic(
+                        tid = tid,
+                        uid = profile.uid,
+                        title = title,
+                        pic = pic,
+                        isTop = false,
+                        coinNum = 0,
+                        commentNum = 0,
+                        rawSection = section,
+                        name = profile.name
+                    ))
+                }
+                pop()
+            }
+            is Data.Error -> slot.tip.error(result.message)
+        }
+    }
 
     @Composable
-    override fun content(model: Model) {
+    private fun SectionSelectLayout(
+        profile: UserProfile,
+        modifier: Modifier = Modifier
+    ) {
+        FlowRow(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            itemVerticalAlignment = Alignment.CenterVertically
+        ) {
+            for (section in Comment.Section.MovableSection) {
+                // 管理员才有发布公告权限
+                FilterChip(
+                    selected = section == input.section,
+                    onClick = { input.section = section },
+                    enabled = section != Comment.Section.NOTIFICATION || profile.hasPrivilegeVIPTopic,
+                    label = { Text(text = Comment.Section.sectionName(section)) },
+                    leadingIcon = if (section == input.section) {
+                        {
+                            MiniIcon(icon = Icons.Filled.Done)
+                        }
+                    } else null,
+                    elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = 0.dp)
+                )
+            }
+        }
+    }
+
+    @Composable
+    override fun content() {
         val profile = app.config.userProfile
 
         SubScreen(
             modifier = Modifier.fillMaxSize(),
             title = "发表主题",
-            onBack = { model.pop() },
+            onBack = { pop() },
             actions = {
                 ActionSuspend(
                     icon = Icons.Outlined.Check,
-                    enabled = model.input.canSubmit
+                    enabled = input.canSubmit
                 ) {
-                    if (profile != null) model.addTopic(profile = profile)
-                    else model.slot.tip.warning("请先登录")
+                    if (profile != null) addTopic(profile = profile)
+                    else slot.tip.warning("请先登录")
                 }
             },
-            slot = model.slot
+            slot = slot
         ) {
             if (profile == null) EmptyBox()
             else {
@@ -171,14 +170,14 @@ data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     TextInput(
-                        state = model.input.title,
+                        state = input.title,
                         hint = "标题",
                         maxLength = 48,
                         maxLines = 2,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(
-                        state = model.input.content,
+                        state = input.content,
                         hint = "内容",
                         maxLength = 512,
                         maxLines = 10,
@@ -186,19 +185,19 @@ data object ScreenAddTopic : Screen<ScreenAddTopic.Model> {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text(text = "主题板块", style = MaterialTheme.typography.titleMedium)
-                    model.SectionSelectLayout(
+                    SectionSelectLayout(
                         profile = profile,
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text(text = "主题附图", style = MaterialTheme.typography.titleMedium)
                     ImageAdder(
                         maxNum = 9,
-                        pics = model.input.pics,
+                        pics = input.pics,
                         size = 80.dp,
                         modifier = Modifier.fillMaxWidth(),
-                        onAdd = { model.launch { model.pickPictures() } },
-                        onDelete = { model.deletePic(it) },
-                        onClick = { model.navigate(ScreenImagePreview(model.input.pics, it))  }
+                        onAdd = { launch { pickPictures() } },
+                        onDelete = { deletePic(it) },
+                        onClick = { navigate(ScreenImagePreview.Args(input.pics, it))  }
                     )
                 }
             }

@@ -64,8 +64,8 @@ sealed class ActionScope(private val ltr: Boolean) {
 }
 
 @Stable
-class SubScreenSlot {
-	val tip: TipState = TipState()
+class SubScreenSlot(scope: CoroutineScope) {
+	val tip: TipState = TipState(scope)
 	val info: DialogInfo = DialogInfo()
 	val confirm: DialogConfirm = DialogConfirm()
 	val loading: DialogLoading = DialogLoading()

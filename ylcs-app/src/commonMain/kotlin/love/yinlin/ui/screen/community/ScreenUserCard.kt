@@ -33,140 +33,136 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
 @Stable
-@Serializable
-data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		var profile: UserPublicProfile? by mutableStateOf(null)
+class ScreenUserCard(model: AppModel, args: Args) : Screen<ScreenUserCard.Args>(model) {
+	@Stable
+	@Serializable
+	data class Args(val uid: Int) : Screen.Args
 
-		val listState = LazyStaggeredGridState()
+	private val uid = args.uid
+	private var profile: UserPublicProfile? by mutableStateOf(null)
 
-		val page = object : PaginationArgs<Topic, Int, Boolean>(Int.MAX_VALUE, true) {
-			override fun offset(item: Topic): Int = item.tid
-			override fun arg1(item: Topic): Boolean = item.isTop
-		}
+	private val listState = LazyStaggeredGridState()
 
-		fun requestUserProfile() {
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Profile.GetPublicProfile,
-					data = uid
-				)
-				if (result is Data.Success) profile = result.data
-			}
-		}
+	private val page = object : PaginationArgs<Topic, Int, Boolean>(Int.MAX_VALUE, true) {
+		override fun offset(item: Topic): Int = item.tid
+		override fun arg1(item: Topic): Boolean = item.isTop
+	}
 
-		fun requestNewTopics() {
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Topic.GetTopics,
-					data = API.User.Topic.GetTopics.Request(
-						uid = uid,
-						num = page.pageNum
-					)
-				)
-				if (result is Data.Success) page.newData(result.data)
-			}
-		}
+	private suspend fun requestUserProfile() {
+		val result = ClientAPI.request(
+			route = API.User.Profile.GetPublicProfile,
+			data = uid
+		)
+		if (result is Data.Success) profile = result.data
+	}
 
-		fun requestMoreTopics() {
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Topic.GetTopics,
-					data = API.User.Topic.GetTopics.Request(
-						uid = uid,
-						isTop = page.arg1,
-						offset = page.offset,
-						num = page.pageNum
-					)
-				)
-				if (result is Data.Success) page.moreData(result.data)
-			}
-		}
+	private suspend fun requestNewTopics() {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopics,
+			data = API.User.Topic.GetTopics.Request(
+				uid = uid,
+				num = page.pageNum
+			)
+		)
+		if (result is Data.Success) page.newData(result.data)
+	}
 
-		fun onTopicClick(topic: Topic) {
-			navigate(ScreenTopic(topic))
-		}
+	private suspend fun requestMoreTopics() {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopics,
+			data = API.User.Topic.GetTopics.Request(
+				uid = uid,
+				isTop = page.arg1,
+				offset = page.offset,
+				num = page.pageNum
+			)
+		)
+		if (result is Data.Success) page.moreData(result.data)
+	}
 
-		@Composable
-		fun TopicCard(
-			topic: Topic,
-			cardWidth: Dp,
-			modifier: Modifier = Modifier
+	private fun onTopicClick(topic: Topic) {
+		navigate(ScreenTopic.Args(topic))
+	}
+
+	@Composable
+	private fun TopicCard(
+		topic: Topic,
+		cardWidth: Dp,
+		modifier: Modifier = Modifier
+	) {
+		ElevatedCard(
+			modifier = modifier,
+			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
+			onClick = { onTopicClick(topic) }
 		) {
-			ElevatedCard(
-				modifier = modifier,
-				colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-				onClick = { onTopicClick(topic) }
-			) {
-				Column(modifier = Modifier.fillMaxWidth().heightIn(min = cardWidth * 0.777777f)) {
-					if (topic.pic != null) {
-						WebImage(
-							uri = topic.picPath,
-							modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
-							contentScale = ContentScale.Crop
-						)
-					}
-					if (topic.isTop) {
-						Row(
-							modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp),
-							horizontalArrangement = Arrangement.spacedBy(10.dp),
-							verticalAlignment = Alignment.CenterVertically
-						) {
-							BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
-						}
-					}
-					Text(
-						text = topic.title,
-						maxLines = 2,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)
+			Column(modifier = Modifier.fillMaxWidth().heightIn(min = cardWidth * 0.777777f)) {
+				if (topic.pic != null) {
+					WebImage(
+						uri = topic.picPath,
+						modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
+						contentScale = ContentScale.Crop
 					)
-					Spacer(Modifier.weight(1f))
+				}
+				if (topic.isTop) {
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
-						horizontalArrangement = Arrangement.spacedBy(5.dp),
+						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp),
+						horizontalArrangement = Arrangement.spacedBy(10.dp),
 						verticalAlignment = Alignment.CenterVertically
 					) {
-						RachelText(
-							text = topic.commentNum.toString(),
-							icon = Icons.AutoMirrored.Outlined.Comment,
-							modifier = Modifier.weight(1f)
-						)
-						RachelText(
-							text = topic.coinNum.toString(),
-							icon = Icons.Outlined.Paid,
-							modifier = Modifier.weight(1f)
-						)
+						BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
 					}
+				}
+				Text(
+					text = topic.title,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)
+				)
+				Spacer(Modifier.weight(1f))
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					RachelText(
+						text = topic.commentNum.toString(),
+						icon = Icons.AutoMirrored.Outlined.Comment,
+						modifier = Modifier.weight(1f)
+					)
+					RachelText(
+						text = topic.coinNum.toString(),
+						icon = Icons.Outlined.Paid,
+						modifier = Modifier.weight(1f)
+					)
 				}
 			}
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
+	override suspend fun initialize() {
 		requestUserProfile()
 		requestNewTopics()
 	}
 
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主页",
-			onBack = { model.pop() },
-			slot = model.slot
+			onBack = { pop() },
+			slot = slot
 		) {
-			model.profile?.let { profile ->
+			profile?.let { profile ->
 				val cardWidth = if (app.isPortrait) 150.dp else 180.dp
 				if (app.isPortrait) {
 					PaginationStaggeredGrid(
-						items = model.page.items,
+						items = page.items,
 						key = { it.tid },
 						columns = StaggeredGridCells.Adaptive(cardWidth),
-						state = model.listState,
+						state = listState,
 						canRefresh = false,
-						canLoading = model.page.canLoading,
-						onLoading = { model.requestMoreTopics() },
+						canLoading = page.canLoading,
+						onLoading = { requestMoreTopics() },
 						modifier = Modifier.fillMaxSize(),
 						contentPadding = PaddingValues(bottom = 10.dp),
 						verticalItemSpacing = 10.dp,
@@ -179,7 +175,7 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 							}
 						}
 					) {  topic ->
-						model.TopicCard(
+						TopicCard(
 							topic = topic,
 							cardWidth = cardWidth,
 							modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
@@ -194,18 +190,18 @@ data class ScreenUserCard(val uid: Int) : Screen<ScreenUserCard.Model> {
 							modifier = Modifier.width(350.dp).padding(10.dp)
 						)
 						PaginationStaggeredGrid(
-							items = model.page.items,
+							items = page.items,
 							key = { it.tid },
 							columns = StaggeredGridCells.Adaptive(cardWidth),
-							state = model.listState,
+							state = listState,
 							canRefresh = false,
-							canLoading = model.page.canLoading,
-							onLoading = { model.requestMoreTopics() },
+							canLoading = page.canLoading,
+							onLoading = { requestMoreTopics() },
 							modifier = Modifier.weight(1f).fillMaxHeight(),
 							contentPadding = PaddingValues(10.dp),
 							verticalItemSpacing = 10.dp
 						) {  topic ->
-							model.TopicCard(
+							TopicCard(
 								topic = topic,
 								cardWidth = cardWidth,
 								modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)

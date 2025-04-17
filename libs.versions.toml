@@ -45,8 +45,6 @@ compose-material3-icons = { module = "org.jetbrains.compose.material:material-ic
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
-kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
@@ -77,6 +75,8 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
 compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version = "1.7.8" }
 
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
 media3-ui = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
@@ -87,6 +87,8 @@ mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 # Desktop
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
+
 javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
 javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
 javafx-controls = { module = "org.openjfx:javafx-controls", version.ref = "javafx" }

@@ -16,18 +16,20 @@ import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.parseJsonValue
 
 @Stable
+val MusicInfo.path get(): Path = Path(OS.Storage.musicPath, this.id)
+@Stable
+val MusicInfo.audioPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.defaultFilename)
+@Stable
+val MusicInfo.recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
+@Stable
+val MusicInfo.backgroundPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.defaultFilename)
+@Stable
+val MusicInfo.lyricsPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.defaultFilename)
+
+@Stable
 abstract class MusicFactory {
     companion object {
         const val UPDATE_INTERVAL: Long = 150L
-
-        @Stable
-        val MusicInfo.audioPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.defaultFilename)
-        @Stable
-        val MusicInfo.recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
-        @Stable
-        val MusicInfo.backgroundPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.defaultFilename)
-        @Stable
-        val MusicInfo.lyricsPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.defaultFilename)
     }
 
     // 初始化

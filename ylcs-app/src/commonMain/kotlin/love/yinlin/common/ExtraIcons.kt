@@ -303,7 +303,7 @@ object ExtraIcons {
             verticalLineToRelative(699.8f)
             curveToRelative(0.0f, 9.6f, -12.1f, 13.9f, -18.1f, 6.3f)
             lineTo(653.4f, 518.5f)
-            arcToRelative(10.2f, 10.2f, 0.0f, false, true, 0.0f, -12.6f)
+            arcToRelative(10.2f, 10.2f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, 0.0f, -12.6f)
             close()
         }.build()
     }

@@ -26,12 +26,13 @@ import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
-import love.yinlin.ui.screen.buildRoute
 import love.yinlin.ui.screen.ScreenMain
+import love.yinlin.ui.screen.ScreenRouteScope
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
 import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 import love.yinlin.ui.screen.music.ScreenPartMusic
+import love.yinlin.ui.screen.screens
 import love.yinlin.ui.screen.world.ScreenPartWorld
 
 @Stable
@@ -39,7 +40,7 @@ abstract class ScreenPart(private val model: AppModel) {
 	private val firstLoad = launchFlag()
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
-	fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 
 	@Composable
 	protected abstract fun content()
@@ -74,7 +75,7 @@ class AppModel(
 	}
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
-	fun navigate(route: Screen<*>, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
+	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
 	fun pop() {
 		if (navController.previousBackStackEntry != null) navController.popBackStack()
 	}
@@ -88,9 +89,11 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 	NavHost(
 		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		navController = navController,
-		startDestination = ScreenMain,
+		startDestination = ScreenMain.Args,
 	) {
-		buildRoute(appModel)
+		with(ScreenRouteScope(this, appModel)) {
+			screens()
+		}
 	}
 }
 

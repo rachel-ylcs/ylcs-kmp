@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
@@ -25,12 +26,15 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
+import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
+import love.yinlin.platform.path
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.screen.DialogDynamicChoice
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -107,80 +111,121 @@ private fun MusicCard(
 }
 
 @Stable
-@Serializable
-data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
-    class Model(model: AppModel) : Screen.Model(model) {
-        var library = mutableStateListOf<MusicInfoPreview>()
+class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(model) {
+    @Stable
+    @Serializable
+    data object Args : Screen.Args
 
-        val isManaging by derivedStateOf { library.any { it.selected } }
-        var isSearching by mutableStateOf(false)
-            private set
+    private val playlistLibrary = app.config.playlistLibrary
+    private var library = mutableStateListOf<MusicInfoPreview>()
 
-        val searchDialog = DialogInput(
-            hint = "歌曲名",
-            maxLength = 32
-        )
+    private val selectIdList: List<String> get() = library.filter { it.selected }.map { it.id }
 
-        fun resetLibrary() {
-            library.replaceAll(app.musicFactory.musicLibrary.map {
-                MusicInfoPreview(it.value)
-            })
+    private val isManaging by derivedStateOf { library.any { it.selected } }
+    private var isSearching by mutableStateOf(false)
+        private set
+
+    private val searchDialog = DialogInput(
+        hint = "歌曲名",
+        maxLength = 32
+    )
+
+    private val addMusicDialog = DialogDynamicChoice("添加到歌单")
+
+    private fun resetLibrary() {
+        library.replaceAll(app.musicFactory.musicLibrary.map {
+            MusicInfoPreview(it.value)
+        })
+    }
+
+    private fun exitManagement() {
+        library.forEachIndexed { index, musicInfo ->
+            if (musicInfo.selected) library[index] = musicInfo.copy(selected = false)
         }
+    }
 
-        fun exitManagement() {
-            library.forEachIndexed { index, musicInfo ->
-                if (musicInfo.selected) library[index] = musicInfo.copy(selected = false)
-            }
+    private suspend fun openSearch() {
+        val result = searchDialog.open()
+        if (result != null) {
+            library.replaceAll(app.musicFactory.musicLibrary
+                .filter { it.value.name.contains(result, true) }
+                .map { MusicInfoPreview(it.value) })
+            isSearching = true
         }
+    }
 
-        suspend fun openSearch() {
-            val result = searchDialog.open()
-            if (result != null) {
-                library.replaceAll(app.musicFactory.musicLibrary
-                    .filter { it.value.name.contains(result, true) }
-                    .map { MusicInfoPreview(it.value) })
-                isSearching = true
-            }
+    private fun closeSearch() {
+        resetLibrary()
+        isSearching = false
+    }
+
+    private fun onCardClick(index: Int) {
+        if (isManaging) {
+            val item = library[index]
+            library[index] = item.copy(selected = !item.selected)
         }
-
-        fun closeSearch() {
-            resetLibrary()
-            isSearching = false
-        }
-
-        fun onCardClick(index: Int) {
-            if (isManaging) {
-                val item = library[index]
-                library[index] = item.copy(selected = !item.selected)
-            }
-            else {
-                println("openCard $index")
-            }
-        }
-
-        fun onCardLongClick(index: Int) {
-            library[index] = library[index].copy(selected = true)
-        }
-
-        suspend fun onMusicAdd() {
-
-        }
-
-        suspend fun onMusicDelete() {
+        else {
 
         }
     }
 
-    override fun model(model: AppModel): Model = Model(model).apply {
+    private fun onCardLongClick(index: Int) {
+        library[index] = library[index].copy(selected = true)
+    }
+
+    private suspend fun onMusicAdd() {
+        val names = playlistLibrary.map { key, _ -> key }
+        if (names.isNotEmpty()) {
+            val result = addMusicDialog.open(names)
+            if (result != null) {
+                val name = names[result]
+                val playlist = playlistLibrary[name]
+                if (playlist != null) {
+                    val addItems = selectIdList
+                    exitManagement()
+                    val oldItems = playlist.items
+                    val newItems = mutableListOf<String>()
+                    for (item in addItems) {
+                        if (!oldItems.contains(item)) {
+                            newItems += item
+                        }
+                    }
+                    if (newItems.isNotEmpty()) {
+                        playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
+                        // TODO: 检查是否在播放列表中
+                        slot.tip.success("已添加${newItems.size}首歌曲")
+                    }
+                    else slot.tip.warning("歌曲均已存在于歌单中")
+                }
+            }
+        }
+        else slot.tip.warning("还没有创建任何歌单哦")
+    }
+
+    private suspend fun onMusicDelete() {
+        if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
+            val deleteItems = selectIdList
+            exitManagement()
+            // TODO: 检查是否在播放列表中
+            for (item in deleteItems) {
+                val removeItem = app.musicFactory.musicLibrary.remove(item)
+                if (removeItem != null) {
+                    SystemFileSystem.deleteRecursively(removeItem.path)
+                }
+            }
+        }
+    }
+
+    override suspend fun initialize() {
         resetLibrary()
     }
 
     @Composable
-    override fun content(model: Model) {
+    override fun content() {
         val title by rememberDerivedState {
-            if (model.isManaging) "选择歌曲"
-            else if (!model.isSearching) "曲库"
-            else if (model.library.isEmpty()) "搜索为空"
+            if (isManaging) "选择歌曲"
+            else if (!isSearching) "曲库"
+            else if (library.isEmpty()) "搜索为空"
             else "搜索结果"
         }
 
@@ -188,27 +233,30 @@ data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
             modifier = Modifier.fillMaxSize(),
             title = title,
             onBack = {
-                if (model.isManaging) model.exitManagement()
-                else if (model.isSearching) model.closeSearch()
-                else model.pop()
+                if (isManaging) exitManagement()
+                else if (isSearching) closeSearch()
+                else pop()
             },
             actions = {
-                if (model.isManaging) {
+                if (isManaging) {
                     ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
-                        model.onMusicAdd()
+                        onMusicAdd()
                     }
                     ActionSuspend(Icons.Outlined.Delete) {
-                        model.onMusicDelete()
+                        onMusicDelete()
                     }
                 }
                 else {
-                    ActionSuspend(if (model.isSearching) Icons.Outlined.Close else Icons.Outlined.Search) {
-                        if (model.isSearching) model.closeSearch()
-                        else model.openSearch()
+                    Action(Icons.Outlined.Add) {
+
+                    }
+                    ActionSuspend(if (isSearching) Icons.Outlined.Close else Icons.Outlined.Search) {
+                        if (isSearching) closeSearch()
+                        else openSearch()
                     }
                 }
             },
-            slot = model.slot
+            slot = slot
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(if (app.isPortrait) 150.dp else 200.dp),
@@ -218,20 +266,21 @@ data object ScreenMusicLibrary : Screen<ScreenMusicLibrary.Model> {
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(
-                    items = model.library,
+                    items = library,
                     key = { index, item -> item.id }
                 ) { index, item ->
                     MusicCard(
                         musicInfo = item,
-                        enableLongClick = !model.isManaging,
-                        onLongClick = { model.onCardLongClick(index) },
-                        onClick = { model.onCardClick(index) },
+                        enableLongClick = !isManaging,
+                        onLongClick = { onCardLongClick(index) },
+                        onClick = { onCardClick(index) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
         }
 
-        model.searchDialog.withOpen()
+        searchDialog.withOpen()
+        addMusicDialog.withOpen()
     }
 }

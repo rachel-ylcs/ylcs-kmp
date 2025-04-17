@@ -123,30 +123,30 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	val processor = object : WeiboProcessor {
 		override fun onWeiboClick(weibo: Weibo) {
 			currentWeibo = weibo
-			navigate(ScreenWeiboDetails)
+			navigate(ScreenWeiboDetails.Args)
 		}
 
 		override fun onWeiboAvatarClick(info: WeiboUserInfo) {
-			navigate(ScreenWeiboUser(info.id))
+			navigate(ScreenWeiboUser.Args(info.id))
 		}
 
 		override fun onWeiboLinkClick(arg: String) {
 			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage(arg))
+			else navigate(ScreenWebpage.Args(arg))
 		}
 
 		override fun onWeiboTopicClick(arg: String) {
 			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage(arg))
+			else navigate(ScreenWebpage.Args(arg))
 		}
 
 		override fun onWeiboAtClick(arg: String) {
 			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage(arg))
+			else navigate(ScreenWebpage.Args(arg))
 		}
 
 		override fun onWeiboPicClick(pics: List<Picture>, current: Int) {
-			navigate(ScreenImagePreview(pics, current))
+			navigate(ScreenImagePreview.Args(pics, current))
 		}
 
 		override fun onWeiboVideoClick(pic: Picture) {
@@ -176,7 +176,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 							onRefresh()
 						}
 						Action(Icons.Filled.AccountCircle) {
-							navigate(ScreenWeiboFollows)
+							navigate(ScreenWeiboFollows.Args)
 						}
 					}
 				}

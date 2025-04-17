@@ -22,7 +22,6 @@ import love.yinlin.common.ThemeColor
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.moveItem
-import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
@@ -37,7 +36,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 
 @Stable
-data class MusicStatusPreview(
+private data class MusicStatusPreview(
     val id: String,
     val name: String,
     val singer: String,
@@ -94,204 +93,203 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 }
 
 @Stable
-@Serializable
-data object ScreenPlaylistLibrary : Screen<ScreenPlaylistLibrary.Model> {
-    class Model(model: AppModel) : Screen.Model(model) {
-        val playlistLibrary = app.config.playlistLibrary
-        val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
-        var currentPage: Int by mutableStateOf(if (tabs.isEmpty()) -1 else 0)
-        val library = mutableStateListOf<MusicStatusPreview>()
+class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args>(model) {
+    @Stable
+    @Serializable
+    data object Args : Screen.Args
 
-        val inputPlaylistNameDialog = DialogInput(
-            hint = "歌单名",
-            maxLength = 16
+    private val playlistLibrary = app.config.playlistLibrary
+    private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
+    private var currentPage: Int by mutableStateOf(if (tabs.isEmpty()) -1 else 0)
+    private val library = mutableStateListOf<MusicStatusPreview>()
+
+    private val inputPlaylistNameDialog = DialogInput(
+        hint = "歌单名",
+        maxLength = 16
+    )
+
+    private val processPlaylistDialog = DialogChoice.fromIconItems(
+        items = listOf(
+            "重命名" to Icons.Outlined.Edit,
+            "删除" to Icons.Outlined.Delete
         )
+    )
 
-        val processPlaylistDialog = DialogChoice.fromIconItems(
-            items = listOf(
-                "重命名" to Icons.Outlined.Edit,
-                "删除" to Icons.Outlined.Delete
-            )
-        )
-
-        suspend fun addPlaylist() {
-            val name = inputPlaylistNameDialog.open()
-            if (name != null) {
-                if (playlistLibrary[name] == null) {
-                    playlistLibrary[name] = MusicPlaylist(name, emptyList())
-                    currentPage = tabs.indexOf(name)
-                }
-                else slot.tip.warning("歌单已存在")
+    private suspend fun addPlaylist() {
+        val name = inputPlaylistNameDialog.open()
+        if (name != null) {
+            if (playlistLibrary[name] == null) {
+                playlistLibrary[name] = MusicPlaylist(name, emptyList())
+                currentPage = tabs.indexOf(name)
             }
+            else slot.tip.warning("歌单已存在")
         }
+    }
 
-        suspend fun processPlaylist(index: Int) {
-            when (processPlaylistDialog.open()) {
-                0 -> {
-                    val oldName = tabs[index]
-                    val newName = inputPlaylistNameDialog.open(oldName)
-                    if (newName != null) {
-                        if (playlistLibrary[newName] == null) {
-                            playlistLibrary.renameKey(oldName, newName) {
-                                it.copy(name = newName)
-                            }
-                            currentPage = tabs.indexOf(newName)
+    private suspend fun processPlaylist(index: Int) {
+        when (processPlaylistDialog.open()) {
+            0 -> {
+                val oldName = tabs[index]
+                val newName = inputPlaylistNameDialog.open(oldName)
+                if (newName != null) {
+                    if (playlistLibrary[newName] == null) {
+                        playlistLibrary.renameKey(oldName, newName) {
+                            it.copy(name = newName)
                         }
-                        else slot.tip.warning("歌单已存在")
+                        currentPage = tabs.indexOf(newName)
                     }
-                }
-                1 -> {
-                    val name = tabs[index]
-                    if (slot.confirm.open(content = "删除歌单\"$name\"")) {
-                        playlistLibrary -= name
-                        if (currentPage == tabs.size) currentPage = if (tabs.isEmpty()) -1 else currentPage - 1
-                        // TODO: Music需要检查当前歌单是否在播放
-                    }
+                    else slot.tip.warning("歌单已存在")
                 }
             }
-        }
-
-        suspend fun playPlaylist() {
-            val name = tabs[currentPage]
-            val playlist = playlistLibrary[name]
-            if (playlist != null) app.musicFactory.startPlaylist(playlist)
-        }
-
-        private suspend fun deleteMusicFromPlaylist(index: Int) {
-            val name = tabs[currentPage]
-            val musicInfo = library[index]
-            if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
-                val playlist = playlistLibrary[name]
-                if (playlist != null) {
-                    val newItems = playlist.items.toMutableList()
-                    newItems -= musicInfo.id
-                    playlistLibrary[name] = playlist.copy(items = newItems)
-                    library.removeAt(index)
-                    // TODO: Music需要检查当前歌曲是否在播放
-                }
-            }
-        }
-
-        private fun moveMusicFromPlaylist(fromIndex: Int, toIndex: Int) {
-            val name = tabs[currentPage]
-            val playlist = playlistLibrary[name]
-            if (playlist != null) {
-                val newItems = playlist.items.toMutableList()
-                newItems.moveItem(fromIndex, toIndex)
-                playlistLibrary[name] = playlist.copy(items = newItems)
-            }
-        }
-
-        @Composable
-        fun PlaylistTab(modifier: Modifier = Modifier) {
-            if (currentPage != -1) {
-                TabBar(
-                    currentPage = currentPage,
-                    onNavigate = { currentPage = it },
-                    onLongClick = {
-                        launch { processPlaylist(it) }
-                    },
-                    items = tabs,
-                    modifier = modifier
-                )
-            }
-            else EmptyBox()
-        }
-
-        @Composable
-        fun PlaylistGrid(modifier: Modifier = Modifier) {
-            var dragStartIndex by rememberValueState(-1)
-            var dragEndIndex by rememberValueState(-1)
-            val gridState = rememberLazyGridState()
-            val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
-                if (dragStartIndex == -1) dragStartIndex = from.index
-                dragEndIndex = to.index
-                library.moveItem(from.index, to.index)
-            }
-
-            LaunchedEffect(currentPage, tabs) {
-                if (currentPage == -1) library.clear()
-                else {
-                    val playlist = playlistLibrary[tabs[currentPage]]
-                    if (playlist != null) {
-                        val musicLibrary = app.musicFactory.musicLibrary
-                        library.replaceAll(playlist.items.map {
-                            val musicInfo = musicLibrary[it]
-                            if (musicInfo != null) MusicStatusPreview(musicInfo) else MusicStatusPreview(it)
-                        })
-                    }
-                    else library.clear()
-                }
-            }
-
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(300.dp),
-                state = gridState,
-                modifier = modifier,
-            ) {
-                itemsIndexed(
-                    items = library,
-                    key = { index, item -> item.id }
-                ) { index, item ->
-                    ReorderableItem(
-                        state = reorderState,
-                        key = item.id
-                    ) {
-                        MusicStatusCard(
-                            musicInfo = item,
-                            onClick = { },
-                            onLongClick = {
-                                launch {
-                                    deleteMusicFromPlaylist(index)
-                                }
-                            },
-                            enabledDrag = !app.musicFactory.isReady,
-                            onDragStart = {
-                                dragStartIndex = -1
-                                dragEndIndex = -1
-                            },
-                            onDragEnd = {
-                                if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
-                                    moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+            1 -> {
+                val name = tabs[index]
+                if (slot.confirm.open(content = "删除歌单\"$name\"")) {
+                    playlistLibrary -= name
+                    if (currentPage == tabs.size) currentPage = if (tabs.isEmpty()) -1 else currentPage - 1
+                    // TODO: Music需要检查当前歌单是否在播放
                 }
             }
         }
     }
 
-    override fun model(model: AppModel): Model = Model(model)
+    private suspend fun playPlaylist() {
+        val name = tabs[currentPage]
+        val playlist = playlistLibrary[name]
+        if (playlist != null) app.musicFactory.startPlaylist(playlist)
+    }
+
+    private suspend fun deleteMusicFromPlaylist(index: Int) {
+        val name = tabs[currentPage]
+        val musicInfo = library[index]
+        if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
+            val playlist = playlistLibrary[name]
+            if (playlist != null) {
+                val newItems = playlist.items.toMutableList()
+                newItems -= musicInfo.id
+                playlistLibrary[name] = playlist.copy(items = newItems)
+                library.removeAt(index)
+                // TODO: Music需要检查当前歌曲是否在播放
+            }
+        }
+    }
+
+    private fun moveMusicFromPlaylist(fromIndex: Int, toIndex: Int) {
+        val name = tabs[currentPage]
+        val playlist = playlistLibrary[name]
+        if (playlist != null) {
+            val newItems = playlist.items.toMutableList()
+            newItems.moveItem(fromIndex, toIndex)
+            playlistLibrary[name] = playlist.copy(items = newItems)
+        }
+    }
 
     @Composable
-    override fun content(model: Model) {
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = "歌单",
-            onBack = { model.pop() },
-            actions = {
-                if (model.currentPage != -1) {
-                    ActionSuspend(Icons.Outlined.PlayArrow) {
-                        model.playPlaylist()
-                    }
+    private fun PlaylistTab(modifier: Modifier = Modifier) {
+        if (currentPage != -1) {
+            TabBar(
+                currentPage = currentPage,
+                onNavigate = { currentPage = it },
+                onLongClick = {
+                    launch { processPlaylist(it) }
+                },
+                items = tabs,
+                modifier = modifier
+            )
+        }
+        else EmptyBox()
+    }
+
+    @Composable
+    private fun PlaylistGrid(modifier: Modifier = Modifier) {
+        var dragStartIndex = remember { -1 }
+        var dragEndIndex = remember { -1 }
+        val gridState = rememberLazyGridState()
+        val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
+            if (dragStartIndex == -1) dragStartIndex = from.index
+            dragEndIndex = to.index
+            library.moveItem(from.index, to.index)
+        }
+
+        LaunchedEffect(currentPage, tabs) {
+            if (currentPage == -1) library.clear()
+            else {
+                val playlist = playlistLibrary[tabs[currentPage]]
+                if (playlist != null) {
+                    val musicLibrary = app.musicFactory.musicLibrary
+                    library.replaceAll(playlist.items.map {
+                        val musicInfo = musicLibrary[it]
+                        if (musicInfo != null) MusicStatusPreview(musicInfo) else MusicStatusPreview(it)
+                    })
                 }
-                Action(Icons.Outlined.Add) {
-                    model.launch {
-                        model.addPlaylist()
-                    }
-                }
-            },
-            slot = model.slot
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                model.PlaylistTab(modifier = Modifier.fillMaxWidth())
-                model.PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
+                else library.clear()
             }
         }
 
-        model.inputPlaylistNameDialog.withOpen()
-        model.processPlaylistDialog.withOpen()
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(300.dp),
+            state = gridState,
+            modifier = modifier,
+        ) {
+            itemsIndexed(
+                items = library,
+                key = { index, item -> item.id }
+            ) { index, item ->
+                ReorderableItem(
+                    state = reorderState,
+                    key = item.id
+                ) {
+                    MusicStatusCard(
+                        musicInfo = item,
+                        onClick = { },
+                        onLongClick = {
+                            launch {
+                                deleteMusicFromPlaylist(index)
+                            }
+                        },
+                        enabledDrag = !app.musicFactory.isReady,
+                        onDragStart = {
+                            dragStartIndex = -1
+                            dragEndIndex = -1
+                        },
+                        onDragEnd = {
+                            if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
+                                moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    override fun content() {
+        SubScreen(
+            modifier = Modifier.fillMaxSize(),
+            title = "歌单",
+            onBack = { pop() },
+            actions = {
+                if (currentPage != -1) {
+                    ActionSuspend(Icons.Outlined.PlayArrow) {
+                        playPlaylist()
+                    }
+                }
+                Action(Icons.Outlined.Add) {
+                    launch {
+                        addPlaylist()
+                    }
+                }
+            },
+            slot = slot
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                PlaylistTab(modifier = Modifier.fillMaxWidth())
+                PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
+            }
+        }
+
+        inputPlaylistNameDialog.withOpen()
+        processPlaylistDialog.withOpen()
     }
 }

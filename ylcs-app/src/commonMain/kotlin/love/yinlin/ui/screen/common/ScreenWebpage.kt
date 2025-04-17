@@ -13,27 +13,26 @@ import love.yinlin.ui.component.platform.WebPageState
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
-@Serializable
-data class ScreenWebpage(val url: String) : Screen<ScreenWebpage.Model> {
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		val state = WebPageState(WebPageSettings(), url)
-	}
+class ScreenWebpage(model: AppModel, args: Args) : Screen<ScreenWebpage.Args>(model) {
+	@Stable
+	@Serializable
+	data class Args(val url: String) : Screen.Args
 
-	override fun model(model: AppModel): Model = Model(model)
+	private val state = WebPageState(WebPageSettings(), args.url)
 
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = model.state.title,
+			title = state.title,
 			onBack = {
-				if (model.state.canGoBack) model.state.goBack()
+				if (state.canGoBack) state.goBack()
 				else model.pop()
 			},
-			slot = model.slot
+			slot = slot
 		) {
 			WebPage(
-				state = model.state,
+				state = state,
 				modifier = Modifier.fillMaxSize()
 			)
 		}

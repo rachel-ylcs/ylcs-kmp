@@ -28,15 +28,3 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 		Text(text = "该组件或功能未在此平台实现")
 	}
 }
-
-@Composable
-fun <M : Screen.Model> UnsupportedScreen(model: M) {
-	SubScreen(
-		modifier = Modifier.fillMaxSize(),
-		title = "该组件或功能未在此平台实现",
-		onBack = { model.pop() },
-		slot = model.slot
-	) {
-		UnsupportedComponent(modifier = Modifier.fillMaxSize())
-	}
-}

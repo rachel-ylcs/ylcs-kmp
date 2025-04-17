@@ -73,7 +73,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				is Data.Error -> {
 					if (result.type == Failed.RequestError.Unauthorized) {
 						logoff()
-						navigate(ScreenLogin)
+						navigate(ScreenLogin.Args)
 					}
 				}
 			}
@@ -97,7 +97,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			)
 			ClickIcon(
 				icon = Icons.Filled.Settings,
-				onClick = { navigate(ScreenSettings) }
+				onClick = { navigate(ScreenSettings.Args) }
 			)
 		}
 	}
@@ -115,10 +115,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				TipButtonInfo("签到", Icons.Filled.EventAvailable) { signinSheet.open() },
 				TipButtonInfo("好友", Icons.Filled.Group) { },
 				TipButtonInfo("主题", Icons.AutoMirrored.Filled.Article) {
-					app.config.userProfile?.let { navigate(ScreenUserCard(it.uid)) }
+					app.config.userProfile?.let { navigate(ScreenUserCard.Args(it.uid)) }
 				},
 				TipButtonInfo("邮箱", Icons.Filled.Mail) {
-					if (app.config.userToken.isNotEmpty()) navigate(ScreenMail)
+					if (app.config.userToken.isNotEmpty()) navigate(ScreenMail.Args)
 				},
 				TipButtonInfo("徽章", Icons.Filled.MilitaryTech) { },
 			)
@@ -208,7 +208,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			) {
 				ClickIcon(
 					icon = Icons.Filled.Settings,
-					onClick = { navigate(ScreenSettings) }
+					onClick = { navigate(ScreenSettings.Args) }
 				)
 			}
 			Box(
@@ -226,7 +226,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					)
 					RachelButton(
 						text = stringResource(Res.string.login),
-						onClick = { navigate(ScreenLogin) }
+						onClick = { navigate(ScreenLogin.Args) }
 					)
 				}
 			}

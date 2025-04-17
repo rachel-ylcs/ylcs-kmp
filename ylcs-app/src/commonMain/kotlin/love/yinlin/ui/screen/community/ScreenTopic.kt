@@ -135,597 +135,638 @@ private fun CoinLayout(
 }
 
 @Stable
-@Serializable
-data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		var details: TopicDetails? by mutableStateOf(null)
-		var topic: Topic by mutableStateOf(currentTopic)
+class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model) {
+	@Stable
+	@Serializable
+	data class Args(val currentTopic: Topic) : Screen.Args
 
-		val commentPage = object : PaginationArgs<Comment, Int, Boolean>(0, true) {
-			override fun offset(item: Comment): Int = item.cid
-			override fun arg1(item: Comment): Boolean = item.isTop
-		}
-		val commentState = LazyListState()
+	private var details: TopicDetails? by mutableStateOf(null)
+	private var topic: Topic by mutableStateOf(args.currentTopic)
 
-		var currentSendComment: Comment? by mutableStateOf(null)
+	private val commentPage = object : PaginationArgs<Comment, Int, Boolean>(0, true) {
+		override fun offset(item: Comment): Int = item.cid
+		override fun arg1(item: Comment): Boolean = item.isTop
+	}
+	private val commentState = LazyListState()
 
-		val subCommentSheet = SheetState<Comment>()
-		val sendCoinSheet = CommonSheetState()
+	private var currentSendComment: Comment? by mutableStateOf(null)
 
-		val moveTopicDialog = DialogChoice.fromItems(
-			items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
-			title = "移动主题板块"
+	private val subCommentSheet = SheetState<Comment>()
+	private val sendCoinSheet = CommonSheetState()
+
+	private val moveTopicDialog = DialogChoice.fromItems(
+		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
+		title = "移动主题板块"
+	)
+
+	private suspend fun requestTopic() {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopicDetails,
+			data = topic.tid
 		)
+		if (result is Data.Success) details = result.data
+	}
 
-		suspend fun requestTopic() {
-			val result = ClientAPI.request(
-				route = API.User.Topic.GetTopicDetails,
-				data = topic.tid
+	private suspend fun requestNewComments() {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopicComments,
+			data = API.User.Topic.GetTopicComments.Request(
+				tid = topic.tid,
+				rawSection = topic.rawSection,
+				num = commentPage.pageNum
 			)
-			if (result is Data.Success) details = result.data
-		}
+		)
+		if (result is Data.Success) commentPage.newData(result.data)
+	}
 
-		suspend fun requestNewComments() {
+	private suspend fun requestMoreComments() {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopicComments,
+			data = API.User.Topic.GetTopicComments.Request(
+				tid = topic.tid,
+				rawSection = topic.rawSection,
+				offset = commentPage.offset,
+				isTop = commentPage.arg1
+			)
+		)
+		if (result is Data.Success) commentPage.moreData(result.data)
+	}
+
+	private suspend fun requestSubComments(cid: Int, offset: Int, num: Int): List<SubComment>? {
+		val result = ClientAPI.request(
+			route = API.User.Topic.GetTopicSubComments,
+			data = API.User.Topic.GetTopicSubComments.Request(
+				cid = cid,
+				rawSection = topic.rawSection,
+				offset = offset,
+				num = num
+			)
+		)
+		return if (result is Data.Success) result.data else null
+	}
+
+	private fun onAvatarClick(uid: Int) {
+		part<ScreenPartDiscovery>().onUserAvatarClick(uid)
+	}
+
+	private fun onImageClick(images: List<Picture>, current: Int) {
+		navigate(ScreenImagePreview.Args(images, current))
+	}
+
+	private suspend fun onChangeTopicIsTop(value: Boolean) {
+		val result = ClientAPI.request(
+			route = API.User.Topic.UpdateTopicTop,
+			data = API.User.Topic.UpdateTopicTop.Request(
+				token = app.config.userToken,
+				tid = topic.tid,
+				isTop = value
+			)
+		)
+		when (result) {
+			is Data.Success -> topic = topic.copy(isTop = value)
+			is Data.Error -> slot.tip.error(result.message)
+		}
+	}
+
+	private suspend fun onDeleteTopic() {
+		if (slot.confirm.open(content = "删除主题?")) {
 			val result = ClientAPI.request(
-				route = API.User.Topic.GetTopicComments,
-				data = API.User.Topic.GetTopicComments.Request(
-					tid = topic.tid,
-					rawSection = topic.rawSection,
-					num = commentPage.pageNum
+				route = API.User.Topic.DeleteTopic,
+				data =  API.User.Topic.DeleteTopic.Request(
+					token = app.config.userToken,
+					tid = topic.tid
 				)
 			)
-			if (result is Data.Success) commentPage.newData(result.data)
-		}
-
-		suspend fun requestMoreComments() {
-			val result = ClientAPI.request(
-				route = API.User.Topic.GetTopicComments,
-				data = API.User.Topic.GetTopicComments.Request(
-					tid = topic.tid,
-					rawSection = topic.rawSection,
-					offset = commentPage.offset,
-					isTop = commentPage.arg1
-				)
-			)
-			if (result is Data.Success) commentPage.moreData(result.data)
-		}
-
-		suspend fun requestSubComments(cid: Int, offset: Int, num: Int): List<SubComment>? {
-			val result = ClientAPI.request(
-				route = API.User.Topic.GetTopicSubComments,
-				data = API.User.Topic.GetTopicSubComments.Request(
-					cid = cid,
-					rawSection = topic.rawSection,
-					offset = offset,
-					num = num
-				)
-			)
-			return if (result is Data.Success) result.data else null
-		}
-
-		fun onAvatarClick(uid: Int) {
-			part<ScreenPartDiscovery>().onUserAvatarClick(uid)
-		}
-
-		fun onImageClick(images: List<Picture>, current: Int) {
-			navigate(ScreenImagePreview(images, current))
-		}
-
-		fun onChangeTopicIsTop(value: Boolean) {
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Topic.UpdateTopicTop,
-					data = API.User.Topic.UpdateTopicTop.Request(
-						token = app.config.userToken,
-						tid = topic.tid,
-						isTop = value
-					)
-				)
-				when (result) {
-					is Data.Success -> topic = topic.copy(isTop = value)
-					is Data.Error -> slot.tip.error(result.message)
+			when (result) {
+				is Data.Success -> {
+					part<ScreenPartDiscovery>().page.items.removeAll { it.tid == topic.tid }
+					pop()
 				}
+				is Data.Error -> slot.tip.error(result.message)
 			}
 		}
+	}
 
-		suspend fun onDeleteTopic() {
-			if (slot.confirm.open(content = "删除主题?")) {
+	private suspend fun onMoveTopic() {
+		moveTopicDialog.open()?.let { index ->
+			val newSection = Comment.Section.MovableSection[index]
+			details?.let { oldDetails ->
+				val oldSection = oldDetails.section
+				if (newSection == oldSection) {
+					slot.tip.warning("不能与原板块相同哦")
+					return@let
+				}
 				val result = ClientAPI.request(
-					route = API.User.Topic.DeleteTopic,
-					data =  API.User.Topic.DeleteTopic.Request(
+					route = API.User.Topic.MoveTopic,
+					data = API.User.Topic.MoveTopic.Request(
 						token = app.config.userToken,
-						tid = topic.tid
+						tid = topic.tid,
+						section = newSection
 					)
 				)
 				when (result) {
 					is Data.Success -> {
-						part<ScreenPartDiscovery>().page.items.removeAll { it.tid == topic.tid }
-						pop()
-					}
-					is Data.Error -> slot.tip.error(result.message)
-				}
-			}
-		}
-
-		suspend fun onMoveTopic() {
-			moveTopicDialog.open()?.let { index ->
-				val newSection = Comment.Section.MovableSection[index]
-				details?.let { oldDetails ->
-					val oldSection = oldDetails.section
-					if (newSection == oldSection) {
-						slot.tip.warning("不能与原板块相同哦")
-						return
-					}
-					val result = ClientAPI.request(
-						route = API.User.Topic.MoveTopic,
-						data = API.User.Topic.MoveTopic.Request(
-							token = app.config.userToken,
-							tid = topic.tid,
-							section = newSection
-						)
-					)
-					when (result) {
-						is Data.Success -> {
-							val part = part<ScreenPartDiscovery>()
-							if (part.currentSection == oldSection) part.page.items.removeAll { it.tid == topic.tid }
-							details = oldDetails.copy(section = newSection)
-							slot.tip.success(result.message)
-						}
-						is Data.Error -> slot.tip.error(result.message)
-					}
-				}
-			}
-		}
-
-		fun onSendCoin(num: Int) {
-			launch {
-				if (app.config.userProfile?.uid == topic.uid) {
-					slot.tip.warning("不能给自己投币哦")
-					return@launch
-				}
-				val result = ClientAPI.request(
-					route = API.User.Topic.SendCoin,
-					data = API.User.Topic.SendCoin.Request(
-						token = app.config.userToken,
-						uid = topic.uid,
-						tid = topic.tid,
-						value = num
-					)
-				)
-				when (result) {
-					is Data.Success -> {
-						part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
-							it.copy(coinNum = it.coinNum + num)
-						}
-						app.config.userProfile?.let {
-							app.config.userProfile = it.copy(coin = it.coin - num)
-						}
+						val part = part<ScreenPartDiscovery>()
+						if (part.currentSection == oldSection) part.page.items.removeAll { it.tid == topic.tid }
+						details = oldDetails.copy(section = newSection)
 						slot.tip.success(result.message)
 					}
 					is Data.Error -> slot.tip.error(result.message)
 				}
 			}
 		}
+	}
 
-		suspend fun onSendComment(content: String): Boolean {
-			val user = app.config.userProfile
-			if (user != null) {
-				// 回复主题
-				val target = currentSendComment
-				if (target == null) {
-					val result = ClientAPI.request(
-						route = API.User.Topic.SendComment,
-						data = API.User.Topic.SendComment.Request(
-							token = app.config.userToken,
-							tid = topic.tid,
-							rawSection = topic.rawSection,
-							content = content
-						)
-					)
-					when (result) {
-						is Data.Success -> {
-							part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
-								it.copy(commentNum = it.commentNum + 1)
-							}
-							commentPage.items += Comment(
-                                cid = result.data,
-                                uid = user.uid,
-                                ts = DateEx.CurrentString,
-                                content = content,
-                                isTop = false,
-                                subCommentNum = 0,
-                                name = user.name,
-                                label = user.label,
-                                coin = user.coin
-                            )
-							commentState.animateScrollToItem(commentPage.items.size - 1)
-							return true
-						}
-						is Data.Error -> slot.tip.error(result.message)
-					}
-				}
-				else { // 回复评论
-					val result = ClientAPI.request(
-						route = API.User.Topic.SendSubComment,
-						data = API.User.Topic.SendSubComment.Request(
-							token = app.config.userToken,
-							tid = topic.tid,
-							cid = target.cid,
-							rawSection = topic.rawSection,
-							content = content
-						)
-					)
-					when (result) {
-						is Data.Success -> {
-							commentPage.items.findAssign(predicate = { it.cid == target.cid }) {
-								it.copy(subCommentNum = it.subCommentNum + 1)
-							}
-							currentSendComment = null
-							return true
-						}
-						is Data.Error -> slot.tip.error(result.message)
-					}
-				}
-			}
-			else slot.tip.error("请先登录")
-			return false
+	private suspend fun onSendCoin(num: Int) {
+		if (app.config.userProfile?.uid == topic.uid) {
+			slot.tip.warning("不能给自己投币哦")
+			return
 		}
+		val result = ClientAPI.request(
+			route = API.User.Topic.SendCoin,
+			data = API.User.Topic.SendCoin.Request(
+				token = app.config.userToken,
+				uid = topic.uid,
+				tid = topic.tid,
+				value = num
+			)
+		)
+		when (result) {
+			is Data.Success -> {
+				part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+					it.copy(coinNum = it.coinNum + num)
+				}
+				app.config.userProfile?.let {
+					app.config.userProfile = it.copy(coin = it.coin - num)
+				}
+				slot.tip.success(result.message)
+			}
+			is Data.Error -> slot.tip.error(result.message)
+		}
+	}
 
-		fun onChangeCommentIsTop(cid: Int, isTop: Boolean) {
-			launch {
+	private suspend fun onSendComment(content: String): Boolean {
+		val user = app.config.userProfile
+		if (user != null) {
+			// 回复主题
+			val target = currentSendComment
+			if (target == null) {
 				val result = ClientAPI.request(
-					route = API.User.Topic.UpdateCommentTop,
-					data = API.User.Topic.UpdateCommentTop.Request(
+					route = API.User.Topic.SendComment,
+					data = API.User.Topic.SendComment.Request(
 						token = app.config.userToken,
 						tid = topic.tid,
-						cid = cid,
 						rawSection = topic.rawSection,
-						isTop = isTop
-					)
-				)
-				when (result) {
-					is Data.Success -> {
-						commentPage.items.findAssign(predicate = { it.cid == cid }) {
-							it.copy(isTop = isTop)
-						}
-						commentPage.items.sort()
-						commentState.scrollToItem(commentPage.items.indexOfFirst { it.cid == cid })
-					}
-					is Data.Error -> slot.tip.error(result.message)
-				}
-			}
-		}
-
-		suspend fun onDeleteComment(cid: Int) {
-			if (slot.confirm.open(content = "删除回复(楼中楼会同步删除)")) {
-				val result = ClientAPI.request(
-					route = API.User.Topic.DeleteComment,
-					data = API.User.Topic.DeleteComment.Request(
-						token = app.config.userToken,
-						tid = topic.tid,
-						cid = cid,
-						rawSection = topic.rawSection
+						content = content
 					)
 				)
 				when (result) {
 					is Data.Success -> {
 						part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
-							it.copy(commentNum = it.commentNum - 1)
+							it.copy(commentNum = it.commentNum + 1)
 						}
-						commentPage.items.removeAll { it.cid == cid }
+						commentPage.items += Comment(
+							cid = result.data,
+							uid = user.uid,
+							ts = DateEx.CurrentString,
+							content = content,
+							isTop = false,
+							subCommentNum = 0,
+							name = user.name,
+							label = user.label,
+							coin = user.coin
+						)
+						commentState.animateScrollToItem(commentPage.items.size - 1)
+						return true
 					}
 					is Data.Error -> slot.tip.error(result.message)
 				}
 			}
-		}
-
-		suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
-			if (slot.confirm.open(content = "删除回复")) {
+			else { // 回复评论
 				val result = ClientAPI.request(
-					route = API.User.Topic.DeleteSubComment,
-					data = API.User.Topic.DeleteSubComment.Request(
+					route = API.User.Topic.SendSubComment,
+					data = API.User.Topic.SendSubComment.Request(
 						token = app.config.userToken,
 						tid = topic.tid,
-						pid = pid,
+						cid = target.cid,
 						rawSection = topic.rawSection,
-						cid = cid
+						content = content
 					)
 				)
 				when (result) {
-					is Data.Success -> onDelete()
+					is Data.Success -> {
+						commentPage.items.findAssign(predicate = { it.cid == target.cid }) {
+							it.copy(subCommentNum = it.subCommentNum + 1)
+						}
+						currentSendComment = null
+						return true
+					}
 					is Data.Error -> slot.tip.error(result.message)
 				}
 			}
 		}
+		else slot.tip.error("请先登录")
+		return false
+	}
 
-		@Composable
-		private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
-			val pics by rememberDerivedState { details.pics.map { Picture(topic.picPath(it)) } }
+	private suspend fun onChangeCommentIsTop(cid: Int, isTop: Boolean) {
+		val result = ClientAPI.request(
+			route = API.User.Topic.UpdateCommentTop,
+			data = API.User.Topic.UpdateCommentTop.Request(
+				token = app.config.userToken,
+				tid = topic.tid,
+				cid = cid,
+				rawSection = topic.rawSection,
+				isTop = isTop
+			)
+		)
+		when (result) {
+			is Data.Success -> {
+				commentPage.items.findAssign(predicate = { it.cid == cid }) {
+					it.copy(isTop = isTop)
+				}
+				commentPage.items.sort()
+				commentState.scrollToItem(commentPage.items.indexOfFirst { it.cid == cid })
+			}
+			is Data.Error -> slot.tip.error(result.message)
+		}
+	}
 
-			Column(
-				modifier = modifier,
-				verticalArrangement = Arrangement.spacedBy(5.dp)
+	private suspend fun onDeleteComment(cid: Int) {
+		if (slot.confirm.open(content = "删除回复(楼中楼会同步删除)")) {
+			val result = ClientAPI.request(
+				route = API.User.Topic.DeleteComment,
+				data = API.User.Topic.DeleteComment.Request(
+					token = app.config.userToken,
+					tid = topic.tid,
+					cid = cid,
+					rawSection = topic.rawSection
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+						it.copy(commentNum = it.commentNum - 1)
+					}
+					commentPage.items.removeAll { it.cid == cid }
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
+		}
+	}
+
+	private suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
+		if (slot.confirm.open(content = "删除回复")) {
+			val result = ClientAPI.request(
+				route = API.User.Topic.DeleteSubComment,
+				data = API.User.Topic.DeleteSubComment.Request(
+					token = app.config.userToken,
+					tid = topic.tid,
+					pid = pid,
+					rawSection = topic.rawSection,
+					cid = cid
+				)
+			)
+			when (result) {
+				is Data.Success -> onDelete()
+				is Data.Error -> slot.tip.error(result.message)
+			}
+		}
+	}
+
+	@Composable
+	private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
+		val pics by rememberDerivedState { details.pics.map { Picture(topic.picPath(it)) } }
+
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(5.dp)
+		) {
+			UserBar(
+				avatar = topic.avatarPath,
+				name = topic.name,
+				time = details.ts,
+				label = details.label,
+				level = details.level,
+				onAvatarClick = { onAvatarClick(topic.uid) }
+			)
+			Text(
+				text = topic.title,
+				style = MaterialTheme.typography.titleMedium,
+				maxLines = 2,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth()
+			)
+			RichText(
+				text = remember(details) { RichString.parse(details.content) },
+				modifier = Modifier.fillMaxWidth()
+			)
+			if (pics.isNotEmpty()) {
+				NineGrid(
+					modifier = Modifier.fillMaxWidth(),
+					pics = pics,
+					onImageClick = { onImageClick(pics, it) },
+					onVideoClick = {}
+				)
+			}
+		}
+	}
+
+	@Composable
+	private fun CommentBar(comment: Comment, modifier: Modifier = Modifier) {
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(3.dp)
+		) {
+			UserBar(
+				avatar = comment.avatarPath,
+				name = comment.name,
+				time = comment.ts,
+				label = comment.label,
+				level = comment.level,
+				onAvatarClick = { onAvatarClick(comment.uid) }
+			)
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(5.dp),
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				UserBar(
-					avatar = topic.avatarPath,
-					name = topic.name,
-					time = details.ts,
-					label = details.label,
-					level = details.level,
-					onAvatarClick = { onAvatarClick(topic.uid) }
-				)
+				if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
+				if (comment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+			}
+			RichText(
+				text = remember(comment) { RichString.parse(comment.content) },
+				modifier = Modifier.fillMaxWidth()
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+				horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				if (comment.subCommentNum > 0) {
+					Box(modifier = Modifier.weight(1f)) {
+						Text(
+							text = ">> 查看${comment.subCommentNum}条回复",
+							style = MaterialTheme.typography.labelLarge,
+							color = MaterialTheme.colorScheme.primary,
+							modifier = Modifier.clickable { subCommentSheet.open(comment) }.padding(2.dp)
+						)
+					}
+				}
 				Text(
-					text = topic.title,
-					style = MaterialTheme.typography.titleMedium,
-					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth()
+					text = "回复",
+					style = MaterialTheme.typography.labelLarge,
+					color = MaterialTheme.colorScheme.secondary,
+					modifier = Modifier.clickable { currentSendComment = comment }.padding(2.dp)
 				)
-				RichText(
-					text = remember(details) { RichString.parse(details.content) },
-					modifier = Modifier.fillMaxWidth()
-				)
-				if (pics.isNotEmpty()) {
-					NineGrid(
-						modifier = Modifier.fillMaxWidth(),
-						pics = pics,
-						onImageClick = { onImageClick(pics, it) },
-						onVideoClick = {}
-					)
+				app.config.userProfile?.let { user ->
+					if (user.canUpdateCommentTop(topic.uid)) {
+						Text(
+							text = if (comment.isTop) "取消置顶" else "置顶",
+							style = MaterialTheme.typography.labelLarge,
+							modifier = Modifier.clickable {
+								launch { onChangeCommentIsTop(comment.cid, !comment.isTop) }
+							}.padding(2.dp)
+						)
+					}
+					if (user.canDeleteComment(topic.uid, comment.uid)) {
+						Text(
+							text = "删除",
+							style = MaterialTheme.typography.labelLarge,
+							modifier = Modifier.clickable {
+								launch { onDeleteComment(comment.cid) }
+							}.padding(2.dp)
+						)
+					}
 				}
 			}
 		}
+	}
 
-		@Composable
-		private fun CommentBar(comment: Comment, modifier: Modifier = Modifier) {
-			Column(
-				modifier = modifier,
-				verticalArrangement = Arrangement.spacedBy(3.dp)
-			) {
-				UserBar(
-					avatar = comment.avatarPath,
-					name = comment.name,
-					time = comment.ts,
-					label = comment.label,
-					level = comment.level,
-					onAvatarClick = { onAvatarClick(comment.uid) }
-				)
-				Row(
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
-					if (comment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+	@Composable
+	private fun SubCommentBar(
+		subComment: SubComment,
+		parentComment: Comment,
+		modifier: Modifier = Modifier,
+		onDelete: () -> Unit
+	) {
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(3.dp)
+		) {
+			UserBar(
+				avatar = subComment.avatarPath,
+				name = subComment.name,
+				time = subComment.ts,
+				label = subComment.label,
+				level = subComment.level,
+				onAvatarClick = {
+					subCommentSheet.hide()
+					onAvatarClick(subComment.uid)
 				}
-				RichText(
-					text = remember(comment) { RichString.parse(comment.content) },
-					modifier = Modifier.fillMaxWidth()
-				)
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					if (comment.subCommentNum > 0) {
-						Box(modifier = Modifier.weight(1f)) {
-							Text(
-								text = ">> 查看${comment.subCommentNum}条回复",
-								style = MaterialTheme.typography.labelLarge,
-								color = MaterialTheme.colorScheme.primary,
-								modifier = Modifier.clickable { subCommentSheet.open(comment) }.padding(2.dp)
-							)
-						}
-					}
-					Text(
-						text = "回复",
-						style = MaterialTheme.typography.labelLarge,
-						color = MaterialTheme.colorScheme.secondary,
-						modifier = Modifier.clickable { currentSendComment = comment }.padding(2.dp)
-					)
-					app.config.userProfile?.let { user ->
-						if (user.canUpdateCommentTop(topic.uid)) {
-							Text(
-								text = if (comment.isTop) "取消置顶" else "置顶",
-								style = MaterialTheme.typography.labelLarge,
-								modifier = Modifier.clickable { onChangeCommentIsTop(comment.cid, !comment.isTop) }.padding(2.dp)
-							)
-						}
-						if (user.canDeleteComment(topic.uid, comment.uid)) {
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
+				horizontalArrangement = Arrangement.spacedBy(5.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
+				if (subComment.uid == parentComment.uid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
+				app.config.userProfile?.let { user ->
+					if (user.canDeleteComment(topic.uid, subComment.uid)) {
+						Row(
+							modifier = Modifier.weight(1f),
+							horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+							verticalAlignment = Alignment.CenterVertically
+						) {
 							Text(
 								text = "删除",
+								textAlign = TextAlign.End,
 								style = MaterialTheme.typography.labelLarge,
 								modifier = Modifier.clickable {
-									launch { onDeleteComment(comment.cid) }
+									launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
 								}.padding(2.dp)
 							)
 						}
 					}
 				}
 			}
+			RichText(
+				text = remember(subComment) { RichString.parse(subComment.content) },
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
+	}
+
+	@Composable
+	private fun SubCommentLayout(comment: Comment) {
+		val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
+			override fun offset(item: SubComment): Int = item.cid
+		} }
+
+		BottomSheet(state = subCommentSheet) {
+			PaginationColumn(
+				items = page.items,
+				key = { it.cid },
+				canRefresh = false,
+				canLoading = page.canLoading,
+				onLoading = {
+					requestSubComments(
+						cid = comment.cid,
+						offset = page.offset,
+						num = page.pageNum
+					)?.let { page.moreData(it) }
+				},
+				contentPadding = PaddingValues(vertical = 10.dp),
+				itemDivider = PaddingValues(vertical = 8.dp),
+				modifier = Modifier.fillMaxWidth()
+			) { subComment ->
+				SubCommentBar(
+					subComment = subComment,
+					parentComment = comment,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+					onDelete = {
+						page.items -= subComment
+						commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
+							it.copy(subCommentNum = it.subCommentNum - 1)
+						}
+						// 楼中楼最后一条回复删除后隐藏楼中楼
+						if (page.items.isEmpty()) subCommentSheet.hide()
+					}
+				)
+			}
 		}
 
-		@Composable
-		private fun SubCommentBar(
-            subComment: SubComment,
-            parentComment: Comment,
-            modifier: Modifier = Modifier,
-            onDelete: () -> Unit
-		) {
+		LaunchedEffect(Unit) {
+			requestSubComments(
+				cid = comment.cid,
+				offset = page.offset,
+				num = page.pageNum
+			)?.let { page.newData(it) }
+		}
+	}
+
+	@Composable
+	private fun SendCoinLayout() {
+		BottomSheet(state = sendCoinSheet) {
 			Column(
-				modifier = modifier,
-				verticalArrangement = Arrangement.spacedBy(3.dp)
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				UserBar(
-					avatar = subComment.avatarPath,
-					name = subComment.name,
-					time = subComment.ts,
-					label = subComment.label,
-					level = subComment.level,
-					onAvatarClick = {
-						subCommentSheet.hide()
-						onAvatarClick(subComment.uid)
-					}
+				Text(
+					text = "银币: ${app.config.userProfile?.coin ?: 0}",
+					style = MaterialTheme.typography.titleLarge,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth()
 				)
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(top = 5.dp),
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
-					if (subComment.uid == parentComment.uid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
-					app.config.userProfile?.let { user ->
-						if (user.canDeleteComment(topic.uid, subComment.uid)) {
-							Row(
-								modifier = Modifier.weight(1f),
-								horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-								verticalAlignment = Alignment.CenterVertically
-							) {
-								Text(
-									text = "删除",
-									textAlign = TextAlign.End,
-									style = MaterialTheme.typography.labelLarge,
-									modifier = Modifier.clickable {
-										launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
-									}.padding(2.dp)
-								)
+					repeat(3) {
+						CoinLayout(
+							num = it + 1,
+							modifier = Modifier.weight(1f).aspectRatio(1f),
+							onClick = { num ->
+								sendCoinSheet.hide()
+								launch { onSendCoin(num) }
 							}
-						}
+						)
 					}
 				}
-				RichText(
-					text = remember(subComment) { RichString.parse(subComment.content) },
-					modifier = Modifier.fillMaxWidth()
-				)
 			}
 		}
+	}
 
-		@Composable
-		fun SubCommentLayout(comment: Comment) {
-			val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
-				override fun offset(item: SubComment): Int = item.cid
-			} }
+	@Composable
+	private fun BottomLayout(modifier: Modifier = Modifier) {
+		val state = remember(currentSendComment) { TextInputState() }
 
-			BottomSheet(state = subCommentSheet) {
-				PaginationColumn(
-					items = page.items,
-					key = { it.cid },
-					canRefresh = false,
-					canLoading = page.canLoading,
-					onLoading = {
-						requestSubComments(
-							cid = comment.cid,
-							offset = page.offset,
-							num = page.pageNum
-						)?.let { page.moreData(it) }
-					},
-					contentPadding = PaddingValues(vertical = 10.dp),
-					itemDivider = PaddingValues(vertical = 8.dp),
-					modifier = Modifier.fillMaxWidth()
-				) { subComment ->
-					SubCommentBar(
-						subComment = subComment,
-						parentComment = comment,
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-						onDelete = {
-							page.items -= subComment
-							commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
-								it.copy(subCommentNum = it.subCommentNum - 1)
-							}
-							// 楼中楼最后一条回复删除后隐藏楼中楼
-							if (page.items.isEmpty()) subCommentSheet.hide()
-						}
-					)
-				}
-			}
-
-			LaunchedEffect(Unit) {
-				requestSubComments(
-					cid = comment.cid,
-					offset = page.offset,
-					num = page.pageNum
-				)?.let { page.newData(it) }
-			}
-		}
-
-		@Composable
-		fun SendCoinLayout() {
-			BottomSheet(state = sendCoinSheet) {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					Text(
-						text = "银币: ${app.config.userProfile?.coin ?: 0}",
-						style = MaterialTheme.typography.titleLarge,
-						textAlign = TextAlign.Center,
-						modifier = Modifier.fillMaxWidth()
-					)
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
-						verticalAlignment = Alignment.CenterVertically
+		Column(
+			modifier = modifier,
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(5.dp)
+		) {
+			SplitActionLayout(
+				modifier = Modifier.fillMaxWidth(),
+				left = {
+					Action(
+						icon = Icons.Filled.Home,
+						enabled = currentSendComment != null
 					) {
-						repeat(3) {
-							CoinLayout(
-								num = it + 1,
-								modifier = Modifier.weight(1f).aspectRatio(1f),
-								onClick = { num ->
-									sendCoinSheet.hide()
-									onSendCoin(num)
-								}
-							)
+						currentSendComment = null
+					}
+				},
+				right = {
+					Action(Icons.Filled.Paid) {
+						sendCoinSheet.open()
+					}
+					ActionSuspend(
+						icon = Icons.AutoMirrored.Filled.Send,
+						enabled = state.text.isNotEmpty()
+					) {
+						if (onSendComment(state.text)) {
+							state.text = ""
 						}
 					}
 				}
-			}
+			)
+			TextInput(
+				state = state,
+				hint = remember(currentSendComment) { "回复 @${currentSendComment?.name ?: "主题"}" },
+				maxLines = 5,
+				maxLength = 1024,
+				clearButton = false,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
+	}
 
-		@Composable
-		fun BottomLayout(modifier: Modifier = Modifier) {
-			val state = remember(currentSendComment) { TextInputState() }
-
-			Column(
-				modifier = modifier,
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(5.dp)
-			) {
-				SplitActionLayout(
+	@Composable
+	private fun Portrait(details: TopicDetails) {
+		PaginationColumn(
+			items = commentPage.items,
+			key = { it.cid },
+			state = commentState,
+			canRefresh = false,
+			canLoading = commentPage.canLoading,
+			onLoading = { requestMoreComments() },
+			modifier = Modifier.fillMaxSize(),
+			header = {
+				Surface(
 					modifier = Modifier.fillMaxWidth(),
-					left = {
-						Action(
-							icon = Icons.Filled.Home,
-							enabled = currentSendComment != null
-						) {
-							currentSendComment = null
-						}
-					},
-					right = {
-						Action(Icons.Filled.Paid) {
-							sendCoinSheet.open()
-						}
-						ActionSuspend(
-							icon = Icons.AutoMirrored.Filled.Send,
-							enabled = state.text.isNotEmpty()
-						) {
-							if (onSendComment(state.text)) {
-								state.text = ""
-							}
-						}
-					}
-				)
-				TextInput(
-					state = state,
-					hint = remember(currentSendComment) { "回复 @${currentSendComment?.name ?: "主题"}" },
-					maxLines = 5,
-					maxLength = 1024,
-					clearButton = false,
-					modifier = Modifier.fillMaxWidth()
+					tonalElevation = 1.dp
+				) {
+					TopicLayout(
+						details = details,
+						modifier = Modifier.fillMaxWidth().padding(10.dp)
+					)
+				}
+				HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
+			},
+			itemDivider = PaddingValues(vertical = 8.dp)
+		) {
+			CommentBar(
+				comment = it,
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
+			)
+		}
+	}
+
+	@Composable
+	private fun Landscape(details: TopicDetails) {
+		Row(modifier = Modifier.fillMaxSize()) {
+			Surface(
+				modifier = Modifier.width(400.dp).fillMaxHeight()
+					.verticalScroll(rememberScrollState()),
+				tonalElevation = 1.dp
+			) {
+				TopicLayout(
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					details = details
 				)
 			}
-		}
-
-		@Composable
-		fun Portrait(details: TopicDetails) {
+			VerticalDivider()
 			PaginationColumn(
 				items = commentPage.items,
 				key = { it.cid },
@@ -733,20 +774,8 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				canRefresh = false,
 				canLoading = commentPage.canLoading,
 				onLoading = { requestMoreComments() },
-				modifier = Modifier.fillMaxSize(),
-				header = {
-					Surface(
-						modifier = Modifier.fillMaxWidth(),
-						tonalElevation = 1.dp
-					) {
-						TopicLayout(
-							details = details,
-							modifier = Modifier.fillMaxWidth().padding(10.dp)
-						)
-					}
-					HorizontalDivider(modifier = Modifier.padding(bottom = 10.dp))
-				},
-				itemDivider = PaddingValues(vertical = 8.dp)
+				itemDivider = PaddingValues(vertical = 8.dp),
+				modifier = Modifier.weight(1f).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
 			) {
 				CommentBar(
 					comment = it,
@@ -754,99 +783,65 @@ data class ScreenTopic(val currentTopic: Topic) : Screen<ScreenTopic.Model> {
 				)
 			}
 		}
-
-		@Composable
-		fun Landscape(details: TopicDetails) {
-			Row(modifier = Modifier.fillMaxSize()) {
-				Surface(
-					modifier = Modifier.width(400.dp).fillMaxHeight()
-						.verticalScroll(rememberScrollState()),
-					tonalElevation = 1.dp
-				) {
-					TopicLayout(
-						modifier = Modifier.fillMaxWidth().padding(10.dp),
-						details = details
-					)
-				}
-				VerticalDivider()
-				PaginationColumn(
-					items = commentPage.items,
-					key = { it.cid },
-					state = commentState,
-					canRefresh = false,
-					canLoading = commentPage.canLoading,
-					onLoading = { requestMoreComments() },
-					itemDivider = PaddingValues(vertical = 8.dp),
-					modifier = Modifier.weight(1f).fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp)
-				) {
-					CommentBar(
-						comment = it,
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)
-					)
-				}
-			}
-		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
-		launch {
-			requestTopic()
-			requestNewComments()
-		}
+	override suspend fun initialize() {
+		requestTopic()
+		requestNewComments()
 	}
 
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主题",
 			actions = {
-				if (model.details != null) {
-					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(model.topic.uid) == true }
-					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(model.topic.uid) == true }
+				if (details != null) {
+					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(topic.uid) == true }
+					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(topic.uid) == true }
 					val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
 					if (canUpdateTopicTop) {
-						Action(if (model.topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
-							model.onChangeTopicIsTop(!model.topic.isTop)
+						ActionSuspend(if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
+							onChangeTopicIsTop(!topic.isTop)
 						}
 					}
 					if (canMoveTopic) {
-						Action(Icons.Outlined.MoveUp) {
-							model.launch { model.onMoveTopic() }
+						ActionSuspend(Icons.Outlined.MoveUp) {
+							onMoveTopic()
 						}
 					}
 					if (canDeleteTopic) {
-						Action(Icons.Outlined.Delete) {
-							model.launch { model.onDeleteTopic() }
+						ActionSuspend(Icons.Outlined.Delete) {
+							onDeleteTopic()
 						}
 					}
 				}
 			},
 			bottomBar = {
-				if (model.details != null) {
-					model.BottomLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+				if (details != null) {
+					BottomLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
 				}
 			},
 			onBack = {
-				if (model.subCommentSheet.isOpen) model.subCommentSheet.hide()
-				else model.pop()
+				if (subCommentSheet.isOpen) subCommentSheet.hide()
+				else pop()
 			},
-			slot = model.slot
+			slot = slot
 		) {
-			val details = model.details
+			val details = details
 			if (details == null) EmptyBox()
-			else if (app.isPortrait) model.Portrait(details = details)
-			else model.Landscape(details = details)
+			else if (app.isPortrait) Portrait(details = details)
+			else Landscape(details = details)
 		}
 
-		model.subCommentSheet.withOpen {
-			model.SubCommentLayout(it)
+		subCommentSheet.withOpen {
+			SubCommentLayout(it)
 		}
 
-		model.sendCoinSheet.withOpen {
-			model.SendCoinLayout()
+		sendCoinSheet.withOpen {
+			SendCoinLayout()
 		}
 
-		model.moveTopicDialog.withOpen()
+		moveTopicDialog.withOpen()
 	}
 }

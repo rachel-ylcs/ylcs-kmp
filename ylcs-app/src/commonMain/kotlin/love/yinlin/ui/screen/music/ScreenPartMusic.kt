@@ -6,37 +6,29 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import dev.chrisbanes.haze.*
-import io.ktor.utils.io.readText
+import io.ktor.utils.io.*
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -44,20 +36,25 @@ import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
 import love.yinlin.data.music.MusicPlayMode
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.MusicFactory
-import love.yinlin.platform.MusicFactory.Companion.backgroundPath
-import love.yinlin.platform.MusicFactory.Companion.lyricsPath
-import love.yinlin.platform.MusicFactory.Companion.recordPath
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.platform.backgroundPath
+import love.yinlin.platform.lyricsPath
+import love.yinlin.platform.recordPath
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_music_record
+import love.yinlin.resources.no_audio_source
+import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.*
+import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.ui.component.layout.OffsetLayout
+import love.yinlin.ui.component.layout.SplitActionLayout
+import love.yinlin.ui.component.layout.equalItem
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -76,10 +73,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			modifier = modifier,
 			left = {
 				Action(Icons.Outlined.LibraryMusic) {
-					navigate(ScreenMusicLibrary)
+					navigate(ScreenMusicLibrary.Args)
 				}
 				Action(Icons.AutoMirrored.Outlined.QueueMusic) {
-					navigate(ScreenPlaylistLibrary)
+					navigate(ScreenPlaylistLibrary.Args)
 				}
 				Action(Icons.Outlined.Lyrics) {
 

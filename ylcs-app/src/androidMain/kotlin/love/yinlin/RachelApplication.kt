@@ -1,4 +1,4 @@
-package love.yinlin;
+package love.yinlin
 
 import android.app.Application
 import love.yinlin.platform.ActualAppContext

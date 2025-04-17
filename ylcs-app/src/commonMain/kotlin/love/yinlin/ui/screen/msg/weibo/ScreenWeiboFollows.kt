@@ -63,67 +63,66 @@ private fun WeiboUserItem(
 }
 
 @Stable
-@Serializable
-data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
-	class Model(model: AppModel) : Screen.Model(model) {
-		var isLocal by mutableStateOf(true)
-		val searchDialog = DialogInput(
-			hint = "输入微博用户昵称关键字",
-			maxLength = 16
-		)
-		var state by mutableStateOf(BoxState.CONTENT)
-		var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
+class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(model) {
+	@Stable
+	@Serializable
+	data object Args : Screen.Args
 
-		fun refreshLocalUser() {
-			isLocal = true
-			launch {
-				val weiboUsers = app.config.weiboUsers
-				for ((index, user) in weiboUsers.withIndex()) {
-					if (user.avatar.isEmpty()) {
-						val data = WeiboAPI.getWeiboUser(user.id)
-						if (data is Data.Success) weiboUsers[index] = data.data.info
-					}
-				}
-			}
-		}
+	private var isLocal by mutableStateOf(true)
+	private val searchDialog = DialogInput(
+		hint = "输入微博用户昵称关键字",
+		maxLength = 16
+	)
+	private var state by mutableStateOf(BoxState.CONTENT)
+	private var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
-		suspend fun onSearchWeiboUser() {
-			searchDialog.open()?.let { key ->
-				state = BoxState.LOADING
-				val result = WeiboAPI.searchWeiboUser(key)
-				isLocal = false
-				if (result is Data.Success) {
-					val data = result.data
-					searchResult = data
-					state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-				}
-				else state = BoxState.NETWORK_ERROR
+	private suspend fun refreshLocalUser() {
+		isLocal = true
+		val weiboUsers = app.config.weiboUsers
+		for ((index, user) in weiboUsers.withIndex()) {
+			if (user.avatar.isEmpty()) {
+				val data = WeiboAPI.getWeiboUser(user.id)
+				if (data is Data.Success) weiboUsers[index] = data.data.info
 			}
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
+	private suspend fun onSearchWeiboUser() {
+		searchDialog.open()?.let { key ->
+			state = BoxState.LOADING
+			val result = WeiboAPI.searchWeiboUser(key)
+			isLocal = false
+			if (result is Data.Success) {
+				val data = result.data
+				searchResult = data
+				state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+			}
+			else state = BoxState.NETWORK_ERROR
+		}
+	}
+
+	override suspend fun initialize() {
 		refreshLocalUser()
 	}
 
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = if (model.isLocal) "微博关注" else "搜索结果",
-			onBack = { model.pop() },
+			title = if (isLocal) "微博关注" else "搜索结果",
+			onBack = { pop() },
 			actions = {
 				Action(Icons.Outlined.Search) {
-					model.launch { model.onSearchWeiboUser() }
+					launch { onSearchWeiboUser() }
 				}
 				Action(Icons.Outlined.Refresh) {
-					model.refreshLocalUser()
+					launch { refreshLocalUser() }
 				}
 			},
-			slot = model.slot
+			slot = slot
 		) {
 			StatefulBox(
-				state = model.state,
+				state = state,
 				modifier = Modifier.fillMaxSize()
 			) {
 				LazyVerticalGrid(
@@ -134,20 +133,20 @@ data object ScreenWeiboFollows : Screen<ScreenWeiboFollows.Model> {
 					modifier = Modifier.fillMaxSize()
 				) {
 					items(
-						items = if (model.isLocal) app.config.weiboUsers.items else model.searchResult,
+						items = if (isLocal) app.config.weiboUsers.items else searchResult,
 						key = { it.id }
 					) {
 						WeiboUserItem(
 							user = it,
 							contentPadding = PaddingValues(5.dp),
 							modifier = Modifier.fillMaxWidth(),
-							onClick = { model.navigate(ScreenWeiboUser(it.id)) }
+							onClick = { navigate(ScreenWeiboUser.Args(it.id)) }
 						)
 					}
 				}
 			}
 		}
 
-		model.searchDialog.withOpen()
+		searchDialog.withOpen()
 	}
 }

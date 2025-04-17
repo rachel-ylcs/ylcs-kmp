@@ -62,12 +62,12 @@ abstract class AppContext {
 	open fun initialize() {
 		// 初始化目录
 		initializePath()
-		// 初始化图片加载器
-		SingletonSketch.setSafe { initializeSketch() }
 		// 初始化配置
 		config = KVConfig(kv)
 		// 初始化资源
 		Coroutines.startIO { Resource.initialize() }
+		// 初始化图片加载器
+		SingletonSketch.setSafe { initializeSketch() }
 		// 初始化音乐播放器
 		musicFactory = initializeMusicFactory()
 		Coroutines.startCPU {

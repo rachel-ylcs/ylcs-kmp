@@ -81,115 +81,115 @@ private fun ActivityDetailsLayout(
 }
 
 @Stable
-@Serializable
-data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Model> {
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		val activity: Activity? by derivedStateOf {
-			part<ScreenPartWorld>().activities.find { it.aid == aid }
-		}
+class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivityDetails.Args>(model) {
+	@Stable
+	@Serializable
+	data class Args(val aid: Int) : Screen.Args
 
-		fun onPicClick(pics: List<Picture>, index: Int) {
-			navigate(ScreenImagePreview(pics, index))
-		}
+	private val aid = args.aid
+	private val activity: Activity? by derivedStateOf {
+		part<ScreenPartWorld>().activities.find { it.aid == aid }
+	}
 
-		suspend fun deleteActivity() {
-			val result = ClientAPI.request(
-				route = API.User.Activity.DeleteActivity,
-				data = API.User.Activity.DeleteActivity.Request(
-					token = app.config.userToken,
-					aid = aid
-				)
+	private fun onPicClick(pics: List<Picture>, index: Int) {
+		navigate(ScreenImagePreview.Args(pics, index))
+	}
+
+	private suspend fun deleteActivity() {
+		val result = ClientAPI.request(
+			route = API.User.Activity.DeleteActivity,
+			data = API.User.Activity.DeleteActivity.Request(
+				token = app.config.userToken,
+				aid = aid
 			)
-			if (result is Data.Success) {
-				part<ScreenPartWorld>().activities.findModify(predicate = { it.aid == aid }) { this -= it }
-				pop()
-			}
-			else if (result is Data.Error) slot.tip.error(result.message)
+		)
+		if (result is Data.Success) {
+			part<ScreenPartWorld>().activities.findModify(predicate = { it.aid == aid }) { this -= it }
+			pop()
+		}
+		else if (result is Data.Error) slot.tip.error(result.message)
+	}
+
+	@Composable
+	private fun ActivityPictureLayout(
+		activity: Activity,
+		modifier: Modifier = Modifier
+	) {
+		val pics = remember(activity) {
+			activity.pics.map { Picture(activity.picPath(it)) }
 		}
 
-		@Composable
-		fun ActivityPictureLayout(
-			activity: Activity,
-			modifier: Modifier = Modifier
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			val pics = remember(activity) {
-				activity.pics.map { Picture(activity.picPath(it)) }
-			}
-
-			Column(
-				modifier = modifier,
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					if (activity.showstart != null) {
-						ClickImage(
-							res = Res.drawable.img_showstart,
-							modifier = Modifier.size(32.dp),
-							onClick = {}
-						)
-					}
-					if (activity.damai != null) {
-						ClickImage(
-							res = Res.drawable.img_damai,
-							modifier = Modifier.size(32.dp),
-							onClick = {}
-						)
-					}
-					if (activity.maoyan != null) {
-						ClickImage(
-							res = Res.drawable.img_maoyan,
-							modifier = Modifier.size(32.dp),
-							onClick = {}
-						)
-					}
-					if (activity.link != null) {
-						ClickIcon(
-							icon = Icons.Outlined.Link,
-							size = 32.dp,
-							onClick = {}
-						)
-					}
+				if (activity.showstart != null) {
+					ClickImage(
+						res = Res.drawable.img_showstart,
+						modifier = Modifier.size(32.dp),
+						onClick = {}
+					)
 				}
-				Text(
-					text = activity.content,
-					modifier = Modifier.fillMaxWidth()
-				)
-				NineGrid(
-					pics = pics,
-					modifier = Modifier.fillMaxWidth(),
-					onImageClick = { onPicClick(pics, it) },
-					onVideoClick = {}
-				)
+				if (activity.damai != null) {
+					ClickImage(
+						res = Res.drawable.img_damai,
+						modifier = Modifier.size(32.dp),
+						onClick = {}
+					)
+				}
+				if (activity.maoyan != null) {
+					ClickImage(
+						res = Res.drawable.img_maoyan,
+						modifier = Modifier.size(32.dp),
+						onClick = {}
+					)
+				}
+				if (activity.link != null) {
+					ClickIcon(
+						icon = Icons.Outlined.Link,
+						size = 32.dp,
+						onClick = {}
+					)
+				}
 			}
+			Text(
+				text = activity.content,
+				modifier = Modifier.fillMaxWidth()
+			)
+			NineGrid(
+				pics = pics,
+				modifier = Modifier.fillMaxWidth(),
+				onImageClick = { onPicClick(pics, it) },
+				onVideoClick = {}
+			)
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model)
-
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = model.activity?.title ?: "未知活动",
-			onBack = { model.pop() },
+			title = activity?.title ?: "未知活动",
+			onBack = { pop() },
 			actions = {
 				if (hasPrivilegeVIPCalendar) {
 					Action(Icons.Outlined.Edit) {
-						model.navigate(ScreenModifyActivity(aid))
+						navigate(ScreenModifyActivity.Args(aid))
 					}
 					ActionSuspend(Icons.Outlined.Delete) {
-						model.deleteActivity()
+						deleteActivity()
 					}
 				}
 			},
-			slot = model.slot
+			slot = slot
 		) {
-			model.activity?.let { activity ->
+			activity?.let { activity ->
 				if (app.isPortrait) {
 					Column(
 						modifier = Modifier.fillMaxSize().padding(10.dp)
@@ -200,7 +200,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 							activity = activity,
 							modifier = Modifier.fillMaxWidth()
 						)
-						model.ActivityPictureLayout(
+						ActivityPictureLayout(
 							activity = activity,
 							modifier = Modifier.fillMaxWidth()
 						)
@@ -213,7 +213,7 @@ data class ScreenActivityDetails(val aid: Int) : Screen<ScreenActivityDetails.Mo
 							modifier = Modifier.weight(2f)
 						)
 						VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
-						model.ActivityPictureLayout(
+						ActivityPictureLayout(
 							activity = activity,
 							modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())
 						)

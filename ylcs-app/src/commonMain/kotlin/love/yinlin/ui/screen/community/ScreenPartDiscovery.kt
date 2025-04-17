@@ -137,13 +137,11 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	}
 
 	fun onTopicClick(topic: Topic) {
-		navigate(ScreenTopic(topic))
+		navigate(ScreenTopic.Args(topic))
 	}
 
 	fun onUserAvatarClick(uid: Int) {
-		launch {
-			navigate(ScreenUserCard(uid))
-		}
+		navigate(ScreenUserCard.Args(uid))
 	}
 
 	@Composable
@@ -246,7 +244,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 							icon = Icons.Outlined.Add,
 							color = MaterialTheme.colorScheme.primary
 						) {
-							navigate(ScreenAddTopic)
+							navigate(ScreenAddTopic.Args)
 						}
 					}
 				}

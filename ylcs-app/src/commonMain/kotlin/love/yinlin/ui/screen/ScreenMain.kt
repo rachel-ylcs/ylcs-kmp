@@ -140,75 +140,74 @@ private fun LandscapeNavigation(
 }
 
 @Stable
-@Serializable
-data object ScreenMain : Screen<ScreenMain.Model> {
-	class Model(model: AppModel) : Screen.Model(model) {
-		val pagerState = object : PagerState() {
-			override val pageCount: Int = TabItem.entries.size
-		}
+class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
+	@Stable
+	@Serializable
+	data object Args : Screen.Args
 
-		fun onPageChanged(index: Int) {
-			launch { pagerState.scrollToPage(index) }
-		}
-
-		@Composable
-		private fun PageContent(modifier: Modifier = Modifier) {
-			HorizontalPager (
-				state = pagerState,
-				modifier = modifier
-			) {
-				Box(modifier = Modifier.fillMaxSize()) {
-					when (it) {
-						TabItem.WORLD.ordinal -> part<ScreenPartWorld>().partContent()
-						TabItem.MSG.ordinal -> part<ScreenPartMsg>().partContent()
-						TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().partContent()
-						TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().partContent()
-						TabItem.ME.ordinal -> part<ScreenPartMe>().partContent()
-					}
-				}
-			}
-		}
-
-		@Composable
-		fun Portrait(modifier: Modifier = Modifier) {
-			Scaffold(
-				modifier = modifier,
-				bottomBar = {
-					PortraitNavigation(
-						modifier = Modifier.fillMaxWidth().zIndex(5f),
-						currentPage = pagerState.currentPage,
-						onNavigate = { onPageChanged(it) }
-					)
-				}
-			) {
-				PageContent(modifier = Modifier.fillMaxSize().padding(it))
-			}
-		}
-
-		@Composable
-		fun Landscape(modifier: Modifier = Modifier) {
-			Row(modifier = modifier) {
-				LandscapeNavigation(
-					modifier = Modifier.fillMaxHeight().zIndex(5f),
-					currentPage = pagerState.currentPage,
-					onNavigate = { onPageChanged(it) }
-				)
-				Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
-					PageContent(modifier = Modifier.fillMaxSize().padding(it))
-				}
-			}
-		}
+	private val pagerState = object : PagerState() {
+		override val pageCount: Int = TabItem.entries.size
 	}
 
-	override fun model(model: AppModel): Model = Model(model).apply {
-		launch {
-			model.mePart.updateUserToken()
+	@Composable
+	private fun PageContent(modifier: Modifier = Modifier) {
+		HorizontalPager (
+			state = pagerState,
+			modifier = modifier
+		) {
+			Box(modifier = Modifier.fillMaxSize()) {
+				when (it) {
+					TabItem.WORLD.ordinal -> part<ScreenPartWorld>().partContent()
+					TabItem.MSG.ordinal -> part<ScreenPartMsg>().partContent()
+					TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().partContent()
+					TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().partContent()
+					TabItem.ME.ordinal -> part<ScreenPartMe>().partContent()
+				}
+			}
 		}
 	}
 
 	@Composable
-	override fun content(model: Model) {
-		if (app.isPortrait) model.Portrait(modifier = Modifier.fillMaxSize())
-		else model.Landscape(modifier = Modifier.fillMaxSize())
+	private fun Portrait(modifier: Modifier = Modifier) {
+		Scaffold(
+			modifier = modifier,
+			bottomBar = {
+				PortraitNavigation(
+					modifier = Modifier.fillMaxWidth().zIndex(5f),
+					currentPage = pagerState.currentPage,
+					onNavigate = {
+						launch { pagerState.scrollToPage(it) }
+					}
+				)
+			}
+		) {
+			PageContent(modifier = Modifier.fillMaxSize().padding(it))
+		}
+	}
+
+	@Composable
+	private fun Landscape(modifier: Modifier = Modifier) {
+		Row(modifier = modifier) {
+			LandscapeNavigation(
+				modifier = Modifier.fillMaxHeight().zIndex(5f),
+				currentPage = pagerState.currentPage,
+				onNavigate = {
+					launch { pagerState.scrollToPage(it) }
+				}
+			)
+			Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
+				PageContent(modifier = Modifier.fillMaxSize().padding(it))
+			}
+		}
+	}
+
+	override suspend fun initialize() {
+		part<ScreenPartMe>().updateUserToken()
+	}
+
+	@Composable
+	override fun content() {
+		if (app.isPortrait) Portrait(modifier = Modifier.fillMaxSize())
+		else Landscape(modifier = Modifier.fillMaxSize())
 	}
 }

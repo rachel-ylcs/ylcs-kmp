@@ -42,7 +42,7 @@ import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
 @Stable
-open class TipState {
+open class TipState(private val scope: CoroutineScope) {
 	enum class Type {
 		INFO, SUCCESS, WARNING, ERROR,
 	}
@@ -51,8 +51,8 @@ open class TipState {
 	var type by mutableStateOf(Type.INFO)
 		private set
 
-	suspend fun show(text: String?, type: Type) {
-		CoroutineScope(coroutineContext).launch {
+	fun show(text: String?, type: Type) {
+		scope.launch {
 			host.currentSnackbarData?.dismiss()
 			this@TipState.type = type
 			host.showSnackbar(
@@ -62,10 +62,10 @@ open class TipState {
 		}
 	}
 
-	suspend fun info(text: String?) = show(text, Type.INFO)
-	suspend fun success(text: String?) = show(text, Type.SUCCESS)
-	suspend fun warning(text: String?) = show(text, Type.WARNING)
-	suspend fun error(text: String?) = show(text, Type.ERROR)
+	fun info(text: String?) = show(text, Type.INFO)
+	fun success(text: String?) = show(text, Type.SUCCESS)
+	fun warning(text: String?) = show(text, Type.WARNING)
+	fun error(text: String?) = show(text, Type.ERROR)
 }
 
 @Composable
@@ -378,11 +378,11 @@ open class DialogInput(
 }
 
 abstract class DialogChoice(
-	val num: Int,
     override val title: String? = null
 ) : RachelDialogState<Int>() {
 	final override val dismissOnClickOutside: Boolean = false
 
+	abstract val num: Int
 	abstract fun name(index: Int): String
 	abstract fun icon(index: Int): ImageVector
 
@@ -419,16 +419,30 @@ abstract class DialogChoice(
 	}
 
 	companion object {
-		fun fromItems(items: List<String>, title: String? = null) = object : DialogChoice(items.size, title) {
+		fun fromItems(items: List<String>, title: String? = null) = object : DialogChoice(title) {
+			override val num: Int = items.size
 			override fun name(index: Int): String = items[index]
 			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
 		}
 
-		fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : DialogChoice(items.size, title) {
+		fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : DialogChoice(title) {
+			override val num: Int = items.size
 			override fun name(index: Int): String = items[index].first
 			override fun icon(index: Int): ImageVector = items[index].second
 		}
 	}
+}
+
+open class DialogDynamicChoice(title: String? = null) : DialogChoice(title) {
+	private var items: List<String> = emptyList()
+	override val num: Int get() = items.size
+	override fun name(index: Int): String = items[index]
+	override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+
+	suspend fun open(items: List<String>): Int? = if (items.isNotEmpty()) {
+		this.items = items
+		awaitResult()
+	} else null
 }
 
 open class DialogProgress : RachelDialogState<Unit>() {

@@ -33,164 +33,164 @@ import love.yinlin.ui.component.screen.DialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
-@Serializable
-data class ScreenImagePreview(val images: List<Picture>, val index: Int) : Screen<ScreenImagePreview.Model> {
+class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePreview.Args>(model) {
 	@Stable
-	class PreviewPicture(val pic: Picture) {
+	@Serializable
+	data class Args(val images: List<Picture>, val index: Int) : Screen.Args
+
+	@Stable
+	private class PreviewPicture(val pic: Picture) {
 		var isSource: Boolean by mutableStateOf(false)
 	}
 
-	inner class Model(model: AppModel) : Screen.Model(model) {
-		val previews: List<PreviewPicture> = images.map { PreviewPicture(it) }
-		var current: Int by mutableIntStateOf(index)
+	private val previews: List<PreviewPicture> = args.images.map { PreviewPicture(it) }
+	private var current: Int by mutableIntStateOf(args.index)
 
-		val downloadDialog = DialogProgress()
-		fun downloadPicture() {
-			val preview = previews[current]
-			val url = if (preview.isSource) preview.pic.source else preview.pic.image
-			val filename = url.substringAfterLast('/').substringBefore('?')
-			launch {
-				PicturePicker.prepareSave(filename)?.let { (origin, sink) ->
-					downloadDialog.open()
-					val result = sink.use {
-						val result = app.fileClient.safeDownload(
-							url = url,
-							sink = it,
-							isCancel = { !downloadDialog.isOpen },
-							onGetSize = { total -> downloadDialog.total = total.fileSizeString },
-							onTick = { current, total ->
-								downloadDialog.current = current.fileSizeString
-								if (total != 0L) downloadDialog.progress = current / total.toFloat()
-							}
-						)
-						if (result) PicturePicker.actualSave(filename, origin, sink)
-						result
-					}
-					PicturePicker.cleanSave(origin, result)
-					downloadDialog.hide()
+	private val downloadDialog = DialogProgress()
+
+	private fun downloadPicture() {
+		val preview = previews[current]
+		val url = if (preview.isSource) preview.pic.source else preview.pic.image
+		val filename = url.substringAfterLast('/').substringBefore('?')
+		launch {
+			PicturePicker.prepareSave(filename)?.let { (origin, sink) ->
+				downloadDialog.open()
+				val result = sink.use {
+					val result = app.fileClient.safeDownload(
+						url = url,
+						sink = it,
+						isCancel = { !downloadDialog.isOpen },
+						onGetSize = { total -> downloadDialog.total = total.fileSizeString },
+						onTick = { current, total ->
+							downloadDialog.current = current.fileSizeString
+							if (total != 0L) downloadDialog.progress = current / total.toFloat()
+						}
+					)
+					if (result) PicturePicker.actualSave(filename, origin, sink)
+					result
 				}
+				PicturePicker.cleanSave(origin, result)
+				downloadDialog.hide()
 			}
 		}
+	}
 
-		@Composable
-		private fun PreviewControls(
-			current: Int,
-			modifier: Modifier = Modifier
+	@Composable
+	private fun PreviewControls(
+		current: Int,
+		modifier: Modifier = Modifier
+	) {
+		val preview = previews[current]
+		Row(
+			modifier = modifier,
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			val preview = previews[current]
-			Row(
-				modifier = modifier,
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(10.dp)
+			Checkbox(
+				checked = preview.isSource,
+				onCheckedChange = {
+					preview.isSource = it
+				}
+			)
+			Text(text = "原图")
+		}
+	}
+
+	@Composable
+	private fun Portrait() {
+		val state = rememberPagerState(
+			initialPage = current,
+			pageCount = { previews.size }
+		)
+		Column(
+			modifier = Modifier.fillMaxSize(),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
+			HorizontalPager(
+				state = state,
+				key = {
+					val preview = previews[it]
+					if (preview.isSource) preview.pic.source else preview.pic.image
+				},
+				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
-				Checkbox(
-					checked = preview.isSource,
-					onCheckedChange = {
-						preview.isSource = it
-					}
+				val preview = previews[it]
+				ZoomWebImage(
+					uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+					modifier = Modifier.fillMaxSize()
 				)
-				Text(text = "原图")
 			}
+			PreviewControls(
+				current = current,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
 
-		@Composable
-		fun Portrait() {
-			val state = rememberPagerState(
-				initialPage = current,
-				pageCount = { previews.size }
-			)
-			Column(
-				modifier = Modifier.fillMaxSize(),
-				horizontalAlignment = Alignment.CenterHorizontally
+		LaunchedEffect(state.currentPage) {
+			current = state.currentPage
+		}
+	}
+
+	@Composable
+	private fun Landscape() {
+		Row(modifier = Modifier.fillMaxSize()) {
+			val state = rememberLazyListState(current)
+			LazyColumn(
+				modifier = Modifier.width(150.dp).fillMaxHeight(),
+				state = state,
+				contentPadding = PaddingValues(horizontal = 10.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(10.dp),
 			) {
-				HorizontalPager(
-					state = state,
-					key = {
-						val preview = previews[it]
-						if (preview.isSource) preview.pic.source else preview.pic.image
-					},
-					modifier = Modifier.fillMaxWidth().weight(1f)
-				) {
-					val preview = previews[it]
-					ZoomWebImage(
-						uri = if (preview.isSource) preview.pic.source else preview.pic.image,
-						modifier = Modifier.fillMaxSize()
+				itemsIndexed(items = previews) { index, item ->
+					WebImage(
+						uri = item.pic.image,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.fillMaxWidth().height(150.dp)
+							.condition(index == current) {
+								border(2.dp, MaterialTheme.colorScheme.primary)
+							},
+						onClick = {
+							current = index
+						}
 					)
 				}
+			}
+			VerticalDivider(modifier = Modifier.padding(end = 10.dp))
+			Column(
+				modifier = Modifier.weight(1f).fillMaxHeight(),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				val preview = previews[current]
+				ZoomWebImage(
+					uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+					modifier = Modifier.fillMaxWidth().weight(1f)
+				)
 				PreviewControls(
 					current = current,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
-
-			LaunchedEffect(state.currentPage) {
-				current = state.currentPage
-			}
-		}
-
-		@Composable
-		fun Landscape() {
-			Row(modifier = Modifier.fillMaxSize()) {
-				val state = rememberLazyListState(current)
-				LazyColumn(
-					modifier = Modifier.width(150.dp).fillMaxHeight(),
-					state = state,
-					contentPadding = PaddingValues(horizontal = 10.dp),
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(10.dp),
-				) {
-					itemsIndexed(items = previews) { index, item ->
-						WebImage(
-							uri = item.pic.image,
-							contentScale = ContentScale.Crop,
-							modifier = Modifier.fillMaxWidth().height(150.dp)
-								.condition(index == current) {
-									border(2.dp, MaterialTheme.colorScheme.primary)
-								},
-							onClick = {
-								current = index
-							}
-						)
-					}
-				}
-				VerticalDivider(modifier = Modifier.padding(end = 10.dp))
-				Column(
-					modifier = Modifier.weight(1f).fillMaxHeight(),
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					val preview = previews[current]
-					ZoomWebImage(
-						uri = if (preview.isSource) preview.pic.source else preview.pic.image,
-						modifier = Modifier.fillMaxWidth().weight(1f)
-					)
-					PreviewControls(
-						current = current,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
 		}
 	}
 
-	override fun model(model: AppModel): Model = Model(model)
-
 	@Composable
-	override fun content(model: Model) {
+	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = "${model.current + 1} / ${model.previews.size}",
+			title = "${current + 1} / ${previews.size}",
 			actions = {
 				Action(Icons.Filled.Download) {
-					model.downloadPicture()
+					downloadPicture()
 				}
 			},
-			onBack = { model.pop() },
-			slot = model.slot
+			onBack = { pop() },
+			slot = slot
 		) {
-			if (app.isPortrait) model.Portrait()
-			else model.Landscape()
+			if (app.isPortrait) Portrait()
+			else Landscape()
 		}
 
-		model.downloadDialog.withOpen()
+		downloadDialog.withOpen()
 	}
 }
