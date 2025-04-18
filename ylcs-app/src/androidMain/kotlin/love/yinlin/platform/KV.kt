@@ -1,9 +1,11 @@
 package love.yinlin.platform
 
 import android.content.Context
+import androidx.compose.runtime.Stable
 import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
 
+@Stable
 actual class KV(context: Context) {
 	val kv: MMKV = run {
 		MMKV.initialize(context, MMKVLogLevel.LevelNone)

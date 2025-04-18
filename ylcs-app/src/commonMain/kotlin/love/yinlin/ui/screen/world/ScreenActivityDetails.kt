@@ -88,7 +88,7 @@ class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivity
 
 	private val aid = args.aid
 	private val activity: Activity? by derivedStateOf {
-		part<ScreenPartWorld>().activities.find { it.aid == aid }
+		worldPart.activities.find { it.aid == aid }
 	}
 
 	private fun onPicClick(pics: List<Picture>, index: Int) {
@@ -104,7 +104,7 @@ class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivity
 			)
 		)
 		if (result is Data.Success) {
-			part<ScreenPartWorld>().activities.findModify(predicate = { it.aid == aid }) { this -= it }
+			worldPart.activities.findModify(predicate = { it.aid == aid }) { this -= it }
 			pop()
 		}
 		else if (result is Data.Error) slot.tip.error(result.message)

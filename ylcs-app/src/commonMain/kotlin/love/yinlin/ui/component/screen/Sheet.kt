@@ -20,6 +20,7 @@ interface BaseSheetState<T> {
     fun hide()
 }
 
+@Stable
 class SheetState<T>(default: T? = null) : BaseSheetState<T> {
     private val state = mutableStateOf(default)
 
@@ -32,6 +33,7 @@ class SheetState<T>(default: T? = null) : BaseSheetState<T> {
     override fun hide() { state.value = null }
 }
 
+@Stable
 class CommonSheetState(status: Boolean = false) : BaseSheetState<Unit> {
     private val state: MutableState<Boolean> = mutableStateOf(status)
 

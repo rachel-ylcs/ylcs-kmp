@@ -1,6 +1,7 @@
 package love.yinlin.common
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -20,6 +21,7 @@ import love.yinlin.platform.setJson
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+@Stable
 class KVConfig(private val kv: KV) {
 	companion object {
 		const val UPDATE: Long = Long.MAX_VALUE
@@ -27,6 +29,7 @@ class KVConfig(private val kv: KV) {
 
 	/* ----------------  持久化存储  ---------------- */
 
+	@Stable
 	private abstract class ValueState<T>(private val version: String? = null) : ReadWriteProperty<Any?, T> {
 		abstract fun kvGet(key: String): T
 		abstract fun kvSet(key: String, value: T)
@@ -46,6 +49,7 @@ class KVConfig(private val kv: KV) {
 		}
 	}
 
+	@Stable
 	abstract inner class CollectionState<C, RC : C>(
 		name: String,
 		version: String? = null,
@@ -62,6 +66,7 @@ class KVConfig(private val kv: KV) {
 		abstract val size: Int
 	}
 
+	@Stable
 	open inner class ListState<T>(
 		name: String,
 		version: String?,
@@ -102,6 +107,7 @@ class KVConfig(private val kv: KV) {
 		}
 	}
 
+	@Stable
 	open inner class MapState<K, V>(
 		name: String,
 		version: String?,
@@ -152,6 +158,7 @@ class KVConfig(private val kv: KV) {
 		}
 	}
 
+	@Stable
 	private class CacheState(private val kv: KV, private val default: Long = 0L) : ReadWriteProperty<Any?, Long> {
 		private var state: MutableState<Long>? = null
 

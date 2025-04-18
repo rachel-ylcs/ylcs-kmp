@@ -29,7 +29,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 	data class Args(val aid: Int) : Screen.Args
 
 	private val aid = args.aid
-	private val activities = part<ScreenPartWorld>().activities
+	private val activities = worldPart.activities
 	private val input = ActivityInputState(activities.find { it.aid == aid })
 
 	private suspend fun modifyActivity() {

@@ -49,6 +49,7 @@ interface WeiboProcessor {
 
 val LocalWeiboProcessor = localComposition<WeiboProcessor>()
 
+@Stable
 class WeiboGridData {
 	var state by mutableStateOf(BoxState.EMPTY)
 	var items by mutableStateOf(emptyList<Weibo>())

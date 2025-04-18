@@ -42,10 +42,10 @@ abstract class ScreenPart(private val model: AppModel) {
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 
+	protected open suspend fun initialize() {}
+
 	@Composable
 	protected abstract fun content()
-
-	protected open suspend fun initialize() {}
 
 	@Composable
 	fun partContent() {
@@ -56,6 +56,7 @@ abstract class ScreenPart(private val model: AppModel) {
 	}
 }
 
+@Stable
 class AppModel(
 	private val navController: NavController
 ) : ViewModel() {
@@ -64,15 +65,6 @@ class AppModel(
 	val musicPart = ScreenPartMusic(this)
 	val discoveryPart = ScreenPartDiscovery(this)
 	val mePart = ScreenPartMe(this)
-
-	inline fun <reified P : ScreenPart> part(): P = when (P::class) {
-		ScreenPartWorld::class -> worldPart as P
-		ScreenPartMsg::class -> msgPart as P
-		ScreenPartMusic::class -> musicPart as P
-		ScreenPartDiscovery::class -> discoveryPart as P
-		ScreenPartMe::class -> mePart as P
-		else -> error("unknown model part")
-	}
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)

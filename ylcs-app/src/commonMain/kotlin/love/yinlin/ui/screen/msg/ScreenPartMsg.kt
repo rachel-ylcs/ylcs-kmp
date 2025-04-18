@@ -52,12 +52,15 @@ private enum class MsgTabItem(
 	}
 }
 
+@Stable
 class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
+	@Stable
 	class WeiboState {
 		val flagFirstLoad = launchFlag()
 		val grid = WeiboGridData()
 	}
 
+	@Stable
 	class ChaohuaState {
 		val flagFirstLoad = launchFlag()
 		val grid = WeiboGridData()

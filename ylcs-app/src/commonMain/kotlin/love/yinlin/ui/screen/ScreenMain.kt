@@ -23,11 +23,6 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.screen.community.ScreenPartDiscovery
-import love.yinlin.ui.screen.community.ScreenPartMe
-import love.yinlin.ui.screen.msg.ScreenPartMsg
-import love.yinlin.ui.screen.music.ScreenPartMusic
-import love.yinlin.ui.screen.world.ScreenPartWorld
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -157,11 +152,11 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 		) {
 			Box(modifier = Modifier.fillMaxSize()) {
 				when (it) {
-					TabItem.WORLD.ordinal -> part<ScreenPartWorld>().partContent()
-					TabItem.MSG.ordinal -> part<ScreenPartMsg>().partContent()
-					TabItem.MUSIC.ordinal -> part<ScreenPartMusic>().partContent()
-					TabItem.DISCOVERY.ordinal -> part<ScreenPartDiscovery>().partContent()
-					TabItem.ME.ordinal -> part<ScreenPartMe>().partContent()
+					TabItem.WORLD.ordinal -> worldPart.partContent()
+					TabItem.MSG.ordinal -> msgPart.partContent()
+					TabItem.MUSIC.ordinal -> musicPart.partContent()
+					TabItem.DISCOVERY.ordinal -> discoveryPart.partContent()
+					TabItem.ME.ordinal -> mePart.partContent()
 				}
 			}
 		}
@@ -202,7 +197,7 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 	}
 
 	override suspend fun initialize() {
-		part<ScreenPartMe>().updateUserToken()
+		mePart.updateUserToken()
 	}
 
 	@Composable

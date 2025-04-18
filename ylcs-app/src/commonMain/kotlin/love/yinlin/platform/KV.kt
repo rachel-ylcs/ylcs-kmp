@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import love.yinlin.extension.parseJsonValue
@@ -14,6 +15,7 @@ object KVExpire {
 	const val YEAR = 946080000
 }
 
+@Stable
 expect class KV {
 	fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
 	fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)

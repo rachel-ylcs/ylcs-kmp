@@ -19,8 +19,11 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 
+@Stable
 sealed class ActionScope(private val ltr: Boolean) {
+	@Stable
 	object Left : ActionScope(true)
+	@Stable
 	object Right : ActionScope(false)
 
 	@Composable

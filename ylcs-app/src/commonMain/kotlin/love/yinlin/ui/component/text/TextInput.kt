@@ -28,6 +28,7 @@ enum class InputType {
 	}
 }
 
+@Stable
 class TextInputState(str: String = "", isOverflow: Boolean = false) {
 	var text: String by mutableStateOf(str)
 	var overflow: Boolean by mutableStateOf(isOverflow)

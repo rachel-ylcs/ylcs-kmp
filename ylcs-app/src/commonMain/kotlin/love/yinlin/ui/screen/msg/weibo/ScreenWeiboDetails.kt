@@ -26,7 +26,6 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Stable
 class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(model) {
@@ -34,7 +33,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 	@Serializable
 	data object Args : Screen.Args
 
-	private val weibo: Weibo? = part<ScreenPartMsg>().currentWeibo
+	private val weibo: Weibo? = msgPart.currentWeibo
 	private var comments: List<WeiboComment>? by mutableStateOf(null)
 
 	@Composable
@@ -166,7 +165,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 
 	@Composable
 	override fun content() {
-		CompositionLocalProvider(LocalWeiboProcessor provides part<ScreenPartMsg>().processor) {
+		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = "微博详情",

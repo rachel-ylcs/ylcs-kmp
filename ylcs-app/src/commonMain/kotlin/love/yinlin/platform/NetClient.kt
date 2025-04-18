@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -17,7 +18,9 @@ import love.yinlin.extension.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 expect object NetClient {
+	@Stable
 	val common: HttpClient
+	@Stable
 	val file: HttpClient
 }
 

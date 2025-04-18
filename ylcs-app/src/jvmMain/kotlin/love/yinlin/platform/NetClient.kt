@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp
@@ -17,12 +18,14 @@ actual object NetClient {
         }
     }
 
+    @Stable
     actual val common: HttpClient = HttpClient(OkHttp) {
         useEngine()
         useJson()
         useCommonTimeout()
     }
 
+    @Stable
     actual val file: HttpClient = HttpClient(OkHttp) {
         useEngine()
         useJson()

@@ -75,12 +75,14 @@ interface RichItem {
 	fun build(context: RichContext)
 }
 
+@Stable
 abstract class RichObject(protected val type: String) : RichItem {
 	protected open val map: JsonObject = makeObject { RICH_ARG_TYPE with type }
 
 	override val json: JsonElement get() = map
 }
 
+@Stable
 abstract class RichContainer(type: String) : RichObject(type) {
 	protected val items = mutableListOf<RichItem>()
 
@@ -106,6 +108,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		items += item
 	}
 
+	@Stable
 	protected class Text(private val text: String) : RichItem {
 		override val json: JsonElement = text.json
 
@@ -115,6 +118,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun text(str: String) = makeItem(Text(str))
 
+	@Stable
 	protected class Emoji(private val id: Int) : RichItem {
 		override val json: JsonElement = id.json
 
@@ -124,6 +128,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
 
+	@Stable
 	protected class Br : RichItem {
 		override val json: JsonElement = JsonNull
 
@@ -133,6 +138,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun br() = makeItem(Br())
 
+	@Stable
 	protected class Image(private val uri: String) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
 		override val map: JsonObject = makeObject {
 			merge(super.map)
@@ -156,6 +162,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun image(uri: String) = makeItem(Image(uri))
 
+	@Stable
 	protected class Link(private val uri: String, private val text: String) : RichObject(RICH_TYPE_LINK) {
 		override val map: JsonObject = makeObject {
 			merge(super.map)
@@ -206,6 +213,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun topic(uri: String, text: String) = makeItem(Topic(uri, text))
 
+	@Stable
 	protected class At(private val uri: String, private val text: String) : RichObject(RICH_TYPE_AT)  {
 		override val map: JsonObject = makeObject {
 			merge(super.map)
@@ -231,6 +239,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	}
 	fun at(uri: String, text: String) = makeItem(At(uri, text))
 
+	@Stable
 	protected class Style(
 		private val textSize: TextUnit?,
 		private val color: Color?,
@@ -282,6 +291,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	), content)
 }
 
+@Stable
 class RichString : RichContainer(RICH_TYPE_ROOT) {
 	fun asState(
 		onLinkClick: ((String) -> Unit)?,

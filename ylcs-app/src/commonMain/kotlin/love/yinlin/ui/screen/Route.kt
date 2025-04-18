@@ -10,13 +10,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
-import love.yinlin.ScreenPart
 import love.yinlin.ui.component.screen.SubScreenSlot
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 
 @Stable
-abstract class Screen<A : Screen.Args>(val model: AppModel) : ViewModel() {
+abstract class Screen<A : Screen.Args>(private val model: AppModel) : ViewModel() {
 	@Stable
 	interface Args
 
@@ -24,7 +23,11 @@ abstract class Screen<A : Screen.Args>(val model: AppModel) : ViewModel() {
 	fun navigate(route: Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 	fun pop() = model.pop()
 
-	inline fun <reified P : ScreenPart> part(): P = model.part()
+	val worldPart = model.worldPart
+	val msgPart = model.msgPart
+	val musicPart = model.musicPart
+	val discoveryPart = model.discoveryPart
+	val mePart = model.mePart
 
 	val slot = SubScreenSlot(viewModelScope)
 

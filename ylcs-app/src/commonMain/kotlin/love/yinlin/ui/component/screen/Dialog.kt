@@ -178,6 +178,7 @@ abstract class DialogState<R> {
 	}
 }
 
+@Stable
 abstract class RachelDialogState<R> : DialogState<R>() {
 	@Stable
 	sealed interface DialogInfo {
@@ -264,6 +265,7 @@ abstract class RachelDialogState<R> : DialogState<R>() {
 	}
 }
 
+@Stable
 open class DialogInfo(
 	title: String = "提示",
 	content: String = ""
@@ -291,6 +293,7 @@ open class DialogInfo(
 	}
 }
 
+@Stable
 open class DialogConfirm(
 	title: String = "确认",
 	content: String = ""
@@ -329,6 +332,7 @@ open class DialogConfirm(
 	}
 }
 
+@Stable
 open class DialogInput(
 	val hint: String = "",
 	val inputType: InputType = InputType.COMMON,
@@ -377,6 +381,7 @@ open class DialogInput(
 	}
 }
 
+@Stable
 abstract class DialogChoice(
     override val title: String? = null
 ) : RachelDialogState<Int>() {
@@ -433,6 +438,7 @@ abstract class DialogChoice(
 	}
 }
 
+@Stable
 open class DialogDynamicChoice(title: String? = null) : DialogChoice(title) {
 	private var items: List<String> = emptyList()
 	override val num: Int get() = items.size
@@ -445,6 +451,7 @@ open class DialogDynamicChoice(title: String? = null) : DialogChoice(title) {
 	} else null
 }
 
+@Stable
 open class DialogProgress : RachelDialogState<Unit>() {
 	var current by mutableStateOf("0")
 	var total by mutableStateOf("0")
@@ -509,6 +516,7 @@ open class DialogProgress : RachelDialogState<Unit>() {
 	}
 }
 
+@Stable
 class DialogLoading : DialogState<Unit>() {
 	override val dismissOnBackPress: Boolean = false
 	override val dismissOnClickOutside: Boolean = false

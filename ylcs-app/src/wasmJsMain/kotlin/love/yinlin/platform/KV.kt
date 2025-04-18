@@ -1,10 +1,12 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import kotlinx.browser.localStorage
 import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 
+@Stable
 actual class KV {
 	actual fun set(key: String, value: Boolean, expire: Int) {
 		localStorage.setItem(key, value.toString())

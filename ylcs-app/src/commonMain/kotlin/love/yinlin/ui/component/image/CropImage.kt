@@ -32,6 +32,7 @@ import kotlin.coroutines.resume
 import kotlin.math.max
 import kotlin.math.min
 
+@Stable
 private sealed interface TouchRegion {
     enum class Vertex : TouchRegion {
         TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
@@ -365,6 +366,7 @@ fun CropImage(
     }
 }
 
+@Stable
 class DialogCrop : DialogState<CropResult>() {
     private var url: String? by mutableStateOf(null)
     private var aspectRatio: Float by mutableStateOf(0f)

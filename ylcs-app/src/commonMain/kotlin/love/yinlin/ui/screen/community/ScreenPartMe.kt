@@ -47,6 +47,7 @@ import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 
+@Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	val signinSheet = CommonSheetState()
 

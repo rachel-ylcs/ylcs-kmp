@@ -102,11 +102,11 @@ class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Ar
 				modifier = Modifier.fillMaxSize().padding(10.dp),
 				verticalArrangement = Arrangement.spacedBy(10.dp),
 			) {
+				val data = caches[current]
 				StatefulBox(
 					state = state,
 					modifier = Modifier.fillMaxWidth().weight(1f)
 				) {
-					val data = caches[current]
 					if (data != null) LazyVerticalGrid(
 						columns = GridCells.Adaptive(if (app.isPortrait) 75.dp else 120.dp),
 						horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -125,26 +125,28 @@ class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Ar
 						}
 					}
 				}
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					ClickIcon(
-						icon = Icons.Outlined.FirstPage,
-						size = 32.dp,
-						onClick = { onPrevious() }
-					)
-					Text(
-						text = "第 $current 页",
-						style = MaterialTheme.typography.bodyLarge,
-						textAlign = TextAlign.Center
-					)
-					ClickIcon(
-						icon = Icons.AutoMirrored.Outlined.LastPage,
-						size = 32.dp,
-						onClick = { onNext() }
-					)
+				if (data != null) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						ClickIcon(
+							icon = Icons.Outlined.FirstPage,
+							size = 32.dp,
+							onClick = { onPrevious() }
+						)
+						Text(
+							text = "第 $current 页",
+							style = MaterialTheme.typography.bodyLarge,
+							textAlign = TextAlign.Center
+						)
+						ClickIcon(
+							icon = Icons.AutoMirrored.Outlined.LastPage,
+							size = 32.dp,
+							onClick = { onNext() }
+						)
+					}
 				}
 			}
 		}

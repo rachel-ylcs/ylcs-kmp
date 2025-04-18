@@ -95,10 +95,9 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
         when (result) {
             is Data.Success -> {
                 val (tid, pic) = result.data
-                val part = part<ScreenPartDiscovery>()
-                val currentSection = part.currentSection
+                val currentSection = discoveryPart.currentSection
                 if (currentSection == Comment.Section.LATEST || currentSection == section) {
-                    part.page.items.add(0, Topic(
+                    discoveryPart.page.items.add(0, Topic(
                         tid = tid,
                         uid = profile.uid,
                         title = title,

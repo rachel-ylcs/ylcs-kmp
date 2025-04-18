@@ -1,5 +1,8 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class KV {
 	companion object {
 		init {

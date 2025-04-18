@@ -10,11 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -39,15 +35,7 @@ import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.AppContext
-import love.yinlin.platform.ImageCompress
-import love.yinlin.platform.ImageCrop
-import love.yinlin.platform.ImageProcessor
-import love.yinlin.platform.ImageQuality
-import love.yinlin.platform.OS
-import love.yinlin.platform.PicturePicker
-import love.yinlin.platform.app
+import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_privacy_policy
 import love.yinlin.resources.default_name
@@ -64,7 +52,6 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.Screen
-import love.yinlin.ui.screen.community.ScreenPartMe
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
@@ -197,7 +184,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 				data = token
 			)
 			// 不论是否成功均从本地设备退出登录
-			part<ScreenPartMe>().logoff()
+			mePart.logoff()
 		}
 	}
 

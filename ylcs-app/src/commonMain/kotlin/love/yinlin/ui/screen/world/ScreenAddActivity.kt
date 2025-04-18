@@ -57,7 +57,7 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 		when (result) {
 			is Data.Success -> {
 				val (aid, serverPic, serverPics) = result.data
-				part<ScreenPartWorld>().activities.add(0, activity.copy(
+				worldPart.activities.add(0, activity.copy(
 					aid = aid,
 					pic = serverPic,
 					pics = serverPics

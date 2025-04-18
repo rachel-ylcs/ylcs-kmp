@@ -1,3 +1,4 @@
+@file:JvmName("MusicFactoryDesktop")
 package love.yinlin.platform
 
 import love.yinlin.data.music.MusicInfo

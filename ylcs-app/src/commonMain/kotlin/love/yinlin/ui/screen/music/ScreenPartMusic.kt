@@ -60,6 +60,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 
+@Stable
 class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val factory = app.musicFactory
 

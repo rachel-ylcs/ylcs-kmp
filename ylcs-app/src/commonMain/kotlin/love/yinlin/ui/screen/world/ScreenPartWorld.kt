@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
@@ -34,6 +35,7 @@ import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.screen.ActionScope
 
+@Stable
 class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	val activities = mutableStateListOf<Activity>()
 

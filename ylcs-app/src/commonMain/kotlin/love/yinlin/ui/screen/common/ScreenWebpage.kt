@@ -27,7 +27,7 @@ class ScreenWebpage(model: AppModel, args: Args) : Screen<ScreenWebpage.Args>(mo
 			title = state.title,
 			onBack = {
 				if (state.canGoBack) state.goBack()
-				else model.pop()
+				else pop()
 			},
 			slot = slot
 		) {

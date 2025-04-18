@@ -1,5 +1,8 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class KV {
 	actual fun set(key: String, value: Boolean, expire: Int) { TODO() }
 	actual fun set(key: String, value: Int, expire: Int) { TODO() }

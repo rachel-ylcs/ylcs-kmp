@@ -33,7 +33,6 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Composable
 private fun UserInfoCard(
@@ -298,7 +297,7 @@ class ScreenWeiboUser(model: AppModel, args: Args) : Screen<ScreenWeiboUser.Args
 
 	@Composable
 	override fun content() {
-		CompositionLocalProvider(LocalWeiboProcessor provides part<ScreenPartMsg>().processor) {
+		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = user?.info?.name ?: "",

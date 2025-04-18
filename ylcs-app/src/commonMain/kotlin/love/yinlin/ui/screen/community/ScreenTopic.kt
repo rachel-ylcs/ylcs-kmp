@@ -206,7 +206,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	private fun onAvatarClick(uid: Int) {
-		part<ScreenPartDiscovery>().onUserAvatarClick(uid)
+		discoveryPart.onUserAvatarClick(uid)
 	}
 
 	private fun onImageClick(images: List<Picture>, current: Int) {
@@ -239,7 +239,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			)
 			when (result) {
 				is Data.Success -> {
-					part<ScreenPartDiscovery>().page.items.removeAll { it.tid == topic.tid }
+					discoveryPart.page.items.removeAll { it.tid == topic.tid }
 					pop()
 				}
 				is Data.Error -> slot.tip.error(result.message)
@@ -266,8 +266,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 				)
 				when (result) {
 					is Data.Success -> {
-						val part = part<ScreenPartDiscovery>()
-						if (part.currentSection == oldSection) part.page.items.removeAll { it.tid == topic.tid }
+						if (discoveryPart.currentSection == oldSection) discoveryPart.page.items.removeAll { it.tid == topic.tid }
 						details = oldDetails.copy(section = newSection)
 						slot.tip.success(result.message)
 					}
@@ -293,7 +292,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 		)
 		when (result) {
 			is Data.Success -> {
-				part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+				discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 					it.copy(coinNum = it.coinNum + num)
 				}
 				app.config.userProfile?.let {
@@ -322,7 +321,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 				)
 				when (result) {
 					is Data.Success -> {
-						part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+						discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 							it.copy(commentNum = it.commentNum + 1)
 						}
 						commentPage.items += Comment(
@@ -405,7 +404,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			)
 			when (result) {
 				is Data.Success -> {
-					part<ScreenPartDiscovery>().page.items.findAssign(predicate = { it.tid == topic.tid }) {
+					discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 						it.copy(commentNum = it.commentNum - 1)
 					}
 					commentPage.items.removeAll { it.cid == cid }

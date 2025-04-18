@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.FilterQuality
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -89,6 +90,7 @@ expect class ImageCrop(rect: CropResult): ImageOp {
     override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
 }
 
+@Stable
 class ImageProcessor(
     vararg items: ImageOp,
     private val quality: ImageQuality = ImageQuality.Medium

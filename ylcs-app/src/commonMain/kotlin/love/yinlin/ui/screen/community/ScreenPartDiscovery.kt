@@ -54,6 +54,8 @@ private enum class DiscoveryItem(
 	}
 }
 
+
+@Stable
 class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	var state by mutableStateOf(BoxState.EMPTY)
 
@@ -62,6 +64,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	var currentPage by mutableIntStateOf(0)
 	val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
 
+	@Stable
 	class DiscoveryPagination : Pagination<Topic, Int>(Int.MAX_VALUE) {
 		var section = Comment.Section.LATEST
 		override fun offset(item: Topic): Int = when (section) {

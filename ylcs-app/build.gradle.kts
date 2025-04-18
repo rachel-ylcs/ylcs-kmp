@@ -28,10 +28,6 @@ kotlin {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 
-    composeCompiler {
-        stabilityConfigurationFiles.add(rootProject.extra["composeStabilityFile"] as RegularFile)
-    }
-
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
@@ -230,6 +226,12 @@ kotlin {
     }
 }
 
+composeCompiler {
+    stabilityConfigurationFiles.add(rootProject.extra["composeStabilityFile"] as RegularFile)
+    reportsDestination = layout.buildDirectory.dir("composeCompiler")
+    metricsDestination = layout.buildDirectory.dir("composeCompiler")
+}
+
 compose.resources {
     packageOfResClass = "${rootProject.extra["appPackageName"] as String}.resources"
 }
@@ -277,12 +279,14 @@ android {
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
+            isDebuggable = true
             signingConfig = signingConfigs.getByName(androidKeyName)
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile(rootProject.extra["r8OptimizeFilename"] as String),
                 rootProject.extra["commonR8File"]!!,
