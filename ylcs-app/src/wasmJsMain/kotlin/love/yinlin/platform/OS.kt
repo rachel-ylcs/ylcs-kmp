@@ -9,6 +9,6 @@ actual fun osNetOpenUrl(url: String) {
 	window.open(url, "_blank")
 }
 
-actual val osStorageDataPath: Path get() = error("wasmJs not supported")
+actual val osStorageDataPath: Path get() = unsupportedPlatform()
 
-actual val osStorageCachePath: Path get() = error("wasmJs not supported")
+actual val osStorageCachePath: Path get() = unsupportedPlatform()

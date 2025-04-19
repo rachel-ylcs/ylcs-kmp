@@ -492,7 +492,22 @@ fun <T> PaginationColumn(
 	itemDivider: PaddingValues? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-	if (OS.platform.isPhone) {
+	OS.runPhone(notPhone = {
+		ClickPaginationColumn(
+			items = items,
+			key = key,
+			state = state,
+			canLoading = canLoading,
+			onLoading = onLoading,
+			modifier = modifier,
+			contentPadding = contentPadding,
+			verticalArrangement = verticalArrangement,
+			horizontalAlignment = horizontalAlignment,
+			header = header,
+			itemDivider = itemDivider,
+			itemContent = itemContent
+		)
+	}) {
 		SwipePaginationLayout(
 			canRefresh = canRefresh,
 			canLoading = canLoading,
@@ -519,22 +534,6 @@ fun <T> PaginationColumn(
 			}
 		}
 	}
-	else {
-		ClickPaginationColumn(
-			items = items,
-			key = key,
-			state = state,
-			canLoading = canLoading,
-			onLoading = onLoading,
-			modifier = modifier,
-			contentPadding = contentPadding,
-			verticalArrangement = verticalArrangement,
-			horizontalAlignment = horizontalAlignment,
-			header = header,
-			itemDivider = itemDivider,
-			itemContent = itemContent
-		)
-	}
 }
 
 @Composable
@@ -554,7 +553,24 @@ fun <T> PaginationGrid(
 	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-	if (OS.platform.isPhone) {
+	OS.runPhone(
+		notPhone = {
+			ClickPaginationGrid(
+				items = items,
+				key = key,
+				columns = columns,
+				state = state,
+				canLoading = canLoading,
+				onLoading = onLoading,
+				modifier = modifier,
+				contentPadding = contentPadding,
+				verticalArrangement = verticalArrangement,
+				horizontalArrangement = horizontalArrangement,
+				header = header,
+				itemContent = itemContent
+			)
+		}
+	) {
 		SwipePaginationLayout(
 			canRefresh = canRefresh,
 			canLoading = canLoading,
@@ -582,22 +598,6 @@ fun <T> PaginationGrid(
 			}
 		}
 	}
-	else {
-		ClickPaginationGrid(
-			items = items,
-			key = key,
-			columns = columns,
-			state = state,
-			canLoading = canLoading,
-			onLoading = onLoading,
-			modifier = modifier,
-			contentPadding = contentPadding,
-			verticalArrangement = verticalArrangement,
-			horizontalArrangement = horizontalArrangement,
-			header = header,
-			itemContent = itemContent
-		)
-	}
 }
 
 @Composable
@@ -617,7 +617,24 @@ fun <T> PaginationStaggeredGrid(
 	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-	if (OS.platform.isPhone) {
+	OS.runPhone(
+		notPhone = {
+			ClickPaginationStaggeredGrid(
+				items = items,
+				key = key,
+				columns = columns,
+				state = state,
+				canLoading = canLoading,
+				onLoading = onLoading,
+				modifier = modifier,
+				contentPadding = contentPadding,
+				verticalItemSpacing = verticalItemSpacing,
+				horizontalArrangement = horizontalArrangement,
+				header = header,
+				itemContent = itemContent
+			)
+		}
+	) {
 		SwipePaginationLayout(
 			canRefresh = canRefresh,
 			canLoading = canLoading,
@@ -644,21 +661,5 @@ fun <T> PaginationStaggeredGrid(
 				items(items = items, key = key, itemContent = itemContent)
 			}
 		}
-	}
-	else {
-		ClickPaginationStaggeredGrid(
-			items = items,
-			key = key,
-			columns = columns,
-			state = state,
-			canLoading = canLoading,
-			onLoading = onLoading,
-			modifier = modifier,
-			contentPadding = contentPadding,
-			verticalItemSpacing = verticalItemSpacing,
-			horizontalArrangement = horizontalArrangement,
-			header = header,
-			itemContent = itemContent
-		)
 	}
 }

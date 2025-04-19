@@ -18,8 +18,8 @@ import kotlin.coroutines.suspendCoroutine
 private var lastChoosePath: File? = FileSystemView.getFileSystemView()?.homeDirectory
 private val pictureFilter = FileChooser.ExtensionFilter("图片", "*.jpg", "*.png", "*.webp")
 
-actual object PicturePicker {
-    actual suspend fun pick(): Source? = suspendCoroutine { continuation ->
+actual object Picker {
+    actual suspend fun pickPicture(): Source? = suspendCoroutine { continuation ->
         Platform.runLater {
             continuation.safeResume {
                 val file = FileChooser().run {
@@ -34,7 +34,7 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun pick(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
         Platform.runLater {
             continuation.safeResume {
                 require(maxNum > 0)
@@ -50,7 +50,37 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun prepareSave(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
+        Platform.runLater {
+            continuation.safeResume {
+                val file = FileChooser().run {
+                    title = "选择一个文件"
+                    initialDirectory = lastChoosePath
+                    extensionFilters += FileChooser.ExtensionFilter("文件", *filter.toTypedArray())
+                    showOpenDialog(null)
+                }
+                lastChoosePath = file.parentFile
+                continuation.resume(file.inputStream().asSource().buffered())
+            }
+        }
+    }
+
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = suspendCoroutine { continuation ->
+        Platform.runLater {
+            continuation.safeResume {
+                val file = FileChooser().run {
+                    title = "选择一个文件"
+                    initialDirectory = lastChoosePath
+                    extensionFilters += FileChooser.ExtensionFilter("文件", *filter.toTypedArray())
+                    showOpenDialog(null)
+                }
+                lastChoosePath = file.parentFile
+                continuation.resume(NormalPath(file.absolutePath))
+            }
+        }
+    }
+
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
         Platform.runLater {
             continuation.safeResume {
                 val file = FileChooser().run {
@@ -66,9 +96,9 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Unit
+    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) = Unit
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) {
+    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) {
         if (!result) SystemFileSystem.delete(origin as Path, false)
     }
 }

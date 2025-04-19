@@ -1,5 +1,6 @@
 package love.yinlin.mod
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
@@ -22,9 +23,10 @@ object ModFactory {
     private const val INTERVAL = 1024 * 64
     const val VERSION = 4
 
+    @Stable
     class Merge(
         private val mediaPaths: List<Path>,
-        private val savePath: Path,
+        private val sink: Sink,
         private val info: ModInfo = ModInfo()
     ) {
         companion object {
@@ -35,7 +37,7 @@ object ModFactory {
             }
         }
 
-        constructor(mediaPath: Path, savePath: Path) : this(listOf(mediaPath), savePath)
+        constructor(mediaPath: Path, sink: Sink) : this(listOf(mediaPath), sink)
 
         private suspend fun Sink.writeMetadata() {
             Coroutines.io {
@@ -85,24 +87,21 @@ object ModFactory {
             filter: List<MusicResourceType> = listOf(),
             onProcess: (Int, Int, String) -> Unit
         ): Data<Unit> = try {
-            SystemFileSystem.sink(savePath).buffered().use { sink ->
-                sink.writeMetadata()
-                for ((index, mediaPath) in mediaPaths.withIndex()) {
-                    sink.writeMedia(mediaPath, filter)
-                    Coroutines.main {
-                        onProcess(index, mediaPaths.size, mediaPath.name)
-                    }
+            sink.writeMetadata()
+            for ((index, mediaPath) in mediaPaths.withIndex()) {
+                sink.writeMedia(mediaPath, filter)
+                Coroutines.main {
+                    onProcess(index, mediaPaths.size, mediaPath.name)
                 }
-                Data.Success(Unit)
             }
+            Data.Success(Unit)
         } catch (e: Throwable) {
             Data.Error(throwable = e)
         }
     }
 
-    abstract class BaseRelease(
-        protected val modPath: Path
-    ) {
+    @Stable
+    abstract class BaseRelease(protected val source: Source) {
         companion object {
             fun Source.readLengthString(): String {
                 val length = readInt()
@@ -125,10 +124,11 @@ object ModFactory {
         }
     }
 
+    @Stable
     class Release(
-        modPath: Path,
+        source: Source,
         private val savePath: Path
-    ): BaseRelease(modPath) {
+    ): BaseRelease(source) {
         private suspend fun Source.readResource(mediaPath: Path) = Coroutines.io {
             val resType = readInt() // 读资源类型
             require(MusicResourceType.fromInt(resType) != null) { "不支持的资源类型 $resType" }
@@ -160,36 +160,36 @@ object ModFactory {
         }
 
         suspend fun process(onProcess: (Int, Int, String) -> Unit): Data<ModMetadata> = try {
-            SystemFileSystem.source(modPath).buffered().use { source ->
-                val metadata = source.readMetadata()
-                repeat(metadata.mediaNum) { index ->
-                    val id = source.readMedia()
-                    Coroutines.main {
-                        onProcess(index, metadata.mediaNum, id)
-                    }
+            val metadata = source.readMetadata()
+            repeat(metadata.mediaNum) { index ->
+                val id = source.readMedia()
+                Coroutines.main {
+                    onProcess(index, metadata.mediaNum, id)
                 }
-                Data.Success(metadata)
             }
+            Data.Success(metadata)
         } catch (e: Throwable) {
             Data.Error(throwable = e)
         }
     }
 
-    class Preview(
-        modPath: Path
-    ): BaseRelease(modPath) {
+    @Stable
+    class Preview(source: Source): BaseRelease(source) {
+        @Stable
         data class ResourceItem(
             val type: MusicResourceType,
             val name: String,
             val length: Int
         )
 
+        @Stable
         data class MediaItem(
             val id: String,
             val config: MusicInfo?,
             val resources: List<ResourceItem>
         )
 
+        @Stable
         data class PreviewItem(
             val metadata: ModMetadata,
             val medias: List<MediaItem>
@@ -230,14 +230,12 @@ object ModFactory {
         }
 
         suspend fun process(): Data<PreviewItem> = try {
-            SystemFileSystem.source(modPath).buffered().use { source ->
-                val metadata = source.readMetadata()
-                val medias = mutableListOf<MediaItem>()
-                repeat(metadata.mediaNum) { index ->
-                    medias += source.previewMedia()
-                }
-                Data.Success(PreviewItem(metadata, medias))
+            val metadata = source.readMetadata()
+            val medias = mutableListOf<MediaItem>()
+            repeat(metadata.mediaNum) { index ->
+                medias += source.previewMedia()
             }
+            Data.Success(PreviewItem(metadata, medias))
         } catch (e: Throwable) {
             Data.Error(throwable = e)
         }

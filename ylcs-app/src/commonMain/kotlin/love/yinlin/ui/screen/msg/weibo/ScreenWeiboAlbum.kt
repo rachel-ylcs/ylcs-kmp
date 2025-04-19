@@ -29,7 +29,7 @@ import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Args>(model) {
+class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenWeiboAlbum.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val containerId: String, val title: String) : Screen.Args
@@ -41,8 +41,6 @@ class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Ar
 		private const val PIC_MAX_LIMIT = 1000
 	}
 
-	private val title = args.title
-	private val containerId = args.containerId
 	private var state by mutableStateOf(BoxState.EMPTY)
 
 	private val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
@@ -53,7 +51,7 @@ class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Ar
 	private suspend fun requestAlbum(page: Int) {
 		if (caches[page] == null) { // 无缓存
 			state = BoxState.LOADING
-			val result = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)
+			val result = WeiboAPI.getWeiboAlbumPics(args.containerId, page, PIC_LIMIT)
 			if (result is Data.Success) {
 				val (data, count) = result.data
 				caches[page] = AlbumCache(count, data)
@@ -94,7 +92,7 @@ class ScreenWeiboAlbum(model: AppModel, args: Args) : Screen<ScreenWeiboAlbum.Ar
 	override fun content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
-			title = "$title - 共 $num 张",
+			title = "${args.title} - 共 $num 张",
 			onBack = { pop() },
 			slot = slot
 		) {

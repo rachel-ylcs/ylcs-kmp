@@ -338,7 +338,7 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 						}
 					}
 				}
-				else -> error("")
+				else -> error("Unsupported Element")
 			}
 		}
 

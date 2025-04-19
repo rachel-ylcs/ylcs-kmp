@@ -33,12 +33,11 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
 @Stable
-class ScreenUserCard(model: AppModel, args: Args) : Screen<ScreenUserCard.Args>(model) {
+class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUserCard.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val uid: Int) : Screen.Args
 
-	private val uid = args.uid
 	private var profile: UserPublicProfile? by mutableStateOf(null)
 
 	private val listState = LazyStaggeredGridState()
@@ -51,7 +50,7 @@ class ScreenUserCard(model: AppModel, args: Args) : Screen<ScreenUserCard.Args>(
 	private suspend fun requestUserProfile() {
 		val result = ClientAPI.request(
 			route = API.User.Profile.GetPublicProfile,
-			data = uid
+			data = args.uid
 		)
 		if (result is Data.Success) profile = result.data
 	}
@@ -60,7 +59,7 @@ class ScreenUserCard(model: AppModel, args: Args) : Screen<ScreenUserCard.Args>(
 		val result = ClientAPI.request(
 			route = API.User.Topic.GetTopics,
 			data = API.User.Topic.GetTopics.Request(
-				uid = uid,
+				uid = args.uid,
 				num = page.pageNum
 			)
 		)
@@ -71,7 +70,7 @@ class ScreenUserCard(model: AppModel, args: Args) : Screen<ScreenUserCard.Args>(
 		val result = ClientAPI.request(
 			route = API.User.Topic.GetTopics,
 			data = API.User.Topic.GetTopics.Request(
-				uid = uid,
+				uid = args.uid,
 				isTop = page.arg1,
 				offset = page.offset,
 				num = page.pageNum

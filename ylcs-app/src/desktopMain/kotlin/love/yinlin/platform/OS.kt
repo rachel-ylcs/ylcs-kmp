@@ -1,5 +1,4 @@
 @file:JvmName("OSDesktop")
-
 package love.yinlin.platform
 
 import kotlinx.io.files.Path

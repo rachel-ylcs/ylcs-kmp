@@ -27,7 +27,7 @@ import love.yinlin.platform.ImageCrop
 import love.yinlin.platform.ImageProcessor
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
-import love.yinlin.platform.PicturePicker
+import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.DialogCrop
 import love.yinlin.ui.component.image.ImageAdder
@@ -73,7 +73,7 @@ class ActivityInputState(initActivity: Activity? = null) {
     val linkString: String? get() = link.text.ifEmpty { null }
 
     suspend fun pickPicture(onPicAdd: (Path) -> Unit) {
-        val path = PicturePicker.pick()?.use { source ->
+        val path = Picker.pickPicture()?.use { source ->
             OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
@@ -88,7 +88,7 @@ class ActivityInputState(initActivity: Activity? = null) {
     }
 
     suspend fun pickPictures(onPicsAdd: (List<Path>) -> Unit) {
-        PicturePicker.pick((9 - pics.size).coerceAtLeast(1))?.use { sources ->
+        Picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
                 OS.Storage.createTempFile { sink ->

@@ -81,14 +81,13 @@ private fun ActivityDetailsLayout(
 }
 
 @Stable
-class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivityDetails.Args>(model) {
+class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<ScreenActivityDetails.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val aid: Int) : Screen.Args
 
-	private val aid = args.aid
 	private val activity: Activity? by derivedStateOf {
-		worldPart.activities.find { it.aid == aid }
+		worldPart.activities.find { it.aid == args.aid }
 	}
 
 	private fun onPicClick(pics: List<Picture>, index: Int) {
@@ -100,11 +99,11 @@ class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivity
 			route = API.User.Activity.DeleteActivity,
 			data = API.User.Activity.DeleteActivity.Request(
 				token = app.config.userToken,
-				aid = aid
+				aid = args.aid
 			)
 		)
 		if (result is Data.Success) {
-			worldPart.activities.findModify(predicate = { it.aid == aid }) { this -= it }
+			worldPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
 			pop()
 		}
 		else if (result is Data.Error) slot.tip.error(result.message)
@@ -180,7 +179,7 @@ class ScreenActivityDetails(model: AppModel, args: Args) : Screen<ScreenActivity
 			actions = {
 				if (hasPrivilegeVIPCalendar) {
 					Action(Icons.Outlined.Edit) {
-						navigate(ScreenModifyActivity.Args(aid))
+						navigate(ScreenModifyActivity.Args(args.aid))
 					}
 					ActionSuspend(Icons.Outlined.Delete) {
 						deleteActivity()

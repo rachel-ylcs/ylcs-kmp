@@ -18,8 +18,8 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-actual object PicturePicker {
-    actual suspend fun pick(): Source? = suspendCoroutine { continuation ->
+actual object Picker {
+    actual suspend fun pickPicture(): Source? = suspendCoroutine { continuation ->
         continuation.safeResume {
             val resolver = appNative.context.contentResolver
             appNative.activityResultRegistry!!.register(
@@ -33,7 +33,7 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun pick(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
         continuation.safeResume {
             val resolver = appNative.context.contentResolver
             appNative.activityResultRegistry!!.register(
@@ -45,7 +45,34 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun prepareSave(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
+        continuation.safeResume {
+            val resolver = appNative.context.contentResolver
+            appNative.activityResultRegistry!!.register(
+                key = UUID.randomUUID().toString(),
+                contract = ActivityResultContracts.OpenDocument()
+            ) { uri ->
+                continuation.safeResume {
+                    continuation.resume(resolver.openInputStream(uri!!)!!.asSource().buffered())
+                }
+            }.launch(mimeType.toTypedArray())
+        }
+    }
+
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = suspendCoroutine { continuation ->
+        continuation.safeResume {
+            appNative.activityResultRegistry!!.register(
+                key = UUID.randomUUID().toString(),
+                contract = ActivityResultContracts.OpenDocument()
+            ) { uri ->
+                continuation.safeResume {
+                    continuation.resume(ContentPath(uri!!.toString()))
+                }
+            }.launch(mimeType.toTypedArray())
+        }
+    }
+
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
         continuation.safeResume {
             val values = ContentValues()
             values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -57,9 +84,9 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Unit
+    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) = Unit
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) {
+    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) {
         if (!result) appNative.context.contentResolver.delete(origin as Uri, null, null)
     }
 }

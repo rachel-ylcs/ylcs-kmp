@@ -9,12 +9,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,7 +31,9 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import kotlinx.coroutines.launch
+import kotlinx.io.buffered
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
@@ -199,13 +201,15 @@ private fun MergeUI(
                 }
 
                 scope.launch {
-                    val result = ModFactory.Merge(
-                        mediaPaths = mediaPaths,
-                        savePath = savePath
-                    ).process(
-                        filter = filter
-                    ) { progress, total, name ->
-                        status = Status.Running("运行中($progress/$total -> $name)")
+                    val result = SystemFileSystem.sink(savePath).buffered().use { sink ->
+                        ModFactory.Merge(
+                            mediaPaths = mediaPaths,
+                            sink = sink
+                        ).process(
+                            filter = filter
+                        ) { progress, total, name ->
+                            status = Status.Running("运行中($progress/$total -> $name)")
+                        }
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
@@ -265,11 +269,13 @@ private fun ReleaseUI(
                 }
 
                 scope.launch {
-                    val result = ModFactory.Release(
-                        modPath = Path(input),
-                        savePath = Path(output)
-                    ).process { progress, total, name ->
-                        status = Status.Running("运行中($progress/$total -> $name)")
+                    val result = SystemFileSystem.source(Path(input)).buffered().use { source ->
+                        ModFactory.Release(
+                            source = source,
+                            savePath = Path(output)
+                        ).process { progress, total, name ->
+                            status = Status.Running("运行中($progress/$total -> $name)")
+                        }
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
@@ -291,11 +297,11 @@ private fun ModPreview(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        item(-2) {
+        item(-1) {
             val metadata = preview.metadata
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = 5.dp,
+                shadowElevation = 5.dp,
                 border = BorderStroke(width = 1.dp, color = Color.LightGray)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -317,7 +323,7 @@ private fun ModPreview(
         ) { mediaItem ->
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = 5.dp,
+                shadowElevation = 5.dp,
                 border = BorderStroke(width = 1.dp, color = Color.LightGray)
             ) {
                 Column(
@@ -405,9 +411,9 @@ private fun PreviewUI(
                 }
 
                 scope.launch {
-                    val result = ModFactory.Preview(
-                        modPath = Path(input)
-                    ).process()
+                    val result = SystemFileSystem.source(Path(input)).buffered().use { source ->
+                        ModFactory.Preview(source = source).process()
+                    }
                     status = when (result) {
                         is Data.Success -> {
                             preview = result.data

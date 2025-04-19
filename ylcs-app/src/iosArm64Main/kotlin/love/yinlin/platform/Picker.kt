@@ -13,17 +13,19 @@ import platform.Foundation.dataWithBytesNoCopy
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageWriteToSavedPhotosAlbum
 
-actual object PicturePicker {
-    actual suspend fun pick(): Source? = TODO()
-    actual suspend fun pick(maxNum: Int): Sources<Source>? = TODO()
+actual object Picker {
+    actual suspend fun pickPicture(): Source? = TODO()
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = TODO()
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = TODO()
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = TODO()
 
-    actual suspend fun prepareSave(filename: String): Pair<Any, Sink>? {
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()
         return buffer to buffer
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
+    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) {
         Coroutines.io {
             val bytes = (origin as Buffer).readBytes()
             val data = NSData.dataWithBytesNoCopy(bytes.pin().addressOf(0), bytes.size.toULong())
@@ -38,5 +40,5 @@ actual object PicturePicker {
         }
     }
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) = Unit
+    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) = Unit
 }

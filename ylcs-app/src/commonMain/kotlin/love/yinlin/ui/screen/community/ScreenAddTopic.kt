@@ -30,7 +30,7 @@ import love.yinlin.platform.ImageCompress
 import love.yinlin.platform.ImageProcessor
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
-import love.yinlin.platform.PicturePicker
+import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.MiniIcon
@@ -60,7 +60,7 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
     private val input = InputState()
 
     private suspend fun pickPictures() {
-        PicturePicker.pick((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
+        Picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
                 OS.Storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)

@@ -23,14 +23,13 @@ import love.yinlin.ui.screen.Screen
 import kotlin.collections.plus
 
 @Stable
-class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyActivity.Args>(model) {
+class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<ScreenModifyActivity.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val aid: Int) : Screen.Args
 
-	private val aid = args.aid
 	private val activities = worldPart.activities
-	private val input = ActivityInputState(activities.find { it.aid == aid })
+	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
 	private suspend fun modifyActivity() {
 		val ts = input.ts
@@ -45,7 +44,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 			data = API.User.Activity.ModifyActivityInfo.Request(
 				token = app.config.userToken,
 				activity = Activity(
-					aid = aid,
+					aid = args.aid,
 					ts = ts,
 					title = title,
 					content = content,
@@ -60,7 +59,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 		)
 		when (result) {
 			is Data.Success -> {
-				activities.findAssign(predicate = { it.aid == aid }) {
+				activities.findAssign(predicate = { it.aid == args.aid }) {
 					it.copy(
 						ts = ts,
 						title = title,
@@ -83,14 +82,14 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 			route = API.User.Activity.ModifyActivityPicture,
 			data = API.User.Activity.ModifyActivityPicture.Request(
 				token = app.config.userToken,
-				aid = aid
+				aid = args.aid
 			),
 			files = { API.User.Activity.ModifyActivityPicture.Files(
 				pic = file(SystemFileSystem.source(path))
 			) }
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPic = result.data
 				input.pic = Picture(it.picPath(newPic))
 				it.copy(pic = newPic)
@@ -106,11 +105,11 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 			route = API.User.Activity.DeleteActivityPicture,
 			data = API.User.Activity.DeleteActivityPicture.Request(
 				token = app.config.userToken,
-				aid = aid
+				aid = args.aid
 			)
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				input.pic = null
 				it.copy(pic = null)
 			}
@@ -125,14 +124,14 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 			route = API.User.Activity.AddActivityPictures,
 			data = API.User.Activity.AddActivityPictures.Request(
 				token = app.config.userToken,
-				aid = aid
+				aid = args.aid
 			),
 			files = { API.User.Activity.AddActivityPictures.Files(
 				pics = file(files.safeToSources { SystemFileSystem.source(it) })
 			) }
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPics = result.data
 				input.pics += newPics.map { pic -> Picture(it.picPath(pic)) }
 				it.copy(pics = it.pics + newPics)
@@ -143,7 +142,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 	}
 
 	private suspend fun modifyPictures(index: Int) {
-		PicturePicker.pick()?.use { source ->
+		Picker.pickPicture()?.use { source ->
 			OS.Storage.createTempFile { sink ->
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
@@ -153,7 +152,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 				route = API.User.Activity.ModifyActivityPictures,
 				data = API.User.Activity.ModifyActivityPictures.Request(
 					token = app.config.userToken,
-					aid = aid,
+					aid = args.aid,
 					index = index
 				),
 				files = { API.User.Activity.ModifyActivityPictures.Files(
@@ -161,7 +160,7 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 				) }
 			)
 			when (result) {
-				is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+				is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 					val newPic = result.data
 					input.pics[index] = Picture(it.picPath(newPic))
 					it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
@@ -178,12 +177,12 @@ class ScreenModifyActivity(model: AppModel, args: Args) : Screen<ScreenModifyAct
 			route = API.User.Activity.DeleteActivityPictures,
 			data = API.User.Activity.DeleteActivityPictures.Request(
 				token = app.config.userToken,
-				aid = aid,
+				aid = args.aid,
 				index = index
 			)
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				input.pics.removeAt(index)
 				it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
 			}

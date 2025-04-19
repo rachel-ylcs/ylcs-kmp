@@ -23,7 +23,7 @@ import love.yinlin.AppModel
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
 import love.yinlin.extension.fileSizeString
-import love.yinlin.platform.PicturePicker
+import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.ui.screen.Screen
@@ -53,7 +53,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 		val url = if (preview.isSource) preview.pic.source else preview.pic.image
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		launch {
-			PicturePicker.prepareSave(filename)?.let { (origin, sink) ->
+			Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
 				downloadDialog.open()
 				val result = sink.use {
 					val result = app.fileClient.safeDownload(
@@ -66,10 +66,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 							if (total != 0L) downloadDialog.progress = current / total.toFloat()
 						}
 					)
-					if (result) PicturePicker.actualSave(filename, origin, sink)
+					if (result) Picker.actualSavePicture(filename, origin, sink)
 					result
 				}
-				PicturePicker.cleanSave(origin, result)
+				Picker.cleanSavePicture(origin, result)
 				downloadDialog.hide()
 			}
 		}

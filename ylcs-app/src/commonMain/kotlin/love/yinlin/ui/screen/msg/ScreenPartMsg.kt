@@ -133,20 +133,19 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			navigate(ScreenWeiboUser.Args(info.id))
 		}
 
-		override fun onWeiboLinkClick(arg: String) {
-			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage.Args(arg))
+		private fun gotoWebPage(arg: String) {
+			OS.runWeb(notWeb = {
+				navigate(ScreenWebpage.Args(arg))
+			}) {
+				OS.Net.openUrl(arg)
+			}
 		}
 
-		override fun onWeiboTopicClick(arg: String) {
-			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage.Args(arg))
-		}
+		override fun onWeiboLinkClick(arg: String) = gotoWebPage(arg)
 
-		override fun onWeiboAtClick(arg: String) {
-			if (OS.platform.isWeb) OS.Net.openUrl(arg)
-			else navigate(ScreenWebpage.Args(arg))
-		}
+		override fun onWeiboTopicClick(arg: String) = gotoWebPage(arg)
+
+		override fun onWeiboAtClick(arg: String) = gotoWebPage(arg)
 
 		override fun onWeiboPicClick(pics: List<Picture>, current: Int) {
 			navigate(ScreenImagePreview.Args(pics, current))

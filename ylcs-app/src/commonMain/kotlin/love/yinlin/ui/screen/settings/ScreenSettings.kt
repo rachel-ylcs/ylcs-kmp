@@ -80,7 +80,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	)
 
 	private suspend fun pickPicture(aspectRatio: Float): Path? {
-		return PicturePicker.pick()?.use { source ->
+		return Picker.pickPicture()?.use { source ->
 			OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
 		}?.let { path ->
 			cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->

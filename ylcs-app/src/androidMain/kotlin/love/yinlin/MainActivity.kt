@@ -1,9 +1,11 @@
 package love.yinlin
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.ViewModelProvider
 import love.yinlin.platform.appNative
 
 class MainActivity : ComponentActivity() {
@@ -16,5 +18,13 @@ class MainActivity : ComponentActivity() {
                 App()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        try {
+            DeepLink(ViewModelProvider(this)[AppModel::class.java]).process(intent)
+        }
+        catch (_: Throwable) { }
     }
 }

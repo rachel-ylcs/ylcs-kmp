@@ -135,12 +135,11 @@ private fun UserAlbumItem(
 }
 
 @Stable
-class ScreenWeiboUser(model: AppModel, args: Args) : Screen<ScreenWeiboUser.Args>(model) {
+class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWeiboUser.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val id: String) : Screen.Args
 
-	private val id = args.id
 	private val grid = WeiboGridData()
 	private var user: WeiboUser? by mutableStateOf(null)
 	private var albums: List<WeiboAlbum>? by mutableStateOf(null)
@@ -283,14 +282,14 @@ class ScreenWeiboUser(model: AppModel, args: Args) : Screen<ScreenWeiboUser.Args
 
 	override suspend fun initialize() {
 		launch {
-			val data = WeiboAPI.getWeiboUser(id)
+			val data = WeiboAPI.getWeiboUser(args.id)
 			user = if (data is Data.Success) data.data else null
 			user?.let {
 				grid.requestWeibo(listOf(it.info.id))
 			}
 		}
 		launch {
-			val data = WeiboAPI.getWeiboUserAlbum(id)
+			val data = WeiboAPI.getWeiboUserAlbum(args.id)
 			albums = if (data is Data.Success) data.data else null
 		}
 	}

@@ -7,6 +7,7 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import love.yinlin.common.ArrayBufferSource
+import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import org.khronos.webgl.ArrayBuffer
@@ -21,63 +22,84 @@ import org.w3c.files.FileList
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private fun htmlFileInput(
-    multiple: Boolean,
-    filter: String,
-    block: (FileList?) -> Unit
-) {
-    val input = document.createElement("input") as HTMLInputElement
-    input.type = "file"
-    input.multiple = multiple
-    input.accept = filter
-    input.onchange = { block(input.files) }
-    input.click()
-}
+actual object Picker {
+    private fun htmlFileInput(
+        multiple: Boolean,
+        filter: String,
+        block: (FileList?) -> Unit
+    ) {
+        val input = document.createElement("input") as HTMLInputElement
+        input.type = "file"
+        input.multiple = multiple
+        input.accept = filter
+        input.onchange = { block(input.files) }
+        input.click()
+    }
 
-actual object PicturePicker {
-    actual suspend fun pick(): Source? = suspendCoroutine { continuation ->
+    private fun openFileUpLoadWorker(files: FileList?, block: (JsAny?) -> Unit) {
+        val worker = Worker("js/worker/FileUpload.js")
+        worker.onmessage = { event -> block(event.data) }
+        worker.postMessage(files)
+    }
+
+    actual suspend fun pickPicture(): Source? = suspendCoroutine { continuation ->
         continuation.safeResume {
-            htmlFileInput(multiple = false, filter = "image/*") { files ->
+            htmlFileInput(multiple = false, filter = MimeType.IMAGE) { files ->
                 continuation.safeResume {
-                    val worker = Worker("js/worker/FileUpload.js")
-                    worker.onmessage = { event ->
+                    openFileUpLoadWorker(files) { data ->
                         continuation.safeResume {
-                            val buffer = ((event.data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
+                            val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
                             continuation.resume(ArrayBufferSource(buffer).buffered())
                         }
                     }
-                    worker.postMessage(files)
                 }
             }
         }
     }
 
-    actual suspend fun pick(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
         continuation.safeResume {
             require(maxNum > 0)
-            htmlFileInput(multiple = true, filter = "image/*") { files ->
+            htmlFileInput(multiple = true, filter = MimeType.IMAGE) { files ->
                 continuation.safeResume {
-                    val worker = Worker("js/worker/FileUpload.js")
-                    worker.onmessage = { event ->
-                        continuation.resume((event.data as? JsArray<*>)?.toList()?.safeToSources {
-                            (it as? ArrayBuffer)?.let { buffer -> ArrayBufferSource(buffer).buffered() }
-                        })
+                    openFileUpLoadWorker(files) { data ->
+                        continuation.safeResume {
+                            continuation.resume((data as? JsArray<*>)?.toList()?.safeToSources {
+                                (it as? ArrayBuffer)?.let { buffer -> ArrayBufferSource(buffer).buffered() }
+                            })
+                        }
                     }
-                    worker.postMessage(files)
                 }
             }
         }
     }
 
-    actual suspend fun prepareSave(filename: String): Pair<Any, Sink>? {
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
+        continuation.safeResume {
+            htmlFileInput(multiple = false, filter = mimeType.joinToString(",")) { files ->
+                continuation.safeResume {
+                    openFileUpLoadWorker(files) { data ->
+                        continuation.safeResume {
+                            val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
+                            continuation.resume(ArrayBufferSource(buffer).buffered())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = unsupportedPlatform()
+
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()
         return buffer to buffer
     }
 
-    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
+    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) {
         val blob = Coroutines.io {
             val bytes = (origin as Buffer).readBytes()
-            Blob(listOf(bytes.toInt8Array()).toJsArray(), BlobPropertyBag(type = "*/*"))
+            Blob(listOf(bytes.toInt8Array()).toJsArray(), BlobPropertyBag(type = MimeType.ANY))
         }
         val url = URL.createObjectURL(blob)
         val link = document.createElement("a") as HTMLAnchorElement
@@ -86,5 +108,5 @@ actual object PicturePicker {
         link.click()
     }
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) = Unit
+    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) = Unit
 }
