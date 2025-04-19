@@ -129,6 +129,12 @@ object ModFactory {
         source: Source,
         private val savePath: Path
     ): BaseRelease(source) {
+        @Stable
+        data class ReleaseResult(
+            val metadata: ModMetadata,
+            val medias: List<String>
+        )
+
         private suspend fun Source.readResource(mediaPath: Path) = Coroutines.io {
             val resType = readInt() // 读资源类型
             require(MusicResourceType.fromInt(resType) != null) { "不支持的资源类型 $resType" }
@@ -159,15 +165,17 @@ object ModFactory {
             id
         }
 
-        suspend fun process(onProcess: (Int, Int, String) -> Unit): Data<ModMetadata> = try {
+        suspend fun process(onProcess: (Int, Int, String) -> Unit): Data<ReleaseResult> = try {
             val metadata = source.readMetadata()
+            val ids = mutableListOf<String>()
             repeat(metadata.mediaNum) { index ->
                 val id = source.readMedia()
+                ids += id
                 Coroutines.main {
                     onProcess(index, metadata.mediaNum, id)
                 }
             }
-            Data.Success(metadata)
+            Data.Success(ReleaseResult(metadata, ids))
         } catch (e: Throwable) {
             Data.Error(throwable = e)
         }
@@ -190,7 +198,7 @@ object ModFactory {
         )
 
         @Stable
-        data class PreviewItem(
+        data class PreviewResult(
             val metadata: ModMetadata,
             val medias: List<MediaItem>
         )
@@ -229,13 +237,13 @@ object ModFactory {
             MediaItem(id, mainConfig, resources)
         }
 
-        suspend fun process(): Data<PreviewItem> = try {
+        suspend fun process(): Data<PreviewResult> = try {
             val metadata = source.readMetadata()
             val medias = mutableListOf<MediaItem>()
             repeat(metadata.mediaNum) { index ->
                 medias += source.previewMedia()
             }
-            Data.Success(PreviewItem(metadata, medias))
+            Data.Success(PreviewResult(metadata, medias))
         } catch (e: Throwable) {
             Data.Error(throwable = e)
         }

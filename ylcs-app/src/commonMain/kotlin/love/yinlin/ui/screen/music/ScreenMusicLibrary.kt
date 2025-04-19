@@ -123,7 +123,6 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
 
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
-        private set
 
     private val searchDialog = DialogInput(
         hint = "歌曲名",
@@ -248,7 +247,11 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                 }
                 else {
                     Action(Icons.Outlined.Add) {
-                        navigate(ScreenImportMusic.Args(null))
+                        if (app.musicFactory.isReady) slot.tip.warning("导入MOD需要先停止播放器")
+                        else {
+                            pop()
+                            navigate(ScreenImportMusic.Args(null))
+                        }
                     }
                     ActionSuspend(if (isSearching) Icons.Outlined.Close else Icons.Outlined.Search) {
                         if (isSearching) closeSearch()

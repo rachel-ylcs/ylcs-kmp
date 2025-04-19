@@ -6,31 +6,37 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Preview
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.ktor.utils.io.core.readText
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
+import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.parseJsonValue
 import love.yinlin.mod.ModFactory
-import love.yinlin.platform.ImplicitPath
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.UnsupportedPlatformText
+import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.LoadingAnimation
+import love.yinlin.ui.component.platform.DragFlag
+import love.yinlin.ui.component.platform.DropResult
+import love.yinlin.ui.component.platform.dragAndDrop
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
@@ -49,7 +55,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
         @Stable
         data class Prepare(val path: ImplicitPath) : Step
         @Stable
-        data class Preview(val path: ImplicitPath, val preview: ModFactory.Preview.PreviewItem?) : Step
+        data class Preview(val path: ImplicitPath, val preview: ModFactory.Preview.PreviewResult?) : Step
         @Stable
         data class Processing(val message: String) : Step
     }
@@ -99,6 +105,20 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
         }
         when (data) {
             is Data.Success -> {
+                val musicLibrary = app.musicFactory.musicLibrary
+                for (id in data.data.medias) {
+                    val modifierCount = musicLibrary[id]?.modifier ?: 0
+                    val info = Coroutines.io {
+                        try {
+                            val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.defaultFilename)
+                            SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                        }
+                        catch (_: Throwable) {
+                            null
+                        }
+                    }
+                    if (info != null) musicLibrary[id] = info.copy(modifier = modifierCount + 1)
+                }
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }
@@ -108,7 +128,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
 
     @Composable
     private fun PreviewList(
-        preview: ModFactory.Preview.PreviewItem,
+        preview: ModFactory.Preview.PreviewResult,
         modifier: Modifier = Modifier
     ) {
         LazyColumn(
@@ -241,7 +261,17 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
             slot = slot
         ) {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().dragAndDrop(
+                    enabled = step is Step.Initial || step is Step.Prepare,
+                    flag = DragFlag.FILE,
+                    onDrop = {
+                        val files = (it as? DropResult.File)?.path
+                        if (files != null) {
+                            if (files.size == 1) step = Step.Prepare(NormalPath(files[0].toString()))
+                            else slot.tip.warning("最多一次只能导入一个MOD")
+                        }
+                    }
+                ),
                 contentAlignment = Alignment.Center
             ) {
                 when (val currentStep = step) {

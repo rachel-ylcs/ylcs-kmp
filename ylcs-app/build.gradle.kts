@@ -122,6 +122,13 @@ kotlin {
             }
         }
 
+        val nonDesktopMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
+        }
+
         val appleMain = appleMain.get().apply {
             dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
@@ -141,6 +148,7 @@ kotlin {
 
         androidMain.get().apply {
             dependsOn(jvmMain)
+            dependsOn(nonDesktopMain)
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.kotlinx.coroutines.android)
@@ -212,6 +220,7 @@ kotlin {
 
         iosArm64Main.get().apply {
             dependsOn(appleMain)
+            dependsOn(nonDesktopMain)
             dependencies {
 
             }
@@ -219,6 +228,7 @@ kotlin {
 
         wasmJsMain.get().apply {
             dependsOn(nonAndroidMain)
+            dependsOn(nonDesktopMain)
             dependencies {
                 implementation(libs.ktor.js)
             }

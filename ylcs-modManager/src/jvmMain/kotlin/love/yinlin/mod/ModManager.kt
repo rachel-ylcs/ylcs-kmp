@@ -103,16 +103,14 @@ private fun DragTextField(
             shouldStartDragAndDrop = {
                 it.awtTransferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
             },
-            target = remember {
-                object : DragAndDropTarget {
-                    override fun onDrop(event: DragAndDropEvent): Boolean {
-                        val list = event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                        val newValue = list.map { (it as File).toString() }.fastJoinToString("\n")
-                        onValueChange(newValue)
-                        return true
-                    }
+            target = remember { object : DragAndDropTarget {
+                override fun onDrop(event: DragAndDropEvent): Boolean {
+                    val list = event.awtTransferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                    val newValue = list.map { (it as File).toString() }.fastJoinToString("\n")
+                    onValueChange(newValue)
+                    return true
                 }
-            }
+            } }
         )
     )
 }
@@ -290,7 +288,7 @@ private fun ReleaseUI(
 
 @Composable
 private fun ModPreview(
-    preview: ModFactory.Preview.PreviewItem,
+    preview: ModFactory.Preview.PreviewResult,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -378,7 +376,7 @@ private fun PreviewUI(
     val scope = rememberCoroutineScope()
     var status: Status by remember { mutableStateOf(Status.Idle) }
     var input by remember { mutableStateOf("") }
-    var preview: ModFactory.Preview.PreviewItem? by remember { mutableStateOf(null) }
+    var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null) }
 
     val reset = {
         status = Status.Idle
