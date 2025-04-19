@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.itemKey
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
@@ -135,7 +137,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            item(-1) {
+            item("metadata".itemKey) {
                 val metadata = preview.metadata
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -256,6 +258,11 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                         }
                     }
                     is Step.Processing -> {}
+                }
+            },
+            leftActions = {
+                Action(Icons.Outlined.Extension) {
+
                 }
             },
             slot = slot

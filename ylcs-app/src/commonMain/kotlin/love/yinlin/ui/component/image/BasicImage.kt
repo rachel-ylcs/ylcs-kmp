@@ -28,6 +28,8 @@ import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.condition
@@ -259,6 +261,11 @@ private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = reme
 }
 
 @Composable
+private fun rememberLocalFileImageKeyUrl(path: Path): String = remember(path) {
+	"$path?_cacheKey=${SystemFileSystem.metadataOrNull(path)?.size}"
+}
+
+@Composable
 fun rememberWebImageState(
 	quality: ImageQuality,
 	placeholder: DrawableResource? = null,
@@ -292,6 +299,31 @@ fun WebImage(
 ) {
 	AsyncImage(
 		uri = rememberWebImageKeyUrl(uri, key),
+		contentDescription = null,
+		state = state,
+		alignment = alignment,
+		contentScale = contentScale,
+		filterQuality = quality.filterQuality,
+		alpha = alpha,
+		modifier = modifier.condition(circle) { clip(CircleShape) }
+			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+	)
+}
+
+@Composable
+fun LocalFileImage(
+	path: Path,
+	modifier: Modifier = Modifier,
+	circle: Boolean = false,
+	quality: ImageQuality = ImageQuality.Medium,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
+	alpha: Float = 1f,
+	state: AsyncImageState = rememberWebImageState(quality, null, true),
+	onClick: (() -> Unit)? = null
+) {
+	AsyncImage(
+		uri = rememberLocalFileImageKeyUrl(path),
 		contentDescription = null,
 		state = state,
 		alignment = alignment,

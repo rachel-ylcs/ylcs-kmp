@@ -126,11 +126,15 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 					RachelText(
 						text = topic.commentNum.toString(),
 						icon = Icons.AutoMirrored.Outlined.Comment,
+						style = MaterialTheme.typography.bodyMedium,
+						padding = PaddingValues(0.dp),
 						modifier = Modifier.weight(1f)
 					)
 					RachelText(
 						text = topic.coinNum.toString(),
 						icon = Icons.Outlined.Paid,
+						style = MaterialTheme.typography.bodyMedium,
+						padding = PaddingValues(0.dp),
 						modifier = Modifier.weight(1f)
 					)
 				}

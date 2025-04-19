@@ -1,11 +1,7 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import io.ktor.utils.io.core.readText
+import androidx.compose.runtime.*
+import io.ktor.utils.io.core.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -14,17 +10,6 @@ import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.parseJsonValue
-
-@Stable
-val MusicInfo.path get(): Path = Path(OS.Storage.musicPath, this.id)
-@Stable
-val MusicInfo.audioPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.defaultFilename)
-@Stable
-val MusicInfo.recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
-@Stable
-val MusicInfo.backgroundPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.defaultFilename)
-@Stable
-val MusicInfo.lyricsPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.defaultFilename)
 
 @Stable
 abstract class MusicFactory {
@@ -52,9 +37,11 @@ abstract class MusicFactory {
     abstract suspend fun stop()
     abstract suspend fun gotoPrevious()
     abstract suspend fun gotoNext()
+    abstract suspend fun gotoIndex(index: Int)
     abstract suspend fun seekTo(position: Long)
     abstract suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?)
     abstract suspend fun addMedia(media: MusicInfo)
+    abstract suspend fun addMedias(medias: List<MusicInfo>)
     abstract suspend fun removeMedia(index: Int)
     abstract suspend fun moveMedia(start: Int, end: Int)
 

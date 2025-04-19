@@ -26,6 +26,8 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
+import love.yinlin.ui.screen.music.audioPath
+import love.yinlin.ui.screen.music.recordPath
 import java.io.File
 
 private fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
@@ -253,11 +255,20 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override suspend fun stop() = withMainPlayer { it.stop() }
     override suspend fun gotoPrevious() = withMainPlayer { it.seekToPreviousMediaItem() }
     override suspend fun gotoNext() = withMainPlayer { it.seekToNextMediaItem() }
+    override suspend fun gotoIndex(index: Int) = withMainPlayer { player ->
+        if (index != -1 && player.currentMediaItemIndex != index) {
+            player.seekTo(index, 0L)
+            if (!player.isPlaying) player.play()
+        }
+    }
     override suspend fun seekTo(position: Long) = withMainPlayer { it.seekTo(position) }
     override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) = withMainPlayer { player ->
         player.setMediaItems(medias.map { it.asMediaItem }, startIndex ?: C.INDEX_UNSET, C.TIME_UNSET)
     }
     override suspend fun addMedia(media: MusicInfo) = withMainPlayer { it.addMediaItem(media.asMediaItem) }
+    override suspend fun addMedias(medias: List<MusicInfo>) = withMainPlayer { player ->
+        player.addMediaItems(medias.map { it.asMediaItem })
+    }
     override suspend fun removeMedia(index: Int) = withMainPlayer { it.removeMediaItem(index)  }
     override suspend fun moveMedia(start: Int, end: Int) = withMainPlayer { it.moveMediaItem(start, end) }
 }

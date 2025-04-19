@@ -28,12 +28,10 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.platform.path
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.screen.DialogDynamicChoice
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
@@ -60,12 +58,6 @@ private fun MusicCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val recordUri by rememberState(musicInfo) {
-        // 因为 KMP 文件系统太烂了, 并没有支持到文件修改时间的读取, 这里临时使用文件大小来标识修改标记
-        val metadata = SystemFileSystem.metadataOrNull(musicInfo.recordPath)
-        "${musicInfo.recordPath}?recordKey=${metadata?.size}"
-    }
-
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
@@ -80,8 +72,8 @@ private fun MusicCard(
                 onClick = onClick
             ),
         ) {
-            WebImage(
-                uri = recordUri,
+            LocalFileImage(
+                path = musicInfo.recordPath,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.weight(3f).aspectRatio(1f)
             )
@@ -159,13 +151,11 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     }
 
     private fun onCardClick(index: Int) {
+        val item = library[index]
         if (isManaging) {
-            val item = library[index]
             library[index] = item.copy(selected = !item.selected)
         }
-        else {
-
-        }
+        else navigate(ScreenMusicDetails.Args(item.id))
     }
 
     private fun onCardLongClick(index: Int) {
@@ -181,7 +171,6 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                 val playlist = playlistLibrary[name]
                 if (playlist != null) {
                     val addItems = selectIdList
-                    exitManagement()
                     val oldItems = playlist.items
                     val newItems = mutableListOf<String>()
                     for (item in addItems) {
@@ -191,10 +180,17 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                     }
                     if (newItems.isNotEmpty()) {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
-                        // TODO: 检查是否在播放列表中
+                        // 添加到当前播放的列表
+                        val musicFactory = app.musicFactory
+                        if (musicFactory.currentPlaylist?.name == name) {
+                            musicFactory.addMedias(newItems
+                                .filter { id -> musicFactory.musicList.find { it.id == id } == null }
+                                .mapNotNull { musicFactory.musicLibrary[it] })
+                        }
                         slot.tip.success("已添加${newItems.size}首歌曲")
                     }
                     else slot.tip.warning("歌曲均已存在于歌单中")
+                    exitManagement()
                 }
             }
         }
@@ -202,16 +198,15 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     }
 
     private suspend fun onMusicDelete() {
-        if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
+        val musicFactory = app.musicFactory
+        if (musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
+        else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
-            exitManagement()
-            // TODO: 检查是否在播放列表中
             for (item in deleteItems) {
                 val removeItem = app.musicFactory.musicLibrary.remove(item)
-                if (removeItem != null) {
-                    SystemFileSystem.deleteRecursively(removeItem.path)
-                }
+                if (removeItem != null) SystemFileSystem.deleteRecursively(removeItem.path)
             }
+            exitManagement()
         }
     }
 
@@ -247,7 +242,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                 }
                 else {
                     Action(Icons.Outlined.Add) {
-                        if (app.musicFactory.isReady) slot.tip.warning("导入MOD需要先停止播放器")
+                        if (app.musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
                         else {
                             pop()
                             navigate(ScreenImportMusic.Args(null))

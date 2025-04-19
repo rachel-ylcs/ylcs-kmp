@@ -40,7 +40,7 @@ private fun LyricsLrcLine(
     isCurrent: Boolean,
     offset: Int
 ) {
-    val fontSize = MaterialTheme.typography.headlineMedium.fontSize / (offset / 30f + if (isCurrent) 0.9f else 1f)
+    val fontSize = MaterialTheme.typography.headlineMedium.fontSize / (offset / 30f + 1f)
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
     val brush = if (isCurrent) Brush.horizontalGradient(ThemeColor.primaryGradient) else null
     val alpha = 3 / (offset + 3f)
@@ -164,5 +164,24 @@ class LyricsLrc : LyricsEngine {
                 }
             }
         }
+    }
+
+    companion object {
+        suspend fun parseLrcPlainText(source: String): String = try {
+            Coroutines.cpu {
+                val pattern = "\\[(\\d{2}):(\\d{2}).(\\d{2,3})](.*)".toRegex()
+                val items = source.split("\\r?\\n".toRegex())
+                buildString {
+                    for (item in items) {
+                        val line = item.trim()
+                        if (line.isEmpty()) continue
+                        val text = pattern.find(line)!!.groups[4]!!.value.trim()
+                        if (text.isNotEmpty()) appendLine(text)
+                    }
+                    if (isNotEmpty()) deleteAt(length - 1)
+                }
+            }
+        }
+        catch (_: Throwable) { "" }
     }
 }

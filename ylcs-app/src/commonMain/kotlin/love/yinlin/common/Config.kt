@@ -14,6 +14,7 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toMutableStateMap
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
@@ -130,6 +131,8 @@ class KVConfig(private val kv: KV) {
 
 		operator fun get(key: K): V? = state[key]
 
+		fun toMap(): Map<K, V> = state
+
 		inline fun <R> map(transform: (K, V) -> R): List<R> = items.map { transform(it.key, it.value) }
 
 		operator fun iterator(): Iterator<Map.Entry<K, V>> = state.iterator()
@@ -156,6 +159,8 @@ class KVConfig(private val kv: KV) {
 				save()
 			}
 		}
+
+		fun replaceAll(items: Map<K, V>) = state.replaceAll(items)
 	}
 
 	@Stable

@@ -161,7 +161,10 @@ private fun CalendarDayGrid(
 			userScrollEnabled = false,
 			modifier = Modifier.fillMaxWidth()
 		) {
-			items(42) { dayIndex ->
+			items(
+				count = 42,
+				key = { it }
+			) { dayIndex ->
 				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
 				val eventTitle = events[date]
 				val color = when {

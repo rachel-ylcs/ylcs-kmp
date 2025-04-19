@@ -6,11 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,35 +33,70 @@ import androidx.compose.ui.zIndex
 import dev.chrisbanes.haze.*
 import io.ktor.utils.io.*
 import kotlinx.io.buffered
+import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.ThemeColor
+import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
-import love.yinlin.platform.backgroundPath
-import love.yinlin.platform.lyricsPath
-import love.yinlin.platform.recordPath
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_music_record
 import love.yinlin.resources.no_audio_source
 import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.component.layout.equalItem
 import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.CommonSheetState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
+
+@Composable
+private fun PlayingMusicStatusCard(
+	musicInfo: MusicInfo,
+	isCurrent: Boolean,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		modifier = modifier.clickable {
+			if (!isCurrent) onClick()
+		}.padding(horizontal = 15.dp, vertical = 10.dp),
+		horizontalArrangement = Arrangement.spacedBy(10.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Text(
+			text = musicInfo.name,
+			style = MaterialTheme.typography.titleMedium,
+			color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+			maxLines = 1,
+			overflow = TextOverflow.MiddleEllipsis,
+			modifier = Modifier.weight(1f)
+		)
+		Text(
+			text = musicInfo.singer,
+			style = MaterialTheme.typography.bodyMedium,
+			maxLines = 1,
+			overflow = TextOverflow.MiddleEllipsis,
+			color = ThemeColor.fade
+		)
+	}
+}
 
 @Stable
 class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
@@ -67,6 +105,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var lyrics = LyricsLrc()
 
 	private val blurState = HazeState()
+
+	private val currentPlaylistSheet = CommonSheetState()
 
 	@Composable
 	private fun ToolLayout(modifier: Modifier = Modifier) {
@@ -84,9 +124,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			},
 			right = {
-				Action(Icons.Outlined.Extension) {
-
-				}
 				Action(Icons.Outlined.AlarmOn) {
 
 				}
@@ -96,7 +133,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicRecord(
-		uri: String,
+		path: Path,
 		modifier: Modifier = Modifier
 	) {
 		var lastDegree by rememberState { 0f }
@@ -120,8 +157,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			}
 		}
 
-		WebImage(
-			uri = uri,
+		LocalFileImage(
+			path = path,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = modifier.rotate(degrees = animation.value)
@@ -130,7 +167,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicRecordLayout(
-		recordPath: String?,
+		recordPath: Path?,
 		modifier: Modifier = Modifier
 	) {
 		OffsetLayout(y = (-50).dp) {
@@ -145,7 +182,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 				recordPath?.let {
 					MusicRecord(
-						uri = it,
+						path = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f).zIndex(2f)
 					)
 				}
@@ -187,7 +224,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			horizontalArrangement = Arrangement.spacedBy(20.dp)
 		) {
 			MusicRecordLayout(
-				recordPath = factory.currentMusic?.recordPath?.toString(),
+				recordPath = factory.currentMusic?.recordPath,
 				modifier = Modifier.size(100.dp).shadow(elevation = 5.dp, clip = false, shape = CircleShape)
 			)
 			MusicTitleLayout(
@@ -240,9 +277,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						interactionSource = null,
 						indication = null,
 						onClick = {
-							launch {
-								factory.seekTo(hotpot)
-							}
+							launch { factory.seekTo(hotpot) }
 						}
 					)
 					.padding(horizontal = 3.dp)
@@ -274,9 +309,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				.pointerInput(duration, maxWidth) {
 					detectTapGestures(onTap = { offset ->
 						if (duration != 0L) {
-							launch {
-								factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
-							}
+							launch { factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong()) }
 						}
 					})
 				}
@@ -294,9 +327,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.pointerInput(duration, maxWidth) {
 						detectTapGestures(onTap = { offset ->
 							if (duration != 0L) {
-								launch {
-									factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
-								}
+								launch { factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong()) }
 							}
 						})
 					}
@@ -350,9 +381,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
                         MusicPlayMode.RANDOM -> ExtraIcons.ShuffleMode
                     },
 					onClick = {
-						launch {
-							factory.switchPlayMode()
-						}
+						launch { factory.switchPlayMode() }
 					}
 				)
 			}
@@ -360,9 +389,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				ClickIcon(
 					icon = ExtraIcons.GotoPrevious,
 					onClick = {
-						launch {
-							factory.gotoPrevious()
-						}
+						launch { factory.gotoPrevious() }
 					}
 				)
 			}
@@ -381,16 +408,16 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				ClickIcon(
 					icon = ExtraIcons.GotoNext,
 					onClick = {
-						launch {
-							factory.gotoNext()
-						}
+						launch { factory.gotoNext() }
 					}
 				)
 			}
 			equalItem {
 				ClickIcon(
 					icon = ExtraIcons.Playlist,
-					onClick = {}
+					onClick = {
+						if (factory.isReady) currentPlaylistSheet.open()
+					}
 				)
 			}
 		}
@@ -488,6 +515,58 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
+	private fun CurrentPlaylistLayout() {
+		val isEmptyList by rememberDerivedState { factory.musicList.isEmpty() }
+
+		LaunchedEffect(isEmptyList) {
+			if (isEmptyList) currentPlaylistSheet.hide()
+		}
+
+		BottomSheet(state = currentPlaylistSheet) {
+			Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.6f)) {
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 10.dp, bottom = 10.dp),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(
+						text = factory.currentPlaylist?.name ?: "",
+						style = MaterialTheme.typography.titleLarge,
+						color = MaterialTheme.colorScheme.primary,
+						modifier = Modifier.weight(1f)
+					)
+					ClickIcon(
+						icon = Icons.Outlined.StopCircle,
+						onClick = {
+							currentPlaylistSheet.hide()
+							launch { factory.stop() }
+						}
+					)
+				}
+				HorizontalDivider(modifier = Modifier.height(1.dp))
+
+				val currentId by derivedStateOf { factory.currentMusic?.id }
+				LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+					items(
+						items = factory.musicList,
+						key = { it.id }
+					) { musicInfo ->
+						PlayingMusicStatusCard(
+							musicInfo = musicInfo,
+							isCurrent = musicInfo.id == currentId,
+							onClick = {
+								currentPlaylistSheet.hide()
+								launch { factory.gotoIndex(factory.musicList.indexOfFirst { it.id == musicInfo.id }) }
+							},
+							modifier = Modifier.fillMaxWidth()
+						)
+					}
+				}
+			}
+		}
+	}
+
+	@Composable
 	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
 			Box(modifier = Modifier
@@ -496,12 +575,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				.hazeSource(state = blurState)
 				.zIndex(1f)
 			) {
-				factory.currentMusic?.backgroundPath?.toString()?.let { uri ->
-					WebImage(
-						uri = uri,
+				factory.currentMusic?.backgroundPath?.let { path ->
+					LocalFileImage(
+						path = path,
 						quality = ImageQuality.Full,
 						contentScale = ContentScale.Crop,
-						alpha = 0.7f,
+						alpha = if (app.isDarkMode) 0.9f else 0.7f,
 						modifier = Modifier.fillMaxSize()
 					)
 				}
@@ -516,7 +595,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						style = HazeStyle(
 							blurRadius = 15.dp,
 							backgroundColor = MaterialTheme.colorScheme.background,
-							tint = HazeTint(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+							tint = null,
 						)
 					)
 					.padding(10.dp)
@@ -533,7 +612,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						style = HazeStyle(
 							blurRadius = 10.dp,
 							backgroundColor = MaterialTheme.colorScheme.background,
-							tint = HazeTint(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+							tint = null,
 						)
 					)
 					.padding(10.dp)
@@ -565,5 +644,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	override fun content() {
 		if (app.isPortrait) Portrait()
 		else Landscape()
+
+		currentPlaylistSheet.withOpen {
+			CurrentPlaylistLayout()
+		}
 	}
 }

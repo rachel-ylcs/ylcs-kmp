@@ -15,9 +15,9 @@ object Local {
 		const val DEVELOPMENT: Boolean = true
 		const val WITH_SERVER: Boolean = false
 
-		// < ------  始终浅色模式  ------ >
-		// 开启后无视主题设置始终保持浅色
-		const val ALWAYS_LIGHT_MODE = false
+		// < ------  始终深色模式  ------ >
+		// 开启后无视主题设置始终保持深色
+		const val ALWAYS_DARK_MODE = false
 
 		// 桌面端配置
 		object Desktop {

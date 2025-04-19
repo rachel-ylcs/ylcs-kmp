@@ -109,17 +109,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		launch { pagerState.scrollToPage(index) }
 	}
 
-	fun onRefresh() {
+	suspend fun onRefresh() {
 		when (pagerState.currentPage) {
-			MsgTabItem.WEIBO.ordinal -> launch {
-				weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
-			}
-			MsgTabItem.CHAOHUA.ordinal -> launch {
-				chaohuaState.requestNewData()
-			}
-			MsgTabItem.PICTURES.ordinal -> {
-
-			}
+			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
+			MsgTabItem.PICTURES.ordinal -> {}
 		}
 	}
 
@@ -174,7 +168,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
 					ActionScope.Right.Actions {
-						Action(Icons.Outlined.Refresh) {
+						ActionSuspend(Icons.Outlined.Refresh) {
 							onRefresh()
 						}
 						Action(Icons.Filled.AccountCircle) {

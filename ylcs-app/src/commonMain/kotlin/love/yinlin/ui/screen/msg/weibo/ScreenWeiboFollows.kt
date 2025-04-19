@@ -112,11 +112,11 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 			title = if (isLocal) "微博关注" else "搜索结果",
 			onBack = { pop() },
 			actions = {
-				Action(Icons.Outlined.Search) {
-					launch { onSearchWeiboUser() }
+				ActionSuspend(Icons.Outlined.Search) {
+					onSearchWeiboUser()
 				}
-				Action(Icons.Outlined.Refresh) {
-					launch { refreshLocalUser() }
+				ActionSuspend(Icons.Outlined.Refresh) {
+					refreshLocalUser()
 				}
 			},
 			slot = slot

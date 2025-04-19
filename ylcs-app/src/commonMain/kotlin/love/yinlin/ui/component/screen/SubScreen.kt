@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
@@ -81,6 +82,7 @@ fun SubScreen(
 	title: @Composable () -> Unit,
 	actions: @Composable (ActionScope.() -> Unit) = {},
 	bottomBar: @Composable () -> Unit = {},
+	leftActions: @Composable (ActionScope.() -> Unit) = {},
 	onBack: (() -> Unit)? = null,
 	slot: SubScreenSlot,
 	content: @Composable () -> Unit
@@ -98,12 +100,15 @@ fun SubScreen(
 					modifier = Modifier.fillMaxWidth(),
 					title = title,
 					navigationIcon = {
-						if (onBack != null) {
-							ClickIcon(
-								modifier = Modifier.padding(horizontal = 5.dp),
-								icon = Icons.AutoMirrored.Outlined.ArrowBack,
-								onClick = onBack
-							)
+						Row(verticalAlignment = Alignment.CenterVertically) {
+							if (onBack != null) {
+								ClickIcon(
+									modifier = Modifier.padding(horizontal = 5.dp),
+									icon = Icons.AutoMirrored.Outlined.ArrowBack,
+									onClick = onBack
+								)
+							}
+							ActionScope.Left.leftActions()
 						}
 					},
 					expandedHeight = 48.dp,
@@ -142,6 +147,7 @@ fun SubScreen(
 	title: String = "",
 	actions: @Composable (ActionScope.() -> Unit) = {},
 	bottomBar: @Composable () -> Unit = {},
+	leftActions: @Composable (ActionScope.() -> Unit) = {},
 	onBack: () -> Unit,
 	slot: SubScreenSlot,
 	content: @Composable () -> Unit
@@ -157,6 +163,7 @@ fun SubScreen(
 		},
 		actions = actions,
 		bottomBar = bottomBar,
+		leftActions = leftActions,
 		onBack = onBack,
 		slot = slot,
 		content = content

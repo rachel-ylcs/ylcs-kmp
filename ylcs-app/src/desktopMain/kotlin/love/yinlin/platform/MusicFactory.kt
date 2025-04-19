@@ -43,6 +43,10 @@ class ActualMusicFactory : MusicFactory() {
 
     }
 
+    override suspend fun gotoIndex(index: Int) {
+
+    }
+
     override suspend fun seekTo(position: Long) {
 
     }
@@ -52,6 +56,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override suspend fun addMedia(media: MusicInfo) {
+
+    }
+
+    override suspend fun addMedias(medias: List<MusicInfo>) {
 
     }
 

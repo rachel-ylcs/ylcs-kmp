@@ -31,6 +31,7 @@ fun ScreenRouteScope.screens() {
     screen { model -> ScreenMusicLibrary(model) }
     screen { model -> ScreenPlaylistLibrary(model) }
     screen { model, args: ScreenImportMusic.Args -> ScreenImportMusic(model, args) }
+    screen { model, args: ScreenMusicDetails.Args -> ScreenMusicDetails(model, args) }
 	// 社区
     screen { model -> ScreenLogin(model) }
     screen { model, args: ScreenUserCard.Args -> ScreenUserCard(model, args) }
