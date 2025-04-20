@@ -29,9 +29,9 @@ enum class InputType {
 }
 
 @Stable
-class TextInputState(str: String = "", isOverflow: Boolean = false) {
+class TextInputState(str: String = "") {
 	var text: String by mutableStateOf(str)
-	var overflow: Boolean by mutableStateOf(isOverflow)
+	var overflow: Boolean by mutableStateOf(false)
 
 	val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
 }

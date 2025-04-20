@@ -248,9 +248,15 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                             navigate(ScreenImportMusic.Args(null))
                         }
                     }
-                    ActionSuspend(if (isSearching) Icons.Outlined.Close else Icons.Outlined.Search) {
-                        if (isSearching) closeSearch()
-                        else openSearch()
+                    ActionSuspend(Icons.Outlined.Search) {
+                        openSearch()
+                    }
+                }
+            },
+            leftActions = {
+                if (isSearching) {
+                    Action(Icons.Outlined.Close) {
+                        closeSearch()
                     }
                 }
             },

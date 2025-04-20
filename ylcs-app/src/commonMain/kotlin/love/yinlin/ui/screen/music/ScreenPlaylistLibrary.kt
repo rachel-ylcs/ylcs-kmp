@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -29,9 +30,11 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.Object
 import love.yinlin.extension.moveItem
+import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.extension.toJsonString
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.Tree
 import love.yinlin.ui.component.image.ClickIcon
@@ -43,6 +46,8 @@ import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.component.screen.DialogChoice
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.Screen
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -322,14 +327,63 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     @Composable
     private fun CloudBackupLayout() {
         var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
+        val state = remember { TextInputState() }
 
         BottomSheet(state = cloudBackupSheet) {
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.6f)
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.8f).padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(text = "本地歌单", modifier = Modifier.padding(vertical = 5.dp))
+                TextInput(
+                    state = state,
+                    hint = "本地歌单(JSON格式)",
+                    maxLines = 6,
+                    clearButton = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    LoadingRachelButton(
+                        text = "导入",
+                        icon = Icons.Outlined.Download,
+                        enabled = state.ok,
+                        onClick = {
+                            if (!app.musicFactory.isReady) {
+                                if (slot.confirm.open(content = "导入会覆盖整个本地歌单且无法撤销!")) {
+                                    try {
+                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
+                                        playlistLibrary.replaceAll(items)
+                                        slot.tip.success("导入成功")
+                                    }
+                                    catch (_: Throwable) {
+                                        slot.tip.error("导入格式错误")
+                                    }
+                                }
+                            }
+                            else slot.tip.warning("恢复歌单需要先停止播放器")
+                        }
+                    )
+                    LoadingRachelButton(
+                        text = "导出",
+                        icon = Icons.Outlined.Upload,
+                        onClick = {
+                            try {
+                                state.text = playlistLibrary.items.toJsonString()
+                            }
+                            catch (e: Throwable) {
+                                slot.tip.error(e.message ?: "导出失败")
+                            }
+                        }
+                    )
+                }
+                HorizontalDivider(modifier = Modifier.height(1.dp))
+                Text(text = "云歌单", modifier = Modifier.padding(vertical = 5.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LoadingRachelButton(
@@ -341,12 +395,12 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                                     route = API.User.Backup.UploadPlaylist,
                                     data = API.User.Backup.UploadPlaylist.Request(
                                         token = app.config.userToken,
-                                        playlist = playlistLibrary.toMap().toJson().Object
+                                        playlist = playlistLibrary.items.toJson().Object
                                     )
                                 )
                                 when (result) {
                                     is Data.Success -> {
-                                        playlists = decodePlaylist(playlistLibrary.toMap())
+                                        playlists = decodePlaylist(playlistLibrary.items)
                                         slot.tip.success(result.message)
                                     }
                                     is Data.Error -> slot.tip.error(result.message)

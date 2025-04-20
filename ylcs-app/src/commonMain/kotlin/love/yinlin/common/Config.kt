@@ -106,6 +106,8 @@ class KVConfig(private val kv: KV) {
 			state -= item
 			save()
 		}
+
+		fun replaceAll(items: List<T>) = state.replaceAll(items)
 	}
 
 	@Stable
@@ -130,8 +132,6 @@ class KVConfig(private val kv: KV) {
 		}
 
 		operator fun get(key: K): V? = state[key]
-
-		fun toMap(): Map<K, V> = state
 
 		inline fun <R> map(transform: (K, V) -> R): List<R> = items.map { transform(it.key, it.value) }
 

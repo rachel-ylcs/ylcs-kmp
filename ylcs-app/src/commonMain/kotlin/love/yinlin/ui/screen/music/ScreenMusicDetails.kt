@@ -42,7 +42,6 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ExpandableLayout
@@ -218,79 +217,78 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
     }
 
     @Composable
-    private fun MusicMetadataLayout(
-        info: MusicInfo,
-        modifier: Modifier = Modifier
-    ) {
-        Surface(
-            modifier = modifier,
-            shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = 5.dp
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp)
+    private fun MusicMetadataLayout(modifier: Modifier = Modifier) {
+        musicInfo?.let { info ->
+            Surface(
+                modifier = modifier,
+                shape = MaterialTheme.shapes.extraLarge,
+                shadowElevation = 5.dp
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(5f),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        RachelText(
-                            text = info.name,
-                            icon = Icons.Outlined.MusicNote,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        RachelText(
-                            text = "ID: ${info.id}",
-                            icon = Icons.Outlined.Badge
-                        )
-                        RachelText(
-                            text = "来源: ${info.author}",
-                            icon = Icons.Outlined.Person
+                        Column(
+                            modifier = Modifier.weight(5f),
+                            verticalArrangement = Arrangement.spacedBy(5.dp)
+                        ) {
+                            RachelText(
+                                text = info.name,
+                                icon = Icons.Outlined.MusicNote,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            RachelText(
+                                text = "ID: ${info.id}",
+                                icon = Icons.Outlined.Badge
+                            )
+                            RachelText(
+                                text = "来源: ${info.author}",
+                                icon = Icons.Outlined.Person
+                            )
+                        }
+                        LocalFileImage(
+                            path = info.recordPath,
+                            quality = ImageQuality.Full,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
                         )
                     }
-                    LocalFileImage(
-                        path = info.recordPath,
-                        quality = ImageQuality.Full,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RachelText(
-                        text = "演唱: ${info.singer}",
-                        icon = ExtraIcons.Artist
-                    )
-                    RachelText(
-                        text = "作词: ${info.lyricist}",
-                        icon = Icons.Outlined.Lyrics
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RachelText(
-                        text = "作曲: ${info.composer}",
-                        icon = Icons.Outlined.Lyrics
-                    )
-                    RachelText(
-                        text = "专辑: ${info.album}",
-                        icon = Icons.Outlined.Album
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RachelText(
+                            text = "演唱: ${info.singer}",
+                            icon = ExtraIcons.Artist
+                        )
+                        RachelText(
+                            text = "作词: ${info.lyricist}",
+                            icon = Icons.Outlined.Lyrics
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RachelText(
+                            text = "作曲: ${info.composer}",
+                            icon = Icons.Outlined.Lyrics
+                        )
+                        RachelText(
+                            text = "专辑: ${info.album}",
+                            icon = Icons.Outlined.Album
+                        )
+                    }
                 }
             }
-        }
+        } ?: Box(modifier = modifier) { EmptyBox() }
     }
 
     @Composable
@@ -456,17 +454,27 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
     }
 
     @Composable
-    private fun Portrait(info: MusicInfo) {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-            MusicMetadataLayout(info = info, modifier = Modifier.fillMaxWidth().padding(10.dp))
+    private fun Portrait() {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+        ) {
+            MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
             MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
             MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
         }
     }
 
     @Composable
-    private fun Landscape(info: MusicInfo) {
-
+    private fun Landscape() {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.weight(2f).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+                MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+            }
+            Box(Modifier.weight(5f).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+            }
+        }
     }
 
     override suspend fun initialize() {
@@ -484,10 +492,8 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
             onBack = { pop() },
             slot = slot
         ) {
-            musicInfo?.let {
-                if (app.isPortrait) Portrait(info = it)
-                else Landscape(info = it)
-            } ?: EmptyBox()
+            if (app.isPortrait) Portrait()
+            else Landscape()
         }
     }
 }

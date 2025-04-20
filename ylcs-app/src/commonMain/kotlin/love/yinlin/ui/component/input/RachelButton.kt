@@ -184,7 +184,7 @@ fun LoadingRachelButton(
 			isLoading = isLoading,
 			text = text,
 			icon = icon,
-			color = color
+			color = if (enabled) color else ThemeColor.fade
 		)
 	}
 }
@@ -215,7 +215,7 @@ fun LoadingButton(
 			isLoading = isLoading,
 			text = text,
 			icon = icon,
-			color = LocalContentColor.current
+			color = if (enabled) LocalContentColor.current else ThemeColor.fade
 		)
 	}
 }

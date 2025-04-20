@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -58,7 +59,7 @@ fun <T> BottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = { state.hide() },
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.extraLarge.copy(bottomStart = CornerSize(0), bottomEnd = CornerSize(0)),
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 1.dp,
         dragHandle = {
