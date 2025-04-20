@@ -3,38 +3,38 @@ package love.yinlin.ui.screen.music
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.io.files.Path
 import love.yinlin.common.Colors
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.platform.OS
 
 @Stable
-val MusicInfo.path get(): Path = Path(OS.Storage.musicPath, this.id)
+val MusicInfo.path: Path get() = Path(OS.Storage.musicPath, this.id)
 @Stable
-val MusicInfo.audioPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.defaultFilename)
+val MusicInfo.audioPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.default.toString())
 @Stable
-val MusicInfo.recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
+val MusicInfo.recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
 @Stable
-val MusicInfo.backgroundPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.defaultFilename)
+val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.default.toString())
 @Stable
-val MusicInfo.lyricsPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.defaultFilename)
+val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
 
-@Stable
-val MusicResourceType.background get(): Color = when (this) {
-    MusicResourceType.Config -> Colors.Yellow5
-    MusicResourceType.Audio -> Colors.Pink4
-    MusicResourceType.Record -> Colors.Purple4
-    MusicResourceType.Background -> Colors.Blue4
-    MusicResourceType.Animation -> Colors.Orange4
-    MusicResourceType.LineLyrics -> Colors.Green6
-    MusicResourceType.Video -> Colors.Green4
+val MusicResourceType?.background: Brush get() = when (this) {
+    MusicResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
+    MusicResourceType.Audio -> Brush.linearGradient(listOf(Colors.Pink3, Colors.Pink4, Colors.Pink5))
+    MusicResourceType.Record -> Brush.linearGradient(listOf(Colors.Purple3, Colors.Purple4, Colors.Purple5))
+    MusicResourceType.Background -> Brush.linearGradient(listOf(Colors.Blue3, Colors.Blue4, Colors.Blue5))
+    MusicResourceType.Animation -> Brush.linearGradient(listOf(Colors.Orange3, Colors.Orange4, Colors.Orange5))
+    MusicResourceType.LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
+    MusicResourceType.Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
+    null -> Brush.linearGradient(listOf(Colors.Gray3, Colors.Gray4, Colors.Gray5))
 }
 
-@Stable
-val MusicResourceType.icon get(): ImageVector = when (this) {
+val MusicResourceType?.icon: ImageVector get() = when (this) {
     MusicResourceType.Config -> Icons.Outlined.Construction
     MusicResourceType.Audio -> Icons.Outlined.AudioFile
     MusicResourceType.Record -> Icons.Outlined.Album
@@ -42,36 +42,5 @@ val MusicResourceType.icon get(): ImageVector = when (this) {
     MusicResourceType.Animation -> Icons.Outlined.GifBox
     MusicResourceType.LineLyrics -> Icons.Outlined.Lyrics
     MusicResourceType.Video -> Icons.Outlined.Movie
-}
-
-@Stable
-sealed interface DeleteProcessor {
-
-}
-
-@Stable
-sealed interface ReplaceProcessor {
-
-}
-
-@Stable
-val MusicResourceType.deleteProcessor get(): DeleteProcessor? = when (this) {
-    MusicResourceType.Config -> TODO()
-    MusicResourceType.Audio -> TODO()
-    MusicResourceType.Record -> TODO()
-    MusicResourceType.Background -> TODO()
-    MusicResourceType.Animation -> TODO()
-    MusicResourceType.LineLyrics -> TODO()
-    MusicResourceType.Video -> TODO()
-}
-
-@Stable
-val MusicResourceType.replaceProcessor get(): ReplaceProcessor? = when (this) {
-    MusicResourceType.Config -> TODO()
-    MusicResourceType.Audio -> TODO()
-    MusicResourceType.Record -> TODO()
-    MusicResourceType.Background -> TODO()
-    MusicResourceType.Animation -> TODO()
-    MusicResourceType.LineLyrics -> TODO()
-    MusicResourceType.Video -> TODO()
+    null -> Icons.Outlined.QuestionMark
 }

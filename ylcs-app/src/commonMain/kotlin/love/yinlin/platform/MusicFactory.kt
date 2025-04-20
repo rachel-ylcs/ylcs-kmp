@@ -53,7 +53,7 @@ abstract class MusicFactory {
             val musicPath = OS.Storage.musicPath
             SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
                 try {
-                    val configPath = Path(musicPath, id, MusicResourceType.Config.defaultFilename)
+                    val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
                     val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
                     musicLibrary.put(info.id, info)
                 }

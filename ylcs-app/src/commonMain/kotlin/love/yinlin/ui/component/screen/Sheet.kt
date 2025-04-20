@@ -14,7 +14,8 @@ import androidx.compose.ui.unit.dp
 
 @Stable
 interface BaseSheetState<T> {
-    @Composable fun withOpen(block: @Composable (T) -> Unit)
+    @Composable
+    fun withOpen(block: @Composable (T) -> Unit)
     val isOpen: Boolean
     fun open(value: T)
     fun hide()
@@ -22,29 +23,31 @@ interface BaseSheetState<T> {
 
 @Stable
 class SheetState<T>(default: T? = null) : BaseSheetState<T> {
-    private val state = mutableStateOf(default)
+    private var state by mutableStateOf(default)
 
-    @Composable override fun withOpen(block: @Composable (T) -> Unit) {
-        state.value?.let { block(it) }
+    @Composable
+    override fun withOpen(block: @Composable (T) -> Unit) {
+        state?.let { block(it) }
         DisposableEffect(Unit) { onDispose { hide() } }
     }
-    override val isOpen: Boolean get() = state.value != null
-    override fun open(value: T) { state.value = value }
-    override fun hide() { state.value = null }
+    override val isOpen: Boolean get() = state != null
+    override fun open(value: T) { state = value }
+    override fun hide() { state = null }
 }
 
 @Stable
 class CommonSheetState(status: Boolean = false) : BaseSheetState<Unit> {
-    private val state: MutableState<Boolean> = mutableStateOf(status)
+    private var state by mutableStateOf(status)
 
-    @Composable override fun withOpen(block: @Composable (Unit) -> Unit) {
-        if (state.value) block(Unit)
+    @Composable
+    override fun withOpen(block: @Composable (Unit) -> Unit) {
+        if (state) block(Unit)
         DisposableEffect(Unit) { onDispose { hide() } }
     }
-    override val isOpen: Boolean get() = state.value
-    override fun open(value: Unit) { state.value = true }
+    override val isOpen: Boolean get() = state
+    override fun open(value: Unit) { state = true }
     fun open() = open(Unit)
-    override fun hide() { state.value = false }
+    override fun hide() { state = false }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

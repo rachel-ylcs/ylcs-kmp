@@ -15,5 +15,5 @@ data class MusicInfo(
     val composer: String, // 作曲
     val album: String, // 专辑
     val chorus: List<Long>?, // 副歌点
-    val modifier: Int = 0 // 修改标记
+    val modification: Int = 0 // 修改标记
 )

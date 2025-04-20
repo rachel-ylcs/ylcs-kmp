@@ -351,16 +351,16 @@ private fun ModPreview(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-                    for (resourceItem in mediaItem.resources) {
+                    for ((resource, length) in mediaItem.resources) {
                         Row(
                             modifier = Modifier.fillMaxWidth().border(1.dp, Color.LightGray).padding(5.dp),
                             horizontalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
                             Text(
-                                text = "${resourceItem.type.description}(${resourceItem.name})",
+                                text = "${resource.type?.description ?: "未知资源"}(${resource.name})",
                                 modifier = Modifier.weight(1f)
                             )
-                            Text(text = resourceItem.length.toLong().fileSizeString)
+                            Text(text = length.toLong().fileSizeString)
                         }
                     }
                 }

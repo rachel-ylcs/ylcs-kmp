@@ -213,7 +213,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         }
     }
 
-    private val MusicInfo.asMediaItem get(): MediaItem = MediaItem.Builder()
+    private val MusicInfo.asMediaItem: MediaItem get() = MediaItem.Builder()
         .setMediaId(this.id)
         .setUri(this.audioPath.toString().toUri())
         .setMediaMetadata(

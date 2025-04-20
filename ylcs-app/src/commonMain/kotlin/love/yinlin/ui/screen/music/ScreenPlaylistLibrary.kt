@@ -116,7 +116,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
 
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
-    private var currentPage: Int by mutableStateOf(if (tabs.isEmpty()) -1 else 0)
+    private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
     private val library = mutableStateListOf<MusicStatusPreview>()
 
     private val cloudBackupSheet = CommonSheetState()

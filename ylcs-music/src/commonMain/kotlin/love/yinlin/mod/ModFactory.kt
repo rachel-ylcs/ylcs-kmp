@@ -12,6 +12,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
@@ -48,10 +49,10 @@ object ModFactory {
             }
         }
 
-        private suspend fun Sink.writeResource(resourcePath: Path, resType: Int, resName: String) {
+        private suspend fun Sink.writeResource(resourcePath: Path, resource: MusicResource) {
             Coroutines.io {
-                writeInt(resType) // 写资源类型
-                writeLengthString(resName) // 写资源名称
+                writeInt(resource.id) // 写资源类型
+                writeLengthString(resource.name) // 写资源名称
                 // 写资源数据
                 val resLength = SystemFileSystem.metadataOrNull(resourcePath)!!.size.toInt()
                 require(resLength > 0) { "资源长度非法 $resourcePath Length: $resLength" }
@@ -74,11 +75,9 @@ object ModFactory {
                 val resourcePaths = SystemFileSystem.list(mediaPath)
                 writeInt(resourcePaths.size) // 写资源数
                 for (resourcePath in resourcePaths) {
-                    val arr = resourcePath.name.split('-')
-                    val resType = arr[0].toInt()
-                    val resName = arr[1]
-                    require(resName.isNotEmpty()) { "资源名非法 ${resourcePath.name}" }
-                    if (filter.find { it.id == resType } == null) writeResource(resourcePath, resType, resName)
+                    val resource = MusicResource.fromString(resourcePath.name)
+                    require(resource != null) { "资源名非法 ${resourcePath.name}" }
+                    if (filter.find { it.id == resource.id } == null) writeResource(resourcePath, resource)
                 }
             }
         }
@@ -137,15 +136,14 @@ object ModFactory {
 
         private suspend fun Source.readResource(mediaPath: Path) = Coroutines.io {
             val resType = readInt() // 读资源类型
-            require(MusicResourceType.fromInt(resType) != null) { "不支持的资源类型 $resType" }
             val resName = readLengthString() // 读资源名称
-            require(resName.length in 1..256) { "资源名称非法 Length: ${resName.length}"}
+            val resource = MusicResource(resType, resName)
             val resLength = readInt() // 读资源长度
             require(resLength > 0) { "资源长度非法 Length: $resLength" }
             val times = resLength / INTERVAL
             val remain = resLength - times * INTERVAL
             // 读资源数据
-            SystemFileSystem.sink(Path(mediaPath, "$resType-$resName")).buffered().use { sink ->
+            SystemFileSystem.sink(Path(mediaPath, resource.toString())).buffered().use { sink ->
                 repeat(times) {
                     readTo(sink, INTERVAL.toLong())
                     readByte()
@@ -185,8 +183,7 @@ object ModFactory {
     class Preview(source: Source): BaseRelease(source) {
         @Stable
         data class ResourceItem(
-            val type: MusicResourceType,
-            val name: String,
+            val resource: MusicResource,
             val length: Int
         )
 
@@ -205,14 +202,12 @@ object ModFactory {
 
         private suspend fun Source.previewResource(): Pair<ResourceItem, MusicInfo?> = Coroutines.io {
             val resType = readInt() // 读资源类型
-            val resourceType = MusicResourceType.fromInt(resType)
-            require(resourceType != null) { "不支持的资源类型 $resType" }
             val resName = readLengthString() // 读资源名称
-            require(resName.length in 1..256) { "资源名称非法 Length: ${resName.length}"}
+            val resource = MusicResource(resType, resName)
             val resLength = readInt() // 读资源长度
             require(resLength > 0) { "资源长度非法 Length: $resLength" }
             val times = resLength / INTERVAL
-            val config = if (resourceType == MusicResourceType.Config) { // 读取媒体配置
+            val config = if (resource.type == MusicResourceType.Config) { // 读取媒体配置
                 val bytes = ByteArray(resLength)
                 readTo(bytes)
                 bytes.decodeToString().parseJsonValue<MusicInfo>()
@@ -221,7 +216,7 @@ object ModFactory {
                 skip((resLength + times).toLong())
                 null
             }
-            ResourceItem(resourceType, resName, resLength) to config
+            ResourceItem(resource, resLength) to config
         }
 
         private suspend fun Source.previewMedia(): MediaItem = Coroutines.io {

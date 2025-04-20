@@ -55,5 +55,5 @@ enum class MusicResourceType(
         }
     }
 
-    val defaultFilename: String by lazy { "$id-$defaultName" }
+    val default: MusicResource get() = MusicResource(id, defaultName ?: "")
 }

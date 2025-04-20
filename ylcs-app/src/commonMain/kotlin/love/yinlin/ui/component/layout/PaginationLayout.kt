@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.api.APIConfig
 import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.ui.component.image.MiniIcon
@@ -334,7 +335,7 @@ private fun <T> ClickPaginationColumn(
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by mutableStateOf(PaginationStatus.IDLE)
+	var status by rememberState { PaginationStatus.IDLE }
 	LazyColumn(
 		state = state,
 		contentPadding = contentPadding,
@@ -384,7 +385,7 @@ private fun <T> ClickPaginationGrid(
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by mutableStateOf(PaginationStatus.IDLE)
+	var status by rememberState { PaginationStatus.IDLE }
 	LazyVerticalGrid(
 		columns = columns,
 		state = state,
@@ -438,7 +439,7 @@ private fun <T> ClickPaginationStaggeredGrid(
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by mutableStateOf(PaginationStatus.IDLE)
+	var status by rememberState { PaginationStatus.IDLE }
 	LazyVerticalStaggeredGrid(
 		columns = columns,
 		state = state,

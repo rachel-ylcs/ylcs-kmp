@@ -109,17 +109,17 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
             is Data.Success -> {
                 val musicLibrary = app.musicFactory.musicLibrary
                 for (id in data.data.medias) {
-                    val modifierCount = musicLibrary[id]?.modifier ?: 0
+                    val modification = musicLibrary[id]?.modification ?: 0
                     val info = Coroutines.io {
                         try {
-                            val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.defaultFilename)
+                            val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
                             SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
                         }
                         catch (_: Throwable) {
                             null
                         }
                     }
-                    if (info != null) musicLibrary[id] = info.copy(modifier = modifierCount + 1)
+                    if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)
                 }
                 slot.tip.success("解压成功")
                 step = Step.Initial()
@@ -193,16 +193,16 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                        for (resourceItem in mediaItem.resources) {
+                        for ((resource, length) in mediaItem.resources) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().border(1.dp, Color.LightGray).padding(5.dp),
                                 horizontalArrangement = Arrangement.spacedBy(20.dp)
                             ) {
                                 Text(
-                                    text = "${resourceItem.type.description}(${resourceItem.name})",
+                                    text = "${resource.type?.description ?: "未知资源"}(${resource.name})",
                                     modifier = Modifier.weight(1f)
                                 )
-                                Text(text = resourceItem.length.toLong().fileSizeString)
+                                Text(text = length.toLong().fileSizeString)
                             }
                         }
                     }

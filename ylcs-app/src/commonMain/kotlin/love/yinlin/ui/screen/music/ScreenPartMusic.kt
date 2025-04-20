@@ -159,6 +159,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 		LocalFileImage(
 			path = path,
+			quality = ImageQuality.Full,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = modifier.rotate(degrees = animation.value)

@@ -369,7 +369,7 @@ fun CropImage(
 @Stable
 class DialogCrop : DialogState<CropResult>() {
     private var url: String? by mutableStateOf(null)
-    private var aspectRatio: Float by mutableStateOf(0f)
+    private var aspectRatio: Float by mutableFloatStateOf(0f)
 
     suspend fun open(url: String, aspectRatio: Float = 0f): CropResult? {
         this.url = url

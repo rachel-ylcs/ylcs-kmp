@@ -47,7 +47,7 @@ data class MusicInfoPreview(
     constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer)
 
     @Stable
-    val recordPath get(): Path = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.defaultFilename)
+    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
 }
 
 @Composable
