@@ -240,7 +240,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
                             RachelText(
                                 text = info.name,
                                 icon = Icons.Outlined.MusicNote,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             RachelText(
                                 text = "ID: ${info.id}",

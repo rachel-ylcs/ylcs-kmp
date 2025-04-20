@@ -21,6 +21,8 @@ val MusicInfo.recordPath: Path get() = Path(OS.Storage.musicPath, this.id, Music
 @Stable
 val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.default.toString())
 @Stable
+val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Animation.default.toString())
+@Stable
 val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
 
 val MusicResourceType?.background: Brush get() = when (this) {

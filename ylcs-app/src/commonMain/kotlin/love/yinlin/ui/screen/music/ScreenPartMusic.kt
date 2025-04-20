@@ -102,11 +102,34 @@ private fun PlayingMusicStatusCard(
 class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val factory = app.musicFactory
 
-	private var lyrics = LyricsLrc()
-
+	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
 
+	private var lyrics = LyricsLrc()
+
 	private val currentPlaylistSheet = CommonSheetState()
+
+	@Composable
+	private fun MusicBackground(modifier: Modifier = Modifier) {
+		val backgroundPath by rememberDerivedState {
+			factory.currentMusic?.let { musicInfo ->
+				if (isAnimationBackground) musicInfo.AnimationPath
+				else musicInfo.backgroundPath
+			}
+		}
+
+		Box(modifier = modifier) {
+			backgroundPath?.let { path ->
+				LocalFileImage(
+					path = path,
+					quality = ImageQuality.Full,
+					contentScale = ContentScale.Crop,
+					alpha = if (app.isDarkMode) 0.9f else 0.7f,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
+		}
+	}
 
 	@Composable
 	private fun ToolLayout(modifier: Modifier = Modifier) {
@@ -428,22 +451,25 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun MusicToolLayout(modifier: Modifier = Modifier) {
 		EqualRow(modifier = modifier) {
 			equalItem {
+				var hasAnimation by rememberState { false }
+
+				LaunchedEffect(factory.currentMusic) {
+					hasAnimation = factory.currentMusic?.AnimationPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true
+					if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
+				}
+
 				ClickIcon(
 					icon = Icons.Outlined.GifBox,
-					onClick = {
-						launch {
-							factory.startPlaylist(app.config.playlistLibrary["歌单1"]!!)
-						}
-					}
+					color = if (isAnimationBackground) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+					enabled = hasAnimation,
+					onClick = { isAnimationBackground = !isAnimationBackground }
 				)
 			}
 			equalItem {
 				ClickIcon(
 					icon = Icons.Outlined.MusicVideo,
 					onClick = {
-						launch {
-							factory.startPlaylist(app.config.playlistLibrary["歌单2"]!!)
-						}
+
 					}
 				)
 			}
@@ -451,9 +477,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				ClickIcon(
 					icon = ExtraIcons.ShowLyrics,
 					onClick = {
-						launch {
-							factory.startPlaylist(app.config.playlistLibrary["歌单3"]!!)
-						}
+
 					}
 				)
 			}
@@ -461,9 +485,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
 					onClick = {
-						launch {
-							factory.stop()
-						}
+
 					}
 				)
 			}
@@ -570,22 +592,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
-			Box(modifier = Modifier
-				.fillMaxSize()
+			MusicBackground(modifier = Modifier.fillMaxSize()
 				.background(MaterialTheme.colorScheme.onBackground)
 				.hazeSource(state = blurState)
-				.zIndex(1f)
-			) {
-				factory.currentMusic?.backgroundPath?.let { path ->
-					LocalFileImage(
-						path = path,
-						quality = ImageQuality.Full,
-						contentScale = ContentScale.Crop,
-						alpha = if (app.isDarkMode) 0.9f else 0.7f,
-						modifier = Modifier.fillMaxSize()
-					)
-				}
-			}
+				.zIndex(1f))
 			Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
 				ToolLayout(modifier = Modifier
 					.fillMaxWidth()
@@ -624,9 +634,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun Landscape() {
-		Column(
-			modifier = Modifier.fillMaxSize()
-		) {
+		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = 5.dp
