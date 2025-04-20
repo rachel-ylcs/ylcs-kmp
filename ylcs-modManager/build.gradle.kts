@@ -44,6 +44,7 @@ compose.desktop {
         mainClass = "love.yinlin.mod.ModManagerKt"
 
         buildTypes.release.proguard {
+            version = "7.7.0"
             isEnabled = true
             optimize = true
             obfuscate = true

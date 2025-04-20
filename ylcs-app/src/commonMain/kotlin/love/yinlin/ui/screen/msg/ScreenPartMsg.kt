@@ -146,7 +146,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 
 		override fun onWeiboVideoClick(pic: Picture) {
-			TODO()
+			// TODO: 视频播放支持
 		}
 	}
 

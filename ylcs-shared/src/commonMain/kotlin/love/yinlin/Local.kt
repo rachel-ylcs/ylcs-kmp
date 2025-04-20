@@ -23,7 +23,7 @@ object Local {
 		object Desktop {
 			// < ------  竖屏模式  ------ >
 			// 开启后桌面端将保持竖屏用于调试
-			const val ALWAYS_PORTRAIT = true
+			const val ALWAYS_PORTRAIT = false
 
 			// < ------  屏幕比  ------ >
 			// 桌面端窗口占屏幕的比例
@@ -36,7 +36,7 @@ object Local {
 		// < ------  开发环境  ------ >
 		// 当处于开发环境时, 服务器运行在本地, 请求服务时连接副机
 		// 当处于生产环境时, 服务器运行在主机, 请求服务时连接主机
-		const val DEVELOPMENT: Boolean = true
+		const val DEVELOPMENT: Boolean = false
 	}
 
 

@@ -56,7 +56,7 @@ object OS {
 
 	inline fun runNotWeb(web: () -> Unit = {}, notWeb: () -> Unit) = runWeb(notWeb, web)
 
-	inline fun <reified R> ifWeb(notWeb: () -> R, web: () -> R) = if (platform.isWeb) notWeb() else web()
+	inline fun <reified R> ifWeb(notWeb: () -> R, web: () -> R) = if (platform.isWeb) web() else notWeb()
 
 	inline fun <reified R> ifNotWeb(web: () -> R, notWeb: () -> R) = ifWeb(notWeb, web)
 

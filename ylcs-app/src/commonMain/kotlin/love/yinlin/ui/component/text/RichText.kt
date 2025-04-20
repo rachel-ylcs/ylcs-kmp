@@ -123,7 +123,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		override val json: JsonElement = id.json
 
 		override fun build(context: RichContext) {
-			TODO()
+			// TODO: 表情包支持
 		}
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
