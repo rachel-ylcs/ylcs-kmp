@@ -19,6 +19,8 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.ui.component.layout.SplitActionLayout
+import love.yinlin.ui.component.layout.SplitLayout
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {
@@ -93,26 +95,34 @@ fun SubScreen(
 		Column(modifier = Modifier.fillMaxSize().padding(it)) {
 			Surface(
 				modifier = Modifier.fillMaxWidth().zIndex(20f),
+				tonalElevation = 1.dp,
 				shadowElevation = 5.dp
 			) {
-				CenterAlignedTopAppBar(
-					modifier = Modifier.fillMaxWidth(),
-					title = title,
-					navigationIcon = {
-						Row(verticalAlignment = Alignment.CenterVertically) {
+				Box(
+					modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp),
+					contentAlignment = Alignment.Center
+				) {
+					Box(
+						modifier = Modifier.fillMaxWidth().zIndex(10f),
+						contentAlignment = Alignment.Center
+					) {
+						title()
+					}
+					SplitActionLayout(
+						modifier = Modifier.fillMaxWidth().zIndex(5f),
+						left = {
 							if (onBack != null) {
 								ClickIcon(
-									modifier = Modifier.padding(horizontal = 5.dp),
+									modifier = Modifier.padding(start = 10.dp),
 									icon = Icons.AutoMirrored.Outlined.ArrowBack,
 									onClick = onBack
 								)
 							}
-							ActionScope.Left.leftActions()
-						}
-					},
-					expandedHeight = 48.dp,
-					actions = { ActionScope.Right.actions() }
-				)
+							leftActions()
+						},
+						right = actions
+					)
+				}
 			}
 			Box(
 				modifier = Modifier.fillMaxWidth().weight(1f)
@@ -122,6 +132,7 @@ fun SubScreen(
 			}
 			Surface(
 				modifier = Modifier.fillMaxWidth().zIndex(20f),
+				tonalElevation = 1.dp,
 				shadowElevation = 5.dp
 			) {
 				bottomBar()
@@ -153,6 +164,7 @@ fun SubScreen(
 		title = {
 			Text(
 				text = title,
+				style = MaterialTheme.typography.titleMedium,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
 			)

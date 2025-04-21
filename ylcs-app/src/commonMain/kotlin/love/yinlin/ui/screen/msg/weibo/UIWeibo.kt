@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
@@ -155,14 +156,16 @@ fun WeiboUserBar(
 				horizontalArrangement = Arrangement.spacedBy(10.dp),
 			) {
 				Text(
-					modifier = Modifier.weight(1f),
 					text = time,
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					overflow = TextOverflow.Ellipsis
+					style = MaterialTheme.typography.bodyMedium,
+					color = ThemeColor.fade,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.weight(1f)
 				)
 				Text(
 					text = location,
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					style = MaterialTheme.typography.bodyMedium,
+					color = ThemeColor.fade,
 				)
 			}
 		}
