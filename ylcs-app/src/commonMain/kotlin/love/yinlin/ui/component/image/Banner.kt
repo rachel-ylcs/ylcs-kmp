@@ -74,7 +74,9 @@ fun <T> Banner(
 	if (autoplay) {
 		LaunchedEffect(state.settledPage) {
 			delay(interval)
-			state.animateScrollToPage((state.currentPage + 1) % state.pageCount)
+			if (pics.isNotEmpty() && state.pageCount != 0) {
+				state.animateScrollToPage((state.currentPage + 1) % state.pageCount)
+			}
 		}
 	}
 }
