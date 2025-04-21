@@ -333,7 +333,7 @@ compose.desktop {
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.contains("desktopRun")) {
             jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
-            jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
+            //jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
         }
 
         buildTypes.release.proguard {
@@ -350,8 +350,12 @@ compose.desktop {
         nativeDistributions {
             packageName = rootProject.extra["appName"] as String
             packageVersion = appVersionName
+            description = "银临茶舍KMP跨平台APP"
+            copyright = "© 2024 银临茶舍 版权所有"
+            vendor = "银临茶舍"
+            licenseFile.set(rootProject.file("LICENSE"))
 
-            targetFormats(TargetFormat.Exe)
+            targetFormats(TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Pkg)
 
             modules(
                 "java.instrument",
@@ -368,6 +372,14 @@ compose.desktop {
             windows {
                 console = false
                 exePackageVersion = appVersionName
+            }
+
+            linux {
+                debPackageVersion = appVersionName
+            }
+
+            macOS {
+                pkgPackageVersion = appVersionName
             }
         }
     }

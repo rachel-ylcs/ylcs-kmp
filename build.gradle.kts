@@ -12,7 +12,7 @@ plugins {
 // Dir
 val dirProject: Directory = layout.projectDirectory
 val dirConfig by extra(dirProject.dir("config"))
-val appProjectName by extra("ylcs-app")
+val appProjectName by extra(projects.ylcsApp.name)
 val dirApp by extra(dirProject.dir(appProjectName))
 val dirSrc by extra(dirApp.dir("src"))
 val dirBuild by extra(dirApp.dir("build"))

@@ -1,16 +1,18 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
+import java.io.File
 
 @Stable
 actual class KV {
 	companion object {
 		init {
+			println(System.getProperty("java.library.path"))
 			System.loadLibrary("mmkv")
 		}
 	}
 
-	val handle: Long = init("${System.getProperty("user.dir")}\\config")
+	val handle: Long = init(File(System.getProperty("user.dir"), "config").toString())
 
 	actual fun set(key: String, value: Boolean, expire: Int) = setBoolean(handle, key, value, expire)
 	actual fun set(key: String, value: Int, expire: Int) = setInt(handle, key, value, expire)
