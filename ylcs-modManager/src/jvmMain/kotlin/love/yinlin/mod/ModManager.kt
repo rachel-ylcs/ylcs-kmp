@@ -2,6 +2,7 @@ package love.yinlin.mod
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,12 +10,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -91,6 +96,7 @@ private fun DragTextField(
     value: String,
     onValueChange: (String) -> Unit,
     title: String,
+    trailingIcon: @Composable (() -> Unit)? = null,
     maxLines: Int = 1,
     modifier: Modifier = Modifier,
 ) {
@@ -98,6 +104,7 @@ private fun DragTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = title) },
+        trailingIcon = trailingIcon,
         maxLines = maxLines,
         modifier = modifier.dragAndDropTarget(
             shouldStartDragAndDrop = {
@@ -123,12 +130,14 @@ private fun MergeUI(
     var status: Status by remember { mutableStateOf(Status.Idle) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
+    var filename by remember { mutableStateOf("${System.currentTimeMillis()}.rachel") }
     val filters = remember { MusicResourceType.entries.map { false }.toMutableStateList() }
 
     val reset = {
         status = Status.Idle
         input = ""
         output = ""
+        filename = "${System.currentTimeMillis()}.rachel"
         filters.fill(false)
     }
 
@@ -152,6 +161,22 @@ private fun MergeUI(
             value = output,
             onValueChange = { output = it },
             title = "保存文件路径",
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        output = "${System.getProperty("user.home")}/Desktop"
+                    }
+                )
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = filename,
+            onValueChange = { filename = it },
+            label = { Text(text = "保存文件名") },
+            maxLines = 1,
             modifier = Modifier.fillMaxWidth()
         )
         Text(text = "过滤器")
@@ -191,7 +216,9 @@ private fun MergeUI(
                     return@ClickButton
                 }
                 val mediaPaths = paths.map { Path(it) }
-                val savePath = Path(output)
+                var saveName = filename.ifEmpty { "${System.currentTimeMillis()}.rachel" }
+                if (!saveName.endsWith(".rachel")) saveName += ".rachel"
+                val savePath = Path(output, saveName)
                 val filter = buildList {
                     filters.forEachIndexed { index, v ->
                         if (v) add(MusicResourceType.entries[index])
@@ -199,15 +226,20 @@ private fun MergeUI(
                 }
 
                 scope.launch {
-                    val result = SystemFileSystem.sink(savePath).buffered().use { sink ->
-                        ModFactory.Merge(
-                            mediaPaths = mediaPaths,
-                            sink = sink
-                        ).process(
-                            filter = filter
-                        ) { progress, total, name ->
-                            status = Status.Running("运行中($progress/$total -> $name)")
+                    val result = try {
+                        SystemFileSystem.sink(savePath).buffered().use { sink ->
+                            ModFactory.Merge(
+                                mediaPaths = mediaPaths,
+                                sink = sink
+                            ).process(
+                                filter = filter
+                            ) { progress, total, name ->
+                                status = Status.Running("运行中($progress/$total -> $name)")
+                            }
                         }
+                    }
+                    catch (e: Throwable) {
+                        Data.Error(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
@@ -253,6 +285,15 @@ private fun ReleaseUI(
             value = output,
             onValueChange = { output = it },
             title = "导出目录",
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        output = "${System.getProperty("user.home")}/Desktop"
+                    }
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -267,13 +308,18 @@ private fun ReleaseUI(
                 }
 
                 scope.launch {
-                    val result = SystemFileSystem.source(Path(input)).buffered().use { source ->
-                        ModFactory.Release(
-                            source = source,
-                            savePath = Path(output)
-                        ).process { progress, total, name ->
-                            status = Status.Running("运行中($progress/$total -> $name)")
+                    val result = try {
+                        SystemFileSystem.source(Path(input)).buffered().use { source ->
+                            ModFactory.Release(
+                                source = source,
+                                savePath = Path(output)
+                            ).process { progress, total, name ->
+                                status = Status.Running("运行中($progress/$total -> $name)")
+                            }
                         }
+                    }
+                    catch (e: Throwable) {
+                        Data.Error(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
@@ -409,8 +455,13 @@ private fun PreviewUI(
                 }
 
                 scope.launch {
-                    val result = SystemFileSystem.source(Path(input)).buffered().use { source ->
-                        ModFactory.Preview(source = source).process()
+                    val result = try {
+                        SystemFileSystem.source(Path(input)).buffered().use { source ->
+                            ModFactory.Preview(source = source).process()
+                        }
+                    }
+                    catch (e: Throwable) {
+                        Data.Error(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> {

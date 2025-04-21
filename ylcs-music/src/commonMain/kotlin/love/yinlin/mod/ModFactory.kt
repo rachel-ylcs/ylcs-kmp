@@ -62,7 +62,7 @@ object ModFactory {
                 SystemFileSystem.source(resourcePath).buffered().use { source ->
                     repeat(times) {
                         source.readTo(this@writeResource, INTERVAL.toLong())
-                        writeByte(Random.Default.nextInt(127).toByte())
+                        writeByte(Random.nextInt(127).toByte())
                     }
                     if (remain > 0) source.readTo(this@writeResource, remain.toLong())
                 }
@@ -72,12 +72,16 @@ object ModFactory {
         private suspend fun Sink.writeMedia(mediaPath: Path, filter: List<MusicResourceType>) {
             Coroutines.io {
                 writeLengthString(mediaPath.name) // 写媒体ID
-                val resourcePaths = SystemFileSystem.list(mediaPath)
+                val resourcePaths = SystemFileSystem.list(mediaPath).filter { path ->
+                    val resource = MusicResource.fromString(path.name)
+                    require(resource != null) { "资源名非法 ${path.name}" }
+                    filter.find { it.id == resource.id } == null
+                }
                 writeInt(resourcePaths.size) // 写资源数
                 for (resourcePath in resourcePaths) {
                     val resource = MusicResource.fromString(resourcePath.name)
                     require(resource != null) { "资源名非法 ${resourcePath.name}" }
-                    if (filter.find { it.id == resource.id } == null) writeResource(resourcePath, resource)
+                    writeResource(resourcePath, resource)
                 }
             }
         }

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.api.APIConfig
 import love.yinlin.extension.itemKey
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
