@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
@@ -123,7 +122,7 @@ private fun UserAlbumItem(
 				Text(text = album.num)
 				Text(
 					text = album.time,
-					color = ThemeColor.fade,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 					textAlign = TextAlign.End,
 					overflow = TextOverflow.Ellipsis,

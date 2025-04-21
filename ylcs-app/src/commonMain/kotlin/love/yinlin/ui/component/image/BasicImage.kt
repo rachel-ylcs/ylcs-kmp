@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
-import love.yinlin.common.ThemeColor
 import love.yinlin.extension.condition
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ImageQuality
@@ -155,7 +154,7 @@ fun ClickIcon(
 			).padding(3.dp),
 		imageVector = icon,
 		contentDescription = null,
-		tint = if (enabled) color else ThemeColor.fade,
+		tint = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant
 	)
 }
 
@@ -184,7 +183,7 @@ fun StaticLoadingIcon(
 				modifier = iconModifier,
 				imageVector = icon,
 				contentDescription = null,
-				tint = if (enabled) color else ThemeColor.fade
+				tint = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant
 			)
 		}
 	}

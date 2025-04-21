@@ -22,7 +22,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -84,7 +83,7 @@ private fun UserBar(
 			)
 			Text(
 				text = time,
-				color = ThemeColor.fade,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				style = MaterialTheme.typography.bodyMedium,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
@@ -128,8 +127,17 @@ private fun CoinLayout(
 					)
 				}
 			}
-			if (num == UserConstraint.MIN_COIN_REWARD) Text(text = "作者获赠1银币", color = ThemeColor.fade, style = MaterialTheme.typography.bodyMedium)
-			Text(text = "$num 银币", style = MaterialTheme.typography.bodyLarge)
+			if (num == UserConstraint.MIN_COIN_REWARD) {
+				Text(
+					text = "作者获赠1银币",
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					style = MaterialTheme.typography.bodyMedium
+				)
+			}
+			Text(
+				text = "$num 银币",
+				style = MaterialTheme.typography.bodyLarge
+			)
 		}
 	}
 }

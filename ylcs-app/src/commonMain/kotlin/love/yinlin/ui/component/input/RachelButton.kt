@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -99,14 +98,14 @@ fun RachelButton(
 					Icon(
 						modifier = Modifier.matchParentSize(),
 						imageVector = it,
-						tint = if (enabled) color else ThemeColor.fade,
+						tint = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
 						contentDescription = null
 					)
 				}
 			}
 			Text(
 				text = text,
-				color = if (enabled) color else ThemeColor.fade,
+				color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
@@ -149,7 +148,7 @@ private fun LoadingButtonContent(
 		}
 		Text(
 			text = text,
-			color = if (isLoading) ThemeColor.fade else color,
+			color = if (isLoading) MaterialTheme.colorScheme.onSurfaceVariant else color,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis
@@ -184,7 +183,7 @@ fun LoadingRachelButton(
 			isLoading = isLoading,
 			text = text,
 			icon = icon,
-			color = if (enabled) color else ThemeColor.fade
+			color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant
 		)
 	}
 }
@@ -215,7 +214,7 @@ fun LoadingButton(
 			isLoading = isLoading,
 			text = text,
 			icon = icon,
-			color = if (enabled) LocalContentColor.current else ThemeColor.fade
+			color = if (enabled) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
 		)
 	}
 }

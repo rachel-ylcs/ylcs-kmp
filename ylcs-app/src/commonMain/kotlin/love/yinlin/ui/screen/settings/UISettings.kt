@@ -20,7 +20,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import love.yinlin.common.ThemeColor
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
@@ -94,7 +93,7 @@ object SettingsScope {
 		) {
 			Text(
 				text = text,
-				color = ThemeColor.fade,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				maxLines = maxLines,
 				overflow = TextOverflow.Ellipsis
 			)
@@ -126,7 +125,7 @@ object SettingsScope {
 				if (text != null) {
 					Text(
 						text = text,
-						color = ThemeColor.fade,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)
@@ -170,7 +169,7 @@ object SettingsScope {
 				if (text != null) {
 					Text(
 						text = text,
-						color = ThemeColor.fade,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)

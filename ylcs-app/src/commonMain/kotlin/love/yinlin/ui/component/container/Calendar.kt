@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.*
-import love.yinlin.common.ThemeColor
 import love.yinlin.common.Resource
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
@@ -170,7 +169,7 @@ private fun CalendarDayGrid(
 				val color = when {
 					date == today -> MaterialTheme.colorScheme.onPrimary
 					eventTitle != null -> MaterialTheme.colorScheme.primary
-					dayIndex !in startDay..endDay -> ThemeColor.fade
+					dayIndex !in startDay..endDay -> MaterialTheme.colorScheme.onSurfaceVariant
 					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
 					else -> LocalTextStyle.current.color
 				}

@@ -23,7 +23,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
@@ -165,13 +164,13 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 					)
 					Text(
 						text = mail.ts,
-						color = ThemeColor.fade,
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						style = MaterialTheme.typography.bodyMedium
 					)
 				}
 				Text(
 					text = mail.content,
-					color = ThemeColor.fade,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.fillMaxWidth()

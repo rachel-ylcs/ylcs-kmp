@@ -20,7 +20,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.rememberDerivedState
 
@@ -66,7 +65,7 @@ fun ImageAdder(
 			Box(
 				modifier = Modifier.size(size)
 					.clip(MaterialTheme.shapes.small)
-					.background(ThemeColor.fade)
+					.background(MaterialTheme.colorScheme.surface)
 					.clickable(onClick = onAdd),
 				contentAlignment = Alignment.Center
 			) {

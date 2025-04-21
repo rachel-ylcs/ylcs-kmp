@@ -24,7 +24,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -99,7 +98,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,
-            color = ThemeColor.fade
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         ClickIcon(
             icon = Icons.Outlined.DragHandle,

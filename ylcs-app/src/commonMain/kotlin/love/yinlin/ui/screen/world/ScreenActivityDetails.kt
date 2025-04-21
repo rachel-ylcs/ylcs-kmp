@@ -19,7 +19,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeColor
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -73,7 +72,7 @@ private fun ActivityDetailsLayout(
 				Text(
 					text = activity.ts ?: "未知时间",
 					style = MaterialTheme.typography.headlineSmall,
-					color = ThemeColor.fade
+					color = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 			}
 		}
