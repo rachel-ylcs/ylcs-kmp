@@ -164,9 +164,9 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 
 	@Composable
 	private fun Portrait(modifier: Modifier = Modifier) {
-		Scaffold(
-			modifier = modifier,
-			bottomBar = {
+		Scaffold(modifier = modifier) {
+			Column(modifier = Modifier.fillMaxSize().padding(it)) {
+				PageContent(modifier = Modifier.fillMaxWidth().weight(1f))
 				PortraitNavigation(
 					modifier = Modifier.fillMaxWidth().zIndex(5f),
 					currentPage = pagerState.currentPage,
@@ -175,23 +175,21 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 					}
 				)
 			}
-		) {
-			PageContent(modifier = Modifier.fillMaxSize().padding(it))
 		}
 	}
 
 	@Composable
 	private fun Landscape(modifier: Modifier = Modifier) {
-		Row(modifier = modifier) {
-			LandscapeNavigation(
-				modifier = Modifier.fillMaxHeight().zIndex(5f),
-				currentPage = pagerState.currentPage,
-				onNavigate = {
-					launch { pagerState.scrollToPage(it) }
-				}
-			)
-			Scaffold(modifier = Modifier.fillMaxHeight().weight(1f)) {
-				PageContent(modifier = Modifier.fillMaxSize().padding(it))
+		Scaffold(modifier = modifier) {
+			Row(modifier = Modifier.fillMaxSize().padding(it)) {
+				LandscapeNavigation(
+					modifier = Modifier.fillMaxHeight().zIndex(5f),
+					currentPage = pagerState.currentPage,
+					onNavigate = {
+						launch { pagerState.scrollToPage(it) }
+					}
+				)
+				PageContent(modifier = Modifier.weight(1f).fillMaxHeight())
 			}
 		}
 	}

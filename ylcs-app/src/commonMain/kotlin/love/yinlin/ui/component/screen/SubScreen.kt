@@ -89,11 +89,10 @@ fun SubScreen(
 ) {
 	BackHandler { onBack?.invoke() }
 
-	Scaffold(
-		modifier = modifier,
-		topBar = {
+	Scaffold(modifier = modifier) {
+		Column(modifier = Modifier.fillMaxSize().padding(it)) {
 			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(520f),
+				modifier = Modifier.fillMaxWidth().zIndex(20f),
 				shadowElevation = 5.dp
 			) {
 				CenterAlignedTopAppBar(
@@ -115,21 +114,18 @@ fun SubScreen(
 					actions = { ActionScope.Right.actions() }
 				)
 			}
-		},
-		bottomBar = {
+			Box(
+				modifier = Modifier.fillMaxWidth().weight(1f)
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				content()
+			}
 			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(520f),
+				modifier = Modifier.fillMaxWidth().zIndex(20f),
 				shadowElevation = 5.dp
 			) {
 				bottomBar()
 			}
-		}
-	) {
-		Box(modifier = Modifier.fillMaxSize()
-			.padding(it)
-			.background(MaterialTheme.colorScheme.background)
-		) {
-			content()
 		}
 	}
 
