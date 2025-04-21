@@ -29,6 +29,7 @@ import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.equalItem
+import love.yinlin.ui.component.screen.Tip
 
 private enum class TabItem(
 	val title: StringResource,
@@ -202,5 +203,12 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 	override fun content() {
 		if (app.isPortrait) Portrait(modifier = Modifier.fillMaxSize())
 		else Landscape(modifier = Modifier.fillMaxSize())
+
+		with(model.slot) {
+			Tip(state = tip)
+			info.withOpen()
+			confirm.withOpen()
+			loading.withOpen()
+		}
 	}
 }

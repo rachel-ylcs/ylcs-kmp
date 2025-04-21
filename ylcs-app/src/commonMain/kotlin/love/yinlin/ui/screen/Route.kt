@@ -15,7 +15,7 @@ import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 
 @Stable
-abstract class Screen<A : Screen.Args>(private val model: AppModel) : ViewModel() {
+abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewModel() {
 	@Stable
 	interface Args
 

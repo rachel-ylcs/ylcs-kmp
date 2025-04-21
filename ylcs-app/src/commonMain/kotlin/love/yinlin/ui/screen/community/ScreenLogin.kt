@@ -14,7 +14,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.KVConfig
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
@@ -74,7 +73,6 @@ class ScreenLogin(model: AppModel) : Screen<ScreenLogin.Args>(model) {
 			is Data.Success -> {
 				val token = result1.data
 				app.config.userToken = token
-				app.config.userTokenUpdate = KVConfig.UPDATE
 				val result2 = ClientAPI.request(
 					route = API.User.Profile.GetProfile,
 					data = token

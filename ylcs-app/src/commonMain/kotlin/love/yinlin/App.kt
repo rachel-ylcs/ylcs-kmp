@@ -25,6 +25,7 @@ import love.yinlin.common.RachelTheme
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
+import love.yinlin.ui.component.screen.SubScreenSlot
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.ScreenRouteScope
@@ -38,6 +39,8 @@ import love.yinlin.ui.screen.world.ScreenPartWorld
 @Stable
 abstract class ScreenPart(private val model: AppModel) {
 	private val firstLoad = launchFlag()
+
+	val slot: SubScreenSlot get() = model.slot
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
@@ -65,6 +68,8 @@ class AppModel(
 	val musicPart = ScreenPartMusic(this)
 	val discoveryPart = ScreenPartDiscovery(this)
 	val mePart = ScreenPartMe(this)
+
+	val slot = SubScreenSlot(viewModelScope)
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)

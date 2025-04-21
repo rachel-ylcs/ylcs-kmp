@@ -273,8 +273,6 @@ class KVConfig(private val kv: KV) {
 
 	// 用户 Token
 	var userToken: String by stringState("")
-	// Token更新
-	var userTokenUpdate: Long by CacheState(kv, Long.MAX_VALUE)
 	// 用户 信息
 	var userProfile: UserProfile? by jsonState { null }
 	// 用户 头像缓存键

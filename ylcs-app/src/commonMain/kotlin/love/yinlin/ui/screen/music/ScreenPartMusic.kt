@@ -13,10 +13,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -32,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import dev.chrisbanes.haze.*
 import io.ktor.utils.io.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -54,9 +59,11 @@ import love.yinlin.resources.no_audio_source
 import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.layout.SplitActionLayout
+import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.layout.equalItem
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.BottomSheet
@@ -106,7 +113,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	private var lyrics = LyricsLrc()
 
+	private var sleepJob: Job? by mutableStateOf(null)
+	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
+
 	private val currentPlaylistSheet = CommonSheetState()
+	private val sleepModeSheet = CommonSheetState()
 
 	@Composable
 	private fun MusicBackground(modifier: Modifier = Modifier) {
@@ -147,7 +158,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			},
 			right = {
 				Action(Icons.Outlined.AlarmOn) {
-
+					sleepModeSheet.open()
 				}
 			}
 		)
@@ -494,8 +505,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
 		LaunchedEffect(factory.currentMusic) {
+			val musicInfo = factory.currentMusic
+
 			lyrics.reset()
-			factory.currentMusic?.lyricsPath?.let { path ->
+			musicInfo?.lyricsPath?.let { path ->
 				try {
 					Coroutines.io {
 						SystemFileSystem.source(path).buffered().use { source ->
@@ -505,6 +518,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 				catch (_: Throwable) { }
 			}
+
+			if (musicInfo == null) closeSleepMode()
 		}
 
 		LaunchedEffect(factory.currentPosition) {
@@ -588,6 +603,72 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	private fun startSleepMode(seconds: Int) {
+		closeSleepMode()
+		sleepJob = launch {
+			sleepRemainSeconds = seconds
+			repeat(seconds) {
+				delay(1000L)
+				sleepRemainSeconds -= 1
+			}
+			app.musicFactory.stop()
+			sleepJob = null
+		}
+	}
+
+	private fun closeSleepMode() {
+		sleepJob?.cancel()
+		sleepJob = null
+	}
+
+	@OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+	private fun SleepModeLayout() {
+		val state = rememberTimePickerState(is24Hour = true)
+
+		BottomSheet(state = sleepModeSheet) {
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				SplitLayout(
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+					left = {
+						Text(
+							text = "睡眠模式",
+							style = MaterialTheme.typography.titleLarge,
+							color = MaterialTheme.colorScheme.primary
+						)
+					},
+					right = {
+						RachelButton(
+							text = if (sleepJob == null) "启动" else "停止",
+							icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
+							onClick = {
+								if (sleepJob == null) {
+									val time = state.hour * 3600 + state.minute * 60
+									if (time > 0) startSleepMode(time)
+									else slot.tip.warning("未设定时间")
+								}
+								else closeSleepMode()
+							}
+						)
+					}
+				)
+				if (sleepJob == null) TimeInput(state = state)
+				else {
+					Text(
+						text = remember(sleepRemainSeconds) { (sleepRemainSeconds * 1000L).timeString },
+						style = MaterialTheme.typography.displayMedium,
+						color = MaterialTheme.colorScheme.secondary,
+						modifier = Modifier.padding(vertical = 30.dp)
+					)
+				}
+			}
+		}
+	}
+
 	@Composable
 	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
@@ -655,6 +736,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 		currentPlaylistSheet.withOpen {
 			CurrentPlaylistLayout()
+		}
+
+		sleepModeSheet.withOpen {
+			SleepModeLayout()
 		}
 	}
 }
