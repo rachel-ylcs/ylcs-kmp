@@ -27,6 +27,7 @@ kotlin-js-store/
 
 # 输出目录
 **/outputs/
+cpp/build
 cpp/libs
 
 # 本地配置

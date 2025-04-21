@@ -64,14 +64,12 @@ ENDIF()
 
 project(mmkv)
 
-set(JNI $ENV{JAVA_HOME}/include)
-
-include_directories(${JNI})
-IF (WIN32)
-    include_directories(${JNI}/win32)
-ENDIF()
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../../libs)
+find_package(Java COMPONENTS Runtime Development)
+if(NOT Java_FOUND)
+    message(FATAL_ERROR "mmkv requires Java to build!")
+    return()
+endif()
+find_package(JNI REQUIRED)
 
 add_library(mmkv SHARED
         main.cpp
@@ -139,8 +137,6 @@ add_library(mmkv SHARED
         MMKVPredef.h
         )
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
-
 IF (MSVC OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
     # .S files is not supported by MSVC.
     # x86_64 asm not supported in OHOS
@@ -150,7 +146,9 @@ ELSE()
         aes/openssl/openssl_aes-armv4.S)
 ENDIF()
 
-target_include_directories(mmkv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(mmkv PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${JNI_INCLUDE_DIRS})
 
 IF (WIN32)
     # MMKV can be used only with Unicode on Windows.
@@ -173,6 +171,8 @@ IF (NOT zlib)
 ELSE()
     target_link_libraries(mmkv ${zlib})
 ENDIF()
+
+target_link_libraries(mmkv ${JNI_LIBRARIES})
 
 function(copy_files)
     list(LENGTH ARGN num_args)

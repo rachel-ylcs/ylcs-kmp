@@ -133,7 +133,7 @@ kotlin {
             dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
-                implementation(libs.ktor.apple)
+
             }
         }
 
@@ -222,7 +222,7 @@ kotlin {
             dependsOn(appleMain)
             dependsOn(nonDesktopMain)
             dependencies {
-
+                implementation(libs.ktor.apple)
             }
         }
 
@@ -351,7 +351,7 @@ compose.desktop {
             packageName = rootProject.extra["appName"] as String
             packageVersion = appVersionName
             description = "银临茶舍KMP跨平台APP"
-            copyright = "© 2024 银临茶舍 版权所有"
+            copyright = "© 2024-2025 银临茶舍 版权所有"
             vendor = "银临茶舍"
             licenseFile.set(rootProject.file("LICENSE"))
 
