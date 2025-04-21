@@ -333,7 +333,7 @@ compose.desktop {
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.contains("desktopRun")) {
             jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
-            //jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
+            jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
         }
 
         buildTypes.release.proguard {
