@@ -443,7 +443,7 @@ afterEvaluate {
                 val outputAppLibDir = desktopOutputDir.let {
                     when (desktopPlatform) {
                         GradlePlatform.Mac -> it.dir("$appName.app/Contents/app")
-                        else -> it.dir(appName)
+                        else -> it.dir("$appName/app")
                     }
                 }
                 from(rootProject.extra["cppLibsDir"])
