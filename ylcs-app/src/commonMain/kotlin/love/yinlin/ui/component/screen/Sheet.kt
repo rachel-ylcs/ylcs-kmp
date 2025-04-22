@@ -2,6 +2,7 @@ package love.yinlin.ui.component.screen
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -78,8 +79,8 @@ private fun ModalLandscapeSheet(
     content: @Composable () -> Unit
 ) {
     var isVisible by rememberState { false }
-    val offset by animateDpAsState(
-        targetValue = if (isVisible) 0.dp else 360.dp,
+    val offset by animateFloatAsState(
+        targetValue = if (isVisible) 0f else 360f,
         animationSpec = tween(
             durationMillis = 300,
             easing = LinearOutSlowInEasing
@@ -99,18 +100,18 @@ private fun ModalLandscapeSheet(
             usePlatformDefaultWidth = false
         )
     ) {
-       Row(
-           modifier = Modifier.fillMaxSize().clip(shape = MaterialTheme.shapes.extraLarge)
+       Row(modifier = Modifier.fillMaxSize()
+           .clip(shape = MaterialTheme.shapes.extraLarge)
+           .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f * (1 - offset / 360)))
        ) {
-           Box(modifier = Modifier.weight(1f).fillMaxHeight().clickable(
-               interactionSource = null,
-               indication = null,
-               onClick = { isVisible = false }
-           ))
+           Box(modifier = Modifier.weight(1f)
+               .fillMaxHeight()
+               .clickable(interactionSource = null, indication = null, onClick = { isVisible = false })
+           )
 
            Surface(
                shadowElevation = 5.dp,
-               modifier = Modifier.width(360.dp).fillMaxHeight().offset(x = offset)
+               modifier = Modifier.width(360.dp).fillMaxHeight().offset(x = offset.dp)
            ) {
                content()
            }
@@ -145,9 +146,7 @@ fun <T> BottomSheet(
         }
     }
     else {
-        ModalLandscapeSheet(
-            onDismissRequest = { state.hide() },
-        ) {
+        ModalLandscapeSheet(onDismissRequest = { state.hide() }) {
             content()
         }
     }
