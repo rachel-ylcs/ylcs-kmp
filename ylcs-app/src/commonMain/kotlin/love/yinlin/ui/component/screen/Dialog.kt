@@ -25,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeColor
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
@@ -74,20 +75,17 @@ fun Tip(state: TipState) {
 		hostState = state.host,
 		modifier = Modifier.fillMaxWidth().zIndex(Float.MAX_VALUE)
 	) {
+		val color = when (state.type) {
+			TipState.Type.INFO -> MaterialTheme.colorScheme.secondaryContainer
+			TipState.Type.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
+			TipState.Type.WARNING -> ThemeColor.warning
+			TipState.Type.ERROR -> MaterialTheme.colorScheme.error
+		}
 		Box(
 			modifier = Modifier.padding(20.dp).fillMaxWidth()
 				.clickable(indication = null, interactionSource = null) { }
 				.background(
-					brush = remember(state.type) { Brush.horizontalGradient(
-						colors = when (state.type) {
-							TipState.Type.INFO -> listOf(Colors.Gray5, Colors.Gray4, Colors.Gray5)
-							TipState.Type.SUCCESS -> listOf(Colors.Green5, Colors.Green4, Colors.Green5)
-							TipState.Type.WARNING -> listOf(Colors.Yellow5, Colors.Yellow4, Colors.Yellow5)
-							TipState.Type.ERROR -> listOf(Colors.Red5, Colors.Red4, Colors.Red5)
-						},
-						startX = 0f,
-						endX = Float.POSITIVE_INFINITY
-					) },
+					color = color,
 					shape = MaterialTheme.shapes.extraLarge
 				)
 		) {

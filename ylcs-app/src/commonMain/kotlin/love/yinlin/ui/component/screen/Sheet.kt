@@ -81,7 +81,7 @@ private fun ModalLandscapeSheet(
     val offset by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 360.dp,
         animationSpec = tween(
-            durationMillis = 500,
+            durationMillis = 300,
             easing = LinearOutSlowInEasing
         ),
         finishedListener = {
