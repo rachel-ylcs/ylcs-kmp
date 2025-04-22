@@ -29,33 +29,47 @@ import love.yinlin.extension.UriEx
 import love.yinlin.extension.arr
 import love.yinlin.extension.obj
 import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
 	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
 	private const val WEIBO_PROXY_HOST: String = "weibo.${Local.MAIN_HOST}"
-	private val WEIBO_HOST: String = OS.ifWeb(notWeb = { WEIBO_SOURCE_HOST }) { WEIBO_PROXY_HOST }
 
-	private fun transferWeiboIconUrl(src: String): String = OS.ifWeb(notWeb = { src }) {
-		src.replace("n.sinaimg.cn", "$WEIBO_PROXY_HOST/icon")
-	}
+	private val WEIBO_HOST: String = OS.ifPlatform(
+		Platform.WebWasm,
+		ifTrue = { WEIBO_PROXY_HOST },
+		ifFalse = { WEIBO_SOURCE_HOST }
+	)
 
-	private fun transferWeiboImageUrl(src: String): String = OS.ifWeb(notWeb = { src }) {
-		if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("wx3.")) src.replace("wx3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("wx4.")) src.replace("wx4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("tvax1.")) src.replace("tvax1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("tvax2.")) src.replace("tvax2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("tvax3.")) src.replace("tvax3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else if (src.contains("tvax4.")) src.replace("tvax4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-		else src
-	}
+	private fun transferWeiboIconUrl(src: String): String = OS.ifPlatform(
+		Platform.WebWasm,
+		ifTrue = { src.replace("n.sinaimg.cn", "$WEIBO_PROXY_HOST/icon") },
+		ifFalse = { src }
+	)
 
-	private fun transferWeiboVideoUrl(src: String): String = OS.ifWeb(notWeb = { src }) {
-		src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video")
-	}
+	private fun transferWeiboImageUrl(src: String): String = OS.ifPlatform(
+		Platform.WebWasm,
+		ifTrue = {
+			if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("wx3.")) src.replace("wx3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("wx4.")) src.replace("wx4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("tvax1.")) src.replace("tvax1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("tvax2.")) src.replace("tvax2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("tvax3.")) src.replace("tvax3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else if (src.contains("tvax4.")) src.replace("tvax4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
+			else src
+		},
+		ifFalse = { src }
+	)
+
+	private fun transferWeiboVideoUrl(src: String): String = OS.ifPlatform(
+		Platform.WebWasm,
+		ifTrue = { src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video") },
+		ifFalse = { src }
+	)
 
 	private object Container {
 		fun searchUser(key: String): String = "api/container/getIndex?containerid=100103type%3D3%26q%3D${UriEx.encode(key)}&page_type=searchall"

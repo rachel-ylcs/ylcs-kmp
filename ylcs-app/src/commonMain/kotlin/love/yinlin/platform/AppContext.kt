@@ -79,7 +79,7 @@ abstract class AppContext {
 	}
 
 	private fun initializePath() {
-		OS.runNotWeb {
+		OS.ifNotPlatform(Platform.WebWasm) {
 			SystemFileSystem.createDirectories(OS.Storage.dataPath)
 			SystemFileSystem.createDirectories(OS.Storage.cachePath)
 

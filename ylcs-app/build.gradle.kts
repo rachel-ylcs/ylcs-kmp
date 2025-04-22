@@ -363,7 +363,6 @@ compose.desktop {
                 "java.net.http",
                 "jdk.jfr",
                 "jdk.jsobject",
-                "jdk.security.auth",
                 "jdk.unsupported",
                 "jdk.unsupported.desktop",
                 "jdk.xml.dom"

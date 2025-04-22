@@ -35,6 +35,7 @@ import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -494,48 +495,52 @@ fun <T> PaginationColumn(
 	itemDivider: PaddingValues? = null,
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-	OS.runPhone(notPhone = {
-		ClickPaginationColumn(
-			items = items,
-			key = key,
-			state = state,
-			canLoading = canLoading,
-			onLoading = onLoading,
-			modifier = modifier,
-			contentPadding = contentPadding,
-			verticalArrangement = verticalArrangement,
-			horizontalAlignment = horizontalAlignment,
-			header = header,
-			itemDivider = itemDivider,
-			itemContent = itemContent
-		)
-	}) {
-		SwipePaginationLayout(
-			canRefresh = canRefresh,
-			canLoading = canLoading,
-			onRefresh = onRefresh,
-			onLoading = onLoading,
-			modifier = modifier
-		) {
-			LazyColumn(
-				modifier = Modifier.fillMaxSize(),
+	OS.ifPlatform(
+		*Platform.Phone,
+		ifTrue = {
+			SwipePaginationLayout(
+				canRefresh = canRefresh,
+				canLoading = canLoading,
+				onRefresh = onRefresh,
+				onLoading = onLoading,
+				modifier = modifier
+			) {
+				LazyColumn(
+					modifier = Modifier.fillMaxSize(),
+					state = state,
+					contentPadding = contentPadding,
+					verticalArrangement = verticalArrangement,
+					horizontalAlignment = horizontalAlignment,
+				) {
+					if (header != null) {
+						item(key = "Header".itemKey) {
+							header()
+						}
+					}
+					itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
+						if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
+						itemContent(item)
+					}
+				}
+			}
+		},
+		ifFalse = {
+			ClickPaginationColumn(
+				items = items,
+				key = key,
 				state = state,
+				canLoading = canLoading,
+				onLoading = onLoading,
+				modifier = modifier,
 				contentPadding = contentPadding,
 				verticalArrangement = verticalArrangement,
 				horizontalAlignment = horizontalAlignment,
-			) {
-				if (header != null) {
-					item(key = "Header".itemKey) {
-						header()
-					}
-				}
-				itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
-					if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
-					itemContent(item)
-				}
-			}
+				header = header,
+				itemDivider = itemDivider,
+				itemContent = itemContent
+			)
 		}
-	}
+	)
 }
 
 @Composable
@@ -555,8 +560,37 @@ fun <T> PaginationGrid(
 	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-	OS.runPhone(
-		notPhone = {
+	OS.ifPlatform(
+		*Platform.Phone,
+		ifTrue = {
+			SwipePaginationLayout(
+				canRefresh = canRefresh,
+				canLoading = canLoading,
+				onRefresh = onRefresh,
+				onLoading = onLoading,
+				modifier = modifier
+			) {
+				LazyVerticalGrid(
+					columns = columns,
+					modifier = Modifier.fillMaxSize(),
+					state = state,
+					contentPadding = contentPadding,
+					verticalArrangement = verticalArrangement,
+					horizontalArrangement = horizontalArrangement,
+				) {
+					if (header != null) {
+						item(
+							key = "Header".itemKey,
+							span = { GridItemSpan(maxLineSpan) }
+						) {
+							header()
+						}
+					}
+					items(items = items, key = key, itemContent = itemContent)
+				}
+			}
+		},
+		ifFalse = {
 			ClickPaginationGrid(
 				items = items,
 				key = key,
@@ -572,34 +606,7 @@ fun <T> PaginationGrid(
 				itemContent = itemContent
 			)
 		}
-	) {
-		SwipePaginationLayout(
-			canRefresh = canRefresh,
-			canLoading = canLoading,
-			onRefresh = onRefresh,
-			onLoading = onLoading,
-			modifier = modifier
-		) {
-			LazyVerticalGrid(
-				columns = columns,
-				modifier = Modifier.fillMaxSize(),
-				state = state,
-				contentPadding = contentPadding,
-				verticalArrangement = verticalArrangement,
-				horizontalArrangement = horizontalArrangement,
-			) {
-				if (header != null) {
-					item(
-						key = "Header".itemKey,
-						span = { GridItemSpan(maxLineSpan) }
-					) {
-						header()
-					}
-				}
-				items(items = items, key = key, itemContent = itemContent)
-			}
-		}
-	}
+	)
 }
 
 @Composable
@@ -619,8 +626,37 @@ fun <T> PaginationStaggeredGrid(
 	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-	OS.runPhone(
-		notPhone = {
+	OS.ifPlatform(
+		*Platform.Phone,
+		ifTrue = {
+			SwipePaginationLayout(
+				canRefresh = canRefresh,
+				canLoading = canLoading,
+				onRefresh = onRefresh,
+				onLoading = onLoading,
+				modifier = modifier
+			) {
+				LazyVerticalStaggeredGrid(
+					columns = columns,
+					modifier = Modifier.fillMaxSize(),
+					state = state,
+					contentPadding = contentPadding,
+					verticalItemSpacing = verticalItemSpacing,
+					horizontalArrangement = horizontalArrangement
+				) {
+					if (header != null) {
+						item(
+							key = "Header".itemKey,
+							span = StaggeredGridItemSpan.FullLine
+						) {
+							header()
+						}
+					}
+					items(items = items, key = key, itemContent = itemContent)
+				}
+			}
+		},
+		ifFalse = {
 			ClickPaginationStaggeredGrid(
 				items = items,
 				key = key,
@@ -636,32 +672,5 @@ fun <T> PaginationStaggeredGrid(
 				itemContent = itemContent
 			)
 		}
-	) {
-		SwipePaginationLayout(
-			canRefresh = canRefresh,
-			canLoading = canLoading,
-			onRefresh = onRefresh,
-			onLoading = onLoading,
-			modifier = modifier
-		) {
-			LazyVerticalStaggeredGrid(
-				columns = columns,
-				modifier = Modifier.fillMaxSize(),
-				state = state,
-				contentPadding = contentPadding,
-				verticalItemSpacing = verticalItemSpacing,
-				horizontalArrangement = horizontalArrangement
-			) {
-				if (header != null) {
-					item(
-						key = "Header".itemKey,
-						span = StaggeredGridItemSpan.FullLine
-					) {
-						header()
-					}
-				}
-				items(items = items, key = key, itemContent = itemContent)
-			}
-		}
-	}
+	)
 }

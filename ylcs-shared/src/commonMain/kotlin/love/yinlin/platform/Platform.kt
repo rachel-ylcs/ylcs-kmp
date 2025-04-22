@@ -9,6 +9,9 @@ enum class Platform {
 	WebWasm;
 
 	companion object {
+		val Phone = arrayOf(Android, IOS)
+		val Desktop = arrayOf(Windows, Linux, MacOS)
+
 		fun fromInt(value: Int): Platform? = when (value) {
 			Android.ordinal -> Android
 			IOS.ordinal -> IOS
@@ -19,8 +22,4 @@ enum class Platform {
 			else -> null
 		}
 	}
-
-	val isPhone: Boolean get() = this == Android || this == IOS
-	val isDesktop: Boolean get() = this == Windows || this == Linux || this == MacOS
-	val isWeb: Boolean get() = this == WebWasm
 }

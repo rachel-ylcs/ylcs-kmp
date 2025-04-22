@@ -42,30 +42,17 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 object OS {
 	val platform: Platform = osPlatform // 平台
 
-	inline fun runAndroid(notAndroid: () -> Unit = {}, android: () -> Unit) {
-		if (platform == Platform.Android) android()
-		else notAndroid()
-	}
+	fun platform(vararg filter: Platform): Boolean = filter.contains(platform)
 
-	inline fun runNotAndroid(android: () -> Unit = {}, notAndroid: () -> Unit) = runAndroid(notAndroid, android)
+	fun notPlatform(vararg filter: Platform): Boolean = !filter.contains(platform)
 
-	inline fun runWeb(notWeb: () -> Unit = {}, web: () -> Unit) {
-		if (platform.isWeb) web()
-		else notWeb()
-	}
+	inline fun ifPlatform(vararg filter: Platform, block: () -> Unit) = if (platform(*filter)) block() else Unit
 
-	inline fun runNotWeb(web: () -> Unit = {}, notWeb: () -> Unit) = runWeb(notWeb, web)
+	inline fun <T> ifPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (platform(*filter)) ifTrue() else ifFalse()
 
-	inline fun <reified R> ifWeb(notWeb: () -> R, web: () -> R) = if (platform.isWeb) web() else notWeb()
+	inline fun ifNotPlatform(vararg filter: Platform, block: () -> Unit) = if (notPlatform(*filter)) block() else Unit
 
-	inline fun <reified R> ifNotWeb(web: () -> R, notWeb: () -> R) = ifWeb(notWeb, web)
-
-	inline fun runPhone(notPhone: () -> Unit = {}, phone: () -> Unit) {
-		if (platform.isPhone) phone()
-		else notPhone()
-	}
-
-	inline fun runNotPhone(phone: () -> Unit = {}, notPhone: () -> Unit) = runPhone(notPhone, phone)
+	inline fun <T> ifNotPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (notPlatform(*filter)) ifTrue() else ifFalse()
 
 	object Net {
 		fun openUrl(url: String) = osNetOpenUrl(url)

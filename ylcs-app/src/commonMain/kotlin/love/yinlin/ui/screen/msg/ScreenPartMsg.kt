@@ -28,6 +28,7 @@ import love.yinlin.extension.String
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.TabBar
@@ -148,11 +149,15 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 
 		private fun gotoWebPage(arg: String) {
-			OS.runWeb(notWeb = {
-				navigate(ScreenWebpage.Args(arg))
-			}) {
-				OS.Net.openUrl(arg)
-			}
+			OS.ifPlatform(
+				Platform.WebWasm,
+				ifTrue = {
+					OS.Net.openUrl(arg)
+				},
+				ifFalse = {
+					navigate(ScreenWebpage.Args(arg))
+				}
+			)
 		}
 
 		override fun onWeiboLinkClick(arg: String) = gotoWebPage(arg)

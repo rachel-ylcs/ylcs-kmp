@@ -69,13 +69,17 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
     }
 
     private suspend fun loadModFile() {
-        OS.runNotWeb(web = {
-            slot.tip.warning(UnsupportedPlatformText)
-        }) {
-            Picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
-                step = Step.Prepare(it)
+        OS.ifPlatform(
+            Platform.WebWasm,
+            ifTrue = {
+                slot.tip.warning(UnsupportedPlatformText)
+            },
+            ifFalse = {
+                Picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
+                    step = Step.Prepare(it)
+                }
             }
-        }
+        )
     }
 
     private suspend fun previewMod(path: ImplicitPath) {
