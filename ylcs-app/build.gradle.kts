@@ -355,13 +355,9 @@ compose.desktop {
 
             modules(
                 "java.instrument",
-                "java.management",
                 "java.net.http",
                 "jdk.jfr",
-                "jdk.jsobject",
                 "jdk.unsupported",
-                "jdk.unsupported.desktop",
-                "jdk.xml.dom"
             )
 
             val dirConfig: Directory by rootProject.extra
