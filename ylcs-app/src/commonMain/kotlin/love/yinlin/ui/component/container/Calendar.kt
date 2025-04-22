@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -95,7 +95,7 @@ private fun CalendarHeader(
 	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
 	Row(
-		modifier = modifier.padding(horizontal = 10.dp),
+		modifier = modifier.padding(horizontal = 20.dp),
 		horizontalArrangement = Arrangement.spacedBy(20.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
@@ -167,11 +167,11 @@ private fun CalendarDayGrid(
 				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
 				val eventTitle = events[date]
 				val color = when {
-					date == today -> MaterialTheme.colorScheme.onPrimary
+					date == today -> MaterialTheme.colorScheme.onPrimaryContainer
 					eventTitle != null -> MaterialTheme.colorScheme.primary
 					dayIndex !in startDay..endDay -> MaterialTheme.colorScheme.onSurfaceVariant
 					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
-					else -> LocalTextStyle.current.color
+					else -> LocalContentColor.current
 				}
 				val text = eventTitle ?: date.lunar
 
@@ -183,7 +183,7 @@ private fun CalendarDayGrid(
 					if (date == today) {
 						Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)
 							.padding(2.dp).background(
-							color = MaterialTheme.colorScheme.primary,
+							color = MaterialTheme.colorScheme.primaryContainer,
 							shape = CircleShape
 						))
 					}

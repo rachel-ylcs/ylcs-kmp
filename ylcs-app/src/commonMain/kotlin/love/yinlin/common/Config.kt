@@ -107,6 +107,8 @@ class KVConfig(private val kv: KV) {
 			save()
 		}
 
+		fun removeAll(predicate: (T) -> Boolean): Boolean = state.removeAll(predicate = predicate)
+
 		fun replaceAll(items: List<T>) = state.replaceAll(items)
 	}
 

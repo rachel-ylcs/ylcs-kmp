@@ -54,7 +54,6 @@ private fun NavigationIcon(
 	Column(
 		modifier = Modifier
 			.width(IntrinsicSize.Min)
-			.wrapContentSize()
 			.clip(MaterialTheme.shapes.medium)
 			.clickable(onClick = onClick)
 			.padding(horizontal = 10.dp, vertical = 5.dp),

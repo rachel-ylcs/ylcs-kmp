@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen.msg.weibo
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -210,12 +212,14 @@ fun WeiboCard(
 	modifier: Modifier = Modifier
 ) {
 	val processor = LocalWeiboProcessor.current
-	ElevatedCard(
+	Surface(
 		modifier = modifier,
-		colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-		onClick = { processor.onWeiboClick(weibo) }
+		shape = MaterialTheme.shapes.extraLarge,
+		shadowElevation = 5.dp
 	) {
-		Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+		Column(modifier = Modifier.fillMaxWidth().clickable {
+			processor.onWeiboClick(weibo)
+		}.padding(10.dp)) {
 			WeiboLayout(weibo = weibo)
 		}
 	}

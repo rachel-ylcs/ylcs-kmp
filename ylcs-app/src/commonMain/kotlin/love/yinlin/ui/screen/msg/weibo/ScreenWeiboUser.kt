@@ -59,10 +59,12 @@ private fun UserInfoCard(
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(20.dp)
+				horizontalArrangement = Arrangement.spacedBy(20.dp),
+				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
 					text = user.info.name,
+					style = MaterialTheme.typography.labelLarge,
 					color = MaterialTheme.colorScheme.primary,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
@@ -148,7 +150,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWe
 		if (isFollow) {
 			if (!weiboUsers.contains { it.id == user.info.id }) weiboUsers += user.info
 		}
-		else weiboUsers -= user.info
+		else weiboUsers.removeAll { it.id == user.info.id }
 	}
 
 	private fun onAlbumClick(album: WeiboAlbum) {

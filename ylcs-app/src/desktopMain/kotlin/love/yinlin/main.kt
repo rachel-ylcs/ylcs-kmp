@@ -66,13 +66,13 @@ fun main() {
                                 actions = {
                                     Action(
                                         icon = Icons.Outlined.Remove,
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
                                     ) {
                                         state.isMinimized = true
                                     }
                                     Action(
                                         icon = Icons.Outlined.Close,
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
                                     ) {
                                         isOpen = false
                                     }

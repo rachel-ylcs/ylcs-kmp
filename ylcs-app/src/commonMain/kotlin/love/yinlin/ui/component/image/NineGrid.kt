@@ -40,7 +40,7 @@ fun NineGrid(
 				MiniIcon(
 					icon = Icons.Outlined.SmartDisplay,
 					size = 48.dp,
-					color = Colors.Red4,
+					color = Colors.White,
 					modifier = Modifier.zIndex(2f)
 				)
 			}

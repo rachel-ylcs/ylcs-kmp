@@ -126,7 +126,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				shadowElevation = 5.dp
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+					modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
 					horizontalArrangement = Arrangement.End,
 				) {
 					ActionScope.Right.Actions {
