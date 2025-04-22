@@ -208,11 +208,7 @@ kotlin {
                 }
                 implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
                 implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.controls.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.fxml.get()) { artifact { classifier = javafxClassifier } }
                 implementation(libs.javafx.media.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.swing.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.web.get()) { artifact { classifier = javafxClassifier } }
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }

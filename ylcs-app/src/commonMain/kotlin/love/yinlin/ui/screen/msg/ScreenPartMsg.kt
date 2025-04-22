@@ -150,7 +150,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 		private fun gotoWebPage(arg: String) {
 			OS.ifPlatform(
-				Platform.WebWasm,
+				Platform.WebWasm, *Platform.Desktop,
 				ifTrue = {
 					OS.Net.openUrl(arg)
 				},
