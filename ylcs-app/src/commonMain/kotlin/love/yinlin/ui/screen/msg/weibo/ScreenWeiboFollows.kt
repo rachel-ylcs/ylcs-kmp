@@ -38,7 +38,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
@@ -118,7 +118,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	private fun ImportLayout() {
 		val state = remember { TextInputState() }
 
-		BottomSheet(state = importSheet) {
+		Sheet(state = importSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(10.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,

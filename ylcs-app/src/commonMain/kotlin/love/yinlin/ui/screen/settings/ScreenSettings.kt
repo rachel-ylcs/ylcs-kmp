@@ -45,7 +45,7 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
@@ -292,7 +292,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 		val text = remember {
 			app.kv.get(AppContext.CRASH_KEY, "无崩溃日志")
 		}
-		BottomSheet(state = crashLogSheet) {
+		Sheet(state = crashLogSheet) {
 			Box(
 				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
 					.padding(10.dp)
@@ -310,7 +310,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	fun FeedbackLayout() {
 		val state = remember { TextInputState() }
 
-		BottomSheet(state = feedbackSheet) {
+		Sheet(state = feedbackSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp)
 					.padding(10.dp),
@@ -336,7 +336,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 
 	@Composable
 	fun PrivacyPolicyLayout() {
-		BottomSheet(state = privacyPolicySheet) {
+		Sheet(state = privacyPolicySheet) {
 			Box(
 				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
 					.padding(10.dp)
@@ -352,7 +352,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 
 	@Composable
 	fun AboutLayout() {
-		BottomSheet(state = aboutSheet) {
+		Sheet(state = aboutSheet) {
 			Box(
 				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp)
 					.padding(10.dp)

@@ -67,7 +67,7 @@ import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.layout.equalItem
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -583,7 +583,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (isEmptyList) currentPlaylistSheet.hide()
 		}
 
-		BottomSheet(state = currentPlaylistSheet) {
+		Sheet(state = currentPlaylistSheet) {
 			Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.6f)) {
 				Row(
 					modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 10.dp, bottom = 10.dp),
@@ -650,7 +650,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun SleepModeLayout() {
 		val state = rememberTimePickerState(is24Hour = true)
 
-		BottomSheet(state = sleepModeSheet) {
+		Sheet(state = sleepModeSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(10.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,

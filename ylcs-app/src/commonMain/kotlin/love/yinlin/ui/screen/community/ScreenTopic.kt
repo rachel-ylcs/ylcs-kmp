@@ -610,7 +610,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			override fun offset(item: SubComment): Int = item.cid
 		} }
 
-		BottomSheet(state = subCommentSheet) {
+		Sheet(state = subCommentSheet) {
 			PaginationColumn(
 				items = page.items,
 				key = { it.cid },
@@ -654,7 +654,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 
 	@Composable
 	private fun SendCoinLayout() {
-		BottomSheet(state = sendCoinSheet) {
+		Sheet(state = sendCoinSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(10.dp),
 				verticalArrangement = Arrangement.spacedBy(10.dp)

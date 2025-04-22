@@ -41,7 +41,7 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.TabBar
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.component.screen.DialogChoice
 import love.yinlin.ui.component.screen.DialogInput
@@ -329,7 +329,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
         var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
         val state = remember { TextInputState() }
 
-        BottomSheet(state = cloudBackupSheet) {
+        Sheet(state = cloudBackupSheet) {
             Column(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.8f).padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

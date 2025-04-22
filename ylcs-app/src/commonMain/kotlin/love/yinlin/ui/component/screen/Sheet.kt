@@ -106,7 +106,7 @@ private fun ModalLandscapeSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> BottomSheet(
+fun <T> Sheet(
     state: BaseSheetState<T>,
     content: @Composable () -> Unit
 ) {

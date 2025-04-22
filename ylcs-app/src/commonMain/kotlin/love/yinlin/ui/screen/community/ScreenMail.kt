@@ -33,7 +33,7 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.SheetState
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
@@ -182,7 +182,7 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 
 	@Composable
 	private fun MailDetailsLayout(mail: Mail) {
-		BottomSheet(state = mailDetailsSheet) {
+		Sheet(state = mailDetailsSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
 					.padding(10.dp)

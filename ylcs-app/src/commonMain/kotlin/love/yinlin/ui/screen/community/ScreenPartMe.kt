@@ -39,7 +39,7 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.screen.BottomSheet
+import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
@@ -74,10 +74,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	fun scanQrcode() {
-
-	}
-
 	@Composable
 	private fun ToolBar(modifier: Modifier = Modifier) {
 		Row(
@@ -87,7 +83,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			ClickIcon(
 				icon = Icons.Filled.CropFree,
-				onClick = { scanQrcode() }
+				onClick = { scanSheet.open() }
 			)
 			ClickIcon(
 				icon = Icons.Filled.Settings,
@@ -126,7 +122,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		var todaySignin by rememberState { true }
 		val today = remember { DateEx.Today }
 
-		BottomSheet(state = signinSheet) {
+		Sheet(state = signinSheet) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,7 +192,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun ScanLayout() {
+		Sheet(state = scanSheet) {
+			Column {
 
+			}
+		}
 	}
 
 	@Composable
