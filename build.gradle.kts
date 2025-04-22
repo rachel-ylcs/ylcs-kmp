@@ -58,9 +58,8 @@ val iosDir by extra(dirSrc.dir("iosArm64Main"))
 val desktopDir by extra(dirSrc.dir("desktopMain"))
 val desktopCurrentDir by extra(dirBuild.dir("desktopRun"))
 val desktopR8File by extra(r8Dir.file("R8Desktop.pro"))
-val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/app/ylcs")
+val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/app")
 val desktopOutputDir by extra(dirOutput.dir("desktop"))
-val desktopOutputAppDir by extra(desktopOutputDir.dir("app"))
 
 // Web
 val webDir by extra(dirSrc.dir("wasmJsMain"))
