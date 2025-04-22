@@ -1,11 +1,9 @@
 package love.yinlin.ui.screen.msg.weibo
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
@@ -20,12 +18,12 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.extension.itemKey
 import love.yinlin.platform.app
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
+import love.yinlin.ui.screen.Screen
 
 @Stable
 class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(model) {
@@ -76,11 +74,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 
 	@Composable
 	private fun Portrait(weibo: Weibo) {
-		LazyColumn(
-			modifier = Modifier.fillMaxSize()
-				.background(MaterialTheme.colorScheme.surface)
-				.padding(start = 10.dp, end = 10.dp, top = 10.dp)
-		) {
+		LazyColumn(modifier = Modifier.fillMaxSize().padding(start = 10.dp, end = 10.dp, top = 10.dp)) {
 			item(key = "WeiboLayout".itemKey) {
 				WeiboLayout(weibo = weibo)
 			}
@@ -101,11 +95,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 	@Composable
 	private fun Landscape(weibo: Weibo) {
 		val processor = LocalWeiboProcessor.current
-		Row(
-			modifier = Modifier.fillMaxSize()
-				.background(MaterialTheme.colorScheme.surface)
-				.padding(10.dp)
-		) {
+		Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
 			Column(modifier = Modifier.width(360.dp).fillMaxHeight()) {
 				WeiboUserBar(
 					info = weibo.info,

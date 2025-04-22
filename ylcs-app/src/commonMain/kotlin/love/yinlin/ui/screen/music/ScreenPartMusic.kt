@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -89,7 +90,7 @@ private fun PlayingMusicStatusCard(
 		Text(
 			text = musicInfo.name,
 			style = MaterialTheme.typography.titleMedium,
-			color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+			color = if (isCurrent) MaterialTheme.colorScheme.primary else LocalContentColor.current,
 			maxLines = 1,
 			overflow = TextOverflow.MiddleEllipsis,
 			modifier = Modifier.weight(1f)
@@ -370,7 +371,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.fillMaxHeight()
 					.padding(vertical = 3.dp)
 					.background(
-						color = MaterialTheme.colorScheme.primary,
+						color = MaterialTheme.colorScheme.primaryContainer,
 						shape = MaterialTheme.shapes.medium
 					)
 					.pointerInput(duration, maxWidth) {

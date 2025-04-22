@@ -1,14 +1,14 @@
 package love.yinlin.ui.screen.community
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.outlined.Paid
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -89,12 +89,15 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 		cardWidth: Dp,
 		modifier: Modifier = Modifier
 	) {
-		ElevatedCard(
+		Surface(
 			modifier = modifier,
-			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-			onClick = { onTopicClick(topic) }
+			shape = MaterialTheme.shapes.large,
+			shadowElevation = 3.dp
 		) {
-			Column(modifier = Modifier.fillMaxWidth().heightIn(min = cardWidth * 0.777777f)) {
+			Column(modifier = Modifier.fillMaxWidth()
+				.heightIn(min = cardWidth * 0.777777f)
+				.clickable { onTopicClick(topic) }
+			) {
 				if (topic.pic != null) {
 					WebImage(
 						uri = topic.picPath,

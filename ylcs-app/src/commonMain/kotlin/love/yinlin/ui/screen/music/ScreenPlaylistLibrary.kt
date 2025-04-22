@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -87,7 +88,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         Text(
             text = musicInfo.name,
             style = MaterialTheme.typography.titleMedium,
-            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else LocalContentColor.current,
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,7 +62,7 @@ private fun MusicCard(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
         shadowElevation = 3.dp,
     ) {
         Row(modifier = Modifier

@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.io.files.Path
 import love.yinlin.common.Colors
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.platform.OS
 

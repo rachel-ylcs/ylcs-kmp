@@ -1,5 +1,6 @@
  package love.yinlin.ui.screen.community
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -153,12 +154,15 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		cardWidth: Dp,
 		modifier: Modifier = Modifier
 	) {
-		ElevatedCard(
+		Surface(
 			modifier = modifier,
-			colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.surface),
-			onClick = { onTopicClick(topic) }
+			shape = MaterialTheme.shapes.large,
+			shadowElevation = 3.dp
 		) {
-			Column(modifier = Modifier.fillMaxWidth().heightIn(min = cardWidth * 0.777777f)) {
+			Column(modifier = Modifier.fillMaxWidth()
+				.heightIn(min = cardWidth * 0.777777f)
+				.clickable { onTopicClick(topic) }
+			) {
 				if (topic.pic != null) {
 					WebImage(
 						uri = topic.picPath,
@@ -247,10 +251,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
 					ActionScope.Right.Actions {
-						Action(
-							icon = Icons.Outlined.Add,
-							color = MaterialTheme.colorScheme.primary
-						) {
+						Action(Icons.Outlined.Add) {
 							navigate(ScreenAddTopic.Args)
 						}
 					}

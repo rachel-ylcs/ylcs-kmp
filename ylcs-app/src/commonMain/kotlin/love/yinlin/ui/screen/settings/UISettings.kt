@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,7 +41,7 @@ object SettingsScope {
 	fun Item(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = MaterialTheme.colorScheme.onSurface,
+		color: Color = LocalContentColor.current,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
 		onClick: () -> Unit = {},
@@ -76,7 +77,7 @@ object SettingsScope {
 	fun ItemText(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = MaterialTheme.colorScheme.onSurface,
+		color: Color = LocalContentColor.current,
 		text: String,
 		maxLines: Int = 1,
 		hasDivider: Boolean = true,
@@ -104,7 +105,7 @@ object SettingsScope {
 	fun ItemExpander(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = MaterialTheme.colorScheme.onSurface,
+		color: Color = LocalContentColor.current,
 		text: String? = null,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
@@ -139,7 +140,7 @@ object SettingsScope {
 	fun ItemExpanderSuspend(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = MaterialTheme.colorScheme.onSurface,
+		color: Color = LocalContentColor.current,
 		text: String? = null,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,

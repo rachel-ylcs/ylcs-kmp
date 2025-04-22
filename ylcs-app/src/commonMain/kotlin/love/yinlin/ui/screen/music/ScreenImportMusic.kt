@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -289,7 +290,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                     is Step.Initial -> {
                         Text(
                             text = currentStep.message,
-                            color = if (currentStep.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                            color = if (currentStep.isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
                             textAlign = TextAlign.Center
                         )
                     }

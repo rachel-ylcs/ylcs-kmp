@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -152,7 +153,7 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 							Mail.Type.INFO -> MaterialTheme.colorScheme.primary
 							Mail.Type.CONFIRM -> MaterialTheme.colorScheme.secondary
 							Mail.Type.DECISION -> MaterialTheme.colorScheme.tertiary
-							else -> MaterialTheme.colorScheme.onSurface
+							else -> LocalContentColor.current
 						}
 					)
 					Text(

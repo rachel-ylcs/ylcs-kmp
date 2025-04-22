@@ -266,14 +266,8 @@ internal fun TipButtonContainer(
 							verticalArrangement = Arrangement.spacedBy(3.dp),
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
-							MiniIcon(
-								icon = button.icon,
-								color = MaterialTheme.colorScheme.onSurface
-							)
-							Text(
-								text = button.text,
-								color = MaterialTheme.colorScheme.onSurface
-							)
+							MiniIcon(icon = button.icon)
+							Text(text = button.text)
 						}
 					}
 				}

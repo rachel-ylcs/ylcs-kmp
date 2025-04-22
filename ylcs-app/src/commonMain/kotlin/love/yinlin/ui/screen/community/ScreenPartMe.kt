@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.IndeterminateCheckBox
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -148,6 +149,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 								Surface(
 									modifier = Modifier.weight(1f),
 									shape = MaterialTheme.shapes.medium,
+									tonalElevation = 3.dp,
 									shadowElevation = 1.dp,
 									border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
 								) {
@@ -160,11 +162,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 										MiniIcon(
 											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
+											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
 										)
 										Text(
 											text = "${date.monthNumber}月${date.dayOfMonth}日",
-											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
+											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
 										)
 									}
 								}
