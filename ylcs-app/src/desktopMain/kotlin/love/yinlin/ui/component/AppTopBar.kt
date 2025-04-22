@@ -23,7 +23,7 @@ fun AppTopBar(
 ) {
 	TopAppBar(
 		modifier = modifier,
-		backgroundColor = MaterialTheme.colorScheme.primary,
+		backgroundColor = MaterialTheme.colorScheme.primaryContainer,
 		title = {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -32,7 +32,7 @@ fun AppTopBar(
 				MiniImage(Res.drawable.img_logo)
 				Text(
 					text = stringResource(Res.string.app_name),
-					color = MaterialTheme.colorScheme.onSecondaryContainer,
+					color = MaterialTheme.colorScheme.onPrimaryContainer,
 					style = MaterialTheme.typography.headlineSmall
 				)
 			}
