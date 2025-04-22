@@ -170,8 +170,8 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 				PortraitNavigation(
 					modifier = Modifier.fillMaxWidth().zIndex(5f),
 					currentPage = pagerState.currentPage,
-					onNavigate = {
-						launch { pagerState.scrollToPage(it) }
+					onNavigate = { index ->
+						launch { pagerState.scrollToPage(index) }
 					}
 				)
 			}
@@ -185,8 +185,8 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 				LandscapeNavigation(
 					modifier = Modifier.fillMaxHeight().zIndex(5f),
 					currentPage = pagerState.currentPage,
-					onNavigate = {
-						launch { pagerState.scrollToPage(it) }
+					onNavigate = { index ->
+						launch { pagerState.scrollToPage(index) }
 					}
 				)
 				PageContent(modifier = Modifier.weight(1f).fillMaxHeight())

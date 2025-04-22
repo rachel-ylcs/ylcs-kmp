@@ -20,7 +20,6 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.layout.SplitActionLayout
-import love.yinlin.ui.component.layout.SplitLayout
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {
