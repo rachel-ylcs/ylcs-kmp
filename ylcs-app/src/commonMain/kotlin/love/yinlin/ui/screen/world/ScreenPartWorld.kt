@@ -74,15 +74,20 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			interval = 3000L,
 			modifier = modifier
 		) { pic, index, scale ->
-			WebImage(
-				uri = pic.picPath ?: "",
-				contentScale = ContentScale.Crop,
-				modifier = Modifier.fillMaxWidth().aspectRatio(2f)
-					.scale(scale).clip(MaterialTheme.shapes.medium),
-				onClick = {
-					showActivityDetails(pic.aid)
-				}
-			)
+			Surface(
+				modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+				shape = MaterialTheme.shapes.large,
+				shadowElevation = 5.dp
+			) {
+				WebImage(
+					uri = pic.picPath ?: "",
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+					onClick = {
+						showActivityDetails(pic.aid)
+					}
+				)
+			}
 		}
 	}
 
