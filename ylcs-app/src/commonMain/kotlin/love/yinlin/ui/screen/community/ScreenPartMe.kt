@@ -48,6 +48,7 @@ import org.jetbrains.compose.resources.stringResource
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	val signinSheet = CommonSheetState()
+	val scanSheet = CommonSheetState()
 
 	fun logoff() {
 		app.config.userToken = ""
@@ -194,6 +195,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
+	private fun ScanLayout() {
+
+	}
+
+	@Composable
 	private fun LoginBox(modifier: Modifier = Modifier) {
 		Column(modifier = modifier) {
 			Row(
@@ -275,6 +281,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 			signinSheet.withOpen {
 				SigninLayout()
+			}
+
+			scanSheet.withOpen {
+				ScanLayout()
 			}
 		}
 	}
