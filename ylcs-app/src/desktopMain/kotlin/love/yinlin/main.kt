@@ -20,9 +20,9 @@ import javafx.application.Platform
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.app_name
+import love.yinlin.resources.*
 import love.yinlin.ui.component.AppTopBar
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 fun main() {
@@ -49,6 +49,7 @@ fun main() {
             Window(
                 onCloseRequest = ::exitApplication,
                 title = stringResource(Res.string.app_name),
+                icon = painterResource(Res.drawable.img_logo),
                 undecorated = true,
                 resizable = false,
                 transparent = true,

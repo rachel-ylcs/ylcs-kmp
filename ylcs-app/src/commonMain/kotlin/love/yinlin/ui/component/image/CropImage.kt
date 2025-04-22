@@ -5,7 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -22,11 +25,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
 import love.yinlin.common.Colors
+import love.yinlin.extension.Reference
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.translate
 import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
+import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.screen.DialogState
 import kotlin.coroutines.resume
 import kotlin.math.max
@@ -155,25 +160,41 @@ private fun DrawScope.drawGrid(
     )
 }
 
+@Stable
+class CropState {
+    var frameRect by mutableStateOf(Rect.Zero)
+    var imageRect by mutableStateOf(Rect.Zero)
+
+    val result: CropResult get() = CropResult(
+        xPercent = (frameRect.left - imageRect.left) / imageRect.width,
+        yPercent = (frameRect.top - imageRect.top) / imageRect.height,
+        widthPercent = frameRect.width / imageRect.width,
+        heightPercent = frameRect.height / imageRect.height
+    )
+
+    fun reset() {
+        frameRect = Rect.Zero
+        imageRect = Rect.Zero
+    }
+}
+
 @Composable
 fun CropImage(
     url: String?,
     aspectRatio: Float = 0f,
-    modifier: Modifier = Modifier,
-    onCrop: (CropResult) -> Unit
+    state: CropState,
+    modifier: Modifier = Modifier
 ) {
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
     val imageState = rememberWebImageState(quality = ImageQuality.High)
     val imageSize by rememberDerivedState { imageState.result?.image?.size }
     var touchRegion: TouchRegion? by rememberState { null }
-    var frameRect: Rect by rememberState { Rect.Zero }
-    var imageRect: Rect by rememberState { Rect.Zero }
 
     BoxWithConstraints(
         modifier = modifier.pointerInput(aspectRatio, imageSize) {
             if (imageSize != null) detectDragGestures(
                 onDragStart = { position ->
-                    touchRegion = frameRect.run { when {
+                    touchRegion = state.frameRect.run { when {
                         Rect(topLeft, tolerance).contains(position) -> TouchRegion.Vertex.TOP_LEFT
                         Rect(topRight, tolerance).contains(position) -> TouchRegion.Vertex.TOP_RIGHT
                         Rect(bottomLeft, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_LEFT
@@ -184,11 +205,12 @@ fun CropImage(
                 },
                 onDragEnd = { touchRegion = null }
             ) { change, dragAmount ->
+                val imageRect = state.imageRect
                 touchRegion?.let {
-                    frameRect = when (it) {
+                    state.frameRect = when (it) {
                         is TouchRegion.Vertex -> {
                             val minimumVertexDistance = tolerance * 2f
-                            frameRect.run {
+                            state.frameRect.run {
                                 if (aspectRatio == 0f) {
                                     val newLeft = (left + dragAmount.x)
                                         .coerceAtLeast(imageRect.left)
@@ -256,7 +278,7 @@ fun CropImage(
                             }
                         }
                         TouchRegion.Inside -> {
-                            var newRect = frameRect.translate(dragAmount)
+                            var newRect = state.frameRect.translate(dragAmount)
                             if (newRect.left < imageRect.left) newRect = newRect.translate(imageRect.left - newRect.left, 0f)
                             if (newRect.right > imageRect.right) newRect = newRect.translate(imageRect.right - newRect.right, 0f)
                             if (newRect.top < imageRect.top) newRect = newRect.translate(0f, imageRect.top - newRect.top)
@@ -277,20 +299,21 @@ fun CropImage(
                 val imageSize = if (newSize.height > canvasSize.height) {
                     (canvasSize.height / newSize.height).let { Size(newSize.width * it, newSize.height * it) }
                 } else newSize
-                imageRect = Rect(
+                val imageRect = Rect(
                     offset = Offset(
                         x = (canvasSize.width - imageSize.width) / 2,
                         y = (canvasSize.height - imageSize.height) / 2
                     ),
                     size = imageSize
                 )
+                state.imageRect = imageRect
                 val frameSize = if (aspectRatio == 0f) {
                     Size(imageRect.width * 0.8f, imageRect.height * 0.8f)
                 } else {
                     val scale = min(imageRect.width, imageRect.height) / max(imageRect.width, imageRect.width / aspectRatio)
                     Size(imageRect.width * scale * 0.8f, imageRect.width * scale / aspectRatio * 0.8f)
                 }
-                frameRect = Rect(
+                state.frameRect = Rect(
                     offset = Offset(
                         x = (canvasSize.width - frameSize.width) / 2,
                         y = (canvasSize.height - frameSize.height) / 2
@@ -306,7 +329,7 @@ fun CropImage(
                 WebImage(
                     uri = url,
                     state = imageState,
-                    quality = ImageQuality.High,
+                    quality = ImageQuality.Low,
                     contentScale = ContentScale.Inside,
                     modifier = Modifier.matchParentSize()
                 )
@@ -315,19 +338,8 @@ fun CropImage(
 
         // Overlay
         imageSize?.let { actualSize ->
-            Canvas(modifier = Modifier.matchParentSize().pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = {
-                    // 在裁剪框内双击触发
-                    if (frameRect.contains(it)) {
-                        onCrop(CropResult(
-                            xPercent = (frameRect.left - imageRect.left) / imageRect.width,
-                            yPercent = (frameRect.top - imageRect.top) / imageRect.height,
-                            widthPercent = frameRect.width / imageRect.width,
-                            heightPercent = frameRect.height / imageRect.height
-                        ))
-                    }
-                })
-            }) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val frameRect = state.frameRect
                 // Mask
                 drawIntoCanvas { canvas ->
                     canvas.saveLayer(Rect(0f, 0f, size.width, size.height), Paint())
@@ -370,22 +382,37 @@ fun CropImage(
 class DialogCrop : DialogState<CropResult>() {
     private var url: String? by mutableStateOf(null)
     private var aspectRatio: Float by mutableFloatStateOf(0f)
+    private val cropState = CropState()
 
     suspend fun open(url: String, aspectRatio: Float = 0f): CropResult? {
         this.url = url
         this.aspectRatio = aspectRatio
+        this.cropState.reset()
         return awaitResult()
     }
 
     @Composable
     override fun dialogContent() {
         BaseDialog {
-            CropImage(
-                url = url,
-                aspectRatio = aspectRatio,
-                onCrop = { continuation?.resume(it) },
-                modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().aspectRatio(1f)
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth().background(Colors.Black),
+                horizontalAlignment = Alignment.End
+            ) {
+                CropImage(
+                    url = url,
+                    aspectRatio = aspectRatio,
+                    state = cropState,
+                    modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().aspectRatio(1f)
+                )
+                RachelButton(
+                    text = "裁剪",
+                    color = Colors.White,
+                    modifier = Modifier.padding(10.dp),
+                    onClick = {
+                        continuation?.resume(cropState.result)
+                    }
+                )
+            }
         }
     }
 }

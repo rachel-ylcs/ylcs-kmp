@@ -369,17 +369,22 @@ compose.desktop {
                 "jdk.xml.dom"
             )
 
+            val dirConfig: Directory by rootProject.extra
+
             windows {
                 console = false
                 exePackageVersion = appVersionName
+                iconFile.set(dirConfig.file("icon.ico"))
             }
 
             linux {
                 debPackageVersion = appVersionName
+                iconFile.set(dirConfig.file("icon.png"))
             }
 
             macOS {
                 pkgPackageVersion = appVersionName
+                iconFile.set(dirConfig.file("icon.icns"))
             }
         }
     }

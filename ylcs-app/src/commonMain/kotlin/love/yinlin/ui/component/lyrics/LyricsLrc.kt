@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
+import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
 import love.yinlin.platform.Coroutines
 import kotlin.math.abs
@@ -47,7 +48,7 @@ private fun LyricsLrcLine(
 
     Text(
         text = text,
-        color = MaterialTheme.colorScheme.background,
+        color = Colors.White,
         style = MaterialTheme.typography.headlineMedium.copy(
             fontSize = fontSize,
             fontWeight = fontWeight,

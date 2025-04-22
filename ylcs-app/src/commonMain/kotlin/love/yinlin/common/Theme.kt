@@ -118,6 +118,9 @@ object Colors {
 
 object ThemeColor {
 	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Red4
+	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Black else Colors.White
+	val backgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.Ghost
+	val onBackgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.Dark
 	val primaryGradient: List<Color> @Composable get() =
 		if (app.isDarkMode) listOf(Colors.Red4, Colors.Orange4, Colors.Red4)
 		else listOf(Colors.Steel4, Colors.Purple4, Colors.Steel4)
@@ -141,7 +144,6 @@ private val LightColorScheme = lightColorScheme(
 	surface = Colors.Gray2,
 	onSurface = Colors.Black,
 	onSurfaceVariant = Colors.Gray5,
-	surfaceContainer = Colors.Gray4,
 	error = Colors.Red4,
 	onError = Colors.White,
 	scrim = Colors.Dark
@@ -165,7 +167,6 @@ private val DarkColorScheme = darkColorScheme(
 	surface = Colors.Gray7,
 	onSurface = Colors.White,
 	onSurfaceVariant = Colors.Gray4,
-	surfaceContainer = Colors.Gray5,
 	error = Colors.Yellow4,
 	onError = Colors.Black,
 	scrim = Colors.Black

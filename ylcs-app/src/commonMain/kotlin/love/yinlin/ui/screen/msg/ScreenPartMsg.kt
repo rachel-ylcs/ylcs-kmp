@@ -13,14 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
+import love.yinlin.api.ClientAPI
+import love.yinlin.api.ServerRes
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.extension.String
 import love.yinlin.extension.launchFlag
+import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
@@ -49,6 +55,37 @@ private enum class MsgTabItem(
 	companion object {
 		@Stable
 		val items = MsgTabItem.entries.map { it.title to it.icon }
+	}
+}
+
+@Stable
+sealed class PhotoItem(val name: String) {
+	override fun toString(): String = name
+
+	@Stable
+	class File(name: String) : PhotoItem(name) {
+		val thumb: String = "https://img.picgo.net/$name.md.webp"
+		val source: String = "https://img.picgo.net/$name.webp"
+	}
+
+	@Stable
+	class Folder (name: String, val items: List<PhotoItem>) : PhotoItem(name)
+
+	companion object {
+		val Home: Folder = Folder("相册", emptyList())
+
+		fun parseJson(name: String, json: JsonObject): Folder {
+			val items = mutableListOf<PhotoItem>()
+			val folder = Folder(name, items)
+			for ((key, value) in json) {
+				items += when (value) {
+					is JsonObject -> parseJson(key, value)
+					is JsonArray -> Folder(key, value.map { File(it.String) })
+					else -> error("")
+				}
+			}
+			return folder
+		}
 	}
 }
 
@@ -100,23 +137,6 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	// 当前微博
 	var currentWeibo: Weibo? = null
 
-	// 微博数据
-	val weiboState = WeiboState()
-	// 超话数据
-	val chaohuaState = ChaohuaState()
-
-	fun onPageChanged(index: Int) {
-		launch { pagerState.scrollToPage(index) }
-	}
-
-	suspend fun onRefresh() {
-		when (pagerState.currentPage) {
-			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
-			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
-			MsgTabItem.PICTURES.ordinal -> {}
-		}
-	}
-
 	val processor = object : WeiboProcessor {
 		override fun onWeiboClick(weibo: Weibo) {
 			currentWeibo = weibo
@@ -150,6 +170,55 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+
+	@Stable
+	class PhotoState {
+		val flagFirstLoad = launchFlag()
+		var photos by mutableStateOf(PhotoItem.Home)
+		var stack = mutableStateListOf(photos)
+		var state by mutableStateOf(BoxState.EMPTY)
+
+		suspend fun loadPhotos() {
+			if (state != BoxState.LOADING) {
+				state = BoxState.LOADING
+				val result = ClientAPI.request<JsonObject>(route = ServerRes.Photo)
+				val data = Coroutines.cpu {
+					try {
+						PhotoItem.parseJson("相册", (result as Data.Success).data)
+					} catch (_: Throwable) {
+						null
+					}
+				}
+				if (data != null) {
+					photos = data
+					stack.clear()
+					stack += photos
+					state = BoxState.CONTENT
+				}
+				else state = BoxState.NETWORK_ERROR
+			}
+		}
+	}
+
+	// 微博数据
+	val weiboState = WeiboState()
+	// 超话数据
+	val chaohuaState = ChaohuaState()
+	// 图集数据
+	val photoState = PhotoState()
+
+	suspend fun onPageChanged(index: Int) {
+		pagerState.scrollToPage(index)
+	}
+
+	suspend fun onRefresh() {
+		when (pagerState.currentPage) {
+			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
+			MsgTabItem.PICTURES.ordinal -> photoState.loadPhotos()
+		}
+	}
+
 	@Composable
 	override fun content() {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -163,7 +232,9 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				) {
 					TabBar(
 						currentPage = pagerState.currentPage,
-						onNavigate = { onPageChanged(it) },
+						onNavigate = {
+							launch { onPageChanged(it) }
+						},
 						items = MsgTabItem.items,
 						modifier = Modifier.weight(1f).padding(end = 10.dp)
 					)
@@ -187,7 +258,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 						when (it) {
 							MsgTabItem.WEIBO.ordinal -> ScreenWeibo(this@ScreenPartMsg)
 							MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(this@ScreenPartMsg)
-							MsgTabItem.PICTURES.ordinal -> ScreenPictures()
+							MsgTabItem.PICTURES.ordinal -> ScreenPictures(this@ScreenPartMsg)
 						}
 					}
 				}

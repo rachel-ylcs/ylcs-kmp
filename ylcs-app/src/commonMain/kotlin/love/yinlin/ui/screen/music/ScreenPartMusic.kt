@@ -44,6 +44,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.ThemeColor
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.rememberDerivedState
@@ -134,7 +135,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					path = path,
 					quality = ImageQuality.Full,
 					contentScale = ContentScale.Crop,
-					alpha = if (app.isDarkMode) 0.9f else 0.7f,
+					alpha = 0.7f,
 					modifier = Modifier.fillMaxSize()
 				)
 			}
@@ -146,18 +147,30 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		SplitActionLayout(
 			modifier = modifier,
 			left = {
-				Action(Icons.Outlined.LibraryMusic) {
+				Action(
+					icon = Icons.Outlined.LibraryMusic,
+					color = Colors.White
+				) {
 					navigate(ScreenMusicLibrary.Args)
 				}
-				Action(Icons.AutoMirrored.Outlined.QueueMusic) {
+				Action(
+					icon = Icons.AutoMirrored.Outlined.QueueMusic,
+					color = Colors.White
+				) {
 					navigate(ScreenPlaylistLibrary.Args)
 				}
-				Action(Icons.Outlined.Lyrics) {
+				Action(
+					icon = Icons.Outlined.Lyrics,
+					color = Colors.White
+				) {
 
 				}
 			},
 			right = {
-				Action(Icons.Outlined.AlarmOn) {
+				Action(
+					icon = Icons.Outlined.AlarmOn,
+					color = Colors.White
+				) {
 					sleepModeSheet.open()
 				}
 			}
@@ -236,6 +249,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		) {
 			Text(
 				text = name ?: stringResource(Res.string.no_audio_source),
+				color = Colors.White,
 				style = MaterialTheme.typography.titleLarge,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
@@ -243,6 +257,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			)
 			Text(
 				text = singer ?: stringResource(Res.string.unknown_singer),
+				color = Colors.White,
 				style = MaterialTheme.typography.bodyLarge,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
@@ -281,11 +296,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		) {
 			Text(
 				text = remember(currentTime) { currentTime.timeString },
+				color = Colors.White,
 				textAlign = TextAlign.Start,
 				modifier = Modifier.weight(1f)
 			)
 			Text(
 				text = remember(duration) { duration.timeString },
+				color = Colors.White,
 				textAlign = TextAlign.End,
 				modifier = Modifier.weight(1f)
 			)
@@ -305,8 +322,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						horizontalBias = hotpot / duration.toFloat() * 2 - 1,
 						verticalBias = 0f
 					))
-					.width(14.dp)
-					.height(8.dp)
+					.width(14.dp).height(8.dp)
 					.clickable(
 						interactionSource = null,
 						indication = null,
@@ -317,7 +333,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.padding(horizontal = 3.dp)
 					.shadow(elevation = 2.dp, shape = CircleShape)
 					.background(
-						color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+						color = Colors.White.copy(alpha = 0.8f),
 						shape = CircleShape
 					)
 				)
@@ -414,6 +430,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
                         MusicPlayMode.LOOP -> ExtraIcons.LoopMode
                         MusicPlayMode.RANDOM -> ExtraIcons.ShuffleMode
                     },
+					color = Colors.White,
 					onClick = {
 						launch { factory.switchPlayMode() }
 					}
@@ -422,6 +439,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = ExtraIcons.GotoPrevious,
+					color = Colors.White,
 					onClick = {
 						launch { factory.gotoPrevious() }
 					}
@@ -430,6 +448,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = if (factory.isPlaying) ExtraIcons.Pause else ExtraIcons.Play,
+					color = Colors.White,
 					onClick = {
 						launch {
 							if (factory.isPlaying) factory.pause()
@@ -441,6 +460,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = ExtraIcons.GotoNext,
+					color = Colors.White,
 					onClick = {
 						launch { factory.gotoNext() }
 					}
@@ -449,6 +469,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = ExtraIcons.Playlist,
+					color = Colors.White,
 					onClick = {
 						if (factory.isReady) currentPlaylistSheet.open()
 					}
@@ -470,7 +491,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 				ClickIcon(
 					icon = Icons.Outlined.GifBox,
-					color = if (isAnimationBackground) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+					color = if (isAnimationBackground) MaterialTheme.colorScheme.primary else Colors.White,
 					enabled = hasAnimation,
 					onClick = { isAnimationBackground = !isAnimationBackground }
 				)
@@ -478,6 +499,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = Icons.Outlined.MusicVideo,
+					color = Colors.White,
 					onClick = {
 
 					}
@@ -486,6 +508,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = ExtraIcons.ShowLyrics,
+					color = Colors.White,
 					onClick = {
 
 					}
@@ -494,6 +517,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			equalItem {
 				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
+					color = Colors.White,
 					onClick = {
 
 					}
@@ -519,7 +543,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				catch (_: Throwable) { }
 			}
 
-			if (musicInfo == null) closeSleepMode()
+			if (musicInfo == null) exitSleepMode()
 		}
 
 		LaunchedEffect(factory.currentPosition) {
@@ -604,7 +628,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	private fun startSleepMode(seconds: Int) {
-		closeSleepMode()
+		exitSleepMode()
 		sleepJob = launch {
 			sleepRemainSeconds = seconds
 			repeat(seconds) {
@@ -616,7 +640,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	private fun closeSleepMode() {
+	private fun exitSleepMode() {
 		sleepJob?.cancel()
 		sleepJob = null
 	}
@@ -646,12 +670,15 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 							text = if (sleepJob == null) "启动" else "停止",
 							icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
 							onClick = {
-								if (sleepJob == null) {
-									val time = state.hour * 3600 + state.minute * 60
-									if (time > 0) startSleepMode(time)
-									else slot.tip.warning("未设定时间")
+								if (factory.isReady) {
+									if (sleepJob == null) {
+										val time = state.hour * 3600 + state.minute * 60
+										if (time > 0) startSleepMode(time)
+										else slot.tip.warning("未设定时间")
+									}
+									else exitSleepMode()
 								}
-								else closeSleepMode()
+								else slot.tip.warning("播放器未开启")
 							}
 						)
 					}
@@ -673,7 +700,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
 			MusicBackground(modifier = Modifier.fillMaxSize()
-				.background(MaterialTheme.colorScheme.onBackground)
+				.background(Colors.Black)
 				.hazeSource(state = blurState)
 				.zIndex(1f))
 			Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
@@ -685,7 +712,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						state = blurState,
 						style = HazeStyle(
 							blurRadius = 15.dp,
-							backgroundColor = MaterialTheme.colorScheme.background,
+							backgroundColor = Colors.Dark,
 							tint = null,
 						)
 					)
@@ -702,7 +729,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						state = blurState,
 						style = HazeStyle(
 							blurRadius = 10.dp,
-							backgroundColor = MaterialTheme.colorScheme.background,
+							backgroundColor = Colors.Dark,
 							tint = null,
 						)
 					)

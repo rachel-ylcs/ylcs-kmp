@@ -1,5 +1,11 @@
 package love.yinlin
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,6 +93,34 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		navController = navController,
 		startDestination = ScreenMain.Args,
+		enterTransition = {
+			slideIntoContainer(
+				towards = AnimatedContentTransitionScope.SlideDirection.Start,
+				animationSpec = tween(
+					durationMillis = 300,
+					easing = FastOutSlowInEasing
+				)
+			) + fadeIn(
+				animationSpec = tween(
+					durationMillis = 300,
+					easing = FastOutSlowInEasing
+				)
+			)
+		},
+		exitTransition = {
+			slideOutOfContainer(
+				towards = AnimatedContentTransitionScope.SlideDirection.End,
+				animationSpec = tween(
+					durationMillis = 300,
+					easing = FastOutSlowInEasing
+				)
+			) + fadeOut(
+				animationSpec = tween(
+					durationMillis = 300,
+					easing = FastOutSlowInEasing
+				)
+			)
+		}
 	) {
 		with(ScreenRouteScope(this, appModel)) {
 			screens()
