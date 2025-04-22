@@ -1,4 +1,4 @@
-﻿#include <jni.h>
+#include <jni.h>
 #include "MMKV.h"
 
 std::string jstring2string(JNIEnv* env, jstring str)
