@@ -8,6 +8,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
@@ -606,18 +608,21 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 				HorizontalDivider(modifier = Modifier.height(1.dp))
 
-				val currentId by derivedStateOf { factory.currentMusic?.id }
-				LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-					items(
+				val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
+				LazyColumn(
+					modifier = Modifier.fillMaxWidth().weight(1f),
+					state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
+				) {
+					itemsIndexed(
 						items = factory.musicList,
-						key = { it.id }
-					) { musicInfo ->
+						key = { _, musicInfo -> musicInfo.id }
+					) { index, musicInfo ->
 						PlayingMusicStatusCard(
 							musicInfo = musicInfo,
-							isCurrent = musicInfo.id == currentId,
+							isCurrent = index == currentIndex,
 							onClick = {
 								currentPlaylistSheet.hide()
-								launch { factory.gotoIndex(factory.musicList.indexOfFirst { it.id == musicInfo.id }) }
+								launch { factory.gotoIndex(index) }
 							},
 							modifier = Modifier.fillMaxWidth()
 						)
