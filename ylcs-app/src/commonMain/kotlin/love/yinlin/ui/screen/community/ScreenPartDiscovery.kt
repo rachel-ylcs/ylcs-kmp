@@ -42,7 +42,7 @@ private enum class DiscoveryItem(
 	val id: Int,
 	val icon: ImageVector
 ) {
-	Lastest(Comment.Section.LATEST, Icons.Filled.NewReleases),
+	Latest(Comment.Section.LATEST, Icons.Filled.NewReleases),
 	Hot(Comment.Section.HOT, Icons.Filled.LocalFireDepartment),
 	Notification(Comment.Section.NOTIFICATION, Icons.Filled.Campaign),
 	Water(Comment.Section.WATER, Icons.Filled.WaterDrop),
@@ -69,7 +69,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	class DiscoveryPagination : Pagination<Topic, Int>(Int.MAX_VALUE) {
 		var section = Comment.Section.LATEST
 		override fun offset(item: Topic): Int = when (section) {
-			DiscoveryItem.Lastest.id -> item.tid
+			DiscoveryItem.Latest.id -> item.tid
 			DiscoveryItem.Hot.id -> item.coinNum
 			else -> item.tid
 		}
@@ -80,7 +80,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		state = BoxState.LOADING
 		val section = currentSection
 		val result = when (section) {
-			DiscoveryItem.Lastest.id -> ClientAPI.request(
+			DiscoveryItem.Latest.id -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
 				data = API.User.Topic.GetLatestTopics.Request(
 					num = page.pageNum
@@ -111,7 +111,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	suspend fun requestMoreData() {
 		val section = currentSection
 		val result = when (section) {
-			DiscoveryItem.Lastest.id -> ClientAPI.request(
+			DiscoveryItem.Latest.id -> ClientAPI.request(
 				route = API.User.Topic.GetLatestTopics,
 				data = API.User.Topic.GetLatestTopics.Request(
 					offset = page.offset,
