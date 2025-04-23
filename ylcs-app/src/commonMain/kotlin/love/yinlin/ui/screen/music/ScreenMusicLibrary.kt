@@ -62,7 +62,7 @@ private fun MusicCard(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+        color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         shadowElevation = 3.dp,
     ) {
         Row(modifier = Modifier
