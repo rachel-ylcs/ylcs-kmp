@@ -70,6 +70,11 @@ class ActualMusicFactory : MusicFactory() {
         controls().stop()
     }
 
+    private fun MediaPlayer.gotoLoopPrevious() {
+        currentIndex = (currentIndex + musicList.size - 1) % musicList.size
+        media().play(musicList[currentIndex].audioPath.toString())
+    }
+
     private fun MediaPlayer.gotoLoopNext() {
         currentIndex = (currentIndex + 1) % musicList.size
         media().play(musicList[currentIndex].audioPath.toString())
@@ -106,12 +111,7 @@ class ActualMusicFactory : MusicFactory() {
 
     override suspend fun gotoPrevious() = withReadyPlayer { player ->
         when (playMode) {
-            MusicPlayMode.ORDER -> {
-
-            }
-            MusicPlayMode.LOOP -> {
-
-            }
+            MusicPlayMode.ORDER, MusicPlayMode.LOOP -> player.gotoLoopPrevious()
             MusicPlayMode.RANDOM -> {
 
             }
