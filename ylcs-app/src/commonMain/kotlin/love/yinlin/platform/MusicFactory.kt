@@ -41,10 +41,8 @@ abstract class MusicFactory {
     abstract suspend fun gotoIndex(index: Int)
     abstract suspend fun seekTo(position: Long)
     abstract suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?)
-    abstract suspend fun addMedia(media: MusicInfo)
     abstract suspend fun addMedias(medias: List<MusicInfo>)
     abstract suspend fun removeMedia(index: Int)
-    abstract suspend fun moveMedia(start: Int, end: Int)
 
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()

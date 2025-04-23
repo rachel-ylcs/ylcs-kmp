@@ -30,8 +30,6 @@ class ActualMusicFactory : MusicFactory() {
         catch (_: Throwable) { }
     }
 
-    private var currentIndex: Int by mutableIntStateOf(-1)
-
     override var error: Throwable? by mutableStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override val musicList = mutableStateListOf<MusicInfo>()
@@ -40,6 +38,15 @@ class ActualMusicFactory : MusicFactory() {
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
     override var currentMusic: MusicInfo? by mutableStateOf(null)
+
+    private var currentIndex: Int by mutableIntStateOf(-1)
+
+    class ShuffledOrder(size: Int = 0, start: Int? = null) {
+        val indices: List<Int> = List(size) { it }.shuffled()
+        val begin: Int = start ?: indices.firstOrNull() ?: -1
+    }
+
+    private var shuffledList = ShuffledOrder()
 
     private val eventListener = object : MediaEventAdapter() {
         override fun mediaDurationChanged(media: Media?, newDuration: Long) { currentDuration = newDuration }
@@ -52,7 +59,7 @@ class ActualMusicFactory : MusicFactory() {
         override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { currentPosition = newTime }
         override fun stopped(mediaPlayer: MediaPlayer?) {
             // 可能是因为播放完当前媒体停止 也可能是手动停止(此处要排除)
-            if (isReady) mediaPlayer?.innerAutoGotoNext()
+            if (isReady && mediaPlayer != null) mediaPlayer.innerGotoIndex(innerAutoNextIndex)
         }
         override fun error(mediaPlayer: MediaPlayer?) {
             mediaPlayer?.innerStop()
@@ -70,24 +77,51 @@ class ActualMusicFactory : MusicFactory() {
         controls().stop()
     }
 
-    private fun MediaPlayer.gotoLoopPrevious() {
-        currentIndex = (currentIndex + musicList.size - 1) % musicList.size
-        media().play(musicList[currentIndex].audioPath.toString())
-    }
+    private val loopPreviousIndex: Int get() = (currentIndex + musicList.size - 1) % musicList.size
 
-    private fun MediaPlayer.gotoLoopNext() {
-        currentIndex = (currentIndex + 1) % musicList.size
-        media().play(musicList[currentIndex].audioPath.toString())
-    }
+    private val loopNextIndex: Int get() = (currentIndex + 1) % musicList.size
 
-    private fun MediaPlayer.innerAutoGotoNext() {
-        when (playMode) {
-            MusicPlayMode.ORDER -> gotoLoopNext()
-            MusicPlayMode.LOOP -> media().play(musicList[currentIndex].audioPath.toString())
-            MusicPlayMode.RANDOM -> {
-
+    private val randomPreviousIndex: Int get() {
+        val indices = shuffledList.indices
+        val indexInShuffled = indices.indexOf(currentIndex)
+        return if (indexInShuffled != -1 && indices.size == musicList.size) {
+            val actualIndex = indices[(indexInShuffled + indices.size - 1) % indices.size]
+            // 播放一轮结束, 重新洗牌
+            if (actualIndex == shuffledList.begin) {
+                shuffledList = ShuffledOrder(size = indices.size)
+                shuffledList.begin
             }
+            else actualIndex
         }
+        else -1
+    }
+
+    private val randomNextIndex: Int get() {
+        val indices = shuffledList.indices
+        val indexInShuffled = indices.indexOf(currentIndex)
+        return if (indexInShuffled != -1 && indices.size == musicList.size) {
+            val actualIndex = indices[(indexInShuffled + 1) % indices.size]
+            // 播放一轮结束, 重新洗牌
+            if (actualIndex == shuffledList.begin) {
+                shuffledList = ShuffledOrder(size = indices.size)
+                shuffledList.begin
+            }
+            else actualIndex
+        } else -1
+    }
+
+    private val innerAutoNextIndex: Int get() = when (playMode) {
+        MusicPlayMode.ORDER -> loopNextIndex
+        MusicPlayMode.LOOP -> currentIndex
+        MusicPlayMode.RANDOM -> randomNextIndex
+    }
+
+    private fun MediaPlayer.innerGotoIndex(index: Int) {
+        if (index in 0 ..< musicList.size) {
+            currentIndex = index
+            media().play(musicList[currentIndex].audioPath.toString())
+        }
+        else innerStop()
     }
 
     private inline fun withPlayer(block: (player: MediaPlayer) -> Unit) = controller?.mediaPlayer()?.let(block) ?: Unit
@@ -95,6 +129,8 @@ class ActualMusicFactory : MusicFactory() {
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
+        // 重新换模式要重设洗牌顺序
+        if (musicPlayMode == MusicPlayMode.RANDOM) shuffledList = ShuffledOrder(size = musicList.size, start = currentIndex)
     }
 
     override suspend fun play() = withReadyPlayer { player ->
@@ -105,34 +141,17 @@ class ActualMusicFactory : MusicFactory() {
         if (player.status().isPlaying) player.controls().pause()
     }
 
-    override suspend fun stop() = withReadyPlayer { player ->
-        player.innerStop()
-    }
+    override suspend fun stop() = withReadyPlayer { player -> player.innerStop() }
 
     override suspend fun gotoPrevious() = withReadyPlayer { player ->
-        when (playMode) {
-            MusicPlayMode.ORDER, MusicPlayMode.LOOP -> player.gotoLoopPrevious()
-            MusicPlayMode.RANDOM -> {
-
-            }
-        }
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomPreviousIndex else loopPreviousIndex)
     }
 
     override suspend fun gotoNext() = withReadyPlayer { player ->
-        when (playMode) {
-            MusicPlayMode.ORDER, MusicPlayMode.LOOP -> player.gotoLoopNext()
-            MusicPlayMode.RANDOM -> {
-
-            }
-        }
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomNextIndex else loopNextIndex)
     }
 
-    override suspend fun gotoIndex(index: Int) = withReadyPlayer { player ->
-        if (index in 0 ..< musicList.size) {
-            currentIndex = index
-            player.media().play(musicList[currentIndex].audioPath.toString())
-        }
-    }
+    override suspend fun gotoIndex(index: Int) = withReadyPlayer { player -> player.innerGotoIndex(index) }
 
     override suspend fun seekTo(position: Long) = withReadyPlayer { player ->
         player.controls().setTime(position)
@@ -142,14 +161,10 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) = withPlayer { player ->
         val index = startIndex ?: 0
         if (index >= 0 && index < medias.size) {
-            currentIndex = index
             musicList.replaceAll(medias)
-            player.media().prepare(musicList[index].audioPath.toString())
+            shuffledList = ShuffledOrder(size = medias.size, start = index)
+            player.innerGotoIndex(index)
         }
-    }
-
-    override suspend fun addMedia(media: MusicInfo) {
-
     }
 
     override suspend fun addMedias(medias: List<MusicInfo>) {
@@ -157,10 +172,6 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override suspend fun removeMedia(index: Int) {
-
-    }
-
-    override suspend fun moveMedia(start: Int, end: Int) {
 
     }
 }
