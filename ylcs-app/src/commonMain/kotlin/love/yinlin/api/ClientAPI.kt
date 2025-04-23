@@ -24,8 +24,12 @@ object ClientAPI {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
-		return if (code == APICode.SUCCESS) Data.Success(json["data"]!!.to(), msg)
-			else Data.Error(Failed.RequestError.InvalidArgument, msg)
+		return when (code) {
+			APICode.SUCCESS -> Data.Success(json["data"]!!.to(), msg)
+			APICode.FAILED -> Data.Error(Failed.RequestError.InvalidArgument, msg)
+			APICode.UNAUTHORIZED -> Data.Error(Failed.RequestError.Unauthorized, msg)
+			else -> Data.Error(Failed.RequestError.ClientError, msg)
+		}
 	}
 
 	@JvmName("processResponseDefault")
@@ -33,8 +37,12 @@ object ClientAPI {
 		val json = response.body<JsonObject>()
 		val code = json["code"].Int
 		val msg = json["msg"].StringNull
-		return if (code == APICode.SUCCESS) Data.Success(Response.Default, msg)
-			else Data.Error(Failed.RequestError.InvalidArgument, msg)
+		return when (code) {
+			APICode.SUCCESS -> Data.Success(Response.Default, msg)
+			APICode.FAILED -> Data.Error(Failed.RequestError.InvalidArgument, msg)
+			APICode.UNAUTHORIZED -> Data.Error(Failed.RequestError.Unauthorized, msg)
+			else -> Data.Error(Failed.RequestError.ClientError, msg)
+		}
 	}
 
 	fun buildGetParameters(argsMap: JsonObject): String = buildString {

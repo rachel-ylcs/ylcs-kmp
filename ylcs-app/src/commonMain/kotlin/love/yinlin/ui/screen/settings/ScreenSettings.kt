@@ -397,16 +397,16 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			)
 
 			ItemExpander(
-				title = "隐私政策",
-				icon = colorfulImageVector(icon = Icons.Outlined.VerifiedUser, background = Colors.Yellow4),
-				onClick = { privacyPolicySheet.open() }
+				title = "关于茶舍",
+				icon = colorfulImageVector(icon = Icons.Outlined.Face, background = Colors.Green4),
+				onClick = { aboutSheet.open() }
 			)
 
 			ItemExpander(
-				title = "关于茶舍",
-				icon = colorfulImageVector(icon = Icons.Outlined.Face, background = Colors.Green4),
+				title = "隐私政策",
+				icon = colorfulImageVector(icon = Icons.Outlined.VerifiedUser, background = Colors.Yellow4),
 				hasDivider = false,
-				onClick = { aboutSheet.open() }
+				onClick = { privacyPolicySheet.open() }
 			)
 		}
 	}

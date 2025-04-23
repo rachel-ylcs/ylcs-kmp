@@ -44,7 +44,7 @@ private fun UserInfoCard(
 		modifier = modifier.padding(horizontal = 10.dp, vertical = 5.dp),
 		horizontalArrangement = Arrangement.spacedBy(10.dp),
 	) {
-		OffsetLayout(y = (-37).dp) {
+		OffsetLayout(y = (-17).dp) {
 			WebImage(
 				uri = user.info.avatar,
 				key = DateEx.TodayString,

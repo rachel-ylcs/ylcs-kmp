@@ -41,6 +41,7 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.OffsetLayout
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.equalItem
 
 @Composable
@@ -97,14 +98,13 @@ internal fun ColumnScope.PortraitUserProfileCard(
 		modifier = Modifier.fillMaxWidth()
 			.shadow(elevation = 5.dp, clip = false)
 			.background(MaterialTheme.colorScheme.surface)
-			.padding(10.dp),
-		verticalArrangement = Arrangement.spacedBy(10.dp)
+			.padding(10.dp)
 	) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			OffsetLayout(y = (-46).dp) {
+			OffsetLayout(y = (-26).dp) {
 				WebImage(
 					uri = profile.avatarPath,
 					key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
@@ -127,10 +127,7 @@ internal fun ColumnScope.PortraitUserProfileCard(
 			horizontalArrangement = Arrangement.spacedBy(10.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			UserLabel(
-				label = profile.label,
-				level = profile.level
-			)
+			UserLabel(label = profile.label, level = profile.level)
 			Row(
 				modifier = Modifier.weight(1f),
 				horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
@@ -146,6 +143,7 @@ internal fun ColumnScope.PortraitUserProfileCard(
 				)
 			}
 		}
+		Space(10.dp)
 		Text(
 			text = profile.signature,
 			maxLines = 2,
