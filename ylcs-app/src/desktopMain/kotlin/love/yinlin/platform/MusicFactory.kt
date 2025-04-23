@@ -2,7 +2,6 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.replaceAll
@@ -46,9 +45,13 @@ class ActualMusicFactory : MusicFactory() {
     class ShuffledOrder(size: Int = 0, start: Int? = null) {
         var indices: List<Int> = List(size) { it }.shuffled()
             private set
-        val begin: Int = start ?: indices.firstOrNull() ?: -1
+        var begin: Int = start ?: indices.firstOrNull() ?: -1
+            private set
 
-        fun internalSet(items: List<Int>) { indices = items }
+        fun internalSet(items: List<Int>, start: Int? = null) {
+            indices = items
+            if (start != null) begin = start
+        }
 
         override fun toString(): String = "ShuffledOrder($begin) [${indices.joinToString(",")}]"
     }
@@ -66,7 +69,11 @@ class ActualMusicFactory : MusicFactory() {
         override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { currentPosition = newTime }
         override fun stopped(mediaPlayer: MediaPlayer?) {
             // 可能是因为播放完当前媒体停止 也可能是手动停止(此处要排除)
-            if (isReady && mediaPlayer != null) mediaPlayer.innerGotoIndex(innerAutoNextIndex)
+            if (isReady && mediaPlayer != null) mediaPlayer.innerGotoIndex(when (playMode) {
+                MusicPlayMode.ORDER -> loopNextIndex
+                MusicPlayMode.LOOP -> currentIndex
+                MusicPlayMode.RANDOM -> randomNextIndex ?: reshuffled()
+            })
         }
         override fun error(mediaPlayer: MediaPlayer?) {
             mediaPlayer?.innerStop()
@@ -80,7 +87,9 @@ class ActualMusicFactory : MusicFactory() {
         currentPosition = 0L
         currentDuration = 0L
         currentMusic = null
+        currentIndex = -1
         currentPlaylist = null
+        shuffledList = ShuffledOrder()
         controls().stop()
     }
 
@@ -88,39 +97,30 @@ class ActualMusicFactory : MusicFactory() {
 
     private val loopNextIndex: Int get() = (currentIndex + 1) % musicList.size
 
-    private val randomPreviousIndex: Int get() {
+    private val randomPreviousIndex: Int? get() {
         val indices = shuffledList.indices
         val indexInShuffled = indices.indexOf(currentIndex)
         return if (indexInShuffled != -1 && indices.size == musicList.size) {
             val actualIndex = indices[(indexInShuffled + indices.size - 1) % indices.size]
             // 播放一轮结束, 重新洗牌
-            if (actualIndex == shuffledList.begin) {
-                shuffledList = ShuffledOrder(size = indices.size)
-                shuffledList.begin
-            }
-            else actualIndex
+            if (actualIndex == shuffledList.begin) null else actualIndex
         }
         else -1
     }
 
-    private val randomNextIndex: Int get() {
+    private val randomNextIndex: Int? get() {
         val indices = shuffledList.indices
         val indexInShuffled = indices.indexOf(currentIndex)
         return if (indexInShuffled != -1 && indices.size == musicList.size) {
             val actualIndex = indices[(indexInShuffled + 1) % indices.size]
             // 播放一轮结束, 重新洗牌
-            if (actualIndex == shuffledList.begin) {
-                shuffledList = ShuffledOrder(size = indices.size)
-                shuffledList.begin
-            }
-            else actualIndex
+            if (actualIndex == shuffledList.begin) null else actualIndex
         } else -1
     }
 
-    private val innerAutoNextIndex: Int get() = when (playMode) {
-        MusicPlayMode.ORDER -> loopNextIndex
-        MusicPlayMode.LOOP -> currentIndex
-        MusicPlayMode.RANDOM -> randomNextIndex
+    private fun reshuffled(size: Int? = null, start: Int? = null): Int {
+        shuffledList = ShuffledOrder(size = size ?: shuffledList.indices.size, start = start)
+        return shuffledList.begin
     }
 
     private fun MediaPlayer.innerGotoIndex(index: Int) {
@@ -137,9 +137,7 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
         // 重新换模式要重设洗牌顺序
-        if (musicPlayMode == MusicPlayMode.RANDOM) {
-            shuffledList = ShuffledOrder(size = musicList.size, start = currentIndex)
-        }
+        if (musicPlayMode == MusicPlayMode.RANDOM) reshuffled(start = currentIndex)
     }
 
     override suspend fun play() = withReadyPlayer { player ->
@@ -153,11 +151,11 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun stop() = withReadyPlayer { player -> player.innerStop() }
 
     override suspend fun gotoPrevious() = withReadyPlayer { player ->
-        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomPreviousIndex else loopPreviousIndex)
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomPreviousIndex ?: reshuffled() else loopPreviousIndex)
     }
 
     override suspend fun gotoNext() = withReadyPlayer { player ->
-        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomNextIndex else loopNextIndex)
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomNextIndex ?: reshuffled() else loopNextIndex)
     }
 
     override suspend fun gotoIndex(index: Int) = withReadyPlayer { player -> player.innerGotoIndex(index) }
@@ -171,13 +169,12 @@ class ActualMusicFactory : MusicFactory() {
         val index = startIndex ?: 0
         if (index >= 0 && index < medias.size) {
             musicList.replaceAll(medias)
-            shuffledList = ShuffledOrder(size = medias.size, start = index)
+            reshuffled(size = medias.size, start = index)
             player.innerGotoIndex(index)
-            println(shuffledList)
         }
     }
 
-    override suspend fun addMedias(medias: List<MusicInfo>) {
+    override suspend fun addMedias(medias: List<MusicInfo>) = withReadyPlayer { player ->
         musicList.addAll(medias)
 
         /*
@@ -187,20 +184,45 @@ class ActualMusicFactory : MusicFactory() {
         * 得到新的随机序索引表
         *  */
         val indices = shuffledList.indices
-        val indexInShuffled = indices.indexOf(currentIndex)
-        val rotated = indices.subList(indexInShuffled, indices.size) + indices.subList(0, indexInShuffled)
-        val head = rotated.first()
-        val rest = rotated.drop(1).toMutableList()
-        repeat(medias.size) {
-            // 生成0到当前rest长度的随机位置
-            val position = Random.nextInt(rest.size + 1)
-            rest.add(position, indices.size + it)
+        if (playMode == MusicPlayMode.RANDOM) {
+            val indexInShuffled = indices.indexOf(currentIndex)
+            val rotated = indices.subList(indexInShuffled, indices.size) + indices.subList(0, indexInShuffled)
+            val head = rotated.first()
+            val rest = rotated.drop(1).toMutableList()
+            repeat(medias.size) {
+                // 生成0到当前rest长度的随机位置
+                val position = Random.nextInt(rest.size + 1)
+                rest.add(position, indices.size + it)
+            }
+            shuffledList.internalSet(listOf(head) + rest)
         }
-        shuffledList.internalSet(listOf(head) + rest)
-        println(shuffledList)
+        else reshuffled(size = indices.size + medias.size)
     }
 
-    override suspend fun removeMedia(index: Int) {
-
+    override suspend fun removeMedia(index: Int) = withReadyPlayer { player ->
+        val size = musicList.size
+        if (index in 0 ..< size) {
+            if (size == 1) player.innerStop()
+            else {
+                musicList.removeAt(index)
+                if (playMode == MusicPlayMode.RANDOM) {
+                    if (currentIndex == index) player.innerGotoIndex(reshuffled(size = size - 1))
+                    else {
+                        // 如果删除了随机序的起点则重新令当前播放的为起点
+                        val rest = shuffledList.indices.toMutableList()
+                        rest.removeIf { it == index }
+                        // 随机序中超过被删除索引的索引都要自减1
+                        for ((i, item) in rest.withIndex()) {
+                            if (item > index) rest[i] -= 1
+                        }
+                        shuffledList.internalSet(rest, if (shuffledList.begin == index) currentIndex else null)
+                    }
+                }
+                else {
+                    if (currentIndex == index) player.innerGotoIndex(if (index == size - 1) index - 1 else index)
+                    reshuffled(size = size - 1)
+                }
+            }
+        }
     }
 }
