@@ -99,7 +99,27 @@ fun DockedDatePicker(
 				modifier = Modifier.fillMaxWidth(),
 				title = null,
 				headline = null,
-				showModeToggle = false
+				showModeToggle = false,
+				colors = DatePickerDefaults.colors().copy(
+					containerColor = MaterialTheme.colorScheme.surface,
+					titleContentColor = MaterialTheme.colorScheme.onSurface,
+					headlineContentColor = MaterialTheme.colorScheme.onSurface,
+					weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+					subheadContentColor = MaterialTheme.colorScheme.onSurface,
+					navigationContentColor = MaterialTheme.colorScheme.onSurface,
+					yearContentColor = MaterialTheme.colorScheme.onSurface,
+					currentYearContentColor = MaterialTheme.colorScheme.onSurface,
+					disabledYearContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+					selectedYearContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+					disabledSelectedYearContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+					selectedYearContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+					dayContentColor = MaterialTheme.colorScheme.onSurface,
+					selectedDayContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+					disabledDayContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+					selectedDayContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+					todayContentColor = MaterialTheme.colorScheme.onSurface,
+					todayDateBorderColor = MaterialTheme.colorScheme.secondary
+				)
 			)
 		}
 	}

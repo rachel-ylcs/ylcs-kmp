@@ -1,6 +1,7 @@
 package love.yinlin.common
 
 import love.yinlin.AppModel
+import love.yinlin.ui.screen.community.ScreenUserCard
 import love.yinlin.ui.screen.music.ScreenImportMusic
 
 class DeepLink(private val model: AppModel) {
@@ -9,7 +10,13 @@ class DeepLink(private val model: AppModel) {
     }
 
     private fun schemeRachel(uri: Uri) {
-
+        when (uri.path) {
+            "/openProfile" -> {
+                uri.params["uid"]?.toIntOrNull()?.let { uid ->
+                    model.navigate(ScreenUserCard.Args(uid))
+                }
+            }
+        }
     }
 
     fun process(uri: Uri) {

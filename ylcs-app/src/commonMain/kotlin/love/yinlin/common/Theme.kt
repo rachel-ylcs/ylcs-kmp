@@ -40,7 +40,7 @@ object Colors {
 	val Gray5 = Color(0xff94a3b8)
 	val Gray6 = Color(0xff64748b)
 	val Gray7 = Color(0xff475569)
-	val Gray8 = Color(0xff334155)
+	val Gray8 = Color(0xff262626)
 	val Red1 = Color(255, 226, 226)
 	val Red2 = Color(255, 201, 201)
 	val Red3 = Color(255, 162, 162)
@@ -117,8 +117,8 @@ object Colors {
 }
 
 object ThemeColor {
-	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Red4
-	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Black else Colors.White
+	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Yellow5
+	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.White
 	val backgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.Ghost
 	val onBackgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.Dark
 	val primaryGradient: List<Color> @Composable get() =
@@ -128,47 +128,47 @@ object ThemeColor {
 
 private val LightColorScheme = lightColorScheme(
 	primary = Colors.Steel4,
-	onPrimary = Colors.White,
-	primaryContainer = Colors.Steel4,
-	onPrimaryContainer = Colors.White,
+	onPrimary = Colors.Ghost,
+	primaryContainer = Colors.Steel6,
+	onPrimaryContainer = Colors.Ghost,
 	secondary = Color(0xff76c1c6),
-	onSecondary = Colors.White,
+	onSecondary = Colors.Ghost,
 	secondaryContainer = Color(0xff1c8d95),
-	onSecondaryContainer = Colors.White,
+	onSecondaryContainer = Colors.Ghost,
 	tertiary = Color(0xffef91a1),
-	onTertiary = Colors.White,
+	onTertiary = Colors.Ghost,
 	tertiaryContainer = Color(0xffc48b92),
-	onTertiaryContainer = Colors.White,
+	onTertiaryContainer = Colors.Ghost,
 	background = Colors.Ghost,
 	onBackground = Colors.Black,
 	surface = Colors.Gray2,
 	onSurface = Colors.Black,
 	onSurfaceVariant = Colors.Gray5,
-	error = Colors.Red4,
+	error = Colors.Red5,
 	onError = Colors.White,
 	scrim = Colors.Dark
 )
 
 private val DarkColorScheme = darkColorScheme(
-	primary = Color(0xffb7f1ed),
-	onPrimary = Colors.Black,
-	primaryContainer = Colors.Steel4,
-	onPrimaryContainer = Color(0xffd0dfe6),
+	primary = Color(0xffb0d5de),
+	onPrimary = Colors.Ghost,
+	primaryContainer = Color(0xff7da1aa),
+	onPrimaryContainer = Colors.Ghost,
 	secondary = Color(0xff9ac84b),
-	onSecondary = Colors.Black,
-	secondaryContainer = Color(0xffeef1c2),
-	onSecondaryContainer = Colors.Black,
-	tertiary = Color(0xfff6bec9),
-	onTertiary = Colors.Black,
-	tertiaryContainer = Color(0xfffbdceb),
-	onTertiaryContainer = Colors.Black,
+	onSecondary = Colors.Ghost,
+	secondaryContainer = Color(0xff608c46),
+	onSecondaryContainer = Colors.Ghost,
+	tertiary = Color(0xffd6c8ff),
+	onTertiary = Colors.Ghost,
+	tertiaryContainer = Color(0xff7a89ce),
+	onTertiaryContainer = Colors.Ghost,
 	background = Colors.Dark,
 	onBackground = Colors.White,
-	surface = Color(0xff262626),
+	surface = Colors.Gray8,
 	onSurface = Colors.White,
 	onSurfaceVariant = Colors.Gray4,
-	error = Colors.Yellow4,
-	onError = Colors.Black,
+	error = Colors.Red4,
+	onError = Colors.Ghost,
 	scrim = Colors.Black
 )
 

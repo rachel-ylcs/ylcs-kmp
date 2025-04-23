@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -683,7 +684,18 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						)
 					}
 				)
-				if (sleepJob == null) TimeInput(state = state)
+				if (sleepJob == null) {
+					TimeInput(
+						state = state,
+						colors = TimePickerDefaults.colors().copy(
+							containerColor = MaterialTheme.colorScheme.surface,
+							timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+							timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+							timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+							timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+						)
+					)
+				}
 				else {
 					Text(
 						text = remember(sleepRemainSeconds) { (sleepRemainSeconds * 1000L).timeString },

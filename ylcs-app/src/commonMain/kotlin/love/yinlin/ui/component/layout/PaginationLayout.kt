@@ -136,18 +136,18 @@ private fun DefaultSwipePaginationHeader(
 	progress: Float
 ) {
 	Row(
-		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary.copy(alpha = progress)),
+		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
 			size = 32.dp,
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowDownward,
 			size = 32.dp,
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
 			text = when (status) {
@@ -156,7 +156,7 @@ private fun DefaultSwipePaginationHeader(
 				PaginationStatus.RELEASE -> "释放立即刷新"
 				else -> ""
 			},
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 	}
 }
@@ -167,18 +167,18 @@ private fun DefaultSwipePaginationFooter(
 	progress: Float
 ) {
 	Row(
-		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary.copy(alpha = progress)),
+		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
 			size = 32.dp,
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowUpward,
 			size = 32.dp,
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
 			text = when (status) {
@@ -187,7 +187,7 @@ private fun DefaultSwipePaginationFooter(
 				PaginationStatus.RELEASE -> "释放立即加载"
 				else -> ""
 			},
-			color = MaterialTheme.colorScheme.onPrimary
+			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 	}
 }
