@@ -2,6 +2,7 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.replaceAll
@@ -12,6 +13,7 @@ import uk.co.caprica.vlcj.media.MediaRef
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.AudioPlayerComponent
+import kotlin.random.Random
 
 class ActualMusicFactory : MusicFactory() {
     private var controller: AudioPlayerComponent? by mutableStateOf(null)
@@ -42,8 +44,11 @@ class ActualMusicFactory : MusicFactory() {
     private var currentIndex: Int by mutableIntStateOf(-1)
 
     class ShuffledOrder(size: Int = 0, start: Int? = null) {
-        val indices: List<Int> = List(size) { it }.shuffled()
+        var indices: List<Int> = List(size) { it }.shuffled()
+            private set
         val begin: Int = start ?: indices.firstOrNull() ?: -1
+
+        fun internalSet(items: List<Int>) { indices = items }
 
         override fun toString(): String = "ShuffledOrder($begin) [${indices.joinToString(",")}]"
     }
@@ -168,11 +173,31 @@ class ActualMusicFactory : MusicFactory() {
             musicList.replaceAll(medias)
             shuffledList = ShuffledOrder(size = medias.size, start = index)
             player.innerGotoIndex(index)
+            println(shuffledList)
         }
     }
 
     override suspend fun addMedias(medias: List<MusicInfo>) {
-        
+        musicList.addAll(medias)
+
+        /*
+        * 将当前播放位置随机序前面的索引接到随机序末尾
+        * 保持第一个元素是始终是当前播放索引
+        * 然后将新导入的媒体随机插入其中
+        * 得到新的随机序索引表
+        *  */
+        val indices = shuffledList.indices
+        val indexInShuffled = indices.indexOf(currentIndex)
+        val rotated = indices.subList(indexInShuffled, indices.size) + indices.subList(0, indexInShuffled)
+        val head = rotated.first()
+        val rest = rotated.drop(1).toMutableList()
+        repeat(medias.size) {
+            // 生成0到当前rest长度的随机位置
+            val position = Random.nextInt(rest.size + 1)
+            rest.add(position, indices.size + it)
+        }
+        shuffledList.internalSet(listOf(head) + rest)
+        println(shuffledList)
     }
 
     override suspend fun removeMedia(index: Int) {
