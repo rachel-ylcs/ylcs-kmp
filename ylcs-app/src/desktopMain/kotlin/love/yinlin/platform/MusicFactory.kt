@@ -27,7 +27,7 @@ class ActualMusicFactory : MusicFactory() {
             }
             controller = component
         }
-        catch (e: Throwable) { }
+        catch (_: Throwable) { }
     }
 
     private var currentIndex: Int by mutableIntStateOf(-1)
@@ -46,9 +46,7 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     private val playerListener = object : MediaPlayerEventAdapter() {
-        override fun mediaChanged(mediaPlayer: MediaPlayer?, media: MediaRef?) {
-            currentMusic = musicList[currentIndex]
-        }
+        override fun mediaChanged(mediaPlayer: MediaPlayer?, media: MediaRef?) { currentMusic = musicList[currentIndex] }
         override fun playing(mediaPlayer: MediaPlayer?) { isPlaying = true }
         override fun paused(mediaPlayer: MediaPlayer?) { isPlaying = false }
         override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { currentPosition = newTime }
