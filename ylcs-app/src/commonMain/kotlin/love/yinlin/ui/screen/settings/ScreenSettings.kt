@@ -292,10 +292,12 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 		val text = remember {
 			app.kv.get(AppContext.CRASH_KEY, "无崩溃日志")
 		}
-		Sheet(state = crashLogSheet) {
+		Sheet(
+			state = crashLogSheet,
+			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
+		) {
 			Box(
-				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
-					.padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
 					.verticalScroll(rememberScrollState())
 			) {
 				Text(
@@ -310,10 +312,12 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	fun FeedbackLayout() {
 		val state = remember { TextInputState() }
 
-		Sheet(state = feedbackSheet) {
+		Sheet(
+			state = feedbackSheet,
+			heightModifier = { heightIn(min = 200.dp) }
+		) {
 			Column(
-				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp)
-					.padding(10.dp),
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
 				horizontalAlignment = Alignment.End,
 				verticalArrangement = Arrangement.spacedBy(10.dp),
 			) {
@@ -336,10 +340,12 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 
 	@Composable
 	fun PrivacyPolicyLayout() {
-		Sheet(state = privacyPolicySheet) {
+		Sheet(
+			state = privacyPolicySheet,
+			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
+		) {
 			Box(
-				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
-					.padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
 					.verticalScroll(rememberScrollState())
 			) {
 				Text(
@@ -352,10 +358,12 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 
 	@Composable
 	fun AboutLayout() {
-		Sheet(state = aboutSheet) {
+		Sheet(
+			state = aboutSheet,
+			heightModifier = { heightIn(min = 200.dp) }
+		) {
 			Box(
-				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp)
-					.padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
 			) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
 			}

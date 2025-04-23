@@ -182,10 +182,12 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 
 	@Composable
 	private fun MailDetailsLayout(mail: Mail) {
-		Sheet(state = mailDetailsSheet) {
+		Sheet(
+			state = mailDetailsSheet,
+			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
+		) {
 			Column(
-				modifier = Modifier.fillMaxWidth().heightIn(min = 200.dp, max = 500.dp)
-					.padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
 					.verticalScroll(rememberScrollState()),
 				verticalArrangement = Arrangement.spacedBy(10.dp)
 			) {

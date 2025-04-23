@@ -329,9 +329,12 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
         var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
         val state = remember { TextInputState() }
 
-        Sheet(state = cloudBackupSheet) {
+        Sheet(
+            state = cloudBackupSheet,
+            heightModifier = { fillMaxHeight(fraction = 0.8f) }
+        ) {
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.8f).padding(10.dp),
+                modifier = Modifier.fillMaxSize().padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "本地歌单", modifier = Modifier.padding(vertical = 5.dp))

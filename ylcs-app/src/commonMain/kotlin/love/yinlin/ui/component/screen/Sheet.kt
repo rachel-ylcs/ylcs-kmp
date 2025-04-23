@@ -90,8 +90,7 @@ private fun ModalLandscapeSheet(
            .clip(shape = MaterialTheme.shapes.extraLarge)
            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f * (1 - offset / 360)))
        ) {
-           Box(modifier = Modifier.weight(1f)
-               .fillMaxHeight()
+           Box(modifier = Modifier.weight(1f).fillMaxHeight()
                .clickable(interactionSource = null, indication = null, onClick = { isVisible = false })
            )
 
@@ -99,7 +98,9 @@ private fun ModalLandscapeSheet(
                shadowElevation = 5.dp,
                modifier = Modifier.width(360.dp).fillMaxHeight().offset(x = offset.dp)
            ) {
-               content()
+               Box(modifier = Modifier.fillMaxSize().padding(vertical = 10.dp)) {
+                   content()
+               }
            }
        }
     }
@@ -109,7 +110,8 @@ private fun ModalLandscapeSheet(
 @Composable
 fun <T> Sheet(
     state: BaseSheetState<T>,
-    hasHandle: Boolean = true,
+    heightModifier: (Modifier.() -> Modifier)? = null, // 仅对竖屏生效
+    hasHandle: Boolean = true, // 仅对竖屏生效
     content: @Composable () -> Unit
 ) {
     if (app.isPortrait) {
@@ -132,7 +134,12 @@ fun <T> Sheet(
             } else null,
             modifier = Modifier.fillMaxWidth()
         ) {
-            content()
+            if (heightModifier != null) {
+                Box(modifier = Modifier.fillMaxWidth().heightModifier()) {
+                    content()
+                }
+            }
+            else content()
         }
     }
     else {

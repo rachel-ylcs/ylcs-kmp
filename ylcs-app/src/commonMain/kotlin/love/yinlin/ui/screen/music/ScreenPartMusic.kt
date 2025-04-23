@@ -585,8 +585,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (isEmptyList) currentPlaylistSheet.hide()
 		}
 
-		Sheet(state = currentPlaylistSheet) {
-			Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.6f)) {
+		Sheet(
+			state = currentPlaylistSheet,
+			heightModifier = { fillMaxHeight(fraction = 0.6f) }
+		) {
+			Column(modifier = Modifier.fillMaxSize()) {
 				Row(
 					modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 10.dp, bottom = 10.dp),
 					horizontalArrangement = Arrangement.spacedBy(10.dp),

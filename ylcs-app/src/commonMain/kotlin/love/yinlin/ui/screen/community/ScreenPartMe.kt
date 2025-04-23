@@ -201,10 +201,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private fun ScanLayout() {
 		Sheet(
 			state = scanSheet,
+			heightModifier = { fillMaxHeight(fraction = 0.9f) },
 			hasHandle = false
 		) {
 			ScannerView(
-				modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.9f),
+				modifier = Modifier.fillMaxSize(),
 				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
 				result = {
 					scanSheet.hide()
