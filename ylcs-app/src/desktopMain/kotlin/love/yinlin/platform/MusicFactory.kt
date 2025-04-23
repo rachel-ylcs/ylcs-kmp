@@ -44,6 +44,8 @@ class ActualMusicFactory : MusicFactory() {
     class ShuffledOrder(size: Int = 0, start: Int? = null) {
         val indices: List<Int> = List(size) { it }.shuffled()
         val begin: Int = start ?: indices.firstOrNull() ?: -1
+
+        override fun toString(): String = "ShuffledOrder($begin) [${indices.joinToString(",")}]"
     }
 
     private var shuffledList = ShuffledOrder()
@@ -130,7 +132,9 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
         // 重新换模式要重设洗牌顺序
-        if (musicPlayMode == MusicPlayMode.RANDOM) shuffledList = ShuffledOrder(size = musicList.size, start = currentIndex)
+        if (musicPlayMode == MusicPlayMode.RANDOM) {
+            shuffledList = ShuffledOrder(size = musicList.size, start = currentIndex)
+        }
     }
 
     override suspend fun play() = withReadyPlayer { player ->
