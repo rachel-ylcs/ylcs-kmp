@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
+import love.yinlin.common.Uri
 import love.yinlin.ui.component.screen.SubScreenSlot
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
@@ -22,6 +23,7 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 	fun navigate(route: Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 	fun pop() = model.pop()
+	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
 	val worldPart = model.worldPart
 	val msgPart = model.msgPart

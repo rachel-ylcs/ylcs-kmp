@@ -26,7 +26,9 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import love.yinlin.common.DeepLink
 import love.yinlin.common.RachelTheme
+import love.yinlin.common.Uri
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
@@ -49,6 +51,7 @@ abstract class ScreenPart(private val model: AppModel) {
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
 	protected open suspend fun initialize() {}
 
@@ -68,6 +71,8 @@ abstract class ScreenPart(private val model: AppModel) {
 class AppModel(
 	private val navController: NavController
 ) : ViewModel() {
+	val deeplink = DeepLink(this)
+
 	val worldPart = ScreenPartWorld(this)
 	val msgPart = ScreenPartMsg(this)
 	val musicPart = ScreenPartMusic(this)

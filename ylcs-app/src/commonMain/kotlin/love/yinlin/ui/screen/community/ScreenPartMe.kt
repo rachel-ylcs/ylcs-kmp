@@ -26,6 +26,8 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Scheme
+import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.data.rachel.profile.UserProfile
@@ -44,6 +46,9 @@ import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.ncgroup.kscan.BarcodeFormats
+import org.ncgroup.kscan.BarcodeResult
+import org.ncgroup.kscan.ScannerView
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
@@ -83,7 +88,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			ClickIcon(
 				icon = Icons.Filled.CropFree,
-				onClick = { scanSheet.open() }
+				onClick = {
+					scanSheet.open()
+				}
 			)
 			ClickIcon(
 				icon = Icons.Filled.Settings,
@@ -192,10 +199,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun ScanLayout() {
-		Sheet(state = scanSheet) {
-			Column {
-
-			}
+		Sheet(
+			state = scanSheet,
+			hasHandle = false
+		) {
+			ScannerView(
+				modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.9f),
+				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
+				result = {
+					scanSheet.hide()
+					if (it is BarcodeResult.OnSuccess) {
+						try {
+							val uri = Uri.parse(it.barcode.data)!!
+							if (uri.scheme == Scheme.Rachel) deeplink(uri)
+						}
+						catch (_: Throwable) {
+							slot.tip.warning("不能识别此信息")
+						}
+					}
+				}
+			)
 		}
 	}
 

@@ -37,10 +37,11 @@ object ClientAPI {
 			else Data.Error(Failed.RequestError.InvalidArgument, msg)
 	}
 
-	fun buildGetParameters(argsMap: JsonObject): String {
-		val args = StringBuilder()
-		for ((key, value) in argsMap) args.append("$key=${UriEx.encode(value.String)}&")
-		return if (args.isNotEmpty()) "?${args.dropLast(1)}" else ""
+	fun buildGetParameters(argsMap: JsonObject): String = buildString {
+		if (argsMap.isEmpty()) return@buildString
+		append("?")
+		for ((key, value) in argsMap) append("$key=${value.String}&")
+		dropLast(1)
 	}
 
 	@JvmName("requestGet")

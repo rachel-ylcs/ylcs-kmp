@@ -7,6 +7,7 @@ import com.fleeksoft.ksoup.nodes.TextNode
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
+import love.yinlin.common.Uri
 import love.yinlin.platform.app
 import love.yinlin.ui.component.text.RichContainer
 import love.yinlin.ui.component.text.RichString
@@ -25,7 +26,6 @@ import love.yinlin.extension.Long
 import love.yinlin.extension.Object
 import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
-import love.yinlin.extension.UriEx
 import love.yinlin.extension.arr
 import love.yinlin.extension.obj
 import love.yinlin.platform.OS
@@ -72,8 +72,8 @@ object WeiboAPI {
 	)
 
 	private object Container {
-		fun searchUser(key: String): String = "api/container/getIndex?containerid=100103type%3D3%26q%3D${UriEx.encode(key)}&page_type=searchall"
-		fun searchTopic(name: String): String = "search?containerid=231522type%3D1%26q%3D$name"
+		fun searchUser(key: String): String = "api/container/getIndex?containerid=100103type%3D3%26q=${Uri.encodeUri(key)}&page_type=searchall"
+		fun searchTopic(name: String): String = "search?containerid=231522type=1&q=$name"
 		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
 		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
 		fun weiboDetails(uid: String): String = "comments/hotflow?id=$uid&mid=$uid"
@@ -299,7 +299,7 @@ object WeiboAPI {
 				for (item2 in card.arr("card_group")) {
 					val album = item2.Object
 					if (album["card_type"].Int == 8) {
-						val containerId = UriEx.parameters(album["scheme"].String)["containerid"]!!
+						val containerId = Uri.parse(album["scheme"].String)!!.params["containerid"]!!
 						items += WeiboAlbum(
 							containerId = containerId,
 							title = album["title_sub"].String,

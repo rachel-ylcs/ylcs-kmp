@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -108,23 +109,27 @@ private fun ModalLandscapeSheet(
 @Composable
 fun <T> Sheet(
     state: BaseSheetState<T>,
+    hasHandle: Boolean = true,
     content: @Composable () -> Unit
 ) {
     if (app.isPortrait) {
         ModalBottomSheet(
             onDismissRequest = { state.hide() },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             shape = MaterialTheme.shapes.extraLarge.copy(bottomStart = CornerSize(0), bottomEnd = CornerSize(0)),
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 1.dp,
-            dragHandle = {
-                Surface(
-                    modifier = Modifier.padding(vertical = 15.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    shape = MaterialTheme.shapes.extraLarge
-                ) {
-                    Box(Modifier.size(width = 32.dp, height = 4.dp))
+            dragHandle = if (hasHandle) {
+                {
+                    Surface(
+                        modifier = Modifier.padding(vertical = 15.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = MaterialTheme.shapes.extraLarge
+                    ) {
+                        Box(Modifier.size(width = 32.dp, height = 4.dp))
+                    }
                 }
-            },
+            } else null,
             modifier = Modifier.fillMaxWidth()
         ) {
             content()
