@@ -128,7 +128,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override suspend fun gotoIndex(index: Int) = withReadyPlayer { player ->
-
+        if (index in 0 ..< musicList.size) {
+            currentIndex = index
+            player.media().play(musicList[currentIndex].audioPath.toString())
+        }
     }
 
     override suspend fun seekTo(position: Long) = withReadyPlayer { player ->
