@@ -324,7 +324,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 				)
 				TextInput(
 					state = state,
-					hint = "反馈与建议",
+					hint = "您的建议",
 					maxLength = 512,
 					maxLines = 5,
 					clearButton = false,
