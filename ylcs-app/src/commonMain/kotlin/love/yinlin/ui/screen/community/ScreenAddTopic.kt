@@ -173,6 +173,7 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
                         hint = "标题",
                         maxLength = 48,
                         maxLines = 2,
+                        clearButton = false,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(
@@ -183,12 +184,12 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
                         clearButton = false,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text(text = "主题板块", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "主题", style = MaterialTheme.typography.titleMedium)
                     SectionSelectLayout(
                         profile = profile,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text(text = "主题附图", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "图片", style = MaterialTheme.typography.titleMedium)
                     ImageAdder(
                         maxNum = 9,
                         pics = input.pics,
@@ -196,7 +197,7 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
                         modifier = Modifier.fillMaxWidth(),
                         onAdd = { launch { pickPictures() } },
                         onDelete = { deletePic(it) },
-                        onClick = { navigate(ScreenImagePreview.Args(input.pics, it))  }
+                        onClick = { navigate(ScreenImagePreview.Args(input.pics, it)) }
                     )
                 }
             }
