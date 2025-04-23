@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.androidApplication)
 }
 
+val appName: String by rootProject.extra
 val appVersionName: String by rootProject.extra
 
 enum class GradlePlatform {
@@ -345,7 +346,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            packageName = rootProject.extra["appName"] as String
+            packageName = appName
             packageVersion = appVersionName
             description = "银临茶舍KMP跨平台APP"
             copyright = "© 2024-2025 银临茶舍 版权所有"
@@ -438,8 +439,15 @@ afterEvaluate {
         mustRunAfter(desktopCopyDir)
         doLast {
             copy {
+                val desktopOutputDir: Directory by rootProject.extra
+                val outputAppLibDir = desktopOutputDir.let {
+                    when (desktopPlatform) {
+                        GradlePlatform.Mac -> it.dir("$appName.app/Contents/app")
+                        else -> it.dir("$appName/app")
+                    }
+                }
                 from(rootProject.extra["cppLibsDir"])
-                into(rootProject.extra["desktopOutputAppDir"]!!)
+                into(outputAppLibDir)
             }
         }
     }
