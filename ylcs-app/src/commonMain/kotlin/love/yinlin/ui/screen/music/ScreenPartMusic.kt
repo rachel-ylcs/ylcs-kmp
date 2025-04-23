@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerDefaults
@@ -564,15 +563,15 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun ControlLayout(modifier: Modifier = Modifier) {
+	private fun ControlLayout(
+		modifier: Modifier = Modifier,
+		content: @Composable ColumnScope.() -> Unit
+	) {
 		Column(
 			modifier = modifier,
 			verticalArrangement = Arrangement.spacedBy(5.dp)
 		) {
-			MusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
-			MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
-			MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
-			MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+			content()
 		}
 	}
 
@@ -746,26 +745,69 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						)
 					)
 					.padding(10.dp)
-				)
+				) {
+					MusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+					MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+					MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
+					MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+				}
 			}
 		}
 	}
 
 	@Composable
 	private fun Landscape() {
-		Column(modifier = Modifier.fillMaxSize()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth(),
-				shadowElevation = 5.dp
-			) {
-				ToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
+		Row(modifier = Modifier.fillMaxSize().background(Colors.Black)) {
+			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+				MusicBackground(modifier = Modifier.fillMaxSize()
+					.hazeSource(state = blurState)
+					.zIndex(1f))
+				Column(
+					modifier = Modifier.fillMaxSize().zIndex(2f),
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					ToolLayout(modifier = Modifier
+						.fillMaxWidth()
+						.padding(10.dp)
+						.clip(MaterialTheme.shapes.large)
+						.hazeEffect(
+							state = blurState,
+							style = HazeStyle(
+								blurRadius = 15.dp,
+								backgroundColor = Colors.Dark,
+								tint = null,
+							)
+						)
+						.padding(10.dp)
+					)
+					ControlLayout(modifier = Modifier
+						.fillMaxWidth()
+						.hazeEffect(
+							state = blurState,
+							style = HazeStyle(
+								blurRadius = 10.dp,
+								backgroundColor = Colors.Dark,
+								tint = null,
+							)
+						)
+						.padding(10.dp)
+					) {
+						MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+						MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
+						MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+					}
+				}
 			}
-			Row(
-				modifier = Modifier.weight(1f)
-			) {
-
+			Box(modifier = Modifier.fillMaxHeight().aspectRatio(0.5625f)) {
+				MusicBackground(modifier = Modifier.fillMaxSize()
+					.hazeSource(state = blurState)
+					.zIndex(1f))
+				LyricsLayout(modifier = Modifier)
 			}
 		}
+
+
 	}
 
     @Composable

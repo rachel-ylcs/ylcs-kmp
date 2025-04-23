@@ -77,7 +77,7 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
 }
 
 class ActualMusicFactory(private val context: Context) : MusicFactory() {
-    var controller: MediaController? by mutableStateOf(null)
+    private var controller: MediaController? by mutableStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
     override suspend fun init() {
@@ -116,6 +116,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
+    override var currentMusic: MusicInfo? by mutableStateOf(null)
 
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = Any()
@@ -177,11 +178,11 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                 when (playbackState) {
                     Player.STATE_IDLE -> {
                         // 已停止播放
+                        musicList = emptyList()
                         currentPosition = 0L
                         currentDuration = 0L
-                        currentMusic = null
                         currentPlaylist = null
-                        musicList = emptyList()
+                        currentMusic = null
                     }
                     Player.STATE_BUFFERING -> { }
                     Player.STATE_READY -> updateDuration(player)

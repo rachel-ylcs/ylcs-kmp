@@ -199,9 +199,11 @@ kotlin {
                     dependsOn(macMain)
                 }
             }
+
             dependencies {
                 implementation(libs.kotlinx.coroutines.swing)
                 implementation(compose.desktop.currentOs)
+                implementation(libs.vlcj)
 
                 val javafxClassifier = when (desktopPlatform) {
                     GradlePlatform.Windows -> "win"
@@ -210,7 +212,6 @@ kotlin {
                 }
                 implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
                 implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.media.get()) { artifact { classifier = javafxClassifier } }
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }

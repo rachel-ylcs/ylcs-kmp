@@ -121,9 +121,6 @@ object ThemeColor {
 	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.White
 	val backgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.Ghost
 	val onBackgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.Dark
-	val primaryGradient: List<Color> @Composable get() =
-		if (app.isDarkMode) listOf(Colors.Red4, Colors.Orange4, Colors.Red4)
-		else listOf(Colors.Steel4, Colors.Purple4, Colors.Steel4)
 }
 
 private val LightColorScheme = lightColorScheme(

@@ -15,14 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
-import love.yinlin.common.ThemeColor
 import love.yinlin.platform.Coroutines
 import kotlin.math.abs
 
@@ -43,16 +41,15 @@ private fun LyricsLrcLine(
 ) {
     val fontSize = MaterialTheme.typography.headlineMedium.fontSize / (offset / 30f + 1f)
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
-    val brush = if (isCurrent) Brush.horizontalGradient(ThemeColor.primaryGradient) else null
+    val color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.White
     val alpha = 3 / (offset + 3f)
 
     Text(
         text = text,
-        color = Colors.White,
+        color = color,
         style = MaterialTheme.typography.headlineMedium.copy(
             fontSize = fontSize,
-            fontWeight = fontWeight,
-            brush = brush
+            fontWeight = fontWeight
         ),
         textAlign = TextAlign.Center,
         maxLines = 1,
@@ -151,8 +148,8 @@ class LyricsLrc : LyricsEngine {
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillParentMaxHeight(0.142857f)
-                            .clickable {
-                                if (item.text.isNotEmpty()) onLyricsClick(item.position)
+                            .clickable(enabled = item.text.isNotEmpty()) {
+                                onLyricsClick(item.position)
                             },
                         contentAlignment = Alignment.Center
                     ) {

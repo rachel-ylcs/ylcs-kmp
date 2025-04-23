@@ -29,6 +29,7 @@ abstract class MusicFactory {
     abstract val isPlaying: Boolean
     abstract val currentPosition: Long
     abstract val currentDuration: Long
+    abstract val currentMusic: MusicInfo?
 
     // 接口
     abstract suspend fun updatePlayMode(musicPlayMode: MusicPlayMode)
@@ -63,8 +64,6 @@ abstract class MusicFactory {
     }
 
     var currentPlaylist: MusicPlaylist? by mutableStateOf(null)
-        protected set
-    var currentMusic: MusicInfo? by mutableStateOf(null)
         protected set
 
     // 通用操作
