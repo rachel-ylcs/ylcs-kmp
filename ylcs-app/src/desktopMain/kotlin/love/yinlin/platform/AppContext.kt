@@ -13,6 +13,7 @@ import love.yinlin.Local
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 import java.awt.GraphicsEnvironment
+import java.io.File
 
 class ActualAppContext : AppContext() {
 	var rawDensity: Density? = null
@@ -22,6 +23,8 @@ class ActualAppContext : AppContext() {
 	override val screenHeight: Int
 	override val fontScale: Float = 1f
 	override val kv: KV = KV()
+
+
 
 	init {
 		val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -41,7 +44,7 @@ class ActualAppContext : AppContext() {
 		}
 
 		// VLC
-		System.setProperty("jna.library.path", "vlc")
+		System.setProperty("jna.library.path", "${System.getProperty("user.dir")}${File.separator}vlc")
 	}
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {

@@ -27,7 +27,9 @@ class ActualMusicFactory : MusicFactory() {
             }
             controller = component
         }
-        catch (_: Throwable) { }
+        catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 
     override var error: Throwable? by mutableStateOf(null)

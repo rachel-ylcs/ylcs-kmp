@@ -16,6 +16,12 @@ val appVersionName: String by rootProject.extra
 
 enum class GradlePlatform {
     Windows, Linux, Mac;
+
+    override fun toString(): String = when (this) {
+        Windows -> "win"
+        Linux -> "linux"
+        Mac -> "mac"
+    }
 }
 
 val desktopPlatform = System.getProperty("os.name").let { when {
@@ -201,17 +207,16 @@ kotlin {
             }
 
             dependencies {
-                implementation(libs.kotlinx.coroutines.swing)
                 implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
                 implementation(libs.vlcj)
+                implementation(libs.jna)
+                implementation(libs.jna.jpms)
+                implementation(libs.jna.platform)
+                implementation(libs.jna.platform.jpms)
 
-                val javafxClassifier = when (desktopPlatform) {
-                    GradlePlatform.Windows -> "win"
-                    GradlePlatform.Linux -> "linux"
-                    GradlePlatform.Mac -> "mac"
-                }
-                implementation(libs.javafx.base.get()) { artifact { classifier = javafxClassifier } }
-                implementation(libs.javafx.graphics.get()) { artifact { classifier = javafxClassifier } }
+                implementation(libs.javafx.base.get()) { artifact { classifier = desktopPlatform.toString() } }
+                implementation(libs.javafx.graphics.get()) { artifact { classifier = desktopPlatform.toString() } }
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }
@@ -453,11 +458,30 @@ afterEvaluate {
         }
     }
 
+    val desktopCopyPackages by tasks.registering {
+        mustRunAfter(desktopCopyLibs)
+        doLast {
+            copy {
+                val srcPath = rootProject.extra["dirPackages"] as Directory
+                val desktopOutputDir: Directory by rootProject.extra
+                val outputAppDir = desktopOutputDir.let {
+                    when (desktopPlatform) {
+                        GradlePlatform.Mac -> it.dir("$appName.app/Contents")
+                        else -> it.dir(appName)
+                    }
+                }
+                from(srcPath.dir(desktopPlatform.toString()))
+                into(outputAppDir)
+            }
+        }
+    }
+
     // 发布桌面应用程序
     val desktopPublish by tasks.registering {
         dependsOn(createReleaseDistributable)
         dependsOn(desktopCopyDir)
         dependsOn(desktopCopyLibs)
+        dependsOn(desktopCopyPackages)
     }
 
     val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")
