@@ -93,41 +93,43 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 	val navController = rememberNavController()
 	val appModel = viewModel { AppModel(navController) }
 
-	NavHost(
-		modifier = modifier.background(MaterialTheme.colorScheme.background),
-		navController = navController,
-		startDestination = ScreenMain.Args,
-		enterTransition = {
-			slideIntoContainer(
-				towards = AnimatedContentTransitionScope.SlideDirection.Start,
-				animationSpec = tween(
-					durationMillis = 300,
-					easing = FastOutSlowInEasing
+	Box(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
+		NavHost(
+			modifier = Modifier.fillMaxSize(),
+			navController = navController,
+			startDestination = ScreenMain.Args,
+			enterTransition = {
+				slideIntoContainer(
+					towards = AnimatedContentTransitionScope.SlideDirection.Start,
+					animationSpec = tween(
+						durationMillis = 300,
+						easing = FastOutSlowInEasing
+					)
+				) + fadeIn(
+					animationSpec = tween(
+						durationMillis = 300,
+						easing = FastOutSlowInEasing
+					)
 				)
-			) + fadeIn(
-				animationSpec = tween(
-					durationMillis = 300,
-					easing = FastOutSlowInEasing
+			},
+			exitTransition = {
+				slideOutOfContainer(
+					towards = AnimatedContentTransitionScope.SlideDirection.End,
+					animationSpec = tween(
+						durationMillis = 300,
+						easing = FastOutSlowInEasing
+					)
+				) + fadeOut(
+					animationSpec = tween(
+						durationMillis = 300,
+						easing = FastOutSlowInEasing
+					)
 				)
-			)
-		},
-		exitTransition = {
-			slideOutOfContainer(
-				towards = AnimatedContentTransitionScope.SlideDirection.End,
-				animationSpec = tween(
-					durationMillis = 300,
-					easing = FastOutSlowInEasing
-				)
-			) + fadeOut(
-				animationSpec = tween(
-					durationMillis = 300,
-					easing = FastOutSlowInEasing
-				)
-			)
-		}
-	) {
-		with(ScreenRouteScope(this, appModel)) {
-			screens()
+			}
+		) {
+			with(ScreenRouteScope(this, appModel)) {
+				screens()
+			}
 		}
 	}
 }
