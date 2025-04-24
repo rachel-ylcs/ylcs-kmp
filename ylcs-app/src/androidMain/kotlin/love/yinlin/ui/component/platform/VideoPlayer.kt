@@ -38,6 +38,7 @@ actual fun VideoPlayer(
 
     DisposableEffect(Unit) {
         controller = FfmpegRenderersFactory.build(context, false).apply {
+            repeatMode = Player.REPEAT_MODE_ONE
             setMediaItem(MediaItem.fromUri(url))
             prepare()
             play()
@@ -49,9 +50,13 @@ actual fun VideoPlayer(
     }
 
     LifecycleStartEffect(Unit) {
-        controller?.play()
+        controller?.let {
+            if (!it.isPlaying) it.play()
+        }
         onStopOrDispose {
-            controller?.pause()
+            controller?.let {
+                if (it.isPlaying) it.pause()
+            }
         }
     }
 
