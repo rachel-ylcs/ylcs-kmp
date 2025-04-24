@@ -118,7 +118,7 @@ object Colors {
 
 object ThemeColor {
 	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Yellow5
-	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.White
+	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.White
 	val backgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.Ghost
 	val onBackgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.Dark
 }

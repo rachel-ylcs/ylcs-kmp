@@ -81,6 +81,12 @@ fun Tip(state: TipState) {
 			TipState.Type.WARNING -> ThemeColor.warning
 			TipState.Type.ERROR -> MaterialTheme.colorScheme.error
 		}
+		val contentColor = when (state.type) {
+			TipState.Type.INFO -> MaterialTheme.colorScheme.onSecondaryContainer
+			TipState.Type.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
+			TipState.Type.WARNING -> ThemeColor.onWarning
+			TipState.Type.ERROR -> MaterialTheme.colorScheme.onError
+		}
 		Box(
 			modifier = Modifier.padding(20.dp).fillMaxWidth()
 				.clickableNoRipple { }
@@ -101,11 +107,11 @@ fun Tip(state: TipState) {
 						TipState.Type.WARNING -> Icons.Outlined.Warning
 						TipState.Type.ERROR -> Icons.Outlined.Error
 					},
-					color = Colors.White
+					color = contentColor
 				)
 				Text(
 					text = it.visuals.message,
-					color = Colors.White,
+					color = contentColor,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
