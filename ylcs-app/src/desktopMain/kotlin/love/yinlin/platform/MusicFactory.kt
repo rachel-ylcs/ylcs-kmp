@@ -20,7 +20,6 @@ class ActualMusicFactory : MusicFactory() {
 
     override suspend fun init() {
         try {
-            System.setProperty("jna.library.path", "vlc")
             val component = AudioPlayerComponent()
             component.mediaPlayer().events().apply {
                 addMediaEventListener(eventListener)

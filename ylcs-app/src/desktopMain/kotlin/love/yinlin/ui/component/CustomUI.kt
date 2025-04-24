@@ -32,8 +32,8 @@ fun <T : Component> CustomUI(
 	appNative.rawDensity?.let { density ->
 		CompositionLocalProvider(LocalDensity provides density) {
 			SwingPanel(
-				modifier = modifier,
 				background = Colors.Transparent,
+				modifier = modifier,
 				factory = {
 					view.value ?: factory().let {
 						view.value = it

@@ -1,7 +1,9 @@
 package love.yinlin
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -16,11 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import javafx.application.Platform
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.app_name
+import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -29,11 +32,6 @@ fun main() {
     val context = ActualAppContext()
     app = context
     context.initialize()
-
-    // JavaFx
-    Platform.startup {
-        Platform.setImplicitExit(false)
-    }
 
     application {
         val rawDensity = LocalDensity.current
@@ -59,7 +57,7 @@ fun main() {
                     if (context.rawDensity == null) context.rawDensity = rawDensity
                 }
                 AppWrapper {
-                    Column(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(15.dp))) {
+                    Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                             AppTopBar(
                                 modifier = Modifier.fillMaxWidth().height(50.dp),
