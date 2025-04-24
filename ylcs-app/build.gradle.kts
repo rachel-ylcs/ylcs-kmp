@@ -436,7 +436,7 @@ afterEvaluate {
         doLast {
             copy {
                 from(rootProject.extra["desktopOriginOutputPath"])
-                into(rootProject.extra["desktopOutputDir"]!!)
+                into(rootProject.extra["dirOutput"]!!)
             }
         }
     }
@@ -445,8 +445,8 @@ afterEvaluate {
         mustRunAfter(desktopCopyDir)
         doLast {
             copy {
-                val desktopOutputDir: Directory by rootProject.extra
-                val outputAppLibDir = desktopOutputDir.let {
+                val dirOutput: Directory by rootProject.extra
+                val outputAppLibDir = dirOutput.let {
                     when (desktopPlatform) {
                         GradlePlatform.Mac -> it.dir("$appName.app/Contents/app")
                         else -> it.dir("$appName/app")
@@ -463,8 +463,8 @@ afterEvaluate {
         doLast {
             copy {
                 val srcPath = rootProject.extra["dirPackages"] as Directory
-                val desktopOutputDir: Directory by rootProject.extra
-                val outputAppDir = desktopOutputDir.let {
+                val dirOutput: Directory by rootProject.extra
+                val outputAppDir = dirOutput.let {
                     when (desktopPlatform) {
                         GradlePlatform.Mac -> it.dir("$appName.app/Contents")
                         else -> it.dir(appName)
