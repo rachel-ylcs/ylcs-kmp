@@ -841,11 +841,11 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			else Landscape(details = details)
 		}
 
-		subCommentSheet.withOpen {
+		subCommentSheet.WithOpen {
 			SubCommentLayout(it)
 		}
 
-		sendCoinSheet.withOpen {
+		sendCoinSheet.WithOpen {
 			SendCoinLayout()
 		}
 

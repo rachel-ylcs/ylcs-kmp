@@ -204,10 +204,10 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 		else Landscape(modifier = Modifier.fillMaxSize())
 
 		with(model.slot) {
-			Tip(state = tip)
 			info.WithOpen()
 			confirm.WithOpen()
 			loading.WithOpen()
+			Tip(state = tip)
 		}
 	}
 }

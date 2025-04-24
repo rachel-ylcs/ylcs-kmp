@@ -4,7 +4,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +24,7 @@ import love.yinlin.platform.app
 @Stable
 interface BaseSheetState<T> {
     @Composable
-    fun withOpen(block: @Composable (T) -> Unit)
+    fun WithOpen(block: @Composable (T) -> Unit)
     val isOpen: Boolean
     fun open(value: T)
     fun hide()
@@ -36,7 +35,7 @@ class SheetState<T>(default: T? = null) : BaseSheetState<T> {
     private var state by mutableStateOf(default)
 
     @Composable
-    override fun withOpen(block: @Composable (T) -> Unit) {
+    override fun WithOpen(block: @Composable (T) -> Unit) {
         state?.let { block(it) }
         DisposableEffect(Unit) { onDispose { hide() } }
     }
@@ -50,7 +49,7 @@ class CommonSheetState(status: Boolean = false) : BaseSheetState<Unit> {
     private var state by mutableStateOf(status)
 
     @Composable
-    override fun withOpen(block: @Composable (Unit) -> Unit) {
+    override fun WithOpen(block: @Composable (Unit) -> Unit) {
         if (state) block(Unit)
         DisposableEffect(Unit) { onDispose { hide() } }
     }

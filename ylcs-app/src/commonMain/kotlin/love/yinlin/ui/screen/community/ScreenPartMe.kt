@@ -303,11 +303,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			if (app.isPortrait) Portrait(userProfile)
 			else Landscape(userProfile)
 
-			signinSheet.withOpen {
+			signinSheet.WithOpen {
 				SigninLayout()
 			}
 
-			scanSheet.withOpen {
+			scanSheet.WithOpen {
 				ScanLayout()
 			}
 		}

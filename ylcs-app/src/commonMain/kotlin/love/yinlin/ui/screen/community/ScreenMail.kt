@@ -271,6 +271,6 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 			}
 		}
 
-		mailDetailsSheet.withOpen { MailDetailsLayout(it) }
+		mailDetailsSheet.WithOpen { MailDetailsLayout(it) }
 	}
 }

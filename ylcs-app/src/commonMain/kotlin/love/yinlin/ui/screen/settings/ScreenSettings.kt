@@ -468,19 +468,19 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			else Landscape(userProfile)
 		}
 
-		crashLogSheet.withOpen {
+		crashLogSheet.WithOpen {
 			CrashLogLayout()
 		}
 
-		feedbackSheet.withOpen {
+		feedbackSheet.WithOpen {
 			FeedbackLayout()
 		}
 
-		privacyPolicySheet.withOpen {
+		privacyPolicySheet.WithOpen {
 			PrivacyPolicyLayout()
 		}
 
-		aboutSheet.withOpen {
+		aboutSheet.WithOpen {
 			AboutLayout()
 		}
 

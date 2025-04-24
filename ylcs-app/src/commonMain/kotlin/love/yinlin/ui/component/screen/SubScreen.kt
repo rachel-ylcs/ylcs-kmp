@@ -140,10 +140,10 @@ fun SubScreen(
 	}
 
 	with(slot) {
-		Tip(state = tip)
 		info.WithOpen()
 		confirm.WithOpen()
 		loading.WithOpen()
+		Tip(state = tip)
 	}
 }
 

@@ -494,7 +494,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
             }
         }
 
-        cloudBackupSheet.withOpen {
+        cloudBackupSheet.WithOpen {
             CloudBackupLayout()
         }
 
