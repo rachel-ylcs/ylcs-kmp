@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -15,14 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.automirrored.outlined.QueueMusic
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
-import androidx.compose.material3.TimePickerDefaults
-import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -34,9 +26,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import dev.chrisbanes.haze.*
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -47,6 +43,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.ThemeStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.rememberDerivedState
@@ -63,14 +60,10 @@ import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.component.layout.OffsetLayout
-import love.yinlin.ui.component.layout.SplitActionLayout
-import love.yinlin.ui.component.layout.SplitLayout
-import love.yinlin.ui.component.layout.equalItem
+import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.Sheet
 import love.yinlin.ui.component.screen.CommonSheetState
+import love.yinlin.ui.component.screen.Sheet
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -123,7 +116,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val sleepModeSheet = CommonSheetState()
 
 	@Composable
-	private fun MusicBackground(modifier: Modifier = Modifier) {
+	private fun MusicBackground(
+		alpha: Float = 1f,
+		modifier: Modifier = Modifier
+	) {
 		val backgroundPath by rememberDerivedState {
 			factory.currentMusic?.let { musicInfo ->
 				if (isAnimationBackground) musicInfo.AnimationPath
@@ -137,7 +133,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					path = path,
 					quality = ImageQuality.Full,
 					contentScale = ContentScale.Crop,
-					alpha = 0.7f,
+					alpha = alpha,
 					modifier = Modifier.fillMaxSize()
 				)
 			}
@@ -216,10 +212,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicRecordLayout(
+		offset: Dp,
 		recordPath: Path?,
 		modifier: Modifier = Modifier
 	) {
-		OffsetLayout(y = (-50).dp) {
+		OffsetLayout(y = offset) {
 			Box(
 				modifier = modifier,
 				contentAlignment = Alignment.Center
@@ -240,48 +237,64 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun MusicTitleLayout(
-		name: String?,
-		singer: String?,
-		modifier: Modifier = Modifier
-	) {
-		Column(
-			modifier = modifier,
-			verticalArrangement = Arrangement.spacedBy(5.dp)
-		) {
-			Text(
-				text = name ?: stringResource(Res.string.no_audio_source),
-				color = Colors.White,
-				style = MaterialTheme.typography.titleLarge,
-				textAlign = TextAlign.Center,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
-			)
-			Text(
-				text = singer ?: stringResource(Res.string.unknown_singer),
-				color = Colors.White,
-				style = MaterialTheme.typography.bodyLarge,
-				textAlign = TextAlign.Center,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
-			)
-		}
-	}
-
-	@Composable
-	private fun MusicInfoLayout(modifier: Modifier = Modifier) {
+	private fun PortraitMusicInfoLayout(modifier: Modifier = Modifier) {
+		val musicInfo = factory.currentMusic
 		Row(
 			modifier = modifier,
 			horizontalArrangement = Arrangement.spacedBy(20.dp)
 		) {
 			MusicRecordLayout(
-				recordPath = factory.currentMusic?.recordPath,
+				offset = (-50).dp,
+				recordPath = musicInfo?.recordPath,
 				modifier = Modifier.size(100.dp).shadow(elevation = 5.dp, clip = false, shape = CircleShape)
 			)
-			MusicTitleLayout(
-				name = factory.currentMusic?.name,
-				singer = factory.currentMusic?.singer,
-				modifier = Modifier.weight(1f)
+			Column(
+				modifier = Modifier.weight(1f),
+				verticalArrangement = Arrangement.spacedBy(5.dp)
+			) {
+				Text(
+					text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
+					color = MaterialTheme.colorScheme.primary,
+					style = MaterialTheme.typography.titleLarge,
+					textAlign = TextAlign.Center,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
+				Text(
+					text = musicInfo?.singer ?: stringResource(Res.string.unknown_singer),
+					color = Colors.White,
+					style = MaterialTheme.typography.bodyLarge,
+					textAlign = TextAlign.Center,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
+			}
+		}
+	}
+
+	@Composable
+	private fun LandscapeMusicInfoLayout(modifier: Modifier = Modifier) {
+		val musicInfo = factory.currentMusic
+		Column(
+			modifier = modifier,
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(20.dp)
+		) {
+			Text(
+				text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
+				color = MaterialTheme.colorScheme.primary,
+				style = ThemeStyle.DisplayExtraLarge,
+				textAlign = TextAlign.Center,
+				maxLines = 2,
+				overflow = TextOverflow.Ellipsis
+			)
+			Text(
+				text = musicInfo?.singer ?: stringResource(Res.string.unknown_singer),
+				color = Colors.White,
+				style = MaterialTheme.typography.displaySmall,
+				textAlign = TextAlign.Center,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis
 			)
 		}
 	}
@@ -565,19 +578,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun ControlLayout(
-		modifier: Modifier = Modifier,
-		content: @Composable ColumnScope.() -> Unit
-	) {
-		Column(
-			modifier = modifier,
-			verticalArrangement = Arrangement.spacedBy(5.dp)
-		) {
-			content()
-		}
-	}
-
-	@Composable
 	private fun CurrentPlaylistLayout() {
 		val isEmptyList by rememberDerivedState { factory.musicList.isEmpty() }
 
@@ -718,10 +718,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Portrait() {
 		Box(modifier = Modifier.fillMaxSize()) {
-			MusicBackground(modifier = Modifier.fillMaxSize()
-				.background(Colors.Black)
-				.hazeSource(state = blurState)
-				.zIndex(1f))
+			MusicBackground(
+				alpha = 0.7f,
+				modifier = Modifier.fillMaxSize()
+					.background(Colors.Black)
+					.hazeSource(state = blurState)
+					.zIndex(1f)
+			)
 			Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
 				ToolLayout(modifier = Modifier
 					.fillMaxWidth()
@@ -742,19 +745,20 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.fillMaxWidth()
 					.weight(1f)
 				)
-				ControlLayout(modifier = Modifier
-					.fillMaxWidth()
-					.hazeEffect(
-						state = blurState,
-						style = HazeStyle(
-							blurRadius = 10.dp,
-							backgroundColor = Colors.Dark,
-							tint = null,
+				Column(
+					modifier = Modifier.fillMaxWidth()
+						.hazeEffect(
+							state = blurState,
+							style = HazeStyle(
+								blurRadius = 10.dp,
+								backgroundColor = Colors.Dark,
+								tint = null,
+							)
 						)
-					)
-					.padding(10.dp)
+						.padding(10.dp),
+					verticalArrangement = Arrangement.spacedBy(5.dp)
 				) {
-					MusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+					PortraitMusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
 					MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
 					MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
 					MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
@@ -767,12 +771,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun Landscape() {
 		Row(modifier = Modifier.fillMaxSize().background(Colors.Black)) {
 			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-				MusicBackground(modifier = Modifier.fillMaxSize()
-					.hazeSource(state = blurState)
-					.zIndex(1f))
+				MusicBackground(
+					alpha = 0.3f,
+					modifier = Modifier.fillMaxSize()
+						.hazeSource(state = blurState)
+						.zIndex(1f)
+				)
 				Column(
 					modifier = Modifier.fillMaxSize().zIndex(2f),
-					horizontalAlignment = Alignment.CenterHorizontally,
 					verticalArrangement = Arrangement.spacedBy(10.dp)
 				) {
 					ToolLayout(modifier = Modifier
@@ -789,33 +795,57 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						)
 						.padding(10.dp)
 					)
-					ControlLayout(modifier = Modifier
-						.fillMaxWidth()
-						.hazeEffect(
-							state = blurState,
-							style = HazeStyle(
-								blurRadius = 10.dp,
-								backgroundColor = Colors.Dark,
-								tint = null,
-							)
-						)
-						.padding(10.dp)
+					Box(
+						modifier = Modifier.padding(start = 50.dp, end = 50.dp, top = 10.dp, bottom = 20.dp)
+							.weight(1f).aspectRatio(1f)
 					) {
-						MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
-						MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
-						MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+						MusicRecordLayout(
+							offset = 0.dp,
+							recordPath = factory.currentMusic?.recordPath,
+							modifier = Modifier.fillMaxSize().shadow(elevation = 5.dp, clip = false, shape = CircleShape)
+						)
+					}
+					Row(
+						modifier = Modifier
+							.fillMaxWidth()
+							.height(IntrinsicSize.Min)
+							.hazeEffect(
+								state = blurState,
+								style = HazeStyle(
+									blurRadius = 10.dp,
+									backgroundColor = Colors.Dark,
+									tint = null,
+								)
+							)
+							.padding(10.dp),
+						horizontalArrangement = Arrangement.spacedBy(20.dp),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Box(
+							modifier = Modifier.width(200.dp).fillMaxHeight(),
+							contentAlignment = Alignment.Center
+						) {
+							LandscapeMusicInfoLayout(modifier = Modifier.fillMaxWidth())
+						}
+						Column(
+							modifier = Modifier.weight(1f),
+							verticalArrangement = Arrangement.spacedBy(10.dp)
+						) {
+							MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+							MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp))
+							MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+						}
 					}
 				}
 			}
 			Box(modifier = Modifier.fillMaxHeight().aspectRatio(0.5625f)) {
-				MusicBackground(modifier = Modifier.fillMaxSize()
-					.hazeSource(state = blurState)
-					.zIndex(1f))
-				LyricsLayout(modifier = Modifier)
+				MusicBackground(
+					alpha = 0.7f,
+					modifier = Modifier.fillMaxSize()
+				)
+				LyricsLayout(modifier = Modifier.padding(vertical = 100.dp).fillMaxSize())
 			}
 		}
-
-
 	}
 
     @Composable

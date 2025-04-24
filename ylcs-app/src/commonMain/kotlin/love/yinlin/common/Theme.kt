@@ -197,6 +197,10 @@ private fun RachelTypography(): Typography = Typography(
 	labelSmall = RachelTextStyle(10.sp, true),
 )
 
+object ThemeStyle {
+	val DisplayExtraLarge: TextStyle @Composable get() = RachelTextStyle(30.sp, true)
+}
+
 @Composable
 private fun RachelShapes(): Shapes = Shapes(
 	extraSmall = RoundedCornerShape(4.dp),
