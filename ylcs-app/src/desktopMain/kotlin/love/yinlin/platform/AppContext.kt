@@ -30,6 +30,7 @@ class ActualAppContext : AppContext() {
 		val transform = ge.defaultScreenDevice.defaultConfiguration.defaultTransform
 		val scaleX = transform.scaleX.toFloat()
 		val scaleY = transform.scaleY.toFloat()
+
 		@Suppress("KotlinConstantConditions")
 		windowWidth = bounds.width * Local.Client.Desktop.SCREEN_PERCENT / (if (Local.Client.Desktop.ALWAYS_PORTRAIT) 4f else 1f)
 		windowHeight = bounds.height * Local.Client.Desktop.SCREEN_PERCENT
