@@ -7,7 +7,7 @@ import java.io.File
 actual class KV {
 	companion object {
 		init {
-			System.loadLibrary("mmkv")
+			System.loadLibrary("libmmkv")
 		}
 	}
 

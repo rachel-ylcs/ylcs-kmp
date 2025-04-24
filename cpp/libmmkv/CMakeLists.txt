@@ -62,7 +62,12 @@ ELSEIF(UNIX AND (NOT APPLE))
 ENDIF()
 
 
-project(mmkv)
+project(libmmkv)
+
+# Creates and names a library, sets it as either STATIC
+# or SHARED, and provides the relative paths to its source code.
+# You can define multiple libraries, and CMake builds them for you.
+# Gradle automatically packages shared libraries with your APK.
 
 find_package(Java COMPONENTS Runtime Development)
 if(NOT Java_FOUND)
@@ -71,10 +76,9 @@ if(NOT Java_FOUND)
 endif()
 find_package(JNI REQUIRED)
 
-add_library(mmkv SHARED
+add_library(libmmkv SHARED
         main.cpp
 
-        # Provides a relative path to your source file(s).
         MMKV.h
         MMKV.cpp
         MMKV_Android.cpp
@@ -141,22 +145,22 @@ IF (MSVC OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
     # .S files is not supported by MSVC.
     # x86_64 asm not supported in OHOS
 ELSE()
-    target_sources(mmkv PRIVATE
-        aes/openssl/openssl_aesv8-armx.S
-        aes/openssl/openssl_aes-armv4.S)
+    target_sources(libmmkv PRIVATE
+        aes/openssl/openssl_aesv8-armx.S)
 ENDIF()
 
-target_include_directories(mmkv PRIVATE
+target_include_directories(libmmkv PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${JNI_INCLUDE_DIRS})
+    ${JNI_INCLUDE_DIRS}
+)
 
 IF (WIN32)
     # MMKV can be used only with Unicode on Windows.
-    target_compile_definitions(mmkv PUBLIC UNICODE)
-    target_compile_definitions(mmkv PUBLIC _UNICODE)
+    target_compile_definitions(libmmkv PUBLIC UNICODE)
+    target_compile_definitions(libmmkv PUBLIC _UNICODE)
 ENDIF()
 
-set_target_properties(mmkv PROPERTIES
+set_target_properties(libmmkv PROPERTIES
         CXX_STANDARD 20
         CXX_EXTENSIONS OFF
         POSITION_INDEPENDENT_CODE ON
@@ -167,12 +171,12 @@ find_library(zlib
         )
 
 IF (NOT zlib)
-    target_compile_definitions(mmkv PUBLIC MMKV_EMBED_ZLIB=1)
+    target_compile_definitions(libmmkv PUBLIC MMKV_EMBED_ZLIB=1)
 ELSE()
-    target_link_libraries(mmkv ${zlib})
+    target_link_libraries(libmmkv ${zlib})
 ENDIF()
 
-target_link_libraries(mmkv ${JNI_LIBRARIES})
+target_link_libraries(libmmkv ${JNI_LIBRARIES})
 
 function(copy_files)
     list(LENGTH ARGN num_args)
@@ -215,4 +219,4 @@ ELSE()
     file(REMOVE include/MMKV/MemoryFile.h include/MMKV/MMKVLog.h)
 ENDIF()
 
-target_include_directories(mmkv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(libmmkv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

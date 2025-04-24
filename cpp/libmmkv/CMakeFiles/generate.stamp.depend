@@ -1,0 +1,26 @@
+# CMake generation dependency list for this directory.
+D:/Rachel/ylcs/ylcs-kmp/cpp/CMakeFiles/4.0.1/CMakeASMCompiler.cmake
+D:/Rachel/ylcs/ylcs-kmp/cpp/libmmkv/CMakeLists.txt
+E:/cmake/share/cmake-4.0/Modules/CMakeASMCompiler.cmake.in
+E:/cmake/share/cmake-4.0/Modules/CMakeASMInformation.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeCompilerIdDetection.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeDetermineASMCompiler.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeDetermineCompiler.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeFindBinUtils.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeFindJavaCommon.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakePushCheckState.cmake
+E:/cmake/share/cmake-4.0/Modules/CMakeTestASMCompiler.cmake
+E:/cmake/share/cmake-4.0/Modules/CheckSourceCompiles.cmake
+E:/cmake/share/cmake-4.0/Modules/Compiler/MSVC-ASM.cmake
+E:/cmake/share/cmake-4.0/Modules/FindJNI.cmake
+E:/cmake/share/cmake-4.0/Modules/FindJava.cmake
+E:/cmake/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake
+E:/cmake/share/cmake-4.0/Modules/FindPackageMessage.cmake
+E:/cmake/share/cmake-4.0/Modules/Internal/CMakeASMLinkerInformation.cmake
+E:/cmake/share/cmake-4.0/Modules/Internal/CMakeInspectASMLinker.cmake
+E:/cmake/share/cmake-4.0/Modules/Internal/CheckSourceCompiles.cmake
+E:/cmake/share/cmake-4.0/Modules/Platform/Linker/GNU.cmake
+E:/cmake/share/cmake-4.0/Modules/Platform/Linker/Windows-ASM.cmake
+E:/cmake/share/cmake-4.0/Modules/Platform/Linker/Windows-GNU-ASM.cmake
+E:/cmake/share/cmake-4.0/Modules/Platform/Linker/Windows-GNU.cmake

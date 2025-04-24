@@ -1,8 +1,8 @@
 # IDE配置
-*.iml
-.fleet/
-.idea/
-.kotlin/
+**/*.iml
+**/.fleet/
+**/.idea/
+**/.kotlin/
 
 # 临时文件
 .DS_Store
@@ -21,13 +21,13 @@ kotlin-js-store/
 
 # 编译目录
 **/build/
-**/cmake-build-debug/
-**/cmake-build-release/
 **/desktop-mapping.txt
 
 # 输出目录
 **/outputs/
 cpp/build
+cpp/cmake-build-debug/
+cpp/cmake-build-release/
 cpp/libs
 
 # 本地配置
