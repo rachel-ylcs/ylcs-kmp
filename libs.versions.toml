@@ -12,7 +12,7 @@ agp = "8.10.0-alpha05"
 lifecycle = "2.9.0-alpha06"
 ktor = "3.1.2"
 sketch = "4.0.5"
-mmkv = "2.2.0"
+mmkv = "2.1.0" # 2.2.0 有BUG 等待修复
 coroutines = "1.10.2"
 
 # Android
