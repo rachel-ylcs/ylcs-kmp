@@ -34,6 +34,7 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.TabBar
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.screen.common.ScreenImagePreview
+import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.msg.weibo.LocalWeiboProcessor
@@ -171,7 +172,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 
 		override fun onWeiboVideoClick(pic: Picture) {
-			// TODO: 视频播放支持
+			navigate(ScreenVideo.Args(pic.video))
 		}
 	}
 

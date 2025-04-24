@@ -64,6 +64,7 @@ import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.CommonSheetState
 import love.yinlin.ui.component.screen.Sheet
+import love.yinlin.ui.screen.common.ScreenVideo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -525,7 +526,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					icon = Icons.Outlined.MusicVideo,
 					color = Colors.White,
 					onClick = {
-
+						val path = factory.currentMusic?.AnimationPath
+						if (path != null && SystemFileSystem.metadataOrNull(path) != null) {
+							navigate(ScreenVideo.Args(path.toString()))
+						}
 					}
 				)
 			}

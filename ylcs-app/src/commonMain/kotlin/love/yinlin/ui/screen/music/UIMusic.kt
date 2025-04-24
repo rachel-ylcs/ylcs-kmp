@@ -23,6 +23,8 @@ val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, M
 val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Animation.default.toString())
 @Stable
 val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
+@Stable
+val MusicInfo.videoPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Video.default.toString())
 
 val MusicResourceType?.background: Brush get() = when (this) {
     MusicResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))

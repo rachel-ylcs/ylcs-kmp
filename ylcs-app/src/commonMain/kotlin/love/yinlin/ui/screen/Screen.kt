@@ -16,6 +16,7 @@ fun ScreenRouteScope.screens() {
     // 通用
     screen { model, args: ScreenWebpage.Args -> ScreenWebpage(model, args) }
     screen(typeMap = buildNavTypeMap<List<Picture>>()) { model, args: ScreenImagePreview.Args -> ScreenImagePreview(model, args) }
+    screen { model, args: ScreenVideo.Args -> ScreenVideo(model, args) }
     // 世界
     screen { model, args: ScreenActivityDetails.Args -> ScreenActivityDetails(model, args) }
     screen { model-> ScreenAddActivity(model) }
