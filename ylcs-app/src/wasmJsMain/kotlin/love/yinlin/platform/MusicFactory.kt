@@ -13,6 +13,7 @@ class ActualMusicFactory : MusicFactory() {
     override val isPlaying: Boolean = false
     override val currentPosition: Long = 0L
     override val currentDuration: Long = 0L
+    override val currentMusic: MusicInfo? = null
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {}
     override suspend fun play() {}
     override suspend fun pause() {}
@@ -22,8 +23,6 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun gotoIndex(index: Int) {}
     override suspend fun seekTo(position: Long) {}
     override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) {}
-    override suspend fun addMedia(media: MusicInfo) {}
     override suspend fun addMedias(medias: List<MusicInfo>) {}
     override suspend fun removeMedia(index: Int) {}
-    override suspend fun moveMedia(start: Int, end: Int) {}
 }
