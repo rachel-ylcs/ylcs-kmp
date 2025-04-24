@@ -29,6 +29,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 fun main() {
+    System.setProperty("compose.swing.render.on.graphics", "true")
+    System.setProperty("compose.interop.blending", "true")
+
     val context = ActualAppContext()
     app = context
     context.initialize()

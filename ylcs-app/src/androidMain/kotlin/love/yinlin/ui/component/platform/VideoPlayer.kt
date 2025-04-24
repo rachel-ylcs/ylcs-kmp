@@ -5,8 +5,6 @@ import android.content.pm.ActivityInfo
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,6 +21,7 @@ import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
 import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
+import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 
@@ -88,14 +87,10 @@ actual fun VideoPlayer(
             PlayerSurface(
                 player = player,
                 surfaceType = SURFACE_TYPE_SURFACE_VIEW,
-                modifier = scaledModifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {
-                        if (player.isPlaying) player.pause()
-                        else player.play()
-                    }
-                ).zIndex(2f)
+                modifier = scaledModifier.clickableNoRipple {
+                    if (player.isPlaying) player.pause()
+                    else player.play()
+                }.zIndex(2f)
             )
         }
     }

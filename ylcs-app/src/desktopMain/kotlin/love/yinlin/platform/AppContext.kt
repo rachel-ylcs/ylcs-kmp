@@ -24,8 +24,6 @@ class ActualAppContext : AppContext() {
 	override val fontScale: Float = 1f
 	override val kv: KV = KV()
 
-
-
 	init {
 		val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
 		val bounds = ge.maximumWindowBounds
