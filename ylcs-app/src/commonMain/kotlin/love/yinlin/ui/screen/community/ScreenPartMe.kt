@@ -296,7 +296,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		val userProfile = app.config.userProfile
 		if (userProfile == null) LoginBox(Modifier.fillMaxSize())
 		else {

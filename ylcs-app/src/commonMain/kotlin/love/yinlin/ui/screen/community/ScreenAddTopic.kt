@@ -144,7 +144,7 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val profile = app.config.userProfile
 
         SubScreen(

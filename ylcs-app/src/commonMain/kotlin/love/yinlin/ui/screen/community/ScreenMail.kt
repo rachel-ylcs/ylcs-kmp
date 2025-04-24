@@ -242,7 +242,7 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "邮箱",

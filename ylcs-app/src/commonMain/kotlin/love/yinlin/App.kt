@@ -56,11 +56,11 @@ abstract class ScreenPart(private val model: AppModel) {
 	protected open suspend fun initialize() {}
 
 	@Composable
-	protected abstract fun content()
+	protected abstract fun Content()
 
 	@Composable
-	fun partContent() {
-		content()
+	fun PartContent() {
+		Content()
 		LaunchOnce(firstLoad) {
 			launch { initialize() }
 		}

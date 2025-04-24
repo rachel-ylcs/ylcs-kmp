@@ -168,7 +168,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 
 		SubScreen(

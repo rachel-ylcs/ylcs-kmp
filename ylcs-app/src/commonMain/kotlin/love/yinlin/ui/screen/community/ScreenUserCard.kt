@@ -151,7 +151,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主页",

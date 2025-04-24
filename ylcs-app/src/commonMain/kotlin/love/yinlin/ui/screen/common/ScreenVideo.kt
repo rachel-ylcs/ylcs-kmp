@@ -19,7 +19,7 @@ class ScreenVideo(model: AppModel, val args: Args) : Screen<ScreenVideo.Args>(mo
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    override fun content() {
+    override fun Content() {
         BackHandler { pop() }
 
         VideoPlayer(

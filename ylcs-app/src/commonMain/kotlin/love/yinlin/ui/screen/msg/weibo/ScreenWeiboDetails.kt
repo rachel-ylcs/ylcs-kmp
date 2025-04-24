@@ -154,7 +154,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),

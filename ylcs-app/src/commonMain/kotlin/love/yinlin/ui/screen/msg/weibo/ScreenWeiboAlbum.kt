@@ -89,7 +89,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenW
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "${args.title} - 共 $num 张",

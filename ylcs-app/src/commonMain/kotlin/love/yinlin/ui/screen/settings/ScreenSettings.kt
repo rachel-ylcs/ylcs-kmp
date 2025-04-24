@@ -455,7 +455,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		val userProfile = app.config.userProfile
 
 		SubScreen(

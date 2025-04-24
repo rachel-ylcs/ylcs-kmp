@@ -464,7 +464,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         SubScreen(
             modifier = Modifier.fillMaxSize(),
             title = "歌单",

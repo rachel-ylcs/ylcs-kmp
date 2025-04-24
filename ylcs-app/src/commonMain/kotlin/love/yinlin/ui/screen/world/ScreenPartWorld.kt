@@ -119,7 +119,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 
 		Column(modifier = Modifier.fillMaxSize()) {

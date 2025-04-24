@@ -192,7 +192,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "修改活动",

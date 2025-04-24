@@ -216,7 +216,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val title by rememberDerivedState {
             if (isManaging) "选择歌曲"
             else if (!isSearching) "曲库"

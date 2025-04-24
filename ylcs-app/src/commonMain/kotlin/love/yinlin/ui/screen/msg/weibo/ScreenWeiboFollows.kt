@@ -176,7 +176,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = if (isLocal) "微博关注" else "搜索结果",

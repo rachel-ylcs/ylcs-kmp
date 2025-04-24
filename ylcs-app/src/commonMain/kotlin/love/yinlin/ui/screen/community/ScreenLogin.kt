@@ -342,7 +342,7 @@ class ScreenLogin(model: AppModel) : Screen<ScreenLogin.Args>(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = when (mode) {

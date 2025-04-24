@@ -296,7 +296,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWe
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),

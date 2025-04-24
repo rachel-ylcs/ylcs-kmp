@@ -798,7 +798,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主题",

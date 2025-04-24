@@ -485,7 +485,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         SubScreen(
             modifier = Modifier.fillMaxSize(),
             title = musicInfo?.name ?: stringResource(Res.string.no_audio_source),

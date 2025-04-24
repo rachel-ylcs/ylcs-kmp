@@ -69,7 +69,7 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "添加活动",

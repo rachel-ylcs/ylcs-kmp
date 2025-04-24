@@ -152,11 +152,11 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 		) {
 			Box(modifier = Modifier.fillMaxSize()) {
 				when (it) {
-					TabItem.WORLD.ordinal -> worldPart.partContent()
-					TabItem.MSG.ordinal -> msgPart.partContent()
-					TabItem.MUSIC.ordinal -> musicPart.partContent()
-					TabItem.DISCOVERY.ordinal -> discoveryPart.partContent()
-					TabItem.ME.ordinal -> mePart.partContent()
+					TabItem.WORLD.ordinal -> worldPart.PartContent()
+					TabItem.MSG.ordinal -> msgPart.PartContent()
+					TabItem.MUSIC.ordinal -> musicPart.PartContent()
+					TabItem.DISCOVERY.ordinal -> discoveryPart.PartContent()
+					TabItem.ME.ordinal -> mePart.PartContent()
 				}
 			}
 		}
@@ -199,7 +199,7 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		if (app.isPortrait) Portrait(modifier = Modifier.fillMaxSize())
 		else Landscape(modifier = Modifier.fillMaxSize())
 

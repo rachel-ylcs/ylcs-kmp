@@ -175,7 +175,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "${current + 1} / ${previews.size}",

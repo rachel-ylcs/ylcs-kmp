@@ -841,7 +841,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
     @Composable
-	override fun content() {
+	override fun Content() {
 		if (app.isPortrait) Portrait()
 		else Landscape()
 

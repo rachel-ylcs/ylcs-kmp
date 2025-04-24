@@ -21,7 +21,7 @@ class ScreenWebpage(model: AppModel, args: Args) : Screen<ScreenWebpage.Args>(mo
 	private val state = WebPageState(WebPageSettings(), args.url)
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = state.title,

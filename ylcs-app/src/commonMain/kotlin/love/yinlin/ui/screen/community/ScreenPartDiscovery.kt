@@ -231,7 +231,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	override fun content() {
+	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
 				modifier = Modifier.fillMaxWidth().zIndex(5f),
