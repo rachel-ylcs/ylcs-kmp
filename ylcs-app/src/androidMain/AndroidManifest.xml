@@ -47,6 +47,7 @@
                 <data android:scheme="file"/>
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.rachel" />
+                <data android:pathSuffix=".rachel" tools:targetApi="31" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
