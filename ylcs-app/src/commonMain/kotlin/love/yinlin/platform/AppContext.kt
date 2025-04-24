@@ -53,6 +53,15 @@ abstract class AppContext {
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
+	private fun initializePath() {
+		OS.ifNotPlatform(Platform.WebWasm) {
+			SystemFileSystem.createDirectories(OS.Storage.dataPath)
+			SystemFileSystem.createDirectories(OS.Storage.cachePath)
+
+			SystemFileSystem.createDirectories(OS.Storage.musicPath)
+		}
+	}
+
 	// ImageLoader
 	abstract fun initializeSketch(): Sketch
 
@@ -75,15 +84,6 @@ abstract class AppContext {
 				musicFactory.initLibrary()
 				musicFactory.init()
 			}
-		}
-	}
-
-	private fun initializePath() {
-		OS.ifNotPlatform(Platform.WebWasm) {
-			SystemFileSystem.createDirectories(OS.Storage.dataPath)
-			SystemFileSystem.createDirectories(OS.Storage.cachePath)
-
-			SystemFileSystem.createDirectories(OS.Storage.musicPath)
 		}
 	}
 }
