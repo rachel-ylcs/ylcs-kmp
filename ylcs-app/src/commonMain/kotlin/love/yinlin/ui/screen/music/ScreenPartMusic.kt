@@ -519,13 +519,20 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 			}
 			equalItem {
+				var hasVideo by rememberState { false }
+
+				LaunchedEffect(factory.currentMusic) {
+					hasVideo = factory.currentMusic?.videoPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true
+				}
+
 				ClickIcon(
 					icon = Icons.Outlined.MusicVideo,
 					color = Colors.White,
+					enabled = hasVideo,
 					onClick = {
-						val path = factory.currentMusic?.AnimationPath
-						if (path != null && SystemFileSystem.metadataOrNull(path) != null) {
-							navigate(ScreenVideo.Args(path.toString()))
+						if (hasVideo) launch {
+							factory.pause()
+							navigate(ScreenVideo.Args(factory.currentMusic?.videoPath.toString()))
 						}
 					}
 				)
