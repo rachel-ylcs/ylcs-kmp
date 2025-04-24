@@ -115,6 +115,15 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val currentPlaylistSheet = CommonSheetState()
 	private val sleepModeSheet = CommonSheetState()
 
+	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
+		state = blurState,
+		style = HazeStyle(
+			blurRadius = radius,
+			backgroundColor = Colors.Dark,
+			tint = null,
+		)
+	)
+
 	@Composable
 	private fun MusicBackground(
 		alpha: Float = 1f,
@@ -730,14 +739,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.fillMaxWidth()
 					.padding(10.dp)
 					.clip(MaterialTheme.shapes.large)
-					.hazeEffect(
-						state = blurState,
-						style = HazeStyle(
-							blurRadius = 15.dp,
-							backgroundColor = Colors.Dark,
-							tint = null,
-						)
-					)
+					.hazeBlur(15.dp)
 					.padding(10.dp)
 				)
 				LyricsLayout(modifier = Modifier
@@ -747,14 +749,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 				Column(
 					modifier = Modifier.fillMaxWidth()
-						.hazeEffect(
-							state = blurState,
-							style = HazeStyle(
-								blurRadius = 10.dp,
-								backgroundColor = Colors.Dark,
-								tint = null,
-							)
-						)
+						.hazeBlur(10.dp)
 						.padding(10.dp),
 					verticalArrangement = Arrangement.spacedBy(5.dp)
 				) {
@@ -785,14 +780,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						.fillMaxWidth()
 						.padding(10.dp)
 						.clip(MaterialTheme.shapes.large)
-						.hazeEffect(
-							state = blurState,
-							style = HazeStyle(
-								blurRadius = 15.dp,
-								backgroundColor = Colors.Dark,
-								tint = null,
-							)
-						)
+						.hazeBlur(30.dp)
 						.padding(10.dp)
 					)
 					Box(
@@ -809,14 +797,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						modifier = Modifier
 							.fillMaxWidth()
 							.height(IntrinsicSize.Min)
-							.hazeEffect(
-								state = blurState,
-								style = HazeStyle(
-									blurRadius = 10.dp,
-									backgroundColor = Colors.Dark,
-									tint = null,
-								)
-							)
+							.hazeBlur(20.dp)
 							.padding(10.dp),
 						horizontalArrangement = Arrangement.spacedBy(20.dp),
 						verticalAlignment = Alignment.CenterVertically
