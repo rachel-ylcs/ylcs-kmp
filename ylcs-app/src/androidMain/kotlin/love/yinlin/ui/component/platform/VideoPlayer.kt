@@ -8,15 +8,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SmartDisplay
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.media3.common.MediaItem
@@ -30,6 +29,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
+import love.yinlin.ui.component.image.MiniIcon
 
 @SuppressLint("SourceLockedOrientationActivity")
 @OptIn(UnstableApi::class)
@@ -39,32 +39,31 @@ actual fun VideoPlayer(
     modifier: Modifier
 ) {
     val context = LocalContext.current
-    var player: Player? by rememberState { null }
+    var controller: Player? by rememberState { null }
 
     DisposableEffect(Unit) {
-        player = FfmpegRenderersFactory.build(context, false).apply {
+        controller = FfmpegRenderersFactory.build(context, false).apply {
             setMediaItem(MediaItem.fromUri(url))
             prepare()
             play()
         }
         onDispose {
-            player?.release()
-            player = null
+            controller?.release()
+            controller = null
         }
     }
 
     LifecycleStartEffect(Unit) {
-        player?.play()
+        controller?.play()
         onStopOrDispose {
-            player?.pause()
+            controller?.pause()
         }
     }
 
     Box(modifier = modifier) {
         Box(Modifier.matchParentSize().background(Colors.Black).zIndex(1f))
-        player?.let {
-            var showControls by rememberState { true }
-            val presentationState = rememberPresentationState(it)
+        controller?.let { player ->
+            val presentationState = rememberPresentationState(player)
             val scaledModifier = Modifier.resizeWithContentScale(ContentScale.Inside, presentationState.videoSizeDp)
             val isLandscape by rememberDerivedState {
                 presentationState.videoSizeDp?.let { size -> size.width > size.height }
@@ -87,14 +86,26 @@ actual fun VideoPlayer(
             }
 
             PlayerSurface(
-                player = it,
+                player = player,
                 surfaceType = SURFACE_TYPE_SURFACE_VIEW,
                 modifier = scaledModifier.clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    onClick = { showControls = !showControls }
+                    onClick = {
+                        if (player.isPlaying) player.pause()
+                        else player.play()
+                    }
                 ).zIndex(2f)
             )
+
+            if (!player.isPlaying) {
+                MiniIcon(
+                    icon = Icons.Outlined.SmartDisplay,
+                    color = Colors.White,
+                    size = 48.dp,
+                    modifier = Modifier.align(Alignment.Center).zIndex(3f),
+                )
+            }
         }
     }
 }
