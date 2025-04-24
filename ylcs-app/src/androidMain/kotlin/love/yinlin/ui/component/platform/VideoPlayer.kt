@@ -8,14 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.media3.common.MediaItem
@@ -29,7 +25,6 @@ import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
-import love.yinlin.ui.component.image.MiniIcon
 
 @SuppressLint("SourceLockedOrientationActivity")
 @OptIn(UnstableApi::class)
@@ -97,15 +92,6 @@ actual fun VideoPlayer(
                     }
                 ).zIndex(2f)
             )
-
-            if (!player.isPlaying) {
-                MiniIcon(
-                    icon = Icons.Outlined.SmartDisplay,
-                    color = Colors.White,
-                    size = 48.dp,
-                    modifier = Modifier.align(Alignment.Center).zIndex(3f),
-                )
-            }
         }
     }
 }

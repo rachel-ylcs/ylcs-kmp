@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
+import love.yinlin.extension.clickableNoRipple
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
@@ -82,7 +83,7 @@ fun Tip(state: TipState) {
 		}
 		Box(
 			modifier = Modifier.padding(20.dp).fillMaxWidth()
-				.clickable(indication = null, interactionSource = null) { }
+				.clickableNoRipple { }
 				.background(
 					color = color,
 					shape = MaterialTheme.shapes.extraLarge

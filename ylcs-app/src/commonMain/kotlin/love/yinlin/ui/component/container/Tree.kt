@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import love.yinlin.common.Colors
+import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.MiniIcon
 
@@ -46,14 +47,10 @@ data class TreeScope(
 
         Column {
             Row(
-                modifier = Modifier.clickable(
-                    interactionSource = null,
-                    indication = null,
-                    onClick = {
-                        if (expandable) expended = !expended
-                        else onClick?.invoke()
-                    }
-                ).padding(verticalPadding),
+                modifier = Modifier.clickableNoRipple {
+                    if (expandable) expended = !expended
+                    else onClick?.invoke()
+                }.padding(verticalPadding),
                 horizontalArrangement = Arrangement.spacedBy(horizontalPadding),
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
 
@@ -90,9 +91,7 @@ private fun ModalLandscapeSheet(
            .clip(shape = MaterialTheme.shapes.extraLarge)
            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f * (1 - offset / 360)))
        ) {
-           Box(modifier = Modifier.weight(1f).fillMaxHeight()
-               .clickable(interactionSource = null, indication = null, onClick = { isVisible = false })
-           )
+           Box(modifier = Modifier.weight(1f).fillMaxHeight().clickableNoRipple { isVisible = false })
 
            Surface(
                shadowElevation = 5.dp,

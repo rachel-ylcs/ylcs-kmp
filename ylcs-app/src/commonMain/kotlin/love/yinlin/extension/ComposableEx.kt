@@ -1,5 +1,7 @@
 package love.yinlin.extension
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +27,16 @@ inline fun Modifier.condition(value: Boolean, callback: Modifier.() -> Modifier)
 inline fun Modifier.condition(value: Boolean, ifTrue: Modifier.() -> Modifier, ifFalse: Modifier.() -> Modifier): Modifier =
 	if (value) this.ifTrue() else this.ifFalse()
 
+
+// clickableNoRipple
+
+@Composable
+fun Modifier.clickableNoRipple(enabled: Boolean = true, onClick: () -> Unit): Modifier = this.clickable(
+	interactionSource = remember { MutableInteractionSource() },
+	indication = null,
+	enabled = enabled,
+	onClick = onClick
+)
 
 // rememberState
 

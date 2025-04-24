@@ -46,6 +46,7 @@ import love.yinlin.common.ExtraIcons
 import love.yinlin.common.ThemeStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
@@ -348,13 +349,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						verticalBias = 0f
 					))
 					.width(14.dp).height(8.dp)
-					.clickable(
-						interactionSource = null,
-						indication = null,
-						onClick = {
-							launch { factory.seekTo(hotpot) }
-						}
-					)
+					.clickableNoRipple {
+						launch { factory.seekTo(hotpot) }
+					}
 					.padding(horizontal = 3.dp)
 					.shadow(elevation = 2.dp, shape = CircleShape)
 					.background(
