@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.common
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

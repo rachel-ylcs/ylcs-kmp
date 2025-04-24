@@ -256,7 +256,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		) {
 			MusicRecordLayout(
 				offset = (-50).dp,
-				recordPath = musicInfo?.recordPath,
+				recordPath = remember(musicInfo) { musicInfo?.recordPath },
 				modifier = Modifier.size(100.dp).shadow(elevation = 5.dp, clip = false, shape = CircleShape)
 			)
 			Column(
@@ -788,11 +788,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						modifier = Modifier.padding(start = 50.dp, end = 50.dp, top = 10.dp, bottom = 20.dp)
 							.weight(1f).aspectRatio(1f)
 					) {
-						MusicRecordLayout(
-							offset = 0.dp,
-							recordPath = factory.currentMusic?.recordPath,
-							modifier = Modifier.fillMaxSize().shadow(elevation = 5.dp, clip = false, shape = CircleShape)
-						)
+						val musicInfo = factory.currentMusic
+						if (musicInfo != null) {
+							MusicRecordLayout(
+								offset = 0.dp,
+								recordPath = remember(musicInfo) { musicInfo.recordPath },
+								modifier = Modifier.fillMaxSize().shadow(elevation = 5.dp, clip = false, shape = CircleShape)
+							)
+						}
 					}
 					Row(
 						modifier = Modifier
