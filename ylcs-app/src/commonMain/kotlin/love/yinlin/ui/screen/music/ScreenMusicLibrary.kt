@@ -32,6 +32,7 @@ import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.DialogDynamicChoice
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
@@ -262,24 +263,27 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
             },
             slot = slot
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(if (app.isPortrait) 150.dp else 200.dp),
-                contentPadding = PaddingValues(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(
-                    items = library,
-                    key = { index, item -> item.id }
-                ) { index, item ->
-                    MusicCard(
-                        musicInfo = item,
-                        enableLongClick = !isManaging,
-                        onLongClick = { onCardLongClick(index) },
-                        onClick = { onCardClick(index) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            if (library.isEmpty()) EmptyBox()
+            else {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(if (app.isPortrait) 150.dp else 200.dp),
+                    contentPadding = PaddingValues(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed(
+                        items = library,
+                        key = { index, item -> item.id }
+                    ) { index, item ->
+                        MusicCard(
+                            musicInfo = item,
+                            enableLongClick = !isManaging,
+                            onLongClick = { onCardLongClick(index) },
+                            onClick = { onCardClick(index) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
