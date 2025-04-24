@@ -141,9 +141,9 @@ fun SubScreen(
 
 	with(slot) {
 		Tip(state = tip)
-		info.withOpen()
-		confirm.withOpen()
-		loading.withOpen()
+		info.WithOpen()
+		confirm.WithOpen()
+		loading.WithOpen()
 	}
 }
 

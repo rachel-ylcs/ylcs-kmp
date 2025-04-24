@@ -206,5 +206,5 @@ fun ActivityInfoLayout(
         )
     }
 
-    input.crop.withOpen()
+    input.crop.WithOpen()
 }

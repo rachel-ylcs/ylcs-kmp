@@ -484,8 +484,8 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			AboutLayout()
 		}
 
-		cropDialog.withOpen()
-		idModifyDialog.withOpen()
-		signatureModifyDialog.withOpen()
+		cropDialog.WithOpen()
+		idModifyDialog.WithOpen()
+		signatureModifyDialog.WithOpen()
 	}
 }

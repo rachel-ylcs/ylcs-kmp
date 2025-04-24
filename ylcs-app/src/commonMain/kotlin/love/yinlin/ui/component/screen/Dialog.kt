@@ -23,7 +23,6 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import love.yinlin.common.Colors
 import love.yinlin.common.ThemeColor
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.platform.app
@@ -157,11 +156,11 @@ abstract class DialogState<R> {
 	}
 
 	@Composable
-	protected abstract fun dialogContent()
+	protected abstract fun DialogContent()
 
 	@Composable
-	fun withOpen() {
-		if (isOpen) dialogContent()
+	fun WithOpen() {
+		if (isOpen) DialogContent()
 		DisposableEffect(Unit) { onDispose { hide() } }
 	}
 
@@ -286,7 +285,7 @@ open class DialogInfo(
 	}
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		RachelDialog {
 			Text(
 				text = content,
@@ -314,7 +313,7 @@ open class DialogConfirm(
 	}
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		RachelDialog(
 			actions = {
 				RachelButton(
@@ -358,7 +357,7 @@ open class DialogInput(
 	}
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		RachelDialog(
 			actions = {
 				RachelButton(
@@ -398,7 +397,7 @@ abstract class DialogChoice(
 	suspend fun open(): Int? = awaitResult()
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		RachelDialog {
 			Column(
 				modifier = Modifier.fillMaxWidth(),
@@ -475,7 +474,7 @@ open class DialogProgress : RachelDialogState<Unit>() {
 	}
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		RachelDialog(
 			actions = {
 				RachelButton(
@@ -528,7 +527,7 @@ class DialogLoading : DialogState<Unit>() {
 	suspend fun open() = openAsync()
 
 	@Composable
-	override fun dialogContent() {
+	override fun DialogContent() {
 		BaseDialog {
 			Surface(
 				shape = MaterialTheme.shapes.extraLarge,

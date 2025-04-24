@@ -230,6 +230,6 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 			ImportLayout()
 		}
 
-		searchDialog.withOpen()
+		searchDialog.WithOpen()
 	}
 }

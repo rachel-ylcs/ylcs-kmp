@@ -191,6 +191,6 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 			else Landscape()
 		}
 
-		downloadDialog.withOpen()
+		downloadDialog.WithOpen()
 	}
 }

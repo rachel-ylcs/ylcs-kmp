@@ -388,7 +388,7 @@ class DialogCrop : DialogState<CropResult>() {
     }
 
     @Composable
-    override fun dialogContent() {
+    override fun DialogContent() {
         BaseDialog {
             Column(
                 modifier = Modifier.fillMaxWidth().background(Colors.Black),

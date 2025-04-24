@@ -288,7 +288,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
             }
         }
 
-        searchDialog.withOpen()
-        addMusicDialog.withOpen()
+        searchDialog.WithOpen()
+        addMusicDialog.WithOpen()
     }
 }

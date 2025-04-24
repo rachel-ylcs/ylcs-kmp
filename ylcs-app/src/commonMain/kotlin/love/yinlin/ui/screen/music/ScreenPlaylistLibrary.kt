@@ -498,7 +498,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
             CloudBackupLayout()
         }
 
-        inputPlaylistNameDialog.withOpen()
-        processPlaylistDialog.withOpen()
+        inputPlaylistNameDialog.WithOpen()
+        processPlaylistDialog.WithOpen()
     }
 }

@@ -849,6 +849,6 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			SendCoinLayout()
 		}
 
-		moveTopicDialog.withOpen()
+		moveTopicDialog.WithOpen()
 	}
 }
