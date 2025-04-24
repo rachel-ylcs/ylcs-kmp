@@ -842,6 +842,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
     @Composable
 	override fun Content() {
+		if (app.isPortrait) Portrait()
+		else Landscape()
+
 		currentPlaylistSheet.WithOpen {
 			CurrentPlaylistLayout()
 		}
@@ -849,9 +852,5 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		sleepModeSheet.WithOpen {
 			SleepModeLayout()
 		}
-		if (app.isPortrait) Portrait()
-		else Landscape()
-
-
 	}
 }
