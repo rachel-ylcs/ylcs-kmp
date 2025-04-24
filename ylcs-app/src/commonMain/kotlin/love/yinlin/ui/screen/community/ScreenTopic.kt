@@ -610,7 +610,10 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			override fun offset(item: SubComment): Int = item.cid
 		} }
 
-		Sheet(state = subCommentSheet) {
+		Sheet(
+			state = subCommentSheet,
+			heightModifier = { fillMaxHeight(0.7f) }
+		) {
 			PaginationColumn(
 				items = page.items,
 				key = { it.cid },
