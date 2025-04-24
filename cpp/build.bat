@@ -4,7 +4,7 @@ mkdir build
 pushd build
 
 rem MSBuild构建出来的库在Release目录下, 所以换构建器, 高版本VS自带Ninja
-cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="/NOEXP /NODEWFA /NOIMPLIB"
+cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_SHARED_LINKER_FLAGS="/NOEXP /NOIMPLIB"
 if %errorlevel% neq 0 goto failed
 cmake --build . --config Release
 if %errorlevel% neq 0 goto failed
