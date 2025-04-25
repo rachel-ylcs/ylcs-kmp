@@ -40,13 +40,13 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.app_privacy_policy
 import love.yinlin.resources.default_name
 import love.yinlin.resources.default_signature
-import love.yinlin.ui.component.image.DialogCrop
+import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -64,14 +64,14 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	private val privacyPolicySheet = FloatingSheet()
 	private val aboutSheet = FloatingSheet()
 
-	private val cropDialog = DialogCrop()
+	private val cropDialog = FloatingDialogCrop()
 
-	private val idModifyDialog = DialogInput(
+	private val idModifyDialog = FloatingDialogInput(
 		hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
 		maxLength = UserConstraint.MAX_NAME_LENGTH
 	)
 
-	private val signatureModifyDialog = DialogInput(
+	private val signatureModifyDialog = FloatingDialogInput(
 		hint = "修改个性签名",
 		maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
 		maxLines = 3,
@@ -82,7 +82,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 		return Picker.pickPicture()?.use { source ->
 			OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
 		}?.let { path ->
-			cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
+			cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
 				OS.Storage.createTempFile { sink ->
 					SystemFileSystem.source(path).buffered().use { source ->
 						ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
@@ -129,7 +129,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	}
 
 	private suspend fun modifyUserId(initText: String) {
-		idModifyDialog.open(initText)?.let { text ->
+		idModifyDialog.openSuspend(initText)?.let { text ->
 			val profile = app.config.userProfile
 			if (profile != null) launch {
 				val result = ClientAPI.request(
@@ -153,7 +153,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	}
 
 	private suspend fun modifyUserSignature(initText: String) {
-		signatureModifyDialog.open(initText)?.let { text ->
+		signatureModifyDialog.openSuspend(initText)?.let { text ->
 			val profile = app.config.userProfile
 			if (profile != null) launch {
 				val result = ClientAPI.request(
@@ -201,7 +201,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			)
 		)
 		when (result) {
-			is Data.Success -> feedbackSheet.hide()
+			is Data.Success -> feedbackSheet.close()
 			is Data.Error -> slot.tip.error(result.message)
 		}
 	}
@@ -382,10 +382,6 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			if (app.isPortrait) Portrait(userProfile)
 			else Landscape(userProfile)
 		}
-
-		cropDialog.WithOpen()
-		idModifyDialog.WithOpen()
-		signatureModifyDialog.WithOpen()
 	}
 
 	@Composable
@@ -403,7 +399,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			}
 		}
 
-		feedbackSheet.Land {
+		feedbackSheet.Land { onClose ->
 			val state = remember { TextInputState() }
 
 			Column(
@@ -443,5 +439,9 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
 			}
 		}
+
+		cropDialog.Land()
+		idModifyDialog.Land()
+		signatureModifyDialog.Land()
 	}
 }

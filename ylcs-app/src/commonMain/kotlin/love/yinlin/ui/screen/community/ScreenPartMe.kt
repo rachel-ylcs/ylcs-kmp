@@ -122,100 +122,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun SigninLayout() {
-		var data by rememberState { BooleanArray(8) { false } }
-		var todayIndex: Int by rememberState { -1 }
-		var todaySignin by rememberState { true }
-		val today = remember { DateEx.Today }
-
-		Column(
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(20.dp)
-		) {
-			Text(
-				text = "签到记录",
-				style = MaterialTheme.typography.titleLarge
-			)
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				repeat(2) { row ->
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(10.dp)
-					) {
-						repeat(4) { col ->
-							val index = row * 4 + col
-							Surface(
-								modifier = Modifier.weight(1f),
-								shape = MaterialTheme.shapes.medium,
-								tonalElevation = 3.dp,
-								shadowElevation = 1.dp,
-								border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-							) {
-								Column(
-									modifier = Modifier.fillMaxWidth().padding(10.dp),
-									horizontalAlignment = Alignment.CenterHorizontally,
-									verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
-								) {
-									val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
-
-									MiniIcon(
-										icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-										color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
-									)
-									Text(
-										text = "${date.monthNumber}月${date.dayOfMonth}日",
-										color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
-									)
-								}
-							}
-						}
-					}
-				}
-			}
-			Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
-		}
-
-		LaunchedEffect(Unit) {
-			val result = ClientAPI.request(
-				route = API.User.Profile.Signin,
-				data = app.config.userToken
-			)
-			if (result is Data.Success) {
-				with(result.data) {
-					todaySignin = status
-					todayIndex = index
-					data = BooleanArray(8) { ((value shr it) and 1) == 1 }
-				}
-			}
-		}
-	}
-
-	@Composable
-	private fun ScanLayout() {
-		ScannerView(
-			modifier = Modifier.fillMaxWidth(),
-			codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
-			showUi = false,
-			result = {
-				scanSheet.hide()
-				if (it is BarcodeResult.OnSuccess) {
-					try {
-						val uri = Uri.parse(it.barcode.data)!!
-						if (uri.scheme == Scheme.Rachel) deeplink(uri)
-					}
-					catch (_: Throwable) {
-						slot.tip.warning("不能识别此信息")
-					}
-				}
-			}
-		)
-	}
-
-	@Composable
 	private fun LoginBox(modifier: Modifier = Modifier) {
 		Column(modifier = modifier) {
 			Row(
@@ -299,7 +205,95 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	override fun Floating() {
-		signinSheet.Land { SigninLayout() }
-		scanSheet.Land { ScanLayout() }
+		signinSheet.Land {
+			var data by rememberState { BooleanArray(8) { false } }
+			var todayIndex: Int by rememberState { -1 }
+			var todaySignin by rememberState { true }
+			val today = remember { DateEx.Today }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(20.dp)
+			) {
+				Text(
+					text = "签到记录",
+					style = MaterialTheme.typography.titleLarge
+				)
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					verticalArrangement = Arrangement.spacedBy(10.dp)
+				) {
+					repeat(2) { row ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(10.dp)
+						) {
+							repeat(4) { col ->
+								val index = row * 4 + col
+								Surface(
+									modifier = Modifier.weight(1f),
+									shape = MaterialTheme.shapes.medium,
+									tonalElevation = 3.dp,
+									shadowElevation = 1.dp,
+									border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+								) {
+									Column(
+										modifier = Modifier.fillMaxWidth().padding(10.dp),
+										horizontalAlignment = Alignment.CenterHorizontally,
+										verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+									) {
+										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
+
+										MiniIcon(
+											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+										)
+										Text(
+											text = "${date.monthNumber}月${date.dayOfMonth}日",
+											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+										)
+									}
+								}
+							}
+						}
+					}
+				}
+				Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
+			}
+
+			LaunchedEffect(Unit) {
+				val result = ClientAPI.request(
+					route = API.User.Profile.Signin,
+					data = app.config.userToken
+				)
+				if (result is Data.Success) {
+					with(result.data) {
+						todaySignin = status
+						todayIndex = index
+						data = BooleanArray(8) { ((value shr it) and 1) == 1 }
+					}
+				}
+			}
+		}
+		scanSheet.Land {
+			ScannerView(
+				modifier = Modifier.fillMaxWidth(),
+				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
+				showUi = false,
+				result = {
+					scanSheet.close()
+					if (it is BarcodeResult.OnSuccess) {
+						try {
+							val uri = Uri.parse(it.barcode.data)!!
+							if (uri.scheme == Scheme.Rachel) deeplink(uri)
+						}
+						catch (_: Throwable) {
+							slot.tip.warning("不能识别此信息")
+						}
+					}
+				}
+			)
+		}
 	}
 }

@@ -28,7 +28,7 @@ import love.yinlin.extension.translate
 import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.screen.DialogState
+import love.yinlin.ui.component.screen.FloatingDialog
 import kotlin.coroutines.resume
 import kotlin.math.max
 import kotlin.math.min
@@ -375,12 +375,12 @@ fun CropImage(
 }
 
 @Stable
-class DialogCrop : DialogState<CropResult>() {
+class FloatingDialogCrop : FloatingDialog<CropResult>() {
     private var url: String? by mutableStateOf(null)
     private var aspectRatio: Float by mutableFloatStateOf(0f)
     private val cropState = CropState()
 
-    suspend fun open(url: String, aspectRatio: Float = 0f): CropResult? {
+    suspend fun openSuspend(url: String, aspectRatio: Float = 0f): CropResult? {
         this.url = url
         this.aspectRatio = aspectRatio
         this.cropState.reset()
@@ -388,8 +388,8 @@ class DialogCrop : DialogState<CropResult>() {
     }
 
     @Composable
-    override fun DialogContent() {
-        BaseDialog {
+    override fun Wrapper(block: @Composable (() -> Unit)) {
+        super.Wrapper {
             Column(
                 modifier = Modifier.fillMaxWidth().background(Colors.Black),
                 horizontalAlignment = Alignment.End

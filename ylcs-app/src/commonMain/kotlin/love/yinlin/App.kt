@@ -31,10 +31,10 @@ import love.yinlin.common.RachelTheme
 import love.yinlin.common.Uri
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
-import love.yinlin.ui.component.screen.SubScreenSlot
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.ScreenRouteScope
+import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
 import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg

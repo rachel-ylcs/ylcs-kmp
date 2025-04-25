@@ -11,10 +11,20 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.common.Uri
-import love.yinlin.ui.component.screen.SubScreenSlot
+import love.yinlin.ui.component.screen.FloatingDialogConfirm
+import love.yinlin.ui.component.screen.FloatingDialogInfo
+import love.yinlin.ui.component.screen.FloatingDialogLoading
 import love.yinlin.ui.component.screen.Tip
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
+
+@Stable
+class SubScreenSlot(scope: CoroutineScope) {
+	val tip = Tip(scope)
+	val info = FloatingDialogInfo()
+	val confirm = FloatingDialogConfirm()
+	val loading = FloatingDialogLoading()
+}
 
 @Stable
 abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewModel() {
@@ -48,10 +58,10 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 		Floating()
 
 		with(slot) {
-			info.WithOpen()
-			confirm.WithOpen()
-			loading.WithOpen()
-			Tip(state = tip)
+			info.Land()
+			confirm.Land()
+			loading.Land()
+			tip.Land()
 		}
 	}
 }

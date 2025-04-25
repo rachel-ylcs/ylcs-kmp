@@ -38,8 +38,8 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -79,7 +79,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	data object Args : Screen.Args
 
 	private var isLocal by mutableStateOf(true)
-	private val searchDialog = DialogInput(
+	private val searchDialog = FloatingDialogInput(
 		hint = "输入微博用户昵称关键字",
 		maxLength = 16
 	)
@@ -100,7 +100,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	}
 
 	private suspend fun onSearchWeiboUser() {
-		searchDialog.open()?.let { key ->
+		searchDialog.openSuspend()?.let { key ->
 			state = BoxState.LOADING
 			val result = WeiboAPI.searchWeiboUser(key)
 			if (result is Data.Success) {
@@ -221,12 +221,12 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 				}
 			}
 		}
-
-		searchDialog.WithOpen()
 	}
 
 	@Composable
 	override fun Floating() {
 		importSheet.Land { ImportLayout() }
+
+		searchDialog.Land()
 	}
 }

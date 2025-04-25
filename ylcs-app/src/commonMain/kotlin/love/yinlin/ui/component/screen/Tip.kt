@@ -34,19 +34,19 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
-open class TipState(private val scope: CoroutineScope) {
+open class Tip(private val scope: CoroutineScope) {
     enum class Type {
         INFO, SUCCESS, WARNING, ERROR,
     }
 
-    val host = SnackbarHostState()
+    private val host = SnackbarHostState()
     var type by mutableStateOf(Type.INFO)
         private set
 
     fun show(text: String?, type: Type) {
         scope.launch {
             host.currentSnackbarData?.dismiss()
-            this@TipState.type = type
+            this@Tip.type = type
             host.showSnackbar(
                 message = text ?: "",
                 duration = SnackbarDuration.Short
@@ -58,58 +58,58 @@ open class TipState(private val scope: CoroutineScope) {
     fun success(text: String?) = show(text, Type.SUCCESS)
     fun warning(text: String?) = show(text, Type.WARNING)
     fun error(text: String?) = show(text, Type.ERROR)
-}
 
-@Composable
-fun Tip(state: TipState) {
-    SnackbarHost(
-        hostState = state.host,
-        modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_TIP)
-    ) {
-        val color = when (state.type) {
-            TipState.Type.INFO -> MaterialTheme.colorScheme.secondaryContainer
-            TipState.Type.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
-            TipState.Type.WARNING -> ThemeColor.warning
-            TipState.Type.ERROR -> MaterialTheme.colorScheme.error
-        }
-        val contentColor = when (state.type) {
-            TipState.Type.INFO -> MaterialTheme.colorScheme.onSecondaryContainer
-            TipState.Type.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
-            TipState.Type.WARNING -> ThemeColor.onWarning
-            TipState.Type.ERROR -> MaterialTheme.colorScheme.onError
-        }
-        Box(
-            modifier = Modifier.padding(
-                horizontal = if (app.isPortrait) 20.dp else 100.dp,
-                vertical = if (app.isPortrait) 20.dp else 40.dp,
-            ).fillMaxWidth()
-                .clickableNoRipple { }
-                .background(
-                    color = color,
-                    shape = MaterialTheme.shapes.extraLarge
-                )
+    @Composable
+    fun Land() {
+        SnackbarHost(
+            hostState = host,
+            modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_TIP)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                verticalAlignment = Alignment.CenterVertically
+            val color = when (type) {
+                Type.INFO -> MaterialTheme.colorScheme.secondaryContainer
+                Type.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
+                Type.WARNING -> ThemeColor.warning
+                Type.ERROR -> MaterialTheme.colorScheme.error
+            }
+            val contentColor = when (type) {
+                Type.INFO -> MaterialTheme.colorScheme.onSecondaryContainer
+                Type.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
+                Type.WARNING -> ThemeColor.onWarning
+                Type.ERROR -> MaterialTheme.colorScheme.onError
+            }
+            Box(
+                modifier = Modifier.padding(
+                    horizontal = if (app.isPortrait) 20.dp else 100.dp,
+                    vertical = if (app.isPortrait) 20.dp else 40.dp,
+                ).fillMaxWidth()
+                    .clickableNoRipple { }
+                    .background(
+                        color = color,
+                        shape = MaterialTheme.shapes.extraLarge
+                    )
             ) {
-                MiniIcon(
-                    icon = when (state.type) {
-                        TipState.Type.INFO -> Icons.Outlined.Lightbulb
-                        TipState.Type.SUCCESS -> Icons.Outlined.Check
-                        TipState.Type.WARNING -> Icons.Outlined.Warning
-                        TipState.Type.ERROR -> Icons.Outlined.Error
-                    },
-                    color = contentColor
-                )
-                Text(
-                    text = it.visuals.message,
-                    color = contentColor,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(15.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    MiniIcon(
+                        icon = when (type) {
+                            Type.INFO -> Icons.Outlined.Lightbulb
+                            Type.SUCCESS -> Icons.Outlined.Check
+                            Type.WARNING -> Icons.Outlined.Warning
+                            Type.ERROR -> Icons.Outlined.Error
+                        },
+                        color = contentColor
+                    )
+                    Text(
+                        text = it.visuals.message,
+                        color = contentColor,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }

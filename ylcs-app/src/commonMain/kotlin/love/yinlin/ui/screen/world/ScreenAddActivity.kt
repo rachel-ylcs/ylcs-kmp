@@ -17,6 +17,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
+import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
@@ -27,6 +28,7 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 	@Serializable
 	data object Args : Screen.Args
 
+	private val cropDialog = FloatingDialogCrop()
 	private val input = ActivityInputState()
 
 	private suspend fun addActivity() {
@@ -84,6 +86,7 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 			}
 		) {
 			ActivityInfoLayout(
+				cropDialog = cropDialog,
 				input = input,
 				onPicAdd = { input.pic = Picture(it.toString()) },
 				onPicDelete = { input.pic = null },
@@ -92,5 +95,10 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 				onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
 			)
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		cropDialog.Land()
 	}
 }

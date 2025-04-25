@@ -80,13 +80,13 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     }
 
     @Composable
-    private fun PortraitWrapper(onClose: () -> Unit, block: @Composable () -> Unit) {
+    private fun PortraitWrapper(block: @Composable () -> Unit) {
         var height by rememberValueState(0)
         var offset by rememberValueState(0)
         val animatedOffset by animateIntAsState(targetValue = offset)
 
         val onDelta = { delta: Float -> offset = ((offset + delta).roundToInt()).coerceAtLeast(0) }
-        val onStop = { if (offset > height / 2) onClose() else offset = 0 }
+        val onStop = { if (offset > height / 2) close() else offset = 0 }
 
         Surface(
             shadowElevation = 5.dp,
@@ -141,13 +141,13 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     }
 
     @Composable
-    private fun LandscapeWrapper(onClose: () -> Unit, block: @Composable () -> Unit) {
+    private fun LandscapeWrapper(block: @Composable () -> Unit) {
         val widthPx = with(LocalDensity.current) { config.maxWidth.toPx() }
         var offset by rememberValueState(0)
         val animatedOffset by animateIntAsState(targetValue = offset)
 
         val onDelta = { delta: Float -> offset = ((offset + delta).roundToInt()).coerceAtLeast(0) }
-        val onStop = { if (offset > widthPx / 2) onClose() else offset = 0 }
+        val onStop = { if (offset > widthPx / 2) close() else offset = 0 }
 
         Surface(
             shadowElevation = 5.dp,
@@ -183,12 +183,13 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     }
 
     @Composable
-    override fun Wrapper(onClose: () -> Unit, block: @Composable () -> Unit) {
-        if (isPortrait) PortraitWrapper(onClose, block)
-        else LandscapeWrapper(onClose, block)
+    override fun Wrapper(block: @Composable () -> Unit) {
+        if (isPortrait) PortraitWrapper(block)
+        else LandscapeWrapper(block)
     }
 }
 
+@Stable
 class FloatingSheet(config: SheetConfig = SheetConfig()) : FloatingArgsSheet<Unit>(config) {
     fun open() { open(Unit) }
 }

@@ -35,9 +35,9 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.DialogChoice
-import love.yinlin.ui.component.screen.DialogInput
+import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -116,12 +116,12 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
 
     private val cloudBackupSheet = FloatingSheet()
 
-    private val inputPlaylistNameDialog = DialogInput(
+    private val inputPlaylistNameDialog = FloatingDialogInput(
         hint = "歌单名",
         maxLength = 16
     )
 
-    private val processPlaylistDialog = DialogChoice.fromIconItems(
+    private val processPlaylistDialog = FloatingDialogChoice.fromIconItems(
         items = listOf(
             "重命名" to Icons.Outlined.Edit,
             "删除" to Icons.Outlined.Delete
@@ -129,7 +129,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     )
 
     private suspend fun addPlaylist() {
-        val name = inputPlaylistNameDialog.open()
+        val name = inputPlaylistNameDialog.openSuspend()
         if (name != null) {
             if (playlistLibrary[name] == null) {
                 playlistLibrary[name] = MusicPlaylist(name, emptyList())
@@ -140,10 +140,10 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     }
 
     private suspend fun processPlaylist(index: Int) {
-        when (processPlaylistDialog.open()) {
+        when (processPlaylistDialog.openSuspend()) {
             0 -> {
                 val oldName = tabs[index]
-                val newName = inputPlaylistNameDialog.open(oldName)
+                val newName = inputPlaylistNameDialog.openSuspend(oldName)
                 if (newName != null) {
                     if (playlistLibrary[newName] == null) {
                         playlistLibrary.renameKey(oldName, newName) {
@@ -156,7 +156,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
             }
             1 -> {
                 val name = tabs[index]
-                if (slot.confirm.open(content = "删除歌单\"$name\"")) {
+                if (slot.confirm.openSuspend(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
                     val musicFactory = app.musicFactory
                     if (musicFactory.currentPlaylist?.name == name) musicFactory.stop()
@@ -182,7 +182,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     private suspend fun deleteMusicFromPlaylist(index: Int) {
         val name = tabs[currentPage]
         val musicInfo = library[index]
-        if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
+        if (slot.confirm.openSuspend(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
@@ -315,140 +315,6 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
     }
 
     @Composable
-    private fun CloudBackupLayout() {
-        var playlists: Map<String, List<PlaylistPreviewItem>> by rememberState { emptyMap() }
-        val state = remember { TextInputState() }
-
-        Column(
-            modifier = Modifier.fillMaxSize().padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "本地歌单", modifier = Modifier.padding(vertical = 10.dp))
-            TextInput(
-                state = state,
-                hint = "本地歌单(JSON格式)",
-                maxLines = 6,
-                clearButton = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                LoadingRachelButton(
-                    text = "导入",
-                    icon = Icons.Outlined.Download,
-                    enabled = state.ok,
-                    onClick = {
-                        if (!app.musicFactory.isReady) {
-                            if (slot.confirm.open(content = "导入会覆盖整个本地歌单且无法撤销!")) {
-                                try {
-                                    val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
-                                    playlistLibrary.replaceAll(items)
-                                    slot.tip.success("导入成功")
-                                }
-                                catch (_: Throwable) {
-                                    slot.tip.error("导入格式错误")
-                                }
-                            }
-                        }
-                        else slot.tip.warning("恢复歌单需要先停止播放器")
-                    }
-                )
-                LoadingRachelButton(
-                    text = "导出",
-                    icon = Icons.Outlined.Upload,
-                    onClick = {
-                        try {
-                            state.text = playlistLibrary.items.toJsonString()
-                        }
-                        catch (e: Throwable) {
-                            slot.tip.error(e.message ?: "导出失败")
-                        }
-                    }
-                )
-            }
-            HorizontalDivider(modifier = Modifier.height(1.dp))
-            Text(text = "云歌单", modifier = Modifier.padding(vertical = 10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LoadingRachelButton(
-                    text = "云备份",
-                    icon = Icons.Outlined.CloudUpload,
-                    onClick = {
-                        if (slot.confirm.open(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
-                            val result = ClientAPI.request(
-                                route = API.User.Backup.UploadPlaylist,
-                                data = API.User.Backup.UploadPlaylist.Request(
-                                    token = app.config.userToken,
-                                    playlist = playlistLibrary.items.toJson().Object
-                                )
-                            )
-                            when (result) {
-                                is Data.Success -> {
-                                    playlists = decodePlaylist(playlistLibrary.items)
-                                    slot.tip.success(result.message)
-                                }
-                                is Data.Error -> slot.tip.error(result.message)
-                            }
-                        }
-                    }
-                )
-                LoadingRachelButton(
-                    text = "云恢复",
-                    icon = Icons.Outlined.CloudDownload,
-                    onClick = {
-                        if (playlists.isNotEmpty()) {
-                            if (!app.musicFactory.isReady) {
-                                if (slot.confirm.open(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
-                                    playlistLibrary.replaceAll(playlists.mapValues { (name, value) ->
-                                        MusicPlaylist(name, value.map { it.id })
-                                    })
-                                    slot.tip.success("云恢复成功")
-                                }
-                            }
-                            else slot.tip.warning("恢复歌单需要先停止播放器")
-                        }
-                    }
-                )
-            }
-            if (playlists.isNotEmpty()) {
-                Tree(
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                        .horizontalScroll(rememberScrollState())
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Node(text = "云备份歌单") {
-                        for ((name, playlist) in playlists) {
-                            Node(text = name) {
-                                for (id in playlist) {
-                                    Node(text = id.name, icon = Icons.Outlined.MusicNote)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                    EmptyBox()
-                }
-            }
-        }
-
-        LaunchedEffect(Unit) {
-            val result = downloadCloudPlaylist()
-            when (result) {
-                is Data.Success -> playlists = result.data
-                is Data.Error -> slot.tip.error(result.message)
-            }
-        }
-    }
-
-    @Composable
     override fun Content() {
         SubScreen(
             modifier = Modifier.fillMaxSize(),
@@ -475,13 +341,143 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                 PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
             }
         }
-
-        inputPlaylistNameDialog.WithOpen()
-        processPlaylistDialog.WithOpen()
     }
 
     @Composable
     override fun Floating() {
-        cloudBackupSheet.Land { CloudBackupLayout() }
+        cloudBackupSheet.Land {
+            var playlists: Map<String, List<PlaylistPreviewItem>> by rememberState { emptyMap() }
+            val state = remember { TextInputState() }
+
+            Column(
+                modifier = Modifier.fillMaxSize().padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "本地歌单", modifier = Modifier.padding(vertical = 10.dp))
+                TextInput(
+                    state = state,
+                    hint = "本地歌单(JSON格式)",
+                    maxLines = 6,
+                    clearButton = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    LoadingRachelButton(
+                        text = "导入",
+                        icon = Icons.Outlined.Download,
+                        enabled = state.ok,
+                        onClick = {
+                            if (!app.musicFactory.isReady) {
+                                if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
+                                    try {
+                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
+                                        playlistLibrary.replaceAll(items)
+                                        slot.tip.success("导入成功")
+                                    }
+                                    catch (_: Throwable) {
+                                        slot.tip.error("导入格式错误")
+                                    }
+                                }
+                            }
+                            else slot.tip.warning("恢复歌单需要先停止播放器")
+                        }
+                    )
+                    LoadingRachelButton(
+                        text = "导出",
+                        icon = Icons.Outlined.Upload,
+                        onClick = {
+                            try {
+                                state.text = playlistLibrary.items.toJsonString()
+                            }
+                            catch (e: Throwable) {
+                                slot.tip.error(e.message ?: "导出失败")
+                            }
+                        }
+                    )
+                }
+                HorizontalDivider(modifier = Modifier.height(1.dp))
+                Text(text = "云歌单", modifier = Modifier.padding(vertical = 10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LoadingRachelButton(
+                        text = "云备份",
+                        icon = Icons.Outlined.CloudUpload,
+                        onClick = {
+                            if (slot.confirm.openSuspend(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
+                                val result = ClientAPI.request(
+                                    route = API.User.Backup.UploadPlaylist,
+                                    data = API.User.Backup.UploadPlaylist.Request(
+                                        token = app.config.userToken,
+                                        playlist = playlistLibrary.items.toJson().Object
+                                    )
+                                )
+                                when (result) {
+                                    is Data.Success -> {
+                                        playlists = decodePlaylist(playlistLibrary.items)
+                                        slot.tip.success(result.message)
+                                    }
+                                    is Data.Error -> slot.tip.error(result.message)
+                                }
+                            }
+                        }
+                    )
+                    LoadingRachelButton(
+                        text = "云恢复",
+                        icon = Icons.Outlined.CloudDownload,
+                        onClick = {
+                            if (playlists.isNotEmpty()) {
+                                if (!app.musicFactory.isReady) {
+                                    if (slot.confirm.openSuspend(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
+                                        playlistLibrary.replaceAll(playlists.mapValues { (name, value) ->
+                                            MusicPlaylist(name, value.map { it.id })
+                                        })
+                                        slot.tip.success("云恢复成功")
+                                    }
+                                }
+                                else slot.tip.warning("恢复歌单需要先停止播放器")
+                            }
+                        }
+                    )
+                }
+                if (playlists.isNotEmpty()) {
+                    Tree(
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                            .horizontalScroll(rememberScrollState())
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Node(text = "云备份歌单") {
+                            for ((name, playlist) in playlists) {
+                                Node(text = name) {
+                                    for (id in playlist) {
+                                        Node(text = id.name, icon = Icons.Outlined.MusicNote)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        EmptyBox()
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                val result = downloadCloudPlaylist()
+                when (result) {
+                    is Data.Success -> playlists = result.data
+                    is Data.Error -> slot.tip.error(result.message)
+                }
+            }
+        }
+        inputPlaylistNameDialog.Land()
+        processPlaylistDialog.Land()
     }
 }

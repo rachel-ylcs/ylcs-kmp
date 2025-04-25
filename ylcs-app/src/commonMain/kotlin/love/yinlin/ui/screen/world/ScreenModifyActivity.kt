@@ -18,6 +18,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.*
+import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 import kotlin.collections.plus
@@ -29,6 +30,8 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 	data class Args(val aid: Int) : Screen.Args
 
 	private val activities = worldPart.activities
+
+	private val cropDialog = FloatingDialogCrop()
 	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
 	private suspend fun modifyActivity() {
@@ -77,7 +80,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 	}
 
 	private suspend fun modifyPicture(path: Path) {
-		slot.loading.open()
+		slot.loading.openSuspend()
 		val result = ClientAPI.request(
 			route = API.User.Activity.ModifyActivityPicture,
 			data = API.User.Activity.ModifyActivityPicture.Request(
@@ -96,11 +99,11 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 			}
 			is Data.Error -> slot.tip.error(result.message)
 		}
-		slot.loading.hide()
+		slot.loading.close()
 	}
 
 	private suspend fun deletePicture() {
-		slot.loading.open()
+		slot.loading.openSuspend()
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPicture,
 			data = API.User.Activity.DeleteActivityPicture.Request(
@@ -115,11 +118,11 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 			}
 			is Data.Error -> slot.tip.error(result.message)
 		}
-		slot.loading.hide()
+		slot.loading.close()
 	}
 
 	private suspend fun addPictures(files: List<Path>) {
-		slot.loading.open()
+		slot.loading.openSuspend()
 		val result = ClientAPI.request(
 			route = API.User.Activity.AddActivityPictures,
 			data = API.User.Activity.AddActivityPictures.Request(
@@ -138,7 +141,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 			}
 			is Data.Error -> slot.tip.error(result.message)
 		}
-		slot.loading.hide()
+		slot.loading.close()
 	}
 
 	private suspend fun modifyPictures(index: Int) {
@@ -147,7 +150,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
 		}?.let { path ->
-			slot.loading.open()
+			slot.loading.openSuspend()
 			val result = ClientAPI.request(
 				route = API.User.Activity.ModifyActivityPictures,
 				data = API.User.Activity.ModifyActivityPictures.Request(
@@ -167,12 +170,12 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 				}
 				is Data.Error -> slot.tip.error(result.message)
 			}
-			slot.loading.hide()
+			slot.loading.close()
 		}
 	}
 
 	private suspend fun deletePictures(index: Int) {
-		slot.loading.open()
+		slot.loading.openSuspend()
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPictures,
 			data = API.User.Activity.DeleteActivityPictures.Request(
@@ -188,7 +191,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 			}
 			is Data.Error -> slot.tip.error(result.message)
 		}
-		slot.loading.hide()
+		slot.loading.close()
 	}
 
 	@Composable
@@ -207,6 +210,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 			}
 		) {
 			ActivityInfoLayout(
+				cropDialog = cropDialog,
 				input = input,
 				onPicAdd = { launch { modifyPicture(it) } },
 				onPicDelete = { launch { deletePicture() } },
@@ -215,5 +219,10 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 				onPicsClick = { _, index -> launch { modifyPictures(index) } }
 			)
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		cropDialog.Land()
 	}
 }

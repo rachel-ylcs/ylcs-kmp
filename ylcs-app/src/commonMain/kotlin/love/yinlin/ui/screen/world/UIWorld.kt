@@ -29,7 +29,7 @@ import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.DialogCrop
+import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.DockedDatePicker
@@ -53,8 +53,6 @@ class ActivityInputState(initActivity: Activity? = null) {
         it.pics.map { name -> Picture(it.picPath(name)) }.toMutableStateList()
     } ?: mutableStateListOf()
 
-    internal val crop = DialogCrop()
-
     // [活动要求]
     // 必须包含内容
     // 必须属于以下之一: <包含轮播图> <包含活动名称及活动日期>
@@ -72,12 +70,12 @@ class ActivityInputState(initActivity: Activity? = null) {
     val maoyanString: String? get() = maoyan.text.ifEmpty { null }
     val linkString: String? get() = link.text.ifEmpty { null }
 
-    suspend fun pickPicture(onPicAdd: (Path) -> Unit) {
+    suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
         val path = Picker.pickPicture()?.use { source ->
             OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
-            crop.open(url = path.toString(), aspectRatio = 2f)?.let { rect ->
+            cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
                 OS.Storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
@@ -102,6 +100,7 @@ class ActivityInputState(initActivity: Activity? = null) {
 
 @Composable
 fun ActivityInfoLayout(
+    cropDialog: FloatingDialogCrop,
     input: ActivityInputState,
     onPicAdd: (Path) -> Unit,
     onPicDelete: () -> Unit,
@@ -166,7 +165,7 @@ fun ActivityInfoLayout(
         val pic = input.pic
         if (pic == null) {
             Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)
-                .clickable(onClick = { scope.launch { input.pickPicture(onPicAdd) } })
+                .clickable(onClick = { scope.launch { input.pickPicture(cropDialog, onPicAdd) } })
             ) {
                 EmptyBox()
             }
@@ -187,7 +186,7 @@ fun ActivityInfoLayout(
                     uri = pic.image,
                     modifier = Modifier.fillMaxSize().zIndex(1f),
                     contentScale = ContentScale.Crop,
-                    onClick = { scope.launch { input.pickPicture(onPicAdd) } }
+                    onClick = { scope.launch { input.pickPicture(cropDialog, onPicAdd) } }
                 )
             }
         }
@@ -205,6 +204,4 @@ fun ActivityInfoLayout(
             onClick = { onPicsClick(input.pics, it) }
         )
     }
-
-    input.crop.WithOpen()
 }

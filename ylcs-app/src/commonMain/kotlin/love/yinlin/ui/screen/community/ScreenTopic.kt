@@ -161,7 +161,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	private val subCommentSheet = FloatingArgsSheet<Comment>()
 	private val sendCoinSheet = FloatingSheet()
 
-	private val moveTopicDialog = DialogChoice.fromItems(
+	private val moveTopicDialog = FloatingDialogChoice.fromItems(
 		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
 		title = "移动主题板块"
 	)
@@ -236,7 +236,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	private suspend fun onDeleteTopic() {
-		if (slot.confirm.open(content = "删除主题?")) {
+		if (slot.confirm.openSuspend(content = "删除主题?")) {
 			val result = ClientAPI.request(
 				route = API.User.Topic.DeleteTopic,
 				data =  API.User.Topic.DeleteTopic.Request(
@@ -255,7 +255,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	private suspend fun onMoveTopic() {
-		moveTopicDialog.open()?.let { index ->
+		moveTopicDialog.openSuspend()?.let { index ->
 			val newSection = Comment.Section.MovableSection[index]
 			details?.let { oldDetails ->
 				val oldSection = oldDetails.section
@@ -399,7 +399,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	private suspend fun onDeleteComment(cid: Int) {
-		if (slot.confirm.open(content = "删除回复(楼中楼会同步删除)")) {
+		if (slot.confirm.openSuspend(content = "删除回复(楼中楼会同步删除)")) {
 			val result = ClientAPI.request(
 				route = API.User.Topic.DeleteComment,
 				data = API.User.Topic.DeleteComment.Request(
@@ -422,7 +422,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 	}
 
 	private suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
-		if (slot.confirm.open(content = "删除回复")) {
+		if (slot.confirm.openSuspend(content = "删除回复")) {
 			val result = ClientAPI.request(
 				route = API.User.Topic.DeleteSubComment,
 				data = API.User.Topic.DeleteSubComment.Request(
@@ -566,7 +566,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 				label = subComment.label,
 				level = subComment.level,
 				onAvatarClick = {
-					subCommentSheet.hide()
+					subCommentSheet.close()
 					onAvatarClick(subComment.uid)
 				}
 			)
@@ -600,83 +600,6 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 				text = remember(subComment) { RichString.parse(subComment.content) },
 				modifier = Modifier.fillMaxWidth()
 			)
-		}
-	}
-
-	@Composable
-	private fun SubCommentLayout(comment: Comment) {
-		val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
-			override fun offset(item: SubComment): Int = item.cid
-		} }
-
-		PaginationColumn(
-			items = page.items,
-			key = { it.cid },
-			canRefresh = false,
-			canLoading = page.canLoading,
-			onLoading = {
-				requestSubComments(
-					cid = comment.cid,
-					offset = page.offset,
-					num = page.pageNum
-				)?.let { page.moreData(it) }
-			},
-			contentPadding = PaddingValues(vertical = 10.dp),
-			itemDivider = PaddingValues(vertical = 8.dp),
-			modifier = Modifier.fillMaxWidth()
-		) { subComment ->
-			SubCommentBar(
-				subComment = subComment,
-				parentComment = comment,
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-				onDelete = {
-					page.items -= subComment
-					commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
-						it.copy(subCommentNum = it.subCommentNum - 1)
-					}
-					// 楼中楼最后一条回复删除后隐藏楼中楼
-					if (page.items.isEmpty()) subCommentSheet.hide()
-				}
-			)
-		}
-
-		LaunchedEffect(Unit) {
-			requestSubComments(
-				cid = comment.cid,
-				offset = page.offset,
-				num = page.pageNum
-			)?.let { page.newData(it) }
-		}
-	}
-
-	@Composable
-	private fun SendCoinLayout() {
-		Column(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			Text(
-				text = "银币: ${app.config.userProfile?.coin ?: 0}",
-				style = MaterialTheme.typography.titleLarge,
-				textAlign = TextAlign.Center,
-				modifier = Modifier.fillMaxWidth()
-			)
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				repeat(3) {
-					CoinLayout(
-						num = it + 1,
-						modifier = Modifier.weight(1f).aspectRatio(1f),
-						onClick = { num ->
-							sendCoinSheet.hide()
-							launch { onSendCoin(num) }
-						}
-					)
-				}
-			}
 		}
 	}
 
@@ -825,7 +748,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 				}
 			},
 			onBack = {
-				if (subCommentSheet.isOpen) subCommentSheet.hide()
+				if (subCommentSheet.isOpen) subCommentSheet.close()
 				else pop()
 			}
 		) {
@@ -834,13 +757,85 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			else if (app.isPortrait) Portrait(details = details)
 			else Landscape(details = details)
 		}
-
-		moveTopicDialog.WithOpen()
 	}
 
 	@Composable
 	override fun Floating() {
-		subCommentSheet.Land { SubCommentLayout(it) }
-		sendCoinSheet.Land { SendCoinLayout() }
+		subCommentSheet.Land { comment ->
+			val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
+				override fun offset(item: SubComment): Int = item.cid
+			} }
+
+			PaginationColumn(
+				items = page.items,
+				key = { it.cid },
+				canRefresh = false,
+				canLoading = page.canLoading,
+				onLoading = {
+					requestSubComments(
+						cid = comment.cid,
+						offset = page.offset,
+						num = page.pageNum
+					)?.let { page.moreData(it) }
+				},
+				contentPadding = PaddingValues(vertical = 10.dp),
+				itemDivider = PaddingValues(vertical = 8.dp),
+				modifier = Modifier.fillMaxWidth()
+			) { subComment ->
+				SubCommentBar(
+					subComment = subComment,
+					parentComment = comment,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+					onDelete = {
+						page.items -= subComment
+						commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
+							it.copy(subCommentNum = it.subCommentNum - 1)
+						}
+						// 楼中楼最后一条回复删除后隐藏楼中楼
+						if (page.items.isEmpty()) subCommentSheet.close()
+					}
+				)
+			}
+
+			LaunchedEffect(Unit) {
+				requestSubComments(
+					cid = comment.cid,
+					offset = page.offset,
+					num = page.pageNum
+				)?.let { page.newData(it) }
+			}
+		}
+
+		sendCoinSheet.Land { onClose ->
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				Text(
+					text = "银币: ${app.config.userProfile?.coin ?: 0}",
+					style = MaterialTheme.typography.titleLarge,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth()
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					repeat(3) {
+						CoinLayout(
+							num = it + 1,
+							modifier = Modifier.weight(1f).aspectRatio(1f),
+							onClick = { num ->
+								sendCoinSheet.close()
+								launch { onSendCoin(num) }
+							}
+						)
+					}
+				}
+			}
+		}
+
+		moveTopicDialog.Land()
 	}
 }

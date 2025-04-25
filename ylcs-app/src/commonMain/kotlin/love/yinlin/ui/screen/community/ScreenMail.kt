@@ -82,8 +82,8 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 	}
 
 	private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
-		if (slot.confirm.open(content = text)) {
-			slot.loading.open()
+		if (slot.confirm.openSuspend(content = text)) {
+			slot.loading.openSuspend()
 			val result = ClientAPI.request(
 				route = API.User.Mail.ProcessMail,
 				data = API.User.Mail.ProcessMail.Request(
@@ -97,17 +97,17 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 					page.items.findAssign(predicate = { it.mid == mid }) {
 						it.copy(processed = true)
 					}
-					mailDetailsSheet.hide()
+					mailDetailsSheet.close()
 				}
 				is Data.Error -> slot.tip.error(result.message)
 			}
-			slot.loading.hide()
+			slot.loading.close()
 		}
 	}
 
 	private suspend fun onDeleteMail(mid: Long) {
-		if (slot.confirm.open(content = "删除此邮件?")) {
-			slot.loading.open()
+		if (slot.confirm.openSuspend(content = "删除此邮件?")) {
+			slot.loading.openSuspend()
 			val result = ClientAPI.request(
 				route = API.User.Mail.DeleteMail,
 				data = API.User.Mail.DeleteMail.Request(
@@ -118,11 +118,11 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 			when (result) {
 				is Data.Success -> {
 					page.items.removeAll { it.mid == mid }
-					mailDetailsSheet.hide()
+					mailDetailsSheet.close()
 				}
 				is Data.Error -> slot.tip.error(result.message)
 			}
-			slot.loading.hide()
+			slot.loading.close()
 		}
 	}
 
@@ -179,57 +179,6 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 		}
 	}
 
-	@Composable
-	private fun MailDetailsLayout(mail: Mail) {
-		Column(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			Text(
-				text = mail.title,
-				style = MaterialTheme.typography.titleLarge,
-				textAlign = TextAlign.Center,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth()
-			)
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				if (mail.withYes) RachelButton(
-					text = "接受",
-					icon = Icons.Outlined.CheckCircle,
-					onClick = {
-						launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
-					}
-				)
-				if (mail.withNo) RachelButton(
-					text = "拒绝",
-					icon = Icons.Outlined.Cancel,
-					color = MaterialTheme.colorScheme.error,
-					onClick = {
-						launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
-					}
-				)
-				if (mail.processed) RachelButton(
-					text = "删除",
-					icon = Icons.Outlined.Delete,
-					color = MaterialTheme.colorScheme.secondary,
-					onClick = {
-						launch { onDeleteMail(mail.mid) }
-					}
-				)
-			}
-			Text(
-				text = mail.content,
-				style = MaterialTheme.typography.bodyMedium,
-				modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
-			)
-		}
-	}
-
 	override suspend fun initialize() {
 		requestNewMails()
 	}
@@ -266,6 +215,54 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 
 	@Composable
 	override fun Floating() {
-		mailDetailsSheet.Land { MailDetailsLayout(it) }
+		mailDetailsSheet.Land { mail ->
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				Text(
+					text = mail.title,
+					style = MaterialTheme.typography.titleLarge,
+					textAlign = TextAlign.Center,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (mail.withYes) RachelButton(
+						text = "接受",
+						icon = Icons.Outlined.CheckCircle,
+						onClick = {
+							launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
+						}
+					)
+					if (mail.withNo) RachelButton(
+						text = "拒绝",
+						icon = Icons.Outlined.Cancel,
+						color = MaterialTheme.colorScheme.error,
+						onClick = {
+							launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
+						}
+					)
+					if (mail.processed) RachelButton(
+						text = "删除",
+						icon = Icons.Outlined.Delete,
+						color = MaterialTheme.colorScheme.secondary,
+						onClick = {
+							launch { onDeleteMail(mail.mid) }
+						}
+					)
+				}
+				Text(
+					text = mail.content,
+					style = MaterialTheme.typography.bodyMedium,
+					modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
+				)
+			}
+		}
 	}
 }

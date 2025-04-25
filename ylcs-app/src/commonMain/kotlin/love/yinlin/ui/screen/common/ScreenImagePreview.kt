@@ -29,7 +29,7 @@ import love.yinlin.platform.safeDownload
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
-import love.yinlin.ui.component.screen.DialogProgress
+import love.yinlin.ui.component.screen.FloatingDialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
@@ -46,7 +46,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 	private val previews: List<PreviewPicture> = args.images.map { PreviewPicture(it) }
 	private var current: Int by mutableIntStateOf(args.index)
 
-	private val downloadDialog = DialogProgress()
+	private val downloadDialog = FloatingDialogProgress()
 
 	private fun downloadPicture() {
 		val preview = previews[current]
@@ -54,7 +54,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		launch {
 			Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
-				downloadDialog.open()
+				downloadDialog.openSuspend()
 				val result = sink.use {
 					val result = app.fileClient.safeDownload(
 						url = url,
@@ -70,7 +70,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 					result
 				}
 				Picker.cleanSavePicture(origin, result)
-				downloadDialog.hide()
+				downloadDialog.close()
 			}
 		}
 	}
@@ -189,7 +189,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 			if (app.isPortrait) Portrait()
 			else Landscape()
 		}
+	}
 
-		downloadDialog.WithOpen()
+	@Composable
+	override fun Floating() {
+		downloadDialog.Land()
 	}
 }

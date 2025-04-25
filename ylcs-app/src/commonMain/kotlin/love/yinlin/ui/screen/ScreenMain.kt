@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeMode
@@ -31,7 +30,6 @@ import love.yinlin.resources.*
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.equalItem
-import love.yinlin.ui.component.screen.Tip
 
 private enum class TabItem(
 	val title: StringResource,
@@ -227,10 +225,10 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 		}?.Floating()
 
 		with(model.slot) {
-			info.WithOpen()
-			confirm.WithOpen()
-			loading.WithOpen()
-			Tip(state = tip)
+			info.Land()
+			confirm.Land()
+			loading.Land()
+			tip.Land()
 		}
 	}
 }

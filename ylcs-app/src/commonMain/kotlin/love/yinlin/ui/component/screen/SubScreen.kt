@@ -68,14 +68,6 @@ sealed class ActionScope(private val ltr: Boolean) {
 	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()
 }
 
-@Stable
-class SubScreenSlot(scope: CoroutineScope) {
-	val tip: TipState = TipState(scope)
-	val info: DialogInfo = DialogInfo()
-	val confirm: DialogConfirm = DialogConfirm()
-	val loading: DialogLoading = DialogLoading()
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SubScreen(

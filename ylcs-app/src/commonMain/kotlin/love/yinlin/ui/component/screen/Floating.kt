@@ -24,7 +24,6 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.extension.clickableNoRipple
-import love.yinlin.extension.rememberState
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Stable
@@ -46,17 +45,22 @@ abstract class Floating<A : Any> {
     protected open val dismissOnClickOutside: Boolean = true // 点击遮罩结束
 
     private var state: A? by mutableStateOf(null)
+    private var visible: Boolean by mutableStateOf(false)
     val isOpen: Boolean get() = state != null
     fun open(args: A) { state = args }
-    fun hide() { state = null }
+    open fun close() { visible = false }
+
+    private fun hide() {
+        state = null
+        visible = false
+    }
 
     @Composable
-    protected open fun Wrapper(onClose: () -> Unit, block: @Composable () -> Unit) = block()
+    protected open fun Wrapper(block: @Composable () -> Unit) = block()
 
     @Composable
     protected fun AnimatedFloatingContent(
         visible: Boolean,
-        onClose: () -> Unit,
         content: @Composable () -> Unit
     ) {
         val alpha by animateFloatAsState(
@@ -72,7 +76,7 @@ abstract class Floating<A : Any> {
                 .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
                 .zIndex(zIndex)
                 .clickableNoRipple {
-                    if (dismissOnClickOutside) onClose()
+                    if (dismissOnClickOutside) close()
                 },
             contentAlignment = alignment
         ) {
@@ -89,11 +93,8 @@ abstract class Floating<A : Any> {
     }
 
     @Composable
-    fun Land(block: @Composable (A) -> Unit) {
+    fun Land(block: @Composable (args: A) -> Unit) {
         state?.let { args ->
-            var visible: Boolean by rememberState { false }
-            val onClose = { visible = false }
-
             LaunchedEffect(Unit) { visible = true }
 
             LaunchedEffect(visible) {
@@ -104,14 +105,11 @@ abstract class Floating<A : Any> {
             }
 
             BackHandler {
-                if (dismissOnBackPress) onClose()
+                if (dismissOnBackPress) close()
             }
 
-            AnimatedFloatingContent(
-                visible = visible,
-                onClose = onClose
-            ) {
-                Wrapper(onClose) {
+            AnimatedFloatingContent(visible = visible) {
+                Wrapper {
                     block(args)
                 }
             }

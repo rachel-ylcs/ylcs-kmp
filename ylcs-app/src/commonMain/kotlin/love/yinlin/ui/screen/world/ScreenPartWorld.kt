@@ -118,6 +118,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	override suspend fun initialize() {
+		requestActivity()
+	}
+
 	@Composable
 	override fun Content() {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
@@ -173,9 +177,5 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
-	}
-
-	override suspend fun initialize() {
-		requestActivity()
 	}
 }

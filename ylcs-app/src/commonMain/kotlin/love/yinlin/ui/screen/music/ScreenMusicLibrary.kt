@@ -33,8 +33,8 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.screen.DialogDynamicChoice
-import love.yinlin.ui.component.screen.DialogInput
+import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
+import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
@@ -117,12 +117,12 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
 
-    private val searchDialog = DialogInput(
+    private val searchDialog = FloatingDialogInput(
         hint = "歌曲名",
         maxLength = 32
     )
 
-    private val addMusicDialog = DialogDynamicChoice("添加到歌单")
+    private val addMusicDialog = FloatingDialogDynamicChoice("添加到歌单")
 
     private fun resetLibrary() {
         library.replaceAll(app.musicFactory.musicLibrary.map {
@@ -137,7 +137,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     }
 
     private suspend fun openSearch() {
-        val result = searchDialog.open()
+        val result = searchDialog.openSuspend()
         if (result != null) {
             library.replaceAll(app.musicFactory.musicLibrary
                 .filter { it.value.name.contains(result, true) }
@@ -166,7 +166,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     private suspend fun onMusicAdd() {
         val names = playlistLibrary.map { key, _ -> key }
         if (names.isNotEmpty()) {
-            val result = addMusicDialog.open(names)
+            val result = addMusicDialog.openSuspend(names)
             if (result != null) {
                 val name = names[result]
                 val playlist = playlistLibrary[name]
@@ -201,7 +201,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
     private suspend fun onMusicDelete() {
         val musicFactory = app.musicFactory
         if (musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
-        else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
+        else if (slot.confirm.openSuspend(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
             for (item in deleteItems) {
                 val removeItem = app.musicFactory.musicLibrary.remove(item)
@@ -286,8 +286,11 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                 }
             }
         }
+    }
 
-        searchDialog.WithOpen()
-        addMusicDialog.WithOpen()
+    @Composable
+    override fun Floating() {
+        searchDialog.Land()
+        addMusicDialog.Land()
     }
 }

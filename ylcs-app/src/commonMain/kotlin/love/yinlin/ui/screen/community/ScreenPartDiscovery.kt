@@ -230,6 +230,10 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	override suspend fun initialize() {
+		requestNewData()
+	}
+
 	@Composable
 	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -285,9 +289,5 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
-	}
-
-	override suspend fun initialize() {
-		requestNewData()
 	}
 }
