@@ -51,7 +51,7 @@ kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-alpha17" }
-runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
