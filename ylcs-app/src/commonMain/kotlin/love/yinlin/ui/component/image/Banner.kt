@@ -61,8 +61,10 @@ fun <T> Banner(
 			contentPadding = PaddingValues(horizontal = spacing),
 			modifier = Modifier.fillMaxWidth()
 		) {
-			val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
-			content(pics[it], it, scale)
+			if (it in 0 ..< pics.size) {
+				val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
+				content(pics[it], it, scale)
+			}
 		}
 		BannerIndicator(
 			num = pics.size,
