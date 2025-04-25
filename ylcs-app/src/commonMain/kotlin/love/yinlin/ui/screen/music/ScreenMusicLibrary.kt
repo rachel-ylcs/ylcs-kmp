@@ -260,8 +260,7 @@ class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(mode
                         closeSearch()
                     }
                 }
-            },
-            slot = slot
+            }
         ) {
             if (library.isEmpty()) EmptyBox()
             else {

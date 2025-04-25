@@ -204,8 +204,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 				) {
 					modifyActivity()
 				}
-			},
-			slot = slot
+			}
 		) {
 			ActivityInfoLayout(
 				input = input,

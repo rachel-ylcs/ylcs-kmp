@@ -159,8 +159,7 @@ class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
                     if (profile != null) addTopic(profile = profile)
                     else slot.tip.warning("请先登录")
                 }
-            },
-            slot = slot
+            }
         ) {
             if (profile == null) EmptyBox()
             else {

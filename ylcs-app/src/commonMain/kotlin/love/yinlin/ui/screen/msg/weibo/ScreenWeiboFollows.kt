@@ -194,8 +194,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 						refreshLocalUser()
 					}
 				}
-			},
-			slot = slot
+			}
 		) {
 			StatefulBox(
 				state = state,

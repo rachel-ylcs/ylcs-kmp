@@ -184,8 +184,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 					downloadPicture()
 				}
 			},
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			if (app.isPortrait) Portrait()
 			else Landscape()

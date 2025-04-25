@@ -29,12 +29,19 @@ import love.yinlin.extension.rememberState
 @OptIn(ExperimentalComposeUiApi::class)
 @Stable
 abstract class Floating<A : Any> {
+    companion object {
+        const val Z_INDEX_COMMON = 5f
+        const val Z_INDEX_SHEET = 10f
+        const val Z_INDEX_DIALOG = 20f
+        const val Z_INDEX_TIP = 30f
+    }
+
     protected abstract val alignment: Alignment // 对齐方式
     protected abstract val enter: EnterTransition // 开始动画
     protected abstract val exit: ExitTransition // 结束动画
     protected open val duration: Int = 300 // 动画时长
     protected open val scrim: Float = 0.4f // 遮罩透明度
-    protected open val zIndex: Float = 10f // 高度
+    protected open val zIndex: Float = Z_INDEX_COMMON // 高度
     protected open val dismissOnBackPress: Boolean = true // 返回键结束
     protected open val dismissOnClickOutside: Boolean = true // 点击遮罩结束
 

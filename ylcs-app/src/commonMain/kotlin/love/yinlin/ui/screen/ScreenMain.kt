@@ -179,7 +179,7 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 			Column(modifier = Modifier.fillMaxSize().padding(it)) {
 				PageContent(modifier = Modifier.fillMaxWidth().weight(1f))
 				PortraitNavigation(
-					modifier = Modifier.fillMaxWidth().zIndex(5f),
+					modifier = Modifier.fillMaxWidth(),
 					currentPage = pagerState.currentPage,
 					onNavigate = { index ->
 						launch { pagerState.scrollToPage(index) }
@@ -194,7 +194,7 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 		Scaffold(modifier = modifier) {
 			Row(modifier = Modifier.fillMaxSize().padding(it)) {
 				LandscapeNavigation(
-					modifier = Modifier.fillMaxHeight().zIndex(5f),
+					modifier = Modifier.fillMaxHeight(),
 					currentPage = pagerState.currentPage,
 					onNavigate = { index ->
 						launch { pagerState.scrollToPage(index) }
@@ -213,13 +213,6 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 	override fun Content() {
 		if (app.isPortrait) Portrait(modifier = Modifier.fillMaxSize())
 		else Landscape(modifier = Modifier.fillMaxSize())
-
-		with(model.slot) {
-			info.WithOpen()
-			confirm.WithOpen()
-			loading.WithOpen()
-			Tip(state = tip)
-		}
 	}
 
 	@Composable
@@ -232,5 +225,12 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 			TabItem.ME.ordinal -> mePart
 			else -> null
 		}?.Floating()
+
+		with(model.slot) {
+			info.WithOpen()
+			confirm.WithOpen()
+			loading.WithOpen()
+			Tip(state = tip)
+		}
 	}
 }

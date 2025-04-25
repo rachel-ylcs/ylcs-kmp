@@ -827,8 +827,7 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			onBack = {
 				if (subCommentSheet.isOpen) subCommentSheet.hide()
 				else pop()
-			},
-			slot = slot
+			}
 		) {
 			val details = details
 			if (details == null) EmptyBox()

@@ -85,7 +85,6 @@ fun SubScreen(
 	bottomBar: @Composable () -> Unit = {},
 	leftActions: @Composable (ActionScope.() -> Unit) = {},
 	onBack: (() -> Unit)? = null,
-	slot: SubScreenSlot,
 	content: @Composable () -> Unit
 ) {
 	BackHandler { onBack?.invoke() }
@@ -138,13 +137,6 @@ fun SubScreen(
 			}
 		}
 	}
-
-	with(slot) {
-		info.WithOpen()
-		confirm.WithOpen()
-		loading.WithOpen()
-		Tip(state = tip)
-	}
 }
 
 @Composable
@@ -155,7 +147,6 @@ fun SubScreen(
 	bottomBar: @Composable () -> Unit = {},
 	leftActions: @Composable (ActionScope.() -> Unit) = {},
 	onBack: () -> Unit,
-	slot: SubScreenSlot,
 	content: @Composable () -> Unit
 ) {
 	SubScreen(
@@ -172,7 +163,6 @@ fun SubScreen(
 		bottomBar = bottomBar,
 		leftActions = leftActions,
 		onBack = onBack,
-		slot = slot,
 		content = content
 	)
 }

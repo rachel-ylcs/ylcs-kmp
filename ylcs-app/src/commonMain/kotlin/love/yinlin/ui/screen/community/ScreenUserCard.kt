@@ -155,8 +155,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "主页",
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			profile?.let { profile ->
 				val cardWidth = if (app.isPortrait) 150.dp else 180.dp

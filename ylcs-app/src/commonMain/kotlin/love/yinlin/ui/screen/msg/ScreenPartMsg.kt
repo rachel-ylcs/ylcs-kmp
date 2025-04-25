@@ -229,7 +229,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(5f),
+				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = 5.dp
 			) {
 				Row(

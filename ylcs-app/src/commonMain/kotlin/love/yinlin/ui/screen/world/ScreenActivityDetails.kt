@@ -184,8 +184,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 						deleteActivity()
 					}
 				}
-			},
-			slot = slot
+			}
 		) {
 			activity?.let { activity ->
 				if (app.isPortrait) {

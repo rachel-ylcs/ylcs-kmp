@@ -350,8 +350,7 @@ class ScreenLogin(model: AppModel) : Screen<ScreenLogin.Args>(model) {
 				Mode.Register -> "注册"
 				Mode.ForgotPassword -> "忘记密码"
 			},
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			if (app.isPortrait) Portrait()
 			else Landscape()

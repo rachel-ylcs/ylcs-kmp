@@ -301,8 +301,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWe
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = user?.info?.name ?: "",
-				onBack = { pop() },
-				slot = slot
+				onBack = { pop() }
 			) {
 				if (user == null) LoadingBox()
 				else user?.let { user ->

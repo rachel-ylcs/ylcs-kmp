@@ -93,8 +93,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenW
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "${args.title} - 共 $num 张",
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			Column(
 				modifier = Modifier.fillMaxSize().padding(10.dp),

@@ -377,8 +377,7 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "设置",
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			if (app.isPortrait) Portrait(userProfile)
 			else Landscape(userProfile)

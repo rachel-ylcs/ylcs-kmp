@@ -489,8 +489,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
         SubScreen(
             modifier = Modifier.fillMaxSize(),
             title = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
-            onBack = { pop() },
-            slot = slot
+            onBack = { pop() }
         ) {
             if (app.isPortrait) Portrait()
             else Landscape()

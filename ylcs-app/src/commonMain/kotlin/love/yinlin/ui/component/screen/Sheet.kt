@@ -58,6 +58,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
         animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
         targetOffsetX = { it }
     )
+    override val zIndex: Float get() = Z_INDEX_SHEET
 
     @Composable
     private fun PortraitWrapperContent(maxHeight: Dp, block: @Composable () -> Unit) {

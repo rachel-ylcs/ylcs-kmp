@@ -239,8 +239,7 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 		SubScreen(
 			modifier = Modifier.fillMaxSize(),
 			title = "邮箱",
-			onBack = { pop() },
-			slot = slot
+			onBack = { pop() }
 		) {
 			StatefulBox(
 				state = state,

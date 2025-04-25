@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.common.Uri
 import love.yinlin.ui.component.screen.SubScreenSlot
+import love.yinlin.ui.component.screen.Tip
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 
@@ -45,6 +46,13 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 	fun UI() {
 		Content()
 		Floating()
+
+		with(slot) {
+			info.WithOpen()
+			confirm.WithOpen()
+			loading.WithOpen()
+			Tip(state = tip)
+		}
 	}
 }
 

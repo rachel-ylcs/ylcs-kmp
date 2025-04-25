@@ -468,8 +468,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                 ActionSuspend(Icons.Outlined.Add) {
                     addPlaylist()
                 }
-            },
-            slot = slot
+            }
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 PlaylistTab(modifier = Modifier.fillMaxWidth())

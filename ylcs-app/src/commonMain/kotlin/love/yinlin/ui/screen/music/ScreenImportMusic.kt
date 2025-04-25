@@ -269,8 +269,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                 Action(Icons.Outlined.Extension) {
 
                 }
-            },
-            slot = slot
+            }
         ) {
             Box(
                 modifier = Modifier.fillMaxSize().dragAndDrop(

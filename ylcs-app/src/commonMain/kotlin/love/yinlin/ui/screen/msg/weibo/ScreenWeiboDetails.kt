@@ -159,8 +159,7 @@ class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(mode
 			SubScreen(
 				modifier = Modifier.fillMaxSize(),
 				title = "微博详情",
-				onBack = { pop() },
-				slot = slot
+				onBack = { pop() }
 			) {
 				if (weibo == null) EmptyBox()
 				else {

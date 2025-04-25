@@ -81,8 +81,7 @@ class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model)
 				) {
 					addActivity()
 				}
-			},
-			slot = slot
+			}
 		) {
 			ActivityInfoLayout(
 				input = input,
