@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.DeepLink
 import love.yinlin.common.RachelTheme
 import love.yinlin.common.Uri
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.SubScreenSlot
@@ -45,7 +44,7 @@ import love.yinlin.ui.screen.world.ScreenPartWorld
 
 @Stable
 abstract class ScreenPart(private val model: AppModel) {
-	private val firstLoad = launchFlag()
+	val firstLoad = launchFlag()
 
 	val slot: SubScreenSlot get() = model.slot
 
@@ -53,18 +52,13 @@ abstract class ScreenPart(private val model: AppModel) {
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
-	protected open suspend fun initialize() {}
+	open suspend fun initialize() {}
 
 	@Composable
-	protected abstract fun Content()
+	abstract fun Content()
 
 	@Composable
-	fun PartContent() {
-		Content()
-		LaunchOnce(firstLoad) {
-			launch { initialize() }
-		}
-	}
+	open fun Floating() {}
 }
 
 @Stable

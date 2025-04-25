@@ -45,8 +45,7 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
-import love.yinlin.ui.component.screen.Sheet
-import love.yinlin.ui.component.screen.CommonSheetState
+import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
@@ -60,10 +59,10 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	@Serializable
 	data object Args : Screen.Args
 
-	private val crashLogSheet = CommonSheetState()
-	private val feedbackSheet = CommonSheetState()
-	private val privacyPolicySheet = CommonSheetState()
-	private val aboutSheet = CommonSheetState()
+	private val crashLogSheet = FloatingSheet()
+	private val feedbackSheet = FloatingSheet()
+	private val privacyPolicySheet = FloatingSheet()
+	private val aboutSheet = FloatingSheet()
 
 	private val cropDialog = DialogCrop()
 
@@ -288,89 +287,6 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 	}
 
 	@Composable
-	fun CrashLogLayout() {
-		val text = remember {
-			app.kv.get(AppContext.CRASH_KEY, "无崩溃日志")
-		}
-		Sheet(
-			state = crashLogSheet,
-			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
-		) {
-			Box(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
-					.verticalScroll(rememberScrollState())
-			) {
-				Text(
-					text = text,
-					modifier = Modifier.fillMaxWidth()
-				)
-			}
-		}
-	}
-
-	@Composable
-	fun FeedbackLayout() {
-		val state = remember { TextInputState() }
-
-		Sheet(
-			state = feedbackSheet,
-			heightModifier = { heightIn(min = 200.dp) }
-		) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
-				horizontalAlignment = Alignment.End,
-				verticalArrangement = Arrangement.spacedBy(10.dp),
-			) {
-				LoadingIcon(
-					icon = Icons.Outlined.Check,
-					enabled = state.ok,
-					onClick = { sendFeedback(state.text) }
-				)
-				TextInput(
-					state = state,
-					hint = "您的建议",
-					maxLength = 512,
-					maxLines = 5,
-					clearButton = false,
-					modifier = Modifier.fillMaxWidth()
-				)
-			}
-		}
-	}
-
-	@Composable
-	fun PrivacyPolicyLayout() {
-		Sheet(
-			state = privacyPolicySheet,
-			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
-		) {
-			Box(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
-					.verticalScroll(rememberScrollState())
-			) {
-				Text(
-					text = stringResource(Res.string.app_privacy_policy),
-					modifier = Modifier.fillMaxWidth()
-				)
-			}
-		}
-	}
-
-	@Composable
-	fun AboutLayout() {
-		Sheet(
-			state = aboutSheet,
-			heightModifier = { heightIn(min = 200.dp) }
-		) {
-			Box(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
-			) {
-				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
-			}
-		}
-	}
-
-	@Composable
 	private fun CommonSettings(modifier: Modifier = Modifier) {
 		SettingsLayout(
 			modifier = modifier,
@@ -468,24 +384,65 @@ class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
 			else Landscape(userProfile)
 		}
 
-		crashLogSheet.WithOpen {
-			CrashLogLayout()
-		}
-
-		feedbackSheet.WithOpen {
-			FeedbackLayout()
-		}
-
-		privacyPolicySheet.WithOpen {
-			PrivacyPolicyLayout()
-		}
-
-		aboutSheet.WithOpen {
-			AboutLayout()
-		}
-
 		cropDialog.WithOpen()
 		idModifyDialog.WithOpen()
 		signatureModifyDialog.WithOpen()
+	}
+
+	@Composable
+	override fun Floating() {
+		crashLogSheet.Land {
+			val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
+			Box(
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
+					.verticalScroll(rememberScrollState())
+			) {
+				Text(
+					text = text,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+
+		feedbackSheet.Land {
+			val state = remember { TextInputState() }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				horizontalAlignment = Alignment.End,
+				verticalArrangement = Arrangement.spacedBy(10.dp),
+			) {
+				LoadingIcon(
+					icon = Icons.Outlined.Check,
+					enabled = state.ok,
+					onClick = { sendFeedback(state.text) }
+				)
+				TextInput(
+					state = state,
+					hint = "您的建议",
+					maxLength = 512,
+					maxLines = 5,
+					clearButton = false,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+
+		privacyPolicySheet.Land {
+			Box(modifier = Modifier.fillMaxWidth().padding(10.dp)
+				.verticalScroll(rememberScrollState())
+			) {
+				Text(
+					text = stringResource(Res.string.app_privacy_policy),
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+
+		aboutSheet.Land {
+			Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
+			}
+		}
 	}
 }

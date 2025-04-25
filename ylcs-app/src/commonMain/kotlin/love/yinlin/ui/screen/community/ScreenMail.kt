@@ -33,8 +33,7 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.Sheet
-import love.yinlin.ui.component.screen.SheetState
+import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.Screen
 
@@ -51,7 +50,7 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 		override fun arg1(item: Mail): Boolean = item.processed
 	}
 
-	private val mailDetailsSheet = SheetState<Mail>()
+	private val mailDetailsSheet = FloatingArgsSheet<Mail>()
 
 	private suspend fun requestNewMails() {
 		if (state != BoxState.LOADING) {
@@ -182,58 +181,52 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 
 	@Composable
 	private fun MailDetailsLayout(mail: Mail) {
-		Sheet(
-			state = mailDetailsSheet,
-			heightModifier = { heightIn(min = 200.dp, max = 500.dp) }
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
-					.verticalScroll(rememberScrollState()),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+			Text(
+				text = mail.title,
+				style = MaterialTheme.typography.titleLarge,
+				textAlign = TextAlign.Center,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				Text(
-					text = mail.title,
-					style = MaterialTheme.typography.titleLarge,
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth()
+				if (mail.withYes) RachelButton(
+					text = "接受",
+					icon = Icons.Outlined.CheckCircle,
+					onClick = {
+						launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
+					}
 				)
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					if (mail.withYes) RachelButton(
-						text = "接受",
-						icon = Icons.Outlined.CheckCircle,
-						onClick = {
-							launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
-						}
-					)
-					if (mail.withNo) RachelButton(
-						text = "拒绝",
-						icon = Icons.Outlined.Cancel,
-						color = MaterialTheme.colorScheme.error,
-						onClick = {
-							launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
-						}
-					)
-					if (mail.processed) RachelButton(
-						text = "删除",
-						icon = Icons.Outlined.Delete,
-						color = MaterialTheme.colorScheme.secondary,
-						onClick = {
-							launch { onDeleteMail(mail.mid) }
-						}
-					)
-				}
-				Text(
-					text = mail.content,
-					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.fillMaxWidth()
+				if (mail.withNo) RachelButton(
+					text = "拒绝",
+					icon = Icons.Outlined.Cancel,
+					color = MaterialTheme.colorScheme.error,
+					onClick = {
+						launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
+					}
+				)
+				if (mail.processed) RachelButton(
+					text = "删除",
+					icon = Icons.Outlined.Delete,
+					color = MaterialTheme.colorScheme.secondary,
+					onClick = {
+						launch { onDeleteMail(mail.mid) }
+					}
 				)
 			}
+			Text(
+				text = mail.content,
+				style = MaterialTheme.typography.bodyMedium,
+				modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
+			)
 		}
 	}
 
@@ -270,7 +263,10 @@ class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
 				}
 			}
 		}
+	}
 
-		mailDetailsSheet.WithOpen { MailDetailsLayout(it) }
+	@Composable
+	override fun Floating() {
+		mailDetailsSheet.Land { MailDetailsLayout(it) }
 	}
 }

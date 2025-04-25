@@ -41,8 +41,7 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.screen.Sheet
-import love.yinlin.ui.component.screen.CommonSheetState
+import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -52,8 +51,8 @@ import org.ncgroup.kscan.ScannerView
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	val signinSheet = CommonSheetState()
-	val scanSheet = CommonSheetState()
+	val signinSheet = FloatingSheet()
+	val scanSheet = FloatingSheet()
 
 	fun logoff() {
 		app.config.userToken = ""
@@ -129,57 +128,55 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		var todaySignin by rememberState { true }
 		val today = remember { DateEx.Today }
 
-		Sheet(state = signinSheet) {
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(20.dp)
+		) {
+			Text(
+				text = "签到记录",
+				style = MaterialTheme.typography.titleLarge
+			)
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(20.dp)
+				modifier = Modifier.fillMaxWidth(),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				Text(
-					text = "签到记录",
-					style = MaterialTheme.typography.titleLarge
-				)
-				Column(
-					modifier = Modifier.fillMaxWidth(),
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					repeat(2) { row ->
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(10.dp)
-						) {
-							repeat(4) { col ->
-								val index = row * 4 + col
-								Surface(
-									modifier = Modifier.weight(1f),
-									shape = MaterialTheme.shapes.medium,
-									tonalElevation = 3.dp,
-									shadowElevation = 1.dp,
-									border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+				repeat(2) { row ->
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.spacedBy(10.dp)
+					) {
+						repeat(4) { col ->
+							val index = row * 4 + col
+							Surface(
+								modifier = Modifier.weight(1f),
+								shape = MaterialTheme.shapes.medium,
+								tonalElevation = 3.dp,
+								shadowElevation = 1.dp,
+								border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+							) {
+								Column(
+									modifier = Modifier.fillMaxWidth().padding(10.dp),
+									horizontalAlignment = Alignment.CenterHorizontally,
+									verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
 								) {
-									Column(
-										modifier = Modifier.fillMaxWidth().padding(10.dp),
-										horizontalAlignment = Alignment.CenterHorizontally,
-										verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
-									) {
-										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
+									val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
-										MiniIcon(
-											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
-										)
-										Text(
-											text = "${date.monthNumber}月${date.dayOfMonth}日",
-											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
-										)
-									}
+									MiniIcon(
+										icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+										color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+									)
+									Text(
+										text = "${date.monthNumber}月${date.dayOfMonth}日",
+										color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+									)
 								}
 							}
 						}
 					}
 				}
-				Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
 			}
+			Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
 		}
 
 		LaunchedEffect(Unit) {
@@ -199,28 +196,23 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun ScanLayout() {
-		Sheet(
-			state = scanSheet,
-			heightModifier = { fillMaxHeight(fraction = 0.9f) },
-			hasHandle = false
-		) {
-			ScannerView(
-				modifier = Modifier.fillMaxSize(),
-				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
-				result = {
-					scanSheet.hide()
-					if (it is BarcodeResult.OnSuccess) {
-						try {
-							val uri = Uri.parse(it.barcode.data)!!
-							if (uri.scheme == Scheme.Rachel) deeplink(uri)
-						}
-						catch (_: Throwable) {
-							slot.tip.warning("不能识别此信息")
-						}
+		ScannerView(
+			modifier = Modifier.fillMaxWidth(),
+			codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
+			showUi = false,
+			result = {
+				scanSheet.hide()
+				if (it is BarcodeResult.OnSuccess) {
+					try {
+						val uri = Uri.parse(it.barcode.data)!!
+						if (uri.scheme == Scheme.Rachel) deeplink(uri)
+					}
+					catch (_: Throwable) {
+						slot.tip.warning("不能识别此信息")
 					}
 				}
-			)
-		}
+			}
+		)
 	}
 
 	@Composable
@@ -302,14 +294,12 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		else {
 			if (app.isPortrait) Portrait(userProfile)
 			else Landscape(userProfile)
-
-			signinSheet.WithOpen {
-				SigninLayout()
-			}
-
-			scanSheet.WithOpen {
-				ScanLayout()
-			}
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		signinSheet.Land { SigninLayout() }
+		scanSheet.Land { ScanLayout() }
 	}
 }

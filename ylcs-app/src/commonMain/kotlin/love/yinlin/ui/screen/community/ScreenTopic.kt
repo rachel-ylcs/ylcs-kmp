@@ -39,7 +39,6 @@ import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.*
-import love.yinlin.ui.component.screen.SheetState
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.text.TextInput
@@ -159,8 +158,8 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 
 	private var currentSendComment: Comment? by mutableStateOf(null)
 
-	private val subCommentSheet = SheetState<Comment>()
-	private val sendCoinSheet = CommonSheetState()
+	private val subCommentSheet = FloatingArgsSheet<Comment>()
+	private val sendCoinSheet = FloatingSheet()
 
 	private val moveTopicDialog = DialogChoice.fromItems(
 		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
@@ -610,40 +609,35 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			override fun offset(item: SubComment): Int = item.cid
 		} }
 
-		Sheet(
-			state = subCommentSheet,
-			heightModifier = { fillMaxHeight(0.7f) }
-		) {
-			PaginationColumn(
-				items = page.items,
-				key = { it.cid },
-				canRefresh = false,
-				canLoading = page.canLoading,
-				onLoading = {
-					requestSubComments(
-						cid = comment.cid,
-						offset = page.offset,
-						num = page.pageNum
-					)?.let { page.moreData(it) }
-				},
-				contentPadding = PaddingValues(vertical = 10.dp),
-				itemDivider = PaddingValues(vertical = 8.dp),
-				modifier = Modifier.fillMaxWidth()
-			) { subComment ->
-				SubCommentBar(
-					subComment = subComment,
-					parentComment = comment,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-					onDelete = {
-						page.items -= subComment
-						commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
-							it.copy(subCommentNum = it.subCommentNum - 1)
-						}
-						// 楼中楼最后一条回复删除后隐藏楼中楼
-						if (page.items.isEmpty()) subCommentSheet.hide()
+		PaginationColumn(
+			items = page.items,
+			key = { it.cid },
+			canRefresh = false,
+			canLoading = page.canLoading,
+			onLoading = {
+				requestSubComments(
+					cid = comment.cid,
+					offset = page.offset,
+					num = page.pageNum
+				)?.let { page.moreData(it) }
+			},
+			contentPadding = PaddingValues(vertical = 10.dp),
+			itemDivider = PaddingValues(vertical = 8.dp),
+			modifier = Modifier.fillMaxWidth()
+		) { subComment ->
+			SubCommentBar(
+				subComment = subComment,
+				parentComment = comment,
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+				onDelete = {
+					page.items -= subComment
+					commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
+						it.copy(subCommentNum = it.subCommentNum - 1)
 					}
-				)
-			}
+					// 楼中楼最后一条回复删除后隐藏楼中楼
+					if (page.items.isEmpty()) subCommentSheet.hide()
+				}
+			)
 		}
 
 		LaunchedEffect(Unit) {
@@ -657,32 +651,30 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 
 	@Composable
 	private fun SendCoinLayout() {
-		Sheet(state = sendCoinSheet) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Text(
+				text = "银币: ${app.config.userProfile?.coin ?: 0}",
+				style = MaterialTheme.typography.titleLarge,
+				textAlign = TextAlign.Center,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				Text(
-					text = "银币: ${app.config.userProfile?.coin ?: 0}",
-					style = MaterialTheme.typography.titleLarge,
-					textAlign = TextAlign.Center,
-					modifier = Modifier.fillMaxWidth()
-				)
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					repeat(3) {
-						CoinLayout(
-							num = it + 1,
-							modifier = Modifier.weight(1f).aspectRatio(1f),
-							onClick = { num ->
-								sendCoinSheet.hide()
-								launch { onSendCoin(num) }
-							}
-						)
-					}
+				repeat(3) {
+					CoinLayout(
+						num = it + 1,
+						modifier = Modifier.weight(1f).aspectRatio(1f),
+						onClick = { num ->
+							sendCoinSheet.hide()
+							launch { onSendCoin(num) }
+						}
+					)
 				}
 			}
 		}
@@ -844,14 +836,12 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 			else Landscape(details = details)
 		}
 
-		subCommentSheet.WithOpen {
-			SubCommentLayout(it)
-		}
-
-		sendCoinSheet.WithOpen {
-			SendCoinLayout()
-		}
-
 		moveTopicDialog.WithOpen()
+	}
+
+	@Composable
+	override fun Floating() {
+		subCommentSheet.Land { SubCommentLayout(it) }
+		sendCoinSheet.Land { SendCoinLayout() }
 	}
 }

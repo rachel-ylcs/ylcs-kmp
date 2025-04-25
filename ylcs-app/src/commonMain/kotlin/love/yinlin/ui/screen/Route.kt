@@ -36,7 +36,16 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 	open suspend fun initialize() {}
 
 	@Composable
-	abstract fun Content()
+	protected abstract fun Content()
+
+	@Composable
+	protected open fun Floating() {}
+
+	@Composable
+	fun UI() {
+		Content()
+		Floating()
+	}
 }
 
 data class ScreenRouteScope(
@@ -55,7 +64,7 @@ inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
 				it.launch { it.initialize() }
 			}
 		}
-		screen.Content()
+		screen.UI()
 	}
 }
 
@@ -70,6 +79,6 @@ inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
 				it.launch { it.initialize() }
 			}
 		}
-		screen.Content()
+		screen.UI()
 	}
 }

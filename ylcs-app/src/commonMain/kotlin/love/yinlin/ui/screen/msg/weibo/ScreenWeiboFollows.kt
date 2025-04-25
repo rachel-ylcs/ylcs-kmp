@@ -38,8 +38,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.Sheet
-import love.yinlin.ui.component.screen.CommonSheetState
+import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.DialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
@@ -87,7 +86,7 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	private var state by mutableStateOf(BoxState.CONTENT)
 	private var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
-	private val importSheet = CommonSheetState()
+	private val importSheet = FloatingSheet()
 
 	private suspend fun refreshLocalUser() {
 		val weiboUsers = app.config.weiboUsers
@@ -118,55 +117,53 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 	private fun ImportLayout() {
 		val state = remember { TextInputState() }
 
-		Sheet(state = importSheet) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			Text(text = "微博关注数据迁移")
+			TextInput(
+				state = state,
+				hint = "关注列表(JSON格式)",
+				maxLines = 6,
+				clearButton = false,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.SpaceEvenly
 			) {
-				Text(text = "微博关注数据迁移")
-				TextInput(
-					state = state,
-					hint = "关注列表(JSON格式)",
-					maxLines = 6,
-					clearButton = false,
-					modifier = Modifier.fillMaxWidth()
+				LoadingRachelButton(
+					text = "导入(保留旧数据)",
+					icon = Icons.Outlined.Download,
+					enabled = state.ok,
+					onClick = {
+						try {
+							val localUsers = app.config.weiboUsers
+							val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
+							for (item in items) {
+								if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
+							}
+							slot.tip.success("导入成功")
+						}
+						catch (_: Throwable) {
+							slot.tip.error("导入格式错误")
+						}
+					}
 				)
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.SpaceEvenly
-				) {
-					LoadingRachelButton(
-						text = "导入(保留旧数据)",
-						icon = Icons.Outlined.Download,
-						enabled = state.ok,
-						onClick = {
-							try {
-								val localUsers = app.config.weiboUsers
-								val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
-								for (item in items) {
-									if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
-								}
-								slot.tip.success("导入成功")
-							}
-							catch (_: Throwable) {
-								slot.tip.error("导入格式错误")
-							}
+				LoadingRachelButton(
+					text = "导出",
+					icon = Icons.Outlined.Upload,
+					onClick = {
+						try {
+							state.text = app.config.weiboUsers.items.map { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
 						}
-					)
-					LoadingRachelButton(
-						text = "导出",
-						icon = Icons.Outlined.Upload,
-						onClick = {
-							try {
-								state.text = app.config.weiboUsers.items.map { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
-							}
-							catch (e: Throwable) {
-								slot.tip.error(e.message ?: "导出失败")
-							}
+						catch (e: Throwable) {
+							slot.tip.error(e.message ?: "导出失败")
 						}
-					)
-				}
+					}
+				)
 			}
 		}
 	}
@@ -226,10 +223,11 @@ class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(mode
 			}
 		}
 
-		importSheet.WithOpen {
-			ImportLayout()
-		}
-
 		searchDialog.WithOpen()
+	}
+
+	@Composable
+	override fun Floating() {
+		importSheet.Land { ImportLayout() }
 	}
 }

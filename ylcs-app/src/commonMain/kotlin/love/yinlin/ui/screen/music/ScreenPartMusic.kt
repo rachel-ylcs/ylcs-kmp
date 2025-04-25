@@ -63,8 +63,7 @@ import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.CommonSheetState
-import love.yinlin.ui.component.screen.Sheet
+import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenVideo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -114,8 +113,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var sleepJob: Job? by mutableStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
-	private val currentPlaylistSheet = CommonSheetState()
-	private val sleepModeSheet = CommonSheetState()
+	private val currentPlaylistSheet = FloatingSheet()
+	private val sleepModeSheet = FloatingSheet()
 
 	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
 		state = blurState,
@@ -602,51 +601,46 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (isEmptyList) currentPlaylistSheet.hide()
 		}
 
-		Sheet(
-			state = currentPlaylistSheet,
-			heightModifier = { fillMaxHeight(fraction = 0.6f) }
-		) {
-			Column(modifier = Modifier.fillMaxSize()) {
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 10.dp, bottom = 10.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Text(
-						text = factory.currentPlaylist?.name ?: "",
-						style = MaterialTheme.typography.titleLarge,
-						color = MaterialTheme.colorScheme.primary,
-						modifier = Modifier.weight(1f)
-					)
-					ClickIcon(
-						icon = Icons.Outlined.StopCircle,
+		Column(modifier = Modifier.fillMaxSize()) {
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 10.dp, bottom = 10.dp),
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Text(
+					text = factory.currentPlaylist?.name ?: "",
+					style = MaterialTheme.typography.titleLarge,
+					color = MaterialTheme.colorScheme.primary,
+					modifier = Modifier.weight(1f)
+				)
+				ClickIcon(
+					icon = Icons.Outlined.StopCircle,
+					onClick = {
+						currentPlaylistSheet.hide()
+						launch { factory.stop() }
+					}
+				)
+			}
+			HorizontalDivider(modifier = Modifier.height(1.dp))
+
+			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
+			LazyColumn(
+				modifier = Modifier.fillMaxWidth().weight(1f),
+				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
+			) {
+				itemsIndexed(
+					items = factory.musicList,
+					key = { _, musicInfo -> musicInfo.id }
+				) { index, musicInfo ->
+					PlayingMusicStatusCard(
+						musicInfo = musicInfo,
+						isCurrent = index == currentIndex,
 						onClick = {
 							currentPlaylistSheet.hide()
-							launch { factory.stop() }
-						}
+							launch { factory.gotoIndex(index) }
+						},
+						modifier = Modifier.fillMaxWidth()
 					)
-				}
-				HorizontalDivider(modifier = Modifier.height(1.dp))
-
-				val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
-				LazyColumn(
-					modifier = Modifier.fillMaxWidth().weight(1f),
-					state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
-				) {
-					itemsIndexed(
-						items = factory.musicList,
-						key = { _, musicInfo -> musicInfo.id }
-					) { index, musicInfo ->
-						PlayingMusicStatusCard(
-							musicInfo = musicInfo,
-							isCurrent = index == currentIndex,
-							onClick = {
-								currentPlaylistSheet.hide()
-								launch { factory.gotoIndex(index) }
-							},
-							modifier = Modifier.fillMaxWidth()
-						)
-					}
 				}
 			}
 		}
@@ -675,59 +669,57 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun SleepModeLayout() {
 		val state = rememberTimePickerState(is24Hour = true)
 
-		Sheet(state = sleepModeSheet) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				SplitLayout(
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-					left = {
-						Text(
-							text = "睡眠模式",
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary
-						)
-					},
-					right = {
-						RachelButton(
-							text = if (sleepJob == null) "启动" else "停止",
-							icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
-							onClick = {
-								if (factory.isReady) {
-									if (sleepJob == null) {
-										val time = state.hour * 3600 + state.minute * 60
-										if (time > 0) startSleepMode(time)
-										else slot.tip.warning("未设定时间")
-									}
-									else exitSleepMode()
-								}
-								else slot.tip.warning("播放器未开启")
-							}
-						)
-					}
-				)
-				if (sleepJob == null) {
-					TimeInput(
-						state = state,
-						colors = TimePickerDefaults.colors().copy(
-							containerColor = MaterialTheme.colorScheme.surface,
-							timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-							timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-							timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-							timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-						)
-					)
-				}
-				else {
+		Column(
+			modifier = Modifier.fillMaxWidth().padding(10.dp),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
+			SplitLayout(
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+				left = {
 					Text(
-						text = remember(sleepRemainSeconds) { (sleepRemainSeconds * 1000L).timeString },
-						style = MaterialTheme.typography.displayMedium,
-						color = MaterialTheme.colorScheme.secondary,
-						modifier = Modifier.padding(vertical = 30.dp)
+						text = "睡眠模式",
+						style = MaterialTheme.typography.titleLarge,
+						color = MaterialTheme.colorScheme.primary
+					)
+				},
+				right = {
+					RachelButton(
+						text = if (sleepJob == null) "启动" else "停止",
+						icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
+						onClick = {
+							if (factory.isReady) {
+								if (sleepJob == null) {
+									val time = state.hour * 3600 + state.minute * 60
+									if (time > 0) startSleepMode(time)
+									else slot.tip.warning("未设定时间")
+								}
+								else exitSleepMode()
+							}
+							else slot.tip.warning("播放器未开启")
+						}
 					)
 				}
+			)
+			if (sleepJob == null) {
+				TimeInput(
+					state = state,
+					colors = TimePickerDefaults.colors().copy(
+						containerColor = MaterialTheme.colorScheme.surface,
+						timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+						timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+						timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+						timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+					)
+				)
+			}
+			else {
+				Text(
+					text = remember(sleepRemainSeconds) { (sleepRemainSeconds * 1000L).timeString },
+					style = MaterialTheme.typography.displayMedium,
+					color = MaterialTheme.colorScheme.secondary,
+					modifier = Modifier.padding(vertical = 30.dp)
+				)
 			}
 		}
 	}
@@ -844,13 +836,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	override fun Content() {
 		if (app.isPortrait) Portrait()
 		else Landscape()
+	}
 
-		currentPlaylistSheet.WithOpen {
-			CurrentPlaylistLayout()
-		}
-
-		sleepModeSheet.WithOpen {
-			SleepModeLayout()
-		}
+	@Composable
+	override fun Floating() {
+		sleepModeSheet.Land { SleepModeLayout() }
+		currentPlaylistSheet.Land { CurrentPlaylistLayout() }
 	}
 }

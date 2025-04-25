@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.*
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.equalItem
 import love.yinlin.ui.component.screen.Tip
@@ -150,15 +152,24 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 			state = pagerState,
 			modifier = modifier
 		) {
-			Box(modifier = Modifier.fillMaxSize()) {
-				when (it) {
-					TabItem.WORLD.ordinal -> worldPart.PartContent()
-					TabItem.MSG.ordinal -> msgPart.PartContent()
-					TabItem.MUSIC.ordinal -> musicPart.PartContent()
-					TabItem.DISCOVERY.ordinal -> discoveryPart.PartContent()
-					TabItem.ME.ordinal -> mePart.PartContent()
+			val part = when (it) {
+				TabItem.WORLD.ordinal -> worldPart
+				TabItem.MSG.ordinal -> msgPart
+				TabItem.MUSIC.ordinal -> musicPart
+				TabItem.DISCOVERY.ordinal -> discoveryPart
+				TabItem.ME.ordinal -> mePart
+				else -> null
+			}
+			if (part != null) {
+				Box(modifier = Modifier.fillMaxSize()) {
+					part.Content()
+				}
+
+				LaunchedEffect(part.firstLoad) {
+					launch { part.initialize() }
 				}
 			}
+			else EmptyBox()
 		}
 	}
 
@@ -209,5 +220,17 @@ class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
 			loading.WithOpen()
 			Tip(state = tip)
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		when (pagerState.settledPage) {
+			TabItem.WORLD.ordinal -> worldPart
+			TabItem.MSG.ordinal -> msgPart
+			TabItem.MUSIC.ordinal -> musicPart
+			TabItem.DISCOVERY.ordinal -> discoveryPart
+			TabItem.ME.ordinal -> mePart
+			else -> null
+		}?.Floating()
 	}
 }
