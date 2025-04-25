@@ -172,7 +172,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
         val playlist = playlistLibrary[name]
         if (playlist != null) {
             if (playlist.items.isNotEmpty()) {
-                app.musicFactory.startPlaylist(playlist)
+                app.musicFactory.startPlaylist(playlist, null, true)
                 pop()
             }
             else slot.tip.warning("歌单中还没有添加歌曲哦")

@@ -349,7 +349,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					))
 					.width(14.dp).height(8.dp)
 					.clickableNoRipple {
-						launch { factory.seekTo(hotpot) }
+						launch {
+							factory.seekTo(hotpot)
+							if (!factory.isPlaying) factory.play()
+						}
 					}
 					.padding(horizontal = 3.dp)
 					.shadow(elevation = 2.dp, shape = CircleShape)
@@ -380,7 +383,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				.pointerInput(duration, maxWidth) {
 					detectTapGestures(onTap = { offset ->
 						if (duration != 0L) {
-							launch { factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong()) }
+							launch {
+								factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
+								if (!factory.isPlaying) factory.play()
+							}
 						}
 					})
 				}
@@ -398,7 +404,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.pointerInput(duration, maxWidth) {
 						detectTapGestures(onTap = { offset ->
 							if (duration != 0L) {
-								launch { factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong()) }
+								launch {
+									factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
+									if (!factory.isPlaying) factory.play()
+								}
 							}
 						})
 					}

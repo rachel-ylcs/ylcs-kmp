@@ -10,6 +10,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
+import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -270,6 +271,12 @@ class KVConfig(private val kv: KV) {
 
 	// 歌单
 	val playlistLibrary = mapState<String, MusicPlaylist>("playlistLibrary")
+	// 上次播放列表
+	var lastPlaylist by stringState("")
+	// 上次播放歌曲
+	var lastMusic by stringState("")
+	// 播放模式
+	var musicPlayMode: MusicPlayMode by jsonState { MusicPlayMode.ORDER }
 
 	/* ------------------  社区  ------------------ */
 

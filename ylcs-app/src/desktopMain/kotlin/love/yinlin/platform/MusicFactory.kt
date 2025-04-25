@@ -64,7 +64,11 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     private val playerListener = object : MediaPlayerEventAdapter() {
-        override fun mediaChanged(mediaPlayer: MediaPlayer?, media: MediaRef?) { currentMusic = musicList[currentIndex] }
+        override fun mediaChanged(mediaPlayer: MediaPlayer?, media: MediaRef?) {
+            val musicInfo = musicList[currentIndex]
+            currentMusic = musicInfo
+            onMusicChanged(musicInfo)
+        }
         override fun playing(mediaPlayer: MediaPlayer?) { isPlaying = true }
         override fun paused(mediaPlayer: MediaPlayer?) { isPlaying = false }
         override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { currentPosition = newTime }
@@ -124,10 +128,12 @@ class ActualMusicFactory : MusicFactory() {
         return shuffledList.begin
     }
 
-    private fun MediaPlayer.innerGotoIndex(index: Int) {
+    private fun MediaPlayer.innerGotoIndex(index: Int, playing: Boolean = true) {
         if (index in 0 ..< musicList.size) {
             currentIndex = index
-            media().play(musicList[currentIndex].audioPath.toString())
+            val uri = musicList[currentIndex].audioPath.toString()
+            if (playing) media().play(uri)
+            else media().prepare(uri)
         }
         else innerStop()
     }
@@ -166,12 +172,12 @@ class ActualMusicFactory : MusicFactory() {
         if (!player.status().isPlaying) player.controls().play()
     }
 
-    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) = withPlayer { player ->
+    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean) = withPlayer { player ->
         val index = startIndex ?: 0
         if (index >= 0 && index < medias.size) {
             musicList.replaceAll(medias)
             reshuffled(size = medias.size, start = index)
-            player.innerGotoIndex(index)
+            player.innerGotoIndex(index, playing)
         }
     }
 

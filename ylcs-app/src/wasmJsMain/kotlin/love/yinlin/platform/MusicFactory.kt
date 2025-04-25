@@ -4,7 +4,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 
 class ActualMusicFactory : MusicFactory() {
-    override val isInit: Boolean get() = false
+    override val isInit: Boolean = false
     override suspend fun init() {}
     override val error: Throwable? = null
     override val playMode: MusicPlayMode = MusicPlayMode.ORDER
@@ -22,7 +22,7 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun gotoNext() {}
     override suspend fun gotoIndex(index: Int) {}
     override suspend fun seekTo(position: Long) {}
-    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) {}
+    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean) {}
     override suspend fun addMedias(medias: List<MusicInfo>) {}
     override suspend fun removeMedia(index: Int) {}
 }

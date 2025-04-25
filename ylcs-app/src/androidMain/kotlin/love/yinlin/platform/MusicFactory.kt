@@ -89,7 +89,6 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
             mediaController.removeListener(listener)
             mediaController.addListener(listener)
             controller = mediaController
-            updatePlayMode(MusicPlayMode.ORDER)
         }
     }
 
@@ -197,9 +196,14 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
             withPlayer { player ->
-                if (mediaItem == null) player.stop()
+                if (mediaItem == null) {
+                    onMusicChanged(null)
+                    player.stop()
+                }
                 else {
-                    currentMusic = musicLibrary[mediaItem.mediaId]
+                    val musicInfo = musicLibrary[mediaItem.mediaId]
+                    currentMusic = musicInfo
+                    onMusicChanged(musicInfo)
                     updateDuration(player)
                 }
             }
@@ -263,8 +267,10 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         }
     }
     override suspend fun seekTo(position: Long) = withMainPlayer { it.seekTo(position) }
-    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?) = withMainPlayer { player ->
+    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean) = withMainPlayer { player ->
         player.setMediaItems(medias.map { it.asMediaItem }, startIndex ?: C.INDEX_UNSET, C.TIME_UNSET)
+        if (playing) player.play()
+        else player.prepare()
     }
     override suspend fun addMedias(medias: List<MusicInfo>) = withMainPlayer { player ->
         player.addMediaItems(medias.map { it.asMediaItem })

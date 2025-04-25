@@ -19,7 +19,40 @@ abstract class MusicFactory {
 
     // 初始化
     abstract val isInit: Boolean
-    abstract suspend fun init()
+
+    private fun initLibrary() = Coroutines.startIO {
+        val musicPath = OS.Storage.musicPath
+        SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
+            try {
+                val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
+                val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                musicLibrary.put(info.id, info)
+            }
+            catch (_: Throwable) { }
+        }
+    }
+
+    private suspend fun initLastStatus() {
+        if (isInit) {
+            // 更新播放模式
+            updatePlayMode(app.config.musicPlayMode)
+            // 恢复上一次播放
+            val playlistName = app.config.lastPlaylist
+            if (playlistName.isNotEmpty()) {
+                val playlist = app.config.playlistLibrary[playlistName]
+                val musicName = app.config.lastMusic
+                if (playlist != null) startPlaylist(playlist, musicName.ifEmpty { null }, false)
+            }
+        }
+    }
+
+    protected abstract suspend fun init()
+
+    suspend fun initFactory() {
+        initLibrary()
+        init()
+        initLastStatus()
+    }
 
     // 当前状态
     abstract val error: Throwable?
@@ -40,32 +73,18 @@ abstract class MusicFactory {
     abstract suspend fun gotoNext()
     abstract suspend fun gotoIndex(index: Int)
     abstract suspend fun seekTo(position: Long)
-    abstract suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?)
+    abstract suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean)
     abstract suspend fun addMedias(medias: List<MusicInfo>)
     abstract suspend fun removeMedia(index: Int)
 
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()
 
-    suspend fun initLibrary() {
-        Coroutines.io {
-            val musicPath = OS.Storage.musicPath
-            SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
-                try {
-                    val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
-                    val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
-                    musicLibrary.put(info.id, info)
-                }
-                catch (_: Throwable) { }
-            }
-        }
-    }
-
     var currentPlaylist: MusicPlaylist? by mutableStateOf(null)
         protected set
 
     // 通用操作
-    suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null) {
+    suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null, playing: Boolean) {
         if (isInit && currentPlaylist != playlist) {
             val actualMusicList = mutableListOf<MusicInfo>()
             for (id in playlist.items) {
@@ -75,13 +94,22 @@ abstract class MusicFactory {
             if (actualMusicList.isNotEmpty()) {
                 currentPlaylist = playlist
                 val index = if (startId != null) actualMusicList.indexOfFirst { it.id == startId } else -1
-                prepareMedias(actualMusicList, if (index != -1) index else null)
-                play()
+                prepareMedias(actualMusicList, if (index != -1) index else null, playing)
             }
         }
     }
 
     suspend fun switchPlayMode() {
-        if (isInit) updatePlayMode(playMode.next)
+        if (isInit) {
+            val nextMode = playMode.next
+            updatePlayMode(nextMode)
+            app.config.musicPlayMode = nextMode
+        }
+    }
+
+    // 回调
+    protected fun onMusicChanged(musicInfo: MusicInfo?) {
+        app.config.lastPlaylist = currentPlaylist?.name ?: ""
+        musicInfo?.let { app.config.lastMusic = it.id }
     }
 }

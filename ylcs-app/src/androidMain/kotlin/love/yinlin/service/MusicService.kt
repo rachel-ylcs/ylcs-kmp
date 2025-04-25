@@ -53,8 +53,7 @@ class MusicService : MediaSessionService() {
                     Intent().apply { setComponent(ComponentName(context, MainActivity::class.java)) },
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_ONE_SHOT
                 )
-            )
-            .build()
+            ).build()
     }
 
     override fun onDestroy() {

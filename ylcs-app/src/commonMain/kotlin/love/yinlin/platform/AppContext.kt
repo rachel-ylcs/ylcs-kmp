@@ -80,10 +80,7 @@ abstract class AppContext {
 		// 初始化音乐播放器
 		musicFactory = initializeMusicFactory()
 		Coroutines.startCPU {
-			if (!musicFactory.isInit) {
-				musicFactory.initLibrary()
-				musicFactory.init()
-			}
+			if (!musicFactory.isInit) musicFactory.initFactory()
 		}
 	}
 }
