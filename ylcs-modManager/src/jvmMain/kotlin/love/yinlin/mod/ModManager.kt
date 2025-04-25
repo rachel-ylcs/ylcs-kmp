@@ -1,25 +1,15 @@
 package love.yinlin.mod
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -43,6 +33,13 @@ import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
 import java.awt.datatransfer.DataFlavor
 import java.io.File
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileFilter
+import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.filechooser.FileSystemView
+
+
+private var lastChoosePath: File? = FileSystemView.getFileSystemView()?.homeDirectory
 
 private sealed interface Status {
     val message: String
@@ -152,6 +149,23 @@ private fun MergeUI(
             value = input,
             onValueChange = { input = it },
             title = "媒体目录",
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        val chooser = JFileChooser().apply {
+                            isMultiSelectionEnabled = true
+                            currentDirectory = lastChoosePath
+                            fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            lastChoosePath = chooser.selectedFiles.firstOrNull()?.parentFile
+                            input = chooser.selectedFiles.joinToString("\n").trim()
+                        }
+                    }
+                )
+            },
             maxLines = 5,
             modifier = Modifier.fillMaxWidth()
         )
@@ -161,13 +175,30 @@ private fun MergeUI(
             onValueChange = { output = it },
             title = "保存文件路径",
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Home,
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        output = "${System.getProperty("user.home")}/Desktop"
-                    }
-                )
+                Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            val chooser = JFileChooser().apply {
+                                isMultiSelectionEnabled = false
+                                currentDirectory = lastChoosePath
+                                fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                            }
+                            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                lastChoosePath = chooser.selectedFile
+                                output = chooser.selectedFile.absolutePath
+                            }
+                        }
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.Home,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            output = "${System.getProperty("user.home")}${File.separator}Desktop"
+                        }
+                    )
+                }
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -276,6 +307,24 @@ private fun ReleaseUI(
         DragTextField(
             value = input,
             onValueChange = { input = it },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        val chooser = JFileChooser().apply {
+                            isMultiSelectionEnabled = false
+                            currentDirectory = lastChoosePath
+                            fileSelectionMode = JFileChooser.FILES_ONLY
+                            fileFilter = FileNameExtensionFilter("MOD文件", "rachel")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            lastChoosePath = chooser.selectedFiles.firstOrNull()?.parentFile
+                            input = chooser.selectedFile.absolutePath
+                        }
+                    }
+                )
+            },
             title = "MOD文件路径",
             modifier = Modifier.fillMaxWidth()
         )
@@ -285,13 +334,30 @@ private fun ReleaseUI(
             onValueChange = { output = it },
             title = "导出目录",
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Home,
-                    contentDescription = null,
-                    modifier = Modifier.clickable {
-                        output = "${System.getProperty("user.home")}/Desktop"
-                    }
-                )
+                Row(modifier = Modifier.padding(horizontal = 10.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            val chooser = JFileChooser().apply {
+                                isMultiSelectionEnabled = false
+                                currentDirectory = lastChoosePath
+                                fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+                            }
+                            if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                                lastChoosePath = chooser.selectedFile
+                                output = chooser.selectedFile.absolutePath
+                            }
+                        }
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.Home,
+                        contentDescription = null,
+                        modifier = Modifier.clickable {
+                            output = "${System.getProperty("user.home")}${File.separator}Desktop"
+                        }
+                    )
+                }
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -439,6 +505,24 @@ private fun PreviewUI(
         DragTextField(
             value = input,
             onValueChange = { input = it },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        val chooser = JFileChooser().apply {
+                            isMultiSelectionEnabled = false
+                            currentDirectory = lastChoosePath
+                            fileSelectionMode = JFileChooser.FILES_ONLY
+                            fileFilter = FileNameExtensionFilter("MOD文件", "rachel")
+                        }
+                        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                            lastChoosePath = chooser.selectedFiles.firstOrNull()?.parentFile
+                            input = chooser.selectedFile.absolutePath
+                        }
+                    }
+                )
+            },
             title = "MOD文件路径",
             modifier = Modifier.fillMaxWidth()
         )
