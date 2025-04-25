@@ -1,14 +1,8 @@
 package love.yinlin.ui.component.screen
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,16 +15,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -46,7 +36,6 @@ import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
@@ -141,7 +130,6 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 			}
 			Surface(
 				shape = MaterialTheme.shapes.extraLarge,
-				shadowElevation = 5.dp,
 				modifier = Modifier.fillMaxWidth().clickableNoRipple { }
 			) {
 				Column(
@@ -449,66 +437,5 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
 				LoadingBox()
 			}
 		}
-	}
-}
-
-@Stable
-abstract class DialogState<R> {
-	var isOpen: Boolean by mutableStateOf(false)
-		protected set
-	protected var continuation: CancellableContinuation<R?>? = null
-
-	open val dismissOnBackPress: Boolean get() = true
-	open val dismissOnClickOutside: Boolean get() = true
-
-	protected fun cancel() {
-		continuation = null
-		isOpen = false
-	}
-
-	protected suspend fun awaitResult(): R? = try {
-		val result = suspendCancellableCoroutine { cont ->
-			cont.invokeOnCancellation { cancel() }
-			continuation?.cancel(CancellationException())
-			continuation = cont
-			isOpen = true
-		}
-		if (result != null) cancel()
-		result
-	}
-	catch (_: CancellationException) { null }
-
-	protected suspend fun openAsync() {
-		CoroutineScope(coroutineContext).launch { awaitResult() }
-	}
-
-	open fun hide() {
-		continuation?.resume(null)
-		cancel()
-	}
-
-	@Composable
-	protected abstract fun DialogContent()
-
-	@Composable
-	fun WithOpen() {
-		if (isOpen) DialogContent()
-		DisposableEffect(Unit) { onDispose { hide() } }
-	}
-
-	@OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-	protected fun BaseDialog(content: @Composable () -> Unit) {
-		BackHandler(!dismissOnBackPress) {}
-
-		Dialog(
-			onDismissRequest = { hide() },
-			properties = DialogProperties(
-				dismissOnBackPress = dismissOnBackPress,
-				dismissOnClickOutside = dismissOnClickOutside,
-				usePlatformDefaultWidth = true
-			),
-			content = content
-		)
 	}
 }

@@ -89,7 +89,6 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
         val onStop = { if (offset > height / 2) close() else offset = 0 }
 
         Surface(
-            shadowElevation = 5.dp,
             shape = MaterialTheme.shapes.extraLarge.copy(bottomStart = CornerSize(0), bottomEnd = CornerSize(0)),
             modifier = Modifier.fillMaxWidth()
                 .offset { IntOffset(x = 0, y = animatedOffset) }
