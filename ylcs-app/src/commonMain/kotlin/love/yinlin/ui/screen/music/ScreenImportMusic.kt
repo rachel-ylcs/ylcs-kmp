@@ -91,6 +91,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
             }
         }
         catch (e: Throwable) {
+            println(e.stackTraceToString())
             Data.Error(throwable = e)
         }
         step = when (data) {
@@ -302,7 +303,10 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                     is Step.Preview -> {
                         val preview = currentStep.preview
                         if (preview == null) {
-                            Column {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
                                 LoadingAnimation()
                                 Text(
                                     text = "预览中...",
@@ -318,7 +322,10 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
                         }
                     }
                     is Step.Processing -> {
-                        Column {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
                             LoadingAnimation()
                             Text(
                                 text = currentStep.message,

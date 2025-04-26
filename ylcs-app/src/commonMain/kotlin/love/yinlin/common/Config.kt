@@ -108,9 +108,16 @@ class KVConfig(private val kv: KV) {
 			save()
 		}
 
-		fun removeAll(predicate: (T) -> Boolean): Boolean = state.removeAll(predicate = predicate)
+		fun removeAll(predicate: (T) -> Boolean): Boolean {
+			val result = state.removeAll(predicate = predicate)
+			if (result) save()
+			return result
+		}
 
-		fun replaceAll(items: List<T>) = state.replaceAll(items)
+		fun replaceAll(items: List<T>) {
+			state.replaceAll(items)
+			save()
+		}
 	}
 
 	@Stable
@@ -163,7 +170,10 @@ class KVConfig(private val kv: KV) {
 			}
 		}
 
-		fun replaceAll(items: Map<K, V>) = state.replaceAll(items)
+		fun replaceAll(items: Map<K, V>) {
+			state.replaceAll(items)
+			save()
+		}
 	}
 
 	@Stable

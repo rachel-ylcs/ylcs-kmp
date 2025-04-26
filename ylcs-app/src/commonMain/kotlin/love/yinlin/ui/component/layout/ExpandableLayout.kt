@@ -6,11 +6,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.Composable
+import love.yinlin.Local
 
 @Composable
 fun ExpandableLayout(
 	isExpanded: Boolean,
-	duration: Int = 300,
+	duration: Int = Local.Client.ANIMATION_DURATION,
 	content: @Composable () -> Unit
 ) {
 	AnimatedVisibility(

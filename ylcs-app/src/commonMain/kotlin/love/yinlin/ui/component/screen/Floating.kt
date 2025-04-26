@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
+import love.yinlin.Local
 import love.yinlin.extension.clickableNoRipple
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -38,7 +39,7 @@ abstract class Floating<A : Any> {
     protected abstract val alignment: Alignment // 对齐方式
     protected abstract val enter: EnterTransition // 开始动画
     protected abstract val exit: ExitTransition // 结束动画
-    protected open val duration: Int = 300 // 动画时长
+    protected open val duration: Int = Local.Client.ANIMATION_DURATION // 动画时长
     protected open val scrim: Float = 0.4f // 遮罩透明度
     protected open val zIndex: Float = Z_INDEX_COMMON // 高度
     protected open val dismissOnBackPress: Boolean = true // 返回键结束

@@ -19,6 +19,10 @@ object Local {
 		// 开启后无视主题设置始终保持深色
 		const val ALWAYS_DARK_MODE = false
 
+		// < ------  动画时长  ------ >
+		// 基本动画时长(毫秒)
+		const val ANIMATION_DURATION = 400
+
 		// 桌面端配置
 		object Desktop {
 			// < ------  竖屏模式  ------ >

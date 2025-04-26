@@ -3,6 +3,8 @@ package love.yinlin.data
 object MimeType {
 	const val ANY = "*/*"
 
+	const val TEXT = "text/plain"
+
 	const val IMAGE = "image/*"
 	const val JPG = "image/jpeg"
 	const val PNG = "image/png"

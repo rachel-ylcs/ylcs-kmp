@@ -20,7 +20,8 @@ media3 = "1.6.1"
 
 # Desktop
 javafx = "21.0.7-ea+1"
-ui-graphics-android = "1.7.8" #noinspection GradleDependency
+ui-graphics-android = "1.7.8"
+core-ktx = "1.10.1" #noinspection GradleDependency
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
@@ -32,6 +33,7 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [libraries]
 # Common
@@ -115,3 +117,4 @@ mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "5.3.0-beta1" }
 ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "ui-graphics-android" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }

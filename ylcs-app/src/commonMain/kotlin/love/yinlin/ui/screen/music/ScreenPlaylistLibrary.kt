@@ -366,26 +366,6 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     LoadingRachelButton(
-                        text = "导入",
-                        icon = Icons.Outlined.Download,
-                        enabled = state.ok,
-                        onClick = {
-                            if (!app.musicFactory.isReady) {
-                                if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
-                                    try {
-                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
-                                        playlistLibrary.replaceAll(items)
-                                        slot.tip.success("导入成功")
-                                    }
-                                    catch (_: Throwable) {
-                                        slot.tip.error("导入格式错误")
-                                    }
-                                }
-                            }
-                            else slot.tip.warning("恢复歌单需要先停止播放器")
-                        }
-                    )
-                    LoadingRachelButton(
                         text = "导出",
                         icon = Icons.Outlined.Upload,
                         onClick = {
@@ -395,6 +375,27 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                             catch (e: Throwable) {
                                 slot.tip.error(e.message ?: "导出失败")
                             }
+                        }
+                    )
+                    LoadingRachelButton(
+                        text = "导入",
+                        icon = Icons.Outlined.Download,
+                        enabled = state.ok,
+                        onClick = {
+                            if (!app.musicFactory.isReady) {
+                                if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
+                                    try {
+                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
+                                        playlistLibrary.replaceAll(items)
+                                        if (items.isNotEmpty()) currentPage = 0
+                                        slot.tip.success("导入成功")
+                                    }
+                                    catch (_: Throwable) {
+                                        slot.tip.error("导入格式错误")
+                                    }
+                                }
+                            }
+                            else slot.tip.warning("恢复歌单需要先停止播放器")
                         }
                     )
                 }
@@ -434,9 +435,11 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
                             if (playlists.isNotEmpty()) {
                                 if (!app.musicFactory.isReady) {
                                     if (slot.confirm.openSuspend(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
-                                        playlistLibrary.replaceAll(playlists.mapValues { (name, value) ->
+                                        val items = playlists.mapValues { (name, value) ->
                                             MusicPlaylist(name, value.map { it.id })
-                                        })
+                                        }
+                                        playlistLibrary.replaceAll(items)
+                                        if (items.isNotEmpty()) currentPage = 0
                                         slot.tip.success("云恢复成功")
                                     }
                                 }
@@ -471,10 +474,7 @@ class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args
 
             LaunchedEffect(Unit) {
                 val result = downloadCloudPlaylist()
-                when (result) {
-                    is Data.Success -> playlists = result.data
-                    is Data.Error -> slot.tip.error(result.message)
-                }
+                if (result is Data.Success) playlists = result.data
             }
         }
         inputPlaylistNameDialog.Land()
