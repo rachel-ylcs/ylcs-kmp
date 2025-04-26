@@ -8,4 +8,13 @@ enum class MusicPlayMode {
         LOOP -> RANDOM
         RANDOM -> ORDER
     }
+
+    companion object {
+        fun fromInt(value: Int): MusicPlayMode? = when (value) {
+            ORDER.ordinal -> ORDER
+            LOOP.ordinal -> LOOP
+            RANDOM.ordinal -> RANDOM
+            else -> null
+        }
+    }
 }

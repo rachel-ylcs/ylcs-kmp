@@ -103,7 +103,6 @@ abstract class MusicFactory {
         if (isInit) {
             val nextMode = playMode.next
             updatePlayMode(nextMode)
-            app.config.musicPlayMode = nextMode
         }
     }
 
@@ -111,5 +110,9 @@ abstract class MusicFactory {
     protected fun onMusicChanged(musicInfo: MusicInfo?) {
         app.config.lastPlaylist = currentPlaylist?.name ?: ""
         musicInfo?.let { app.config.lastMusic = it.id }
+    }
+
+    protected fun onPlayModeChanged(mode: MusicPlayMode) {
+        app.config.musicPlayMode = mode
     }
 }

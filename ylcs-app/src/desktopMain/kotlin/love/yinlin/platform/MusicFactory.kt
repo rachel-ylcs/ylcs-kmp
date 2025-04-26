@@ -143,6 +143,7 @@ class ActualMusicFactory : MusicFactory() {
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
+        onPlayModeChanged(musicPlayMode)
         // 重新换模式要重设洗牌顺序
         if (musicPlayMode == MusicPlayMode.RANDOM) reshuffled(start = currentIndex)
     }

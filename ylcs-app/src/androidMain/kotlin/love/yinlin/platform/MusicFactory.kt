@@ -30,7 +30,7 @@ import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
 import java.io.File
 
-private fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
+fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
     shuffleModeEnabled -> MusicPlayMode.RANDOM
     repeatMode == Player.REPEAT_MODE_ONE -> MusicPlayMode.LOOP
     else -> MusicPlayMode.ORDER
@@ -71,8 +71,7 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
     }
 
     override fun stop() {
-        clearMediaItems()
-        super.stop()
+        super.clearMediaItems()
     }
 }
 
@@ -102,8 +101,8 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         controller?.let(block)
     }
 
-    private fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Data<Bundle> {
-        val result = controller?.sendCustomCommand(command, args)?.get()
+    private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Data<Bundle> {
+        val result = Coroutines.main { controller?.sendCustomCommand(command, args)?.get() }
         if (result == null) return Data.Error()
         return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Error(message = "${result.sessionError}")
     }
@@ -130,12 +129,20 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     val listener = object : Player.Listener {
         override fun onRepeatModeChanged(repeatMode: Int) {
             super.onRepeatModeChanged(repeatMode)
-            withPlayer { playMode = mergePlayMode(repeatMode, it.shuffleModeEnabled) }
+            withPlayer {
+                val newPlayMode = mergePlayMode(repeatMode, it.shuffleModeEnabled)
+                playMode = newPlayMode
+                onPlayModeChanged(playMode)
+            }
         }
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
             super.onShuffleModeEnabledChanged(shuffleModeEnabled)
-            withPlayer { playMode = mergePlayMode(it.repeatMode, shuffleModeEnabled) }
+            withPlayer {
+                val newPlayMode = mergePlayMode(it.repeatMode, shuffleModeEnabled)
+                playMode = newPlayMode
+                onPlayModeChanged(playMode)
+            }
         }
 
         override fun onIsPlayingChanged(value: Boolean) {
@@ -175,20 +182,21 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
             super.onPlaybackStateChanged(playbackState)
             withPlayer { player ->
                 when (playbackState) {
-                    Player.STATE_IDLE -> {
-                        // 已停止播放
-                        musicList = emptyList()
-                        isPlaying = false
-                        currentPosition = 0L
-                        currentDuration = 0L
-                        currentPlaylist = null
-                        currentMusic = null
-                    }
+                    Player.STATE_IDLE -> { }
                     Player.STATE_BUFFERING -> { }
                     Player.STATE_READY -> updateDuration(player)
                     Player.STATE_ENDED -> {
                         // 当因为删除当前媒体等原因停止了循环播放, 但仍然有剩余媒体则继续循环播放
                         if (player.mediaItemCount != 0 && playMode == MusicPlayMode.LOOP) player.play()
+                        else {
+                            // 已停止播放
+                            musicList = emptyList()
+                            isPlaying = false
+                            currentPosition = 0L
+                            currentDuration = 0L
+                            currentPlaylist = null
+                            currentMusic = null
+                        }
                     }
                 }
             }
@@ -239,21 +247,11 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         )
         .build()
 
-    override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) = withMainPlayer { player ->
-        when (musicPlayMode) {
-            MusicPlayMode.ORDER -> {
-                player.repeatMode = Player.REPEAT_MODE_ALL
-                player.shuffleModeEnabled = false
-            }
-            MusicPlayMode.LOOP -> {
-                player.repeatMode = Player.REPEAT_MODE_ONE
-                player.shuffleModeEnabled = false
-            }
-            MusicPlayMode.RANDOM -> {
-                player.repeatMode = Player.REPEAT_MODE_ALL
-                player.shuffleModeEnabled = true
-            }
-        }
+    override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
+        send(
+            command = CustomCommands.SetMode,
+            args = Bundle().apply { putInt(CustomCommands.Args.SET_MODE_ARG_MODE, musicPlayMode.ordinal) }
+        )
     }
 
     override suspend fun play() = withMainPlayer { it.play() }
