@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberOffScreenState
 
 @Composable
 private fun BannerIndicator(
@@ -49,8 +50,6 @@ fun <T> Banner(
 	modifier: Modifier = Modifier,
 	content: @Composable (pic: T, index: Int, scale: Float) -> Unit
 ) {
-	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }
-
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,7 +72,10 @@ fun <T> Banner(
 		)
 	}
 
-	if (autoplay) {
+	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }
+	val isForeground = rememberOffScreenState()
+
+	if (autoplay && isForeground) {
 		LaunchedEffect(state.settledPage) {
 			delay(interval)
 			if (pics.isNotEmpty() && state.pageCount != 0) {

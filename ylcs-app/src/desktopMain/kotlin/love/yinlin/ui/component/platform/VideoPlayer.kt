@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.LifecycleStartEffect
+import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.CustomUI
@@ -22,12 +22,12 @@ actual fun VideoPlayer(
 ) {
     val controller: MutableState<CallbackMediaPlayerComponent?> = rememberState { null }
 
-    LifecycleStartEffect(Unit) {
+    OffScreenEffect { isForeground ->
         controller.value?.mediaPlayer()?.let {
-            if (!it.status().isPlaying) it.controls().play()
-        }
-        onStopOrDispose {
-            controller.value?.mediaPlayer()?.let {
+            if (isForeground) {
+                if (!it.status().isPlaying) it.controls().play()
+            }
+            else {
                 if (it.status().isPlaying) it.controls().pause()
             }
         }

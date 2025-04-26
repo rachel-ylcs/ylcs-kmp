@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.compose.LifecycleStartEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -84,6 +85,31 @@ fun <T> rememberDerivedState(key1: Any?, key2: Any?, key3: Any?, calculation: ()
 @Composable
 fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
 	remember(*keys) { derivedStateOf(calculation) }
+
+
+// rememberOffScreenState
+
+@Composable
+fun rememberOffScreenState(): Boolean {
+	var value by rememberState { false }
+	LifecycleStartEffect(Unit) {
+		value = true
+		onStopOrDispose {
+			value = false
+		}
+	}
+	return value
+}
+
+@Composable
+inline fun OffScreenEffect(crossinline block: (isForeground: Boolean) -> Unit) {
+	LifecycleStartEffect(Unit) {
+		block(true)
+		onStopOrDispose {
+			block(false)
+		}
+	}
+}
 
 // itemKey
 

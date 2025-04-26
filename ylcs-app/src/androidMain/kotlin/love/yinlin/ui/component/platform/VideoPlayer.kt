@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -21,6 +20,7 @@ import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
 import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
+import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
@@ -48,12 +48,12 @@ actual fun VideoPlayer(
         }
     }
 
-    LifecycleStartEffect(Unit) {
+    OffScreenEffect { isForeground ->
         controller?.let {
-            if (!it.isPlaying) it.play()
-        }
-        onStopOrDispose {
-            controller?.let {
+            if (isForeground) {
+                if (!it.isPlaying) it.play()
+            }
+            else {
                 if (it.isPlaying) it.pause()
             }
         }

@@ -29,7 +29,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.LifecycleStartEffect
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
@@ -49,6 +48,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberOffScreenState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
 import love.yinlin.platform.Coroutines
@@ -119,16 +119,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun Modifier.hazeBlur(radius: Dp): Modifier {
-		var enabled by rememberState { false }
-
-		LifecycleStartEffect(Unit) {
-			enabled = true
-			onStopOrDispose {
-				enabled = false
-			}
-		}
-
-		return if (enabled) hazeEffect(
+		val isForeground = rememberOffScreenState()
+		return if (isForeground) hazeEffect(
 			state = blurState,
 			style = HazeStyle(
 				blurRadius = radius,
@@ -205,15 +197,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	) {
 		var lastDegree by rememberState { 0f }
 		val animation by rememberState { Animatable(0f) }
-
-		var isForeground by rememberState { false }
-
-		LifecycleStartEffect(Unit) {
-			isForeground = true
-			onStopOrDispose {
-				isForeground = false
-			}
-		}
+		val isForeground = rememberOffScreenState()
 
 		LaunchedEffect(factory.isPlaying, isForeground) {
 			if (factory.isPlaying && isForeground) {
