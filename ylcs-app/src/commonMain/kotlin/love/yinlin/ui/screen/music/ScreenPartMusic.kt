@@ -228,7 +228,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 			else {
-				println("shit")
 				animation.snapTo(lastDegree)
 				animation.stop()
 			}
