@@ -91,7 +91,6 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
             }
         }
         catch (e: Throwable) {
-            println(e.stackTraceToString())
             Data.Error(throwable = e)
         }
         step = when (data) {

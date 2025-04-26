@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.LifecycleStartEffect
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
@@ -116,14 +117,26 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val currentPlaylistSheet = FloatingSheet()
 	private val sleepModeSheet = FloatingSheet()
 
-	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
-		state = blurState,
-		style = HazeStyle(
-			blurRadius = radius,
-			backgroundColor = Colors.Dark,
-			tint = null,
-		)
-	)
+	@Composable
+	private fun Modifier.hazeBlur(radius: Dp): Modifier {
+		var enabled by rememberState { false }
+
+		LifecycleStartEffect(Unit) {
+			enabled = true
+			onStopOrDispose {
+				enabled = false
+			}
+		}
+
+		return if (enabled) hazeEffect(
+			state = blurState,
+			style = HazeStyle(
+				blurRadius = radius,
+				backgroundColor = Colors.Dark,
+				tint = null,
+			)
+		) else this
+	}
 
 	@Composable
 	private fun MusicBackground(
@@ -193,8 +206,17 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		var lastDegree by rememberState { 0f }
 		val animation by rememberState { Animatable(0f) }
 
-		LaunchedEffect(factory.isPlaying) {
-			if (factory.isPlaying) {
+		var isForeground by rememberState { false }
+
+		LifecycleStartEffect(Unit) {
+			isForeground = true
+			onStopOrDispose {
+				isForeground = false
+			}
+		}
+
+		LaunchedEffect(factory.isPlaying, isForeground) {
+			if (factory.isPlaying && isForeground) {
 				animation.animateTo(
 					targetValue = 360f + lastDegree,
 					animationSpec = infiniteRepeatable(
@@ -206,6 +228,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 			else {
+				println("shit")
 				animation.snapTo(lastDegree)
 				animation.stop()
 			}
