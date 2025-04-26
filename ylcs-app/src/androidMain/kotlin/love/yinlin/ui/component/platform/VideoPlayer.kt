@@ -37,7 +37,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.ui.component.image.ClickIcon
 
-private class VideoPlayerState(val url: String) {
+private class VideoPlayerState {
     var controller by mutableStateOf<Player?>(null)
 
     var isPlaying by mutableStateOf(false)
@@ -88,7 +88,7 @@ actual fun VideoPlayer(
     modifier: Modifier
 ) {
     val context = LocalContext.current
-    val state by rememberState { VideoPlayerState(url) }
+    val state by rememberState { VideoPlayerState() }
 
     val activity = LocalActivity.current!!
     val oldOrientation = remember { activity.requestedOrientation }
@@ -112,7 +112,9 @@ actual fun VideoPlayer(
             play()
         }
         onDispose {
-            state.updateProgressJob?.cancel()
+            synchronized(state.updateProgressJobLock) {
+                state.updateProgressJob?.cancel()
+            }
             state.controller?.removeListener(state.listener)
             state.controller?.release()
             state.controller = null
