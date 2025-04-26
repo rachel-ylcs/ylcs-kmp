@@ -4,7 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -22,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,11 +44,7 @@ import love.yinlin.common.ExtraIcons
 import love.yinlin.common.ThemeStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
-import love.yinlin.extension.clickableNoRipple
-import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberOffScreenState
-import love.yinlin.extension.rememberState
-import love.yinlin.extension.timeString
+import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.MusicFactory
@@ -61,6 +55,7 @@ import love.yinlin.resources.no_audio_source
 import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
@@ -378,51 +373,23 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		chorus: List<Long>,
 		modifier: Modifier = Modifier
 	) {
-		BoxWithConstraints(modifier = modifier) {
-			Box(modifier = Modifier
-				.fillMaxSize()
-				.padding(vertical = 3.dp)
-				.background(
-					color = Colors.Gray5,
-					shape = MaterialTheme.shapes.medium
-				)
-				.pointerInput(duration, maxWidth) {
-					detectTapGestures(onTap = { offset ->
-						if (duration != 0L) {
-							launch {
-								factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
-								if (!factory.isPlaying) factory.play()
-							}
-						}
-					})
+		BeautifulSlider(
+			value = currentTime / duration.toFloat(),
+			height = 4.dp,
+			showThumb = false,
+			onValueChangeFinished = {
+				launch {
+					factory.seekTo((it * duration).toLong())
+					if (!factory.isPlaying) factory.play()
 				}
-				.zIndex(1f)
-			)
+			},
+			modifier = modifier
+		) {
 			if (duration != 0L) {
-				Box(modifier = Modifier
-					.fillMaxWidth(fraction = currentTime / duration.toFloat())
-					.fillMaxHeight()
-					.padding(vertical = 3.dp)
-					.background(
-						color = MaterialTheme.colorScheme.primaryContainer,
-						shape = MaterialTheme.shapes.medium
-					)
-					.pointerInput(duration, maxWidth) {
-						detectTapGestures(onTap = { offset ->
-							if (duration != 0L) {
-								launch {
-									factory.seekTo((offset.x / maxWidth.toPx() * duration).toLong())
-									if (!factory.isPlaying) factory.play()
-								}
-							}
-						})
-					}
-					.zIndex(2f)
-				)
 				MusicChorus(
 					chorus = chorus,
 					duration = duration,
-					modifier = Modifier.fillMaxSize().zIndex(3f)
+					modifier = Modifier.fillMaxSize()
 				)
 			}
 		}

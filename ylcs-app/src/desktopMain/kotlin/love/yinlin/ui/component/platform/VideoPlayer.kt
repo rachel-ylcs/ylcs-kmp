@@ -1,66 +1,126 @@
+@file:JvmName("DesktopVideoPlayer")
 package love.yinlin.ui.component.platform
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.delay
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.CustomUI
+import uk.co.caprica.vlcj.media.Media
+import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
 import javax.swing.SwingUtilities
+
+private class VideoPlayerState(val url: String) {
+    var component = mutableStateOf<CallbackMediaPlayerComponent?>(null)
+
+    var isPlaying by mutableStateOf(false)
+    var position by mutableLongStateOf(0L)
+    var duration by mutableLongStateOf(0L)
+
+    val eventListener = object : MediaEventAdapter() {
+        override fun mediaDurationChanged(media: Media?, newDuration: Long) {
+            duration = newDuration
+        }
+    }
+
+    val playerListener = object : MediaPlayerEventAdapter() {
+        override fun playing(mediaPlayer: MediaPlayer?) { isPlaying = true }
+        override fun paused(mediaPlayer: MediaPlayer?) { isPlaying = false }
+        override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { position = newTime }
+        override fun stopped(mediaPlayer: MediaPlayer?) { mediaPlayer?.media()?.play(url) }
+        override fun error(mediaPlayer: MediaPlayer?) { mediaPlayer?.controls()?.stop() }
+    }
+
+    inline fun withPlayer(block: (EmbeddedMediaPlayer) -> Unit) {
+        component.value?.mediaPlayer()?.let(block)
+    }
+
+    fun play() = withPlayer { player ->
+        if (!player.status().isPlaying) player.controls().play()
+    }
+
+    fun pause() = withPlayer { player ->
+        if (player.status().isPlaying) player.controls().pause()
+    }
+
+    fun seekTo(value: Long) = withPlayer { player ->
+        player.controls().setTime(value)
+    }
+}
 
 @Composable
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier
 ) {
-    val controller: MutableState<CallbackMediaPlayerComponent?> = rememberState { null }
+    val state by rememberState { VideoPlayerState(url) }
 
     OffScreenEffect { isForeground ->
-        controller.value?.mediaPlayer()?.let {
-            if (isForeground) {
-                if (!it.status().isPlaying) it.controls().play()
-            }
-            else {
-                if (it.status().isPlaying) it.controls().pause()
-            }
-        }
+        if (isForeground) state.play()
+        else state.pause()
     }
 
     Box(modifier = modifier) {
         CustomUI(
-            view = controller,
-            modifier = Modifier.fillMaxSize(),
+            view = state.component,
+            modifier = Modifier.fillMaxSize().zIndex(1f),
             factory = {
                 val component = CallbackMediaPlayerComponent()
                 SwingUtilities.invokeLater {
                     component.mediaPlayer().apply {
-                        events().addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
-                            override fun stopped(player: MediaPlayer?) {
-                                player?.media()?.play(url)
-                            }
-                        })
+                        events().apply {
+                            addMediaEventListener(state.eventListener)
+                            addMediaPlayerEventListener(state.playerListener)
+                        }
                         media().play(url)
                     }
                 }
                 component
             },
-            release = { player, onRelease ->
-                player.release()
+            release = { component, onRelease ->
+                component.mediaPlayer().events().apply {
+                    removeMediaEventListener(state.eventListener)
+                    removeMediaPlayerEventListener(state.playerListener)
+                }
+                component.release()
                 onRelease()
             }
         )
-        Box(modifier = Modifier.fillMaxSize().clickableNoRipple {
-            controller.value?.mediaPlayer()?.let {
-                if (!it.status().isPlaying) it.controls().play()
-                else it.controls().pause()
+        Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
+            var isShowControls by rememberState { false }
+
+            LaunchedEffect(Unit) {
+                delay(500)
+                isShowControls = true
             }
-        }.zIndex(2f))
+
+            Box(modifier = Modifier.fillMaxWidth().weight(1f).clickableNoRipple {
+                isShowControls = !isShowControls
+            })
+
+            VideoPlayerControls(
+                visible = isShowControls,
+                modifier = Modifier.fillMaxWidth(),
+                isPlaying = state.isPlaying,
+                onPlayClick = {
+                    if (state.isPlaying) state.pause()
+                    else state.play()
+                },
+                position = state.position,
+                duration = state.duration,
+                onProgressClick = { state.seekTo(it) }
+            )
+        }
     }
 }
