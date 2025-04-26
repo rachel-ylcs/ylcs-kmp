@@ -178,6 +178,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                     Player.STATE_IDLE -> {
                         // 已停止播放
                         musicList = emptyList()
+                        isPlaying = false
                         currentPosition = 0L
                         currentDuration = 0L
                         currentPlaylist = null
