@@ -3,8 +3,6 @@ package love.yinlin
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +29,7 @@ import love.yinlin.common.RachelTheme
 import love.yinlin.common.Uri
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
+import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.ScreenRouteScope
@@ -39,17 +38,19 @@ import love.yinlin.ui.screen.community.ScreenPartDiscovery
 import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 import love.yinlin.ui.screen.music.ScreenPartMusic
+import love.yinlin.ui.screen.route
 import love.yinlin.ui.screen.screens
 import love.yinlin.ui.screen.world.ScreenPartWorld
 
 @Stable
-abstract class ScreenPart(private val model: AppModel) {
+abstract class ScreenPart(val model: AppModel) {
 	val firstLoad = launchFlag()
 
 	val slot: SubScreenSlot get() = model.slot
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
 	open suspend fun initialize() {}
@@ -63,7 +64,7 @@ abstract class ScreenPart(private val model: AppModel) {
 
 @Stable
 class AppModel(
-	private val navController: NavController
+	val navController: NavController
 ) : ViewModel() {
 	val deeplink = DeepLink(this)
 
@@ -77,6 +78,7 @@ class AppModel(
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
+	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route<T>(), options, extras)
 	fun pop() {
 		if (navController.previousBackStackEntry != null) navController.popBackStack()
 	}
@@ -91,7 +93,7 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 		NavHost(
 			modifier = Modifier.fillMaxSize(),
 			navController = navController,
-			startDestination = ScreenMain.Args,
+			startDestination = route<ScreenMain>(),
 			enterTransition = {
 				slideIntoContainer(
 					towards = AnimatedContentTransitionScope.SlideDirection.Start,

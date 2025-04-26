@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
@@ -23,14 +22,10 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenWeiboDetails(model: AppModel) : Screen<ScreenWeiboDetails.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenWeiboDetails(model: AppModel) : CommonScreen(model) {
 	private val weibo: Weibo? = msgPart.currentWeibo
 	private var comments: List<WeiboComment>? by mutableStateOf(null)
 

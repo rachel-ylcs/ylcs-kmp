@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.data.Data
@@ -33,7 +32,6 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.app
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
@@ -43,6 +41,7 @@ import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.screen.CommonScreen
 
 @Composable
 private fun WeiboUserItem(
@@ -73,11 +72,7 @@ private fun WeiboUserItem(
 }
 
 @Stable
-class ScreenWeiboFollows(model: AppModel) : Screen<ScreenWeiboFollows.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenWeiboFollows(model: AppModel) : CommonScreen(model) {
 	private var isLocal by mutableStateOf(true)
 	private val searchDialog = FloatingDialogInput(
 		hint = "输入微博用户昵称关键字",

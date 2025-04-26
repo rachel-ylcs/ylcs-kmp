@@ -142,7 +142,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	val processor = object : WeiboProcessor {
 		override fun onWeiboClick(weibo: Weibo) {
 			currentWeibo = weibo
-			navigate(ScreenWeiboDetails.Args)
+			navigate<ScreenWeiboDetails>()
 		}
 
 		override fun onWeiboAvatarClick(info: WeiboUserInfo) {
@@ -249,7 +249,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 							onRefresh()
 						}
 						Action(Icons.Filled.AccountCircle) {
-							navigate(ScreenWeiboFollows.Args)
+							navigate<ScreenWeiboFollows>()
 						}
 					}
 				}

@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -19,7 +18,6 @@ import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.LoadingButton
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
@@ -27,13 +25,10 @@ import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
+import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenLogin(model: AppModel) : Screen<ScreenLogin.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenLogin(model: AppModel) : CommonScreen(model) {
 	private enum class Mode {
 		Login,
 		Register,

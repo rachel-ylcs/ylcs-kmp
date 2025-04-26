@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -40,9 +39,10 @@ import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.layout.equalItem
+import love.yinlin.ui.component.layout.EqualItem
 
 @Composable
 internal fun BoxText(
@@ -84,72 +84,75 @@ internal fun PortraitValue(
 }
 
 @Composable
-internal fun ColumnScope.PortraitUserProfileCard(
+internal fun PortraitUserProfileCard(
 	profile: UserPublicProfile,
 	owner: Boolean,
+	modifier: Modifier = Modifier,
 	toolbar: @Composable RowScope.() -> Unit = {}
 ) {
-	WebImage(
-		uri = profile.wallPath,
-		key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
-		modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
-	)
-	Column(
-		modifier = Modifier.fillMaxWidth()
-			.shadow(elevation = 5.dp, clip = false)
-			.background(MaterialTheme.colorScheme.surface)
-			.padding(10.dp)
-	) {
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(10.dp)
+	Column(modifier = modifier) {
+		WebImage(
+			uri = profile.wallPath,
+			key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
+			modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
+		)
+		Column(
+			modifier = Modifier.fillMaxWidth()
+				.shadow(elevation = 5.dp, clip = false)
+				.background(MaterialTheme.colorScheme.surface)
+				.padding(10.dp)
 		) {
-			OffsetLayout(y = (-26).dp) {
-				WebImage(
-					uri = profile.avatarPath,
-					key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
-					contentScale = ContentScale.Crop,
-					circle = true,
-					modifier = Modifier.size(72.dp).shadow(5.dp, CircleShape)
-				)
-			}
-			Text(
-				text = profile.name,
-				style = MaterialTheme.typography.titleLarge,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.weight(1f).padding(horizontal = 10.dp)
-			)
-			toolbar()
-		}
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			UserLabel(label = profile.label, level = profile.level)
 			Row(
-				modifier = Modifier.weight(1f),
-				horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp)
+			) {
+				OffsetLayout(y = (-26).dp) {
+					WebImage(
+						uri = profile.avatarPath,
+						key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
+						contentScale = ContentScale.Crop,
+						circle = true,
+						modifier = Modifier.size(72.dp).shadow(5.dp, CircleShape)
+					)
+				}
+				Text(
+					text = profile.name,
+					style = MaterialTheme.typography.titleLarge,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.weight(1f).padding(horizontal = 10.dp)
+				)
+				toolbar()
+			}
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				PortraitValue(
-					value = profile.level.toString(),
-					title = "等级"
-				)
-				PortraitValue(
-					value = profile.coin.toString(),
-					title = "银币"
-				)
+				UserLabel(label = profile.label, level = profile.level)
+				Row(
+					modifier = Modifier.weight(1f),
+					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					PortraitValue(
+						value = profile.level.toString(),
+						title = "等级"
+					)
+					PortraitValue(
+						value = profile.coin.toString(),
+						title = "银币"
+					)
+				}
 			}
+			Space(10.dp)
+			Text(
+				text = profile.signature,
+				maxLines = 2,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
-		Space(10.dp)
-		Text(
-			text = profile.signature,
-			maxLines = 2,
-			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.fillMaxWidth()
-		)
 	}
 }
 
@@ -227,18 +230,31 @@ internal fun LandscapeUserProfileCard(
 }
 
 @Stable
-internal data class TipButtonInfo(
-	val text: String,
-	val icon: ImageVector,
-	val onClick: () -> Unit
-)
+data class TipButtonScope(private val equalRowScope: EqualRowScope) {
+	@Composable
+	fun Item(text: String, icon: ImageVector, onClick: () -> Unit) {
+		equalRowScope.EqualItem {
+			Column(
+				modifier = Modifier
+					.clip(MaterialTheme.shapes.medium)
+					.clickable(onClick = onClick)
+					.padding(horizontal = 10.dp, vertical = 5.dp),
+				verticalArrangement = Arrangement.spacedBy(3.dp),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				MiniIcon(icon = icon)
+				Text(text = text)
+			}
+		}
+	}
+}
 
 @Composable
 internal fun TipButtonContainer(
 	title: String,
-	buttons: List<TipButtonInfo>,
 	modifier: Modifier = Modifier,
-	shape: Shape = RectangleShape
+	shape: Shape = RectangleShape,
+	content: @Composable TipButtonScope.() -> Unit
 ) {
 	Surface(
 		modifier = modifier,
@@ -254,21 +270,7 @@ internal fun TipButtonContainer(
 				style = MaterialTheme.typography.titleLarge
 			)
 			EqualRow(modifier = Modifier.fillMaxWidth()) {
-				for (button in buttons) {
-					equalItem {
-						Column(
-							modifier = Modifier
-								.clip(MaterialTheme.shapes.medium)
-								.clickable(onClick = button.onClick)
-								.padding(horizontal = 10.dp, vertical = 5.dp),
-							verticalArrangement = Arrangement.spacedBy(3.dp),
-							horizontalAlignment = Alignment.CenterHorizontally
-						) {
-							MiniIcon(icon = button.icon)
-							Text(text = button.text)
-						}
-					}
-				}
+				TipButtonScope(this).content()
 			}
 		}
 	}

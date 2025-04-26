@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
@@ -256,7 +255,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 					)
 					ActionScope.Right.Actions {
 						Action(Icons.Outlined.Add) {
-							navigate(ScreenAddTopic.Args)
+							navigate<ScreenAddTopic>()
 						}
 					}
 				}

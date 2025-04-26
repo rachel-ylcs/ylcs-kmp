@@ -40,7 +40,6 @@ import love.yinlin.resources.login
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
@@ -71,7 +70,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				is Data.Error -> {
 					if (result.type == Failed.RequestError.Unauthorized) {
 						logoff()
-						navigate(ScreenLogin.Args)
+						navigate<ScreenLogin>()
 					}
 				}
 			}
@@ -93,7 +92,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			)
 			ClickIcon(
 				icon = Icons.Filled.Settings,
-				onClick = { navigate(ScreenSettings.Args) }
+				onClick = { navigate<ScreenSettings>() }
 			)
 		}
 	}
@@ -106,19 +105,32 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		TipButtonContainer(
 			modifier = modifier,
 			shape = shape,
-			title = "个人空间",
-			buttons = listOf(
-				TipButtonInfo("签到", Icons.Filled.EventAvailable) { signinSheet.open() },
-				TipButtonInfo("好友", Icons.Filled.Group) { },
-				TipButtonInfo("主题", Icons.AutoMirrored.Filled.Article) {
-					app.config.userProfile?.let { navigate(ScreenUserCard.Args(it.uid)) }
-				},
-				TipButtonInfo("邮箱", Icons.Filled.Mail) {
-					if (app.config.userToken.isNotEmpty()) navigate(ScreenMail.Args)
-				},
-				TipButtonInfo("徽章", Icons.Filled.MilitaryTech) { },
-			)
-		)
+			title = "个人空间"
+		) {
+			Item("签到", Icons.Filled.EventAvailable) { signinSheet.open() }
+			Item("好友", Icons.Filled.Group) { }
+			Item("主题", Icons.AutoMirrored.Filled.Article) {
+				app.config.userProfile?.let { navigate(ScreenUserCard.Args(it.uid)) }
+			}
+			Item("邮箱", Icons.Filled.Mail) {
+				if (app.config.userToken.isNotEmpty()) navigate<ScreenMail>()
+			}
+			Item("徽章", Icons.Filled.MilitaryTech) { }
+		}
+	}
+
+	@Composable
+	private fun AdminContainer(
+		modifier: Modifier = Modifier,
+		shape: Shape = RectangleShape
+	) {
+		TipButtonContainer(
+			modifier = modifier,
+			shape = shape,
+			title = "超管空间"
+		) {
+			Item("活动", Icons.Filled.Link) { }
+		}
 	}
 
 	@Composable
@@ -130,7 +142,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			) {
 				ClickIcon(
 					icon = Icons.Filled.Settings,
-					onClick = { navigate(ScreenSettings.Args) }
+					onClick = { navigate<ScreenSettings>() }
 				)
 			}
 			Box(
@@ -148,7 +160,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					)
 					RachelButton(
 						text = stringResource(Res.string.login),
-						onClick = { navigate(ScreenLogin.Args) }
+						onClick = { navigate<ScreenLogin>() }
 					)
 				}
 			}
@@ -157,14 +169,18 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun Portrait(userProfile: UserProfile) {
-		Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+		Column(
+			modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
+		) {
 			PortraitUserProfileCard(
+				modifier = Modifier.fillMaxWidth(),
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true,
 				toolbar = { ToolBar() }
 			)
-			Space(10.dp)
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
+			AdminContainer(modifier = Modifier.fillMaxWidth())
 		}
 	}
 
@@ -185,6 +201,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				)
 				Column(modifier = Modifier.weight(1f)) {
 					UserSpaceContainer(
+						modifier = Modifier.fillMaxWidth().padding(10.dp),
+						shape = MaterialTheme.shapes.large
+					)
+					AdminContainer(
 						modifier = Modifier.fillMaxWidth().padding(10.dp),
 						shape = MaterialTheme.shapes.large
 					)

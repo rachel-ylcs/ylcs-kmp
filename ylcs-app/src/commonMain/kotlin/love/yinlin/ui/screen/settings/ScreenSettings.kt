@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
@@ -50,15 +49,11 @@ import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.CommonScreen
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class ScreenSettings(model: AppModel) : Screen<ScreenSettings.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenSettings(model: AppModel) : CommonScreen(model) {
 	private val crashLogSheet = FloatingSheet()
 	private val feedbackSheet = FloatingSheet()
 	private val privacyPolicySheet = FloatingSheet()

@@ -159,13 +159,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					icon = Icons.Outlined.LibraryMusic,
 					color = Colors.White
 				) {
-					navigate(ScreenMusicLibrary.Args)
+					navigate<ScreenMusicLibrary>()
 				}
 				Action(
 					icon = Icons.AutoMirrored.Outlined.QueueMusic,
 					color = Colors.White
 				) {
-					navigate(ScreenPlaylistLibrary.Args)
+					navigate<ScreenPlaylistLibrary>()
 				}
 				Action(
 					icon = Icons.Outlined.Lyrics,
@@ -426,7 +426,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun MusicControlLayout(modifier: Modifier = Modifier) {
 		EqualRow(modifier = modifier) {
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = when (factory.playMode) {
                         MusicPlayMode.ORDER -> ExtraIcons.OrderMode
@@ -439,7 +439,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.GotoPrevious,
 					color = Colors.White,
@@ -448,7 +448,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = if (factory.isPlaying) ExtraIcons.Pause else ExtraIcons.Play,
 					color = Colors.White,
@@ -460,7 +460,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.GotoNext,
 					color = Colors.White,
@@ -469,7 +469,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.Playlist,
 					color = Colors.White,
@@ -484,7 +484,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun MusicToolLayout(modifier: Modifier = Modifier) {
 		EqualRow(modifier = modifier) {
-			equalItem {
+			EqualItem {
 				var hasAnimation by rememberState { false }
 
 				LaunchedEffect(factory.currentMusic) {
@@ -499,7 +499,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					onClick = { isAnimationBackground = !isAnimationBackground }
 				)
 			}
-			equalItem {
+			EqualItem {
 				var hasVideo by rememberState { false }
 
 				LaunchedEffect(factory.currentMusic) {
@@ -518,7 +518,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.ShowLyrics,
 					color = Colors.White,
@@ -527,7 +527,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					}
 				)
 			}
-			equalItem {
+			EqualItem {
 				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
 					color = Colors.White,

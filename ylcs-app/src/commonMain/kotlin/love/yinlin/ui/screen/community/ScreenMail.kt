@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -35,14 +34,10 @@ import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenMail(model: AppModel) : Screen<ScreenMail.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenMail(model: AppModel) : CommonScreen(model) {
 	private var state by mutableStateOf(BoxState.EMPTY)
 
 	private val page = object : PaginationArgs<Mail, Long, Boolean>(Long.MAX_VALUE, false) {

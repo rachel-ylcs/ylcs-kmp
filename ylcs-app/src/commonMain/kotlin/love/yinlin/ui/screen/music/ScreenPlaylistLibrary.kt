@@ -41,6 +41,7 @@ import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.Screen
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
@@ -104,11 +105,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 }
 
 @Stable
-class ScreenPlaylistLibrary(model: AppModel) : Screen<ScreenPlaylistLibrary.Args>(model) {
-    @Stable
-    @Serializable
-    data object Args : Screen.Args
-
+class ScreenPlaylistLibrary(model: AppModel) : CommonScreen(model) {
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)

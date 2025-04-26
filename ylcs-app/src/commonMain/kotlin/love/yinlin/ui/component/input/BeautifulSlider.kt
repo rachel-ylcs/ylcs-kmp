@@ -95,6 +95,7 @@ fun BeautifulSlider(
                 )
             }
 
+            // Others
             Box(
                 modifier = Modifier.fillMaxSize().zIndex(3f),
                 contentAlignment = Alignment.CenterStart

@@ -12,31 +12,31 @@ import love.yinlin.ui.screen.settings.*
 
 fun ScreenRouteScope.screens() {
     // 主页
-    screen { model -> ScreenMain(model) }
+    screen(::ScreenMain)
     // 通用
     screen { model, args: ScreenWebpage.Args -> ScreenWebpage(model, args) }
     screen(typeMap = buildNavTypeMap<List<Picture>>()) { model, args: ScreenImagePreview.Args -> ScreenImagePreview(model, args) }
     screen { model, args: ScreenVideo.Args -> ScreenVideo(model, args) }
     // 世界
     screen { model, args: ScreenActivityDetails.Args -> ScreenActivityDetails(model, args) }
-    screen { model-> ScreenAddActivity(model) }
+    screen(::ScreenAddActivity)
     screen { model, args: ScreenModifyActivity.Args -> ScreenModifyActivity(model, args) }
 	// 设置
-    screen { model -> ScreenSettings(model) }
+    screen(::ScreenSettings)
 	// 微博
-    screen { model -> ScreenWeiboDetails(model) }
+    screen(::ScreenWeiboDetails)
     screen { model, args: ScreenWeiboUser.Args -> ScreenWeiboUser(model, args) }
-    screen { model -> ScreenWeiboFollows(model) }
+    screen(::ScreenWeiboFollows)
     screen { model, args: ScreenWeiboAlbum.Args -> ScreenWeiboAlbum(model, args) }
 	// 听歌
-    screen { model -> ScreenMusicLibrary(model) }
-    screen { model -> ScreenPlaylistLibrary(model) }
+    screen(::ScreenMusicLibrary)
+    screen(::ScreenPlaylistLibrary)
     screen { model, args: ScreenImportMusic.Args -> ScreenImportMusic(model, args) }
     screen { model, args: ScreenMusicDetails.Args -> ScreenMusicDetails(model, args) }
 	// 社区
-    screen { model -> ScreenLogin(model) }
+    screen(::ScreenLogin)
     screen { model, args: ScreenUserCard.Args -> ScreenUserCard(model, args) }
     screen(typeMap = buildNavTypeMap<Topic>()) { model, args: ScreenTopic.Args -> ScreenTopic(model, args) }
-    screen { model -> ScreenMail(model) }
-    screen { model -> ScreenAddTopic(model) }
+    screen(::ScreenMail)
+    screen(::ScreenAddTopic)
 }

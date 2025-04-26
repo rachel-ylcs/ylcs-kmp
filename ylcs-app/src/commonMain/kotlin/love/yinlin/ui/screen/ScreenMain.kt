@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.ThemeMode
 import love.yinlin.platform.app
@@ -29,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.component.layout.equalItem
+import love.yinlin.ui.component.layout.EqualItem
 
 private enum class TabItem(
 	val title: StringResource,
@@ -84,7 +83,7 @@ private fun PortraitNavigation(
 	) {
 		EqualRow(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
 			for (index in TabItem.entries.indices) {
-				equalItem {
+				EqualItem {
 					NavigationIcon(
 						index = index,
 						current = currentPage,
@@ -135,11 +134,7 @@ private fun LandscapeNavigation(
 }
 
 @Stable
-class ScreenMain(model: AppModel) : Screen<ScreenMain.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenMain(model: AppModel) : CommonScreen(model) {
 	private val pagerState = object : PagerState() {
 		override val pageCount: Int = TabItem.entries.size
 	}

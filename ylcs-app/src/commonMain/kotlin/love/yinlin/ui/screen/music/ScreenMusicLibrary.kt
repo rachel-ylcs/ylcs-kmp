@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
@@ -36,7 +35,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.CommonScreen
 
 @Stable
 data class MusicInfoPreview(
@@ -104,11 +103,7 @@ private fun MusicCard(
 }
 
 @Stable
-class ScreenMusicLibrary(model: AppModel) : Screen<ScreenMusicLibrary.Args>(model) {
-    @Stable
-    @Serializable
-    data object Args : Screen.Args
-
+class ScreenMusicLibrary(model: AppModel) : CommonScreen(model) {
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 

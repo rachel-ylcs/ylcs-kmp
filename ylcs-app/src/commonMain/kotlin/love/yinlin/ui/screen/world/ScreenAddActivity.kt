@@ -8,7 +8,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -19,15 +18,12 @@ import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenAddActivity(model: AppModel) : Screen<ScreenAddActivity.Args>(model) {
-	@Stable
-	@Serializable
-	data object Args : Screen.Args
-
+class ScreenAddActivity(model: AppModel) : CommonScreen(model) {
 	private val cropDialog = FloatingDialogCrop()
 	private val input = ActivityInputState()
 

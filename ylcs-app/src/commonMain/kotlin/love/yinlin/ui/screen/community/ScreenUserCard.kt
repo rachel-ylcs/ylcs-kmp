@@ -172,12 +172,11 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 						contentPadding = PaddingValues(bottom = 10.dp),
 						verticalItemSpacing = 10.dp,
 						header = {
-							Column(modifier = Modifier.fillMaxWidth()) {
-								PortraitUserProfileCard(
-									profile = profile,
-									owner = false
-								)
-							}
+							PortraitUserProfileCard(
+								modifier = Modifier.fillMaxWidth(),
+								profile = profile,
+								owner = false
+							)
 						}
 					) {  topic ->
 						TopicCard(

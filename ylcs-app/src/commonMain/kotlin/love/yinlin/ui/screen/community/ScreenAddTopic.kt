@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -38,15 +37,11 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.Screen
+import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenAddTopic(model: AppModel) : Screen<ScreenAddTopic.Args>(model) {
-    @Stable
-    @Serializable
-    data object Args : Screen.Args
-
+class ScreenAddTopic(model: AppModel) : CommonScreen(model) {
     @Stable
     private class InputState {
         val title = TextInputState()

@@ -66,14 +66,19 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 	}
 }
 
+@Stable
+abstract class CommonScreen(model: AppModel) : Screen<Screen.Args>(model)
+
 data class ScreenRouteScope(
 	val builder: NavGraphBuilder,
 	val model: AppModel
 )
 
-inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
+inline fun <reified S : CommonScreen> route(): String = "rachel.${S::class.qualifiedName!!}"
+
+inline fun <reified A : Screen.Args, reified S : Screen<out Screen.Args>> ScreenRouteScope.screen(
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
-    crossinline factory: (AppModel, A) -> Screen<A>
+    crossinline factory: (AppModel, A) -> S
 ) {
 	val appModel = this.model
 	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
@@ -86,12 +91,9 @@ inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
 	}
 }
 
-inline fun <reified A : Screen.Args> ScreenRouteScope.screen(
-	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
-	crossinline factory: (AppModel) -> Screen<A>
-) {
+inline fun <reified S : CommonScreen> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
 	val appModel = this.model
-	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
+	this.builder.composable(route = route<S>()) {
 		val screen = viewModel {
 			factory(appModel).also {
 				it.launch { it.initialize() }
