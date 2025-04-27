@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen
+package love.yinlin.ui.screen.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,6 +29,7 @@ import love.yinlin.resources.*
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualItem
+import love.yinlin.ui.screen.CommonScreen
 
 private enum class TabItem(
 	val title: StringResource,

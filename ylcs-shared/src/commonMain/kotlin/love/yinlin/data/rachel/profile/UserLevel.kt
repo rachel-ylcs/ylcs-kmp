@@ -3,10 +3,12 @@ package love.yinlin.data.rachel.profile
 object UserLevel {
 	// 等级对照表
 	private val Default = intArrayOf(
-		0, 5, 10, 20, 30,
-		50, 75, 100, 125, 150,
-		200, 250, 300, 350, 400,
-		500, 600, 700, 800, 900,
+		0, 5, 10, 20,
+		30, 50, 75, 100,
+		135, 170, 210, 250,
+		300, 350, 420, 500,
+		600, 720, 850, 1000,
+		1200, 1500, 2000, 3000,
 	)
 
 	fun level(num: Int): Int {

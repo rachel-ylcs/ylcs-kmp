@@ -21,7 +21,6 @@ media3 = "1.6.1"
 # Desktop
 javafx = "21.0.7-ea+1"
 ui-graphics-android = "1.7.8"
-core-ktx = "1.10.1" #noinspection GradleDependency
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
@@ -93,6 +92,8 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 
+ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "ui-graphics-android" }
+
 javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
 javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
 jna = { module = "net.java.dev.jna:jna", version = "5.14.0" }
@@ -116,5 +117,3 @@ logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "5.3.0-beta1" }
-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "ui-graphics-android" }
-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }

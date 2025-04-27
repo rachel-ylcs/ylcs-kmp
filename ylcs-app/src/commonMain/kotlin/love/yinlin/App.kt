@@ -30,7 +30,7 @@ import love.yinlin.common.Uri
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.CommonScreen
-import love.yinlin.ui.screen.ScreenMain
+import love.yinlin.ui.screen.common.ScreenMain
 import love.yinlin.ui.screen.ScreenRouteScope
 import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
