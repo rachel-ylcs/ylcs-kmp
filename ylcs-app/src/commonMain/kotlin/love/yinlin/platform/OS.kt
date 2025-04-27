@@ -14,6 +14,7 @@ import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.common.Uri
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
@@ -54,6 +55,10 @@ object OS {
 
 	inline fun <T> ifNotPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (notPlatform(*filter)) ifTrue() else ifFalse()
 
+	object Application {
+		suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
+	}
+
 	object Net {
 		fun openUrl(url: String) = osNetOpenUrl(url)
 	}
@@ -80,6 +85,10 @@ object OS {
 // ----  OS
 
 internal expect val osPlatform: Platform
+
+// ------------  Application
+
+internal expect suspend fun osApplicationStartAppIntent(uri: Uri): Boolean
 
 // ------------  Net
 

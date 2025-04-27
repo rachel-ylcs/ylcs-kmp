@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -144,21 +145,25 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 					ClickImage(
 						res = Res.drawable.img_showstart,
 						modifier = Modifier.size(32.dp),
-						onClick = { openLink(showstart) }
+						onClick = {
+							launch {
+								Uri.parse(showstart)?.let { OS.Application.startAppIntent(it) }
+							}
+						}
 					)
 				}
 				activity.damai?.let { damai ->
 					ClickImage(
 						res = Res.drawable.img_damai,
 						modifier = Modifier.size(32.dp),
-						onClick = { openLink(damai) }
+						onClick = { openLink("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
 				}
 				activity.maoyan?.let { maoyan ->
 					ClickImage(
 						res = Res.drawable.img_maoyan,
 						modifier = Modifier.size(32.dp),
-						onClick = { openLink(maoyan) }
+						onClick = { openLink("https://show.maoyan.com/qqw#/detail/${maoyan}") }
 					)
 				}
 				activity.link?.let { link ->

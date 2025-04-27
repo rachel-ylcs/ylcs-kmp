@@ -62,6 +62,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.settings.ScreenSettings
+import love.yinlin.ui.screen.world.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.ncgroup.kscan.BarcodeFormats
@@ -148,7 +149,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			shape = shape,
 			title = "超管空间"
 		) {
-			Item("活动", Icons.Filled.Link) { }
+			Item("活动", Icons.Filled.Link) {
+				if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+					navigate<ScreenActivityLink>() // 250539
+				}
+			}
 		}
 	}
 

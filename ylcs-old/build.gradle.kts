@@ -41,8 +41,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile(rootProject.extra["r8OptimizeFilename"] as String),
+                rootProject.extra["commonR8File"]!!,
+                rootProject.extra["androidR8File"]!!
             )
             signingConfig = signingConfigs.getByName("release")
         }

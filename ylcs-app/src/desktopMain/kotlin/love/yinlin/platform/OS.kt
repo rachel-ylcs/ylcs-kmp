@@ -3,6 +3,7 @@ package love.yinlin.platform
 
 import kotlinx.io.files.Path
 import love.yinlin.Local
+import love.yinlin.common.Uri
 import java.awt.Desktop
 import java.net.URI
 
@@ -13,6 +14,8 @@ actual val osPlatform: Platform = System.getProperty("os.name").let {
 		else -> Platform.Linux
 	}
 }
+
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = false
 
 actual fun osNetOpenUrl(url: String) {
 	try {

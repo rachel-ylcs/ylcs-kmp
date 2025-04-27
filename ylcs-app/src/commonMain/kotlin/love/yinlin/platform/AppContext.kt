@@ -53,6 +53,8 @@ abstract class AppContext {
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
 
+	// 初始化部分
+
 	private fun initializePath() {
 		OS.ifNotPlatform(Platform.WebWasm) {
 			SystemFileSystem.createDirectories(OS.Storage.dataPath)
