@@ -24,6 +24,8 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
@@ -34,6 +36,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.resources.*
+import love.yinlin.ui.screen.common.ScreenWebpage
 
 @Composable
 private fun ActivityDetailsLayout(
@@ -108,6 +111,18 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 		else if (result is Data.Error) slot.tip.error(result.message)
 	}
 
+	private fun openLink(url: String) {
+		OS.ifPlatform(
+			Platform.WebWasm, *Platform.Desktop,
+			ifTrue = {
+				OS.Net.openUrl(url)
+			},
+			ifFalse = {
+				navigate(ScreenWebpage.Args(url))
+			}
+		)
+	}
+
 	@Composable
 	private fun ActivityPictureLayout(
 		activity: Activity,
@@ -125,32 +140,32 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 				modifier = Modifier.fillMaxWidth(),
 				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				if (activity.showstart != null) {
+				activity.showstart?.let { showstart ->
 					ClickImage(
 						res = Res.drawable.img_showstart,
 						modifier = Modifier.size(32.dp),
-						onClick = {}
+						onClick = { openLink(showstart) }
 					)
 				}
-				if (activity.damai != null) {
+				activity.damai?.let { damai ->
 					ClickImage(
 						res = Res.drawable.img_damai,
 						modifier = Modifier.size(32.dp),
-						onClick = {}
+						onClick = { openLink(damai) }
 					)
 				}
-				if (activity.maoyan != null) {
+				activity.maoyan?.let { maoyan ->
 					ClickImage(
 						res = Res.drawable.img_maoyan,
 						modifier = Modifier.size(32.dp),
-						onClick = {}
+						onClick = { openLink(maoyan) }
 					)
 				}
-				if (activity.link != null) {
+				activity.link?.let { link ->
 					ClickIcon(
 						icon = Icons.Outlined.Link,
 						size = 32.dp,
-						onClick = {}
+						onClick = { openLink(link) }
 					)
 				}
 			}
