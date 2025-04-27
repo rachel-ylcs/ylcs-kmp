@@ -2,7 +2,6 @@ package love.yinlin.ui.screen
 
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.topic.Topic
-import love.yinlin.extension.buildNavTypeMap
 import love.yinlin.ui.screen.common.*
 import love.yinlin.ui.screen.world.*
 import love.yinlin.ui.screen.msg.weibo.*
@@ -15,7 +14,7 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenMain)
     // 通用
     screen(::ScreenWebpage)
-    screen(::ScreenImagePreview, typeMap = buildNavTypeMap<List<Picture>>())
+    screen(::ScreenImagePreview, type<List<Picture>>())
     screen(::ScreenVideo)
     // 世界
     screen(::ScreenActivityDetails)
@@ -36,7 +35,7 @@ fun ScreenRouteScope.screens() {
 	// 社区
     screen(::ScreenLogin)
     screen(::ScreenUserCard)
-    screen(::ScreenTopic, typeMap = buildNavTypeMap<Topic>())
+    screen(::ScreenTopic, type<Topic>())
     screen(::ScreenMail)
     screen(::ScreenAddTopic)
 }

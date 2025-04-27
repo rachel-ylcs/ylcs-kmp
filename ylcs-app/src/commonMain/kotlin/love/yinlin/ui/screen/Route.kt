@@ -11,12 +11,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.common.Uri
+import love.yinlin.extension.getNavType
 import love.yinlin.ui.component.screen.FloatingDialogConfirm
 import love.yinlin.ui.component.screen.FloatingDialogInfo
 import love.yinlin.ui.component.screen.FloatingDialogLoading
 import love.yinlin.ui.component.screen.Tip
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Stable
 class SubScreenSlot(scope: CoroutineScope) {
@@ -74,9 +76,21 @@ data class ScreenRouteScope(
 
 inline fun <reified S : CommonScreen> route(): String = "rachel.${S::class.qualifiedName!!}"
 
+inline fun <reified S : CommonScreen> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
+	val appModel = this.model
+	this.builder.composable(route = route<S>()) {
+		val screen = viewModel {
+			factory(appModel).also {
+				it.launch { it.initialize() }
+			}
+		}
+		screen.UI()
+	}
+}
+
 inline fun <reified A : Any> ScreenRouteScope.screen(
 	crossinline factory: (AppModel, A) -> Screen<A>,
-    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
+	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
 ) {
 	val appModel = this.model
 	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
@@ -89,14 +103,4 @@ inline fun <reified A : Any> ScreenRouteScope.screen(
 	}
 }
 
-inline fun <reified S : CommonScreen> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
-	val appModel = this.model
-	this.builder.composable(route = route<S>()) {
-		val screen = viewModel {
-			factory(appModel).also {
-				it.launch { it.initialize() }
-			}
-		}
-		screen.UI()
-	}
-}
+inline fun <reified T> ScreenRouteScope.type() = mapOf(typeOf<T>() to getNavType<T>())

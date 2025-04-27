@@ -5,8 +5,6 @@ import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
 import love.yinlin.common.Uri
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 inline fun <reified T> buildNavType(
 	isNullableAllowed: Boolean = false
@@ -30,13 +28,4 @@ inline fun <reified T> getNavType(): NavType<*> {
 		return newType
 	}
 	else return type
-}
-
-inline fun <reified T> buildNavTypeMap() = mutableMapOf(
-	typeOf<T>() to getNavType<T>()
-)
-
-inline fun <reified T> MutableMap<KType, NavType<*>>.appendNavType(): MutableMap<KType, NavType<*>> {
-	put(typeOf<T>(), getNavType<T>())
-	return this
 }
