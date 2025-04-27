@@ -79,6 +79,7 @@ kotlin {
             dependencies {
                 implementation(projects.ylcsShared)
                 implementation(projects.ylcsMusic)
+
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.material3)
@@ -113,6 +114,7 @@ kotlin {
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
                 implementation(libs.tool.scan)
+                implementation(libs.tool.qrcode)
             }
         }
 

@@ -70,6 +70,7 @@ tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.0-beta01" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.4.3" }
 tool-scan = { module = "io.github.ismai117:KScan", version = "0.1.0-beta05" }
+tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

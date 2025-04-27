@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
@@ -17,9 +18,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import io.github.alexzhirkevich.qrose.options.QrBallShape
+import io.github.alexzhirkevich.qrose.options.QrBrush
+import io.github.alexzhirkevich.qrose.options.QrFrameShape
+import io.github.alexzhirkevich.qrose.options.QrLogoPadding
+import io.github.alexzhirkevich.qrose.options.QrLogoShape
+import io.github.alexzhirkevich.qrose.options.QrPixelShape
+import io.github.alexzhirkevich.qrose.options.brush
+import io.github.alexzhirkevich.qrose.options.circle
+import io.github.alexzhirkevich.qrose.options.roundCorners
+import io.github.alexzhirkevich.qrose.options.solid
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import love.yinlin.AppModel
@@ -35,11 +51,14 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
+import love.yinlin.resources.img_logo
 import love.yinlin.resources.img_not_login
 import love.yinlin.resources.login
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.settings.ScreenSettings
@@ -51,8 +70,9 @@ import org.ncgroup.kscan.ScannerView
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	val signinSheet = FloatingSheet()
 	val scanSheet = FloatingSheet()
+	val userCardSheet = FloatingSheet()
+	val signinSheet = FloatingSheet()
 
 	fun logoff() {
 		app.config.userToken = ""
@@ -89,6 +109,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			title = "功能栏"
 		) {
 			Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
+			Item("名片", Icons.Filled.AccountBox) {
+				if (app.config.userToken.isNotEmpty()) userCardSheet.open()
+			}
 			Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
 		}
 	}
@@ -219,6 +242,86 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	override fun Floating() {
+		userCardSheet.Land {
+			val profile = app.config.userProfile
+			if (profile == null) EmptyBox()
+			else {
+				Column(
+					modifier = Modifier.fillMaxWidth().padding(20.dp),
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(20.dp)
+				) {
+					WebImage(
+						uri = profile.avatarPath,
+						key = app.config.cacheUserWall,
+						contentScale = ContentScale.Crop,
+						circle = true,
+						modifier = Modifier.size(100.dp).shadow(5.dp, CircleShape)
+					)
+					Text(
+						text = profile.name,
+						style = MaterialTheme.typography.displayMedium,
+						color = MaterialTheme.colorScheme.primary
+					)
+					Text(
+						text = "扫我添加好友",
+						style = MaterialTheme.typography.headlineSmall
+					)
+
+					val primaryColor = MaterialTheme.colorScheme.primary
+					val secondaryColor = MaterialTheme.colorScheme.secondary
+					val logoPainter = painterResource(Res.drawable.img_logo)
+					val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${profile.uid}") {
+						logo {
+							painter = logoPainter
+							padding = QrLogoPadding.Natural(1f)
+							shape = QrLogoShape.circle()
+							size = 0.2f
+						}
+						shapes {
+							ball = QrBallShape.circle()
+							darkPixel = QrPixelShape.roundCorners()
+							frame = QrFrameShape.roundCorners(0.25f)
+						}
+						colors {
+							dark = QrBrush.brush {
+								Brush.linearGradient(
+									0f to primaryColor.copy(alpha = 0.9f),
+									1f to secondaryColor.copy(0.9f),
+									end = Offset(it, it)
+								)
+							}
+							frame = QrBrush.solid(primaryColor)
+						}
+					}
+					Image(
+						painter = qrcodePainter,
+						contentDescription = null,
+						modifier = Modifier.size(180.dp)
+					)
+					Space(40.dp)
+				}
+			}
+		}
+		scanSheet.Land {
+			ScannerView(
+				modifier = Modifier.fillMaxWidth(),
+				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
+				showUi = false,
+				result = {
+					scanSheet.close()
+					if (it is BarcodeResult.OnSuccess) {
+						try {
+							val uri = Uri.parse(it.barcode.data)!!
+							if (uri.scheme == Scheme.Rachel) deeplink(uri)
+						}
+						catch (_: Throwable) {
+							slot.tip.warning("不能识别此信息")
+						}
+					}
+				}
+			)
+		}
 		signinSheet.Land {
 			var data by rememberState { BooleanArray(8) { false } }
 			var todayIndex: Int by rememberState { -1 }
@@ -289,25 +392,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					}
 				}
 			}
-		}
-		scanSheet.Land {
-			ScannerView(
-				modifier = Modifier.fillMaxWidth(),
-				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
-				showUi = false,
-				result = {
-					scanSheet.close()
-					if (it is BarcodeResult.OnSuccess) {
-						try {
-							val uri = Uri.parse(it.barcode.data)!!
-							if (uri.scheme == Scheme.Rachel) deeplink(uri)
-						}
-						catch (_: Throwable) {
-							slot.tip.warning("不能识别此信息")
-						}
-					}
-				}
-			)
 		}
 	}
 }
