@@ -40,6 +40,7 @@ import love.yinlin.resources.login
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
@@ -78,22 +79,17 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun ToolBar(modifier: Modifier = Modifier) {
-		Row(
+	private fun ToolContainer(
+		modifier: Modifier = Modifier,
+		shape: Shape = RectangleShape
+	) {
+		TipButtonContainer(
 			modifier = modifier,
-			horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-			verticalAlignment = Alignment.CenterVertically
+			shape = shape,
+			title = "功能栏"
 		) {
-			ClickIcon(
-				icon = Icons.Filled.CropFree,
-				onClick = {
-					scanSheet.open()
-				}
-			)
-			ClickIcon(
-				icon = Icons.Filled.Settings,
-				onClick = { navigate<ScreenSettings>() }
-			)
+			Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
+			Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
 		}
 	}
 
@@ -176,39 +172,37 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			PortraitUserProfileCard(
 				modifier = Modifier.fillMaxWidth(),
 				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true,
-				toolbar = { ToolBar() }
+				owner = true
 			)
+			ToolContainer(modifier = Modifier.fillMaxWidth())
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
 			AdminContainer(modifier = Modifier.fillMaxWidth())
+			Space(10.dp)
 		}
 	}
 
 	@Composable
 	private fun Landscape(userProfile: UserProfile) {
-		Column(modifier = Modifier.fillMaxSize()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth(),
-				shadowElevation = 5.dp
-			) {
-				ToolBar(modifier = Modifier.fillMaxWidth().padding(10.dp))
-			}
-			Row(modifier = Modifier.fillMaxWidth()) {
-				LandscapeUserProfileCard(
-					profile = remember(userProfile) { userProfile.publicProfile },
-					owner = true,
-					modifier = Modifier.width(450.dp).padding(10.dp)
+		Row(modifier = Modifier.fillMaxSize()) {
+			LandscapeUserProfileCard(
+				profile = remember(userProfile) { userProfile.publicProfile },
+				owner = true,
+				modifier = Modifier.weight(1f).padding(20.dp)
+			)
+			Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
+				ToolContainer(
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					shape = MaterialTheme.shapes.large
 				)
-				Column(modifier = Modifier.weight(1f)) {
-					UserSpaceContainer(
-						modifier = Modifier.fillMaxWidth().padding(10.dp),
-						shape = MaterialTheme.shapes.large
-					)
-					AdminContainer(
-						modifier = Modifier.fillMaxWidth().padding(10.dp),
-						shape = MaterialTheme.shapes.large
-					)
-				}
+				UserSpaceContainer(
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					shape = MaterialTheme.shapes.large
+				)
+				AdminContainer(
+					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					shape = MaterialTheme.shapes.large
+				)
+				Space(10.dp)
 			}
 		}
 	}

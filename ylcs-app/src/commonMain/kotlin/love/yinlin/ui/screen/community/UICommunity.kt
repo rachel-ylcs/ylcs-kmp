@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,8 +40,8 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.ui.component.layout.OffsetLayout
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.EqualItem
+import love.yinlin.ui.component.layout.Space
 
 @Composable
 internal fun BoxText(
@@ -87,8 +86,7 @@ internal fun PortraitValue(
 internal fun PortraitUserProfileCard(
 	profile: UserPublicProfile,
 	owner: Boolean,
-	modifier: Modifier = Modifier,
-	toolbar: @Composable RowScope.() -> Unit = {}
+	modifier: Modifier = Modifier
 ) {
 	Column(modifier = modifier) {
 		WebImage(
@@ -122,7 +120,6 @@ internal fun PortraitUserProfileCard(
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f).padding(horizontal = 10.dp)
 				)
-				toolbar()
 			}
 			Row(
 				modifier = Modifier.fillMaxWidth(),
@@ -177,7 +174,7 @@ internal fun LandscapeUserProfileCard(
 				modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 			)
 			Row(
-				modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 10.dp),
+				modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 20.dp),
 				horizontalArrangement = Arrangement.spacedBy(15.dp)
 			) {
 				Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {

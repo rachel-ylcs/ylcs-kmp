@@ -191,7 +191,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 						LandscapeUserProfileCard(
 							profile = profile,
 							owner = false,
-							modifier = Modifier.width(350.dp).padding(10.dp)
+							modifier = Modifier.weight(1f).padding(20.dp)
 						)
 						PaginationStaggeredGrid(
 							items = page.items,

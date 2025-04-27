@@ -71,11 +71,10 @@ fun UserLabel(
 		)
 		Text(
 			modifier = Modifier.fillMaxSize()
-				.padding(start = 11.2.dp, end = 11.2.dp, top = 13.5.dp, bottom = 4.8.dp),
+				.padding(start = 11.2.dp, end = 11.2.dp, top = 14.dp, bottom = 4.8.dp),
 			text = text,
-			color = Colors.Black,
-			style = if (text.length >= 5) MaterialTheme.typography.bodySmall else
-				MaterialTheme.typography.bodyMedium,
+			color = Colors.Black.copy(alpha = 0.7f),
+			style = MaterialTheme.typography.labelSmall,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			overflow = TextOverflow.Clip

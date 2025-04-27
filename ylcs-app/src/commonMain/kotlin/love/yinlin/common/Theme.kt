@@ -179,7 +179,7 @@ private fun RachelTextStyle(size: TextUnit, isBold: Boolean = false): TextStyle 
 )
 
 @Composable
-private fun RachelTypography(): Typography = Typography(
+private fun rachelTypography(): Typography = Typography(
 	displayLarge = RachelTextStyle(26.sp, true),
 	displayMedium = RachelTextStyle(22.sp, true),
 	displaySmall = RachelTextStyle(18.sp, true),
@@ -202,7 +202,7 @@ object ThemeStyle {
 }
 
 @Composable
-private fun RachelShapes(): Shapes = Shapes(
+private fun rachelShapes(): Shapes = Shapes(
 	extraSmall = RoundedCornerShape(4.dp),
 	small = RoundedCornerShape(6.dp),
 	medium = RoundedCornerShape(8.dp),
@@ -215,8 +215,8 @@ private fun RachelShapes(): Shapes = Shapes(
 fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
 		colorScheme = if (darkMode || Local.Client.ALWAYS_DARK_MODE) DarkColorScheme else LightColorScheme,
-		shapes = RachelShapes(),
-		typography = RachelTypography(),
+		shapes = rachelShapes(),
+		typography = rachelTypography(),
 		content = content
 	)
 }
