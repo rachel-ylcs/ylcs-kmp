@@ -83,7 +83,7 @@ private fun ActivityDetailsLayout(
 class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<ScreenActivityDetails.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val aid: Int) : Screen.Args
+	data class Args(val aid: Int)
 
 	private val activity: Activity? by derivedStateOf {
 		worldPart.activities.find { it.aid == args.aid }

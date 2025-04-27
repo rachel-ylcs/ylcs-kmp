@@ -27,12 +27,10 @@ class SubScreenSlot(scope: CoroutineScope) {
 }
 
 @Stable
-abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewModel() {
-	@Stable
-	interface Args
-
+abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
-	fun navigate(route: Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun pop() = model.pop()
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
@@ -67,7 +65,7 @@ abstract class Screen<A : Screen.Args>(protected val model: AppModel) : ViewMode
 }
 
 @Stable
-abstract class CommonScreen(model: AppModel) : Screen<Screen.Args>(model)
+abstract class CommonScreen(model: AppModel) : Screen<Unit>(model)
 
 data class ScreenRouteScope(
 	val builder: NavGraphBuilder,
@@ -76,9 +74,9 @@ data class ScreenRouteScope(
 
 inline fun <reified S : CommonScreen> route(): String = "rachel.${S::class.qualifiedName!!}"
 
-inline fun <reified A : Screen.Args, reified S : Screen<out Screen.Args>> ScreenRouteScope.screen(
-    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
-    crossinline factory: (AppModel, A) -> S
+inline fun <reified A : Any> ScreenRouteScope.screen(
+	crossinline factory: (AppModel, A) -> Screen<A>,
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
 ) {
 	val appModel = this.model
 	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->

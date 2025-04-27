@@ -32,7 +32,7 @@ import love.yinlin.ui.screen.common.ScreenImagePreview
 class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenWeiboAlbum.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val containerId: String, val title: String) : Screen.Args
+	data class Args(val containerId: String, val title: String)
 
 	private data class AlbumCache(val count: Int, val items: List<Picture>)
 

@@ -139,7 +139,7 @@ private fun UserAlbumItem(
 class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWeiboUser.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val id: String) : Screen.Args
+	data class Args(val id: String)
 
 	private val grid = WeiboGridData()
 	private var user: WeiboUser? by mutableStateOf(null)

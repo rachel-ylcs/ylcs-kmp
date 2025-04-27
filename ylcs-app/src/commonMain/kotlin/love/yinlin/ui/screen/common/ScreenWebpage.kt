@@ -16,7 +16,7 @@ import love.yinlin.ui.component.screen.SubScreen
 class ScreenWebpage(model: AppModel, args: Args) : Screen<ScreenWebpage.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val url: String) : Screen.Args
+	data class Args(val url: String)
 
 	private val state = WebPageState(WebPageSettings(), args.url)
 

@@ -54,7 +54,7 @@ import org.jetbrains.compose.resources.stringResource
 class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDetails.Args>(model) {
     @Stable
     @Serializable
-    data class Args(val id: String) : Screen.Args
+    data class Args(val id: String)
 
     abstract class ResourceStrategy(
         val enabled: Boolean

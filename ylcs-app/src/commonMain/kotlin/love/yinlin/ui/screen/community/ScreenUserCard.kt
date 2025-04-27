@@ -36,7 +36,7 @@ import love.yinlin.ui.screen.Screen
 class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUserCard.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val uid: Int) : Screen.Args
+	data class Args(val uid: Int)
 
 	private var profile: UserPublicProfile? by mutableStateOf(null)
 

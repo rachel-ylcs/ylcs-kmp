@@ -145,7 +145,7 @@ private fun CoinLayout(
 class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val currentTopic: Topic) : Screen.Args
+	data class Args(val currentTopic: Topic)
 
 	private var details: TopicDetails? by mutableStateOf(null)
 	private var topic: Topic by mutableStateOf(args.currentTopic)

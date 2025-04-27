@@ -30,7 +30,6 @@ import love.yinlin.common.Uri
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.CommonScreen
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.ScreenMain
 import love.yinlin.ui.screen.ScreenRouteScope
 import love.yinlin.ui.screen.SubScreenSlot
@@ -49,7 +48,7 @@ abstract class ScreenPart(val model: AppModel) {
 	val slot: SubScreenSlot get() = model.slot
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
-	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
+	inline fun <reified A : Any> navigate(route: A, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
 	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
@@ -77,7 +76,7 @@ class AppModel(
 	val slot = SubScreenSlot(viewModelScope)
 
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
-	fun navigate(route: Screen.Args, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
+	inline fun <reified A : Any> navigate(route: A, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
 	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route<T>(), options, extras)
 	fun pop() {
 		if (navController.previousBackStackEntry != null) navController.popBackStack()

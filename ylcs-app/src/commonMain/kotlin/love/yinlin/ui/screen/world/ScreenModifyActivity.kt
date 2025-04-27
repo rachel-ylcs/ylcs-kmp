@@ -27,7 +27,7 @@ import kotlin.collections.plus
 class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<ScreenModifyActivity.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val aid: Int) : Screen.Args
+	data class Args(val aid: Int)
 
 	private val activities = worldPart.activities
 

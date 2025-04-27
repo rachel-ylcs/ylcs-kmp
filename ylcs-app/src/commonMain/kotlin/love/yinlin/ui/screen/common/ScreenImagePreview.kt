@@ -36,7 +36,7 @@ import love.yinlin.ui.component.screen.SubScreen
 class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePreview.Args>(model) {
 	@Stable
 	@Serializable
-	data class Args(val images: List<Picture>, val index: Int) : Screen.Args
+	data class Args(val images: List<Picture>, val index: Int)
 
 	@Stable
 	private class PreviewPicture(val pic: Picture) {

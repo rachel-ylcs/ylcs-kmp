@@ -14,29 +14,29 @@ fun ScreenRouteScope.screens() {
     // 主页
     screen(::ScreenMain)
     // 通用
-    screen { model, args: ScreenWebpage.Args -> ScreenWebpage(model, args) }
-    screen(typeMap = buildNavTypeMap<List<Picture>>()) { model, args: ScreenImagePreview.Args -> ScreenImagePreview(model, args) }
-    screen { model, args: ScreenVideo.Args -> ScreenVideo(model, args) }
+    screen(::ScreenWebpage)
+    screen(::ScreenImagePreview, typeMap = buildNavTypeMap<List<Picture>>())
+    screen(::ScreenVideo)
     // 世界
-    screen { model, args: ScreenActivityDetails.Args -> ScreenActivityDetails(model, args) }
+    screen(::ScreenActivityDetails)
     screen(::ScreenAddActivity)
-    screen { model, args: ScreenModifyActivity.Args -> ScreenModifyActivity(model, args) }
+    screen(::ScreenModifyActivity)
 	// 设置
     screen(::ScreenSettings)
 	// 微博
     screen(::ScreenWeiboDetails)
-    screen { model, args: ScreenWeiboUser.Args -> ScreenWeiboUser(model, args) }
+    screen(::ScreenWeiboUser)
     screen(::ScreenWeiboFollows)
-    screen { model, args: ScreenWeiboAlbum.Args -> ScreenWeiboAlbum(model, args) }
+    screen(::ScreenWeiboAlbum)
 	// 听歌
     screen(::ScreenMusicLibrary)
     screen(::ScreenPlaylistLibrary)
-    screen { model, args: ScreenImportMusic.Args -> ScreenImportMusic(model, args) }
-    screen { model, args: ScreenMusicDetails.Args -> ScreenMusicDetails(model, args) }
+    screen(::ScreenImportMusic)
+    screen(::ScreenMusicDetails)
 	// 社区
     screen(::ScreenLogin)
-    screen { model, args: ScreenUserCard.Args -> ScreenUserCard(model, args) }
-    screen(typeMap = buildNavTypeMap<Topic>()) { model, args: ScreenTopic.Args -> ScreenTopic(model, args) }
+    screen(::ScreenUserCard)
+    screen(::ScreenTopic, typeMap = buildNavTypeMap<Topic>())
     screen(::ScreenMail)
     screen(::ScreenAddTopic)
 }

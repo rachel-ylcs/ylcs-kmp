@@ -15,7 +15,7 @@ import love.yinlin.ui.screen.Screen
 class ScreenVideo(model: AppModel, val args: Args) : Screen<ScreenVideo.Args>(model) {
     @Stable
     @Serializable
-    data class Args(val url: String) : Screen.Args
+    data class Args(val url: String)
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable

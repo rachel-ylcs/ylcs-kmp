@@ -49,7 +49,7 @@ expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
 class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<ScreenImportMusic.Args>(model) {
     @Stable
     @Serializable
-    data class Args(val deepLink: String?) : Screen.Args
+    data class Args(val deepLink: String?)
 
     @Stable
     private sealed interface Step {
