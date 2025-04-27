@@ -49,9 +49,11 @@ abstract class MusicFactory {
     protected abstract suspend fun init()
 
     suspend fun initFactory() {
-        initLibrary()
+        OS.ifNotPlatform(Platform.WebWasm) {
+            initLibrary()
+        }
         init()
-        initLastStatus()
+        if (isInit) initLastStatus()
     }
 
     // 当前状态

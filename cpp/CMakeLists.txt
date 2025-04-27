@@ -9,3 +9,4 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/libs") # .so and
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/libs") # .lib and .a
 
 add_subdirectory(mmkv)
+add_subdirectory(picker)

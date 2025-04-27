@@ -67,7 +67,7 @@ fun VideoPlayerControls(
                 Space(10.dp)
             }
             BeautifulSlider(
-                value = position / duration.toFloat(),
+                value = if (duration == 0L) 0f else position / duration.toFloat(),
                 onValueChangeFinished = { onProgressClick((it * duration).toLong()) },
                 modifier = Modifier.weight(1f)
             )

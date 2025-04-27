@@ -370,11 +370,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun MusicProgressBar(
 		currentTime: Long,
 		duration: Long,
-		chorus: List<Long>,
+		chorus: List<Long>?,
 		modifier: Modifier = Modifier
 	) {
 		BeautifulSlider(
-			value = currentTime / duration.toFloat(),
+			value = if (duration == 0L) 0f else currentTime / duration.toFloat(),
 			height = 4.dp,
 			showThumb = false,
 			onValueChangeFinished = {
@@ -385,7 +385,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			},
 			modifier = modifier
 		) {
-			if (duration != 0L) {
+			if (chorus != null && duration != 0L) {
 				MusicChorus(
 					chorus = chorus,
 					duration = duration,
@@ -417,7 +417,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			MusicProgressBar(
 				currentTime = currentTime,
 				duration = factory.currentDuration,
-				chorus = factory.currentMusic?.chorus ?: emptyList(),
+				chorus = factory.currentMusic?.chorus,
 				modifier = Modifier.fillMaxWidth().height(10.dp)
 			)
 		}
