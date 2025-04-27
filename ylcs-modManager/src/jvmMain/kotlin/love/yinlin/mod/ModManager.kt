@@ -34,7 +34,6 @@ import love.yinlin.extension.fileSizeString
 import java.awt.datatransfer.DataFlavor
 import java.io.File
 import javax.swing.JFileChooser
-import javax.swing.filechooser.FileFilter
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.filechooser.FileSystemView
 

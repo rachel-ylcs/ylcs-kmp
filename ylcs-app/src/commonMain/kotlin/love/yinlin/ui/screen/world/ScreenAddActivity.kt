@@ -19,7 +19,6 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.CommonScreen
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
