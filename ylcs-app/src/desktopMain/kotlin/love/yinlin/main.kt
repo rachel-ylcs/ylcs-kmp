@@ -9,13 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import love.yinlin.extension.rememberState
@@ -37,7 +35,7 @@ fun main() {
     context.initialize()
 
     application {
-        val rawDensity = LocalDensity.current
+        var isOpen by rememberState { true }
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,
@@ -45,7 +43,7 @@ fun main() {
             width = context.windowWidth.dp,
             height = context.windowHeight.dp
         )
-        var isOpen by rememberState { true }
+
         if (isOpen) {
             Window(
                 onCloseRequest = ::exitApplication,
@@ -56,9 +54,6 @@ fun main() {
                 transparent = true,
                 state = state,
             ) {
-                LaunchedEffect(Unit) {
-                    if (context.rawDensity == null) context.rawDensity = rawDensity
-                }
                 AppWrapper {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {

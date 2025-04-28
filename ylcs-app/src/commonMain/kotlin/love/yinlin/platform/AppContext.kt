@@ -84,3 +84,4 @@ abstract class AppContext {
 }
 
 lateinit var app: AppContext
+	internal set

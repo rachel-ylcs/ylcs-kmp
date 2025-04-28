@@ -7,6 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import love.yinlin.common.Colors
 import love.yinlin.platform.appNative
 import java.awt.Component
@@ -29,19 +30,17 @@ fun <T : Component> CustomUI(
 		}
 	}
 
-	appNative.rawDensity?.let { density ->
-		CompositionLocalProvider(LocalDensity provides density) {
-			SwingPanel(
-				background = Colors.Transparent,
-				modifier = modifier,
-				factory = {
-					view.value ?: factory().let {
-						view.value = it
-						it
-					}
-				},
-				update = { update?.invoke(it) }
-			)
-		}
-	}
+    CompositionLocalProvider(LocalDensity provides Density(appNative.rawDensity)) {
+        SwingPanel(
+            background = Colors.Transparent,
+            modifier = modifier,
+            factory = {
+                view.value ?: factory().let {
+                    view.value = it
+                    it
+                }
+            },
+            update = { update?.invoke(it) }
+        )
+    }
 }
