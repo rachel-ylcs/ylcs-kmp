@@ -391,7 +391,7 @@ class FloatingDialogCrop : FloatingDialog<CropResult>() {
     override fun Wrapper(block: @Composable (() -> Unit)) {
         super.Wrapper {
             Column(
-                modifier = Modifier.width(500.dp).background(Colors.Black),
+                modifier = Modifier.width(400.dp).background(Colors.Black),
                 horizontalAlignment = Alignment.End
             ) {
                 CropImage(
