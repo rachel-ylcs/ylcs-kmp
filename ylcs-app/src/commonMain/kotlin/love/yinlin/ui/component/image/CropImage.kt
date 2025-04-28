@@ -391,14 +391,14 @@ class FloatingDialogCrop : FloatingDialog<CropResult>() {
     override fun Wrapper(block: @Composable (() -> Unit)) {
         super.Wrapper {
             Column(
-                modifier = Modifier.fillMaxWidth().background(Colors.Black),
+                modifier = Modifier.width(500.dp).background(Colors.Black),
                 horizontalAlignment = Alignment.End
             ) {
                 CropImage(
                     url = url,
                     aspectRatio = aspectRatio,
                     state = cropState,
-                    modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth().aspectRatio(1f)
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                 )
                 RachelButton(
                     text = "裁剪",
