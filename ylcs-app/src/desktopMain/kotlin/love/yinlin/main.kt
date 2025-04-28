@@ -39,9 +39,7 @@ fun main() {
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,
-            position = WindowPosition.Aligned(Alignment.Center),
-            width = context.windowWidth.dp,
-            height = context.windowHeight.dp
+            position = WindowPosition.Aligned(Alignment.Center)
         )
 
         if (isOpen) {
@@ -50,7 +48,7 @@ fun main() {
                 title = stringResource(Res.string.app_name),
                 icon = painterResource(Res.drawable.img_logo),
                 undecorated = true,
-                resizable = false,
+                resizable = true,
                 transparent = true,
                 state = state,
             ) {

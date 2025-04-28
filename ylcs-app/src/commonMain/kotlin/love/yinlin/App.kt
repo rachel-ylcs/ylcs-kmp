@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -28,6 +29,8 @@ import love.yinlin.common.DeepLink
 import love.yinlin.common.RachelTheme
 import love.yinlin.common.Uri
 import love.yinlin.extension.launchFlag
+import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.common.ScreenMain
@@ -121,12 +124,16 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 
 @Composable
 fun AppWrapper(content: @Composable () -> Unit) {
-	CompositionLocalProvider(
-		LocalDensity provides Density(
-			density = app.screenWidth / app.designWidth.value,
-			fontScale = app.fontScale
-		)
-	) {
+	val density = OS.ifPlatform(
+		*Platform.Phone,
+		ifTrue = {
+			remember { Density(density = app.screenWidth / app.designWidth.value, fontScale = app.fontScale) }
+		},
+		ifFalse = {
+			LocalDensity.current
+		}
+	)
+	CompositionLocalProvider(LocalDensity provides density) {
 		RachelTheme(app.isDarkMode) {
 			Box(modifier = Modifier.fillMaxSize()) {
 				content()
