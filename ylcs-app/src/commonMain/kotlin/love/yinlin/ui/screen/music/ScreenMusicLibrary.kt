@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -123,6 +124,12 @@ class ScreenMusicLibrary(model: AppModel) : CommonScreen(model) {
         library.replaceAll(app.musicFactory.musicLibrary.map {
             MusicInfoPreview(it.value)
         })
+    }
+
+    private fun selectAll() {
+        library.forEachIndexed { index, musicInfo ->
+            if (!musicInfo.selected) library[index] = musicInfo.copy(selected = true)
+        }
     }
 
     private fun exitManagement() {
@@ -253,6 +260,12 @@ class ScreenMusicLibrary(model: AppModel) : CommonScreen(model) {
                 if (isSearching) {
                     Action(Icons.Outlined.Close) {
                         closeSearch()
+                    }
+                }
+                if (isManaging) {
+                    Action(Icons.Outlined.SelectAll) {
+                        if (library.all { it.selected }) exitManagement()
+                        else selectAll()
                     }
                 }
             }

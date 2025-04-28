@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -295,9 +294,9 @@ class ScreenSettings(model: AppModel) : CommonScreen(model) {
 	) {
 		SegmentedButton(
 			selected = mode == current,
-			onClick = { if (mode != current) onChanged(mode) },
 			shape = SegmentedButtonDefaults.itemShape(index = mode.ordinal, count = 3),
-			label = { Text(text = mode.toString()) }
+			label = { Text(text = mode.toString()) },
+			onClick = { if (mode != current) onChanged(mode) }
 		)
 	}
 
