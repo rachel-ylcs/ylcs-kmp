@@ -27,7 +27,7 @@ object Local {
 		object Desktop {
 			// < ------  竖屏模式  ------ >
 			// 开启后桌面端将保持竖屏用于调试
-			const val ALWAYS_PORTRAIT = false
+			const val ALWAYS_PORTRAIT = true
 
 			// < ------  屏幕比  ------ >
 			// 桌面端窗口占屏幕的比例

@@ -3,9 +3,6 @@ package love.yinlin.platform
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.SingletonSketch
@@ -36,9 +33,8 @@ abstract class AppContext {
 	val designHeight: Dp get() = 800.dp
 
 	// 主题
-	var theme by mutableStateOf(ThemeMode.SYSTEM)
 
-	val isDarkMode: Boolean @Composable get() = when (theme) {
+	val isDarkMode: Boolean @Composable get() = when (config.themeMode) {
 		ThemeMode.SYSTEM -> isSystemInDarkTheme()
 		ThemeMode.LIGHT -> false
 		ThemeMode.DARK -> true

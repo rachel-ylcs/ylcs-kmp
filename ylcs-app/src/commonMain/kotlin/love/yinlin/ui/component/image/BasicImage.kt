@@ -117,15 +117,15 @@ fun ColorfulIcon(
 	Box(
 		modifier = Modifier.size(size)
 			.clip(CircleShape)
-			.background(icon.background)
-			.padding(3.dp),
+			.background(icon.background.copy(alpha = 0.6f))
+			.padding(5.dp),
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
 			modifier = Modifier.fillMaxSize(),
 			imageVector = icon.icon,
 			contentDescription = null,
-			tint = icon.color,
+			tint = icon.color.copy(alpha = 0.8f),
 		)
 	}
 }

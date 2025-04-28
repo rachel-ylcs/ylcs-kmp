@@ -19,10 +19,10 @@ import love.yinlin.resources.xwwk
 enum class ThemeMode {
 	SYSTEM, LIGHT, DARK;
 
-	val next: ThemeMode get() = when (this) {
-		SYSTEM -> LIGHT
-		LIGHT -> DARK
-		DARK -> SYSTEM
+	override fun toString(): String = when (this) {
+		SYSTEM -> "跟随系统"
+		LIGHT -> "浅色"
+		DARK -> "深色"
 	}
 }
 

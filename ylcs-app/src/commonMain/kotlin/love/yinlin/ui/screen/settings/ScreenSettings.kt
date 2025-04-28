@@ -9,6 +9,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +32,7 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Colors
 import love.yinlin.common.KVConfig
 import love.yinlin.common.ThemeColor
+import love.yinlin.common.ThemeMode
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
@@ -282,12 +288,45 @@ class ScreenSettings(model: AppModel) : CommonScreen(model) {
 	}
 
 	@Composable
+	private fun SingleChoiceSegmentedButtonRowScope.ThemeSwitcherItem(
+		mode: ThemeMode,
+		current: ThemeMode,
+		onChanged: (ThemeMode) -> Unit
+	) {
+		SegmentedButton(
+			selected = mode == current,
+			onClick = { if (mode != current) onChanged(mode) },
+			shape = SegmentedButtonDefaults.itemShape(index = mode.ordinal, count = 3),
+			label = { Text(text = mode.toString()) }
+		)
+	}
+
+	@Composable
+	private fun ThemeSwitcher(
+		mode: ThemeMode,
+		onChanged: (ThemeMode) -> Unit,
+		modifier: Modifier = Modifier
+	) {
+		SingleChoiceSegmentedButtonRow(modifier = modifier) {
+			ThemeSwitcherItem(ThemeMode.SYSTEM, mode, onChanged)
+			ThemeSwitcherItem(ThemeMode.LIGHT, mode, onChanged)
+			ThemeSwitcherItem(ThemeMode.DARK, mode, onChanged)
+		}
+	}
+
+	@Composable
 	private fun CommonSettings(modifier: Modifier = Modifier) {
 		SettingsLayout(
 			modifier = modifier,
 			title = "系统",
 			icon = Icons.Outlined.Info
 		) {
+			ThemeSwitcher(
+				mode = app.config.themeMode,
+				onChanged = { app.config.themeMode = it },
+				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+			)
+
 			var cacheSizeText by rememberState { OS.Storage.cacheSize.fileSizeString }
 			ItemExpanderSuspend(
 				title = "清理缓存",

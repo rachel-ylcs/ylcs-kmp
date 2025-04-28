@@ -272,6 +272,11 @@ class KVConfig(private val kv: KV) {
 		defaultFactory = defaultFactory
 	)
 
+	/* ------------------  系统  ------------------ */
+
+	// 主题模式
+	var themeMode: ThemeMode by jsonState { ThemeMode.SYSTEM }
+
 	/* ------------------  微博  ------------------ */
 
 	// 微博用户

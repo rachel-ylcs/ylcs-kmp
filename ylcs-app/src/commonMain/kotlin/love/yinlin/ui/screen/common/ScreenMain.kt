@@ -4,11 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Contrast
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -17,19 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeMode
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.layout.EqualItem
+import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.ui.screen.CommonScreen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import love.yinlin.resources.*
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.component.layout.EqualItem
-import love.yinlin.ui.screen.CommonScreen
 
 private enum class TabItem(
 	val title: StringResource,
@@ -111,18 +107,6 @@ private fun LandscapeNavigation(
 			modifier = Modifier.fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			ClickIcon(
-				icon = when (app.theme) {
-					ThemeMode.SYSTEM -> Icons.Filled.Contrast
-					ThemeMode.LIGHT -> Icons.Filled.LightMode
-					ThemeMode.DARK -> Icons.Filled.DarkMode
-				},
-				color = MaterialTheme.colorScheme.primary,
-				onClick = {
-					app.theme = app.theme.next
-				}
-			)
-			Space(10.dp)
 			for (index in TabItem.entries.indices) {
 				NavigationIcon(
 					index = index,
