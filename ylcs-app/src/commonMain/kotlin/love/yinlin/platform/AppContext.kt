@@ -72,14 +72,12 @@ abstract class AppContext {
 		// 初始化配置
 		config = KVConfig(kv)
 		// 初始化资源
-		Coroutines.startIO { Resource.initialize() }
+		Resource.initialize()
 		// 初始化图片加载器
 		SingletonSketch.setSafe { initializeSketch() }
 		// 初始化音乐播放器
 		musicFactory = initializeMusicFactory()
-		Coroutines.startCPU {
-			if (!musicFactory.isInit) musicFactory.initFactory()
-		}
+		musicFactory.initFactory()
 	}
 }
 

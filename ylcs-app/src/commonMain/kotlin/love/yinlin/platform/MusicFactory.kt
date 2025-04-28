@@ -18,7 +18,7 @@ abstract class MusicFactory {
     }
 
     // 初始化
-    abstract val isInit: Boolean
+    protected abstract val isInit: Boolean
 
     private fun initLibrary() = Coroutines.startIO {
         val musicPath = OS.Storage.musicPath
@@ -48,12 +48,12 @@ abstract class MusicFactory {
 
     protected abstract suspend fun init()
 
-    suspend fun initFactory() {
-        OS.ifNotPlatform(Platform.WebWasm) {
-            initLibrary()
+    fun initFactory() {
+        Coroutines.startCPU {
+            OS.ifNotPlatform(Platform.WebWasm) { initLibrary() }
+            init()
+            if (isInit) initLastStatus()
         }
-        init()
-        if (isInit) initLastStatus()
     }
 
     // 当前状态
