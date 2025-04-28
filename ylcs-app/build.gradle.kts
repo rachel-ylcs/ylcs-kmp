@@ -85,6 +85,7 @@ kotlin {
                 implementation(libs.compose.material3)
                 implementation(libs.compose.material3.icons)
                 implementation(libs.compose.material3.iconsExtended)
+                implementation("org.jetbrains.compose.material3.adaptive:adaptive:1.1.0-rc01")
                 implementation(libs.compose.ui)
                 implementation(libs.compose.ui.backhandler)
                 implementation(libs.compose.components.uiToolingPreview)
