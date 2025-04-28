@@ -75,9 +75,18 @@ private class VideoPlayerState {
         controller?.let(block)
     }
 
-    fun play() = withPlayer { if (!it.isPlaying) it.play() }
-    fun pause() = withPlayer { if (it.isPlaying) it.pause() }
-    fun seekTo(value: Long) = withPlayer { it.seekTo(value) }
+    fun play() = withPlayer {
+        if (!it.isPlaying) it.play()
+    }
+
+    fun pause() = withPlayer {
+        if (it.isPlaying) it.pause()
+    }
+
+    fun seekTo(value: Long) = withPlayer {
+        it.seekTo(value)
+        play()
+    }
 }
 
 @SuppressLint("SourceLockedOrientationActivity")

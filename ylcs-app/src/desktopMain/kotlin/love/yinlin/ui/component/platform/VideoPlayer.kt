@@ -56,6 +56,7 @@ private class VideoPlayerState(val url: String) {
 
     fun seekTo(value: Long) = withPlayer { player ->
         player.controls().setTime(value)
+        play()
     }
 }
 
