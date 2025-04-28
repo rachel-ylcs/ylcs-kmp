@@ -7,9 +7,8 @@ import androidx.activity.compose.LocalActivity
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.FullscreenExit
@@ -31,7 +30,6 @@ import kotlinx.coroutines.isActive
 import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
@@ -94,7 +92,8 @@ private class VideoPlayerState {
 @Composable
 actual fun VideoPlayer(
     url: String,
-    modifier: Modifier
+    modifier: Modifier,
+    topBar: (@Composable RowScope.() -> Unit)?
 ) {
     val context = LocalContext.current
     val state by rememberState { VideoPlayerState() }
@@ -149,38 +148,25 @@ actual fun VideoPlayer(
                 modifier = scaledModifier.zIndex(2f)
             )
 
-            Column(modifier = Modifier.fillMaxSize().zIndex(3f)) {
-                var isShowControls by rememberState { false }
-
-                LaunchedEffect(Unit) {
-                    delay(500)
-                    isShowControls = true
+            VideoPlayerControls(
+                modifier = Modifier.fillMaxSize().zIndex(3f),
+                isPlaying = state.isPlaying,
+                onPlayClick = {
+                    if (state.isPlaying) state.pause()
+                    else state.play()
+                },
+                position = state.position,
+                duration = state.duration,
+                onProgressClick = { state.seekTo(it) },
+                topBar = topBar,
+                rightAction = {
+                    ClickIcon(
+                        icon = if (isPortrait) Icons.Outlined.Fullscreen else Icons.Outlined.FullscreenExit,
+                        color = Colors.White,
+                        onClick = { isPortrait = !isPortrait }
+                    )
                 }
-
-                Box(modifier = Modifier.fillMaxWidth().weight(1f).clickableNoRipple {
-                    isShowControls = !isShowControls
-                })
-
-                VideoPlayerControls(
-                    visible = isShowControls,
-                    modifier = Modifier.fillMaxWidth(),
-                    isPlaying = state.isPlaying,
-                    onPlayClick = {
-                        if (state.isPlaying) state.pause()
-                        else state.play()
-                    },
-                    position = state.position,
-                    duration = state.duration,
-                    onProgressClick = { state.seekTo(it) },
-                    rightAction = {
-                        ClickIcon(
-                            icon = if (isPortrait) Icons.Outlined.Fullscreen else Icons.Outlined.FullscreenExit,
-                            color = Colors.White,
-                            onClick = { isPortrait = !isPortrait }
-                        )
-                    }
-                )
-            }
+            )
         }
     }
 }

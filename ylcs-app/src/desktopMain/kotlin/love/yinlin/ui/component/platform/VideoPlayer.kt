@@ -2,15 +2,12 @@
 package love.yinlin.ui.component.platform
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.delay
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.CustomUI
 import uk.co.caprica.vlcj.media.Media
@@ -63,7 +60,8 @@ private class VideoPlayerState(val url: String) {
 @Composable
 actual fun VideoPlayer(
     url: String,
-    modifier: Modifier
+    modifier: Modifier,
+    topBar: (@Composable RowScope.() -> Unit)?
 ) {
     val state by rememberState { VideoPlayerState(url) }
 
@@ -98,30 +96,18 @@ actual fun VideoPlayer(
                 onRelease()
             }
         )
-        Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
-            var isShowControls by rememberState { false }
 
-            LaunchedEffect(Unit) {
-                delay(500)
-                isShowControls = true
-            }
-
-            Box(modifier = Modifier.fillMaxWidth().weight(1f).clickableNoRipple {
-                isShowControls = !isShowControls
-            })
-
-            VideoPlayerControls(
-                visible = isShowControls,
-                modifier = Modifier.fillMaxWidth(),
-                isPlaying = state.isPlaying,
-                onPlayClick = {
-                    if (state.isPlaying) state.pause()
-                    else state.play()
-                },
-                position = state.position,
-                duration = state.duration,
-                onProgressClick = { state.seekTo(it) }
-            )
-        }
+        VideoPlayerControls(
+            modifier = Modifier.fillMaxSize().zIndex(2f),
+            isPlaying = state.isPlaying,
+            onPlayClick = {
+                if (state.isPlaying) state.pause()
+                else state.play()
+            },
+            position = state.position,
+            duration = state.duration,
+            onProgressClick = { state.seekTo(it) },
+            topBar = topBar
+        )
     }
 }
