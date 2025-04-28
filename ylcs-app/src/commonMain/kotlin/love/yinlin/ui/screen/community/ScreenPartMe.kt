@@ -61,6 +61,7 @@ import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.ui.component.screen.SheetConfig
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
@@ -71,7 +72,7 @@ import org.ncgroup.kscan.ScannerView
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	val scanSheet = FloatingSheet()
+	val scanSheet = FloatingSheet(SheetConfig(max = 0.9f, full = true))
 	val userCardSheet = FloatingSheet()
 	val signinSheet = FloatingSheet()
 
