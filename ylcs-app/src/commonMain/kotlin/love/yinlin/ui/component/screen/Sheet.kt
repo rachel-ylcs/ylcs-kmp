@@ -42,16 +42,15 @@ data class SheetConfig(
 @Suppress("DuplicatedCode")
 @Stable
 open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetConfig()) : Floating<A>() {
-    private val isPortrait: Boolean = app.isPortrait
-    override val alignment: Alignment = if (isPortrait) Alignment.BottomCenter else Alignment.CenterEnd
-    override val enter: EnterTransition = if (isPortrait) slideInVertically(
+    override val alignment: Alignment = if (app.isPortrait) Alignment.BottomCenter else Alignment.CenterEnd
+    override val enter: EnterTransition = if (app.isPortrait) slideInVertically(
         animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
         initialOffsetY = { it }
     ) else slideInHorizontally(
         animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
         initialOffsetX = { it }
     )
-    override val exit: ExitTransition = if (isPortrait) slideOutVertically(
+    override val exit: ExitTransition = if (app.isPortrait) slideOutVertically(
         animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
         targetOffsetY = { it }
     ) else slideOutHorizontally(
@@ -183,7 +182,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
 
     @Composable
     override fun Wrapper(block: @Composable () -> Unit) {
-        if (isPortrait) PortraitWrapper(block)
+        if (app.isPortrait) PortraitWrapper(block)
         else LandscapeWrapper(block)
     }
 }
