@@ -126,7 +126,7 @@ class ScreenMain(model: AppModel) : CommonScreen(model) {
 
 	@Composable
 	private fun PageContent(modifier: Modifier = Modifier) {
-		HorizontalPager (
+		HorizontalPager(
 			state = pagerState,
 			modifier = modifier
 		) {
