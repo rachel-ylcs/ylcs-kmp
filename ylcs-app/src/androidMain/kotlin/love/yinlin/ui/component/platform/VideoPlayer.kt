@@ -3,13 +3,16 @@ package love.yinlin.ui.component.platform
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.os.Build
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.material.icons.outlined.FullscreenExit
 import androidx.compose.runtime.*
@@ -93,13 +96,16 @@ private class VideoPlayerState {
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
-    topBar: (@Composable RowScope.() -> Unit)?
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val state by rememberState { VideoPlayerState() }
 
     val activity = LocalActivity.current!!
     val oldOrientation = remember { activity.requestedOrientation }
+    val oldBehavior = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) activity.window.insetsController?.systemBarsBehavior else null
+    }
 
     var isPortrait by rememberState { true }
     LaunchedEffect(isPortrait) {
@@ -119,6 +125,12 @@ actual fun VideoPlayer(
             prepare()
             play()
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.window.insetsController?.apply {
+                hide(WindowInsets.Type.statusBars())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
         onDispose {
             synchronized(state.updateProgressJobLock) {
                 state.updateProgressJob?.cancel()
@@ -127,6 +139,12 @@ actual fun VideoPlayer(
             state.controller?.release()
             state.controller = null
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && oldBehavior != null) {
+                activity.window.insetsController?.apply {
+                    show(WindowInsets.Type.statusBars())
+                    systemBarsBehavior = oldBehavior
+                }
+            }
             if (activity.requestedOrientation != oldOrientation) activity.requestedOrientation = oldOrientation
         }
     }
@@ -158,7 +176,13 @@ actual fun VideoPlayer(
                 position = state.position,
                 duration = state.duration,
                 onProgressClick = { state.seekTo(it) },
-                topBar = topBar,
+                topBar = {
+                    ClickIcon(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        color = Colors.White,
+                        onClick = onBack
+                    )
+                },
                 rightAction = {
                     ClickIcon(
                         icon = if (isPortrait) Icons.Outlined.Fullscreen else Icons.Outlined.FullscreenExit,

@@ -2,14 +2,17 @@
 package love.yinlin.ui.component.platform
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.CustomUI
+import love.yinlin.ui.component.image.ClickIcon
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.player.base.MediaPlayer
@@ -61,7 +64,7 @@ private class VideoPlayerState(val url: String) {
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
-    topBar: (@Composable RowScope.() -> Unit)?
+    onBack: () -> Unit
 ) {
     val state by rememberState { VideoPlayerState(url) }
 
@@ -107,7 +110,13 @@ actual fun VideoPlayer(
             position = state.position,
             duration = state.duration,
             onProgressClick = { state.seekTo(it) },
-            topBar = topBar
+            topBar = {
+                ClickIcon(
+                    icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                    color = Colors.White,
+                    onClick = onBack
+                )
+            }
         )
     }
 }
