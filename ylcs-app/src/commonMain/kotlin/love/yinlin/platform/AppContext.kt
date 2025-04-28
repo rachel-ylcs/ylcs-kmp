@@ -3,6 +3,10 @@ package love.yinlin.platform
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.SingletonSketch
@@ -20,13 +24,13 @@ abstract class AppContext {
 	}
 
 	// 屏幕宽度
-	abstract val screenWidth: Int
+	var screenWidth: Int by mutableIntStateOf(0)
 	// 屏幕高度
-	abstract val screenHeight: Int
+	var screenHeight: Int by mutableIntStateOf(0)
 	// 字体缩放
 	abstract val fontScale: Float
 	// 是否竖屏
-	val isPortrait: Boolean get() = screenWidth <= screenHeight
+	val isPortrait: Boolean by derivedStateOf { screenWidth <= screenHeight }
 	// 设计宽度
 	val designWidth: Dp get() = if (isPortrait) 360.dp else 1200.dp
 	// 设计高度

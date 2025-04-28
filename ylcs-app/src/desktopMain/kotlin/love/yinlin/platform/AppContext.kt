@@ -14,10 +14,9 @@ import java.awt.GraphicsEnvironment
 import java.io.File
 
 class ActualAppContext : AppContext() {
+	val rawDensity: Float
 	val windowWidth: Float
 	val windowHeight: Float
-	override val screenWidth: Int
-	override val screenHeight: Int
 	override val fontScale: Float = 1f
 	override val kv: KV = KV()
 
@@ -28,6 +27,7 @@ class ActualAppContext : AppContext() {
 		val scaleX = transform.scaleX.toFloat()
 		val scaleY = transform.scaleY.toFloat()
 
+		rawDensity = scaleX
 		@Suppress("KotlinConstantConditions")
 		windowWidth = bounds.width * Local.Client.Desktop.SCREEN_PERCENT / (if (Local.Client.Desktop.ALWAYS_PORTRAIT) 4f else 1f)
 		windowHeight = bounds.height * Local.Client.Desktop.SCREEN_PERCENT
