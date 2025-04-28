@@ -19,7 +19,6 @@ coroutines = "1.10.2"
 media3 = "1.6.1"
 
 # Desktop
-javafx = "21.0.7-ea+1"
 ui-graphics-android = "1.7.8"
 
 [plugins]
@@ -95,8 +94,6 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 
 ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "ui-graphics-android" }
 
-javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
-javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
 jna = { module = "net.java.dev.jna:jna", version = "5.14.0" }
 jna-jpms = { module = "net.java.dev.jna:jna-jpms", version = "5.14.0" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.14.0" }

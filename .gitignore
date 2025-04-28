@@ -19,16 +19,24 @@ kotlin-js-store/
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 
+# CPP
+cpp/**/test/
+cpp/**/.vs/
+cpp/**/build/
+cpp/**/cmake-build-debug/
+cpp/**/cmake-build-release/
+cpp/libs/
+**/*.sln
+**/*.vcxproj
+**/*.vcxproj.filters
+**/*.vcxproj.user
+
 # 编译目录
 **/build/
 **/desktop-mapping.txt
 
 # 输出目录
 **/outputs/
-cpp/build
-cpp/cmake-build-debug/
-cpp/cmake-build-release/
-cpp/libs
 
 # 本地配置
 *.properties

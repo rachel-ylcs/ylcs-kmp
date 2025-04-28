@@ -1,20 +1,5 @@
-#include <jni.h>
+#include "../include/platform.h"
 #include "MMKV.h"
-
-std::string jstring2string(JNIEnv* env, jstring str)
-{
-	if (str)
-	{
-		const char* kstr = env->GetStringUTFChars(str, nullptr);
-		if (kstr)
-		{
-			std::string result(kstr);
-			env->ReleaseStringUTFChars(str, kstr);
-			return result;
-		}
-	}
-	return "";
-}
 
 inline MMKV* kv_cast(jlong handle)
 {
@@ -34,7 +19,7 @@ extern "C" {
 
 	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_KV_init(JNIEnv* env, jobject, jstring path)
 	{
-		MMKV::initializeMMKV(string2MMKVPath_t(jstring2string(env, path)), MMKVLogLevel::MMKVLogNone);
+		MMKV::initializeMMKV(string2MMKVPath_t(j2s(env, path)), MMKVLogLevel::MMKVLogNone);
 		return reinterpret_cast<jlong>(MMKV::defaultMMKV());
 	}
 
@@ -42,7 +27,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set((bool)value, jstring2string(env, key), (uint32_t)expire);
+			kv->set((bool)value, j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -50,7 +35,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set((int32_t)value, jstring2string(env, key), (uint32_t)expire);
+			kv->set((int32_t)value, j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -58,7 +43,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set((int64_t)value, jstring2string(env, key), (uint32_t)expire);
+			kv->set((int64_t)value, j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -66,7 +51,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set((float)value, jstring2string(env, key), (uint32_t)expire);
+			kv->set((float)value, j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -74,7 +59,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set((double)value, jstring2string(env, key), (uint32_t)expire);
+			kv->set((double)value, j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -82,7 +67,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->set(jstring2string(env, value), jstring2string(env, key), (uint32_t)expire);
+			kv->set(j2s(env, value), j2s(env, key), (uint32_t)expire);
 		}
 	}
 
@@ -96,7 +81,7 @@ extern "C" {
 			{
 				mmkv::MMBuffer buffer(data, length);
 				env->ReleasePrimitiveArrayCritical(value, data, JNI_ABORT);
-				kv->set(buffer, jstring2string(env, key), (uint32_t)expire);
+				kv->set(buffer, j2s(env, key), (uint32_t)expire);
 			}
 		}
 	}
@@ -105,7 +90,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jboolean)kv->getBool(jstring2string(env, key), (bool)def);
+			return (jboolean)kv->getBool(j2s(env, key), (bool)def);
 		}
 		return def;
 	}
@@ -114,7 +99,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jint)kv->getInt32(jstring2string(env, key), (int32_t)def);
+			return (jint)kv->getInt32(j2s(env, key), (int32_t)def);
 		}
 		return def;
 	}
@@ -123,7 +108,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jlong)kv->getInt64(jstring2string(env, key), (int64_t)def);
+			return (jlong)kv->getInt64(j2s(env, key), (int64_t)def);
 		}
 		return def;
 	}
@@ -132,7 +117,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jfloat)kv->getFloat(jstring2string(env, key), (float)def);
+			return (jfloat)kv->getFloat(j2s(env, key), (float)def);
 		}
 		return def;
 	}
@@ -141,7 +126,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jdouble)kv->getDouble(jstring2string(env, key), (double)def);
+			return (jdouble)kv->getDouble(j2s(env, key), (double)def);
 		}
 		return def;
 	}
@@ -151,7 +136,7 @@ extern "C" {
 		if (auto kv = kv_cast(handle); kv && key)
 		{
 			std::string value;
-			bool hasValue = kv->getString(jstring2string(env, key), value);
+			bool hasValue = kv->getString(j2s(env, key), value);
 			if (hasValue)
 			{
 				return env->NewStringUTF(value.data());
@@ -165,7 +150,7 @@ extern "C" {
 		if (auto kv = kv_cast(handle); kv && key)
 		{
 			mmkv::MMBuffer buffer;
-			auto hasValue = kv->getBytes(jstring2string(env, key), buffer);
+			auto hasValue = kv->getBytes(j2s(env, key), buffer);
 			auto data = reinterpret_cast<jbyte const*>(buffer.getPtr());
 			auto size = (jsize)buffer.length();
 			if (hasValue)
@@ -182,7 +167,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			return (jboolean)kv->containsKey(jstring2string(env, key));
+			return (jboolean)kv->containsKey(j2s(env, key));
 		}
 		return false;
 	}
@@ -191,7 +176,7 @@ extern "C" {
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
-			kv->removeValueForKey(jstring2string(env, key));
+			kv->removeValueForKey(j2s(env, key));
 		}
 	}
 }

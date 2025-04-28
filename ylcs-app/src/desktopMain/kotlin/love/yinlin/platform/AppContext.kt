@@ -8,7 +8,6 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
-import javafx.application.Platform
 import love.yinlin.Local
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
@@ -37,10 +36,8 @@ class ActualAppContext : AppContext() {
 		screenWidth = (windowWidth * scaleX).toInt()
 		screenHeight = (windowHeight * scaleY).toInt()
 
-		// JavaFx
-		Platform.startup {
-			Platform.setImplicitExit(false)
-		}
+		// 本机库
+		System.loadLibrary("ylcs")
 
 		// VLC
 		System.setProperty("jna.library.path", "${System.getProperty("user.dir")}${File.separator}vlc")

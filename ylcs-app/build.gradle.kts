@@ -217,9 +217,6 @@ kotlin {
                 implementation(libs.jna.platform)
                 implementation(libs.jna.platform.jpms)
 
-                implementation(libs.javafx.base.get()) { artifact { classifier = desktopPlatform.toString() } }
-                implementation(libs.javafx.graphics.get()) { artifact { classifier = desktopPlatform.toString() } }
-
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }
         }
@@ -366,7 +363,7 @@ compose.desktop {
             modules(
                 "java.instrument",
                 "java.net.http",
-                "jdk.jfr",
+                "java.management",
                 "jdk.unsupported",
             )
 

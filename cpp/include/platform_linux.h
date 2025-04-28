@@ -1,0 +1,4 @@
+#ifndef CPP_PLATFORM_LINUX_H
+#define CPP_PLATFORM_LINUX_H
+
+#endif
