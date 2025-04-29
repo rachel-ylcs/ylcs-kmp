@@ -120,11 +120,11 @@ fun AppWrapper(content: @Composable () -> Unit) {
 		val orientation = remember(maxWidth, maxHeight) { Orientation.fromSize(maxWidth, maxHeight) }
 		val oldDensity = LocalDensity.current
 		val newDensity = remember(orientation, maxWidth, maxHeight, oldDensity) {
-			app.densityWrapper(maxWidth, maxHeight, oldDensity)
+
 		}
 		CompositionLocalProvider(
 			LocalOrientation provides orientation,
-			LocalDensity provides newDensity
+			LocalDensity provides app.densityWrapper(maxWidth, maxHeight, oldDensity)
 		) {
 			RachelTheme(app.isDarkMode) {
 				content()
