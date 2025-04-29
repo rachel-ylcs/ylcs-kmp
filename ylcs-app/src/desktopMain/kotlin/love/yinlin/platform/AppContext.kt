@@ -11,15 +11,9 @@ import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
-import java.awt.GraphicsEnvironment
 import java.io.File
 
-class ActualAppContext : AppContext(run {
-	val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
-	val bounds = ge.defaultScreenDevice.displayMode
-	val density = ge.defaultScreenDevice.defaultConfiguration.defaultTransform.scaleX.toFloat()
-	PhysicalGraphics(width = bounds.width, height = bounds.height, density = Density(density, 1f))
-}) {
+class ActualAppContext : AppContext() {
 	override val kv: KV = KV()
 
 	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = oldDensity

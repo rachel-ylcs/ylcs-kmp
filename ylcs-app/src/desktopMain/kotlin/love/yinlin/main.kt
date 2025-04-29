@@ -42,8 +42,8 @@ fun main() {
             placement = WindowPlacement.Floating,
             isMinimized = false,
             position = WindowPosition.Aligned(Alignment.Center),
-            width = remember { context.physics.width.dp * 0.6f },
-            height = remember { context.physics.height.dp * 0.6f }
+            width = 1200.dp,
+            height = 600.dp
         )
 
         if (isOpen) {

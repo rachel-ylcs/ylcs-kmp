@@ -14,10 +14,7 @@ import love.yinlin.common.Resource
 import love.yinlin.common.ThemeMode
 
 @Stable
-data class PhysicalGraphics(val width: Int, val height: Int, val density: Density)
-
-@Stable
-abstract class AppContext(val physics: PhysicalGraphics) {
+abstract class AppContext {
 	companion object {
 		const val CRASH_KEY = "crash_key"
 	}

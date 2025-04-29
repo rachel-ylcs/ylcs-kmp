@@ -118,9 +118,13 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 fun AppWrapper(content: @Composable () -> Unit) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 		val orientation = remember(maxWidth, maxHeight) { Orientation.fromSize(maxWidth, maxHeight) }
+		val oldDensity = LocalDensity.current
+		val newDensity = remember(orientation, maxWidth, maxHeight, oldDensity) {
+			app.densityWrapper(maxWidth, maxHeight, oldDensity)
+		}
 		CompositionLocalProvider(
 			LocalOrientation provides orientation,
-			LocalDensity provides (app.densityWrapper(maxWidth, maxHeight, LocalDensity.current))
+			LocalDensity provides newDensity
 		) {
 			RachelTheme(app.isDarkMode) {
 				content()

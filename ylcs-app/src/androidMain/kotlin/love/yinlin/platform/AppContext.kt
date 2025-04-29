@@ -14,10 +14,7 @@ import com.github.panpf.sketch.util.Logger
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
-class ActualAppContext(val context: Context) : AppContext(run {
-	val metrics = context.resources.displayMetrics
-	PhysicalGraphics(width = metrics.widthPixels, height = metrics.heightPixels, density = Density(metrics.density, 1f))
-}) {
+class ActualAppContext(val context: Context) : AppContext() {
 	companion object {
 		val DesignWidth = 360.dp
 		val DesignHeight = 800.dp
@@ -25,10 +22,13 @@ class ActualAppContext(val context: Context) : AppContext(run {
 
 	override val kv: KV = KV(context)
 
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = Density(
-		if (newWidth <= newHeight) physics.width / DesignWidth.value else physics.height / DesignHeight.value,
-		oldDensity.fontScale
-	)
+	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density {
+		val metrics = context.resources.displayMetrics
+		return Density(density = if (newWidth <= newHeight) metrics.widthPixels / DesignWidth.value
+			else metrics.heightPixels / DesignHeight.value,
+			fontScale = oldDensity.fontScale
+		)
+	}
 
 	var activityResultRegistry: ActivityResultRegistry? = null
 

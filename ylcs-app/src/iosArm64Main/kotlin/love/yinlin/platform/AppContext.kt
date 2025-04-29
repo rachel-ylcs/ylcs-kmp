@@ -22,26 +22,19 @@ import platform.Foundation.NSUncaughtExceptionHandler
 import platform.UIKit.UIScreen
 
 @OptIn(ExperimentalForeignApi::class)
-class ActualAppContext : AppContext(run {
-	val screenBounds = UIScreen.mainScreen.bounds
-	PhysicalGraphics(
-		width = CGRectGetWidth(screenBounds).toInt(),
-		height = CGRectGetHeight(screenBounds).toInt(),
-		density = Density(
-			density = UIScreen.mainScreen.scale.toFloat(),
-			fontScale = 1f
-		)
-	)
-}) {
+class ActualAppContext : AppContext() {
 	companion object {
 		val DesignWidth = 360.dp
 		val DesignHeight = 800.dp
 	}
 
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = Density(
-		if (newWidth <= newHeight) physics.width / DesignWidth.value else physics.height / DesignHeight.value,
-		oldDensity.fontScale
-	)
+	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density {
+		val screenBounds = UIScreen.mainScreen.bounds
+		return Density(density = if (newWidth <= newHeight) CGRectGetWidth(screenBounds).toFloat() / DesignWidth.value
+			else CGRectGetHeight(screenBounds).toFloat() / DesignHeight.value,
+			fontScale = oldDensity.fontScale
+		)
+	}
 
 	override val kv: KV = KV()
 

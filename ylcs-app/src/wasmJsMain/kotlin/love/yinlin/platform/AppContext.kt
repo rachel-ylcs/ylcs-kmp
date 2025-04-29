@@ -7,18 +7,8 @@ import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
-import kotlinx.browser.window
 
-class ActualAppContext : AppContext(run {
-	PhysicalGraphics(
-		width = window.innerWidth,
-		height = window.innerHeight,
-		density = Density(
-			density = window.devicePixelRatio.toFloat(),
-			fontScale = 1f
-		)
-	)
-}) {
+class ActualAppContext : AppContext() {
 	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = oldDensity
 
 	override val kv: KV = KV()

@@ -27,7 +27,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.app
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
