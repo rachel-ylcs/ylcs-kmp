@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.itemKey
 import love.yinlin.platform.app
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
@@ -136,7 +136,7 @@ private fun UserAlbumItem(
 }
 
 @Stable
-class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWeiboUser.Args>(model) {
+class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<ScreenWeiboUser.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val id: String)
@@ -295,28 +295,18 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : Screen<ScreenWe
 		}
 	}
 
+	override val title: String by derivedStateOf { user?.info?.name ?: "" }
+
 	@Composable
-	override fun Content() {
+	override fun SubContent(orientation: Orientation) {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
-			SubScreen(
-				modifier = Modifier.fillMaxSize(),
-				title = user?.info?.name ?: "",
-				onBack = { pop() }
-			) {
-				if (user == null) LoadingBox()
-				else user?.let { user ->
-					if (app.isPortrait) Portrait(
-						user = user,
-						albums = albums,
-						grid = grid
-					)
-					else Landscape(
-						user = user,
-						albums = albums,
-						grid = grid
-					)
+			user?.let {
+				when (orientation) {
+					Orientation.PORTRAIT -> Portrait(user = it, albums = albums, grid = grid)
+					Orientation.LANDSCAPE -> Landscape(user = it, albums = albums, grid = grid)
+					Orientation.SQUARE -> {}
 				}
-			}
+			} ?: LoadingBox()
 		}
 	}
 }

@@ -21,19 +21,19 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
-import love.yinlin.platform.app
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
 
 @Stable
-class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUserCard.Args>(model) {
+class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<ScreenUserCard.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val uid: Int)
@@ -145,75 +145,79 @@ class ScreenUserCard(model: AppModel, private val args: Args) : Screen<ScreenUse
 		}
 	}
 
+	@Composable
+	private fun Portrait(profile: UserPublicProfile, cardWidth: Dp) {
+		PaginationStaggeredGrid(
+			items = page.items,
+			key = { it.tid },
+			columns = StaggeredGridCells.Adaptive(cardWidth),
+			state = listState,
+			canRefresh = false,
+			canLoading = page.canLoading,
+			onLoading = { requestMoreTopics() },
+			modifier = Modifier.fillMaxSize(),
+			contentPadding = PaddingValues(bottom = 10.dp),
+			verticalItemSpacing = 10.dp,
+			header = {
+				PortraitUserProfileCard(
+					modifier = Modifier.fillMaxWidth(),
+					profile = profile,
+					owner = false
+				)
+			}
+		) {  topic ->
+			TopicCard(
+				topic = topic,
+				cardWidth = cardWidth,
+				modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
+			)
+		}
+	}
+
+	@Composable
+	private fun Landscape(profile: UserPublicProfile, cardWidth: Dp) {
+		Row(modifier = Modifier.fillMaxSize()) {
+			LandscapeUserProfileCard(
+				profile = profile,
+				owner = false,
+				modifier = Modifier.weight(1f).padding(20.dp)
+			)
+			PaginationStaggeredGrid(
+				items = page.items,
+				key = { it.tid },
+				columns = StaggeredGridCells.Adaptive(180.dp),
+				state = listState,
+				canRefresh = false,
+				canLoading = page.canLoading,
+				onLoading = { requestMoreTopics() },
+				modifier = Modifier.weight(1f).fillMaxHeight(),
+				contentPadding = PaddingValues(10.dp),
+				verticalItemSpacing = 10.dp
+			) {  topic ->
+				TopicCard(
+					topic = topic,
+					cardWidth = cardWidth,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
+				)
+			}
+		}
+	}
+
 	override suspend fun initialize() {
 		requestUserProfile()
 		requestNewTopics()
 	}
 
+	override val title: String = "主页"
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "主页",
-			onBack = { pop() }
-		) {
-			profile?.let { profile ->
-				val cardWidth = if (app.isPortrait) 150.dp else 180.dp
-				if (app.isPortrait) {
-					PaginationStaggeredGrid(
-						items = page.items,
-						key = { it.tid },
-						columns = StaggeredGridCells.Adaptive(cardWidth),
-						state = listState,
-						canRefresh = false,
-						canLoading = page.canLoading,
-						onLoading = { requestMoreTopics() },
-						modifier = Modifier.fillMaxSize(),
-						contentPadding = PaddingValues(bottom = 10.dp),
-						verticalItemSpacing = 10.dp,
-						header = {
-							PortraitUserProfileCard(
-								modifier = Modifier.fillMaxWidth(),
-								profile = profile,
-								owner = false
-							)
-						}
-					) {  topic ->
-						TopicCard(
-							topic = topic,
-							cardWidth = cardWidth,
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
-						)
-					}
-				}
-				else {
-					Row(modifier = Modifier.fillMaxSize()) {
-						LandscapeUserProfileCard(
-							profile = profile,
-							owner = false,
-							modifier = Modifier.weight(1f).padding(20.dp)
-						)
-						PaginationStaggeredGrid(
-							items = page.items,
-							key = { it.tid },
-							columns = StaggeredGridCells.Adaptive(cardWidth),
-							state = listState,
-							canRefresh = false,
-							canLoading = page.canLoading,
-							onLoading = { requestMoreTopics() },
-							modifier = Modifier.weight(1f).fillMaxHeight(),
-							contentPadding = PaddingValues(10.dp),
-							verticalItemSpacing = 10.dp
-						) {  topic ->
-							TopicCard(
-								topic = topic,
-								cardWidth = cardWidth,
-								modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
-							)
-						}
-					}
-				}
+	override fun SubContent(orientation: Orientation) {
+		profile?.let {
+			when (orientation) {
+				Orientation.PORTRAIT -> Portrait(it, 150.dp)
+				Orientation.LANDSCAPE -> Landscape(it, 180.dp)
+				Orientation.SQUARE -> {}
 			}
-		}
+		} ?: EmptyBox()
 	}
 }

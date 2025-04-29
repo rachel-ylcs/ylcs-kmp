@@ -4,7 +4,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
@@ -24,6 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.extension.rememberValueState
 import love.yinlin.platform.app
 import kotlin.math.roundToInt
@@ -42,21 +43,30 @@ data class SheetConfig(
 @Suppress("DuplicatedCode")
 @Stable
 open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetConfig()) : Floating<A>() {
-    override val alignment: Alignment = if (app.isPortrait) Alignment.BottomCenter else Alignment.CenterEnd
-    override val enter: EnterTransition = if (app.isPortrait) slideInVertically(
-        animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
-        initialOffsetY = { it }
-    ) else slideInHorizontally(
-        animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
-        initialOffsetX = { it }
-    )
-    override val exit: ExitTransition = if (app.isPortrait) slideOutVertically(
-        animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
-        targetOffsetY = { it }
-    ) else slideOutHorizontally(
-        animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
-        targetOffsetX = { it }
-    )
+    override fun alignment(orientation: Orientation): Alignment = when (orientation) {
+        Orientation.PORTRAIT, Orientation.SQUARE -> Alignment.BottomCenter
+        Orientation.LANDSCAPE -> Alignment.CenterEnd
+    }
+    override fun enter(orientation: Orientation): EnterTransition = when (orientation) {
+        Orientation.PORTRAIT, Orientation.SQUARE -> slideInVertically(
+            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            initialOffsetY = { it }
+        )
+        Orientation.LANDSCAPE -> slideInHorizontally(
+            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            initialOffsetX = { it }
+        )
+    }
+    override fun exit(orientation: Orientation): ExitTransition = when (orientation) {
+        Orientation.PORTRAIT, Orientation.SQUARE -> slideOutVertically(
+            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            targetOffsetY = { it }
+        )
+        Orientation.LANDSCAPE -> slideOutHorizontally(
+            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            targetOffsetX = { it }
+        )
+    }
     override val zIndex: Float get() = Z_INDEX_SHEET
 
     @Composable
@@ -94,7 +104,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
                 .onSizeChanged { height = it.height }
                 .draggable(
                     state = rememberDraggableState(onDelta),
-                    orientation = Orientation.Vertical,
+                    orientation = androidx.compose.foundation.gestures.Orientation.Vertical,
                     onDragStopped = { onStop() }
                 )
                 .nestedScroll(connection = remember { object : NestedScrollConnection {
@@ -154,7 +164,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
                 .offset { IntOffset(x = animatedOffset, y = 0) }
                 .draggable(
                     state = rememberDraggableState(onDelta),
-                    orientation = Orientation.Horizontal,
+                    orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                     onDragStopped = { onStop() }
                 )
                 .nestedScroll(connection = remember { object : NestedScrollConnection {
@@ -182,8 +192,11 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
 
     @Composable
     override fun Wrapper(block: @Composable () -> Unit) {
-        if (app.isPortrait) PortraitWrapper(block)
-        else LandscapeWrapper(block)
+        when (LocalOrientation.current) {
+            Orientation.PORTRAIT -> PortraitWrapper(block)
+            Orientation.LANDSCAPE -> LandscapeWrapper(block)
+            Orientation.SQUARE -> {}
+        }
     }
 }
 

@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
@@ -36,12 +38,12 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.CommonScreen
 
 @Composable
 private fun WeiboUserItem(
@@ -72,7 +74,7 @@ private fun WeiboUserItem(
 }
 
 @Stable
-class ScreenWeiboFollows(model: AppModel) : CommonScreen(model) {
+class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	private var isLocal by mutableStateOf(true)
 	private val searchDialog = FloatingDialogInput(
 		hint = "输入微博用户昵称关键字",
@@ -167,52 +169,52 @@ class ScreenWeiboFollows(model: AppModel) : CommonScreen(model) {
 		refreshLocalUser()
 	}
 
+	override val title: String by derivedStateOf { if (isLocal) "微博关注" else "搜索结果" }
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = if (isLocal) "微博关注" else "搜索结果",
-			onBack = { pop() },
-			actions = {
-				ActionSuspend(Icons.Outlined.Search) {
-					onSearchWeiboUser()
-				}
-				if (isLocal) {
-					Action(Icons.Outlined.SwapVert) {
-						importSheet.open()
-					}
-				}
-			},
-			leftActions = {
-				if (!isLocal) {
-					ActionSuspend(Icons.Outlined.Close) {
-						refreshLocalUser()
-					}
-				}
+	override fun ActionScope.LeftActions() {
+		if (!isLocal) {
+			ActionSuspend(Icons.Outlined.Close) {
+				refreshLocalUser()
 			}
+		}
+	}
+
+	@Composable
+	override fun ActionScope.RightActions() {
+		ActionSuspend(Icons.Outlined.Search) {
+			onSearchWeiboUser()
+		}
+		if (isLocal) {
+			Action(Icons.Outlined.SwapVert) {
+				importSheet.open()
+			}
+		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) {
+		StatefulBox(
+			state = state,
+			modifier = Modifier.fillMaxSize()
 		) {
-			StatefulBox(
-				state = state,
+			LazyVerticalGrid(
+				columns = GridCells.Adaptive(300.dp),
+				contentPadding = PaddingValues(5.dp),
+				horizontalArrangement = Arrangement.spacedBy(5.dp),
+				verticalArrangement = Arrangement.spacedBy(5.dp),
 				modifier = Modifier.fillMaxSize()
 			) {
-				LazyVerticalGrid(
-					columns = GridCells.Adaptive(300.dp),
-					contentPadding = PaddingValues(5.dp),
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
-					verticalArrangement = Arrangement.spacedBy(5.dp),
-					modifier = Modifier.fillMaxSize()
+				items(
+					items = if (isLocal) app.config.weiboUsers.items else searchResult,
+					key = { it.id }
 				) {
-					items(
-						items = if (isLocal) app.config.weiboUsers.items else searchResult,
-						key = { it.id }
-					) {
-						WeiboUserItem(
-							user = it,
-							contentPadding = PaddingValues(5.dp),
-							modifier = Modifier.fillMaxWidth(),
-							onClick = { navigate(ScreenWeiboUser.Args(it.id)) }
-						)
-					}
+					WeiboUserItem(
+						user = it,
+						contentPadding = PaddingValues(5.dp),
+						modifier = Modifier.fillMaxWidth(),
+						onClick = { navigate(ScreenWeiboUser.Args(it.id)) }
+					)
 				}
 			}
 		}

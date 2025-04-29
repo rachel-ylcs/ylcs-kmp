@@ -263,26 +263,25 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 
 			StatefulBox(
 				state = state,
-				modifier = Modifier.fillMaxSize()
+				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
-				val cardWidth = if (app.isPortrait) 150.dp else 200.dp
 				PaginationStaggeredGrid(
 					items = page.items,
 					key = { it.tid },
-					columns = StaggeredGridCells.Adaptive(cardWidth),
+					columns = StaggeredGridCells.Adaptive(150.dp),
 					state = listState,
 					canRefresh = true,
 					canLoading = page.canLoading,
 					onRefresh = { requestNewData() },
 					onLoading = { requestMoreData() },
-					modifier = Modifier.fillMaxWidth().weight(1f),
+					modifier = Modifier.fillMaxSize(),
 					contentPadding = PaddingValues(10.dp),
 					horizontalArrangement = Arrangement.spacedBy(10.dp),
 					verticalItemSpacing = 10.dp
 				) { topic ->
 					TopicCard(
 						topic = topic,
-						cardWidth = cardWidth,
+						cardWidth = 150.dp,
 						modifier = Modifier.fillMaxWidth()
 					)
 				}

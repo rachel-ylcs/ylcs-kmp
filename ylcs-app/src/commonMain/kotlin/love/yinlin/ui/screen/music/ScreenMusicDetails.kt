@@ -28,6 +28,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.Orientation
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
@@ -36,8 +37,6 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.*
-import love.yinlin.resources.Res
-import love.yinlin.resources.no_audio_source
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
@@ -47,11 +46,9 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
-import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDetails.Args>(model) {
+class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusicDetails.Args>(model) {
     @Stable
     @Serializable
     data class Args(val id: String)
@@ -484,15 +481,12 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : Screen<ScreenMusicDe
         }
     }
 
+    override val title: String by derivedStateOf { musicInfo?.name ?: "" }
+
     @Composable
-    override fun Content() {
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
-            onBack = { pop() }
-        ) {
-            if (app.isPortrait) Portrait()
-            else Landscape()
-        }
+    override fun SubContent(orientation: Orientation) = when (orientation) {
+        Orientation.PORTRAIT -> Portrait()
+        Orientation.LANDSCAPE -> Landscape()
+        Orientation.SQUARE -> {}
     }
 }

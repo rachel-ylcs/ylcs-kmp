@@ -10,7 +10,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import love.yinlin.Local
 import love.yinlin.platform.app
 import org.jetbrains.compose.resources.Font
 import love.yinlin.resources.Res
@@ -210,11 +209,10 @@ private fun rachelShapes(): Shapes = Shapes(
 	extraLarge = RoundedCornerShape(12.dp)
 )
 
-@Suppress("SimplifyBooleanWithConstants")
 @Composable
 fun RachelTheme(darkMode: Boolean, content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = if (darkMode || Local.Client.ALWAYS_DARK_MODE) DarkColorScheme else LightColorScheme,
+		colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
 		shapes = rachelShapes(),
 		typography = rachelTypography(),
 		content = content

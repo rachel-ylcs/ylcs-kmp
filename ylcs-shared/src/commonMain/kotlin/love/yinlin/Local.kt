@@ -15,24 +15,9 @@ object Local {
 		const val DEVELOPMENT: Boolean = true
 		const val WITH_SERVER: Boolean = false
 
-		// < ------  始终深色模式  ------ >
-		// 开启后无视主题设置始终保持深色
-		const val ALWAYS_DARK_MODE = false
-
 		// < ------  动画时长  ------ >
 		// 基本动画时长(毫秒)
 		const val ANIMATION_DURATION = 400
-
-		// 桌面端配置
-		object Desktop {
-			// < ------  竖屏模式  ------ >
-			// 开启后桌面端将保持竖屏用于调试
-			const val ALWAYS_PORTRAIT = false
-
-			// < ------  屏幕比  ------ >
-			// 桌面端窗口占屏幕的比例
-			const val SCREEN_PERCENT = 0.85f
-		}
 	}
 
 	// 服务器配置

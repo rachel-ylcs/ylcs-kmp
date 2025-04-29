@@ -9,18 +9,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
@@ -41,12 +37,13 @@ fun main() {
 
     application {
         var isOpen by rememberState { true }
+
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,
             position = WindowPosition.Aligned(Alignment.Center),
-            width = context.windowWidth.dp,
-            height = context.windowHeight.dp
+            width = remember { context.physics.width.dp * 0.6f },
+            height = remember { context.physics.height.dp * 0.6f }
         )
 
         if (isOpen) {
@@ -59,14 +56,6 @@ fun main() {
                 transparent = true,
                 state = state,
             ) {
-                LaunchedEffect(state) {
-                    snapshotFlow { state.size }
-                        .onEach {
-                            context.screenWidth = (it.width.value * context.rawDensity).toInt()
-                            context.screenHeight = (it.height.value * context.rawDensity).toInt()
-                        }.launchIn(this)
-                }
-
                 AppWrapper {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {

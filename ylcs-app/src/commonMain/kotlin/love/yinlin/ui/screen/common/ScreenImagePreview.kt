@@ -20,20 +20,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.common.Orientation
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.FloatingDialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
-class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePreview.Args>(model) {
+class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePreview.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val images: List<Picture>, val index: Int)
@@ -174,21 +175,20 @@ class ScreenImagePreview(model: AppModel, args: Args) : Screen<ScreenImagePrevie
 		}
 	}
 
+	override val title: String by derivedStateOf { "${current + 1} / ${previews.size}" }
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "${current + 1} / ${previews.size}",
-			actions = {
-				Action(Icons.Filled.Download) {
-					downloadPicture()
-				}
-			},
-			onBack = { pop() }
-		) {
-			if (app.isPortrait) Portrait()
-			else Landscape()
+	override fun ActionScope.RightActions() {
+		Action(Icons.Filled.Download) {
+			downloadPicture()
 		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) = when (orientation) {
+		Orientation.PORTRAIT -> Portrait()
+		Orientation.LANDSCAPE -> Landscape()
+		Orientation.SQUARE -> {}
 	}
 
 	@Composable

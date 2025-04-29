@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.platform.app
@@ -25,11 +26,10 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenWeiboAlbum.Args>(model) {
+class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<ScreenWeiboAlbum.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val containerId: String, val title: String)
@@ -88,62 +88,58 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : Screen<ScreenW
 		requestAlbum(1)
 	}
 
+	override val title: String by derivedStateOf { "${args.title} - 共 $num 张" }
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "${args.title} - 共 $num 张",
-			onBack = { pop() }
+	override fun SubContent(orientation: Orientation) {
+		Column(
+			modifier = Modifier.fillMaxSize().padding(10.dp),
+			verticalArrangement = Arrangement.spacedBy(10.dp),
 		) {
-			Column(
-				modifier = Modifier.fillMaxSize().padding(10.dp),
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+			val data = caches[current]
+			StatefulBox(
+				state = state,
+				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
-				val data = caches[current]
-				StatefulBox(
-					state = state,
-					modifier = Modifier.fillMaxWidth().weight(1f)
+				if (data != null) LazyVerticalGrid(
+					columns = GridCells.Adaptive(75.dp),
+					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					verticalArrangement = Arrangement.spacedBy(10.dp),
+					modifier = Modifier.fillMaxSize()
 				) {
-					if (data != null) LazyVerticalGrid(
-						columns = GridCells.Adaptive(if (app.isPortrait) 75.dp else 120.dp),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
-						verticalArrangement = Arrangement.spacedBy(10.dp),
-						modifier = Modifier.fillMaxSize()
-					) {
-						itemsIndexed(
-							items = data.items,
-							key = { index, pic -> pic.image }
-						){ index, pic ->
-							WebImage(
-								uri = pic.image,
-								modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-								onClick = { navigate(ScreenImagePreview.Args(data.items, index)) }
-							)
-						}
+					itemsIndexed(
+						items = data.items,
+						key = { index, pic -> pic.image }
+					){ index, pic ->
+						WebImage(
+							uri = pic.image,
+							modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+							onClick = { navigate(ScreenImagePreview.Args(data.items, index)) }
+						)
 					}
 				}
-				if (data != null) {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						ClickIcon(
-							icon = Icons.Outlined.FirstPage,
-							size = 32.dp,
-							onClick = { onPrevious() }
-						)
-						Text(
-							text = "第 $current 页",
-							style = MaterialTheme.typography.bodyLarge,
-							textAlign = TextAlign.Center
-						)
-						ClickIcon(
-							icon = Icons.AutoMirrored.Outlined.LastPage,
-							size = 32.dp,
-							onClick = { onNext() }
-						)
-					}
+			}
+			if (data != null) {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					ClickIcon(
+						icon = Icons.Outlined.FirstPage,
+						size = 32.dp,
+						onClick = { onPrevious() }
+					)
+					Text(
+						text = "第 $current 页",
+						style = MaterialTheme.typography.bodyLarge,
+						textAlign = TextAlign.Center
+					)
+					ClickIcon(
+						icon = Icons.AutoMirrored.Outlined.LastPage,
+						size = 32.dp,
+						onClick = { onNext() }
+					)
 				}
 			}
 		}

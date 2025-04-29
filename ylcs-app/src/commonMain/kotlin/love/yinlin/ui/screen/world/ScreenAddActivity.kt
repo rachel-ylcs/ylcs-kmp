@@ -1,28 +1,27 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.FloatingDialogCrop
-import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.CommonScreen
+import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenAddActivity(model: AppModel) : CommonScreen(model) {
+class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 	private val cropDialog = FloatingDialogCrop()
 	private val input = ActivityInputState()
 
@@ -65,31 +64,29 @@ class ScreenAddActivity(model: AppModel) : CommonScreen(model) {
 		}
 	}
 
+	override val title: String = "添加活动"
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "添加活动",
-			onBack = { pop() },
-			actions = {
-				ActionSuspend(
-					icon = Icons.Outlined.Check,
-					enabled = input.canSubmit
-				) {
-					addActivity()
-				}
-			}
+	override fun ActionScope.RightActions() {
+		ActionSuspend(
+			icon = Icons.Outlined.Check,
+			enabled = input.canSubmit
 		) {
-			ActivityInfoLayout(
-				cropDialog = cropDialog,
-				input = input,
-				onPicAdd = { input.pic = Picture(it.toString()) },
-				onPicDelete = { input.pic = null },
-				onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
-				onPicsDelete = { input.pics.removeAt(it) },
-				onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
-			)
+			addActivity()
 		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) {
+		ActivityInfoLayout(
+			cropDialog = cropDialog,
+			input = input,
+			onPicAdd = { input.pic = Picture(it.toString()) },
+			onPicDelete = { input.pic = null },
+			onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
+			onPicsDelete = { input.pics.removeAt(it) },
+			onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
+		)
 	}
 
 	@Composable

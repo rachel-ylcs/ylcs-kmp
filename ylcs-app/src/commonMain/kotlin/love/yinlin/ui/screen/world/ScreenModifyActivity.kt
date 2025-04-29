@@ -1,17 +1,16 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -19,12 +18,12 @@ import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.FloatingDialogCrop
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
 import kotlin.collections.plus
 
 @Stable
-class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<ScreenModifyActivity.Args>(model) {
+class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<ScreenModifyActivity.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val aid: Int)
@@ -194,31 +193,29 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : Screen<Scr
 		slot.loading.close()
 	}
 
+	override val title: String = "修改活动"
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "修改活动",
-			onBack = { pop() },
-			actions = {
-				ActionSuspend(
-					icon = Icons.Outlined.Check,
-					enabled = input.canSubmit
-				) {
-					modifyActivity()
-				}
-			}
+	override fun ActionScope.RightActions() {
+		ActionSuspend(
+			icon = Icons.Outlined.Check,
+			enabled = input.canSubmit
 		) {
-			ActivityInfoLayout(
-				cropDialog = cropDialog,
-				input = input,
-				onPicAdd = { launch { modifyPicture(it) } },
-				onPicDelete = { launch { deletePicture() } },
-				onPicsAdd = { launch { addPictures(it) } },
-				onPicsDelete = { launch { deletePictures(it) } },
-				onPicsClick = { _, index -> launch { modifyPictures(index) } }
-			)
+			modifyActivity()
 		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) {
+		ActivityInfoLayout(
+			cropDialog = cropDialog,
+			input = input,
+			onPicAdd = { launch { modifyPicture(it) } },
+			onPicDelete = { launch { deletePicture() } },
+			onPicsAdd = { launch { addPictures(it) } },
+			onPicsDelete = { launch { deletePictures(it) } },
+			onPicsClick = { _, index -> launch { modifyPictures(index) } }
+		)
 	}
 
 	@Composable

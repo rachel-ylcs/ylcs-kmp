@@ -41,6 +41,8 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.common.ThemeStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -701,10 +703,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-    @Composable
+	@Composable
 	override fun Content() {
-		if (app.isPortrait) Portrait()
-		else Landscape()
+		when (LocalOrientation.current) {
+			Orientation.PORTRAIT -> Portrait()
+			Orientation.LANDSCAPE -> Landscape()
+			Orientation.SQUARE -> {}
+		}
 	}
 
 	@OptIn(ExperimentalMaterial3Api::class)

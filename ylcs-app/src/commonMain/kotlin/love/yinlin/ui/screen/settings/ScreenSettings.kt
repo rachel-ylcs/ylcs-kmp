@@ -30,6 +30,7 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.Colors
 import love.yinlin.common.KVConfig
+import love.yinlin.common.Orientation
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeMode
 import love.yinlin.data.Data
@@ -49,16 +50,16 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.CommonScreen
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class ScreenSettings(model: AppModel) : CommonScreen(model) {
+class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private val crashLogSheet = FloatingSheet()
 	private val feedbackSheet = FloatingSheet()
 	private val privacyPolicySheet = FloatingSheet()
@@ -403,19 +404,16 @@ class ScreenSettings(model: AppModel) : CommonScreen(model) {
 		}
 	}
 
-	@Composable
-	override fun Content() {
-		val userProfile = app.config.userProfile
+	override val title: String = "设置"
 
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "设置",
-			onBack = { pop() }
-		) {
-			if (app.isPortrait) Portrait(userProfile)
-			else Landscape(userProfile)
+	@Composable
+	override fun SubContent(orientation: Orientation) = app.config.userProfile?.let {
+		when (orientation) {
+			Orientation.PORTRAIT -> Portrait(it)
+			Orientation.LANDSCAPE -> Landscape(it)
+			Orientation.SQUARE -> {}
 		}
-	}
+	} ?: EmptyBox()
 
 	@Composable
 	override fun Floating() {

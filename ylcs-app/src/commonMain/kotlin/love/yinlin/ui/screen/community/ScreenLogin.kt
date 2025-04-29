@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
@@ -25,10 +26,9 @@ import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.painterResource
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
-import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenLogin(model: AppModel) : CommonScreen(model) {
+class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	private enum class Mode {
 		Login,
 		Register,
@@ -146,13 +146,13 @@ class ScreenLogin(model: AppModel) : CommonScreen(model) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = loginId,
-				hint = "输入昵称",
+				hint = "昵称",
 				maxLength = UserConstraint.MAX_NAME_LENGTH
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = loginPwd,
-				hint = "输入密码",
+				hint = "密码",
 				inputType = InputType.PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH
 			)
@@ -201,27 +201,27 @@ class ScreenLogin(model: AppModel) : CommonScreen(model) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerId,
-				hint = "输入注册昵称",
+				hint = "注册昵称",
 				maxLength = UserConstraint.MAX_NAME_LENGTH
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd,
-				hint = "输入密码",
+				hint = "密码",
 				inputType = InputType.PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd2,
-				hint = "再确认一次密码",
+				hint = "确认密码",
 				inputType = InputType.PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerInviter,
-				hint = "输入邀请人昵称",
+				hint = "邀请人昵称",
 				maxLength = UserConstraint.MAX_NAME_LENGTH
 			)
 			Text(
@@ -252,13 +252,13 @@ class ScreenLogin(model: AppModel) : CommonScreen(model) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = forgotPasswordId,
-				hint = "输入昵称",
+				hint = "昵称",
 				maxLength = UserConstraint.MAX_NAME_LENGTH
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = forgotPasswordPwd,
-				hint = "输入修改后的新密码",
+				hint = "新密码",
 				inputType = InputType.PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH
 			)
@@ -336,19 +336,18 @@ class ScreenLogin(model: AppModel) : CommonScreen(model) {
 		}
 	}
 
-	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = when (mode) {
-				Mode.Login -> "登录"
-				Mode.Register -> "注册"
-				Mode.ForgotPassword -> "忘记密码"
-			},
-			onBack = { pop() }
-		) {
-			if (app.isPortrait) Portrait()
-			else Landscape()
+	override val title: String by derivedStateOf {
+		when (mode) {
+			Mode.Login -> "登录"
+			Mode.Register -> "注册"
+			Mode.ForgotPassword -> "忘记密码"
 		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) = when (orientation) {
+		Orientation.PORTRAIT -> Portrait()
+		Orientation.LANDSCAPE -> Landscape()
+		Orientation.SQUARE -> {}
 	}
 }

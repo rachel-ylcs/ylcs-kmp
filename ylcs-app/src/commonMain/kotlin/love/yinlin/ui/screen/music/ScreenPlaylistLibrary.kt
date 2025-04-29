@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -34,13 +35,13 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.CommonScreen
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -103,7 +104,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 }
 
 @Stable
-class ScreenPlaylistLibrary(model: AppModel) : CommonScreen(model) {
+class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
@@ -309,32 +310,32 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonScreen(model) {
         }
     }
 
+    override val title: String = "歌单"
+
     @Composable
-    override fun Content() {
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = "歌单",
-            onBack = { pop() },
-            leftActions = {
-                if (currentPage != -1) {
-                    ActionSuspend(Icons.Outlined.PlayArrow) {
-                        playPlaylist()
-                    }
-                }
-            },
-            actions = {
-                Action(Icons.Outlined.CloudUpload) {
-                    cloudBackupSheet.open()
-                }
-                ActionSuspend(Icons.Outlined.Add) {
-                    addPlaylist()
-                }
+    override fun ActionScope.LeftActions() {
+        if (currentPage != -1) {
+            ActionSuspend(Icons.Outlined.PlayArrow) {
+                playPlaylist()
             }
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                PlaylistTab(modifier = Modifier.fillMaxWidth())
-                PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
-            }
+        }
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        Action(Icons.Outlined.CloudUpload) {
+            cloudBackupSheet.open()
+        }
+        ActionSuspend(Icons.Outlined.Add) {
+            addPlaylist()
+        }
+    }
+
+    @Composable
+    override fun SubContent(orientation: Orientation) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PlaylistTab(modifier = Modifier.fillMaxWidth())
+            PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
         }
     }
 

@@ -3,38 +3,26 @@ package love.yinlin.platform
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import io.ktor.client.*
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.common.ThemeMode
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
+import love.yinlin.common.ThemeMode
 
 @Stable
-abstract class AppContext {
+data class PhysicalGraphics(val width: Int, val height: Int, val density: Density)
+
+@Stable
+abstract class AppContext(val physics: PhysicalGraphics) {
 	companion object {
 		const val CRASH_KEY = "crash_key"
 	}
 
-	// 屏幕宽度
-	var screenWidth: Int by mutableIntStateOf(0)
-	// 屏幕高度
-	var screenHeight: Int by mutableIntStateOf(0)
-	// 字体缩放
-	abstract val fontScale: Float
-	// 是否竖屏
-	val isPortrait: Boolean by derivedStateOf { screenWidth <= screenHeight }
-	// 设计宽度
-	val designWidth: Dp get() = if (isPortrait) 360.dp else 1200.dp
-	// 设计高度
-	val designHeight: Dp get() = 800.dp
+	abstract fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density
 
 	// 主题
 

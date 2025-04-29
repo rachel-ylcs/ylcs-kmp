@@ -24,19 +24,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
+import love.yinlin.common.Orientation
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.deleteRecursively
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
-import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.CommonScreen
 
 @Stable
 data class MusicInfoPreview(
@@ -104,7 +104,7 @@ private fun MusicCard(
 }
 
 @Stable
-class ScreenMusicLibrary(model: AppModel) : CommonScreen(model) {
+class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
@@ -217,80 +217,80 @@ class ScreenMusicLibrary(model: AppModel) : CommonScreen(model) {
         resetLibrary()
     }
 
-    @Composable
-    override fun Content() {
-        val title by rememberDerivedState {
-            if (isManaging) "选择歌曲"
-            else if (!isSearching) "曲库"
-            else if (library.isEmpty()) "搜索为空"
-            else "搜索结果"
-        }
+    override val title: String by derivedStateOf {
+        if (isManaging) "选择歌曲"
+        else if (!isSearching) "曲库"
+        else if (library.isEmpty()) "搜索为空"
+        else "搜索结果"
+    }
 
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = title,
-            onBack = {
-                if (isManaging) exitManagement()
-                else if (isSearching) closeSearch()
-                else pop()
-            },
-            actions = {
-                if (isManaging) {
-                    ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
-                        onMusicAdd()
-                    }
-                    ActionSuspend(Icons.Outlined.Delete) {
-                        onMusicDelete()
-                    }
-                }
+    override fun onBack() {
+        if (isManaging) exitManagement()
+        else if (isSearching) closeSearch()
+        else pop()
+    }
+
+    @Composable
+    override fun ActionScope.LeftActions() {
+        if (isSearching) {
+            Action(Icons.Outlined.Close) {
+                closeSearch()
+            }
+        }
+        if (isManaging) {
+            Action(Icons.Outlined.SelectAll) {
+                if (library.all { it.selected }) exitManagement()
+                else selectAll()
+            }
+        }
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        if (isManaging) {
+            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+                onMusicAdd()
+            }
+            ActionSuspend(Icons.Outlined.Delete) {
+                onMusicDelete()
+            }
+        }
+        else {
+            Action(Icons.Outlined.Add) {
+                if (app.musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
                 else {
-                    Action(Icons.Outlined.Add) {
-                        if (app.musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
-                        else {
-                            pop()
-                            navigate(ScreenImportMusic.Args(null))
-                        }
-                    }
-                    ActionSuspend(Icons.Outlined.Search) {
-                        openSearch()
-                    }
-                }
-            },
-            leftActions = {
-                if (isSearching) {
-                    Action(Icons.Outlined.Close) {
-                        closeSearch()
-                    }
-                }
-                if (isManaging) {
-                    Action(Icons.Outlined.SelectAll) {
-                        if (library.all { it.selected }) exitManagement()
-                        else selectAll()
-                    }
+                    pop()
+                    navigate(ScreenImportMusic.Args(null))
                 }
             }
-        ) {
-            if (library.isEmpty()) EmptyBox()
-            else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(if (app.isPortrait) 150.dp else 200.dp),
-                    contentPadding = PaddingValues(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    itemsIndexed(
-                        items = library,
-                        key = { index, item -> item.id }
-                    ) { index, item ->
-                        MusicCard(
-                            musicInfo = item,
-                            enableLongClick = !isManaging,
-                            onLongClick = { onCardLongClick(index) },
-                            onClick = { onCardClick(index) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+            ActionSuspend(Icons.Outlined.Search) {
+                openSearch()
+            }
+        }
+    }
+
+    @Composable
+    override fun SubContent(orientation: Orientation) {
+        if (library.isEmpty()) EmptyBox()
+        else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                contentPadding = PaddingValues(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                itemsIndexed(
+                    items = library,
+                    key = { index, item -> item.id }
+                ) { index, item ->
+                    MusicCard(
+                        musicInfo = item,
+                        enableLongClick = !isManaging,
+                        onLongClick = { onCardLongClick(index) },
+                        onClick = { onCardClick(index) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

@@ -17,9 +17,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
+import love.yinlin.AppModel
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.layout.SplitActionLayout
+import love.yinlin.ui.screen.Screen
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {
@@ -68,93 +72,84 @@ sealed class ActionScope(private val ltr: Boolean) {
 	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@Composable
-fun SubScreen(
-	modifier: Modifier = Modifier,
-	title: @Composable () -> Unit,
-	actions: @Composable (ActionScope.() -> Unit) = {},
-	bottomBar: @Composable () -> Unit = {},
-	leftActions: @Composable (ActionScope.() -> Unit) = {},
-	onBack: (() -> Unit)? = null,
-	content: @Composable () -> Unit
-) {
-	BackHandler { onBack?.invoke() }
+@Stable
+abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
+	protected abstract val title: String
 
-	Scaffold(modifier = modifier) {
-		Column(modifier = Modifier.fillMaxSize().padding(it)) {
-			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(20f),
-				tonalElevation = 1.dp,
-				shadowElevation = 5.dp
-			) {
-				Box(
-					modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp),
-					contentAlignment = Alignment.Center
+	protected open fun onBack() { pop() }
+
+	@Composable
+	protected open fun ActionScope.LeftActions() { }
+
+	@Composable
+	protected open fun ActionScope.RightActions() { }
+
+	@Composable
+	protected open fun BottomBar() { }
+
+	@Composable
+	protected abstract fun SubContent(orientation: Orientation)
+
+	@OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+	final override fun Content() {
+		BackHandler { onBack() }
+
+		Scaffold(modifier = Modifier.fillMaxSize()) {
+			Column(modifier = Modifier.fillMaxSize().padding(it)) {
+				Surface(
+					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
+					tonalElevation = 1.dp,
+					shadowElevation = 5.dp
 				) {
 					Box(
-						modifier = Modifier.fillMaxWidth().zIndex(10f),
+						modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp),
 						contentAlignment = Alignment.Center
 					) {
-						title()
-					}
-					SplitActionLayout(
-						modifier = Modifier.fillMaxWidth().zIndex(5f),
-						left = {
-							if (onBack != null) {
+						Box(
+							modifier = Modifier.fillMaxWidth().zIndex(10f),
+							contentAlignment = Alignment.Center
+						) {
+							Text(
+								text = title,
+								style = MaterialTheme.typography.titleMedium,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis
+							)
+						}
+						SplitActionLayout(
+							modifier = Modifier.fillMaxWidth().zIndex(5f),
+							left = {
 								ClickIcon(
 									modifier = Modifier.padding(start = 10.dp),
 									icon = Icons.AutoMirrored.Outlined.ArrowBack,
-									onClick = onBack
+									onClick = ::onBack
 								)
+								LeftActions()
+							},
+							right = {
+								RightActions()
 							}
-							leftActions()
-						},
-						right = actions
-					)
+						)
+					}
 				}
-			}
-			Box(
-				modifier = Modifier.fillMaxWidth().weight(1f)
-					.background(MaterialTheme.colorScheme.background)
-			) {
-				content()
-			}
-			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(20f),
-				tonalElevation = 1.dp,
-				shadowElevation = 5.dp
-			) {
-				bottomBar()
+				Box(
+					modifier = Modifier.fillMaxWidth().weight(1f)
+						.background(MaterialTheme.colorScheme.background)
+				) {
+					SubContent(LocalOrientation.current)
+				}
+				Surface(
+					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
+					tonalElevation = 1.dp,
+					shadowElevation = 5.dp
+				) {
+					BottomBar()
+				}
 			}
 		}
 	}
 }
 
-@Composable
-fun SubScreen(
-	modifier: Modifier = Modifier,
-	title: String = "",
-	actions: @Composable (ActionScope.() -> Unit) = {},
-	bottomBar: @Composable () -> Unit = {},
-	leftActions: @Composable (ActionScope.() -> Unit) = {},
-	onBack: () -> Unit,
-	content: @Composable () -> Unit
-) {
-	SubScreen(
-		modifier = modifier,
-		title = {
-			Text(
-				text = title,
-				style = MaterialTheme.typography.titleMedium,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
-			)
-		},
-		actions = actions,
-		bottomBar = bottomBar,
-		leftActions = leftActions,
-		onBack = onBack,
-		content = content
-	)
-}
+@Stable
+abstract class CommonSubScreen(model: AppModel) : SubScreen<Unit>(model)

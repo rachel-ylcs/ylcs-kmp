@@ -25,8 +25,9 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.extension.clickableNoRipple
-import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
@@ -44,10 +45,10 @@ import kotlin.math.roundToInt
 
 @Stable
 abstract class FloatingDialog<R>() : Floating<Unit>() {
-	override val alignment: Alignment = Alignment.Center
-	override val enter: EnterTransition = scaleIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
+	override fun alignment(orientation: Orientation): Alignment = Alignment.Center
+	override fun enter(orientation: Orientation): EnterTransition = scaleIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
 			fadeIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
-	override val exit: ExitTransition = scaleOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
+	override fun exit(orientation: Orientation): ExitTransition = scaleOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
 			fadeOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
 	override val zIndex: Float = Z_INDEX_DIALOG
 
@@ -105,9 +106,14 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 			override val maxContentHeight: Dp = 280.dp
 			override val width: Dp = 500.dp
 		}
-	}
 
-	private val info: DialogInfo = if (app.isPortrait) DialogInfo.Portrait else DialogInfo.Landscape
+		data object Square : DialogInfo {
+			override val rachelWidth: Dp = 140.dp
+			override val minContentHeight: Dp = 40.dp
+			override val maxContentHeight: Dp = 280.dp
+			override val width: Dp = 500.dp
+		}
+	}
 
 	open val scrollable: Boolean get() = true
 	abstract val title: String?
@@ -115,6 +121,12 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 
 	@Composable
 	override fun Wrapper(block: @Composable () -> Unit) {
+		val info = when (LocalOrientation.current) {
+			Orientation.PORTRAIT -> DialogInfo.Portrait
+			Orientation.LANDSCAPE -> DialogInfo.Landscape
+			Orientation.SQUARE -> DialogInfo.Square
+		}
+
 		Column(
 			modifier = Modifier.width(info.width)
 				.clickableNoRipple { close() }

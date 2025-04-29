@@ -79,8 +79,8 @@ open class Tip(private val scope: CoroutineScope) {
             }
             Box(
                 modifier = Modifier.padding(
-                    horizontal = if (app.isPortrait) 20.dp else 100.dp,
-                    vertical = if (app.isPortrait) 20.dp else 40.dp,
+                    horizontal = 20.dp,
+                    vertical = 20.dp,
                 ).fillMaxWidth()
                     .clickableNoRipple { }
                     .background(

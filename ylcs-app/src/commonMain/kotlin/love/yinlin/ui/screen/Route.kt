@@ -32,7 +32,7 @@ class SubScreenSlot(scope: CoroutineScope) {
 abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
 	inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
-	inline fun <reified T : CommonScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
+	inline fun <reified T : Screen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun pop() = model.pop()
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
@@ -66,17 +66,14 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	}
 }
 
-@Stable
-abstract class CommonScreen(model: AppModel) : Screen<Unit>(model)
-
 data class ScreenRouteScope(
 	val builder: NavGraphBuilder,
 	val model: AppModel
 )
 
-inline fun <reified S : CommonScreen> route(): String = "rachel.${S::class.qualifiedName!!}"
+inline fun <reified S : Screen<Unit>> route(): String = "rachel.${S::class.qualifiedName!!}"
 
-inline fun <reified S : CommonScreen> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
+inline fun <reified S : Screen<Unit>> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
 	val appModel = this.model
 	this.builder.composable(route = route<S>()) {
 		val screen = viewModel {

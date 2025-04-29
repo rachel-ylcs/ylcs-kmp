@@ -16,13 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
-import love.yinlin.platform.app
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.screen.CommonScreen
+import love.yinlin.ui.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -119,7 +120,7 @@ private fun LandscapeNavigation(
 }
 
 @Stable
-class ScreenMain(model: AppModel) : CommonScreen(model) {
+class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 	private val pagerState = object : PagerState() {
 		override val pageCount: Int = TabItem.entries.size
 	}
@@ -152,8 +153,8 @@ class ScreenMain(model: AppModel) : CommonScreen(model) {
 	}
 
 	@Composable
-	private fun Portrait(modifier: Modifier = Modifier) {
-		Scaffold(modifier = modifier) {
+	private fun Portrait() {
+		Scaffold(modifier = Modifier.fillMaxSize()) {
 			Column(modifier = Modifier.fillMaxSize().padding(it)) {
 				PageContent(modifier = Modifier.fillMaxWidth().weight(1f))
 				PortraitNavigation(
@@ -168,8 +169,8 @@ class ScreenMain(model: AppModel) : CommonScreen(model) {
 	}
 
 	@Composable
-	private fun Landscape(modifier: Modifier = Modifier) {
-		Scaffold(modifier = modifier) {
+	private fun Landscape() {
+		Scaffold(modifier = Modifier.fillMaxSize()) {
 			Row(modifier = Modifier.fillMaxSize().padding(it)) {
 				LandscapeNavigation(
 					modifier = Modifier.fillMaxHeight(),
@@ -189,8 +190,11 @@ class ScreenMain(model: AppModel) : CommonScreen(model) {
 
 	@Composable
 	override fun Content() {
-		if (app.isPortrait) Portrait(modifier = Modifier.fillMaxSize())
-		else Landscape(modifier = Modifier.fillMaxSize())
+		when (LocalOrientation.current) {
+			Orientation.PORTRAIT -> Portrait()
+			Orientation.LANDSCAPE -> Landscape()
+			Orientation.SQUARE -> {}
+		}
 	}
 
 	@Composable

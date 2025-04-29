@@ -20,6 +20,8 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
@@ -68,7 +70,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			pics = pics,
 			spacing = spacing,
 			gap = gap,
-			interval = 3000L,
+			interval = 5000L,
 			modifier = modifier
 		) { pic, index, scale ->
 			Surface(
@@ -123,57 +125,71 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	override fun Content() {
+	private fun ToolBar(modifier: Modifier = Modifier) {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 
-		Column(modifier = Modifier.fillMaxSize()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth(),
-				shadowElevation = 5.dp
+		Surface(
+			modifier = modifier,
+			shadowElevation = 5.dp
+		) {
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+				horizontalArrangement = Arrangement.End,
 			) {
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
-					horizontalArrangement = Arrangement.End,
-				) {
-					ActionScope.Right.Actions {
-						if (hasPrivilegeVIPCalendar) {
-							Action(Icons.Outlined.Add) {
-								navigate<ScreenAddActivity>()
-							}
+				ActionScope.Right.Actions {
+					if (hasPrivilegeVIPCalendar) {
+						Action(Icons.Outlined.Add) {
+							navigate<ScreenAddActivity>()
 						}
-						ActionSuspend(Icons.Outlined.Refresh) {
-							requestActivity()
-						}
+					}
+					ActionSuspend(Icons.Outlined.Refresh) {
+						requestActivity()
 					}
 				}
 			}
-			Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-				if (app.isPortrait) {
-					Column(
-						modifier = Modifier.fillMaxSize(),
-						verticalArrangement = Arrangement.SpaceBetween
-					) {
-						BannerLayout(
-							spacing = 40.dp,
-							gap = 10.dp,
-							modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
-						)
-						CalendarLayout(
-							modifier = Modifier.fillMaxWidth().padding(10.dp)
-						)
-					}
-				}
-				else {
-					Row(modifier = Modifier.fillMaxSize()) {
-						BannerLayout(
-							spacing = 100.dp,
-							gap = 50.dp,
-							modifier = Modifier.weight(2f).padding(start = 10.dp, top = 10.dp)
-						)
-						CalendarLayout(
-							modifier = Modifier.weight(1f).padding(10.dp)
-						)
-					}
+		}
+	}
+
+	@Composable
+	private fun Portrait(modifier: Modifier = Modifier) {
+		Column(
+			modifier = modifier,
+			verticalArrangement = Arrangement.SpaceBetween
+		) {
+			BannerLayout(
+				spacing = 40.dp,
+				gap = 10.dp,
+				modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp)
+			)
+			CalendarLayout(
+				modifier = Modifier.fillMaxWidth().padding(10.dp)
+			)
+		}
+	}
+
+	@Composable
+	private fun Landscape(modifier: Modifier = Modifier) {
+		Row(modifier = modifier) {
+			BannerLayout(
+				spacing = 100.dp,
+				gap = 50.dp,
+				modifier = Modifier.weight(2f).padding(start = 10.dp, top = 10.dp)
+			)
+			CalendarLayout(
+				modifier = Modifier.weight(1f).padding(10.dp)
+			)
+		}
+	}
+
+	@Composable
+	override fun Content() {
+		Column(modifier = Modifier.fillMaxSize()) {
+			ToolBar(modifier = Modifier.fillMaxWidth())
+			when (LocalOrientation.current) {
+				Orientation.PORTRAIT -> Portrait(modifier = Modifier.fillMaxWidth().weight(1f))
+				Orientation.LANDSCAPE -> Landscape(modifier = Modifier.fillMaxWidth().weight(1f))
+				Orientation.SQUARE -> {
+
 				}
 			}
 		}

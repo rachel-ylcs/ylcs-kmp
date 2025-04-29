@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
@@ -32,12 +33,11 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingArgsSheet
-import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenMail(model: AppModel) : CommonScreen(model) {
+class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	private var state by mutableStateOf(BoxState.EMPTY)
 
 	private val page = object : PaginationArgs<Mail, Long, Boolean>(Long.MAX_VALUE, false) {
@@ -178,32 +178,28 @@ class ScreenMail(model: AppModel) : CommonScreen(model) {
 		requestNewMails()
 	}
 
+	override val title: String = "邮箱"
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "邮箱",
-			onBack = { pop() }
+	override fun SubContent(orientation: Orientation) {
+		StatefulBox(
+			state = state,
+			modifier = Modifier.fillMaxSize()
 		) {
-			StatefulBox(
-				state = state,
-				modifier = Modifier.fillMaxSize()
+			PaginationGrid(
+				items = page.items,
+				key = { it.mid },
+				columns = GridCells.Adaptive(300.dp),
+				canRefresh = true,
+				canLoading = page.canLoading,
+				onRefresh = { requestNewMails() },
+				onLoading = { requestMoreMails() },
+				modifier = Modifier.fillMaxSize(),
+				contentPadding = PaddingValues(10.dp),
+				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy(10.dp)
 			) {
-				PaginationGrid(
-					items = page.items,
-					key = { it.mid },
-					columns = GridCells.Adaptive(300.dp),
-					canRefresh = true,
-					canLoading = page.canLoading,
-					onRefresh = { requestNewMails() },
-					onLoading = { requestMoreMails() },
-					modifier = Modifier.fillMaxSize(),
-					contentPadding = PaddingValues(10.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalArrangement = Arrangement.spacedBy(10.dp)
-				) {
-					MailItem(mail = it)
-				}
+				MailItem(mail = it)
 			}
 		}
 	}

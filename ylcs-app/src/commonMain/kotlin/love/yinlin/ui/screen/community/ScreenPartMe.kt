@@ -42,6 +42,8 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.LocalOrientation
+import love.yinlin.common.Orientation
 import love.yinlin.common.Scheme
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
@@ -241,8 +243,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		val userProfile = app.config.userProfile
 		if (userProfile == null) LoginBox(Modifier.fillMaxSize())
 		else {
-			if (app.isPortrait) Portrait(userProfile)
-			else Landscape(userProfile)
+			when (LocalOrientation.current) {
+				Orientation.PORTRAIT -> Portrait(userProfile = userProfile)
+				Orientation.LANDSCAPE -> Landscape(userProfile = userProfile)
+				Orientation.SQUARE -> {}
+			}
 		}
 	}
 

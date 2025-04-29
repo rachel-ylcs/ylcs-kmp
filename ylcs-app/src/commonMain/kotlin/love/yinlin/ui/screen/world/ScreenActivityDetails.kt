@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -28,7 +29,6 @@ import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.NineGrid
@@ -37,6 +37,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.resources.*
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.screen.common.ScreenWebpage
 
 @Composable
@@ -84,7 +85,7 @@ private fun ActivityDetailsLayout(
 }
 
 @Stable
-class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<ScreenActivityDetails.Args>(model) {
+class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen<ScreenActivityDetails.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val aid: Int)
@@ -188,55 +189,59 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : Screen<Sc
 	}
 
 	@Composable
-	override fun Content() {
-		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
-
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = activity?.title ?: "未知活动",
-			onBack = { pop() },
-			actions = {
-				if (hasPrivilegeVIPCalendar) {
-					Action(Icons.Outlined.Edit) {
-						navigate(ScreenModifyActivity.Args(args.aid))
-					}
-					ActionSuspend(Icons.Outlined.Delete) {
-						deleteActivity()
-					}
-				}
-			}
+	private fun Portrait(activity: Activity) {
+		Column(
+			modifier = Modifier.fillMaxSize().padding(10.dp)
+				.verticalScroll(rememberScrollState()),
+			verticalArrangement = Arrangement.spacedBy(10.dp)
 		) {
-			activity?.let { activity ->
-				if (app.isPortrait) {
-					Column(
-						modifier = Modifier.fillMaxSize().padding(10.dp)
-							.verticalScroll(rememberScrollState()),
-						verticalArrangement = Arrangement.spacedBy(10.dp)
-					) {
-						ActivityDetailsLayout(
-							activity = activity,
-							modifier = Modifier.fillMaxWidth()
-						)
-						ActivityPictureLayout(
-							activity = activity,
-							modifier = Modifier.fillMaxWidth()
-						)
-					}
-				}
-				else {
-					Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
-						ActivityDetailsLayout(
-							activity = activity,
-							modifier = Modifier.weight(2f)
-						)
-						VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
-						ActivityPictureLayout(
-							activity = activity,
-							modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())
-						)
-					}
-				}
+			ActivityDetailsLayout(
+				activity = activity,
+				modifier = Modifier.fillMaxWidth()
+			)
+			ActivityPictureLayout(
+				activity = activity,
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
+	}
+
+	@Composable
+	private fun Landscape(activity: Activity) {
+		Row(modifier = Modifier.fillMaxSize().padding(10.dp)) {
+			ActivityDetailsLayout(
+				activity = activity,
+				modifier = Modifier.weight(2f)
+			)
+			VerticalDivider(modifier = Modifier.padding(horizontal = 10.dp))
+			ActivityPictureLayout(
+				activity = activity,
+				modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())
+			)
+		}
+	}
+
+	override val title: String by derivedStateOf { activity?.title ?: "未知活动" }
+
+	@Composable
+	override fun ActionScope.RightActions() {
+		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
+		if (hasPrivilegeVIPCalendar) {
+			Action(Icons.Outlined.Edit) {
+				navigate(ScreenModifyActivity.Args(args.aid))
+			}
+			ActionSuspend(Icons.Outlined.Delete) {
+				deleteActivity()
 			}
 		}
 	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) = activity?.let {
+		when (orientation) {
+			Orientation.PORTRAIT -> Portrait(it)
+			Orientation.LANDSCAPE -> Landscape(it)
+			Orientation.SQUARE -> {}
+		}
+	} ?: EmptyBox()
 }

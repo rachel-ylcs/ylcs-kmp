@@ -3,6 +3,9 @@ package love.yinlin.platform
 
 import android.content.Context
 import androidx.activity.result.ActivityResultRegistry
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
@@ -11,11 +14,21 @@ import com.github.panpf.sketch.util.Logger
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
-class ActualAppContext(val context: Context) : AppContext() {
-	override val screenWidth: Int = context.resources.displayMetrics.widthPixels
-	override val screenHeight: Int = context.resources.displayMetrics.heightPixels
-	override val fontScale: Float = 1f
+class ActualAppContext(val context: Context) : AppContext(run {
+	val metrics = context.resources.displayMetrics
+	PhysicalGraphics(width = metrics.widthPixels, height = metrics.heightPixels, density = Density(metrics.density, 1f))
+}) {
+	companion object {
+		val DesignWidth = 360.dp
+		val DesignHeight = 800.dp
+	}
+
 	override val kv: KV = KV(context)
+
+	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = Density(
+		if (newWidth <= newHeight) physics.width / DesignWidth.value else physics.height / DesignHeight.value,
+		oldDensity.fontScale
+	)
 
 	var activityResultRegistry: ActivityResultRegistry? = null
 

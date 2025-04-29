@@ -27,6 +27,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
@@ -40,13 +41,13 @@ import love.yinlin.ui.component.layout.LoadingAnimation
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult
 import love.yinlin.ui.component.platform.dragAndDrop
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.Screen
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
 
 @Stable
-class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<ScreenImportMusic.Args>(model) {
+class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<ScreenImportMusic.Args>(model) {
     @Stable
     @Serializable
     data class Args(val deepLink: String?)
@@ -222,115 +223,115 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : Screen<Screen
         }
     }
 
-    @Composable
-    override fun Content() {
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = "导入歌曲",
-            onBack = { pop() },
-            actions = {
-                when (val currentStep = step) {
-                    is Step.Initial -> {
-                        ActionSuspend(
-                            icon = Icons.Outlined.Add,
-                            onClick = { loadModFile() }
-                        )
-                    }
-                    is Step.Prepare -> {
-                        Action(
-                            icon = Icons.Outlined.Refresh,
-                            onClick = { reset() }
-                        )
-                        Action(
-                            icon = Icons.Outlined.Preview,
-                            onClick = { launch { previewMod(currentStep.path) } }
-                        )
-                        Action(
-                            icon = Icons.Outlined.Check,
-                            onClick = { launch { processMod(currentStep.path) } }
-                        )
-                    }
-                    is Step.Preview -> {
-                        if (currentStep.preview != null) {
-                            Action(
-                                icon = Icons.Outlined.Refresh,
-                                onClick = { reset() }
-                            )
-                            Action(
-                                icon = Icons.Outlined.Check,
-                                onClick = { launch { processMod(currentStep.path) } }
-                            )
-                        }
-                    }
-                    is Step.Processing -> {}
-                }
-            },
-            leftActions = {
-                Action(Icons.Outlined.Extension) {
+    override val title: String = "导入歌曲"
 
+    @Composable
+    override fun ActionScope.LeftActions() {
+        Action(Icons.Outlined.Extension) {
+
+        }
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        when (val currentStep = step) {
+            is Step.Initial -> {
+                ActionSuspend(
+                    icon = Icons.Outlined.Add,
+                    onClick = { loadModFile() }
+                )
+            }
+            is Step.Prepare -> {
+                Action(
+                    icon = Icons.Outlined.Refresh,
+                    onClick = { reset() }
+                )
+                Action(
+                    icon = Icons.Outlined.Preview,
+                    onClick = { launch { previewMod(currentStep.path) } }
+                )
+                Action(
+                    icon = Icons.Outlined.Check,
+                    onClick = { launch { processMod(currentStep.path) } }
+                )
+            }
+            is Step.Preview -> {
+                if (currentStep.preview != null) {
+                    Action(
+                        icon = Icons.Outlined.Refresh,
+                        onClick = { reset() }
+                    )
+                    Action(
+                        icon = Icons.Outlined.Check,
+                        onClick = { launch { processMod(currentStep.path) } }
+                    )
                 }
             }
+            is Step.Processing -> {}
+        }
+    }
+
+    @Composable
+    override fun SubContent(orientation: Orientation) {
+        Box(
+            modifier = Modifier.fillMaxSize().dragAndDrop(
+                enabled = step is Step.Initial || step is Step.Prepare,
+                flag = DragFlag.FILE,
+                onDrop = {
+                    val files = (it as? DropResult.File)?.path
+                    if (files != null) {
+                        if (files.size == 1) step = Step.Prepare(NormalPath(files[0].toString()))
+                        else slot.tip.warning("最多一次只能导入一个MOD")
+                    }
+                }
+            ),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize().dragAndDrop(
-                    enabled = step is Step.Initial || step is Step.Prepare,
-                    flag = DragFlag.FILE,
-                    onDrop = {
-                        val files = (it as? DropResult.File)?.path
-                        if (files != null) {
-                            if (files.size == 1) step = Step.Prepare(NormalPath(files[0].toString()))
-                            else slot.tip.warning("最多一次只能导入一个MOD")
-                        }
-                    }
-                ),
-                contentAlignment = Alignment.Center
-            ) {
-                when (val currentStep = step) {
-                    is Step.Initial -> {
-                        Text(
-                            text = currentStep.message,
-                            color = if (currentStep.isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    is Step.Prepare -> {
-                        Text(
-                            text = "已加载: ${currentStep.path.path}",
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    is Step.Preview -> {
-                        val preview = currentStep.preview
-                        if (preview == null) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                LoadingAnimation()
-                                Text(
-                                    text = "预览中...",
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                        else {
-                            PreviewList(
-                                preview = preview,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-                    is Step.Processing -> {
+            when (val currentStep = step) {
+                is Step.Initial -> {
+                    Text(
+                        text = currentStep.message,
+                        color = if (currentStep.isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                is Step.Prepare -> {
+                    Text(
+                        text = "已加载: ${currentStep.path.path}",
+                        textAlign = TextAlign.Center
+                    )
+                }
+                is Step.Preview -> {
+                    val preview = currentStep.preview
+                    if (preview == null) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             LoadingAnimation()
                             Text(
-                                text = currentStep.message,
+                                text = "预览中...",
                                 textAlign = TextAlign.Center
                             )
                         }
+                    }
+                    else {
+                        PreviewList(
+                            preview = preview,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+                is Step.Processing -> {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        LoadingAnimation()
+                        Text(
+                            text = currentStep.message,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

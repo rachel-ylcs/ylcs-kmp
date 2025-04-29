@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,17 +34,21 @@ private object UserLabelMeta {
 
 	fun label(level: Int): String = labelNameFromLevel.getOrNull(level) ?: labelNameFromLevel[0]
 
-	fun image(level: Int, darkMode: Boolean): DrawableResource = when (level) {
-		in 1..4 -> Res.drawable.img_label_fucaoweiying
-		in 5..8 -> Res.drawable.img_label_pifuduhai
-		in 9..12 -> Res.drawable.img_label_fenghuaxueyue
-		in 13..16 -> Res.drawable.img_label_liuli
-		in 17..20 -> if (darkMode) Res.drawable.img_label_lidishigongfen2 else Res.drawable.img_label_lidishigongfen1
-		in 21..99 -> Res.drawable.img_label_shanseyouwuzhong
-		else -> Res.drawable.img_label_fucaoweiying
+	fun image(level: Int, darkMode: Boolean): Pair<DrawableResource, Color> {
+		val drawable = when (level) {
+			in 1..4 -> Res.drawable.img_label_fucaoweiying
+			in 5..8 -> Res.drawable.img_label_pifuduhai
+			in 9..12 -> Res.drawable.img_label_fenghuaxueyue
+			in 13..16 -> Res.drawable.img_label_liuli
+			in 17..20 -> if (darkMode) Res.drawable.img_label_lidishigongfen2 else Res.drawable.img_label_lidishigongfen1
+			in 21..99 -> Res.drawable.img_label_shanseyouwuzhong
+			else -> Res.drawable.img_label_fucaoweiying
+		}
+		val color = if (darkMode && level in 17 .. 20) Colors.White else Colors.Black
+		return drawable to color
 	}
 
-	fun image(name: String): DrawableResource = Res.drawable.img_label_special
+	fun image(name: String): Pair<DrawableResource, Color> = Res.drawable.img_label_special to Colors.Black
 }
 
 @Composable
@@ -52,7 +57,7 @@ fun UserLabel(
 	level: Int
 ) {
 	val isDarkMode = app.isDarkMode
-	val img = remember(label, level, isDarkMode) {
+	val (img, color) = remember(label, level, isDarkMode) {
 		if (label.isEmpty()) UserLabelMeta.image(level, isDarkMode)
 		else UserLabelMeta.image(label)
 	}
@@ -73,7 +78,7 @@ fun UserLabel(
 			modifier = Modifier.fillMaxSize()
 				.padding(start = 11.2.dp, end = 11.2.dp, top = 14.dp, bottom = 4.8.dp),
 			text = text,
-			color = Colors.Black.copy(alpha = 0.7f),
+			color = color.copy(alpha = 0.7f),
 			style = MaterialTheme.typography.labelSmall,
 			textAlign = TextAlign.Center,
 			maxLines = 1,

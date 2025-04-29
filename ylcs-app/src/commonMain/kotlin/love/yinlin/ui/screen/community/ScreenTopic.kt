@@ -22,6 +22,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -43,7 +44,6 @@ import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.Screen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -142,7 +142,7 @@ private fun CoinLayout(
 }
 
 @Stable
-class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model) {
+class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(model) {
 	@Stable
 	@Serializable
 	data class Args(val currentTopic: Topic)
@@ -715,48 +715,53 @@ class ScreenTopic(model: AppModel, args: Args) : Screen<ScreenTopic.Args>(model)
 		requestNewComments()
 	}
 
+	override val title: String = "主题"
+
+	override fun onBack() {
+		if (subCommentSheet.isOpen) subCommentSheet.close()
+		else pop()
+	}
+
 	@Composable
-	override fun Content() {
-		SubScreen(
-			modifier = Modifier.fillMaxSize(),
-			title = "主题",
-			actions = {
-				if (details != null) {
-					val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(topic.uid) == true }
-					val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(topic.uid) == true }
-					val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
-					if (canUpdateTopicTop) {
-						ActionSuspend(if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
-							onChangeTopicIsTop(!topic.isTop)
-						}
-					}
-					if (canMoveTopic) {
-						ActionSuspend(Icons.Outlined.MoveUp) {
-							onMoveTopic()
-						}
-					}
-					if (canDeleteTopic) {
-						ActionSuspend(Icons.Outlined.Delete) {
-							onDeleteTopic()
-						}
-					}
+	override fun ActionScope.RightActions() {
+		if (details != null) {
+			val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(topic.uid) == true }
+			val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(topic.uid) == true }
+			val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
+			if (canUpdateTopicTop) {
+				ActionSuspend(if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
+					onChangeTopicIsTop(!topic.isTop)
 				}
-			},
-			bottomBar = {
-				if (details != null) {
-					BottomLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
-				}
-			},
-			onBack = {
-				if (subCommentSheet.isOpen) subCommentSheet.close()
-				else pop()
 			}
-		) {
-			val details = details
-			if (details == null) EmptyBox()
-			else if (app.isPortrait) Portrait(details = details)
-			else Landscape(details = details)
+			if (canMoveTopic) {
+				ActionSuspend(Icons.Outlined.MoveUp) {
+					onMoveTopic()
+				}
+			}
+			if (canDeleteTopic) {
+				ActionSuspend(Icons.Outlined.Delete) {
+					onDeleteTopic()
+				}
+			}
 		}
+	}
+
+	@Composable
+	override fun BottomBar() {
+		if (details != null) {
+			BottomLayout(modifier = Modifier.fillMaxWidth().padding(10.dp))
+		}
+	}
+
+	@Composable
+	override fun SubContent(orientation: Orientation) {
+		details?.let {
+			when (orientation) {
+				Orientation.PORTRAIT -> Portrait(details = it)
+				Orientation.LANDSCAPE -> Landscape(details = it)
+				Orientation.SQUARE -> {}
+			}
+		} ?: EmptyBox()
 	}
 
 	@Composable

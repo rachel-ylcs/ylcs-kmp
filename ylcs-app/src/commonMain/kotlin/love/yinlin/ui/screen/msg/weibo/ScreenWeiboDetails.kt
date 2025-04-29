@@ -12,20 +12,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.extension.itemKey
-import love.yinlin.platform.app
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.screen.CommonScreen
 
 @Stable
-class ScreenWeiboDetails(model: AppModel) : CommonScreen(model) {
+class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 	private val weibo: Weibo? = msgPart.currentWeibo
 	private var comments: List<WeiboComment>? by mutableStateOf(null)
 
@@ -148,20 +147,18 @@ class ScreenWeiboDetails(model: AppModel) : CommonScreen(model) {
 		}
 	}
 
+	override val title: String = "微博详情"
+
 	@Composable
-	override fun Content() {
+	override fun SubContent(orientation: Orientation) {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
-			SubScreen(
-				modifier = Modifier.fillMaxSize(),
-				title = "微博详情",
-				onBack = { pop() }
-			) {
-				if (weibo == null) EmptyBox()
-				else {
-					if (app.isPortrait) Portrait(weibo = weibo)
-					else Landscape(weibo = weibo)
+			weibo?.let {
+				when (orientation) {
+					Orientation.PORTRAIT -> Portrait(weibo = it)
+					Orientation.LANDSCAPE -> Landscape(weibo = it)
+					Orientation.SQUARE -> {}
 				}
-			}
+			} ?: EmptyBox()
 		}
 	}
 }

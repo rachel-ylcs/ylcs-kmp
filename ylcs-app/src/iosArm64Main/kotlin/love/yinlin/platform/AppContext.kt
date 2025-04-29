@@ -1,5 +1,8 @@
 package love.yinlin.platform
 
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -19,12 +22,27 @@ import platform.Foundation.NSUncaughtExceptionHandler
 import platform.UIKit.UIScreen
 
 @OptIn(ExperimentalForeignApi::class)
-class ActualAppContext : AppContext() {
-	private val screenBounds = UIScreen.mainScreen.bounds
+class ActualAppContext : AppContext(run {
+	val screenBounds = UIScreen.mainScreen.bounds
+	PhysicalGraphics(
+		width = CGRectGetWidth(screenBounds).toInt(),
+		height = CGRectGetHeight(screenBounds).toInt(),
+		density = Density(
+			density = UIScreen.mainScreen.scale.toFloat(),
+			fontScale = 1f
+		)
+	)
+}) {
+	companion object {
+		val DesignWidth = 360.dp
+		val DesignHeight = 800.dp
+	}
 
-	override val screenWidth: Int = CGRectGetWidth(screenBounds).toInt()
-	override val screenHeight: Int = CGRectGetHeight(screenBounds).toInt()
-	override val fontScale: Float = 1f
+	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = Density(
+		if (newWidth <= newHeight) physics.width / DesignWidth.value else physics.height / DesignHeight.value,
+		oldDensity.fontScale
+	)
+
 	override val kv: KV = KV()
 
 	@OptIn(ExperimentalForeignApi::class)

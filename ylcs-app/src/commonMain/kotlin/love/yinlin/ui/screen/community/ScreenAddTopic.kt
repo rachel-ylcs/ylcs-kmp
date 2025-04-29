@@ -19,6 +19,7 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Orientation
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserProfile
@@ -34,14 +35,14 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.CommonScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenAddTopic(model: AppModel) : CommonScreen(model) {
+class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     @Stable
     private class InputState {
         val title = TextInputState()
@@ -138,63 +139,59 @@ class ScreenAddTopic(model: AppModel) : CommonScreen(model) {
         }
     }
 
-    @Composable
-    override fun Content() {
-        val profile = app.config.userProfile
+    override val title: String = "发表主题"
 
-        SubScreen(
-            modifier = Modifier.fillMaxSize(),
-            title = "发表主题",
-            onBack = { pop() },
-            actions = {
-                ActionSuspend(
-                    icon = Icons.Outlined.Check,
-                    enabled = input.canSubmit
-                ) {
-                    if (profile != null) addTopic(profile = profile)
-                    else slot.tip.warning("请先登录")
-                }
-            }
+    @Composable
+    override fun ActionScope.RightActions() {
+        ActionSuspend(
+            icon = Icons.Outlined.Check,
+            enabled = input.canSubmit
         ) {
-            if (profile == null) EmptyBox()
-            else {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    TextInput(
-                        state = input.title,
-                        hint = "标题",
-                        maxLength = 48,
-                        maxLines = 2,
-                        clearButton = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextInput(
-                        state = input.content,
-                        hint = "内容",
-                        maxLength = 512,
-                        maxLines = 10,
-                        clearButton = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Text(text = "主题", style = MaterialTheme.typography.titleMedium)
-                    SectionSelectLayout(
-                        profile = profile,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Text(text = "图片", style = MaterialTheme.typography.titleMedium)
-                    ImageAdder(
-                        maxNum = 9,
-                        pics = input.pics,
-                        size = 80.dp,
-                        modifier = Modifier.fillMaxWidth(),
-                        onAdd = { launch { pickPictures() } },
-                        onDelete = { deletePic(it) },
-                        onClick = { navigate(ScreenImagePreview.Args(input.pics, it)) }
-                    )
-                }
-            }
+            val profile = app.config.userProfile
+            if (profile != null) addTopic(profile = profile)
+            else slot.tip.warning("请先登录")
         }
+    }
+
+    @Composable
+    override fun SubContent(orientation: Orientation) {
+        app.config.userProfile?.let {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                TextInput(
+                    state = input.title,
+                    hint = "标题",
+                    maxLength = 48,
+                    maxLines = 2,
+                    clearButton = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                TextInput(
+                    state = input.content,
+                    hint = "内容",
+                    maxLength = 512,
+                    maxLines = 10,
+                    clearButton = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(text = "主题", style = MaterialTheme.typography.titleMedium)
+                SectionSelectLayout(
+                    profile = it,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(text = "图片", style = MaterialTheme.typography.titleMedium)
+                ImageAdder(
+                    maxNum = 9,
+                    pics = input.pics,
+                    size = 80.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                    onAdd = { launch { pickPictures() } },
+                    onDelete = { deletePic(it) },
+                    onClick = { navigate(ScreenImagePreview.Args(input.pics, it)) }
+                )
+            }
+        } ?: EmptyBox()
     }
 }
