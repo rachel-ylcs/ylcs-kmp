@@ -24,7 +24,6 @@ class ActualAppContext(val context: Context) : AppContext() {
 
 	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density {
 		val metrics = context.resources.displayMetrics
-		println("${metrics.widthPixels} x ${metrics.heightPixels}")
 		return Density(
 			density = (if (newWidth <= newHeight) metrics.widthPixels else metrics.heightPixels) / DesignWidth.value,
 			fontScale = oldDensity.fontScale
