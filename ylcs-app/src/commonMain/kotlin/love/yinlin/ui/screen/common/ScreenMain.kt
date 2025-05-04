@@ -14,6 +14,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
@@ -50,21 +51,19 @@ private fun NavigationIcon(
 	val tabItem = TabItem.entries[index]
 	Column(
 		modifier = Modifier
-			.width(IntrinsicSize.Min)
 			.clip(MaterialTheme.shapes.medium)
 			.clickable(onClick = onClick)
 			.padding(ThemeValue.Padding.Value),
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 	) {
-		MiniIcon(
-			res = if (isSelected) tabItem.iconActive else tabItem.iconNormal,
-			modifier = Modifier.fillMaxWidth().aspectRatio(1f)
-		)
+		MiniIcon(res = if (isSelected) tabItem.iconActive else tabItem.iconNormal)
 		Text(
 			text = stringResource(tabItem.title),
 			style = MaterialTheme.typography.labelMedium,
-			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis
 		)
 	}
 }

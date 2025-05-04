@@ -15,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
@@ -45,9 +45,9 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
             },
             ifFalse = {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.Value).verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace),
                 ) {
                     WebPage(
                         state = webPageState,

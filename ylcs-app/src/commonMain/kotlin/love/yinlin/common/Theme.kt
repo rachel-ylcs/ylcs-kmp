@@ -224,40 +224,6 @@ private fun rachelTypography(device: Device): Typography {
 	val font = Font(Res.font.xwwk)
 	return remember(device) { when (device.size) {
         Device.Size.SMALL -> Typography(
-			displayLarge = baseTextStyle(font, 24.sp, true),
-			displayMedium = baseTextStyle(font, 20.sp, true),
-			displaySmall = baseTextStyle(font, 16.sp, true),
-			headlineLarge = baseTextStyle(font, 24.sp, false),
-			headlineMedium = baseTextStyle(font, 20.sp, false),
-			headlineSmall = baseTextStyle(font, 16.sp, false),
-			titleLarge = baseTextStyle(font, 14.sp, true),
-			titleMedium = baseTextStyle(font, 12.sp, true),
-			titleSmall = baseTextStyle(font, 10.sp, true),
-			bodyLarge = baseTextStyle(font, 12.sp, false),
-			bodyMedium = baseTextStyle(font, 10.sp, false),
-			bodySmall = baseTextStyle(font, 8.sp, false),
-			labelLarge = baseTextStyle(font, 12.sp, true),
-			labelMedium = baseTextStyle(font, 10.sp, true),
-			labelSmall = baseTextStyle(font, 8.sp, true),
-		)
-        Device.Size.MEDIUM -> Typography(
-			displayLarge = baseTextStyle(font, 26.sp, true),
-			displayMedium = baseTextStyle(font, 22.sp, true),
-			displaySmall = baseTextStyle(font, 18.sp, true),
-			headlineLarge = baseTextStyle(font, 26.sp, false),
-			headlineMedium = baseTextStyle(font, 22.sp, false),
-			headlineSmall = baseTextStyle(font, 18.sp, false),
-			titleLarge = baseTextStyle(font, 16.sp, true),
-			titleMedium = baseTextStyle(font, 14.sp, true),
-			titleSmall = baseTextStyle(font, 12.sp, true),
-			bodyLarge = baseTextStyle(font, 14.sp, false),
-			bodyMedium = baseTextStyle(font, 12.sp, false),
-			bodySmall = baseTextStyle(font, 10.sp, false),
-			labelLarge = baseTextStyle(font, 14.sp, true),
-			labelMedium = baseTextStyle(font, 12.sp, true),
-			labelSmall = baseTextStyle(font, 10.sp, true),
-		)
-        Device.Size.LARGE -> Typography(
 			displayLarge = baseTextStyle(font, 28.sp, true),
 			displayMedium = baseTextStyle(font, 24.sp, true),
 			displaySmall = baseTextStyle(font, 20.sp, true),
@@ -274,15 +240,49 @@ private fun rachelTypography(device: Device): Typography {
 			labelMedium = baseTextStyle(font, 14.sp, true),
 			labelSmall = baseTextStyle(font, 12.sp, true),
 		)
+        Device.Size.MEDIUM -> Typography(
+			displayLarge = baseTextStyle(font, 29.sp, true),
+			displayMedium = baseTextStyle(font, 25.sp, true),
+			displaySmall = baseTextStyle(font, 21.sp, true),
+			headlineLarge = baseTextStyle(font, 29.sp, false),
+			headlineMedium = baseTextStyle(font, 25.sp, false),
+			headlineSmall = baseTextStyle(font, 21.sp, false),
+			titleLarge = baseTextStyle(font, 17.sp, true),
+			titleMedium = baseTextStyle(font, 15.sp, true),
+			titleSmall = baseTextStyle(font, 13.sp, true),
+			bodyLarge = baseTextStyle(font, 15.sp, false),
+			bodyMedium = baseTextStyle(font, 13.sp, false),
+			bodySmall = baseTextStyle(font, 11.sp, false),
+			labelLarge = baseTextStyle(font, 15.sp, true),
+			labelMedium = baseTextStyle(font, 13.sp, true),
+			labelSmall = baseTextStyle(font, 11.sp, true),
+		)
+        Device.Size.LARGE -> Typography(
+			displayLarge = baseTextStyle(font, 30.sp, true),
+			displayMedium = baseTextStyle(font, 26.sp, true),
+			displaySmall = baseTextStyle(font, 22.sp, true),
+			headlineLarge = baseTextStyle(font, 30.sp, false),
+			headlineMedium = baseTextStyle(font, 26.sp, false),
+			headlineSmall = baseTextStyle(font, 22.sp, false),
+			titleLarge = baseTextStyle(font, 18.sp, true),
+			titleMedium = baseTextStyle(font, 16.sp, true),
+			titleSmall = baseTextStyle(font, 14.sp, true),
+			bodyLarge = baseTextStyle(font, 16.sp, false),
+			bodyMedium = baseTextStyle(font, 14.sp, false),
+			bodySmall = baseTextStyle(font, 12.sp, false),
+			labelLarge = baseTextStyle(font, 16.sp, true),
+			labelMedium = baseTextStyle(font, 14.sp, true),
+			labelSmall = baseTextStyle(font, 12.sp, true),
+		)
     } }
 }
 
 @Stable
 object ThemeStyle {
 	val DisplayExtraLarge: TextStyle @Composable get() = when (LocalDevice.current.size) {
-        Device.Size.SMALL -> rachelTextStyle(24.sp, true)
-        Device.Size.MEDIUM -> rachelTextStyle(30.sp, true)
-        Device.Size.LARGE -> rachelTextStyle(36.sp, true)
+        Device.Size.SMALL -> rachelTextStyle(30.sp, true)
+        Device.Size.MEDIUM -> rachelTextStyle(32.sp, true)
+        Device.Size.LARGE -> rachelTextStyle(34.sp, true)
     }
 }
 
@@ -291,19 +291,19 @@ object ThemeValue {
 	@Stable
 	object Size {
 		val MicroIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 16.dp
+			Device.Size.SMALL -> 18.dp
 			Device.Size.MEDIUM -> 20.dp
-			Device.Size.LARGE -> 24.dp
+			Device.Size.LARGE -> 22.dp
 		}
 		val Icon: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 20.dp
+			Device.Size.SMALL -> 22.dp
 			Device.Size.MEDIUM -> 24.dp
-			Device.Size.LARGE -> 28.dp
+			Device.Size.LARGE -> 26.dp
 		}
 		val ExtraIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 24.dp
+			Device.Size.SMALL -> 26.dp
 			Device.Size.MEDIUM -> 28.dp
-			Device.Size.LARGE -> 32.dp
+			Device.Size.LARGE -> 30.dp
 		}
 		val SmallImage: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 48.dp

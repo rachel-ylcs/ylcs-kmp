@@ -44,13 +44,14 @@ private fun BannerIndicator(
 fun <T> Banner(
 	pics: List<T>,
 	interval: Long = 0L,
+	gap: Float = 0.2f,
 	state: PagerState = rememberPagerState { pics.size },
 	modifier: Modifier = Modifier,
 	content: @Composable (pic: T, index: Int, scale: Float) -> Unit
 ) {
 	BoxWithConstraints(modifier = modifier) {
-		val spacingGap = maxWidth * 0.2f
-		val totalWidth = maxWidth * 0.4f
+		val spacingGap = maxWidth * gap
+		val totalWidth = maxWidth * 0.3f
 		Column(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalAlignment = Alignment.CenterHorizontally,

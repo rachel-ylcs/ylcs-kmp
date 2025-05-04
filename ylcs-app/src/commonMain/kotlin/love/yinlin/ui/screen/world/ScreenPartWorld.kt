@@ -94,6 +94,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		Banner(
 			pics = pics,
 			interval = 5000L,
+			gap = if (LocalDevice.current.type == Device.Type.PORTRAIT) 0.15f else 0.3f,
 			modifier = modifier
 		) { pic, index, scale ->
 			Surface(
