@@ -18,8 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.layout.SplitActionLayout
@@ -39,13 +40,13 @@ sealed class ActionScope(private val ltr: Boolean) {
 		enabled: Boolean = true,
 		onClick: () -> Unit
 	) {
-		val padding = if (ltr) 10.dp else 0.dp
+		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else 0.dp
 
 		ClickIcon(
 			icon = icon,
 			color = color,
 			enabled = enabled,
-			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
+			modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
 			onClick = onClick
 		)
 	}
@@ -57,13 +58,13 @@ sealed class ActionScope(private val ltr: Boolean) {
 		enabled: Boolean = true,
 		onClick: suspend CoroutineScope.() -> Unit
 	) {
-		val padding = if (ltr) 10.dp else 0.dp
+		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else 0.dp
 
 		LoadingIcon(
 			icon = icon,
 			color = color,
 			enabled = enabled,
-			modifier = Modifier.padding(start = padding, end = 10.dp - padding),
+			modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
 			onClick = onClick
 		)
 	}
@@ -88,7 +89,7 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 	protected open fun BottomBar() { }
 
 	@Composable
-	protected abstract fun SubContent(orientation: Orientation)
+	protected abstract fun SubContent(device: Device)
 
 	@OptIn(ExperimentalComposeUiApi::class)
     @Composable
@@ -99,15 +100,15 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 			Column(modifier = Modifier.fillMaxSize().padding(it)) {
 				Surface(
 					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-					tonalElevation = 1.dp,
-					shadowElevation = 5.dp
+					tonalElevation = ThemeValue.Shadow.Tonal,
+					shadowElevation = ThemeValue.Shadow.Surface
 				) {
 					Box(
-						modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp),
+						modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
 						contentAlignment = Alignment.Center
 					) {
 						Box(
-							modifier = Modifier.fillMaxWidth().zIndex(10f),
+							modifier = Modifier.fillMaxWidth().zIndex(2f),
 							contentAlignment = Alignment.Center
 						) {
 							Text(
@@ -118,10 +119,10 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 							)
 						}
 						SplitActionLayout(
-							modifier = Modifier.fillMaxWidth().zIndex(5f),
+							modifier = Modifier.fillMaxWidth().zIndex(1f),
 							left = {
 								ClickIcon(
-									modifier = Modifier.padding(start = 10.dp),
+									modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
 									icon = Icons.AutoMirrored.Outlined.ArrowBack,
 									onClick = ::onBack
 								)
@@ -137,12 +138,12 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 					modifier = Modifier.fillMaxWidth().weight(1f)
 						.background(MaterialTheme.colorScheme.background)
 				) {
-					SubContent(LocalOrientation.current)
+					SubContent(LocalDevice.current)
 				}
 				Surface(
 					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-					tonalElevation = 1.dp,
-					shadowElevation = 5.dp
+					tonalElevation = ThemeValue.Shadow.Tonal,
+					shadowElevation = ThemeValue.Shadow.Surface
 				) {
 					BottomBar()
 				}

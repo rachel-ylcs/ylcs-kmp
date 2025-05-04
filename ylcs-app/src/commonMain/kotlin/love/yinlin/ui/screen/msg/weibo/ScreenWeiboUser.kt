@@ -17,11 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
@@ -41,52 +41,56 @@ private fun UserInfoCard(
 	modifier: Modifier = Modifier
 ) {
 	Row(
-		modifier = modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-		horizontalArrangement = Arrangement.spacedBy(10.dp),
+		modifier = modifier.padding(ThemeValue.Padding.Value),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 	) {
-		OffsetLayout(y = (-17).dp) {
+		OffsetLayout(y = -ThemeValue.Size.SmallImage / 4) {
 			WebImage(
 				uri = user.info.avatar,
 				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
-				modifier = Modifier.size(64.dp)
+				modifier = Modifier.size(ThemeValue.Size.SmallImage)
 			)
 		}
 		Column(
 			modifier = Modifier.weight(1f),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(20.dp),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
 					text = user.info.name,
 					style = MaterialTheme.typography.labelLarge,
 					color = MaterialTheme.colorScheme.primary,
+					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
 				ClickIcon(
 					icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
 					color = MaterialTheme.colorScheme.primary,
-					size = 24.dp,
 					onClick = { onFollowClick(!isFollowed) }
 				)
 			}
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp)
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
 			) {
 				Text(
 					text = "关注 ${user.followNum}",
-					modifier = Modifier.weight(1f)
+					modifier = Modifier.weight(1f),
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
 				)
 				Text(
 					text = "粉丝 ${user.fansNum}",
-					modifier = Modifier.weight(1f)
+					modifier = Modifier.weight(1f),
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
 				)
 			}
 		}
@@ -101,15 +105,15 @@ private fun UserAlbumItem(
 ) {
 	Row(
 		modifier = modifier.clickable(onClick = onAlbumClick),
-		horizontalArrangement = Arrangement.spacedBy(10.dp)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
 	) {
 		WebImage(
 			uri = album.pic,
-			modifier = Modifier.size(50.dp)
+			modifier = Modifier.size(ThemeValue.Size.SmallImage)
 		)
 		Column(
 			modifier = Modifier.weight(1f),
-			verticalArrangement = Arrangement.spacedBy(5.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			Text(
 				text = album.title,
@@ -118,15 +122,21 @@ private fun UserAlbumItem(
 			)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				Text(text = album.num)
+				Text(
+					text = album.num,
+					style = MaterialTheme.typography.bodyMedium,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
 				Text(
 					text = album.time,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodySmall,
 					textAlign = TextAlign.End,
+					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
@@ -167,7 +177,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 			item(key = "UserInfoCard".itemKey) {
 				WebImage(
 					uri = user.background,
-					modifier = Modifier.fillMaxWidth().height(150.dp),
+					modifier = Modifier.fillMaxWidth().aspectRatio(2f),
 					contentScale = ContentScale.Crop,
 					alpha = 0.8f
 				)
@@ -177,7 +187,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					onFollowClick = { onFollowClick(user, it) },
 					modifier = Modifier.fillMaxWidth()
 				)
-				HorizontalDivider(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp))
+				HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualValue))
 			}
 			if (albums != null) {
 				items(
@@ -187,7 +197,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					UserAlbumItem(
 						album = it,
 						onAlbumClick = { onAlbumClick(it) },
-						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 					)
 				}
 			}
@@ -198,7 +208,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					style = MaterialTheme.typography.titleMedium,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
 			items(
@@ -207,7 +217,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 			) { weibo ->
 				WeiboCard(
 					weibo = weibo,
-					modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
 		}
@@ -221,14 +231,14 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	) {
 		Row(modifier = Modifier.fillMaxSize()) {
 			Surface(
-				modifier = Modifier.width(300.dp).fillMaxHeight(),
-				shadowElevation = 5.dp
+				modifier = Modifier.width(ThemeValue.Size.CardWidth).fillMaxHeight(),
+				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Column(modifier = Modifier.fillMaxSize()) {
 					WebImage(
 						uri = user.background,
 						key = DateEx.TodayString,
-						modifier = Modifier.fillMaxWidth().height(150.dp),
+						modifier = Modifier.fillMaxWidth().aspectRatio(2f),
 						contentScale = ContentScale.Crop,
 						alpha = 0.8f
 					)
@@ -238,15 +248,15 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 						onFollowClick = { onFollowClick(user, it) },
 						modifier = Modifier.fillMaxWidth()
 					)
-					HorizontalDivider(modifier = Modifier.padding(horizontal = 5.dp))
-					Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 10.dp)) {
+					HorizontalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalSpace))
+					Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(vertical = ThemeValue.Padding.VerticalSpace)) {
 						if (albums == null) SimpleLoadingBox()
 						else {
 							if (albums.isEmpty()) SimpleEmptyBox()
 							else LazyColumn(
 								modifier = Modifier.fillMaxWidth(),
-								contentPadding = PaddingValues(horizontal = 10.dp),
-								verticalArrangement = Arrangement.spacedBy(10.dp)
+								contentPadding = ThemeValue.Padding.EqualValue,
+								verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 							) {
 								items(
 									items = albums,
@@ -263,10 +273,10 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					}
 				}
 			}
-			Space(10.dp)
+			Space()
 			Surface(
 				modifier = Modifier.weight(1f).fillMaxHeight(),
-				shadowElevation = 5.dp
+				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				StatefulBox(
 					state = grid.state,
@@ -298,13 +308,12 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	override val title: String by derivedStateOf { user?.info?.name ?: "" }
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			user?.let {
-				when (orientation) {
-					Orientation.PORTRAIT -> Portrait(user = it, albums = albums, grid = grid)
-					Orientation.LANDSCAPE -> Landscape(user = it, albums = albums, grid = grid)
-					Orientation.SQUARE -> {}
+				when (device.type) {
+					Device.Type.PORTRAIT -> Portrait(user = it, albums = albums, grid = grid)
+					Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(user = it, albums = albums, grid = grid)
 				}
 			} ?: LoadingBox()
 		}

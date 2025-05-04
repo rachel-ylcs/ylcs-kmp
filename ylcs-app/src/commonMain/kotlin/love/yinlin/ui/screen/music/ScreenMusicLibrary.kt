@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.deleteRecursively
@@ -270,7 +270,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    override fun SubContent(orientation: Orientation) {
+    override fun SubContent(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
             LazyVerticalGrid(

@@ -14,12 +14,12 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.ThemeValue
 import love.yinlin.resources.*
-import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
@@ -53,12 +53,13 @@ private fun NavigationIcon(
 			.width(IntrinsicSize.Min)
 			.clip(MaterialTheme.shapes.medium)
 			.clickable(onClick = onClick)
-			.padding(horizontal = 10.dp, vertical = 5.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
+			.padding(ThemeValue.Padding.Value),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 	) {
-		MiniImage(
+		MiniIcon(
 			res = if (isSelected) tabItem.iconActive else tabItem.iconNormal,
-			modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(5.dp)
+			modifier = Modifier.fillMaxWidth().aspectRatio(1f)
 		)
 		Text(
 			text = stringResource(tabItem.title),
@@ -76,10 +77,10 @@ private fun PortraitNavigation(
 ) {
 	Surface(
 		modifier = modifier,
-		tonalElevation = 1.dp,
-		shadowElevation = 5.dp
+		tonalElevation = ThemeValue.Shadow.Tonal,
+		shadowElevation = ThemeValue.Shadow.Surface
 	) {
-		EqualRow(modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+		EqualRow(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.LittleSpace)) {
 			for (index in TabItem.entries.indices) {
 				EqualItem {
 					NavigationIcon(
@@ -101,12 +102,13 @@ private fun LandscapeNavigation(
 ) {
 	Surface(
 		modifier = modifier,
-		tonalElevation = 1.dp,
-		shadowElevation = 5.dp
+		tonalElevation = ThemeValue.Shadow.Tonal,
+		shadowElevation = ThemeValue.Shadow.Surface
 	) {
 		Column(
-			modifier = Modifier.fillMaxHeight().padding(horizontal = 5.dp, vertical = 10.dp),
-			horizontalAlignment = Alignment.CenterHorizontally
+			modifier = Modifier.fillMaxHeight().padding(ThemeValue.Padding.LittleSpace),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			for (index in TabItem.entries.indices) {
 				NavigationIcon(
@@ -190,10 +192,9 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 
 	@Composable
 	override fun Content() {
-		when (LocalOrientation.current) {
-			Orientation.PORTRAIT -> Portrait()
-			Orientation.LANDSCAPE -> Landscape()
-			Orientation.SQUARE -> {}
+		when (LocalDevice.current.type) {
+			Device.Type.PORTRAIT -> Portrait()
+			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 		}
 	}
 

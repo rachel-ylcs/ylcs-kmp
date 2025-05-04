@@ -29,8 +29,8 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.Colors
+import love.yinlin.common.Device
 import love.yinlin.common.KVConfig
-import love.yinlin.common.Orientation
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeMode
 import love.yinlin.data.Data
@@ -407,11 +407,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	override val title: String = "设置"
 
 	@Composable
-	override fun SubContent(orientation: Orientation) = app.config.userProfile?.let {
-		when (orientation) {
-			Orientation.PORTRAIT -> Portrait(it)
-			Orientation.LANDSCAPE -> Landscape(it)
-			Orientation.SQUARE -> {}
+	override fun SubContent(device: Device) = app.config.userProfile?.let {
+		when (device.type) {
+			Device.Type.PORTRAIT -> Portrait(it)
+			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
 		}
 	} ?: EmptyBox()
 

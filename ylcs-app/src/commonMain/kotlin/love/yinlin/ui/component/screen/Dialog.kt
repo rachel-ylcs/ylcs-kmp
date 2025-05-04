@@ -25,12 +25,11 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.OffsetLayout
@@ -45,10 +44,10 @@ import kotlin.math.roundToInt
 
 @Stable
 abstract class FloatingDialog<R>() : Floating<Unit>() {
-	override fun alignment(orientation: Orientation): Alignment = Alignment.Center
-	override fun enter(orientation: Orientation): EnterTransition = scaleIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
+	override fun alignment(device: Device): Alignment = Alignment.Center
+	override fun enter(device: Device): EnterTransition = scaleIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
 			fadeIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
-	override fun exit(orientation: Orientation): ExitTransition = scaleOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
+	override fun exit(device: Device): ExitTransition = scaleOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
 			fadeOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
 	override val zIndex: Float = Z_INDEX_DIALOG
 
@@ -121,10 +120,10 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 
 	@Composable
 	override fun Wrapper(block: @Composable () -> Unit) {
-		val info = when (LocalOrientation.current) {
-			Orientation.PORTRAIT -> DialogInfo.Portrait
-			Orientation.LANDSCAPE -> DialogInfo.Landscape
-			Orientation.SQUARE -> DialogInfo.Square
+		val info = when (LocalDevice.current.type) {
+			Device.Type.PORTRAIT -> DialogInfo.Portrait
+			Device.Type.LANDSCAPE -> DialogInfo.Landscape
+			Device.Type.SQUARE -> DialogInfo.Square
 		}
 
 		Column(
@@ -134,7 +133,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			OffsetLayout(y = info.rachelWidth / 15.5f) {
-				MiniImage(
+				MiniIcon(
 					res = Res.drawable.img_dialog_rachel,
 					size = info.rachelWidth,
 					modifier = Modifier.clickableNoRipple { }

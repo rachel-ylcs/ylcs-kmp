@@ -40,9 +40,9 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.Colors
+import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeStyle
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -705,10 +705,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	override fun Content() {
-		when (LocalOrientation.current) {
-			Orientation.PORTRAIT -> Portrait()
-			Orientation.LANDSCAPE -> Landscape()
-			Orientation.SQUARE -> {}
+		when (LocalDevice.current.type) {
+			Device.Type.PORTRAIT -> Portrait()
+			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 		}
 	}
 

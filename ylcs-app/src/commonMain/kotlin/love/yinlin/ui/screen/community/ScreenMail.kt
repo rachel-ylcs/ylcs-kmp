@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
@@ -181,7 +181,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	override val title: String = "邮箱"
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		StatefulBox(
 			state = state,
 			modifier = Modifier.fillMaxSize()

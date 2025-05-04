@@ -27,8 +27,8 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
+import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.Orientation
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
@@ -484,9 +484,8 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     override val title: String by derivedStateOf { musicInfo?.name ?: "" }
 
     @Composable
-    override fun SubContent(orientation: Orientation) = when (orientation) {
-        Orientation.PORTRAIT -> Portrait()
-        Orientation.LANDSCAPE -> Landscape()
-        Orientation.SQUARE -> {}
+    override fun SubContent(device: Device) = when (device.type) {
+        Device.Type.PORTRAIT -> Portrait()
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
     }
 }

@@ -3,7 +3,6 @@ package love.yinlin.ui.component.layout
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
@@ -17,13 +16,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.ui.component.input.LoadingButton
-import love.yinlin.ui.component.image.MiniIcon
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
+import love.yinlin.Local
+import love.yinlin.common.ThemeValue
 import love.yinlin.resources.*
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.LoadingButton
+import org.jetbrains.compose.resources.stringResource
 
 enum class BoxState {
 	LOADING,
@@ -34,9 +33,9 @@ enum class BoxState {
 
 @Composable
 fun LoadingAnimation(
-	size: Dp = 32.dp,
+	size: Dp = ThemeValue.Size.Icon,
 	color: Color = MaterialTheme.colorScheme.primary,
-	duration: Int = 500,
+	duration: Int = Local.Client.ANIMATION_DURATION,
 	num: Int = 3,
 	modifier: Modifier = Modifier
 ) {
@@ -48,7 +47,7 @@ fun LoadingAnimation(
 		))
 	}
 
-	Canvas(modifier = modifier.size(size)) {
+	Canvas(modifier = modifier.padding(ThemeValue.Padding.InnerIcon).size(size)) {
 		values.forEachIndexed { index, state ->
 			val width = (size / 5).toPx()
 			val spacing = (this.size.width - (num * width)) / 2
@@ -70,7 +69,7 @@ fun SimpleLoadingBox() {
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
 	) {
-		LoadingAnimation(size = 32.dp)
+		LoadingAnimation()
 	}
 }
 
@@ -82,18 +81,17 @@ fun LoadingBox() {
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(20.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			Image(
-				modifier = Modifier.height(200.dp),
-				painter = painterResource(Res.drawable.img_state_loading),
-				contentDescription = null
+			MiniIcon(
+				res = Res.drawable.img_state_loading,
+				size = ThemeValue.Size.ShowImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(20.dp)
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
-				LoadingAnimation(size = 32.dp)
+				LoadingAnimation()
 				Text(text = stringResource(Res.string.loading_state_string))
 			}
 		}
@@ -103,12 +101,12 @@ fun LoadingBox() {
 @Composable
 fun SimpleEmptyBox() {
 	Box(
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(20.dp)
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 		) {
 			MiniIcon(Icons.Filled.Error)
 			Text(text = stringResource(Res.string.empty_state_string))
@@ -119,21 +117,20 @@ fun SimpleEmptyBox() {
 @Composable
 fun EmptyBox() {
 	Box(
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(20.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			Image(
-				modifier = Modifier.size(200.dp),
-				painter = painterResource(Res.drawable.img_state_empty),
-				contentDescription = null
+			MiniIcon(
+				res = Res.drawable.img_state_empty,
+				size = ThemeValue.Size.ShowImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(20.dp)
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
 				MiniIcon(Icons.Filled.Error)
 				Text(text = stringResource(Res.string.empty_state_string))
@@ -145,21 +142,20 @@ fun EmptyBox() {
 @Composable
 fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 	Box(
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(20.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			Image(
-				modifier = Modifier.size(200.dp),
-				painter = painterResource(Res.drawable.img_state_network_error),
-				contentDescription = null
+			MiniIcon(
+				res = Res.drawable.img_state_network_error,
+				size = ThemeValue.Size.ShowImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(20.dp)
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
 				MiniIcon(
 					icon = Icons.Filled.WifiOff,

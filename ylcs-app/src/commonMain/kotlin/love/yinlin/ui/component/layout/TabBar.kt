@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
 
@@ -36,7 +37,7 @@ private fun <T> TabBar(
 			if (currentPage < tabPositions.size) {
 				TabRowDefaults.SecondaryIndicator(
 					modifier = Modifier.tabIndicatorOffset(tabPositions[currentPage]),
-					height = 3.dp,
+					height = ThemeValue.Padding.LittleSpace,
 					color = MaterialTheme.colorScheme.primary
 				)
 			}
@@ -53,7 +54,7 @@ private fun <T> TabBar(
 					onLongClick = {
 						if (currentPage == index) onLongClick?.invoke(index)
 					}
-				).padding(horizontal = 15.dp, vertical = 10.dp),
+				).padding(ThemeValue.Padding.Value),
 				contentAlignment = Alignment.Center
 			) {
 				content(isSelected, item)
@@ -79,18 +80,17 @@ fun TabBar(
 		modifier = modifier
 	) { isSelected, (title, icon) ->
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			MiniIcon(
 				icon = icon,
-				size = 20.dp,
 				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
 			)
 			Text(
 				text = title,
 				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-				style = if (isSelected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge,
+				style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
 				textAlign = TextAlign.Center
 			)
 		}
@@ -115,7 +115,7 @@ fun TabBar(
 		Text(
 			text = title,
 			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-			style = if (isSelected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyLarge,
+			style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
 			textAlign = TextAlign.Center
 		)
 	}

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import love.yinlin.common.ThemeValue
 
 private object SpaceMeasurePolicy : MeasurePolicy {
 	override fun MeasureScope.measure(
@@ -27,12 +27,12 @@ private object SpaceMeasurePolicy : MeasurePolicy {
 
 @Composable
 @NonRestartableComposable
-fun RowScope.Space(size: Dp = 10.dp) {
+fun RowScope.Space(size: Dp = ThemeValue.Padding.HorizontalSpace) {
 	Layout(Modifier.width(size), SpaceMeasurePolicy)
 }
 
 @Composable
 @NonRestartableComposable
-fun ColumnScope.Space(size: Dp = 10.dp) {
+fun ColumnScope.Space(size: Dp = ThemeValue.Padding.VerticalSpace) {
 	Layout(Modifier.height(size), SpaceMeasurePolicy)
 }

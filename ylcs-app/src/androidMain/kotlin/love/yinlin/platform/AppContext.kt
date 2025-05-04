@@ -22,14 +22,6 @@ class ActualAppContext(val context: Context) : AppContext() {
 
 	override val kv: KV = KV(context)
 
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density {
-		val metrics = context.resources.displayMetrics
-		return Density(
-			density = (if (newWidth <= newHeight) metrics.widthPixels else metrics.heightPixels) / DesignWidth.value,
-			fontScale = oldDensity.fontScale
-		)
-	}
-
 	var activityResultRegistry: ActivityResultRegistry? = null
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(context).apply {

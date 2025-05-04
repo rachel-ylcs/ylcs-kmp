@@ -13,14 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
@@ -91,10 +90,10 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 	override val title: String by derivedStateOf { "${args.title} - 共 $num 张" }
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		Column(
-			modifier = Modifier.fillMaxSize().padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp),
+			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.Value),
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
 		) {
 			val data = caches[current]
 			StatefulBox(
@@ -102,9 +101,9 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
 				if (data != null) LazyVerticalGrid(
-					columns = GridCells.Adaptive(75.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalArrangement = Arrangement.spacedBy(10.dp),
+					columns = GridCells.Adaptive(ThemeValue.Size.MicroCellWidth),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
 					modifier = Modifier.fillMaxSize()
 				) {
 					itemsIndexed(
@@ -122,12 +121,11 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 			if (data != null) {
 				Row(
 					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					ClickIcon(
 						icon = Icons.Outlined.FirstPage,
-						size = 32.dp,
 						onClick = { onPrevious() }
 					)
 					Text(
@@ -137,7 +135,6 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 					)
 					ClickIcon(
 						icon = Icons.AutoMirrored.Outlined.LastPage,
-						size = 32.dp,
 						onClick = { onNext() }
 					)
 				}

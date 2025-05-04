@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -30,7 +30,6 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
@@ -143,7 +142,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				horizontalArrangement = Arrangement.spacedBy(10.dp)
 			) {
 				activity.showstart?.let { showstart ->
-					ClickImage(
+					ClickIcon(
 						res = Res.drawable.img_showstart,
 						modifier = Modifier.size(32.dp),
 						onClick = {
@@ -154,14 +153,14 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 					)
 				}
 				activity.damai?.let { damai ->
-					ClickImage(
+					ClickIcon(
 						res = Res.drawable.img_damai,
 						modifier = Modifier.size(32.dp),
 						onClick = { openLink("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
 				}
 				activity.maoyan?.let { maoyan ->
-					ClickImage(
+					ClickIcon(
 						res = Res.drawable.img_maoyan,
 						modifier = Modifier.size(32.dp),
 						onClick = { openLink("https://show.maoyan.com/qqw#/detail/${maoyan}") }
@@ -237,11 +236,10 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) = activity?.let {
-		when (orientation) {
-			Orientation.PORTRAIT -> Portrait(it)
-			Orientation.LANDSCAPE -> Landscape(it)
-			Orientation.SQUARE -> {}
+	override fun SubContent(device: Device) = activity?.let {
+		when (device.type) {
+			Device.Type.PORTRAIT -> Portrait(it)
+			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
 		}
 	} ?: EmptyBox()
 }

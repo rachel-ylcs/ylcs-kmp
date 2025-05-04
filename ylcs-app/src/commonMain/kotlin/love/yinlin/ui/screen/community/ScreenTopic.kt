@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -754,12 +754,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		details?.let {
-			when (orientation) {
-				Orientation.PORTRAIT -> Portrait(details = it)
-				Orientation.LANDSCAPE -> Landscape(details = it)
-				Orientation.SQUARE -> {}
+			when (device.type) {
+				Device.Type.PORTRAIT -> Portrait(details = it)
+				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(details = it)
 			}
 		} ?: EmptyBox()
 	}

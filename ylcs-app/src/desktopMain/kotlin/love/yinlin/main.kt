@@ -3,7 +3,6 @@ package love.yinlin
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
@@ -56,25 +56,22 @@ fun main() {
                 state = state,
             ) {
                 AppWrapper {
-                    Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
+                    Column(modifier = Modifier.fillMaxSize().clip(ThemeValue.Shape.Large)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
-                            AppTopBar(
-                                modifier = Modifier.fillMaxWidth().height(50.dp),
-                                actions = {
-                                    Action(
-                                        icon = Icons.Outlined.Remove,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        state.isMinimized = true
-                                    }
-                                    Action(
-                                        icon = Icons.Outlined.Close,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        isOpen = false
-                                    }
+                            AppTopBar {
+                                Action(
+                                    icon = Icons.Outlined.Remove,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    state.isMinimized = true
                                 }
-                            )
+                                Action(
+                                    icon = Icons.Outlined.Close,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    isOpen = false
+                                }
+                            }
                         }
                         App(modifier = Modifier.fillMaxWidth().weight(1f))
                     }

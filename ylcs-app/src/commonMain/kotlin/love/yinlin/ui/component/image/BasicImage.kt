@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.github.panpf.sketch.*
 import com.github.panpf.sketch.request.ImageOptions
@@ -31,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.condition
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ImageQuality
@@ -39,61 +39,39 @@ import love.yinlin.resources.placeholder_pic
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-private val DEFAULT_ICON_SIZE = 24.dp
-
 @Composable
 fun MiniIcon(
 	icon: ImageVector? = null,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = DEFAULT_ICON_SIZE,
+	size: Dp = ThemeValue.Size.Icon,
 	modifier: Modifier = Modifier
 ) {
-	if (icon != null) {
-		Icon(
-			modifier = modifier.size(size),
-			imageVector = icon,
-			contentDescription = null,
-			tint = color,
-		)
-	}
-	else {
-		Spacer(modifier = modifier.size(size))
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.Center
+	) {
+		if (icon != null) {
+			Icon(
+				modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+				imageVector = icon,
+				contentDescription = null,
+				tint = color,
+			)
+		}
 	}
 }
 
 @Composable
 fun NoImage(
-	width: Dp = DEFAULT_ICON_SIZE,
-	height: Dp = DEFAULT_ICON_SIZE,
+	width: Dp = ThemeValue.Size.Icon,
+	height: Dp = ThemeValue.Size.Icon,
 	color: Color = MaterialTheme.colorScheme.onSurface
-) {
-	if (width == height) {
-		Box(
-			modifier = Modifier.shadow(2.dp, CircleShape),
-			contentAlignment = Alignment.Center
-		) {
-			Icon(
-				modifier = Modifier.size(width),
-				imageVector = Icons.AutoMirrored.Filled.Help,
-				contentDescription = null,
-				tint = color,
-			)
-		}
-	}
-	else {
-		Box(
-			modifier = Modifier.width(width).height(height).shadow(2.dp),
-			contentAlignment = Alignment.Center
-		) {
-			Icon(
-				modifier = Modifier.size(min(width, height)).padding(5.dp),
-				imageVector = Icons.AutoMirrored.Filled.Help,
-				contentDescription = null,
-				tint = color,
-			)
-		}
-	}
-}
+) = MiniIcon(
+	icon = Icons.AutoMirrored.Filled.Help,
+	color = color,
+	size = min(width, height),
+	modifier = Modifier.size(width = width, height = height).shadow(ThemeValue.Shadow.Icon)
+)
 
 @Stable
 data class ColorfulImageVector(
@@ -112,87 +90,81 @@ fun colorfulImageVector(
 @Composable
 fun ColorfulIcon(
 	icon: ColorfulImageVector,
-	size: Dp = DEFAULT_ICON_SIZE
-) {
-	Box(
-		modifier = Modifier.size(size)
-			.clip(CircleShape)
-			.background(icon.background.copy(alpha = 0.6f))
-			.padding(5.dp),
-		contentAlignment = Alignment.Center
-	) {
-		Icon(
-			modifier = Modifier.fillMaxSize(),
-			imageVector = icon.icon,
-			contentDescription = null,
-			tint = icon.color.copy(alpha = 0.8f),
-		)
-	}
-}
+	size: Dp = ThemeValue.Size.Icon
+) = MiniIcon(
+	icon = icon.icon,
+	color = icon.color.copy(alpha = 0.8f),
+	size = size,
+	modifier = Modifier.clip(CircleShape).background(icon.background.copy(alpha = 0.6f))
+)
 
 @Composable
 fun ClickIcon(
 	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = DEFAULT_ICON_SIZE,
+	size: Dp = ThemeValue.Size.Icon,
 	indication: Boolean = true,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
-) {
-	val localIndication = if (indication) LocalIndication.current else null
-	val interactionSource = if (localIndication is IndicationNodeFactory) null else remember { MutableInteractionSource() }
+) = MiniIcon(
+	icon = icon,
+	color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+	size = size,
+	modifier = modifier
+		.clip(ThemeValue.Shape.Small)
+		.clickable(
+			onClick = onClick,
+			indication = if (indication) LocalIndication.current else null,
+			interactionSource = remember { MutableInteractionSource() },
+			enabled = enabled
+		)
+)
 
-	Icon(
-		modifier = modifier.size(size + 6.dp)
-			.clip(MaterialTheme.shapes.small)
-			.clickable(
-				onClick = onClick,
-				indication = localIndication,
-				interactionSource = interactionSource,
-				enabled = enabled
-			).padding(3.dp),
-		imageVector = icon,
-		contentDescription = null,
-		tint = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant
-	)
+@Composable
+fun LoadingCircle(
+	modifier: Modifier = Modifier,
+	size: Dp = ThemeValue.Size.Icon,
+	color: Color = MaterialTheme.colorScheme.onSurface,
+) {
+	Box(modifier = modifier) {
+		CircularProgressIndicator(
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			color = color
+		)
+	}
 }
 
 @Composable
 fun StaticLoadingIcon(
 	isLoading: Boolean,
 	icon: ImageVector,
-	size: Dp = DEFAULT_ICON_SIZE,
+	size: Dp = ThemeValue.Size.Icon,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
-	modifier: Modifier = Modifier,
-	iconModifier: Modifier = Modifier.fillMaxSize(),
+	modifier: Modifier = Modifier
 ) {
-	Box(
-		modifier = modifier.size(size),
-		contentAlignment = Alignment.Center
-	) {
-		if (isLoading) {
-			CircularProgressIndicator(
-				modifier = Modifier.fillMaxSize(fraction = 0.75f),
-				color = color
-			)
-		}
-		else {
-			Icon(
-				modifier = iconModifier,
-				imageVector = icon,
-				contentDescription = null,
-				tint = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant
-			)
-		}
+	if (isLoading) {
+		LoadingCircle(
+			size = size,
+			color = color,
+			modifier = modifier
+		)
+	}
+	else {
+		MiniIcon(
+			icon = icon,
+			color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+			size = size,
+			modifier = modifier
+		)
 	}
 }
 
 @Composable
 fun LoadingIcon(
 	icon: ImageVector,
-	size: Dp = DEFAULT_ICON_SIZE,
+	size: Dp = ThemeValue.Size.Icon,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
@@ -201,56 +173,97 @@ fun LoadingIcon(
 	val scope = rememberCoroutineScope()
 	var isLoading by rememberState { false }
 
-	StaticLoadingIcon(
-		isLoading = isLoading,
-		icon = icon,
-		size = size + 6.dp,
-		color = color,
-		enabled = enabled,
-		modifier = modifier,
-		iconModifier = Modifier.fillMaxSize()
-			.clip(MaterialTheme.shapes.small)
-			.clickable(
-				enabled = enabled && !isLoading,
-				onClick = {
-					scope.launch {
-						isLoading = true
-						onClick()
-						isLoading = false
-					}
+	if (isLoading) {
+		LoadingCircle(
+			size = size,
+			color = color,
+			modifier = modifier
+		)
+	}
+	else {
+		ClickIcon(
+			icon = icon,
+			color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+			size = size,
+			enabled = enabled && !isLoading,
+			onClick = {
+				scope.launch {
+					isLoading = true
+					onClick()
+					isLoading = false
 				}
-			).padding(3.dp),
-	)
+			},
+			modifier = modifier
+		)
+	}
 }
+
+@Composable
+fun MiniIcon(
+	res: DrawableResource,
+	size: Dp = ThemeValue.Size.Icon,
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.Center
+	) {
+		Image(
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			painter = painterResource(res),
+			contentDescription = null
+		)
+	}
+}
+
+@Composable
+fun ClickIcon(
+	res: DrawableResource,
+	size: Dp = ThemeValue.Size.Icon,
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit
+) = MiniIcon(
+	res = res,
+	size = size,
+	modifier = modifier
+		.clip(ThemeValue.Shape.Small)
+		.clickable(onClick = onClick)
+)
 
 @Composable
 fun MiniImage(
 	res: DrawableResource,
-	size: Dp = DEFAULT_ICON_SIZE,
+	contentScale: ContentScale = ContentScale.Fit,
+	alpha: Float = 1f,
 	modifier: Modifier = Modifier
 ) {
-	Image(
-		modifier = modifier.size(size),
-		painter = painterResource(res),
-		contentDescription = null
-	)
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.Center
+	) {
+		Image(
+			modifier = modifier,
+			contentScale = contentScale,
+			alpha = alpha,
+			painter = painterResource(res),
+			contentDescription = null
+		)
+	}
 }
 
 @Composable
 fun ClickImage(
 	res: DrawableResource,
+	contentScale: ContentScale = ContentScale.Fit,
+	alpha: Float = 1f,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
-) {
-	Image(
-		modifier = modifier
-			.clip(MaterialTheme.shapes.small)
-			.clickable(onClick = onClick)
-			.padding(3.dp),
-		painter = painterResource(res),
-		contentDescription = null
-	)
-}
+) = MiniImage(
+	res = res,
+	contentScale = contentScale,
+	alpha = alpha,
+	modifier = modifier.clickable(onClick = onClick)
+)
 
 @Composable
 private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(uri, key) {

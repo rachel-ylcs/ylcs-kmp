@@ -30,9 +30,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.layout.LoadingAnimation
 
@@ -42,7 +42,7 @@ fun RachelText(
 	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	style: TextStyle = LocalTextStyle.current,
-	padding: PaddingValues = PaddingValues(horizontal = 10.dp, vertical = 5.dp),
+	padding: PaddingValues = ThemeValue.Padding.Value,
 	modifier: Modifier = Modifier
 ) {
 	Box(
@@ -51,7 +51,7 @@ fun RachelText(
 	) {
 		Row(
 			modifier = Modifier.height(IntrinsicSize.Min).padding(padding),
-			horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
@@ -89,7 +89,7 @@ fun RachelButton(
 	) {
 		Row(
 			modifier = Modifier.height(IntrinsicSize.Min),
-			horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterHorizontally),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			icon?.let {
@@ -122,7 +122,7 @@ private fun LoadingButtonContent(
 ) {
 	Row(
 		modifier = Modifier.height(IntrinsicSize.Min),
-		horizontalArrangement = Arrangement.spacedBy(if (isLoading) 10.dp else 5.dp, Alignment.CenterHorizontally),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		if (isLoading) {
@@ -130,7 +130,7 @@ private fun LoadingButtonContent(
 				modifier = Modifier.fillMaxHeight().aspectRatio(1f),
 				contentAlignment = Alignment.Center
 			) {
-				LoadingAnimation(size = 24.dp, color = color)
+				LoadingAnimation(color = color)
 			}
 		}
 		else {
@@ -230,8 +230,8 @@ fun RachelRadioButton(
 			selected = checked,
 			onClick = onCheck,
 			role = Role.RadioButton
-		).padding(horizontal = 10.dp, vertical = 5.dp),
-		horizontalArrangement = Arrangement.spacedBy(15.dp),
+		).padding(ThemeValue.Padding.Value),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		RadioButton(

@@ -1,13 +1,12 @@
 package love.yinlin.ui.screen.msg.weibo
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -22,15 +21,15 @@ fun ScreenChaohua(part: ScreenPartMsg) {
 		PaginationStaggeredGrid(
 			items = part.chaohuaState.grid.items,
 			key = { it.id },
-			columns = StaggeredGridCells.Adaptive(300.dp),
+			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
 			canRefresh = true,
 			canLoading = part.chaohuaState.canLoading,
 			onRefresh = { part.chaohuaState.requestNewData() },
 			onLoading = { part.chaohuaState.requestMoreData() },
 			modifier = Modifier.fillMaxSize(),
-			contentPadding = PaddingValues(10.dp),
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
-			verticalItemSpacing = 10.dp
+			contentPadding = ThemeValue.Padding.EqualValue,
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+			verticalItemSpacing = ThemeValue.Padding.EqualSpace
 		) { weibo ->
 			WeiboCard(
 				weibo = weibo,

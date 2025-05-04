@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
@@ -345,9 +345,8 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) = when (orientation) {
-		Orientation.PORTRAIT -> Portrait()
-		Orientation.LANDSCAPE -> Landscape()
-		Orientation.SQUARE -> {}
+	override fun SubContent(device: Device) = when (device.type) {
+		Device.Type.PORTRAIT -> Portrait()
+		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 	}
 }

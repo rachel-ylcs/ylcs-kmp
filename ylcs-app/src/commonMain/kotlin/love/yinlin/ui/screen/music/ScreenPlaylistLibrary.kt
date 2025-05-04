@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -332,7 +332,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    override fun SubContent(orientation: Orientation) {
+    override fun SubContent(device: Device) {
         Column(modifier = Modifier.fillMaxSize()) {
             PlaylistTab(modifier = Modifier.fillMaxWidth())
             PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))

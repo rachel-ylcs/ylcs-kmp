@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
@@ -37,7 +37,7 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "链接提取"
 
     @Composable
-    override fun SubContent(orientation: Orientation) {
+    override fun SubContent(device: Device) {
         OS.ifPlatform(
             Platform.WebWasm, *Platform.Desktop,
             ifTrue = {

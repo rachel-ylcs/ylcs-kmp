@@ -25,8 +25,8 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.Local
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
 import love.yinlin.extension.clickableNoRipple
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -39,9 +39,9 @@ abstract class Floating<A : Any> {
         const val Z_INDEX_TIP = 30f
     }
 
-    protected abstract fun alignment(orientation: Orientation): Alignment // 对齐方式
-    protected abstract fun enter(orientation: Orientation): EnterTransition // 开始动画
-    protected abstract fun exit(orientation: Orientation): ExitTransition // 结束动画
+    protected abstract fun alignment(device: Device): Alignment // 对齐方式
+    protected abstract fun enter(device: Device): EnterTransition // 开始动画
+    protected abstract fun exit(device: Device): ExitTransition // 结束动画
     protected open val duration: Int = Local.Client.ANIMATION_DURATION // 动画时长
     protected open val scrim: Float = 0.4f // 遮罩透明度
     protected open val zIndex: Float = Z_INDEX_COMMON // 高度
@@ -75,7 +75,7 @@ abstract class Floating<A : Any> {
             )
         )
 
-        val orientation = LocalOrientation.current
+        val device = LocalDevice.current
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
@@ -83,12 +83,12 @@ abstract class Floating<A : Any> {
                 .clickableNoRipple {
                     if (dismissOnClickOutside) close()
                 },
-            contentAlignment = remember(orientation) { alignment(orientation) }
+            contentAlignment = remember(device) { alignment(device) }
         ) {
             AnimatedVisibility(
                 visible = visible,
-                enter = remember(orientation) { enter(orientation) },
-                exit = remember(orientation) { exit(orientation) }
+                enter = remember(device) { enter(device) },
+                exit = remember(device) { exit(device) }
             ) {
                 Box(modifier = Modifier.clickableNoRipple { }) {
                     content()

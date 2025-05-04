@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberOffScreenState
 
@@ -24,18 +24,18 @@ import love.yinlin.extension.rememberOffScreenState
 private fun BannerIndicator(
 	num: Int,
 	current: Int,
-	width: Dp,
+	totalWidth: Dp,
 ) {
+	val width = totalWidth / num
 	val offsetX by animateDpAsState(targetValue = width * current)
-	val height = width / 4f
 
 	Row(
-		modifier = Modifier.width(width * num).height(height)
-			.clip(MaterialTheme.shapes.extraSmall)
+		modifier = Modifier.width(totalWidth).height(width / 8f)
+			.clip(MaterialTheme.shapes.extraLarge)
 			.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
 	) {
 		Box(modifier = Modifier.width(width).fillMaxHeight()
-			.offset(x = offsetX).clip(MaterialTheme.shapes.extraSmall)
+			.offset(x = offsetX).clip(MaterialTheme.shapes.extraLarge)
 			.background(MaterialTheme.colorScheme.onBackground))
 	}
 }
@@ -43,33 +43,37 @@ private fun BannerIndicator(
 @Composable
 fun <T> Banner(
 	pics: List<T>,
-	spacing: Dp = 0.dp,
-	gap: Dp = 10.dp,
 	interval: Long = 0L,
 	state: PagerState = rememberPagerState { pics.size },
 	modifier: Modifier = Modifier,
 	content: @Composable (pic: T, index: Int, scale: Float) -> Unit
 ) {
-	Column(
-		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(gap)
-	) {
-		HorizontalPager(
-			state = state,
-			contentPadding = PaddingValues(horizontal = spacing),
-			modifier = Modifier.fillMaxWidth()
+	BoxWithConstraints(modifier = modifier) {
+		val spacingGap = maxWidth * 0.2f
+		val totalWidth = maxWidth * 0.4f
+		Column(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			if (it in 0 ..< pics.size) {
-				val scale by animateFloatAsState(targetValue = if (it == state.currentPage || spacing == 0.dp) 1f else 0.85f)
-				content(pics[it], it, scale)
+			HorizontalPager(
+				state = state,
+				contentPadding = PaddingValues(horizontal = spacingGap),
+				modifier = Modifier.fillMaxWidth()
+			) {
+				if (it in 0 ..< pics.size) {
+					val scale by animateFloatAsState(targetValue = if (it == state.currentPage) 1f else 0.85f)
+					content(pics[it], it, scale)
+				}
+			}
+			if (pics.isNotEmpty()) {
+				BannerIndicator(
+					num = pics.size,
+					current = state.currentPage,
+					totalWidth = totalWidth
+				)
 			}
 		}
-		BannerIndicator(
-			num = pics.size,
-			current = state.currentPage,
-			width = 20.dp
-		)
 	}
 
 	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }

@@ -8,13 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.screen.ActionScope
 
 @Composable
 fun SplitLayout(
     modifier: Modifier = Modifier,
-    gap: Dp = 10.dp,
+    gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable BoxScope.() -> Unit = {},
     right: @Composable BoxScope.() -> Unit = {}
 ) {
@@ -39,7 +39,7 @@ fun SplitLayout(
 @Composable
 fun SplitActionLayout(
     modifier: Modifier = Modifier,
-    gap: Dp = 10.dp,
+    gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable ActionScope.() -> Unit = {},
     right: @Composable ActionScope.() -> Unit = {}
 ) {

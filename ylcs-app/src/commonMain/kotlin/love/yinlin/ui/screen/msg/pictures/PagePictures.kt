@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.msg.pictures
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,18 +18,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_photo_album
 import love.yinlin.ui.component.container.Breadcrumb
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.msg.PhotoItem
 import love.yinlin.ui.screen.msg.ScreenPartMsg
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 private fun PhotoFile(
@@ -40,7 +40,7 @@ private fun PhotoFile(
 ) {
     Surface(
         modifier = modifier,
-        shadowElevation = 5.dp
+        shadowElevation = ThemeValue.Shadow.Surface
     ) {
         WebImage(
             uri = item.thumb,
@@ -56,21 +56,37 @@ private fun CombinedPhotoFolder(
     items: List<PhotoItem.File>,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier,
         contentAlignment = Alignment.BottomStart
     ) {
-        repeat(items.size.coerceAtMost(4)) { index ->
+        val subSize = items.size.coerceAtMost(4)
+        val gap = if (subSize > 0) maxWidth / subSize else 0.dp
+        repeat(subSize) { index ->
             WebImage(
                 uri = items[index].thumb,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .padding(start = 40.dp * index)
+                    .padding(start = gap * index)
                     .fillMaxSize()
                     .zIndex(index.toFloat())
             )
         }
     }
+}
+
+@Composable
+private fun PhotoFolderText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -83,33 +99,37 @@ private fun PhotoFolder(
 
     Surface(
         modifier = modifier,
-        shadowElevation = 5.dp
+        shadowElevation = ThemeValue.Shadow.Surface
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (isAlbum) {
+        if (isAlbum) {
+            Column(
+                modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 CombinedPhotoFolder(
                     items = item.items.map { it as PhotoItem.File },
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 )
-            }
-            else {
-                Image(
-                    painter = painterResource(Res.drawable.img_photo_album),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth().weight(1f)
+                PhotoFolderText(
+                    text = item.name,
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
                 )
             }
-            Text(
-                text = item.name,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
-            )
+        }
+        else {
+            Box(
+                modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                MiniImage(
+                    res = Res.drawable.img_photo_album,
+                    modifier = Modifier.fillMaxSize().zIndex(1f)
+                )
+                PhotoFolderText(
+                    text = item.name,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = ThemeValue.Padding.VerticalExtraSpace).zIndex(2f)
+                )
+            }
         }
     }
 }
@@ -132,8 +152,8 @@ fun ScreenPictures(part: ScreenPartMsg) {
         Column(modifier = Modifier.fillMaxSize()) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                tonalElevation = 1.dp,
-                shadowElevation = 5.dp
+                tonalElevation = ThemeValue.Shadow.Tonal,
+                shadowElevation = ThemeValue.Shadow.Surface
             ) {
                 Breadcrumb(
                     items = state.stack,
@@ -144,10 +164,10 @@ fun ScreenPictures(part: ScreenPartMsg) {
                 )
             }
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(150.dp),
-                contentPadding = PaddingValues(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                contentPadding = ThemeValue.Padding.EqualValue,
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 itemsIndexed(

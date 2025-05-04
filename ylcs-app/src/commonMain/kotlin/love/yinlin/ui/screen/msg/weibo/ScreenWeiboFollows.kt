@@ -11,7 +11,6 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material.icons.outlined.Upload
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -24,16 +23,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.app
+import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.BoxState
@@ -48,22 +48,21 @@ import love.yinlin.ui.component.text.TextInputState
 @Composable
 private fun WeiboUserItem(
 	user: WeiboUserInfo,
-	contentPadding: PaddingValues,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
 	Row(
-		modifier = modifier.clickable(onClick = onClick).padding(contentPadding),
+		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(10.dp)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
 	) {
-		if (user.avatar.isEmpty()) CircularProgressIndicator(modifier = Modifier.size(28.dp))
+		if (user.avatar.isEmpty()) LoadingCircle(size = ThemeValue.Size.ExtraIcon)
 		else WebImage(
 			uri = user.avatar,
 			key = DateEx.TodayString,
 			contentScale = ContentScale.Crop,
 			circle = true,
-			modifier = Modifier.size(32.dp)
+			modifier = Modifier.size(ThemeValue.Size.ExtraIcon)
 		)
 		Text(
 			text = user.name,
@@ -110,61 +109,6 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 		}
 	}
 
-	@Composable
-	private fun ImportLayout() {
-		val state = remember { TextInputState() }
-
-		Column(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
-			Text(text = "微博关注数据迁移")
-			TextInput(
-				state = state,
-				hint = "关注列表(JSON格式)",
-				maxLines = 6,
-				clearButton = false,
-				modifier = Modifier.fillMaxWidth()
-			)
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.SpaceEvenly
-			) {
-				LoadingRachelButton(
-					text = "导入(保留旧数据)",
-					icon = Icons.Outlined.Download,
-					enabled = state.ok,
-					onClick = {
-						try {
-							val localUsers = app.config.weiboUsers
-							val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
-							for (item in items) {
-								if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
-							}
-							slot.tip.success("导入成功")
-						}
-						catch (_: Throwable) {
-							slot.tip.error("导入格式错误")
-						}
-					}
-				)
-				LoadingRachelButton(
-					text = "导出",
-					icon = Icons.Outlined.Upload,
-					onClick = {
-						try {
-							state.text = app.config.weiboUsers.items.map { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
-						}
-						catch (e: Throwable) {
-							slot.tip.error(e.message ?: "导出失败")
-						}
-					}
-				)
-			}
-		}
-	}
-
 	override suspend fun initialize() {
 		refreshLocalUser()
 	}
@@ -193,16 +137,16 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		StatefulBox(
 			state = state,
 			modifier = Modifier.fillMaxSize()
 		) {
 			LazyVerticalGrid(
-				columns = GridCells.Adaptive(300.dp),
-				contentPadding = PaddingValues(5.dp),
-				horizontalArrangement = Arrangement.spacedBy(5.dp),
-				verticalArrangement = Arrangement.spacedBy(5.dp),
+				columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+				contentPadding = ThemeValue.Padding.EqualValue,
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 				modifier = Modifier.fillMaxSize()
 			) {
 				items(
@@ -211,7 +155,6 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 				) {
 					WeiboUserItem(
 						user = it,
-						contentPadding = PaddingValues(5.dp),
 						modifier = Modifier.fillMaxWidth(),
 						onClick = { navigate(ScreenWeiboUser.Args(it.id)) }
 					)
@@ -222,7 +165,59 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	override fun Floating() {
-		importSheet.Land { ImportLayout() }
+		importSheet.Land {
+			val state = remember { TextInputState() }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				Text(text = "微博关注数据迁移")
+				TextInput(
+					state = state,
+					hint = "关注列表(JSON格式)",
+					maxLines = 6,
+					clearButton = false,
+					modifier = Modifier.fillMaxWidth()
+				)
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceEvenly
+				) {
+					LoadingRachelButton(
+						text = "导入(叠加)",
+						icon = Icons.Outlined.Download,
+						enabled = state.ok,
+						onClick = {
+							try {
+								val localUsers = app.config.weiboUsers
+								val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
+								for (item in items) {
+									if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
+								}
+								slot.tip.success("导入成功")
+							}
+							catch (_: Throwable) {
+								slot.tip.error("导入格式错误")
+							}
+						}
+					)
+					LoadingRachelButton(
+						text = "导出",
+						icon = Icons.Outlined.Upload,
+						onClick = {
+							try {
+								state.text = app.config.weiboUsers.items.map { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
+							}
+							catch (e: Throwable) {
+								slot.tip.error(e.message ?: "导出失败")
+							}
+						}
+					)
+				}
+			}
+		}
 
 		searchDialog.Land()
 	}

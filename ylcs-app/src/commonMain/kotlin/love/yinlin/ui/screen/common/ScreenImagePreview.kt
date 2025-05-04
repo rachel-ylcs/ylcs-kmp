@@ -20,7 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
 import love.yinlin.extension.fileSizeString
@@ -185,10 +185,9 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) = when (orientation) {
-		Orientation.PORTRAIT -> Portrait()
-		Orientation.LANDSCAPE -> Landscape()
-		Orientation.SQUARE -> {}
+	override fun SubContent(device: Device) = when (device.type) {
+		Device.Type.PORTRAIT -> Portrait()
+		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 	}
 
 	@Composable

@@ -7,13 +7,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.extension.launchFlag
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.*
 import love.yinlin.ui.screen.common.ScreenMain
@@ -117,18 +118,9 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 @Composable
 fun AppWrapper(content: @Composable () -> Unit) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-		val orientation = remember(maxWidth, maxHeight) { Orientation.fromSize(maxWidth, maxHeight) }
-		val oldDensity = LocalDensity.current
-		val newDensity = remember(orientation, maxWidth, maxHeight, oldDensity) {
-
-		}
-		CompositionLocalProvider(
-			LocalOrientation provides orientation,
-			LocalDensity provides app.densityWrapper(maxWidth, maxHeight, oldDensity)
-		) {
-			RachelTheme(app.isDarkMode) {
-				content()
-			}
+		val device by rememberDerivedState(maxWidth, maxHeight) { Device(maxWidth, maxHeight) }
+		CompositionLocalProvider(LocalDevice provides device) {
+			RachelTheme(app.isDarkMode, device, content)
 		}
 	}
 }

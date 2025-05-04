@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
@@ -19,6 +18,7 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
@@ -30,6 +30,7 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.TabBar
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.screen.common.ScreenImagePreview
@@ -229,7 +230,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
-				shadowElevation = 5.dp
+				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Row(
 					modifier = Modifier.fillMaxWidth(),
@@ -241,8 +242,9 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 							launch { onPageChanged(it) }
 						},
 						items = MsgTabItem.items,
-						modifier = Modifier.weight(1f).padding(end = 10.dp)
+						modifier = Modifier.weight(1f)
 					)
+					Space()
 					ActionScope.Right.Actions {
 						ActionSuspend(Icons.Outlined.Refresh) {
 							onRefresh()

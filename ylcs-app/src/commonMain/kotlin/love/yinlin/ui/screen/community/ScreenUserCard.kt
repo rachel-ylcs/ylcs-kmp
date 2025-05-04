@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
@@ -211,12 +211,11 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	override val title: String = "主页"
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		profile?.let {
-			when (orientation) {
-				Orientation.PORTRAIT -> Portrait(it, 150.dp)
-				Orientation.LANDSCAPE -> Landscape(it, 180.dp)
-				Orientation.SQUARE -> {}
+			when (device.type) {
+				Device.Type.PORTRAIT -> Portrait(it, 150.dp)
+				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it, 180.dp)
 			}
 		} ?: EmptyBox()
 	}

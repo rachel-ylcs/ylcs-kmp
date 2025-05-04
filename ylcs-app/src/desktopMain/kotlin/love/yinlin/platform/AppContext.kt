@@ -16,8 +16,6 @@ import java.io.File
 class ActualAppContext : AppContext() {
 	override val kv: KV = KV()
 
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = oldDensity
-
 	init {
 		// 本机库
 		System.loadLibrary("ylcs")

@@ -19,8 +19,6 @@ abstract class AppContext {
 		const val CRASH_KEY = "crash_key"
 	}
 
-	abstract fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density
-
 	// 主题
 
 	val isDarkMode: Boolean @Composable get() = when (config.themeMode) {

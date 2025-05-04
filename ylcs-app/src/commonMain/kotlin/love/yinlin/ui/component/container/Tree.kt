@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.MiniIcon
@@ -67,7 +67,7 @@ data class TreeScope(
 
             if (children != null) {
                 AnimatedVisibility(visible = expended) {
-                    Column(modifier = Modifier.padding(start = 24.dp + horizontalPadding)) {
+                    Column(modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalExtraSpace + horizontalPadding)) {
                         children()
                     }
                 }
@@ -80,8 +80,8 @@ data class TreeScope(
 fun Tree(
     color: Color = Colors.Unspecified,
     style: TextStyle = LocalTextStyle.current,
-    horizontalPadding: Dp = 3.dp,
-    verticalPadding: Dp = 2.dp,
+    horizontalPadding: Dp = ThemeValue.Padding.LittleSpace,
+    verticalPadding: Dp = ThemeValue.Padding.LittleSpace,
     modifier: Modifier = Modifier,
     children: @Composable TreeScope.() -> Unit = {},
 ) {

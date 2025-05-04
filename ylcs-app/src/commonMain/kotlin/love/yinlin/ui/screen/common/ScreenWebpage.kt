@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.ui.component.platform.WebPage
 import love.yinlin.ui.component.platform.WebPageSettings
 import love.yinlin.ui.component.platform.WebPageState
@@ -30,7 +30,7 @@ class ScreenWebpage(model: AppModel, args: Args) : SubScreen<ScreenWebpage.Args>
 	}
 
 	@Composable
-	override fun SubContent(orientation: Orientation) {
+	override fun SubContent(device: Device) {
 		WebPage(
 			state = state,
 			modifier = Modifier.fillMaxSize()

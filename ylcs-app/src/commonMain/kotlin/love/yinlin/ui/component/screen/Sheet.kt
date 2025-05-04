@@ -23,10 +23,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import love.yinlin.common.LocalOrientation
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
 import love.yinlin.extension.rememberValueState
-import love.yinlin.platform.app
 import kotlin.math.roundToInt
 
 // SheetConfig仅在竖屏下生效
@@ -43,26 +42,26 @@ data class SheetConfig(
 @Suppress("DuplicatedCode")
 @Stable
 open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetConfig()) : Floating<A>() {
-    override fun alignment(orientation: Orientation): Alignment = when (orientation) {
-        Orientation.PORTRAIT, Orientation.SQUARE -> Alignment.BottomCenter
-        Orientation.LANDSCAPE -> Alignment.CenterEnd
+    override fun alignment(device: Device): Alignment = when (device.type) {
+        Device.Type.PORTRAIT -> Alignment.BottomCenter
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
     }
-    override fun enter(orientation: Orientation): EnterTransition = when (orientation) {
-        Orientation.PORTRAIT, Orientation.SQUARE -> slideInVertically(
+    override fun enter(device: Device): EnterTransition = when (device.type) {
+        Device.Type.PORTRAIT -> slideInVertically(
             animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
-        Orientation.LANDSCAPE -> slideInHorizontally(
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
             animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
-    override fun exit(orientation: Orientation): ExitTransition = when (orientation) {
-        Orientation.PORTRAIT, Orientation.SQUARE -> slideOutVertically(
+    override fun exit(device: Device): ExitTransition = when (device.type) {
+        Device.Type.PORTRAIT -> slideOutVertically(
             animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
             targetOffsetY = { it }
         )
-        Orientation.LANDSCAPE -> slideOutHorizontally(
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
             animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
@@ -192,10 +191,9 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
 
     @Composable
     override fun Wrapper(block: @Composable () -> Unit) {
-        when (LocalOrientation.current) {
-            Orientation.PORTRAIT -> PortraitWrapper(block)
-            Orientation.LANDSCAPE -> LandscapeWrapper(block)
-            Orientation.SQUARE -> {}
+        when (LocalDevice.current.type) {
+            Device.Type.PORTRAIT -> PortraitWrapper(block)
+            Device.Type.LANDSCAPE, Device.Type.SQUARE -> LandscapeWrapper(block)
         }
     }
 }

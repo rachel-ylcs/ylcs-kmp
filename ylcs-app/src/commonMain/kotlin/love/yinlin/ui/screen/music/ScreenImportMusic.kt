@@ -27,7 +27,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Orientation
+import love.yinlin.common.Device
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
@@ -272,7 +272,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     }
 
     @Composable
-    override fun SubContent(orientation: Orientation) {
+    override fun SubContent(device: Device) {
         Box(
             modifier = Modifier.fillMaxSize().dragAndDrop(
                 enabled = step is Step.Initial || step is Step.Prepare,

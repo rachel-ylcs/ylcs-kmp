@@ -16,9 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.datetime.*
 import love.yinlin.common.Resource
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
 import love.yinlin.extension.rememberDerivedState
@@ -95,8 +95,8 @@ private fun CalendarHeader(
 	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
 	Row(
-		modifier = modifier.padding(horizontal = 20.dp),
-		horizontalArrangement = Arrangement.spacedBy(20.dp),
+		modifier = modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
@@ -107,7 +107,7 @@ private fun CalendarHeader(
 			modifier = Modifier.weight(1f)
 		)
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			actions()
@@ -181,8 +181,7 @@ private fun CalendarDayGrid(
 					contentAlignment = Alignment.Center
 				) {
 					if (date == today) {
-						Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)
-							.padding(2.dp).background(
+						Box(modifier = Modifier.fillMaxHeight(fraction = 0.9f).aspectRatio(1f).background(
 							color = MaterialTheme.colorScheme.primaryContainer,
 							shape = CircleShape
 						))
@@ -221,11 +220,11 @@ fun Calendar(
 ) {
 	Column(
 		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(10.dp)
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 	) {
 		CalendarHeader(
 			state = state,
-			modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+			modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace),
 			actions = actions
 		)
 		CalendarWeekGrid(
