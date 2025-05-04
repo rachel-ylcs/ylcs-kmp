@@ -346,33 +346,33 @@ object ThemeValue {
 		}
 		val EqualSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 6.dp
-			Device.Size.MEDIUM -> 8.25.dp
-			Device.Size.LARGE -> 10.5.dp
+			Device.Size.MEDIUM -> 7.5.dp
+			Device.Size.LARGE -> 9.dp
 		}
 		val HorizontalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 8.dp
-			Device.Size.MEDIUM -> 11.dp
-			Device.Size.LARGE -> 14.dp
+			Device.Size.MEDIUM -> 10.dp
+			Device.Size.LARGE -> 12.dp
 		}
 		val VerticalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 4.dp
-			Device.Size.MEDIUM -> 5.5.dp
-			Device.Size.LARGE -> 7.dp
+			Device.Size.MEDIUM -> 5.dp
+			Device.Size.LARGE -> 6.dp
 		}
 		val EqualExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 13.5.dp
-			Device.Size.MEDIUM -> 16.5.dp
-			Device.Size.LARGE -> 19.5.dp
+			Device.Size.MEDIUM -> 15.dp
+			Device.Size.LARGE -> 16.5.dp
 		}
 		val HorizontalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 18.dp
-			Device.Size.MEDIUM -> 22.dp
-			Device.Size.LARGE -> 26.dp
+			Device.Size.MEDIUM -> 20.dp
+			Device.Size.LARGE -> 22.dp
 		}
 		val VerticalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 9.dp
-			Device.Size.MEDIUM -> 11.dp
-			Device.Size.LARGE -> 13.dp
+			Device.Size.MEDIUM -> 10.dp
+			Device.Size.LARGE -> 11.dp
 		}
 		val EqualValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualSpace, vertical = EqualSpace)
 		val Value: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalSpace, vertical = VerticalSpace)
@@ -390,7 +390,7 @@ object ThemeValue {
 		val Icon: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 2.5.dp
 			Device.Size.MEDIUM -> 3.5.dp
-			Device.Size.LARGE -> 5.dp
+			Device.Size.LARGE -> 4.5.dp
 		}
 		val Surface: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 3.dp
