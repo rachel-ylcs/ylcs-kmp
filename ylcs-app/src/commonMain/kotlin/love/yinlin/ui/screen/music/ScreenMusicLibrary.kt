@@ -76,7 +76,7 @@ private fun MusicCard(
         ) {
             LocalFileImage(
                 path = { musicInfo.recordPath },
-                key = musicInfo,
+                musicInfo,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.weight(3f).aspectRatio(1f)
             )

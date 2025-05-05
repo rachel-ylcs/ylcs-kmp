@@ -357,7 +357,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         }
                         LocalFileImage(
                             path = { info.recordPath },
-                            key = info,
+                            info,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
                         )

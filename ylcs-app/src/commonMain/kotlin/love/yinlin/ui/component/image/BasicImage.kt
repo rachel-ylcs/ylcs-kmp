@@ -319,7 +319,7 @@ fun WebImage(
 @Composable
 fun LocalFileImage(
 	path: () -> Path,
-	key: Any,
+	vararg key: Any,
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
 	contentScale: ContentScale = ContentScale.Fit,
@@ -327,8 +327,8 @@ fun LocalFileImage(
 	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, null, true),
 	onClick: (() -> Unit)? = null
 ) {
-	val baseUri = remember(key) { path().toString() }
-	val baseKey = remember(key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
+	val baseUri = remember(*key) { path().toString() }
+	val baseKey = remember(*key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
 	AsyncImage(
 		uri = rememberWebImageKeyUrl(baseUri, baseKey),
 		contentDescription = null,

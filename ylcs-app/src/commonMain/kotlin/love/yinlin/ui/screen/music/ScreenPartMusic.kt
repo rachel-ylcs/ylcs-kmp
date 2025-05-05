@@ -130,8 +130,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		Box(modifier = modifier) {
 			factory.currentMusic?.let { musicInfo ->
 				LocalFileImage(
-					path = { musicInfo.backgroundPath },
-					key = musicInfo,
+					path = { if (isAnimationBackground) musicInfo.AnimationPath else musicInfo.backgroundPath },
+					musicInfo, isAnimationBackground,
 					contentScale = ContentScale.Crop,
 					alpha = alpha,
 					modifier = Modifier.fillMaxSize()
@@ -204,7 +204,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 		LocalFileImage(
 			path = { musicInfo.recordPath },
-			key = musicInfo,
+			musicInfo,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = modifier.rotate(degrees = animation.value)
