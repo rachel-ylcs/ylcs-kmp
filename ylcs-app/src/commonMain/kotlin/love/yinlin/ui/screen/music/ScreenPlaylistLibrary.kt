@@ -391,7 +391,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                     }
                                 }
                             }
-                            else slot.tip.warning("恢复歌单需要先停止播放器")
+                            else slot.tip.warning("请先停止播放器")
                         }
                     )
                 }
@@ -439,7 +439,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                         slot.tip.success("云恢复成功")
                                     }
                                 }
-                                else slot.tip.warning("恢复歌单需要先停止播放器")
+                                else slot.tip.warning("请先停止播放器")
                             }
                         }
                     )

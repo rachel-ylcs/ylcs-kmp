@@ -204,7 +204,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
 
     private suspend fun onMusicDelete() {
         val musicFactory = app.musicFactory
-        if (musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
+        if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
         else if (slot.confirm.openSuspend(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
             for (item in deleteItems) {
@@ -259,7 +259,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         }
         else {
             Action(Icons.Outlined.Add) {
-                if (app.musicFactory.isReady) slot.tip.warning("此操作需要先停止播放器")
+                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
                 else {
                     pop()
                     navigate(ScreenImportMusic.Args(null))
