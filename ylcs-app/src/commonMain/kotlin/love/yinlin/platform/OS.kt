@@ -57,14 +57,17 @@ object OS {
 
 	inline fun <T> ifNotPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (notPlatform(*filter)) ifTrue() else ifFalse()
 
+	@Stable
 	object Application {
 		suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
 	}
 
+	@Stable
 	object Net {
 		fun openUrl(url: String) = osNetOpenUrl(url)
 	}
 
+	@Stable
 	object Storage {
 		val dataPath: Path by lazy { osStorageDataPath }
 

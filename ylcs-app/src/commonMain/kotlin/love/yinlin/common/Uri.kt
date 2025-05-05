@@ -30,7 +30,7 @@ data class Scheme(val name: String) {
 
 @Stable
 @Serializable
-class Uri private constructor(
+class Uri(
     val scheme: Scheme,
     val host: String? = null,
     val port: Int? = null,

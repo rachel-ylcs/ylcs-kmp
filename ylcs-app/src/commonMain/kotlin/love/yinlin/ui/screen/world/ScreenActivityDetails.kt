@@ -147,7 +147,9 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 						size = ThemeValue.Size.ExtraIcon,
 						onClick = {
 							launch {
-								Uri.parse(showstart)?.let { OS.Application.startAppIntent(it) }
+								val uri = Uri.parse(showstart)
+								if (uri == null) slot.tip.warning("链接已失效")
+								else if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
 							}
 						}
 					)

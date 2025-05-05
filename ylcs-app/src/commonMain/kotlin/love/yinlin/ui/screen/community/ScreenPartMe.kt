@@ -25,16 +25,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import io.github.alexzhirkevich.qrose.options.QrBallShape
-import io.github.alexzhirkevich.qrose.options.QrBrush
-import io.github.alexzhirkevich.qrose.options.QrFrameShape
-import io.github.alexzhirkevich.qrose.options.QrLogoPadding
-import io.github.alexzhirkevich.qrose.options.QrLogoShape
-import io.github.alexzhirkevich.qrose.options.QrPixelShape
-import io.github.alexzhirkevich.qrose.options.brush
-import io.github.alexzhirkevich.qrose.options.circle
-import io.github.alexzhirkevich.qrose.options.roundCorners
-import io.github.alexzhirkevich.qrose.options.solid
+import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
@@ -43,6 +34,7 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
@@ -52,6 +44,7 @@ import love.yinlin.data.Failed
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
+import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
@@ -141,6 +134,41 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
+	private fun PromotionContainer(
+		modifier: Modifier = Modifier,
+		shape: Shape = RectangleShape
+	) {
+		TipButtonContainer(
+			modifier = modifier,
+			shape = shape,
+			title = "推广"
+		) {
+			Item("水群", ExtraIcons.QQ) {
+				val uri = Uri(
+					scheme = Scheme("mqqapi"),
+					host = "card",
+					path = "/show_pslcard",
+					query = "src_type=internal&version=1&uin=828049503&card_type=group&source=qrcode"
+				)
+				launch {
+					if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装QQ")
+				}
+			}
+			Item("店铺", Icons.Filled.Store) {
+				val uri = Uri(
+					scheme = Scheme("taobao"),
+					host = "shop.m.taobao.com",
+					path = "/shop/shop_index.html",
+					query = "shop_id=280201975"
+				)
+				launch {
+					if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装淘宝")
+				}
+			}
+		}
+	}
+
+	@Composable
 	private fun AdminContainer(
 		modifier: Modifier = Modifier,
 		shape: Shape = RectangleShape
@@ -151,9 +179,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			title = "超管空间"
 		) {
 			Item("活动", Icons.Filled.Link) {
-				if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-					navigate<ScreenActivityLink>()
-				}
+				navigate<ScreenActivityLink>()
 			}
 		}
 	}
@@ -205,7 +231,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			)
 			ToolContainer(modifier = Modifier.fillMaxWidth())
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
-			AdminContainer(modifier = Modifier.fillMaxWidth())
+			PromotionContainer(modifier = Modifier.fillMaxWidth())
+			if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+				AdminContainer(modifier = Modifier.fillMaxWidth())
+			}
 			Space()
 		}
 	}
@@ -228,10 +257,16 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
 					shape = MaterialTheme.shapes.large
 				)
-				AdminContainer(
+				PromotionContainer(
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
 					shape = MaterialTheme.shapes.large
 				)
+				if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+					AdminContainer(
+						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+						shape = MaterialTheme.shapes.large
+					)
+				}
 				Space()
 			}
 		}

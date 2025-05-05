@@ -77,7 +77,7 @@ private fun PlayingMusicStatusCard(
 	Row(
 		modifier = modifier.clickable {
 			if (!isCurrent) onClick()
-		}.padding(ThemeValue.Padding.Value),
+		}.padding(ThemeValue.Padding.ExtraValue),
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 		verticalAlignment = Alignment.CenterVertically
 	) {
