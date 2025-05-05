@@ -49,7 +49,7 @@ data class MusicInfoPreview(
     constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
 
     @Stable
-    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, "${MusicResourceType.Record.default}?mod=$modification")
+    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
 }
 
 @Composable
@@ -75,8 +75,9 @@ private fun MusicCard(
             ),
         ) {
             LocalFileImage(
-                path = musicInfo.recordPath,
-                contentScale = ContentScale.Fit,
+                path = { musicInfo.recordPath },
+                key = musicInfo,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.weight(3f).aspectRatio(1f)
             )
             Column(

@@ -27,6 +27,7 @@ import com.github.panpf.zoomimage.rememberSketchZoomState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.condition
@@ -317,23 +318,24 @@ fun WebImage(
 
 @Composable
 fun LocalFileImage(
-	path: Path,
+	path: () -> Path,
+	key: Any,
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
-	quality: ImageQuality = ImageQuality.Medium,
 	contentScale: ContentScale = ContentScale.Fit,
-	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
-	state: AsyncImageState = rememberWebImageState(quality, null, true),
+	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, null, true),
 	onClick: (() -> Unit)? = null
 ) {
+	val baseUri = remember(key) { path().toString() }
+	val baseKey = remember(key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
 	AsyncImage(
-		uri = path.toString(),
+		uri = rememberWebImageKeyUrl(baseUri, baseKey),
 		contentDescription = null,
 		state = state,
-		alignment = alignment,
+		alignment = Alignment.Center,
 		contentScale = contentScale,
-		filterQuality = quality.filterQuality,
+		filterQuality = ImageQuality.Full.filterQuality,
 		alpha = alpha,
 		modifier = modifier.condition(circle) { clip(CircleShape) }
 			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }

@@ -35,7 +35,6 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.buffered
-import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
@@ -48,13 +47,9 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.img_music_record
-import love.yinlin.resources.no_audio_source
-import love.yinlin.resources.unknown_singer
+import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.input.BeautifulSlider
@@ -132,18 +127,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		alpha: Float = 1f,
 		modifier: Modifier = Modifier
 	) {
-		val backgroundPath by rememberDerivedState {
-			factory.currentMusic?.let { musicInfo ->
-				if (isAnimationBackground) musicInfo.AnimationPath
-				else musicInfo.backgroundPath
-			}
-		}
-
 		Box(modifier = modifier) {
-			backgroundPath?.let { path ->
+			factory.currentMusic?.let { musicInfo ->
 				LocalFileImage(
-					path = path,
-					quality = ImageQuality.Full,
+					path = { musicInfo.backgroundPath },
+					key = musicInfo,
 					contentScale = ContentScale.Crop,
 					alpha = alpha,
 					modifier = Modifier.fillMaxSize()
@@ -189,7 +177,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicRecord(
-		path: Path,
+		musicInfo: MusicInfo,
 		modifier: Modifier = Modifier
 	) {
 		var lastDegree by rememberState { 0f }
@@ -215,8 +203,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 
 		LocalFileImage(
-			path = path,
-			quality = ImageQuality.Full,
+			path = { musicInfo.recordPath },
+			key = musicInfo,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = modifier.rotate(degrees = animation.value)
@@ -226,7 +214,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun MusicRecordLayout(
 		offset: Dp,
-		recordPath: Path?,
+		musicInfo: MusicInfo?,
 		modifier: Modifier = Modifier
 	) {
 		OffsetLayout(y = offset) {
@@ -239,9 +227,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					contentDescription = null,
 					modifier = Modifier.fillMaxSize().zIndex(1f)
 				)
-				recordPath?.let {
+				musicInfo?.let {
 					MusicRecord(
-						path = it,
+						musicInfo = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f).zIndex(2f)
 					)
 				}
@@ -258,7 +246,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		) {
 			MusicRecordLayout(
 				offset = -ThemeValue.Size.LargeImage / 2,
-				recordPath = remember(musicInfo) { musicInfo?.recordPath },
+				musicInfo = musicInfo,
 				modifier = Modifier.size(ThemeValue.Size.LargeImage)
 					.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
 			)
@@ -667,7 +655,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						if (musicInfo != null) {
 							MusicRecordLayout(
 								offset = ThemeValue.Padding.ZeroSpace,
-								recordPath = remember(musicInfo) { musicInfo.recordPath },
+								musicInfo = musicInfo,
 								modifier = Modifier.fillMaxHeight().aspectRatio(1f)
 									.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
 							)
@@ -727,7 +715,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						if (musicInfo != null) {
 							MusicRecordLayout(
 								offset = ThemeValue.Padding.ZeroSpace,
-								recordPath = remember(musicInfo) { musicInfo.recordPath },
+								musicInfo = musicInfo,
 								modifier = Modifier.fillMaxHeight().aspectRatio(1f)
 									.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
 							)
