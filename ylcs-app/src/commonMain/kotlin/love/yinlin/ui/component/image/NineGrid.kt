@@ -8,15 +8,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 
 @Composable
 fun NineGrid(
 	pics: List<Picture>,
-	padding: Dp = 5.dp,
+	padding: Dp = ThemeValue.Padding.LittleSpace,
 	modifier: Modifier = Modifier,
 	onImageClick: (Int) -> Unit,
 	onVideoClick: (Picture) -> Unit
@@ -25,7 +25,7 @@ fun NineGrid(
 	if (size == 1) {
 		val pic = pics[0]
 		Box(
-			modifier = modifier.height(200.dp),
+			modifier = modifier.height(ThemeValue.Size.ExtraLargeImage),
 			contentAlignment = Alignment.Center
 		) {
 			WebImage(
@@ -39,7 +39,7 @@ fun NineGrid(
 			if (pic.isVideo) {
 				MiniIcon(
 					icon = Icons.Outlined.SmartDisplay,
-					size = 48.dp,
+					size = ThemeValue.Size.SmallImage,
 					color = Colors.White,
 					modifier = Modifier.zIndex(2f)
 				)

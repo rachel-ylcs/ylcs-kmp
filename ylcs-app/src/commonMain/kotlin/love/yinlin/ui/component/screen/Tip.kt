@@ -3,6 +3,7 @@ package love.yinlin.ui.component.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeColor
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
-import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
@@ -77,20 +80,20 @@ open class Tip(private val scope: CoroutineScope) {
                 Type.WARNING -> ThemeColor.onWarning
                 Type.ERROR -> MaterialTheme.colorScheme.onError
             }
+            val tipPadding = PaddingValues(when (LocalDevice.current.size) {
+                Device.Size.SMALL -> 40.dp
+                Device.Size.MEDIUM -> 50.dp
+                Device.Size.LARGE -> 60.dp
+            })
             Box(
-                modifier = Modifier.padding(
-                    horizontal = 20.dp,
-                    vertical = 20.dp,
-                ).fillMaxWidth()
+                modifier = Modifier.padding(tipPadding)
+                    .fillMaxWidth()
                     .clickableNoRipple { }
-                    .background(
-                        color = color,
-                        shape = MaterialTheme.shapes.extraLarge
-                    )
+                    .background(color = color, shape = MaterialTheme.shapes.extraLarge)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(15.dp),
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     MiniIcon(

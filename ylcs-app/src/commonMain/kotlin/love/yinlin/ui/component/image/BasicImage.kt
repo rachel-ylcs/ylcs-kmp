@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -70,7 +69,7 @@ fun NoImage(
 	icon = Icons.AutoMirrored.Filled.Help,
 	color = color,
 	size = min(width, height),
-	modifier = Modifier.size(width = width, height = height).shadow(ThemeValue.Shadow.Icon)
+	modifier = Modifier.size(width = width, height = height)
 )
 
 @Stable
@@ -112,7 +111,7 @@ fun ClickIcon(
 	color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
 	size = size,
 	modifier = modifier
-		.clip(ThemeValue.Shape.Small)
+		.clip(MaterialTheme.shapes.extraSmall)
 		.clickable(
 			onClick = onClick,
 			indication = if (indication) LocalIndication.current else null,
@@ -226,7 +225,7 @@ fun ClickIcon(
 	res = res,
 	size = size,
 	modifier = modifier
-		.clip(ThemeValue.Shape.Small)
+		.clip(MaterialTheme.shapes.extraSmall)
 		.clickable(onClick = onClick)
 )
 

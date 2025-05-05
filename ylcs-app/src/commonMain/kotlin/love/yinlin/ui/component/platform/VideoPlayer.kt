@@ -12,11 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import love.yinlin.Local
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
@@ -50,7 +50,7 @@ private fun VideoPlayerControlBar(
         )
     ) {
         Row(
-            modifier = modifier.background(Colors.Dark.copy(alpha = 0.5f)).padding(10.dp),
+            modifier = modifier.background(Colors.Dark.copy(alpha = 0.5f)).padding(ThemeValue.Padding.Value),
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -73,7 +73,7 @@ fun VideoPlayerControls(
         var isShowControls by rememberState { false }
 
         LaunchedEffect(Unit) {
-            delay(500)
+            delay(Local.Client.ANIMATION_DURATION.toLong())
             isShowControls = true
         }
 
@@ -100,33 +100,33 @@ fun VideoPlayerControls(
                 color = Colors.White,
                 onClick = onPlayClick
             )
-            Space(10.dp)
+            Space()
             if (leftAction != null) {
                 leftAction()
-                Space(10.dp)
+                Space()
             }
             BeautifulSlider(
                 value = if (duration == 0L) 0f else position / duration.toFloat(),
                 onValueChangeFinished = { onProgressClick((it * duration).toLong()) },
                 modifier = Modifier.weight(1f)
             )
-            Space(10.dp)
+            Space()
             Text(
                 text = remember(position) { position.timeString },
                 color = Colors.White
             )
-            Space(5.dp)
+            Space(ThemeValue.Padding.HorizontalSpace / 2)
             Text(
                 text = "/",
                 color = Colors.White
             )
-            Space(5.dp)
+            Space(ThemeValue.Padding.HorizontalSpace / 2)
             Text(
                 text = remember(duration) { duration.timeString },
                 color = Colors.White
             )
             if (rightAction != null) {
-                Space(10.dp)
+                Space()
                 rightAction()
             }
         }

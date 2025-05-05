@@ -3,7 +3,6 @@ package love.yinlin.common
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import kotlinx.serialization.Serializable
 import love.yinlin.extension.localComposition
 

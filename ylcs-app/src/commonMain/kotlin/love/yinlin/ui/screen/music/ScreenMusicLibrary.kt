@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.deleteRecursively
@@ -63,7 +63,7 @@ private fun MusicCard(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
         color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        shadowElevation = 3.dp,
+        shadowElevation = ThemeValue.Shadow.Surface,
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -85,7 +85,7 @@ private fun MusicCard(
                 Text(
                     text = musicInfo.name,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.labelMedium,
                     maxLines = 2,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -93,7 +93,7 @@ private fun MusicCard(
                 Text(
                     text = musicInfo.singer,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     maxLines = 2,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
@@ -274,10 +274,10 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         if (library.isEmpty()) EmptyBox()
         else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(150.dp),
-                contentPadding = PaddingValues(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                contentPadding = ThemeValue.Padding.EqualValue,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
                 modifier = Modifier.fillMaxSize()
             ) {
                 itemsIndexed(

@@ -13,13 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserProfile
@@ -118,7 +118,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     ) {
         FlowRow(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
             itemVerticalAlignment = Alignment.CenterVertically
         ) {
             for (section in Comment.Section.MovableSection) {
@@ -133,7 +133,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                             MiniIcon(icon = Icons.Filled.Done)
                         }
                     } else null,
-                    elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = 0.dp)
+                    elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = ThemeValue.Padding.ZeroSpace)
                 )
             }
         }
@@ -155,10 +155,11 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun SubContent(device: Device) {
-        app.config.userProfile?.let {
+        app.config.userProfile?.let { profile ->
             Column(
-                modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {
                 TextInput(
                     state = input.title,
@@ -178,14 +179,14 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                 )
                 Text(text = "主题", style = MaterialTheme.typography.titleMedium)
                 SectionSelectLayout(
-                    profile = it,
+                    profile = profile,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(text = "图片", style = MaterialTheme.typography.titleMedium)
                 ImageAdder(
                     maxNum = 9,
                     pics = input.pics,
-                    size = 80.dp,
+                    size = ThemeValue.Size.MicroCellWidth,
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },
                     onDelete = { deletePic(it) },

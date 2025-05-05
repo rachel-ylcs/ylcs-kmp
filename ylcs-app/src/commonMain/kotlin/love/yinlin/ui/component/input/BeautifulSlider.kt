@@ -17,15 +17,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 
 @Composable
 fun BeautifulSlider(
     value: Float,
     modifier: Modifier = Modifier,
-    height: Dp = 6.dp,
+    height: Dp = ThemeValue.Size.ProgressHeight,
     trackColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
     trackShape: Shape = MaterialTheme.shapes.medium,

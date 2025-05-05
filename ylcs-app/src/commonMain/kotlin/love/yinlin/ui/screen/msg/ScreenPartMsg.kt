@@ -31,7 +31,7 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo

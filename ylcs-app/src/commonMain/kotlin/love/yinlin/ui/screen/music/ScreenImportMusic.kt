@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import io.ktor.utils.io.core.readText
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
@@ -28,6 +27,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
@@ -38,6 +38,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.LoadingAnimation
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult
 import love.yinlin.ui.component.platform.dragAndDrop
@@ -141,16 +142,16 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     ) {
         LazyColumn(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             item("metadata".itemKey) {
                 val metadata = preview.metadata
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = 5.dp,
-                    border = BorderStroke(width = 1.dp, color = Color.LightGray)
+                    shadowElevation = ThemeValue.Shadow.Surface,
+                    border = BorderStroke(width = ThemeValue.Border.Small, color = Color.LightGray)
                 ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Column(modifier = Modifier.padding(ThemeValue.Padding.EqualValue)) {
                         Text(
                             text = "MOD元信息",
                             style = MaterialTheme.typography.titleMedium,
@@ -169,12 +170,12 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             ) { mediaItem ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = 5.dp,
-                    border = BorderStroke(width = 1.dp, color = Color.LightGray)
+                    shadowElevation = ThemeValue.Shadow.Surface,
+                    border = BorderStroke(width = ThemeValue.Border.Small, color = Color.LightGray)
                 ) {
                     Column(
-                        modifier = Modifier.padding(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                        modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
+                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
                     ) {
                         val config = mediaItem.config
                         if (config != null) {
@@ -192,7 +193,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                             Text(text = "作曲: ${config.composer}")
                             Text(text = "专辑: ${config.album}")
                             Text(text = "副歌点: ${config.chorus}")
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Space()
                         }
                         Text(
                             text = "资源表",
@@ -201,8 +202,10 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                         )
                         for ((resource, length) in mediaItem.resources) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().border(1.dp, Color.LightGray).padding(5.dp),
-                                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                                modifier = Modifier.fillMaxWidth()
+                                    .border(ThemeValue.Border.Small, Color.LightGray)
+                                    .padding(ThemeValue.Padding.EqualValue),
+                                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
                             ) {
                                 Text(
                                     text = "${resource.type?.description ?: "未知资源"}(${resource.name})",
@@ -306,7 +309,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     if (preview == null) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
                         ) {
                             LoadingAnimation()
                             Text(
@@ -325,7 +328,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 is Step.Processing -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
                     ) {
                         LoadingAnimation()
                         Text(

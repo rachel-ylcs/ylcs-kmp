@@ -17,10 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
 import love.yinlin.extension.fileSizeString
@@ -85,7 +85,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		Row(
 			modifier = modifier,
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(10.dp)
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
 		) {
 			Checkbox(
 				checked = preview.isSource,
@@ -137,27 +137,24 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		Row(modifier = Modifier.fillMaxSize()) {
 			val state = rememberLazyListState(current)
 			LazyColumn(
-				modifier = Modifier.width(150.dp).fillMaxHeight(),
+				modifier = Modifier.width(ThemeValue.Size.LargeImage).fillMaxHeight(),
 				state = state,
-				contentPadding = PaddingValues(horizontal = 10.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				itemsIndexed(items = previews) { index, item ->
 					WebImage(
 						uri = item.pic.image,
 						contentScale = ContentScale.Crop,
-						modifier = Modifier.fillMaxWidth().height(150.dp)
+						modifier = Modifier.fillMaxWidth().aspectRatio(1f)
 							.condition(index == current) {
-								border(2.dp, MaterialTheme.colorScheme.primary)
+								border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)
 							},
-						onClick = {
-							current = index
-						}
+						onClick = { current = index }
 					)
 				}
 			}
-			VerticalDivider(modifier = Modifier.padding(end = 10.dp))
+			VerticalDivider(modifier = Modifier.padding(end = ThemeValue.Padding.HorizontalSpace))
 			Column(
 				modifier = Modifier.weight(1f).fillMaxHeight(),
 				horizontalAlignment = Alignment.CenterHorizontally

@@ -1,17 +1,12 @@
 package love.yinlin.platform
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import io.ktor.client.*
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
-import love.yinlin.common.ThemeMode
 
 @Stable
 abstract class AppContext {
@@ -20,12 +15,6 @@ abstract class AppContext {
 	}
 
 	// 主题
-
-	val isDarkMode: Boolean @Composable get() = when (config.themeMode) {
-		ThemeMode.SYSTEM -> isSystemInDarkTheme()
-		ThemeMode.LIGHT -> false
-		ThemeMode.DARK -> true
-	}
 
 	// KV
 	abstract val kv: KV

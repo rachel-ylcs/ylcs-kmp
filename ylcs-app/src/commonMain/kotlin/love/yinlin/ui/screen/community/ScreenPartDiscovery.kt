@@ -18,11 +18,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
@@ -33,7 +33,7 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.screen.ActionScope
 
 private enum class DiscoveryItem(
@@ -155,7 +155,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		Surface(
 			modifier = modifier,
 			shape = MaterialTheme.shapes.large,
-			shadowElevation = 3.dp
+			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			Column(modifier = Modifier.fillMaxWidth()
 				.heightIn(min = cardWidth * 0.777777f)
@@ -172,12 +172,12 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 					text = topic.title,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
 				)
 				Spacer(Modifier.weight(1f))
 				Row(
-					modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(5.dp),
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(ThemeValue.Padding.Value),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
@@ -192,7 +192,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 					}
 					Column(
 						modifier = Modifier.weight(1f),
-						verticalArrangement = Arrangement.spacedBy(5.dp)
+						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 					) {
 						Text(
 							text = topic.name,
@@ -204,21 +204,21 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 						)
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(5.dp),
+							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 							verticalAlignment = Alignment.CenterVertically
 						) {
 							RachelText(
 								text = topic.commentNum.toString(),
 								icon = Icons.AutoMirrored.Outlined.Comment,
-								style = MaterialTheme.typography.bodyMedium,
-								padding = PaddingValues(0.dp),
+								style = MaterialTheme.typography.bodySmall,
+								padding = ThemeValue.Padding.ZeroValue,
 								modifier = Modifier.weight(1f)
 							)
 							RachelText(
 								text = topic.coinNum.toString(),
 								icon = Icons.Outlined.Paid,
-								style = MaterialTheme.typography.bodyMedium,
-								padding = PaddingValues(0.dp),
+								style = MaterialTheme.typography.bodySmall,
+								padding = ThemeValue.Padding.ZeroValue,
 								modifier = Modifier.weight(1f)
 							)
 						}
@@ -237,7 +237,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
-				shadowElevation = 5.dp
+				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Row(
 					modifier = Modifier.fillMaxWidth(),
@@ -250,7 +250,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 							launch { requestNewData() }
 						},
 						items = DiscoveryItem.items,
-						modifier = Modifier.weight(1f).padding(end = 10.dp)
+						modifier = Modifier.weight(1f).padding(end = ThemeValue.Padding.HorizontalSpace)
 					)
 					ActionScope.Right.Actions {
 						Action(Icons.Outlined.Add) {
@@ -267,20 +267,20 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 				PaginationStaggeredGrid(
 					items = page.items,
 					key = { it.tid },
-					columns = StaggeredGridCells.Adaptive(150.dp),
+					columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
 					state = listState,
 					canRefresh = true,
 					canLoading = page.canLoading,
 					onRefresh = { requestNewData() },
 					onLoading = { requestMoreData() },
 					modifier = Modifier.fillMaxSize(),
-					contentPadding = PaddingValues(10.dp),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalItemSpacing = 10.dp
+					contentPadding = ThemeValue.Padding.EqualValue,
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+					verticalItemSpacing = ThemeValue.Padding.EqualSpace
 				) { topic ->
 					TopicCard(
 						topic = topic,
-						cardWidth = 150.dp,
+						cardWidth = ThemeValue.Size.CellWidth,
 						modifier = Modifier.fillMaxWidth()
 					)
 				}

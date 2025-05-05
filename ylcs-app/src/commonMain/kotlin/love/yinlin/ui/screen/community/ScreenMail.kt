@@ -19,11 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
@@ -128,17 +128,18 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	) {
 		Surface(
 			modifier = modifier,
-			shadowElevation = 3.dp,
-			border = if (mail.processed) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+			shadowElevation = ThemeValue.Shadow.Surface,
+			border = if (mail.processed) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
 		) {
 			Column(
-				modifier = Modifier.fillMaxWidth().clickable{ mailDetailsSheet.open(mail) }.padding(10.dp),
+				modifier = Modifier.fillMaxWidth().clickable{ mailDetailsSheet.open(mail) }
+					.padding(ThemeValue.Padding.EqualValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				Row(
 					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					BoxText(
@@ -152,7 +153,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 					)
 					Text(
 						text = mail.title,
-						style = MaterialTheme.typography.titleMedium,
+						style = MaterialTheme.typography.labelMedium,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
 						modifier = Modifier.weight(1f)
@@ -160,12 +161,15 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 					Text(
 						text = mail.ts,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
-						style = MaterialTheme.typography.bodyMedium
+						style = MaterialTheme.typography.bodySmall,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
 					)
 				}
 				Text(
 					text = mail.content,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					style = MaterialTheme.typography.bodySmall,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					modifier = Modifier.fillMaxWidth()
@@ -189,15 +193,15 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 			PaginationGrid(
 				items = page.items,
 				key = { it.mid },
-				columns = GridCells.Adaptive(300.dp),
+				columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
 				canRefresh = true,
 				canLoading = page.canLoading,
 				onRefresh = { requestNewMails() },
 				onLoading = { requestMoreMails() },
 				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(10.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+				contentPadding = ThemeValue.Padding.EqualValue,
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace)
 			) {
 				MailItem(mail = it)
 			}
@@ -208,8 +212,8 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	override fun Floating() {
 		mailDetailsSheet.Land { mail ->
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
-				verticalArrangement = Arrangement.spacedBy(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				Text(
 					text = mail.title,
@@ -221,7 +225,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				)
 				Row(
 					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					if (mail.withYes) RachelButton(

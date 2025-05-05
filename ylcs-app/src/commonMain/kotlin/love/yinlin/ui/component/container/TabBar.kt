@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.layout
+package love.yinlin.ui.component.container
 
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
@@ -32,7 +31,7 @@ private fun <T> TabBar(
 	ScrollableTabRow(
 		modifier = modifier,
 		selectedTabIndex = currentPage,
-		edgePadding = 0.dp,
+		edgePadding = ThemeValue.Padding.ZeroSpace,
 		indicator = { tabPositions ->
 			if (currentPage < tabPositions.size) {
 				TabRowDefaults.SecondaryIndicator(
@@ -116,7 +115,8 @@ fun TabBar(
 			text = title,
 			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
+			modifier = Modifier.padding(ThemeValue.Padding.Value)
 		)
 	}
 }

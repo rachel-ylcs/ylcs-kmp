@@ -30,8 +30,7 @@ private fun BreadcrumbItem(
         color = color,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.clickable(onClick = onClick)
-            .padding(ThemeValue.Padding.Value)
+        modifier = Modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue)
     )
 }
 

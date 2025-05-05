@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,7 +28,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
@@ -39,9 +37,7 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
-import love.yinlin.ui.component.layout.OffsetLayout
 import love.yinlin.ui.component.layout.EqualItem
-import love.yinlin.ui.component.layout.Space
 
 @Composable
 internal fun BoxText(
@@ -49,14 +45,15 @@ internal fun BoxText(
 	color: Color
 ) {
 	Box(
-		modifier = Modifier.padding(vertical = 3.dp).border(1.dp, color = color),
+		modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace / 2)
+			.border(ThemeValue.Border.Small, color = color),
 		contentAlignment = Alignment.Center
 	) {
 		Text(
 			text = text,
 			style = MaterialTheme.typography.labelMedium,
 			color = color,
-			modifier = Modifier.padding(horizontal = 3.dp, vertical = 2.dp)
+			modifier = Modifier.padding(ThemeValue.Padding.LittleValue)
 		)
 	}
 }
@@ -70,158 +67,86 @@ internal fun PortraitValue(
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(5.dp)
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 	) {
 		Text(
 			text = value,
-			style = MaterialTheme.typography.titleLarge
+			style = MaterialTheme.typography.labelLarge
 		)
-		Text(
-			text = title
-		)
+		Text(text = title)
 	}
 }
 
 @Composable
-internal fun PortraitUserProfileCard(
+internal fun UserProfileCard(
 	profile: UserPublicProfile,
 	owner: Boolean,
-	modifier: Modifier = Modifier
-) {
-	Column(modifier = modifier) {
-		WebImage(
-			uri = profile.wallPath,
-			key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
-			modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
-		)
-		Column(
-			modifier = Modifier.fillMaxWidth()
-				.shadow(elevation = 5.dp, clip = false)
-				.background(MaterialTheme.colorScheme.surface)
-				.padding(10.dp)
-		) {
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp)
-			) {
-				OffsetLayout(y = (-26).dp) {
-					WebImage(
-						uri = profile.avatarPath,
-						key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
-						contentScale = ContentScale.Crop,
-						circle = true,
-						modifier = Modifier.size(72.dp).shadow(5.dp, CircleShape)
-					)
-				}
-				Text(
-					text = profile.name,
-					style = MaterialTheme.typography.titleLarge,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.weight(1f).padding(horizontal = 10.dp)
-				)
-			}
-			Row(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				UserLabel(label = profile.label, level = profile.level)
-				Row(
-					modifier = Modifier.weight(1f),
-					horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					PortraitValue(
-						value = profile.level.toString(),
-						title = "等级"
-					)
-					PortraitValue(
-						value = profile.coin.toString(),
-						title = "银币"
-					)
-				}
-			}
-			Space(10.dp)
-			Text(
-				text = profile.signature,
-				maxLines = 2,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth()
-			)
-		}
-	}
-}
-
-@Composable
-internal fun LandscapeUserProfileCard(
-	profile: UserPublicProfile,
-	owner: Boolean,
+	shape: Shape = RectangleShape,
 	modifier: Modifier = Modifier
 ) {
 	Surface(
 		modifier = modifier,
-		shape = MaterialTheme.shapes.large,
-		shadowElevation = 5.dp
+		shape = shape,
+		shadowElevation = ThemeValue.Shadow.Surface
 	) {
-		Column(
-			modifier = Modifier.fillMaxWidth(),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
-		) {
+		Column(modifier = Modifier.fillMaxWidth()) {
 			WebImage(
 				uri = profile.wallPath,
 				key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
 				modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 			)
-			Row(
-				modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(horizontal = 20.dp),
-				horizontalArrangement = Arrangement.spacedBy(15.dp)
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
-				Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
-					WebImage(
-						uri = profile.avatarPath,
-						key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
-						contentScale = ContentScale.Crop,
-						circle = true,
-						modifier = Modifier.matchParentSize().shadow(5.dp, CircleShape)
-					)
-				}
-				Column(
-					modifier = Modifier.weight(1f),
-					verticalArrangement = Arrangement.spacedBy(5.dp)
-				) {
-					Text(
-						text = profile.name,
-						style = MaterialTheme.typography.titleLarge,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier.fillMaxWidth()
-					)
-					UserLabel(
-						label = profile.label,
-						level = profile.level
-					)
-				}
 				Row(
-					horizontalArrangement = Arrangement.spacedBy(10.dp),
-					verticalAlignment = Alignment.CenterVertically
+					modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 				) {
-					PortraitValue(
-						value = profile.level.toString(),
-						title = "等级"
-					)
-					PortraitValue(
-						value = profile.coin.toString(),
-						title = "银币"
-					)
+					Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+						WebImage(
+							uri = profile.avatarPath,
+							key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
+							contentScale = ContentScale.Crop,
+							circle = true,
+							modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
+						)
+					}
+					Column(
+						modifier = Modifier.weight(1f),
+						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+					) {
+						Text(
+							text = profile.name,
+							style = MaterialTheme.typography.labelLarge,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis,
+							modifier = Modifier.fillMaxWidth()
+						)
+						UserLabel(label = profile.label, level = profile.level)
+					}
+					Row(
+						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						PortraitValue(
+							value = profile.level.toString(),
+							title = "等级"
+						)
+						PortraitValue(
+							value = profile.coin.toString(),
+							title = "银币"
+						)
+					}
 				}
+				Text(
+					text = profile.signature,
+					style = MaterialTheme.typography.bodySmall,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
-			Text(
-				text = profile.signature,
-				maxLines = 2,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-			)
 		}
 	}
 }
@@ -235,12 +160,16 @@ data class TipButtonScope(private val equalRowScope: EqualRowScope) {
 				modifier = Modifier
 					.clip(MaterialTheme.shapes.medium)
 					.clickable(onClick = onClick)
-					.padding(horizontal = 10.dp, vertical = 5.dp),
-				verticalArrangement = Arrangement.spacedBy(3.dp),
+					.padding(ThemeValue.Padding.Value),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				MiniIcon(icon = icon)
-				Text(text = text)
+				Text(
+					text = text,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
 			}
 		}
 	}
@@ -256,15 +185,15 @@ internal fun TipButtonContainer(
 	Surface(
 		modifier = modifier,
 		shape = shape,
-		shadowElevation = 5.dp
+		shadowElevation = ThemeValue.Shadow.Surface
 	) {
 		Column(
-			modifier = Modifier.fillMaxWidth().padding(10.dp),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			Text(
 				text = title,
-				style = MaterialTheme.typography.titleLarge
+				style = MaterialTheme.typography.labelLarge
 			)
 			EqualRow(modifier = Modifier.fillMaxWidth()) {
 				TipButtonScope(this).content()

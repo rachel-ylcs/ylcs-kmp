@@ -42,6 +42,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 				text = comment.text,
 				modifier = Modifier.fillMaxWidth()
 			)
+			Space()
 			val subComments = comment.subComments
 			if (subComments.isNotEmpty()) {
 				Surface(
@@ -72,15 +73,15 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Portrait(weibo: Weibo) {
 		LazyColumn(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue),
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
 			item(key = "WeiboLayout".itemKey) {
 				WeiboLayout(weibo = weibo)
 			}
 			comments?.let { weiboComments ->
 				item(key = "HorizontalDivider".itemKey) {
-					HorizontalDivider(modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))
+					HorizontalDivider(modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
 				}
 				items(
 					items = weiboComments,
@@ -98,7 +99,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 			Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				WeiboLayout(weibo = weibo)
 			}
-			VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalSpace))
+			VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace))
 			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
 				val weiboComments = comments
 				if (weiboComments == null) LoadingBox()
@@ -106,7 +107,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 				else {
 					LazyColumn(
 						modifier = Modifier.fillMaxSize(),
-						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 					) {
 						items(
 							items = weiboComments,

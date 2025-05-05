@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
@@ -92,7 +92,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 		Surface(
 			modifier = modifier,
 			shape = MaterialTheme.shapes.large,
-			shadowElevation = 3.dp
+			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			Column(modifier = Modifier.fillMaxWidth()
 				.heightIn(min = cardWidth * 0.777777f)
@@ -107,8 +107,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				}
 				if (topic.isTop) {
 					Row(
-						modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, top = 5.dp),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
@@ -118,26 +118,26 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 					text = topic.title,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 5.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
 				)
 				Spacer(Modifier.weight(1f))
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					RachelText(
 						text = topic.commentNum.toString(),
 						icon = Icons.AutoMirrored.Outlined.Comment,
-						style = MaterialTheme.typography.bodyMedium,
-						padding = PaddingValues(0.dp),
+						style = MaterialTheme.typography.bodySmall,
+						padding = ThemeValue.Padding.ZeroValue,
 						modifier = Modifier.weight(1f)
 					)
 					RachelText(
 						text = topic.coinNum.toString(),
 						icon = Icons.Outlined.Paid,
-						style = MaterialTheme.typography.bodyMedium,
-						padding = PaddingValues(0.dp),
+						style = MaterialTheme.typography.bodySmall,
+						padding = ThemeValue.Padding.ZeroValue,
 						modifier = Modifier.weight(1f)
 					)
 				}
@@ -146,20 +146,21 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	}
 
 	@Composable
-	private fun Portrait(profile: UserPublicProfile, cardWidth: Dp) {
+	private fun Portrait(profile: UserPublicProfile) {
 		PaginationStaggeredGrid(
 			items = page.items,
 			key = { it.tid },
-			columns = StaggeredGridCells.Adaptive(cardWidth),
+			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
 			state = listState,
 			canRefresh = false,
 			canLoading = page.canLoading,
 			onLoading = { requestMoreTopics() },
 			modifier = Modifier.fillMaxSize(),
-			contentPadding = PaddingValues(bottom = 10.dp),
-			verticalItemSpacing = 10.dp,
+			contentPadding = ThemeValue.Padding.EqualValue,
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+			verticalItemSpacing = ThemeValue.Padding.EqualSpace,
 			header = {
-				PortraitUserProfileCard(
+				UserProfileCard(
 					modifier = Modifier.fillMaxWidth(),
 					profile = profile,
 					owner = false
@@ -168,36 +169,39 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 		) {  topic ->
 			TopicCard(
 				topic = topic,
-				cardWidth = cardWidth,
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
+				cardWidth = ThemeValue.Size.CellWidth,
+				modifier = Modifier.fillMaxWidth()
 			)
 		}
 	}
 
 	@Composable
-	private fun Landscape(profile: UserPublicProfile, cardWidth: Dp) {
+	private fun Landscape(profile: UserPublicProfile) {
 		Row(modifier = Modifier.fillMaxSize()) {
-			LandscapeUserProfileCard(
+			UserProfileCard(
 				profile = profile,
 				owner = false,
-				modifier = Modifier.weight(1f).padding(20.dp)
+				shape = MaterialTheme.shapes.large,
+				modifier = Modifier.width(ThemeValue.Size.PanelWidth)
+					.padding(ThemeValue.Padding.EqualExtraValue)
 			)
 			PaginationStaggeredGrid(
 				items = page.items,
 				key = { it.tid },
-				columns = StaggeredGridCells.Adaptive(180.dp),
+				columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
 				state = listState,
 				canRefresh = false,
 				canLoading = page.canLoading,
 				onLoading = { requestMoreTopics() },
 				modifier = Modifier.weight(1f).fillMaxHeight(),
-				contentPadding = PaddingValues(10.dp),
-				verticalItemSpacing = 10.dp
+				contentPadding = ThemeValue.Padding.EqualValue,
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+				verticalItemSpacing = ThemeValue.Padding.EqualSpace
 			) {  topic ->
 				TopicCard(
 					topic = topic,
-					cardWidth = cardWidth,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
+					cardWidth = ThemeValue.Size.CellWidth,
+					modifier = Modifier.fillMaxWidth()
 				)
 			}
 		}
@@ -214,8 +218,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	override fun SubContent(device: Device) {
 		profile?.let {
 			when (device.type) {
-				Device.Type.PORTRAIT -> Portrait(it, 150.dp)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it, 180.dp)
+				Device.Type.PORTRAIT -> Portrait(it)
+				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
 			}
 		} ?: EmptyBox()
 	}

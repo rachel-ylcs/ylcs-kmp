@@ -4,10 +4,10 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -119,8 +119,15 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 fun AppWrapper(content: @Composable () -> Unit) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 		val device by rememberDerivedState(maxWidth, maxHeight) { Device(maxWidth, maxHeight) }
-		CompositionLocalProvider(LocalDevice provides device) {
-			RachelTheme(app.isDarkMode, device, content)
+		CompositionLocalProvider(
+			LocalDevice provides device,
+			LocalDarkMode provides when (app.config.themeMode) {
+				ThemeMode.SYSTEM -> isSystemInDarkTheme()
+				ThemeMode.LIGHT -> false
+				ThemeMode.DARK -> true
+			}
+		) {
+			RachelTheme(content)
 		}
 	}
 }

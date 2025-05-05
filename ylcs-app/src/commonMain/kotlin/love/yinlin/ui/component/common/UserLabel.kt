@@ -1,12 +1,10 @@
 package love.yinlin.ui.component.common
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -15,12 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import love.yinlin.common.Colors
-import love.yinlin.platform.app
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDarkMode
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.ThemeStyle
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
 import love.yinlin.resources.*
+import love.yinlin.ui.component.image.MiniImage
 
 private object UserLabelMeta {
 	private val labelNameFromLevel = arrayOf("BUG",
@@ -56,7 +58,7 @@ fun UserLabel(
 	label: String,
 	level: Int
 ) {
-	val isDarkMode = app.isDarkMode
+	val isDarkMode = LocalDarkMode.current
 	val (img, color) = remember(label, level, isDarkMode) {
 		if (label.isEmpty()) UserLabelMeta.image(level, isDarkMode)
 		else UserLabelMeta.image(label)
@@ -65,21 +67,31 @@ fun UserLabel(
 		label.ifEmpty { UserLabelMeta.label(level) }
 	}
 
+	val device = LocalDevice.current
+	val size = when (device.size) {
+        Device.Size.SMALL -> DpSize(84.dp, 32.dp)
+        Device.Size.MEDIUM -> DpSize(92.dp, 35.dp)
+        Device.Size.LARGE -> DpSize(100.dp, 38.dp)
+    }
+	val padding = when (device.size) {
+		Device.Size.SMALL -> PaddingValues(start = 11.2.dp, end = 11.2.dp, top = 14.dp, bottom = 4.8.dp)
+		Device.Size.MEDIUM -> PaddingValues(start = 12.3.dp, end = 12.3.dp, top = 15.4.dp, bottom = 5.3.dp)
+		Device.Size.LARGE -> PaddingValues(start = 13.4.dp, end = 13.4.dp, top = 16.8.dp, bottom = 5.8.dp)
+	}
+
 	Box(
-		modifier = Modifier.width(84.dp).height(32.dp),
+		modifier = Modifier.size(size),
 		contentAlignment = Alignment.Center
 	) {
-		Image(
-			modifier = Modifier.fillMaxSize(),
-			painter = painterResource(img),
-			contentDescription = null
+		MiniImage(
+			res = img,
+			modifier = Modifier.fillMaxSize()
 		)
 		Text(
-			modifier = Modifier.fillMaxSize()
-				.padding(start = 11.2.dp, end = 11.2.dp, top = 14.dp, bottom = 4.8.dp),
+			modifier = Modifier.fillMaxSize().padding(padding),
 			text = text,
-			color = color.copy(alpha = 0.7f),
-			style = MaterialTheme.typography.labelSmall,
+			color = color.copy(alpha = 0.8f),
+			style = ThemeStyle.bodyExtraSmall,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			overflow = TextOverflow.Clip

@@ -147,7 +147,7 @@ fun WeiboUserBar(
 				modifier = Modifier.fillMaxWidth(),
 				text = info.name,
 				color = MaterialTheme.colorScheme.primary,
-				style = MaterialTheme.typography.titleMedium,
+				style = MaterialTheme.typography.labelMedium,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
 			)
@@ -157,7 +157,7 @@ fun WeiboUserBar(
 			) {
 				Text(
 					text = time,
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -165,7 +165,7 @@ fun WeiboUserBar(
 				)
 				Text(
 					text = location,
-					style = MaterialTheme.typography.bodyMedium,
+					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis
@@ -218,7 +218,7 @@ fun WeiboCard(
 	val processor = LocalWeiboProcessor.current
 	Surface(
 		modifier = modifier,
-		shape = ThemeValue.Shape.Large,
+		shape = MaterialTheme.shapes.large,
 		shadowElevation = ThemeValue.Shadow.Surface
 	) {
 		Column(modifier = Modifier.fillMaxWidth().clickable {

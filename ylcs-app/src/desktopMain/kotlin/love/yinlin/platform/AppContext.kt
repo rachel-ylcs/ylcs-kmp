@@ -1,8 +1,6 @@
 @file:JvmName("AppContextDesktop")
 package love.yinlin.platform
 
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -29,13 +27,13 @@ class ActualAppContext : AppContext() {
 		downloadCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 500 * 1024 * 1024
+				maxSize = 1024 * 1024 * 1024
 			)
 		}
 		resultCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 500 * 1024 * 1024
+				maxSize = 1024 * 1024 * 1024
 			)
 		}
 		globalImageOptions(ImageOptions {

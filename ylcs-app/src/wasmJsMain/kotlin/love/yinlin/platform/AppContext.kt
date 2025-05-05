@@ -1,7 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -9,8 +7,6 @@ import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 
 class ActualAppContext : AppContext() {
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density = oldDensity
-
 	override val kv: KV = KV()
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {

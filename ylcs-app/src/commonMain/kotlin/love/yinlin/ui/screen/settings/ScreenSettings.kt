@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -19,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -33,6 +33,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.KVConfig
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeMode
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
@@ -50,7 +51,6 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
@@ -179,12 +179,14 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private suspend fun logoff() {
 		val token = app.config.userToken
 		if (token.isNotEmpty()) {
-			ClientAPI.request(
-				route = API.User.Account.Logoff,
-				data = token
-			)
-			// 不论是否成功均从本地设备退出登录
-			mePart.logoff()
+			if (slot.confirm.openSuspend(content = "退出登录")) {
+				ClientAPI.request(
+					route = API.User.Account.Logoff,
+					data = token
+				)
+				// 不论是否成功均从本地设备退出登录
+				mePart.logoff()
+			}
 		}
 	}
 
@@ -242,7 +244,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					key = app.config.cacheUserAvatar,
 					contentScale = ContentScale.Crop,
 					circle = true,
-					modifier = Modifier.size(48.dp).shadow(5.dp, CircleShape)
+					modifier = Modifier.size(ThemeValue.Size.SmallImage)
+						.shadow(ThemeValue.Shadow.Icon, CircleShape)
 				)
 			}
 			ItemText(
@@ -266,11 +269,14 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					if (userProfile != null) launch { modifyUserWall() }
 				}
 			) {
-				if (userProfile == null) NoImage(width = 96.dp, height = 54.dp)
+				if (userProfile == null) {
+					NoImage(width = ThemeValue.Size.LargeImage, height = ThemeValue.Size.LargeImage / 1.77778f)
+				}
 				else WebImage(
 					uri = userProfile.wallPath,
 					key = app.config.cacheUserWall,
-					modifier = Modifier.width(96.dp).height(54.dp).shadow(5.dp)
+					modifier = Modifier.width(ThemeValue.Size.LargeImage).aspectRatio(1.77778f)
+						.shadow(ThemeValue.Shadow.Icon)
 				)
 			}
 			ItemText(
@@ -296,7 +302,12 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		SegmentedButton(
 			selected = mode == current,
 			shape = SegmentedButtonDefaults.itemShape(index = mode.ordinal, count = 3),
-			label = { Text(text = mode.toString()) },
+			label = {
+				Text(
+					text = mode.toString(),
+					style = if (mode == current) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium
+				)
+			},
 			onClick = { if (mode != current) onChanged(mode) }
 		)
 	}
@@ -324,7 +335,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			ThemeSwitcher(
 				mode = app.config.themeMode,
 				onChanged = { app.config.themeMode = it },
-				modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
 			)
 
 			var cacheSizeText by rememberState { OS.Storage.cacheSize.fileSizeString }
@@ -374,10 +385,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
 			AccountSettings(
 				userProfile = userProfile,
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 			)
 			CommonSettings(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 			)
 		}
 	}
@@ -387,18 +398,18 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		LazyVerticalStaggeredGrid(
 			columns = StaggeredGridCells.Fixed(3),
 			modifier = Modifier.fillMaxSize(),
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
-			verticalItemSpacing = 10.dp
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+			verticalItemSpacing = ThemeValue.Padding.EqualSpace
 		) {
 			item(key = "AccountSettings".itemKey) {
 				AccountSettings(
 					userProfile = userProfile,
-					modifier = Modifier.fillMaxWidth().padding(10.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
 			item(key = "CommonSettings".itemKey) {
 				CommonSettings(
-					modifier = Modifier.fillMaxWidth().padding(10.dp)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
 		}
@@ -407,19 +418,17 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	override val title: String = "设置"
 
 	@Composable
-	override fun SubContent(device: Device) = app.config.userProfile?.let {
-		when (device.type) {
-			Device.Type.PORTRAIT -> Portrait(it)
-			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
-		}
-	} ?: EmptyBox()
+	override fun SubContent(device: Device) = when (device.type) {
+		Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(app.config.userProfile)
+		Device.Type.LANDSCAPE -> Landscape(app.config.userProfile)
+	}
 
 	@Composable
 	override fun Floating() {
 		crashLogSheet.Land {
 			val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
 			Box(
-				modifier = Modifier.fillMaxWidth().padding(10.dp)
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 					.verticalScroll(rememberScrollState())
 			) {
 				Text(
@@ -433,9 +442,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			val state = remember { TextInputState() }
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
 				horizontalAlignment = Alignment.End,
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				LoadingIcon(
 					icon = Icons.Outlined.Check,
@@ -454,7 +463,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		privacyPolicySheet.Land {
-			Box(modifier = Modifier.fillMaxWidth().padding(10.dp)
+			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				.verticalScroll(rememberScrollState())
 			) {
 				Text(
@@ -465,7 +474,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		aboutSheet.Land {
-			Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
 			}
 		}

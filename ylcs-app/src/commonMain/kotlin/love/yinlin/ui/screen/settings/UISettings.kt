@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
@@ -30,11 +30,8 @@ import love.yinlin.ui.component.layout.Space
 
 object SettingsScope {
 	@Composable
-	private fun ItemDivider(
-		x: Dp = 10.dp,
-		y: Dp = 1.dp
-	) {
-		HorizontalDivider(modifier = Modifier.padding(horizontal = x, vertical = y))
+	private fun ItemDivider(x: Dp = ThemeValue.Padding.ZeroSpace) {
+		HorizontalDivider(modifier = Modifier.padding(horizontal = x))
 	}
 
 	@Composable
@@ -42,26 +39,28 @@ object SettingsScope {
 		title: String,
 		icon: ColorfulImageVector? = null,
 		color: Color = LocalContentColor.current,
+		padding: PaddingValues = ThemeValue.Padding.Value,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
 		onClick: () -> Unit = {},
 		content: @Composable () -> Unit
 	) {
 		Row(
-			modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick)
-				.padding(horizontal = 15.dp, vertical = 10.dp),
-			horizontalArrangement = Arrangement.spacedBy(10.dp),
+			modifier = Modifier.fillMaxWidth()
+				.clickable(enabled = enabled, onClick = onClick)
+				.padding(padding),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			if (icon != null) ColorfulIcon(icon = icon)
 			Text(
 				text = title,
-				style = MaterialTheme.typography.labelLarge,
+				style = MaterialTheme.typography.labelMedium,
 				color = color,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
 			)
-			Space(10.dp)
+			Space()
 			Box(
 				modifier = Modifier.weight(1f),
 				contentAlignment = Alignment.CenterEnd
@@ -89,12 +88,14 @@ object SettingsScope {
 			icon = icon,
 			color = color,
 			hasDivider = hasDivider,
+			padding = ThemeValue.Padding.EqualValue,
 			enabled = enabled,
 			onClick = onClick
 		) {
 			Text(
 				text = text,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				style = MaterialTheme.typography.bodySmall,
 				maxLines = maxLines,
 				overflow = TextOverflow.Ellipsis
 			)
@@ -120,13 +121,14 @@ object SettingsScope {
 			onClick = onClick
 		) {
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				if (text != null) {
 					Text(
 						text = text,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						style = MaterialTheme.typography.bodySmall,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)
@@ -164,13 +166,14 @@ object SettingsScope {
 			}
 		) {
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				if (text != null) {
 					Text(
 						text = text,
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						style = MaterialTheme.typography.bodySmall,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)
@@ -196,12 +199,12 @@ fun SettingsLayout(
 	Surface(
 		modifier = modifier,
 		shape = MaterialTheme.shapes.large,
-		shadowElevation = 3.dp
+		shadowElevation = ThemeValue.Shadow.Surface
 	) {
 		Column(modifier = Modifier.fillMaxWidth()) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, top = 10.dp, bottom = 20.dp),
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				MiniIcon(
@@ -210,7 +213,7 @@ fun SettingsLayout(
 				)
 				Text(
 					text = title,
-					style = MaterialTheme.typography.displaySmall,
+					style = MaterialTheme.typography.titleLarge,
 					color = MaterialTheme.colorScheme.primary,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis

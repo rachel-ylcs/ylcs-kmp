@@ -12,13 +12,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
@@ -111,8 +111,9 @@ fun ActivityInfoLayout(
     val scope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
     ) {
         TextInput(
             state = input.title,
@@ -178,8 +179,9 @@ fun ActivityInfoLayout(
                 ClickIcon(
                     icon = Icons.Outlined.Cancel,
                     color = MaterialTheme.colorScheme.error,
-                    size = 32.dp,
-                    modifier = Modifier.padding(5.dp).align(Alignment.TopEnd).zIndex(2f),
+                    size = ThemeValue.Size.ExtraIcon,
+                    modifier = Modifier.padding(ThemeValue.Padding.EqualValue)
+                        .align(Alignment.TopEnd).zIndex(2f),
                     onClick = { onPicDelete() }
                 )
                 WebImage(
@@ -197,7 +199,7 @@ fun ActivityInfoLayout(
         ImageAdder(
             maxNum = 9,
             pics = input.pics,
-            size = 80.dp,
+            size = ThemeValue.Size.MicroCellWidth,
             modifier = Modifier.fillMaxWidth(),
             onAdd = { scope.launch { input.pickPictures(onPicsAdd) } },
             onDelete = { onPicsDelete(it) },

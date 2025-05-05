@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.QrBallShape
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrFrameShape
@@ -45,6 +45,7 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.Scheme
+import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
@@ -52,16 +53,13 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.img_logo
-import love.yinlin.resources.img_not_login
-import love.yinlin.resources.login
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SheetConfig
 import love.yinlin.ui.screen.settings.ScreenSettings
@@ -154,7 +152,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			Item("活动", Icons.Filled.Link) {
 				if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-					navigate<ScreenActivityLink>() // 250539
+					navigate<ScreenActivityLink>()
 				}
 			}
 		}
@@ -164,13 +162,14 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private fun LoginBox(modifier: Modifier = Modifier) {
 		Column(modifier = modifier) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(10.dp),
+				modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
 				horizontalArrangement = Arrangement.End
 			) {
-				ClickIcon(
-					icon = Icons.Filled.Settings,
-					onClick = { navigate<ScreenSettings>() }
-				)
+				ActionScope.Right.Actions {
+					Action(Icons.Filled.Settings) {
+						navigate<ScreenSettings>()
+					}
+				}
 			}
 			Box(
 				modifier = Modifier.fillMaxWidth().weight(1f),
@@ -178,12 +177,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			) {
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(20.dp)
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 				) {
-					Image(
-						modifier = Modifier.size(200.dp),
-						painter = painterResource(Res.drawable.img_not_login),
-						contentDescription = null
+					MiniIcon(
+						res = Res.drawable.img_not_login,
+						size = ThemeValue.Size.ExtraLargeImage
 					)
 					RachelButton(
 						text = stringResource(Res.string.login),
@@ -198,9 +196,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private fun Portrait(userProfile: UserProfile) {
 		Column(
 			modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			PortraitUserProfileCard(
+			UserProfileCard(
 				modifier = Modifier.fillMaxWidth(),
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true
@@ -208,32 +206,33 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			ToolContainer(modifier = Modifier.fillMaxWidth())
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
 			AdminContainer(modifier = Modifier.fillMaxWidth())
-			Space(10.dp)
+			Space()
 		}
 	}
 
 	@Composable
 	private fun Landscape(userProfile: UserProfile) {
 		Row(modifier = Modifier.fillMaxSize()) {
-			LandscapeUserProfileCard(
+			UserProfileCard(
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true,
-				modifier = Modifier.weight(1f).padding(20.dp)
+				shape = MaterialTheme.shapes.large,
+				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue)
 			)
 			Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				ToolContainer(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
 					shape = MaterialTheme.shapes.large
 				)
 				UserSpaceContainer(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
 					shape = MaterialTheme.shapes.large
 				)
 				AdminContainer(
-					modifier = Modifier.fillMaxWidth().padding(10.dp),
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
 					shape = MaterialTheme.shapes.large
 				)
-				Space(10.dp)
+				Space()
 			}
 		}
 	}
@@ -257,25 +256,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			if (profile == null) EmptyBox()
 			else {
 				Column(
-					modifier = Modifier.fillMaxWidth().padding(20.dp),
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(20.dp)
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 				) {
 					WebImage(
 						uri = profile.avatarPath,
 						key = app.config.cacheUserWall,
 						contentScale = ContentScale.Crop,
 						circle = true,
-						modifier = Modifier.size(100.dp).shadow(5.dp, CircleShape)
+						modifier = Modifier.size(ThemeValue.Size.LargeImage)
+							.shadow(ThemeValue.Shadow.Icon, CircleShape)
 					)
 					Text(
 						text = profile.name,
-						style = MaterialTheme.typography.displayMedium,
+						style = MaterialTheme.typography.displaySmall,
 						color = MaterialTheme.colorScheme.primary
 					)
 					Text(
 						text = "扫我添加好友",
-						style = MaterialTheme.typography.headlineSmall
+						style = MaterialTheme.typography.bodyLarge
 					)
 
 					val primaryColor = MaterialTheme.colorScheme.primary
@@ -307,9 +307,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					Image(
 						painter = qrcodePainter,
 						contentDescription = null,
-						modifier = Modifier.size(180.dp)
+						modifier = Modifier.size(ThemeValue.Size.ExtraLargeImage)
 					)
-					Space(40.dp)
+					Space()
 				}
 			}
 		}
@@ -339,9 +339,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			val today = remember { DateEx.Today }
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 20.dp),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(20.dp)
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
 				Text(
 					text = "签到记录",
@@ -349,26 +349,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				)
 				Column(
 					modifier = Modifier.fillMaxWidth(),
-					verticalArrangement = Arrangement.spacedBy(10.dp)
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 				) {
 					repeat(2) { row ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(10.dp)
+							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
 						) {
 							repeat(4) { col ->
 								val index = row * 4 + col
 								Surface(
 									modifier = Modifier.weight(1f),
 									shape = MaterialTheme.shapes.medium,
-									tonalElevation = 3.dp,
-									shadowElevation = 1.dp,
-									border = if (index != todayIndex) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+									tonalElevation = ThemeValue.Shadow.Tonal,
+									shadowElevation = ThemeValue.Shadow.Item,
+									border = if (index != todayIndex) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
 								) {
 									Column(
-										modifier = Modifier.fillMaxWidth().padding(10.dp),
+										modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
 										horizontalAlignment = Alignment.CenterHorizontally,
-										verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+										verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
 									) {
 										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
@@ -378,7 +378,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 										)
 										Text(
 											text = "${date.monthNumber}月${date.dayOfMonth}日",
-											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary,
+											maxLines = 1,
+											overflow = TextOverflow.Ellipsis
 										)
 									}
 								}

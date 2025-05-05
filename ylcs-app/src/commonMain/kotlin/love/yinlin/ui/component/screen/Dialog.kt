@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
@@ -85,57 +85,40 @@ abstract class FloatingDialog<R>() : Floating<Unit>() {
 
 @Stable
 abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
-	@Stable
-	sealed interface DialogInfo {
-		val rachelWidth: Dp
-		val minContentHeight: Dp
-		val maxContentHeight: Dp
-		val width: Dp
-
-		data object Portrait : DialogInfo {
-			override val rachelWidth: Dp = 140.dp
-			override val minContentHeight: Dp = 50.dp
-			override val maxContentHeight: Dp = 260.dp
-			override val width: Dp = 300.dp
-		}
-
-		data object Landscape : DialogInfo {
-			override val rachelWidth: Dp = 140.dp
-			override val minContentHeight: Dp = 40.dp
-			override val maxContentHeight: Dp = 280.dp
-			override val width: Dp = 500.dp
-		}
-
-		data object Square : DialogInfo {
-			override val rachelWidth: Dp = 140.dp
-			override val minContentHeight: Dp = 40.dp
-			override val maxContentHeight: Dp = 280.dp
-			override val width: Dp = 500.dp
-		}
-	}
-
 	open val scrollable: Boolean get() = true
 	abstract val title: String?
 	open val actions: @Composable (RowScope.() -> Unit)? = null
 
 	@Composable
 	override fun Wrapper(block: @Composable () -> Unit) {
-		val info = when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> DialogInfo.Portrait
-			Device.Type.LANDSCAPE -> DialogInfo.Landscape
-			Device.Type.SQUARE -> DialogInfo.Square
+		val sizeType = LocalDevice.current.size
+
+		val rachelWidth = when (sizeType) {
+			Device.Size.SMALL -> 140.dp
+			Device.Size.MEDIUM -> 150.dp
+			Device.Size.LARGE -> 160.dp
+		}
+		val minContentHeight = when (sizeType) {
+			Device.Size.SMALL -> 50.dp
+			Device.Size.MEDIUM -> 45.dp
+			Device.Size.LARGE -> 40.dp
+		}
+		val maxContentHeight = when (sizeType) {
+			Device.Size.SMALL -> 260.dp
+			Device.Size.MEDIUM -> 280.dp
+			Device.Size.LARGE -> 300.dp
 		}
 
 		Column(
-			modifier = Modifier.width(info.width)
+			modifier = Modifier.width(ThemeValue.Size.DialogWidth)
 				.clickableNoRipple { close() }
-				.padding(bottom = info.rachelWidth),
+				.padding(bottom = rachelWidth),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			OffsetLayout(y = info.rachelWidth / 15.5f) {
+			OffsetLayout(y = rachelWidth / 15.5f + ThemeValue.Padding.VerticalExtraSpace / 5) {
 				MiniIcon(
 					res = Res.drawable.img_dialog_rachel,
-					size = info.rachelWidth,
+					size = rachelWidth,
 					modifier = Modifier.clickableNoRipple { }
 				)
 			}
@@ -144,8 +127,13 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 				modifier = Modifier.fillMaxWidth().clickableNoRipple { }
 			) {
 				Column(
-					modifier = Modifier.fillMaxWidth().padding(15.dp),
-					verticalArrangement = Arrangement.spacedBy(15.dp)
+					modifier = Modifier.fillMaxWidth().padding(
+						top = ThemeValue.Padding.VerticalExtraSpace * 2,
+						bottom = ThemeValue.Padding.VerticalExtraSpace,
+						start = ThemeValue.Padding.HorizontalExtraSpace,
+						end = ThemeValue.Padding.HorizontalExtraSpace
+					),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 				) {
 					title?.let {
 						Text(
@@ -154,11 +142,13 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 							color = MaterialTheme.colorScheme.primary,
 							maxLines = 1,
 							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
+							modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
 						)
 					}
-					Box(modifier = Modifier.fillMaxWidth()
-						.heightIn(min = info.minContentHeight, max = info.maxContentHeight)
+
+					Box(modifier = Modifier
+						.heightIn(min = minContentHeight, max = maxContentHeight)
+						.fillMaxWidth()
 						.verticalScroll(enabled = scrollable, state = rememberScrollState())
 					) {
 						block()
@@ -166,7 +156,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 					actions?.let {
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
+							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End)
 						) {
 							it()
 						}
@@ -310,20 +300,20 @@ abstract class FloatingDialogChoice(
 		super.Wrapper {
 			Column(
 				modifier = Modifier.fillMaxWidth(),
-				verticalArrangement = Arrangement.spacedBy(5.dp)
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				repeat(num) { index ->
 					val nameString = name(index)
 					Row(
 						modifier = Modifier.fillMaxWidth().clickable {
 							continuation?.resume(index)
-						}.padding(5.dp),
-						horizontalArrangement = Arrangement.spacedBy(10.dp),
+						}.padding(ThemeValue.Padding.Value),
+						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						MiniIcon(
 							icon = icon(index),
-							size = 24.dp
+							size = ThemeValue.Size.ExtraIcon
 						)
 						Text(
 							text = nameString,
@@ -395,17 +385,17 @@ open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
 		super.Wrapper {
 			Column(
 				modifier = Modifier.fillMaxWidth(),
-				verticalArrangement = Arrangement.spacedBy(5.dp)
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				LinearProgressIndicator(
 					progress = { progress },
-					modifier = Modifier.fillMaxWidth().height(6.dp),
-					gapSize = 0.dp,
+					modifier = Modifier.fillMaxWidth().height(ThemeValue.Size.ProgressHeight),
+					gapSize = ThemeValue.Padding.ZeroSpace,
 					drawStopIndicator = {}
 				)
 				Row(
 					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.spacedBy(20.dp),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
@@ -442,8 +432,8 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
 		super.Wrapper {
 			Surface(
 				shape = MaterialTheme.shapes.extraLarge,
-				shadowElevation = 5.dp,
-				modifier = Modifier.size(300.dp)
+				shadowElevation = ThemeValue.Shadow.Surface,
+				modifier = Modifier.size(ThemeValue.Size.DialogWidth)
 			) {
 				LoadingBox()
 			}

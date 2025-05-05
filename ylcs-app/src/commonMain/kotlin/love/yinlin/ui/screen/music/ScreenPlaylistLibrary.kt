@@ -20,11 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -34,7 +34,7 @@ import love.yinlin.ui.component.container.Tree
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.TabBar
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
@@ -71,13 +71,13 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         modifier = modifier.combinedClickable(
             onClick = onClick,
             onLongClick = onLongClick
-        ).padding(horizontal = 15.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ).padding(ThemeValue.Padding.Value),
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = musicInfo.name,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.labelMedium,
             color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else LocalContentColor.current,
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             maxLines = 1,
@@ -86,7 +86,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         )
         Text(
             text = musicInfo.singer,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -247,7 +247,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         }
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(300.dp),
+            columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
             state = gridState,
             modifier = modifier,
         ) {
@@ -346,10 +346,10 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
             val state = remember { TextInputState() }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(10.dp),
+                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "本地歌单", modifier = Modifier.padding(vertical = 10.dp))
+                Text(text = "本地歌单", modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))
                 TextInput(
                     state = state,
                     hint = "本地歌单(JSON格式)",
@@ -395,10 +395,10 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                         }
                     )
                 }
-                HorizontalDivider(modifier = Modifier.height(1.dp))
-                Text(text = "云歌单", modifier = Modifier.padding(vertical = 10.dp))
+                HorizontalDivider()
+                Text(text = "云歌单", modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

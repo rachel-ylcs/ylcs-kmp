@@ -8,14 +8,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
@@ -25,6 +26,7 @@ import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import java.awt.Dimension
 
 fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
@@ -42,7 +44,7 @@ fun main() {
             isMinimized = false,
             position = WindowPosition.Aligned(Alignment.Center),
             width = 1200.dp,
-            height = 600.dp
+            height = 700.dp
         )
 
         if (isOpen) {
@@ -55,8 +57,17 @@ fun main() {
                 transparent = true,
                 state = state,
             ) {
+                // MinimumSize
+                val density = LocalDensity.current
+                LaunchedEffect(density) {
+                    with(density) {
+                        window.minimumSize = Dimension(360.dp.roundToPx(), 640.dp.roundToPx())
+                    }
+                }
+
+                // Content
                 AppWrapper {
-                    Column(modifier = Modifier.fillMaxSize().clip(ThemeValue.Shape.Large)) {
+                    Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                             AppTopBar {
                                 Action(

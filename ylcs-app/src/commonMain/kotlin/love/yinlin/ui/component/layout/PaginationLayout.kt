@@ -28,9 +28,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.api.APIConfig
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
@@ -138,15 +138,15 @@ private fun DefaultSwipePaginationHeader(
 	Row(
 		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
-			size = 32.dp,
+			size = ThemeValue.Size.ExtraIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowDownward,
-			size = 32.dp,
+			size = ThemeValue.Size.ExtraIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
@@ -169,15 +169,15 @@ private fun DefaultSwipePaginationFooter(
 	Row(
 		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
-			size = 32.dp,
+			size = ThemeValue.Size.ExtraIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowUpward,
-			size = 32.dp,
+			size = ThemeValue.Size.ExtraIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
@@ -198,9 +198,9 @@ private fun SwipePaginationLayout(
 	canLoading: Boolean = false,
 	onRefresh: (suspend () -> Unit)? = null,
 	onLoading: (suspend () -> Unit)? = null,
-	headerHeight: Dp = 70.dp,
+	headerHeight: Dp = ThemeValue.Size.RefreshHeaderHeight,
 	header: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationHeader(status, progress) },
-	footerHeight: Dp = 50.dp,
+	footerHeight: Dp = ThemeValue.Size.RefreshFooterHeight,
 	footer: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationFooter(status, progress) },
 	stickinessLevel: Float = 0.5f,
 	modifier: Modifier = Modifier,
@@ -309,12 +309,12 @@ private fun DefaultClickPaginationIndicator(
 		contentAlignment = Alignment.Center
 	) {
 		Row(
-			modifier = Modifier.padding(10.dp),
+			modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally)
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 		) {
-			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = 32.dp)
-			else MiniIcon(icon = Icons.Filled.Update, size = 32.dp)
+			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = ThemeValue.Size.ExtraIcon)
+			else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.ExtraIcon)
 			Text(text = if (status == PaginationStatus.RUNNING) "加载中..." else "加载更多")
 		}
 	}
@@ -329,7 +329,7 @@ private fun <T> ClickPaginationColumn(
 	onLoading: (suspend () -> Unit)? = null,
 	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	header: (@Composable LazyItemScope.() -> Unit)? = null,
@@ -380,7 +380,7 @@ private fun <T> ClickPaginationGrid(
 	onLoading: (suspend () -> Unit)? = null,
 	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
 	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
@@ -434,9 +434,9 @@ private fun <T> ClickPaginationStaggeredGrid(
 	onLoading: (suspend () -> Unit)? = null,
 	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
-	verticalItemSpacing: Dp = 0.dp,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+	verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
+	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
 	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
@@ -488,7 +488,7 @@ fun <T> PaginationColumn(
 	onRefresh: (suspend () -> Unit)? = null,
 	onLoading: (suspend () -> Unit)? = null,
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 	header: (@Composable LazyItemScope.() -> Unit)? = null,
@@ -554,7 +554,7 @@ fun <T> PaginationGrid(
 	onRefresh: (suspend () -> Unit)? = null,
 	onLoading: (suspend () -> Unit)? = null,
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
 	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
 	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
 	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
@@ -620,9 +620,9 @@ fun <T> PaginationStaggeredGrid(
 	onRefresh: (suspend () -> Unit)? = null,
 	onLoading: (suspend () -> Unit)? = null,
 	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = PaddingValues(0.dp),
-	verticalItemSpacing: Dp = 0.dp,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+	verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
+	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
 	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {

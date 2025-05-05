@@ -14,7 +14,6 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
@@ -40,7 +39,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 		enabled: Boolean = true,
 		onClick: () -> Unit
 	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else 0.dp
+		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
 
 		ClickIcon(
 			icon = icon,
@@ -58,7 +57,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 		enabled: Boolean = true,
 		onClick: suspend CoroutineScope.() -> Unit
 	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else 0.dp
+		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
 
 		LoadingIcon(
 			icon = icon,

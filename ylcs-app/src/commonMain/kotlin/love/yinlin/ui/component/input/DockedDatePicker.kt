@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -20,6 +19,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ExpandableLayout
@@ -63,7 +63,7 @@ fun DockedDatePicker(
 
 	Column(
 		modifier = modifier,
-		verticalArrangement = Arrangement.spacedBy(5.dp)
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 	) {
 		OutlinedTextField(
 			value = text,
@@ -77,8 +77,8 @@ fun DockedDatePicker(
 			readOnly = true,
 			trailingIcon = {
 				Row(
-					modifier = Modifier.padding(end = 10.dp),
-					horizontalArrangement = Arrangement.spacedBy(5.dp),
+					modifier = Modifier.padding(end = ThemeValue.Padding.HorizontalSpace),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					ClickIcon(

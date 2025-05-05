@@ -85,7 +85,7 @@ fun LoadingBox() {
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_loading,
-				size = ThemeValue.Size.ShowImage
+				size = ThemeValue.Size.ExtraLargeImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -126,7 +126,7 @@ fun EmptyBox() {
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_empty,
-				size = ThemeValue.Size.ShowImage
+				size = ThemeValue.Size.ExtraLargeImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -151,7 +151,7 @@ fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_network_error,
-				size = ThemeValue.Size.ShowImage
+				size = ThemeValue.Size.ExtraLargeImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,

@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -9,11 +8,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.platform.OS
@@ -23,9 +22,9 @@ import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import org.jetbrains.compose.resources.painterResource
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
+import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
@@ -141,7 +140,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -158,7 +157,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.End),
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.End),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
@@ -196,7 +195,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -247,7 +246,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -297,14 +296,13 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Portrait() {
 		Column(
-			modifier = Modifier.fillMaxSize().padding(10.dp),
+			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp)
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
-			Image(
-				modifier = Modifier.size(120.dp),
-				painter = painterResource(Res.drawable.img_logo),
-				contentDescription = null
+			MiniIcon(
+				res = Res.drawable.img_logo,
+				size = ThemeValue.Size.LargeImage
 			)
 			ContentBox(modifier = Modifier.fillMaxWidth().weight(1f))
 		}
@@ -313,18 +311,17 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Landscape() {
 		Row(
-			modifier = Modifier.fillMaxSize().padding(10.dp),
-			horizontalArrangement = Arrangement.spacedBy(20.dp),
+			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Box(
 				modifier = Modifier.weight(1f).fillMaxHeight(),
 				contentAlignment = Alignment.Center
 			) {
-				Image(
-					modifier = Modifier.size(200.dp),
-					painter = painterResource(Res.drawable.img_logo),
-					contentDescription = null
+				MiniIcon(
+					res = Res.drawable.img_logo,
+					size = ThemeValue.Size.LargeImage
 				)
 			}
 			Box(

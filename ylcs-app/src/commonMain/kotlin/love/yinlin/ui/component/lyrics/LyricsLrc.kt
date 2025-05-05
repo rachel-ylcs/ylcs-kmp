@@ -39,7 +39,7 @@ private fun LyricsLrcLine(
     isCurrent: Boolean,
     offset: Int
 ) {
-    val fontSize = MaterialTheme.typography.headlineMedium.fontSize / (offset / 30f + 1f)
+    val fontSize = MaterialTheme.typography.headlineSmall.fontSize / (offset / 30f + 1f)
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
     val color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.White
     val alpha = 2 / (offset + 2f)

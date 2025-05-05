@@ -1,8 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -14,28 +11,12 @@ import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.ptr
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
-import platform.CoreGraphics.CGRectGetHeight
-import platform.CoreGraphics.CGRectGetWidth
 import platform.Foundation.NSException
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import platform.Foundation.NSUncaughtExceptionHandler
-import platform.UIKit.UIScreen
 
 @OptIn(ExperimentalForeignApi::class)
 class ActualAppContext : AppContext() {
-	companion object {
-		val DesignWidth = 360.dp
-		val DesignHeight = 800.dp
-	}
-
-	override fun densityWrapper(newWidth: Dp, newHeight: Dp, oldDensity: Density): Density {
-		val screenBounds = UIScreen.mainScreen.bounds
-		return Density(density = if (newWidth <= newHeight) CGRectGetWidth(screenBounds).toFloat() / DesignWidth.value
-			else CGRectGetHeight(screenBounds).toFloat() / DesignHeight.value,
-			fontScale = oldDensity.fontScale
-		)
-	}
-
 	override val kv: KV = KV()
 
 	@OptIn(ExperimentalForeignApi::class)
@@ -50,13 +31,13 @@ class ActualAppContext : AppContext() {
 		downloadCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 300 * 1024 * 1024
+				maxSize = 400 * 1024 * 1024
 			)
 		}
 		resultCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 300 * 1024 * 1024
+				maxSize = 400 * 1024 * 1024
 			)
 		}
 		globalImageOptions(ImageOptions {

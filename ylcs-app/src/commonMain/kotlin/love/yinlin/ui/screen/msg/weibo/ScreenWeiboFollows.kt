@@ -144,9 +144,6 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 		) {
 			LazyVerticalGrid(
 				columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
-				contentPadding = ThemeValue.Padding.EqualValue,
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 				modifier = Modifier.fillMaxSize()
 			) {
 				items(

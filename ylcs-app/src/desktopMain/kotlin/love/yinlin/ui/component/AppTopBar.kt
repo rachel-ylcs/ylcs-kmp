@@ -10,8 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.ThemeValue
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -27,22 +26,22 @@ fun AppTopBar(actions: @Composable ActionScope.() -> Unit = {}) {
 		modifier = Modifier.fillMaxWidth()
 			.background(MaterialTheme.colorScheme.primaryContainer)
 			.padding(
-				top = ThemeValue.Padding.VerticalSpace,
-				bottom = ThemeValue.Padding.VerticalSpace,
-				start = ThemeValue.Padding.HorizontalSpace
+				top = ThemeValue.Padding.VerticalExtraSpace,
+				bottom = ThemeValue.Padding.VerticalExtraSpace,
+				start = ThemeValue.Padding.HorizontalExtraSpace
 			),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		MiniIcon(res = Res.drawable.img_logo)
 		Space()
-		if (LocalDevice.current.size != Device.Size.SMALL) {
-			Text(
-				text = stringResource(Res.string.app_name),
-				color = MaterialTheme.colorScheme.onPrimaryContainer,
-				style = MaterialTheme.typography.headlineSmall
-			)
-			Space()
-		}
+		Text(
+			text = stringResource(Res.string.app_name),
+			color = MaterialTheme.colorScheme.onPrimaryContainer,
+			style = MaterialTheme.typography.bodyLarge,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis
+		)
+		Space()
 		Row(
 			modifier = Modifier.weight(1f),
 			horizontalArrangement = Arrangement.End

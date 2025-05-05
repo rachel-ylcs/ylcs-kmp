@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import love.yinlin.platform.app
+import love.yinlin.extension.localComposition
 import org.jetbrains.compose.resources.Font
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
@@ -30,6 +30,8 @@ enum class ThemeMode {
 		DARK -> "深色"
 	}
 }
+
+val LocalDarkMode = localComposition<Boolean>()
 
 @Stable
 object Colors {
@@ -124,10 +126,10 @@ object Colors {
 
 @Stable
 object ThemeColor {
-	val warning: Color @Composable get() = if (app.isDarkMode) Colors.Yellow4 else Colors.Yellow5
-	val onWarning: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.White
-	val backgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Dark else Colors.Ghost
-	val onBackgroundVariant: Color @Composable get() = if (app.isDarkMode) Colors.Ghost else Colors.Dark
+	val warning: Color @Composable get() = if (LocalDarkMode.current) Colors.Yellow4 else Colors.Yellow5
+	val onWarning: Color @Composable get() = if (LocalDarkMode.current) Colors.Dark else Colors.White
+	val backgroundVariant: Color @Composable get() = if (LocalDarkMode.current) Colors.Dark else Colors.Ghost
+	val onBackgroundVariant: Color @Composable get() = if (LocalDarkMode.current) Colors.Ghost else Colors.Dark
 }
 
 private val LightColorScheme = lightColorScheme(
@@ -179,25 +181,25 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 private fun rachelShapes(device: Device): Shapes = remember(device) { when (device.size) {
 	Device.Size.SMALL -> Shapes(
-		extraSmall = RoundedCornerShape(2.dp),
-		small = RoundedCornerShape(4.dp),
-		medium = RoundedCornerShape(6.dp),
-		large = RoundedCornerShape(8.dp),
-		extraLarge = RoundedCornerShape(10.dp)
-	)
-	Device.Size.MEDIUM -> Shapes(
 		extraSmall = RoundedCornerShape(3.dp),
 		small = RoundedCornerShape(5.dp),
 		medium = RoundedCornerShape(7.dp),
-		large = RoundedCornerShape(10.dp),
-		extraLarge = RoundedCornerShape(13.dp)
+		large = RoundedCornerShape(9.dp),
+		extraLarge = RoundedCornerShape(11.dp)
+	)
+	Device.Size.MEDIUM -> Shapes(
+		extraSmall = RoundedCornerShape(3.5.dp),
+		small = RoundedCornerShape(5.5.dp),
+		medium = RoundedCornerShape(7.5.dp),
+		large = RoundedCornerShape(9.5.dp),
+		extraLarge = RoundedCornerShape(11.5.dp)
 	)
 	Device.Size.LARGE -> Shapes(
 		extraSmall = RoundedCornerShape(4.dp),
 		small = RoundedCornerShape(6.dp),
-		medium = RoundedCornerShape(9.dp),
-		large = RoundedCornerShape(12.dp),
-		extraLarge = RoundedCornerShape(15.dp)
+		medium = RoundedCornerShape(8.dp),
+		large = RoundedCornerShape(10.dp),
+		extraLarge = RoundedCornerShape(12.dp)
 	)
 } }
 
@@ -217,7 +219,10 @@ private fun baseTextStyle(
 private fun rachelTextStyle(
 	size: TextUnit,
 	isBold: Boolean = false
-): TextStyle = baseTextStyle(Font(Res.font.xwwk), size, isBold)
+): TextStyle {
+	val font = Font(Res.font.xwwk)
+	return remember(size, isBold) { baseTextStyle(font, size, isBold) }
+}
 
 @Composable
 private fun rachelTypography(device: Device): Typography {
@@ -230,9 +235,9 @@ private fun rachelTypography(device: Device): Typography {
 			headlineLarge = baseTextStyle(font, 28.sp, false),
 			headlineMedium = baseTextStyle(font, 24.sp, false),
 			headlineSmall = baseTextStyle(font, 20.sp, false),
-			titleLarge = baseTextStyle(font, 18.sp, true),
-			titleMedium = baseTextStyle(font, 16.sp, true),
-			titleSmall = baseTextStyle(font, 14.sp, true),
+			titleLarge = baseTextStyle(font, 17.sp, true),
+			titleMedium = baseTextStyle(font, 15.sp, true),
+			titleSmall = baseTextStyle(font, 13.sp, true),
 			bodyLarge = baseTextStyle(font, 16.sp, false),
 			bodyMedium = baseTextStyle(font, 14.sp, false),
 			bodySmall = baseTextStyle(font, 12.sp, false),
@@ -241,23 +246,6 @@ private fun rachelTypography(device: Device): Typography {
 			labelSmall = baseTextStyle(font, 12.sp, true),
 		)
         Device.Size.MEDIUM -> Typography(
-			displayLarge = baseTextStyle(font, 29.sp, true),
-			displayMedium = baseTextStyle(font, 25.sp, true),
-			displaySmall = baseTextStyle(font, 21.sp, true),
-			headlineLarge = baseTextStyle(font, 29.sp, false),
-			headlineMedium = baseTextStyle(font, 25.sp, false),
-			headlineSmall = baseTextStyle(font, 21.sp, false),
-			titleLarge = baseTextStyle(font, 17.sp, true),
-			titleMedium = baseTextStyle(font, 15.sp, true),
-			titleSmall = baseTextStyle(font, 13.sp, true),
-			bodyLarge = baseTextStyle(font, 15.sp, false),
-			bodyMedium = baseTextStyle(font, 13.sp, false),
-			bodySmall = baseTextStyle(font, 11.sp, false),
-			labelLarge = baseTextStyle(font, 15.sp, true),
-			labelMedium = baseTextStyle(font, 13.sp, true),
-			labelSmall = baseTextStyle(font, 11.sp, true),
-		)
-        Device.Size.LARGE -> Typography(
 			displayLarge = baseTextStyle(font, 30.sp, true),
 			displayMedium = baseTextStyle(font, 26.sp, true),
 			displaySmall = baseTextStyle(font, 22.sp, true),
@@ -267,22 +255,44 @@ private fun rachelTypography(device: Device): Typography {
 			titleLarge = baseTextStyle(font, 18.sp, true),
 			titleMedium = baseTextStyle(font, 16.sp, true),
 			titleSmall = baseTextStyle(font, 14.sp, true),
-			bodyLarge = baseTextStyle(font, 16.sp, false),
-			bodyMedium = baseTextStyle(font, 14.sp, false),
-			bodySmall = baseTextStyle(font, 12.sp, false),
-			labelLarge = baseTextStyle(font, 16.sp, true),
-			labelMedium = baseTextStyle(font, 14.sp, true),
-			labelSmall = baseTextStyle(font, 12.sp, true),
+			bodyLarge = baseTextStyle(font, 17.sp, false),
+			bodyMedium = baseTextStyle(font, 15.sp, false),
+			bodySmall = baseTextStyle(font, 13.sp, false),
+			labelLarge = baseTextStyle(font, 17.sp, true),
+			labelMedium = baseTextStyle(font, 15.sp, true),
+			labelSmall = baseTextStyle(font, 13.sp, true),
+		)
+        Device.Size.LARGE -> Typography(
+			displayLarge = baseTextStyle(font, 32.sp, true),
+			displayMedium = baseTextStyle(font, 28.sp, true),
+			displaySmall = baseTextStyle(font, 24.sp, true),
+			headlineLarge = baseTextStyle(font, 32.sp, false),
+			headlineMedium = baseTextStyle(font, 28.sp, false),
+			headlineSmall = baseTextStyle(font, 24.sp, false),
+			titleLarge = baseTextStyle(font, 19.sp, true),
+			titleMedium = baseTextStyle(font, 17.sp, true),
+			titleSmall = baseTextStyle(font, 15.sp, true),
+			bodyLarge = baseTextStyle(font, 18.sp, false),
+			bodyMedium = baseTextStyle(font, 16.sp, false),
+			bodySmall = baseTextStyle(font, 14.sp, false),
+			labelLarge = baseTextStyle(font, 18.sp, true),
+			labelMedium = baseTextStyle(font, 16.sp, true),
+			labelSmall = baseTextStyle(font, 14.sp, true),
 		)
     } }
 }
 
 @Stable
 object ThemeStyle {
+	val bodyExtraSmall: TextStyle @Composable get() = when (LocalDevice.current.size) {
+		Device.Size.SMALL -> rachelTextStyle(10.sp, false)
+		Device.Size.MEDIUM -> rachelTextStyle(11.sp, false)
+		Device.Size.LARGE -> rachelTextStyle(12.sp, false)
+	}
 	val DisplayExtraLarge: TextStyle @Composable get() = when (LocalDevice.current.size) {
-        Device.Size.SMALL -> rachelTextStyle(30.sp, true)
-        Device.Size.MEDIUM -> rachelTextStyle(32.sp, true)
-        Device.Size.LARGE -> rachelTextStyle(34.sp, true)
+        Device.Size.SMALL -> rachelTextStyle(32.sp, true)
+        Device.Size.MEDIUM -> rachelTextStyle(34.sp, true)
+        Device.Size.LARGE -> rachelTextStyle(36.sp, true)
     }
 }
 
@@ -310,10 +320,35 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 56.dp
 			Device.Size.LARGE -> 64.dp
 		}
-		val ShowImage: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 150.dp
-			Device.Size.MEDIUM -> 200.dp
+		val MediumImage: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 64.dp
+			Device.Size.MEDIUM -> 72.dp
+			Device.Size.LARGE -> 80.dp
+		}
+		val LargeImage: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 100.dp
+			Device.Size.MEDIUM -> 125.dp
+			Device.Size.LARGE -> 150.dp
+		}
+		val ExtraLargeImage: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 200.dp
+			Device.Size.MEDIUM -> 225.dp
 			Device.Size.LARGE -> 250.dp
+		}
+		val ProgressHeight: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 4.dp
+			Device.Size.MEDIUM -> 5.dp
+			Device.Size.LARGE -> 6.dp
+		}
+		val RefreshHeaderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 70.dp
+			Device.Size.MEDIUM -> 75.dp
+			Device.Size.LARGE -> 80.dp
+		}
+		val RefreshFooterHeight: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 50.dp
+			Device.Size.MEDIUM -> 55.dp
+			Device.Size.LARGE -> 60.dp
 		}
 		val MicroCellWidth: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 75.dp
@@ -330,6 +365,16 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 320.dp
 			Device.Size.LARGE -> 350.dp
 		}
+		val DialogWidth: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 300.dp
+			Device.Size.MEDIUM -> 400.dp
+			Device.Size.LARGE -> 500.dp
+		}
+		val SheetWidth: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 360.dp
+			Device.Size.MEDIUM -> 450.dp
+			Device.Size.LARGE -> 500.dp
+		}
 		val PanelWidth: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 360.dp
 			Device.Size.MEDIUM -> 380.dp
@@ -339,49 +384,71 @@ object ThemeValue {
 
 	@Stable
 	object Padding {
+		val ZeroSpace: Dp = 0.dp
 		val LittleSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 2.dp
+			Device.Size.SMALL -> 2.5.dp
 			Device.Size.MEDIUM -> 3.dp
-			Device.Size.LARGE -> 4.dp
+			Device.Size.LARGE -> 3.5.dp
 		}
 		val EqualSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 6.dp
-			Device.Size.MEDIUM -> 7.5.dp
-			Device.Size.LARGE -> 9.dp
+			Device.Size.SMALL -> 7.5.dp
+			Device.Size.MEDIUM -> 9.dp
+			Device.Size.LARGE -> 10.5.dp
 		}
 		val HorizontalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 8.dp
-			Device.Size.MEDIUM -> 10.dp
-			Device.Size.LARGE -> 12.dp
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 12.dp
+			Device.Size.LARGE -> 14.dp
 		}
 		val VerticalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 4.dp
-			Device.Size.MEDIUM -> 5.dp
-			Device.Size.LARGE -> 6.dp
+			Device.Size.SMALL -> 5.dp
+			Device.Size.MEDIUM -> 6.dp
+			Device.Size.LARGE -> 7.dp
 		}
 		val EqualExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 13.5.dp
-			Device.Size.MEDIUM -> 15.dp
-			Device.Size.LARGE -> 16.5.dp
+			Device.Size.SMALL -> 11.25.dp
+			Device.Size.MEDIUM -> 13.125.dp
+			Device.Size.LARGE -> 15.dp
 		}
 		val HorizontalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 18.dp
-			Device.Size.MEDIUM -> 20.dp
-			Device.Size.LARGE -> 22.dp
+			Device.Size.SMALL -> 15.dp
+			Device.Size.MEDIUM -> 17.5.dp
+			Device.Size.LARGE -> 20.dp
 		}
 		val VerticalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 9.dp
-			Device.Size.MEDIUM -> 10.dp
-			Device.Size.LARGE -> 11.dp
+			Device.Size.SMALL -> 7.5.dp
+			Device.Size.MEDIUM -> 8.75.dp
+			Device.Size.LARGE -> 10.dp
 		}
+		val InnerIcon: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
+		}
+		val ZeroValue: PaddingValues = PaddingValues(0.dp)
+		val LittleValue: PaddingValues @Composable get() = PaddingValues(horizontal = LittleSpace, vertical = LittleSpace * 0.8f)
 		val EqualValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualSpace, vertical = EqualSpace)
 		val Value: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalSpace, vertical = VerticalSpace)
 		val EqualExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualExtraSpace, vertical = EqualExtraSpace)
 		val ExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
-		val InnerIcon: Dp @Composable get() = when (LocalDevice.current.size) {
+	}
+
+	@Stable
+	object Border {
+		val Small: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 1.dp
+			Device.Size.MEDIUM -> 1.5.dp
+			Device.Size.LARGE -> 2.dp
+		}
+		val Medium: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 2.dp
-			Device.Size.MEDIUM -> 3.dp
-			Device.Size.LARGE -> 4.dp
+			Device.Size.MEDIUM -> 2.5.dp
+			Device.Size.LARGE -> 3.dp
+		}
+		val Large: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 3.dp
+			Device.Size.MEDIUM -> 4.dp
+			Device.Size.LARGE -> 5.dp
 		}
 	}
 
@@ -389,12 +456,17 @@ object ThemeValue {
 	object Shadow {
 		val Icon: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 2.5.dp
-			Device.Size.MEDIUM -> 3.5.dp
-			Device.Size.LARGE -> 4.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
+		}
+		val Item: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 1.dp
+			Device.Size.MEDIUM -> 1.5.dp
+			Device.Size.LARGE -> 2.dp
 		}
 		val Surface: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 3.dp
-			Device.Size.MEDIUM -> 4.dp
+			Device.Size.SMALL -> 4.dp
+			Device.Size.MEDIUM -> 4.5.dp
 			Device.Size.LARGE -> 5.dp
 		}
 		val Tonal: Dp @Composable get() = when (LocalDevice.current.size) {
@@ -403,39 +475,18 @@ object ThemeValue {
 			Device.Size.LARGE -> 2.dp
 		}
 	}
-
-	@Stable
-	object Shape {
-		val Small: androidx.compose.ui.graphics.Shape @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> MaterialTheme.shapes.extraSmall
-			Device.Size.MEDIUM -> MaterialTheme.shapes.small
-			Device.Size.LARGE -> MaterialTheme.shapes.medium
-		}
-		val Medium: androidx.compose.ui.graphics.Shape @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> MaterialTheme.shapes.small
-			Device.Size.MEDIUM -> MaterialTheme.shapes.medium
-			Device.Size.LARGE -> MaterialTheme.shapes.large
-		}
-		val Large: androidx.compose.ui.graphics.Shape @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> MaterialTheme.shapes.medium
-			Device.Size.MEDIUM -> MaterialTheme.shapes.large
-			Device.Size.LARGE -> MaterialTheme.shapes.extraLarge
-		}
-	}
 }
 
 @Composable
-fun RachelTheme(
-	darkMode: Boolean,
-	device: Device,
-	content: @Composable () -> Unit
-) {
+fun RachelTheme(content: @Composable () -> Unit) {
 	MaterialTheme(
-		colorScheme = if (darkMode) DarkColorScheme else LightColorScheme,
-		shapes = rachelShapes(device),
-		typography = rachelTypography(device)
+		colorScheme = if (LocalDarkMode.current) DarkColorScheme else LightColorScheme,
+		shapes = rachelShapes(LocalDevice.current),
+		typography = rachelTypography(LocalDevice.current)
 	) {
-		CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+		CompositionLocalProvider(
+			LocalTextStyle provides MaterialTheme.typography.bodyMedium
+		) {
 			content()
 		}
 	}

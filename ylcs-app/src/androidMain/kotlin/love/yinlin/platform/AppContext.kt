@@ -3,9 +3,6 @@ package love.yinlin.platform
 
 import android.content.Context
 import androidx.activity.result.ActivityResultRegistry
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
@@ -15,11 +12,6 @@ import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
 class ActualAppContext(val context: Context) : AppContext() {
-	companion object {
-		val DesignWidth = 360.dp
-		val DesignHeight = 800.dp
-	}
-
 	override val kv: KV = KV(context)
 
 	var activityResultRegistry: ActivityResultRegistry? = null
@@ -29,13 +21,13 @@ class ActualAppContext(val context: Context) : AppContext() {
 		downloadCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 300 * 1024 * 1024
+				maxSize = 400 * 1024 * 1024
 			)
 		}
 		resultCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 300 * 1024 * 1024
+				maxSize = 400 * 1024 * 1024
 			)
 		}
 		globalImageOptions(ImageOptions {

@@ -105,6 +105,7 @@ fun RachelButton(
 			Text(
 				text = text,
 				color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+				style = MaterialTheme.typography.labelMedium,
 				textAlign = TextAlign.Center,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis
@@ -148,6 +149,7 @@ private fun LoadingButtonContent(
 		Text(
 			text = text,
 			color = if (isLoading) MaterialTheme.colorScheme.onSurfaceVariant else color,
+			style = MaterialTheme.typography.bodyMedium,
 			textAlign = TextAlign.Center,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis

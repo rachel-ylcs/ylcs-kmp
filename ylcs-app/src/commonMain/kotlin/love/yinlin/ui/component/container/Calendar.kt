@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
 import love.yinlin.common.Resource
+import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
@@ -101,7 +102,7 @@ private fun CalendarHeader(
 	) {
 		Text(
 			text = "${currentDate.year}年${currentDate.monthNumber}月",
-			style = MaterialTheme.typography.displaySmall,
+			style = MaterialTheme.typography.titleLarge,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f)
@@ -157,7 +158,6 @@ private fun CalendarDayGrid(
 
 		LazyVerticalGrid(
 			columns = GridCells.Fixed(7),
-			userScrollEnabled = false,
 			modifier = Modifier.fillMaxWidth()
 		) {
 			items(
@@ -173,7 +173,7 @@ private fun CalendarDayGrid(
 					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
 					else -> LocalContentColor.current
 				}
-				val text = eventTitle ?: date.lunar
+				val text = remember(eventTitle, date) { eventTitle ?: date.lunar }
 
 				Box(
 					modifier = Modifier.fillMaxWidth().aspectRatio(1f)
@@ -198,7 +198,7 @@ private fun CalendarDayGrid(
 						Text(
 							text = text,
 							color = color,
-							style = MaterialTheme.typography.bodySmall,
+							style = ThemeStyle.bodyExtraSmall,
 							textAlign = TextAlign.Center,
 							maxLines = 1,
 							overflow = TextOverflow.Clip

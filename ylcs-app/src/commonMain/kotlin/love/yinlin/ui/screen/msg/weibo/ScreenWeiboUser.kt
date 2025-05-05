@@ -44,13 +44,13 @@ private fun UserInfoCard(
 		modifier = modifier.padding(ThemeValue.Padding.Value),
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 	) {
-		OffsetLayout(y = -ThemeValue.Size.SmallImage / 4) {
+		OffsetLayout(y = -ThemeValue.Size.MediumImage / 4) {
 			WebImage(
 				uri = user.info.avatar,
 				key = DateEx.TodayString,
 				contentScale = ContentScale.Crop,
 				circle = true,
-				modifier = Modifier.size(ThemeValue.Size.SmallImage)
+				modifier = Modifier.size(ThemeValue.Size.MediumImage)
 			)
 		}
 		Column(
@@ -105,7 +105,8 @@ private fun UserAlbumItem(
 ) {
 	Row(
 		modifier = modifier.clickable(onClick = onAlbumClick),
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+		verticalAlignment = Alignment.CenterVertically
 	) {
 		WebImage(
 			uri = album.pic,
