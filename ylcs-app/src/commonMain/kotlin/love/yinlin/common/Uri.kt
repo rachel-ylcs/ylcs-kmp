@@ -17,6 +17,8 @@ data class Scheme(val name: String) {
         val File = Scheme("file")
         val Content = Scheme("content")
         val Rachel = Scheme("rachel")
+        val Taobao = Scheme("taobao")
+        val QQ = Scheme("mqqapi")
     }
 
     override fun toString(): String = name
@@ -226,4 +228,27 @@ class Uri(
             return builder.toString()
         }
     }
+}
+
+object UriGenerator {
+    fun qq(id: String): Uri = Uri(
+        scheme = Scheme.QQ,
+        host = "card",
+        path = "/show_pslcard",
+        query = "src_type=internal&version=1&uin=$id&card_type=person&source=qrcode"
+    )
+
+    fun qqGroup(id: String): Uri = Uri(
+        scheme = Scheme.QQ,
+        host = "card",
+        path = "/show_pslcard",
+        query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
+    )
+
+    fun taobao(shopId: String): Uri = Uri(
+        scheme = Scheme.Taobao,
+        host = "shop.m.taobao.com",
+        path = "/shop/shop_index.html",
+        query = "shop_id=$shopId"
+    )
 }

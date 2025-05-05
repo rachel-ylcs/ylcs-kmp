@@ -2,7 +2,7 @@ package love.yinlin.common
 
 import love.yinlin.AppModel
 import love.yinlin.ui.screen.community.ScreenUserCard
-import love.yinlin.ui.screen.music.ScreenImportMusic
+import love.yinlin.ui.screen.music.loader.ScreenImportMusic
 
 class DeepLink(private val model: AppModel) {
     private fun schemeContent(uri: Uri) {

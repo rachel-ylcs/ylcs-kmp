@@ -39,6 +39,7 @@ import love.yinlin.common.LocalDevice
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
+import love.yinlin.common.UriGenerator
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.data.rachel.profile.UserProfile
@@ -144,25 +145,13 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			title = "推广"
 		) {
 			Item("水群", ExtraIcons.QQ) {
-				val uri = Uri(
-					scheme = Scheme("mqqapi"),
-					host = "card",
-					path = "/show_pslcard",
-					query = "src_type=internal&version=1&uin=828049503&card_type=group&source=qrcode"
-				)
 				launch {
-					if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装QQ")
+					if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ")
 				}
 			}
 			Item("店铺", Icons.Filled.Store) {
-				val uri = Uri(
-					scheme = Scheme("taobao"),
-					host = "shop.m.taobao.com",
-					path = "/shop/shop_index.html",
-					query = "shop_id=280201975"
-				)
 				launch {
-					if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装淘宝")
+					if (!OS.Application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
 				}
 			}
 		}

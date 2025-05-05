@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.music
+package love.yinlin.ui.screen.music.loader
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.LocalContentColor
@@ -226,14 +225,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
         }
     }
 
-    override val title: String = "导入歌曲"
-
-    @Composable
-    override fun ActionScope.LeftActions() {
-        Action(Icons.Outlined.Extension) {
-
-        }
-    }
+    override val title: String = "导入MOD"
 
     @Composable
     override fun ActionScope.RightActions() {

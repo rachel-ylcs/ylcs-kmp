@@ -72,9 +72,4 @@ App 不需要任何文件存储读写权限，所有数据和文件均存储在 
     <string name="dialog_cancel">取消</string>
     <string name="dialog_yes">是</string>
     <string name="dialog_no">否</string>
-
-    <string name="qqgroup_main">828049503</string>
-    <string name="qqgroup_mod0">836289670</string>
-    <string name="qqgroup_mod1">971218639</string>
-    <string name="qqgroup_mod2">942459444</string>
 </resources>

@@ -1,5 +1,6 @@
 package love.yinlin.common
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -729,6 +730,207 @@ object ExtraIcons {
             horizontalLineToRelative(-0.091f)
             curveToRelative(-2.245f, -0.023f, -3.7f, -1.562f, -3.846f, -4.011f)
             curveToRelative(-0.054f, -0.9f, 0f, -1.663f, 0.097f, -2.285f)
+        }.build()
+    }
+
+    val QQMusic by lazy {
+        ImageVector.Builder(
+            name = "QQMusic",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Color(0xFFF8C913)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(42.7f, 516.7f)
+            arcTo(469.3f, 469.3f, 0.0f, isMoreThanHalf = true, isPositiveArc = false, 512.0f, 52.1f)
+            arcToRelative(469.3f, 469.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -469.3f, 464.6f)
+            close()
+        }.path(
+            fill = SolidColor(Color(0xFF02B053)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(654.9f, 12.4f)
+            arcToRelative(217.2f, 217.2f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, dx1 = -105.4f, dy1 = 49.5f)
+            arcToRelative(409.6f, 409.6f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, dx1 = -128.0f, dy1 = 39.7f)
+            arcToRelative(184.7f, 184.7f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, dx1 = -42.7f, dy1 = 29.9f)
+            curveToRelative(-20.1f, 17.5f, -35.0f, 49.5f, -30.3f, 59.7f)
+            reflectiveCurveToRelative(50.3f, 72.1f, 107.9f, 154.0f)
+            reflectiveCurveTo(569.6f, 504.3f, 582.0f, 521.4f)
+            arcToRelative(269.2f, 269.2f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, 20.1f, 32.4f)
+            curveToRelative(0.0f, 2.6f, -10.2f, 0.0f, -20.1f, -2.6f)
+            arcTo(256.0f, 256.0f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 421.5f, 576.0f)
+            arcToRelative(260.3f, 260.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -97.7f, 96.9f)
+            arcToRelative(170.7f, 170.7f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -7.7f, 131.8f)
+            arcToRelative(183.9f, 183.9f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 90.5f, 94.3f)
+            arcToRelative(146.3f, 146.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 82.8f, 20.1f)
+            arcToRelative(221.9f, 221.9f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 75.1f, -5.1f)
+            arcToRelative(216.3f, 216.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 165.5f, -183.9f)
+            curveToRelative(2.6f, -47.4f, -2.6f, -62.3f, -65.3f, -170.7f)
+            curveToRelative(-97.7f, -170.7f, -185.6f, -323.0f, -185.6f, -325.5f)
+            lineToRelative(40.1f, -5.1f)
+            arcToRelative(166.0f, 166.0f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, dx1 = 145.5f, dy1 = -85.3f)
+            curveToRelative(12.4f, -22.2f, 12.4f, -29.9f, 12.4f, -77.2f)
+            arcTo(221.4f, 221.4f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, x1 = 672.0f, y1 = 6.4f)
+            curveToRelative(-2.1f, -9.0f, -4.3f, -6.4f, -17.1f, 6.0f)
+            close()
+        }.build()
+    }
+
+    val NetEaseCloudMusic by lazy {
+        ImageVector.Builder(
+            name = "NetEaseCloudMusic",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Color(0xFFEA3E3C)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(0.0f, 0.0f)
+            moveToRelative(184.3f, 0.0f)
+            lineToRelative(655.4f, 0.0f)
+            quadToRelative(184.3f, 0.0f, 184.3f, 184.3f)
+            lineToRelative(0.0f, 655.4f)
+            quadToRelative(0.0f, 184.3f, -184.3f, 184.3f)
+            lineToRelative(-655.4f, 0.0f)
+            quadToRelative(-184.3f, 0.0f, -184.3f, -184.3f)
+            lineToRelative(0.0f, -655.4f)
+            quadToRelative(0.0f, -184.3f, 184.3f, -184.3f)
+            close()
+        }.path(
+            fill = SolidColor(Color(0xFFFFFFFF)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(527.6f, 849.4f)
+            arcToRelative(373.6f, 373.6f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -162.5f, -39.0f)
+            curveToRelative(-112.4f, -55.2f, -180.0f, -176.3f, -172.6f, -308.7f)
+            curveToRelative(7.4f, -130.3f, 85.1f, -237.5f, 202.8f, -279.6f)
+            arcToRelative(35.9f, 35.9f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, 24.2f, 67.5f)
+            curveToRelative(-107.7f, 38.5f, -150.8f, 136.9f, -155.3f, 216.1f)
+            curveToRelative(-5.9f, 103.5f, 46.1f, 197.8f, 132.3f, 240.1f)
+            curveToRelative(124.7f, 60.3f, 216.9f, 22.4f, 260.8f, -5.6f)
+            curveToRelative(59.8f, -38.2f, 97.9f, -100.0f, 97.0f, -157.6f)
+            curveToRelative(-1.0f, -63.7f, -24.1f, -121.0f, -63.3f, -157.1f)
+            arcToRelative(145.4f, 145.4f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -65.6f, -35.3f)
+            quadToRelative(2.8f, 9.8f, 5.6f, 19.3f)
+            curveToRelative(13.4f, 45.6f, 24.9f, 85.1f, 25.6f, 114.4f)
+            arcToRelative(134.3f, 134.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -37.7f, 97.8f)
+            arcToRelative(139.1f, 139.1f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -100.7f, 40.5f)
+            arcToRelative(140.1f, 140.1f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -100.5f, -42.2f)
+            arcToRelative(169.1f, 169.1f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -46.3f, -122.8f)
+            curveToRelative(1.2f, -85.1f, 80.1f, -153.3f, 162.8f, -175.1f)
+            arcToRelative(324.8f, 324.8f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -6.7f, -67.1f)
+            arcToRelative(92.1f, 92.1f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, 69.2f, -91.8f)
+            curveToRelative(46.2f, -12.5f, 104.4f, 5.2f, 124.7f, 37.9f)
+            arcToRelative(35.8f, 35.8f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -11.7f, 49.3f)
+            arcToRelative(35.8f, 35.8f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -49.3f, -11.7f)
+            arcToRelative(62.3f, 62.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -48.5f, -5.2f)
+            curveToRelative(-4.3f, 1.7f, -12.4f, 4.9f, -12.8f, 23.1f)
+            arcToRelative(270.9f, 270.9f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 6.7f, 58.5f)
+            arcToRelative(217.5f, 217.5f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, 133.6f, 57.7f)
+            curveToRelative(53.6f, 49.4f, 85.0f, 125.5f, 86.4f, 208.7f)
+            curveToRelative(1.3f, 81.9f, -49.8f, 167.9f, -130.0f, 219.1f)
+            arcToRelative(310.1f, 310.1f, 0.0f, isMoreThanHalf = false, isPositiveArc = true, -168.2f, 48.7f)
+            close()
+            moveTo(551.3f, 391.9f)
+            curveToRelative(-56.8f, 15.7f, -107.5f, 63.0f, -108.1f, 106.4f)
+            arcToRelative(98.3f, 98.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 25.7f, 71.4f)
+            arcToRelative(68.0f, 68.0f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 49.4f, 20.9f)
+            arcToRelative(67.2f, 67.2f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 49.4f, -18.9f)
+            arcToRelative(63.2f, 63.2f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, 17.2f, -46.1f)
+            curveToRelative(-0.4f, -19.8f, -11.7f, -58.4f, -22.7f, -95.7f)
+            curveToRelative(-3.6f, -12.4f, -7.4f, -25.1f, -11.0f, -38.0f)
+            close()
+        }.build()
+    }
+
+    val KugouMusic by lazy {
+        ImageVector.Builder(
+            name = "KugouMusic",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Color(0xFF3D8BFA)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(849.9f, 51.2f)
+            lineTo(174.1f, 51.2f)
+            curveToRelative(-67.9f, 0.0f, -122.9f, 55.0f, -122.9f, 122.9f)
+            verticalLineToRelative(675.8f)
+            curveToRelative(0.0f, 67.9f, 55.0f, 122.9f, 122.9f, 122.9f)
+            horizontalLineToRelative(675.8f)
+            curveToRelative(67.9f, 0.0f, 122.9f, -55.0f, 122.9f, -122.9f)
+            lineTo(972.8f, 174.1f)
+            curveToRelative(0.0f, -67.9f, -55.0f, -122.9f, -122.9f, -122.9f)
+            close()
+            moveTo(512.0f, 819.2f)
+            curveToRelative(-169.4f, 0.0f, -307.2f, -137.8f, -307.2f, -307.2f)
+            reflectiveCurveToRelative(137.8f, -307.2f, 307.2f, -307.2f)
+            reflectiveCurveToRelative(307.2f, 137.8f, 307.2f, 307.2f)
+            reflectiveCurveToRelative(-137.8f, 307.2f, -307.2f, 307.2f)
+            close()
+        }.path(
+            fill = SolidColor(Color(0xFF3D8BFA)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(512.0f, 235.5f)
+            curveToRelative(-152.5f, 0.0f, -276.5f, 124.0f, -276.5f, 276.5f)
+            reflectiveCurveToRelative(124.0f, 276.5f, 276.5f, 276.5f)
+            reflectiveCurveToRelative(276.5f, -124.0f, 276.5f, -276.5f)
+            reflectiveCurveToRelative(-124.0f, -276.5f, -276.5f, -276.5f)
+            close()
+            moveTo(555.0f, 529.9f)
+            lineToRelative(103.4f, 132.6f)
+            horizontalLineToRelative(-94.2f)
+            lineTo(485.4f, 549.4f)
+            curveToRelative(-13.2f, -20.0f, -16.7f, -35.3f, -16.1f, -46.5f)
+            lineToRelative(-14.8f, 159.7f)
+            horizontalLineToRelative(-70.7f)
+            lineToRelative(27.7f, -298.0f)
+            horizontalLineToRelative(70.7f)
+            lineToRelative(-12.5f, 134.6f)
+            curveToRelative(1.9f, -14.1f, 10.2f, -20.5f, 10.2f, -20.5f)
+            lineToRelative(114.2f, -114.2f)
+            horizontalLineToRelative(87.0f)
+            reflectiveCurveTo(581.6f, 464.9f, 559.6f, 486.9f)
+            reflectiveCurveToRelative(-4.6f, 43.0f, -4.6f, 43.0f)
+            close()
         }.build()
     }
 }

@@ -7,6 +7,11 @@ import love.yinlin.ui.screen.world.*
 import love.yinlin.ui.screen.msg.weibo.*
 import love.yinlin.ui.screen.music.*
 import love.yinlin.ui.screen.community.*
+import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
+import love.yinlin.ui.screen.music.loader.ScreenImportMusic
+import love.yinlin.ui.screen.music.loader.ScreenKugouMusic
+import love.yinlin.ui.screen.music.loader.ScreenNetEaseCloudMusic
+import love.yinlin.ui.screen.music.loader.ScreenQQMusic
 import love.yinlin.ui.screen.settings.*
 
 fun ScreenRouteScope.screens() {
@@ -36,8 +41,13 @@ fun ScreenRouteScope.screens() {
 	// 听歌
     screen(::ScreenMusicLibrary)
     screen(::ScreenPlaylistLibrary)
-    screen(::ScreenImportMusic)
     screen(::ScreenMusicDetails)
+
+    screen(::ScreenImportMusic)
+    screen(::ScreenCreateMusic)
+    screen(::ScreenQQMusic)
+    screen(::ScreenNetEaseCloudMusic)
+    screen(::ScreenKugouMusic)
 
 	// 社区
     screen(::ScreenLogin)

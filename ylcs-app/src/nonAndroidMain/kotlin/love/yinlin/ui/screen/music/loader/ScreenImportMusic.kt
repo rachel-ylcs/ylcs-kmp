@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.music
+package love.yinlin.ui.screen.music.loader
 
 import love.yinlin.platform.ImplicitPath
 import love.yinlin.platform.NormalPath

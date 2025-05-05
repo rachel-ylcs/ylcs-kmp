@@ -10,13 +10,17 @@ import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Extension
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SelectAll
+import androidx.compose.material.icons.outlined.Token
+import androidx.compose.material.icons.outlined.Unarchive
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,7 +28,9 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ExtraIcons
 import love.yinlin.common.ThemeValue
+import love.yinlin.common.UriGenerator
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.deleteRecursively
@@ -32,11 +38,19 @@ import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
+import love.yinlin.ui.screen.music.loader.ScreenImportMusic
+import love.yinlin.ui.screen.music.loader.ScreenKugouMusic
+import love.yinlin.ui.screen.music.loader.ScreenNetEaseCloudMusic
+import love.yinlin.ui.screen.music.loader.ScreenQQMusic
 
 @Stable
 data class MusicInfoPreview(
@@ -115,6 +129,31 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
 
+    private enum class ImportMusicItem(val text: String, val icon: ImageVector, val isImage: Boolean) {
+        FromMod("从MOD导入", Icons.Outlined.Token, false),
+        FromLocal("本地制作", Icons.Outlined.Unarchive, false),
+        FromQQMusic("QQ音乐", ExtraIcons.QQMusic, true),
+        FromNetEaseCloudMusic("网易云音乐", ExtraIcons.NetEaseCloudMusic, true),
+        FromKugouMusic("酷狗音乐", ExtraIcons.KugouMusic, true),
+        FromGroup0("MOD工坊0群", Icons.Outlined.Extension, false),
+        FromGroup1("MOD工坊1群", Icons.Outlined.Extension, false),
+        FromGroup2("MOD工坊2群", Icons.Outlined.Extension, false),
+    }
+
+    private val importDialog = object : FloatingDialogChoice() {
+        override val num: Int = ImportMusicItem.entries.size
+
+        @Composable
+        override fun Name(index: Int) = Text(text = ImportMusicItem.entries[index].text, modifier = Modifier.fillMaxWidth())
+
+        @Composable
+        override fun Icon(index: Int) {
+            val item = ImportMusicItem.entries[index]
+            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.ExtraIcon)
+            else MiniIcon(icon = item.icon, size = ThemeValue.Size.ExtraIcon)
+        }
+    }
+
     private val searchDialog = FloatingDialogInput(
         hint = "歌曲名",
         maxLength = 32
@@ -179,9 +218,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     val oldItems = playlist.items
                     val newItems = mutableListOf<String>()
                     for (item in addItems) {
-                        if (!oldItems.contains(item)) {
-                            newItems += item
-                        }
+                        if (!oldItems.contains(item)) newItems += item
                     }
                     if (newItems.isNotEmpty()) {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
@@ -258,11 +295,41 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
             }
         }
         else {
-            Action(Icons.Outlined.Add) {
+            ActionSuspend(Icons.Outlined.Add) {
                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
                 else {
-                    pop()
-                    navigate(ScreenImportMusic.Args(null))
+                    when (importDialog.openSuspend()) {
+                        ImportMusicItem.FromMod.ordinal -> {
+                            pop()
+                            navigate(ScreenImportMusic.Args(null))
+                        }
+                        ImportMusicItem.FromLocal.ordinal -> {
+                            pop()
+                            navigate<ScreenCreateMusic>()
+                        }
+                        ImportMusicItem.FromQQMusic.ordinal -> {
+                            pop()
+                            navigate(ScreenQQMusic.Args(null))
+                        }
+                        ImportMusicItem.FromNetEaseCloudMusic.ordinal -> {
+                            pop()
+                            navigate(ScreenNetEaseCloudMusic.Args(null))
+                        }
+                        ImportMusicItem.FromKugouMusic.ordinal -> {
+                            pop()
+                            navigate(ScreenKugouMusic.Args(null))
+                        }
+                        ImportMusicItem.FromGroup0.ordinal -> {
+                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("836289670"))) slot.tip.warning("未安装QQ")
+                        }
+                        ImportMusicItem.FromGroup1.ordinal -> {
+                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("971218639"))) slot.tip.warning("未安装QQ")
+                        }
+                        ImportMusicItem.FromGroup2.ordinal -> {
+                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("942459444"))) slot.tip.warning("未安装QQ")
+                        }
+                        else -> {}
+                    }
                 }
             }
             ActionSuspend(Icons.Outlined.Search) {
@@ -307,5 +374,6 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun Floating() {
         searchDialog.Land()
         addMusicDialog.Land()
+        importDialog.Land()
     }
 }

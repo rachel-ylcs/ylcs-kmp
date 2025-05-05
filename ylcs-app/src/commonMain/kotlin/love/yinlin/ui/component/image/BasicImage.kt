@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.min
@@ -228,6 +229,24 @@ fun ClickIcon(
 		.clip(MaterialTheme.shapes.extraSmall)
 		.clickable(onClick = onClick)
 )
+
+@Composable
+fun MiniImage(
+	icon: ImageVector,
+	size: Dp = ThemeValue.Size.Icon,
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.Center
+	) {
+		Image(
+			painter = rememberVectorPainter(icon),
+			contentDescription = null,
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size)
+		)
+	}
+}
 
 @Composable
 fun MiniImage(

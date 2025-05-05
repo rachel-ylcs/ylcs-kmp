@@ -39,7 +39,6 @@ object SettingsScope {
 		title: String,
 		icon: ColorfulImageVector? = null,
 		color: Color = LocalContentColor.current,
-		padding: PaddingValues = ThemeValue.Padding.Value,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
 		onClick: () -> Unit = {},
@@ -48,7 +47,7 @@ object SettingsScope {
 		Row(
 			modifier = Modifier.fillMaxWidth()
 				.clickable(enabled = enabled, onClick = onClick)
-				.padding(padding),
+				.padding(ThemeValue.Padding.ExtraValue),
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
@@ -88,7 +87,6 @@ object SettingsScope {
 			icon = icon,
 			color = color,
 			hasDivider = hasDivider,
-			padding = ThemeValue.Padding.EqualValue,
 			enabled = enabled,
 			onClick = onClick
 		) {

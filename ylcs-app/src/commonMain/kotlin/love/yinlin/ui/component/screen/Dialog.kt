@@ -287,11 +287,11 @@ open class FloatingDialogInput(
 abstract class FloatingDialogChoice(
 	override val title: String? = null
 ) : FloatingRachelDialog<Int>() {
-	final override val dismissOnClickOutside: Boolean = false
-
 	abstract val num: Int
-	abstract fun name(index: Int): String
-	abstract fun icon(index: Int): ImageVector
+	@Composable
+	abstract fun Name(index: Int)
+	@Composable
+	abstract fun Icon(index: Int)
 
 	suspend fun openSuspend(): Int? = awaitResult()
 
@@ -303,7 +303,6 @@ abstract class FloatingDialogChoice(
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				repeat(num) { index ->
-					val nameString = name(index)
 					Row(
 						modifier = Modifier.fillMaxWidth().clickable {
 							continuation?.resume(index)
@@ -311,14 +310,10 @@ abstract class FloatingDialogChoice(
 						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
 						verticalAlignment = Alignment.CenterVertically
 					) {
-						MiniIcon(
-							icon = icon(index),
-							size = ThemeValue.Size.ExtraIcon
-						)
-						Text(
-							text = nameString,
-							modifier = Modifier.fillMaxWidth()
-						)
+						Icon(index)
+						Box(modifier = Modifier.weight(1f)) {
+							Name(index)
+						}
 					}
 				}
 			}
@@ -326,26 +321,48 @@ abstract class FloatingDialogChoice(
 	}
 
 	companion object {
-		fun fromItems(items: List<String>, title: String? = null) = object : FloatingDialogChoice(title) {
+		fun fromItems(items: List<String>, title: String? = null) = object : ListDialogChoice(title) {
 			override val num: Int = items.size
-			override fun name(index: Int): String = items[index]
-			override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+			override fun nameFactory(index: Int): String = items[index]
+			override fun iconFactory(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
 		}
 
-		fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : FloatingDialogChoice(title) {
+		fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : ListDialogChoice(title) {
 			override val num: Int = items.size
-			override fun name(index: Int): String = items[index].first
-			override fun icon(index: Int): ImageVector = items[index].second
+			override fun nameFactory(index: Int): String = items[index].first
+			override fun iconFactory(index: Int): ImageVector = items[index].second
 		}
 	}
 }
 
 @Stable
-open class FloatingDialogDynamicChoice(title: String? = null) : FloatingDialogChoice(title) {
+abstract class ListDialogChoice(title: String? = null) : FloatingDialogChoice(title) {
+	abstract fun nameFactory(index: Int): String
+	abstract fun iconFactory(index: Int): ImageVector
+
+	@Composable
+	override fun Name(index: Int) {
+		Text(
+			text = remember(index) { nameFactory(index) },
+			modifier = Modifier.fillMaxWidth()
+		)
+	}
+
+	@Composable
+	override fun Icon(index: Int) {
+		MiniIcon(
+			icon = remember(index) { iconFactory(index) },
+			size = ThemeValue.Size.ExtraIcon
+		)
+	}
+}
+
+@Stable
+open class FloatingDialogDynamicChoice(title: String? = null) : ListDialogChoice(title) {
 	private var items: List<String> = emptyList()
 	override val num: Int get() = items.size
-	override fun name(index: Int): String = items[index]
-	override fun icon(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+	override fun nameFactory(index: Int): String = items[index]
+	override fun iconFactory(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
 
 	suspend fun openSuspend(items: List<String>): Int? = if (items.isNotEmpty()) {
 		this.items = items
