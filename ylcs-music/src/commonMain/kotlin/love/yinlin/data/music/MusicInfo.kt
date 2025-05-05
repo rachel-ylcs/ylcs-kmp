@@ -1,6 +1,7 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.Serializable
 
 @Stable
@@ -15,5 +16,5 @@ data class MusicInfo(
     val composer: String, // 作曲
     val album: String, // 专辑
     val chorus: List<Long>?, // 副歌点
-    val modification: Int = 0 // 修改标记
+    @Transient val modification: Int = 0 // 修改标记
 )

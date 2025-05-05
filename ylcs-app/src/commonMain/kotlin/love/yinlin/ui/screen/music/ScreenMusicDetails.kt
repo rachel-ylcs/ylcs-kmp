@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.writeText
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
@@ -34,18 +35,25 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusicDetails.Args>(model) {
@@ -59,16 +67,15 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Stable
     sealed class DeleteStrategy(enabled: Boolean = true): ResourceStrategy(enabled) {
-        suspend operator fun invoke(id: String, resource: MusicResource): Boolean {
-            if (enabled) {
-                try {
-                    val resourceFile = Path(OS.Storage.musicPath, id, resource.toString())
-                    Coroutines.io { SystemFileSystem.delete(resourceFile) }
-                    return true
-                }
-                catch (_: Throwable) {}
+        suspend fun ScreenMusicDetails.invoke(item: ResourceItem) {
+            if (!enabled) return
+            if (!slot.confirm.openSuspend(content = "删除资源")) return
+            try {
+                val resourceFile = Path(OS.Storage.musicPath, args.id, item.resource.toString())
+                Coroutines.io { SystemFileSystem.delete(resourceFile) }
+                resources.removeAll { it == item }
             }
-            return false
+            catch (_: Throwable) {}
         }
 
         @Stable
@@ -83,36 +90,52 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         enabled: Boolean = true,
         protected val needUpdateInfo: Boolean
     ): ResourceStrategy(enabled) {
-        open suspend fun openSource(): Source? = null
+        open suspend fun ScreenMusicDetails.openSource(): Source? = null
 
-        suspend operator fun invoke(id: String, resource: MusicResource): Boolean {
-            if (enabled) {
-                try {
+        suspend fun ScreenMusicDetails.invoke(item: ResourceItem) {
+            val id = args.id
+            val musicPath = musicInfo?.path
+            if (!enabled || musicPath == null) return
+            try {
+                Coroutines.io {
                     openSource()?.use { source ->
-                        val resourceFile = Path(OS.Storage.musicPath, id, resource.toString())
+                        val resourceFile = Path(OS.Storage.musicPath, id, item.resource.toString())
                         SystemFileSystem.sink(resourceFile).buffered().use { sink ->
                             source.transferTo(sink)
                         }
-                        if (needUpdateInfo) {
-                            val musicLibrary =  app.musicFactory.musicLibrary
-                            musicLibrary[id]?.let { info ->
-                                musicLibrary[id] = info.copy(modification = info.modification + 1)
+                        Coroutines.main {
+                            if (needUpdateInfo) {
+                                app.musicFactory.musicLibrary.findAssign(id) {
+                                    it.copy(modification = it.modification + 1)
+                                }
+                            }
+                            val newLength = SystemFileSystem.metadataOrNull(resourceFile)?.size?.toInt() ?: 0
+                            resources.findAssign(predicate = { it == item }) {
+                                makeResourceItem(it.resource, newLength)
                             }
                         }
-                        return true
                     }
                 }
-                catch (_: Throwable) { }
             }
-            return false
+            catch (_: Throwable) { }
         }
 
         @Stable
         data object Disabled : ReplaceStrategy(enabled = false, needUpdateInfo = false)
 
         @Stable
-        data object Picture : ReplaceStrategy(needUpdateInfo = true) {
-            override suspend fun openSource(): Source? = Picker.pickPicture()
+        data class Picture(val aspectRatio: Float = 0f) : ReplaceStrategy(needUpdateInfo = true) {
+            override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickPicture()?.use { source ->
+                OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            }?.let { path ->
+                cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
+                    OS.Storage.createTempFile { sink ->
+                        SystemFileSystem.source(path).buffered().use { source ->
+                            ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
+                        }
+                    }?.let { SystemFileSystem.source(it).buffered() }
+                }
+            }
         }
 
         @Stable
@@ -120,14 +143,14 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             val mimeType: List<String> = emptyList(),
             val filter: List<String> = emptyList()
         ) : ReplaceStrategy(needUpdateInfo = false) {
-            override suspend fun openSource(): Source? = Picker.pickFile(mimeType, filter)
+            override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickFile(mimeType, filter)
         }
     }
 
     @Stable
     sealed class ModifyStrategy(enabled: Boolean = true): ResourceStrategy(enabled) {
         @Composable
-        open fun ScreenMusicDetails.ModifyLayout(modifier: Modifier = Modifier) {}
+        open fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {}
 
         @Stable
         data object Disabled : ModifyStrategy(false)
@@ -135,16 +158,94 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         @Stable
         data object Config : ModifyStrategy() {
             @Composable
-            override fun ScreenMusicDetails.ModifyLayout(modifier: Modifier) {
+            override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
+                val name = remember { TextInputState(musicInfo?.name ?: "") }
+                val singer = remember { TextInputState(musicInfo?.singer ?: "") }
+                val lyricist = remember { TextInputState(musicInfo?.lyricist ?: "") }
+                val composer = remember { TextInputState(musicInfo?.composer ?: "") }
+                val album = remember { TextInputState(musicInfo?.album ?: "") }
 
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                ) {
+                    LoadingRachelButton(
+                        text = "修改",
+                        enabled = name.ok && singer.ok && lyricist.ok && composer.ok && album.ok,
+                        onClick = {
+                            val id = args.id
+                            app.musicFactory.musicLibrary.findAssign(id) {
+                                it.copy(
+                                    name = name.text,
+                                    singer = singer.text,
+                                    lyricist = lyricist.text,
+                                    composer = composer.text,
+                                    album = album.text,
+                                    modification = it.modification + 1
+                                )
+                            }?.let { newInfo ->
+                                try {
+                                    val configPath = newInfo.configPath
+                                    Coroutines.io {
+                                        SystemFileSystem.sink(configPath).buffered().use { sink ->
+                                            sink.writeText(newInfo.toJsonString())
+                                        }
+                                    }
+                                    resources.findAssign(predicate = { it == item }) {
+                                        makeResourceItem(it.resource, SystemFileSystem.metadataOrNull(configPath)!!.size.toInt())
+                                    }
+                                }
+                                catch (_: Throwable) {}
+                            }
+                            modifySheet.close()
+                        }
+                    )
+                    TextInput(
+                        state = name,
+                        hint = "歌曲名",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextInput(
+                        state = singer,
+                        hint = "演唱",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextInput(
+                        state = lyricist,
+                        hint = "作词",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextInput(
+                        state = composer,
+                        hint = "作曲",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    TextInput(
+                        state = album,
+                        hint = "专辑",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 
         @Stable
         data object LineLyrics : ModifyStrategy() {
             @Composable
-            override fun ScreenMusicDetails.ModifyLayout(modifier: Modifier) {
-
+            override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "暂未开放")
+                }
             }
         }
     }
@@ -158,60 +259,65 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         val onModify: ModifyStrategy
     )
 
+    companion object {
+        private fun makeResourceItem(resource: MusicResource, length: Int): ResourceItem {
+            val type = resource.type
+            val onDelete = when (type) {
+                MusicResourceType.Config, MusicResourceType.Record, MusicResourceType.Background -> DeleteStrategy.Disabled
+                MusicResourceType.Audio, MusicResourceType.LineLyrics -> if (type.defaultName == resource.name) DeleteStrategy.Disabled else DeleteStrategy.NoOption
+                MusicResourceType.Animation, MusicResourceType.Video, null -> DeleteStrategy.NoOption
+            }
+            val onReplace = when (type) {
+                MusicResourceType.Config, MusicResourceType.LineLyrics, null -> ReplaceStrategy.Disabled
+                MusicResourceType.Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
+                MusicResourceType.Record -> ReplaceStrategy.Picture(aspectRatio = 1f)
+                MusicResourceType.Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
+                MusicResourceType.Animation -> ReplaceStrategy.File(mimeType = listOf(MimeType.WEBP), filter = listOf("*.webp"))
+                MusicResourceType.Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
+            }
+            val onModify = when (type) {
+                MusicResourceType.Config -> ModifyStrategy.Config
+                MusicResourceType.LineLyrics -> ModifyStrategy.LineLyrics
+                else -> ModifyStrategy.Disabled
+            }
+            return ResourceItem(
+                resource = resource,
+                length = length,
+                onDelete = onDelete,
+                onReplace = onReplace,
+                onModify = onModify
+            )
+        }
+
+        private suspend fun loadLyrics(info: MusicInfo): String = Coroutines.io {
+            try {
+                val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
+                    it.readText()
+                }
+                LyricsLrc.parseLrcPlainText(lyrics)
+            }
+            catch (_: Throwable) { "" }
+        }
+
+        private suspend fun loadResources(info: MusicInfo): List<ResourceItem> = Coroutines.io {
+            try {
+                SystemFileSystem.list(info.path).map { path ->
+                    makeResourceItem(
+                        resource = MusicResource.fromString(path.name)!!,
+                        length = SystemFileSystem.metadataOrNull(path)!!.size.toInt()
+                    )
+                }
+            }
+            catch (_: Throwable) { emptyList() }
+        }
+    }
+
     private val musicInfo by derivedStateOf { app.musicFactory.musicLibrary[args.id] }
     private var lyricsText by mutableStateOf("")
     private val resources = mutableStateListOf<ResourceItem>()
 
-    fun makeResourceItem(resource: MusicResource, length: Int): ResourceItem {
-        val type = resource.type
-        val onDelete = when (type) {
-            MusicResourceType.Config, MusicResourceType.Record, MusicResourceType.Background -> DeleteStrategy.Disabled
-            MusicResourceType.Audio, MusicResourceType.LineLyrics -> if (type.defaultName == resource.name) DeleteStrategy.Disabled else DeleteStrategy.NoOption
-            MusicResourceType.Animation, MusicResourceType.Video, null -> DeleteStrategy.NoOption
-        }
-        val onReplace = when (type) {
-            MusicResourceType.Config, MusicResourceType.LineLyrics, null -> ReplaceStrategy.Disabled
-            MusicResourceType.Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
-            MusicResourceType.Record -> ReplaceStrategy.Picture
-            MusicResourceType.Background -> ReplaceStrategy.Picture
-            MusicResourceType.Animation -> ReplaceStrategy.File(mimeType = listOf(MimeType.WEBP), filter = listOf("*.webp"))
-            MusicResourceType.Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
-        }
-        val onModify = when (type) {
-            MusicResourceType.Config -> ModifyStrategy.Config
-            MusicResourceType.LineLyrics -> ModifyStrategy.LineLyrics
-            else -> ModifyStrategy.Disabled
-        }
-        return ResourceItem(
-            resource = resource,
-            length = length,
-            onDelete = onDelete,
-            onReplace = onReplace,
-            onModify = onModify
-        )
-    }
-
-    private suspend fun loadLyrics(info: MusicInfo): String = Coroutines.io {
-        try {
-            val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
-                it.readText()
-            }
-            LyricsLrc.parseLrcPlainText(lyrics)
-        }
-        catch (_: Throwable) { "" }
-    }
-
-    private suspend fun loadResources(info: MusicInfo): List<ResourceItem> = Coroutines.io {
-        try {
-            SystemFileSystem.list(info.path).map { path ->
-                makeResourceItem(
-                    resource = MusicResource.fromString(path.name)!!,
-                    length = SystemFileSystem.metadataOrNull(path)!!.size.toInt()
-                )
-            }
-        }
-        catch (_: Throwable) { emptyList() }
-    }
+    private val cropDialog = FloatingDialogCrop()
+    private val modifySheet = FloatingArgsSheet<ResourceItem>()
 
     @Composable
     private fun MusicMetadataLayout(modifier: Modifier = Modifier) {
@@ -236,6 +342,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         ) {
                             RachelText(
                                 text = info.name,
+                                style = MaterialTheme.typography.labelLarge,
                                 icon = Icons.Outlined.MusicNote,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -255,34 +362,22 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                             modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
                         )
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RachelText(
-                            text = "演唱: ${info.singer}",
-                            icon = ExtraIcons.Artist
-                        )
-                        RachelText(
-                            text = "作词: ${info.lyricist}",
-                            icon = Icons.Outlined.Lyrics
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RachelText(
-                            text = "作曲: ${info.composer}",
-                            icon = Icons.Outlined.Lyrics
-                        )
-                        RachelText(
-                            text = "专辑: ${info.album}",
-                            icon = Icons.Outlined.Album
-                        )
-                    }
+                    RachelText(
+                        text = "演唱: ${info.singer}",
+                        icon = ExtraIcons.Artist
+                    )
+                    RachelText(
+                        text = "作词: ${info.lyricist}",
+                        icon = Icons.Outlined.Lyrics
+                    )
+                    RachelText(
+                        text = "作曲: ${info.composer}",
+                        icon = Icons.Outlined.Lyrics
+                    )
+                    RachelText(
+                        text = "专辑: ${info.album}",
+                        icon = Icons.Outlined.Album
+                    )
                 }
             }
         } ?: Box(modifier = modifier) { EmptyBox() }
@@ -387,21 +482,30 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         LoadingIcon(
                             icon = Icons.Outlined.Delete,
                             color = Colors.White,
-                            onClick = { }
+                            onClick = {
+                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                else with(item.onDelete) { invoke(item) }
+                            }
                         )
                     }
                     if (item.onReplace.enabled) {
                         LoadingIcon(
                             icon = Icons.Outlined.FindReplace,
                             color = Colors.White,
-                            onClick = { }
+                            onClick = {
+                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                else with(item.onReplace) { invoke(item) }
+                            }
                         )
                     }
                     if (item.onModify.enabled) {
                         LoadingIcon(
                             icon = Icons.Outlined.Edit,
                             color = Colors.White,
-                            onClick = { }
+                            onClick = {
+                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                else modifySheet.open(item)
+                            }
                         )
                     }
                 }
@@ -483,5 +587,16 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     override fun SubContent(device: Device) = when (device.type) {
         Device.Type.PORTRAIT -> Portrait()
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+    }
+
+    @Composable
+    override fun Floating() {
+        modifySheet.Land {
+            with(it.onModify) {
+                ModifyLayout(it)
+            }
+        }
+
+        cropDialog.Land()
     }
 }

@@ -43,12 +43,13 @@ data class MusicInfoPreview(
     val id: String,
     val name: String,
     val singer: String,
+    val modification: Int = 0,
     val selected: Boolean = false
 ) {
-    constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer)
+    constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
 
     @Stable
-    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
+    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, "${MusicResourceType.Record.default}?mod=$modification")
 }
 
 @Composable
@@ -293,6 +294,11 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     )
                 }
             }
+        }
+
+        LaunchedEffect(app.musicFactory.musicLibrary) {
+            if (isManaging) exitManagement()
+            if (!isSearching) resetLibrary()
         }
     }
 

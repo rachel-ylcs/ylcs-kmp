@@ -27,7 +27,6 @@ import com.github.panpf.zoomimage.rememberSketchZoomState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.condition
@@ -272,11 +271,6 @@ private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = reme
 }
 
 @Composable
-private fun rememberLocalFileImageKeyUrl(path: Path): String = remember(path) {
-	"$path?_cacheKey=${SystemFileSystem.metadataOrNull(path)?.size}"
-}
-
-@Composable
 fun rememberWebImageState(
 	quality: ImageQuality,
 	placeholder: DrawableResource? = null,
@@ -334,7 +328,7 @@ fun LocalFileImage(
 	onClick: (() -> Unit)? = null
 ) {
 	AsyncImage(
-		uri = rememberLocalFileImageKeyUrl(path),
+		uri = path.toString(),
 		contentDescription = null,
 		state = state,
 		alignment = alignment,

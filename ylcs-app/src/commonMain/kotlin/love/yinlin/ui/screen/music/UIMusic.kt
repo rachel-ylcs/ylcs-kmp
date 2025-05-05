@@ -14,13 +14,15 @@ import love.yinlin.platform.OS
 @Stable
 val MusicInfo.path: Path get() = Path(OS.Storage.musicPath, this.id)
 @Stable
+val MusicInfo.configPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Config.default.toString())
+@Stable
 val MusicInfo.audioPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.default.toString())
 @Stable
-val MusicInfo.recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
+val MusicInfo.recordPath: Path get() = Path(OS.Storage.musicPath, this.id, "${MusicResourceType.Record.default}?mod=$modification")
 @Stable
-val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.default.toString())
+val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, "${MusicResourceType.Background.default}?mod=$modification")
 @Stable
-val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Animation.default.toString())
+val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, "${MusicResourceType.Animation.default}?mod=$modification")
 @Stable
 val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
 @Stable

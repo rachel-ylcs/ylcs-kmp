@@ -41,7 +41,26 @@ inline fun <T, R> MutableCollection<T>.findModify(predicate: (T) -> Boolean, blo
 	this.find(predicate = predicate)?.let { this.block(it) }
 
 // 若查找到元素则对这个元素执行操作并将结果赋值给自身
-inline fun <T> MutableList<T>.findAssign(predicate: (T) -> Boolean, block: (T) -> T) {
+inline fun <T> MutableList<T>.findAssign(value: T, block: (T) -> T): T? {
+	val index = this.indexOf(value)
+	return if (index != -1) {
+		val newValue = block(this[index])
+		this[index] = newValue
+		newValue
+	} else null
+}
+
+inline fun <T> MutableList<T>.findAssign(predicate: (T) -> Boolean, block: (T) -> T): T? {
 	val index = this.indexOfFirst(predicate = predicate)
-	if (index != -1) this[index] = block(this[index])
+	return if (index != -1) {
+		val newValue = block(this[index])
+		this[index] = newValue
+		newValue
+	} else null
+}
+
+inline fun <K, V> MutableMap<K, V>.findAssign(key: K, block: (V) -> V): V? = this[key]?.let { value ->
+	val newValue = block(value)
+	this[key] = newValue
+	newValue
 }
