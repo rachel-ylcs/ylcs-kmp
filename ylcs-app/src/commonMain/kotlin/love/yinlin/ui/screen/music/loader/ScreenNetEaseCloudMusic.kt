@@ -223,13 +223,17 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
     override val title: String = "网易云音乐"
 
     @Composable
-    override fun ActionScope.RightActions() {
+    override fun ActionScope.LeftActions() {
         if (linkState.text.isNotEmpty() || items.isNotEmpty()) {
             Action(Icons.Outlined.Refresh) {
                 linkState.text = ""
                 items = emptyList()
             }
         }
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
         ActionSuspend(
             icon = Icons.Outlined.Preview,
             enabled = linkState.text.isNotEmpty()
