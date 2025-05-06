@@ -14,6 +14,7 @@ import io.ktor.utils.io.*
 import kotlinx.io.Sink
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
+import love.yinlin.data.MimeType
 import love.yinlin.extension.Json
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -71,7 +72,10 @@ suspend inline fun <reified T, R> HttpClient.safeGet(
 	url: String,
 	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
-	client.prepareGet(url).execute { response ->
+	client.prepareGet(url) {
+		header(HttpHeaders.ContentType, ContentType.Text.Plain)
+		header(HttpHeaders.Accept, MimeType.ANY)
+	}.execute { response ->
 		val data = response.body<T>()
 		Coroutines.main { block(data) }
 	}
@@ -82,7 +86,10 @@ suspend inline fun <reified U, reified T, R> HttpClient.safePost(
 	data: U,
 	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
-	client.preparePost(url) { setBody(data) }.execute { response ->
+	client.preparePost(url) {
+		header(HttpHeaders.Accept, MimeType.ANY)
+		setBody(data)
+	}.execute { response ->
 		val data = response.body<T>()
 		Coroutines.main { block(data) }
 	}
@@ -100,6 +107,7 @@ suspend inline fun HttpClient.safeDownload(
 	var downloadedBytes = 0L
 	var totalBytes = 0L
 	client.prepareGet(url) {
+		header(HttpHeaders.Accept, MimeType.ANY)
 		onDownload { current, total ->
 			if (isCancel()) throw CancellationException()
 			if (current - downloadedBytes > TRANSFER_BUFFER_SIZE) {

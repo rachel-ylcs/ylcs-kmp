@@ -18,8 +18,11 @@ import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.QQMusic
+import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
+import love.yinlin.platform.Coroutines
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
@@ -49,7 +52,16 @@ class ScreenQQMusic(model: AppModel, args: Args) : SubScreen<ScreenQQMusic.Args>
     private var items by mutableStateOf(emptyList<QQMusic>())
 
     private suspend fun parseLink(link: String) {
-
+        val result = when {
+            // https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
+            link.contains("c6.y.qq.com") -> Coroutines.io {
+                when (val tmp = QQMusicAPI.requestMusicId(link)) {
+                    is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
+                    is Data.Error -> tmp
+                }
+            }
+            else -> { }
+        }
     }
 
     private suspend fun downloadMusic() {

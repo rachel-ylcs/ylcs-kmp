@@ -23,6 +23,10 @@ object IntentProcessor {
         object SendText {
             fun process(deeplink: DeepLink, text: String) {
                 when {
+                    text.contains("QQ音乐") -> {
+                        val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
+                        deeplink.process(result.copy(scheme = Scheme.QQMusic))
+                    }
                     text.contains("网易云音乐") -> {
                         val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
                         deeplink.process(result.copy(scheme = Scheme.NetEaseCloud))

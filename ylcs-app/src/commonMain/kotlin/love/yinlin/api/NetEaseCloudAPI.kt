@@ -1,15 +1,10 @@
 package love.yinlin.api
 
 import androidx.compose.runtime.Stable
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
-import love.yinlin.data.MimeType
 import love.yinlin.extension.*
 import love.yinlin.platform.app
-import love.yinlin.platform.safeCall
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.lyrics.LyricsLrc
 
@@ -33,14 +28,8 @@ object NetEaseCloudAPI {
         fun mp3(id: String) = "song/media/outer/url?id=${id}"
     }
 
-
-    suspend fun requestMusicId(url: String): Data<String> = app.client.safeCall { client ->
-        client.prepareGet(url) {
-            header(HttpHeaders.Accept, MimeType.HTML)
-        }.execute { response ->
-            val text = response.bodyAsText()
-            "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(text)!!.groupValues[1]
-        }
+    suspend fun requestMusicId(url: String): Data<String> = app.client.safeGet(url) { body: ByteArray ->
+        "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(body.decodeToString())!!.groupValues[1]
     }
 
     private fun getCloudMusic(json: JsonObject): CloudMusic = CloudMusic(

@@ -18,6 +18,7 @@ data class Scheme(val name: String) {
         val Content = Scheme("content")
         val Rachel = Scheme("rachel")
         val NetEaseCloud = Scheme("nec")
+        val QQMusic = Scheme("qm")
         val Taobao = Scheme("taobao")
         val QQ = Scheme("mqqapi")
     }
