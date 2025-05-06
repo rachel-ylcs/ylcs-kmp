@@ -86,6 +86,22 @@ abstract class MusicFactory {
         protected set
 
     // 通用操作
+    suspend fun updateMusicLibraryInfo(ids: List<String>) {
+        for (id in ids) {
+            val modification = musicLibrary[id]?.modification ?: 0
+            val info = Coroutines.io {
+                try {
+                    val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
+                    SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                }
+                catch (_: Throwable) {
+                    null
+                }
+            }
+            if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)
+        }
+    }
+
     suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null, playing: Boolean) {
         if (isInit && currentPlaylist != playlist) {
             val actualMusicList = mutableListOf<MusicInfo>()

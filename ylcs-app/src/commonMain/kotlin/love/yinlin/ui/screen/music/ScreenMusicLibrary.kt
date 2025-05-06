@@ -248,7 +248,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                 val removeItem = app.musicFactory.musicLibrary.remove(item)
                 if (removeItem != null) SystemFileSystem.deleteRecursively(removeItem.path)
             }
-            exitManagement()
+            resetLibrary()
         }
     }
 

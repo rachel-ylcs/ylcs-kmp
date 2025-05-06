@@ -17,6 +17,7 @@ data class Scheme(val name: String) {
         val File = Scheme("file")
         val Content = Scheme("content")
         val Rachel = Scheme("rachel")
+        val NetEaseCloud = Scheme("nec")
         val Taobao = Scheme("taobao")
         val QQ = Scheme("mqqapi")
     }
@@ -32,13 +33,12 @@ data class Scheme(val name: String) {
 
 @Stable
 @Serializable
-class Uri(
+data class Uri(
     val scheme: Scheme,
     val host: String? = null,
     val port: Int? = null,
     val path: String? = null,
-    val query: String? = null,
-    val fragment: String? = null
+    val query: String? = null
 ) {
     fun encode(): String = encodeUri(toString())
 
@@ -59,7 +59,6 @@ class Uri(
         if (port != null) append(":$port")
         if (path != null) append(path)
         if (query != null) append("?$query")
-        if (fragment != null) append("#$fragment")
     }
 
     companion object {
@@ -108,7 +107,7 @@ class Uri(
             var authorityEnd = -1
             for (i in remaining.indices) {
                 when (remaining[i]) {
-                    '/', '?', '#' -> {
+                    '/', '?' -> {
                         authorityEnd = i
                         break
                     }
@@ -133,19 +132,13 @@ class Uri(
                 }
             }
             var query: String? = null
-            var fragment: String? = null
-            val hashIndex = afterAuthority.indexOf('#')
-            if (hashIndex != -1) {
-                fragment = afterAuthority.substring(hashIndex + 1)
-                afterAuthority = afterAuthority.substring(0, hashIndex)
-            }
             val queryIndex = afterAuthority.indexOf('?')
             if (queryIndex != -1) {
                 query = afterAuthority.substring(queryIndex + 1)
                 afterAuthority = afterAuthority.substring(0, queryIndex)
             }
             val path: String? = afterAuthority.ifEmpty { null }
-            return Uri(Scheme(scheme.lowercase()), host, port, path, query, fragment)
+            return Uri(Scheme(scheme.lowercase()), host, port, path, query)
         }
 
         fun encodeUri(str: String): String {

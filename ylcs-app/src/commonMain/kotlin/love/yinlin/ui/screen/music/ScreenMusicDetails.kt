@@ -294,7 +294,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
                     it.readText()
                 }
-                LyricsLrc.parseLrcPlainText(lyrics)
+                LyricsLrc.Parser(lyrics).plainText
             }
             catch (_: Throwable) { "" }
         }

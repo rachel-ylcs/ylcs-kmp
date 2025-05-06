@@ -21,12 +21,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
-import love.yinlin.platform.Coroutines
+import love.yinlin.extension.timeString
 import kotlin.math.abs
 
 @Stable
 @Serializable
-private data class LrcLine(
+data class LrcLine(
     val position: Long,
     val text: String
 ) : Comparable<LrcLine> {
@@ -60,6 +60,56 @@ private fun LyricsLrcLine(
 
 @Stable
 class LyricsLrc : LyricsEngine {
+    class Parser(source: String) {
+        private var lines: List<LrcLine>? = null
+
+        init {
+            try {
+                val newLines = mutableListOf<LrcLine>()
+                val pattern = "\\[(\\d{2}):(\\d{2}).(\\d{2,3})](.*)".toRegex()
+                val items = source.split("\\r?\\n".toRegex())
+                for (item in items) {
+                    val line = item.trim()
+                    if (line.isEmpty()) continue
+                    val result = pattern.find(line)!!.groups
+                    val minutes = result[1]!!.value.toLong()
+                    val seconds = result[2]!!.value.toLong()
+                    val millisecondsString = result[3]!!.value
+                    var milliseconds = millisecondsString.toLong()
+                    if (millisecondsString.length == 2) milliseconds *= 10L
+                    val position = (minutes * 60 + seconds) * 1000 + milliseconds
+                    val text = result[4]!!.value.trim()
+                    if (text.isNotEmpty()) newLines += LrcLine(position, text)
+                }
+                lines = newLines.distinctBy { it.position }.sorted().ifEmpty { null }
+            }
+            catch (_: Throwable) {}
+        }
+
+        val paddingLyrics: List<LrcLine>? get() = lines?.let { items ->
+            val startTime = items.first().position
+            buildList(capacity = 9 + items.size) {
+                // 插入6个空并均分起始时间
+                repeat(6) { add(LrcLine(startTime / 6 * it, "")) }
+                // 插入原歌词
+                addAll(items)
+                // 插入永久3个空
+                repeat(3) { add(LrcLine(Long.MAX_VALUE - it, "")) }
+            }
+        }
+
+        val plainText: String get() = lines?.let { items ->
+            items.joinToString("\n") { it.text }
+        } ?: ""
+
+        override fun toString(): String = lines?.let { items ->
+            items.joinToString("\n") {
+                val milliseconds = (it.position % 1000) / 10
+                "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
+            }
+        } ?: ""
+    }
+
     private var lines: List<LrcLine>? by mutableStateOf(null)
     private val listState = LazyListState()
     private var currentIndex by mutableIntStateOf(-1)
@@ -78,40 +128,8 @@ class LyricsLrc : LyricsEngine {
         } ?: -1
     }
 
-    suspend fun parseLrcString(source: String) {
-        try {
-            val newLines = mutableListOf<LrcLine>()
-            Coroutines.cpu {
-                val pattern = "\\[(\\d{2}):(\\d{2}).(\\d{2,3})](.*)".toRegex()
-                val items = source.split("\\r?\\n".toRegex())
-                for (item in items) {
-                    val line = item.trim()
-                    if (line.isEmpty()) continue
-                    val result = pattern.find(line)!!.groups
-                    val minutes = result[1]!!.value.toLong()
-                    val seconds = result[2]!!.value.toLong()
-                    val millisecondsString = result[3]!!.value
-                    var milliseconds = millisecondsString.toLong()
-                    if (millisecondsString.length == 2) milliseconds *= 10L
-                    val position = (minutes * 60 + seconds) * 1000 + milliseconds
-                    val text = result[4]!!.value.trim()
-                    if (text.isNotEmpty()) newLines += LrcLine(position, text)
-                }
-            }
-            val sortLines = newLines.distinctBy { it.position }.sorted()
-            if (sortLines.isNotEmpty()) {
-                val startTime = sortLines.first().position
-                lines = buildList(capacity = 9 + sortLines.size) {
-                    // 插入6个空并均分起始时间
-                    repeat(6) { add(LrcLine(startTime / 6 * it, "")) }
-                    // 插入原歌词
-                    addAll(sortLines)
-                    // 插入永久3个空
-                    repeat(3) { add(LrcLine(Long.MAX_VALUE - it, "")) }
-                }
-            }
-        }
-        catch (_: Throwable) { }
+    fun parseLrcString(source: String) {
+        lines = Parser(source).paddingLyrics
     }
 
     @Composable
@@ -140,10 +158,7 @@ class LyricsLrc : LyricsEngine {
             modifier = Modifier.fillMaxSize()
         ) {
             lines?.let { lines ->
-                itemsIndexed(
-                    items = lines,
-                    key = { _, item -> item.position }
-                ) { index, item ->
+                itemsIndexed(items = lines) { index, item ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -162,24 +177,5 @@ class LyricsLrc : LyricsEngine {
                 }
             }
         }
-    }
-
-    companion object {
-        suspend fun parseLrcPlainText(source: String): String = try {
-            Coroutines.cpu {
-                val pattern = "\\[(\\d{2}):(\\d{2}).(\\d{2,3})](.*)".toRegex()
-                val items = source.split("\\r?\\n".toRegex())
-                buildString {
-                    for (item in items) {
-                        val line = item.trim()
-                        if (line.isEmpty()) continue
-                        val text = pattern.find(line)!!.groups[4]!!.value.trim()
-                        if (text.isNotEmpty()) appendLine(text)
-                    }
-                    if (isNotEmpty()) deleteAt(length - 1)
-                }
-            }
-        }
-        catch (_: Throwable) { "" }
     }
 }

@@ -113,20 +113,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
         }
         when (data) {
             is Data.Success -> {
-                val musicLibrary = app.musicFactory.musicLibrary
-                for (id in data.data.medias) {
-                    val modification = musicLibrary[id]?.modification ?: 0
-                    val info = Coroutines.io {
-                        try {
-                            val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
-                            SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
-                        }
-                        catch (_: Throwable) {
-                            null
-                        }
-                    }
-                    if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)
-                }
+                app.musicFactory.updateMusicLibraryInfo(data.data.medias)
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }
@@ -228,6 +215,16 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     override val title: String = "导入MOD"
 
     @Composable
+    override fun ActionScope.LeftActions() {
+        if (step is Step.Prepare) {
+            Action(
+                icon = Icons.Outlined.Refresh,
+                onClick = { reset() }
+            )
+        }
+    }
+
+    @Composable
     override fun ActionScope.RightActions() {
         when (val currentStep = step) {
             is Step.Initial -> {
@@ -237,10 +234,6 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 )
             }
             is Step.Prepare -> {
-                Action(
-                    icon = Icons.Outlined.Refresh,
-                    onClick = { reset() }
-                )
                 Action(
                     icon = Icons.Outlined.Preview,
                     onClick = { launch { previewMod(currentStep.path) } }

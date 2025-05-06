@@ -1,12 +1,15 @@
 package love.yinlin.common
 
 import love.yinlin.AppModel
+import love.yinlin.platform.app
 import love.yinlin.ui.screen.community.ScreenUserCard
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
+import love.yinlin.ui.screen.music.loader.ScreenNetEaseCloudMusic
 
 class DeepLink(private val model: AppModel) {
     private fun schemeContent(uri: Uri) {
-        model.navigate(ScreenImportMusic.Args(uri.toString()))
+        if (!app.musicFactory.isReady) model.navigate(ScreenImportMusic.Args(uri.toString()))
+        else model.slot.tip.warning("请先停止播放器")
     }
 
     private fun schemeRachel(uri: Uri) {
@@ -23,6 +26,10 @@ class DeepLink(private val model: AppModel) {
         when (uri.scheme) {
             Scheme.Content -> schemeContent(uri)
             Scheme.Rachel -> schemeRachel(uri)
+            Scheme.NetEaseCloud -> {
+                if (!app.musicFactory.isReady) model.navigate(ScreenNetEaseCloudMusic.Args(uri.copy(scheme = Scheme.Https).toString()))
+                else model.slot.tip.warning("请先停止播放器")
+            }
         }
     }
 }

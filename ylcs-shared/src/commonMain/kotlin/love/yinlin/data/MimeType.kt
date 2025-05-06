@@ -4,6 +4,7 @@ object MimeType {
 	const val ANY = "*/*"
 
 	const val TEXT = "text/plain"
+	const val HTML = "text/html"
 
 	const val IMAGE = "image/*"
 	const val JPG = "image/jpeg"

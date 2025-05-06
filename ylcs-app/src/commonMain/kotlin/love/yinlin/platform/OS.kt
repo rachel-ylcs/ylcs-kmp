@@ -82,8 +82,15 @@ object OS {
 			if (SystemFileSystem.sink(path).buffered().use {
 				Coroutines.io { block(it) }
 			}) path else null
-		}
-		catch (_: Throwable) { null }
+		} catch (_: Throwable) { null }
+
+		suspend fun createTempFolder(): Path? = try {
+			Coroutines.io {
+				val path = Path(cachePath, DateEx.CurrentLong.toString())
+				SystemFileSystem.createDirectories(path)
+				path
+			}
+		} catch (_: Throwable) { null }
 	}
 }
 
