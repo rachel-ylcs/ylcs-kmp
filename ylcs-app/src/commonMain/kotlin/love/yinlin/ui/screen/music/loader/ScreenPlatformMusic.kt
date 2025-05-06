@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -21,8 +23,8 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.api.CloudMusic
 import love.yinlin.api.NetEaseCloudAPI
+import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.ThemeValue
@@ -30,6 +32,8 @@ import love.yinlin.common.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.PlatformMusicInfo
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
@@ -37,21 +41,18 @@ import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.input.RachelRadioButton
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
-import love.yinlin.ui.screen.music.audioPath
-import love.yinlin.ui.screen.music.backgroundPath
-import love.yinlin.ui.screen.music.configPath
-import love.yinlin.ui.screen.music.lyricsPath
-import love.yinlin.ui.screen.music.recordPath
+import love.yinlin.ui.screen.music.*
 
 @Composable
-private fun CloudMusicCard(
-    cloudMusic: CloudMusic,
+private fun PlatformMusicInfoCard(
+    info: PlatformMusicInfo,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -60,7 +61,7 @@ private fun CloudMusicCard(
         shadowElevation = ThemeValue.Shadow.Surface
     ) {
         WebImage(
-            uri = cloudMusic.pic,
+            uri = info.pic,
             contentScale = ContentScale.Crop,
             alpha = 0.1f,
             modifier = Modifier.fillMaxSize().zIndex(1f)
@@ -72,25 +73,25 @@ private fun CloudMusicCard(
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             RachelText(
-                text = cloudMusic.name,
+                text = info.name,
                 style = MaterialTheme.typography.labelLarge,
                 icon = Icons.Outlined.MusicNote,
                 color = MaterialTheme.colorScheme.primary
             )
             RachelText(
-                text = "ID: ${cloudMusic.id}",
+                text = "ID: ${info.id}",
                 icon = Icons.Outlined.Badge
             )
             RachelText(
-                text = "演唱: ${cloudMusic.singer}",
+                text = "演唱: ${info.singer}",
                 icon = ExtraIcons.Artist
             )
             RachelText(
-                text = "时长: ${cloudMusic.time}",
+                text = "时长: ${info.time}",
                 icon = Icons.Outlined.Schedule
             )
             Text(
-                text = remember(cloudMusic) { LyricsLrc.Parser(cloudMusic.lyrics).plainText },
+                text = remember(info) { LyricsLrc.Parser(info.lyrics).plainText },
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Clip,
                 modifier = Modifier.fillMaxWidth()
@@ -99,44 +100,79 @@ private fun CloudMusicCard(
     }
 }
 
-@Stable
-class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNetEaseCloudMusic.Args>(model) {
-    @Stable
-    @Serializable
-    data class Args(val deeplink: String?)
+private interface PlatformMusicParser {
+    suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>>
 
-    private var linkState = TextInputState(args.deeplink ?: "")
-    private var items by mutableStateOf(emptyList<CloudMusic>())
-
-    private suspend fun parseLink(link: String) {
-        val result = when {
-            // http://163cn.tv/EElG0jr
-            link.contains("163cn.tv") -> Coroutines.io {
-                when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
-                    is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
-                    is Data.Error -> tmp
-                }
-            }.map { listOf(it) }
-            // https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
-            link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
-                val id = Uri.parse(link)?.params["id"]
-                if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Error()
-            }
-            // https://music.163.com/#/song?textid=1064008&id=504686858
-            link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
-                val id = Uri.parse(link)?.params["id"]
-                if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Error()
-            }.map { listOf(it) }
-            // 504686858
-            else -> Coroutines.io {
-                NetEaseCloudAPI.requestMusic(link)
-            }.map { listOf(it) }
-        }
-        when (result) {
-            is Data.Success -> items = result.data
-            is Data.Error -> slot.tip.warning("解析失败")
+    companion object {
+        fun build(type: PlatformMusicType): PlatformMusicParser = when (type) {
+            PlatformMusicType.QQMusic -> QQMusicParser()
+            PlatformMusicType.NetEaseCloud -> NetEaseCloudParser()
+            PlatformMusicType.Kugou -> KugouParser()
         }
     }
+}
+
+private class QQMusicParser : PlatformMusicParser {
+    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
+        // https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
+        link.contains("c6.y.qq.com") -> Coroutines.io {
+            when (val tmp = QQMusicAPI.requestMusicId(link)) {
+                is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
+                is Data.Error -> tmp
+            }
+        }.map { listOf(it) }
+        // https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
+        link.contains("y.qq.com") && link.contains("songDetail") -> Coroutines.io {
+            QQMusicAPI.requestMusic(link.substringAfterLast("/"))
+        }.map { listOf(it) }
+        // 003yJ3Ba1bDVJc
+        else -> Coroutines.io {
+            QQMusicAPI.requestMusic(link)
+        }.map { listOf(it) }
+    }
+}
+
+private class NetEaseCloudParser : PlatformMusicParser {
+    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
+        // http://163cn.tv/EElG0jr
+        link.contains("163cn.tv") -> Coroutines.io {
+            when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
+                is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
+                is Data.Error -> tmp
+            }
+        }.map { listOf(it) }
+        // https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
+        link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Error()
+        }
+        // https://music.163.com/#/song?textid=1064008&id=504686858
+        link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Error()
+        }.map { listOf(it) }
+        // 504686858
+        else -> Coroutines.io {
+            NetEaseCloudAPI.requestMusic(link)
+        }.map { listOf(it) }
+    }
+}
+
+private class KugouParser : PlatformMusicParser {
+    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> {
+        return Data.Error()
+    }
+}
+
+@Stable
+class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatformMusic.Args>(model) {
+    @Stable
+    @Serializable
+    data class Args(val deeplink: String?, val type: PlatformMusicType)
+
+    private var platformType by mutableStateOf(args.type)
+    private var linkState = TextInputState(args.deeplink ?: "")
+    private var items by mutableStateOf(emptyList<PlatformMusicInfo>())
 
     private suspend fun downloadMusic() {
         try {
@@ -144,16 +180,17 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
             val ids = mutableListOf<String>()
             Coroutines.io {
                 for (item in items) {
-                    // 下载文件
+                    // 下载音频
                     val audioFile = OS.Storage.createTempFile { sink ->
                         app.fileClient.safeDownload(
-                            url = item.mp3Url,
+                            url = item.audioUrl,
                             sink = sink,
                             isCancel = { false },
                             onGetSize = { },
                             onTick = { _, _ -> }
                         )
                     }
+                    // 下载封面
                     val recordFile = OS.Storage.createTempFile { sink ->
                         app.fileClient.safeDownload(
                             url = item.pic,
@@ -167,13 +204,13 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
                     if ((SystemFileSystem.metadataOrNull(audioFile)?.size ?: 0L) <= 1024 * 1024L) continue
                     if ((SystemFileSystem.metadataOrNull(recordFile)?.size ?: 0L) <= 1024 * 10L) continue
                     // 生成目录
-                    val id = "NEC${item.id}"
+                    val id = "${platformType.prefix}${item.id}"
                     val musicPath = Path(OS.Storage.musicPath, id)
                     SystemFileSystem.createDirectories(musicPath)
                     // 写入配置
                     val info = MusicInfo(
                         version = "1.0",
-                        author = "网易云音乐",
+                        author = platformType.description,
                         id = id,
                         name = item.name,
                         singer = item.singer,
@@ -220,7 +257,7 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
         }
     }
 
-    override val title: String = "网易云音乐"
+    override val title: String by derivedStateOf { platformType.description }
 
     @Composable
     override fun ActionScope.LeftActions() {
@@ -238,7 +275,12 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
             icon = Icons.Outlined.Preview,
             enabled = linkState.text.isNotEmpty()
         ) {
-            parseLink(linkState.text)
+            val parser = PlatformMusicParser.build(platformType)
+            val result = parser.parseLink(linkState.text)
+            when (result) {
+                is Data.Success -> items = result.data
+                is Data.Error -> slot.tip.warning("解析失败")
+            }
         }
         ActionSuspend(
             icon = Icons.Outlined.Download,
@@ -254,6 +296,20 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
             modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().selectableGroup(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PlatformMusicType.entries.forEach {
+                    RachelRadioButton(
+                        checked = platformType == it,
+                        text = it.description,
+                        enabled = items.isEmpty(),
+                        onCheck = { platformType = it }
+                    )
+                }
+            }
             TextInput(
                 state = linkState,
                 hint = "ID/链接/歌单",
@@ -270,8 +326,8 @@ class ScreenNetEaseCloudMusic(model: AppModel, args: Args) : SubScreen<ScreenNet
                     items = items,
                     key = { it.id }
                 ) {
-                    CloudMusicCard(
-                        cloudMusic = it,
+                    PlatformMusicInfoCard(
+                        info = it,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                     )
                 }

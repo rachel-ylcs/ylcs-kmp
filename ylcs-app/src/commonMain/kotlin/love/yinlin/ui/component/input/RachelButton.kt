@@ -225,12 +225,14 @@ fun RachelRadioButton(
 	checked: Boolean,
 	text: String,
 	onCheck: () -> Unit,
+	enabled: Boolean = true,
 	modifier: Modifier = Modifier
 ) {
 	Row(
 		modifier = modifier.height(IntrinsicSize.Min).selectable(
 			selected = checked,
 			onClick = onCheck,
+			enabled = enabled,
 			role = Role.RadioButton
 		).padding(ThemeValue.Padding.Value),
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
@@ -238,8 +240,12 @@ fun RachelRadioButton(
 	) {
 		RadioButton(
 			selected = checked,
+			enabled = enabled,
 			onClick = null
 		)
-		Text(text = text)
+		Text(
+			text = text,
+			color = if (enabled) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
+		)
 	}
 }

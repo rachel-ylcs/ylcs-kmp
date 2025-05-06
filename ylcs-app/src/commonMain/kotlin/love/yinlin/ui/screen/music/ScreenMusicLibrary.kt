@@ -33,6 +33,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.common.UriGenerator
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
@@ -48,9 +49,7 @@ import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
-import love.yinlin.ui.screen.music.loader.ScreenKugouMusic
-import love.yinlin.ui.screen.music.loader.ScreenNetEaseCloudMusic
-import love.yinlin.ui.screen.music.loader.ScreenQQMusic
+import love.yinlin.ui.screen.music.loader.ScreenPlatformMusic
 
 @Stable
 data class MusicInfoPreview(
@@ -309,15 +308,15 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                         }
                         ImportMusicItem.FromQQMusic.ordinal -> {
                             pop()
-                            navigate(ScreenQQMusic.Args(null))
+                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
                         }
                         ImportMusicItem.FromNetEaseCloudMusic.ordinal -> {
                             pop()
-                            navigate(ScreenNetEaseCloudMusic.Args(null))
+                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
                         }
                         ImportMusicItem.FromKugouMusic.ordinal -> {
                             pop()
-                            navigate(ScreenKugouMusic.Args(null))
+                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
                         }
                         ImportMusicItem.FromGroup0.ordinal -> {
                             if (!OS.Application.startAppIntent(UriGenerator.qqGroup("836289670"))) slot.tip.warning("未安装QQ")

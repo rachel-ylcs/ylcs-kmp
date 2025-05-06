@@ -1,23 +1,12 @@
 package love.yinlin.api
 
-import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
+import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.lyrics.LyricsLrc
-
-@Stable
-data class CloudMusic(
-    val id: String, // 音乐 ID
-    val name: String, // 名称
-    val singer: String, // 歌手
-    val time: String, // 时长
-    val pic: String, // 封面
-    val lyrics: String, // 歌词
-    val mp3Url: String, // MP3 下载链接
-)
 
 object NetEaseCloudAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
@@ -32,24 +21,24 @@ object NetEaseCloudAPI {
         "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(body.decodeToString())!!.groupValues[1]
     }
 
-    private fun getCloudMusic(json: JsonObject): CloudMusic = CloudMusic(
+    private fun getCloudMusic(json: JsonObject): PlatformMusicInfo = PlatformMusicInfo(
         id = json["id"].String,
         name = json["name"].String,
         singer = json.arr("artists").joinToString(",") { it.Object["name"].String },
         time = json["duration"].Long.timeString,
         pic = json.obj("album")["picUrl"].String,
-        lyrics = "",
-        mp3Url = "https://$NETEASECLOUD_HOST/${Container.mp3(json["id"].String)}"
+        audioUrl = "https://$NETEASECLOUD_HOST/${Container.mp3(json["id"].String)}",
+        lyrics = ""
     )
 
-    suspend fun requestLyrics(id: String): Data<String> = app.client.safeGet(
+    private suspend fun requestLyrics(id: String): Data<String> = app.client.safeGet(
         url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
     ) { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
         LyricsLrc.Parser(text).toString()
     }
 
-    suspend fun requestMusic(id: String): Data<CloudMusic> {
+    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> {
         val result1 = app.client.safeGet(
             url = "https://$NETEASECLOUD_HOST/${Container.detail(id)}"
         ) { json: JsonObject ->
@@ -64,7 +53,7 @@ object NetEaseCloudAPI {
         }
     }
 
-    suspend fun requestPlaylist(id: String): Data<List<CloudMusic>> {
+    suspend fun requestPlaylist(id: String): Data<List<PlatformMusicInfo>> {
         val result1 = app.client.safeGet(
             url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
         ) { json: JsonObject ->
