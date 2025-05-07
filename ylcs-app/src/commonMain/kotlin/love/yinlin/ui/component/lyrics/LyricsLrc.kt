@@ -83,7 +83,7 @@ class LyricsLrc : LyricsEngine {
                 }
                 catch (_: Throwable) { }
             }
-            lines = newLines.distinctBy { it.position }.sorted().ifEmpty { null }
+            lines = newLines.filter { it.position > 100L }.distinctBy { it.position }.sorted().ifEmpty { null }
         }
 
         val ok: Boolean get() = lines != null
@@ -162,7 +162,10 @@ class LyricsLrc : LyricsEngine {
             modifier = Modifier.fillMaxSize()
         ) {
             lines?.let { lines ->
-                itemsIndexed(items = lines) { index, item ->
+                itemsIndexed(
+                    items = lines,
+                    key = { index, item -> item.position }
+                ) { index, item ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
