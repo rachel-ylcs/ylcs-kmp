@@ -56,6 +56,9 @@ abstract class MusicFactory {
         }
     }
 
+    // 悬浮歌词
+    var floatingLyrics: FloatingLyrics? by mutableStateOf(null)
+
     // 当前状态
     abstract val error: Throwable?
     abstract val playMode: MusicPlayMode

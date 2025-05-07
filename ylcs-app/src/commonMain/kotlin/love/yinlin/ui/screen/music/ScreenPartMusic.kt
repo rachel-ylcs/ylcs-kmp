@@ -265,7 +265,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				Text(
 					text = musicInfo?.singer ?: stringResource(Res.string.unknown_singer),
 					color = Colors.White,
-					style = MaterialTheme.typography.bodyLarge,
+					style = MaterialTheme.typography.bodyMedium,
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis
@@ -552,11 +552,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 
 		LaunchedEffect(factory.currentPosition) {
-			lyrics.updateIndex(factory.currentPosition)
+			val newLyricsText = lyrics.updateIndex(factory.currentPosition)
+            factory.floatingLyrics?.updateLyrics(newLyricsText)
 		}
 
 		Box(modifier = modifier) {
-			lyrics.content(
+			lyrics.Content(
 				modifier = Modifier.fillMaxSize(),
 				onLyricsClick = {
 					launch {
@@ -840,7 +841,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			Column(modifier = Modifier.fillMaxSize()) {
 				Row(
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
@@ -853,15 +854,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						icon = Icons.Outlined.StopCircle,
 						onClick = {
 							currentPlaylistSheet.close()
-							launch {
-								factory.stop()
-								app.config.lastPlaylist = ""
-								app.config.lastMusic = ""
-							}
+							launch { factory.stop() }
 						}
 					)
 				}
-				HorizontalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalSpace))
+
+				HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
 
 				val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
 				LazyColumn(

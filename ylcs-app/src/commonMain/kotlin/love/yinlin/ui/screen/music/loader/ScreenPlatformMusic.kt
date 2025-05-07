@@ -130,6 +130,11 @@ private class QQMusicParser : PlatformMusicParser {
             val id = Uri.parse(link)?.params["id"]
             if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Error()
         }
+        // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
+        link.contains("i.y.qq.com") && link.contains("taoge") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Error()
+        }
         // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
         link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
             QQMusicAPI.requestPlaylist(link.substringAfterLast("/"))

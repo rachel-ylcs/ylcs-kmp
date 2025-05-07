@@ -198,11 +198,15 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun Portrait(modifier: Modifier = Modifier) {
 		Column(
 			modifier = modifier,
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			BannerLayout(modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
-			CalendarLayout(modifier = Modifier.widthIn(max = ThemeValue.Size.PanelWidth).fillMaxWidth().padding(ThemeValue.Padding.Value))
+			Box(
+				modifier = Modifier.widthIn(max = ThemeValue.Size.PanelWidth).fillMaxWidth().weight(1f),
+				contentAlignment = Alignment.Center
+			) {
+				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+			}
 		}
 	}
 

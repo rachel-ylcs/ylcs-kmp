@@ -123,11 +123,13 @@ class LyricsLrc : LyricsEngine {
         listState.animateScrollToItem(0)
     }
 
-    fun updateIndex(position: Long) {
-        currentIndex = lines?.let { items ->
+    override fun updateIndex(position: Long): String {
+        val newIndex = lines?.let { items ->
             val index = items.indexOfFirst { it.position > position } - 1
             if (index >= 0) index else -1
         } ?: -1
+        currentIndex = newIndex
+        return lines?.getOrNull(newIndex)?.text ?: ""
     }
 
     fun parseLrcString(source: String) {
@@ -135,7 +137,7 @@ class LyricsLrc : LyricsEngine {
     }
 
     @Composable
-    override fun content(
+    override fun Content(
         modifier: Modifier,
         onLyricsClick: (Long) -> Unit
     ) {

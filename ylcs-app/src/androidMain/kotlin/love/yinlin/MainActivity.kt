@@ -6,18 +6,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
+import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.appNative
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         appNative.activityResultRegistry = activityResultRegistry
-        setContent {
-            AppWrapper {
-                App()
-            }
-        }
+
+        appNative.musicFactory.floatingLyrics = ActualFloatingLyrics(this).apply { attach() }
+
+        setContent { AppWrapper { App() } }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (appNative.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.detach()
+        appNative.musicFactory.floatingLyrics = null
     }
 
     override fun onNewIntent(intent: Intent) {
