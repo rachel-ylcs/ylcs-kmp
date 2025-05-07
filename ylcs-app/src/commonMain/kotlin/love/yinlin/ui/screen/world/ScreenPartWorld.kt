@@ -92,25 +92,27 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun BannerLayout(modifier: Modifier = Modifier) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
 		val isPortrait = LocalDevice.current.type == Device.Type.PORTRAIT
-		Banner(
-			pics = pics,
-			interval = 5000L,
-			gap = if (isPortrait) 0f else 0.3f,
-			modifier = modifier
-		) { pic, index, scale ->
-			Surface(
-				modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-				shape = if (isPortrait) RectangleShape else MaterialTheme.shapes.large,
-				shadowElevation = ThemeValue.Shadow.Surface
-			) {
-				WebImage(
-					uri = pic.picPath ?: "",
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.fillMaxSize(),
-					onClick = {
-						showActivityDetails(pic.aid)
-					}
-				)
+		BoxWithConstraints(modifier = modifier) {
+			Banner(
+				pics = pics,
+				interval = 5000L,
+				gap = if (isPortrait) 0f else 0.3f,
+				modifier = Modifier.condition(isPortrait) { heightIn(min = maxWidth / 2f) }.fillMaxWidth()
+			) { pic, index, scale ->
+				Surface(
+					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+					shape = if (isPortrait) RectangleShape else MaterialTheme.shapes.large,
+					shadowElevation = ThemeValue.Shadow.Surface
+				) {
+					WebImage(
+						uri = pic.picPath ?: "",
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.fillMaxSize(),
+						onClick = {
+							showActivityDetails(pic.aid)
+						}
+					)
+				}
 			}
 		}
 	}
