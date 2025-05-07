@@ -764,6 +764,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			Device.Type.SQUARE -> Square()
 			Device.Type.LANDSCAPE -> Landscape()
 		}
+
+		LaunchedEffect(factory.error) {
+			factory.error?.let { slot.tip.error(it.message) }
+		}
 	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
