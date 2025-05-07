@@ -674,7 +674,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 			Box(
-				modifier = Modifier.fillMaxHeight().aspectRatio(0.5625f),
+				modifier = Modifier.fillMaxHeight().aspectRatio(0.6f),
 				contentAlignment = Alignment.Center
 			) {
 				MusicBackground(
@@ -746,7 +746,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 			Box(
-				modifier = Modifier.fillMaxHeight().aspectRatio(0.5625f),
+				modifier = Modifier.fillMaxHeight().aspectRatio(0.65f),
 				contentAlignment = Alignment.Center
 			) {
 				MusicBackground(
