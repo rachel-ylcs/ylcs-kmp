@@ -22,8 +22,9 @@ import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
 class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
-	private val cropDialog = FloatingDialogCrop()
 	private val input = ActivityInputState()
+
+	private val cropDialog = FloatingDialogCrop()
 
 	private suspend fun addActivity() {
 		val activity = Activity(
@@ -46,7 +47,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 				activity = activity
 			),
 			files = { API.User.Activity.AddActivity.Files(
-				pic = file(input.pic?.let { SystemFileSystem.source(Path(it.image)) }) ,
+				pic = file(input.pic?.let { SystemFileSystem.source(Path(it)) }) ,
 				pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
 			) }
 		)
@@ -81,7 +82,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 		ActivityInfoLayout(
 			cropDialog = cropDialog,
 			input = input,
-			onPicAdd = { input.pic = Picture(it.toString()) },
+			onPicAdd = { input.pic = it.toString() },
 			onPicDelete = { input.pic = null },
 			onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
 			onPicsDelete = { input.pics.removeAt(it) },

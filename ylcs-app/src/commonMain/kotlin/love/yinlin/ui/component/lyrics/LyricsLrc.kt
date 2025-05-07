@@ -86,6 +86,8 @@ class LyricsLrc : LyricsEngine {
             lines = newLines.distinctBy { it.position }.sorted().ifEmpty { null }
         }
 
+        val ok: Boolean get() = lines != null
+
         val paddingLyrics: List<LrcLine>? get() = lines?.let { items ->
             val startTime = items.first().position
             buildList(capacity = 9 + items.size) {

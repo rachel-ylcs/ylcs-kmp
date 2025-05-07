@@ -189,7 +189,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
             val ids = mutableListOf<String>()
             Coroutines.io {
                 for (item in items) {
-                    // 下载音频
+                    // 1. 下载音频
                     val audioFile = OS.Storage.createTempFile { sink ->
                         app.fileClient.safeDownload(
                             url = item.audioUrl,
@@ -199,7 +199,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                             onTick = { _, _ -> }
                         )
                     }
-                    // 下载封面
+                    // 2. 下载封面
                     val recordFile = OS.Storage.createTempFile { sink ->
                         app.fileClient.safeDownload(
                             url = item.pic,
@@ -212,11 +212,11 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                     if (audioFile == null || recordFile == null) continue
                     if ((SystemFileSystem.metadataOrNull(audioFile)?.size ?: 0L) <= 1024 * 1024L) continue
                     if ((SystemFileSystem.metadataOrNull(recordFile)?.size ?: 0L) <= 1024 * 10L) continue
-                    // 生成目录
+                    // 3. 生成目录
                     val id = "${platformType.prefix}${item.id}"
                     val musicPath = Path(OS.Storage.musicPath, id)
                     SystemFileSystem.createDirectories(musicPath)
-                    // 写入配置
+                    // 4. 写入配置
                     val info = MusicInfo(
                         version = "1.0",
                         author = platformType.description,
@@ -231,26 +231,27 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                     SystemFileSystem.sink(info.configPath).buffered().use { sink ->
                         sink.writeText(info.toJsonString())
                     }
-                    // 写入音频
+                    // 5. 写入音频
                     SystemFileSystem.sink(info.audioPath).buffered().use { sink ->
                         SystemFileSystem.source(audioFile).buffered().use { source ->
                             source.transferTo(sink)
                         }
                     }
-                    // 写入封面
+                    // 6. 写入封面
                     SystemFileSystem.sink(info.recordPath).buffered().use { sink ->
                         SystemFileSystem.source(recordFile).buffered().use { source ->
                             source.transferTo(sink)
                         }
                     }
-                    // 写入壁纸
+                    // 7. 写入壁纸
                     SystemFileSystem.sink(info.backgroundPath).buffered().use { sink ->
                         sink.write(Res.readBytes("files/black_background.webp"))
                     }
-                    // 写入歌词
+                    // 8. 写入歌词
                     SystemFileSystem.sink(info.lyricsPath).buffered().use { sink ->
                         sink.writeText(item.lyrics)
                     }
+                    // 9. 更新曲库
                     ids += id
                 }
             }

@@ -1,18 +1,13 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
@@ -22,23 +17,16 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.ImageCompress
-import love.yinlin.platform.ImageCrop
-import love.yinlin.platform.ImageProcessor
-import love.yinlin.platform.ImageQuality
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.platform.*
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.input.DockedDatePicker
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 
 @Stable
-class ActivityInputState(initActivity: Activity? = null) {
+internal class ActivityInputState(initActivity: Activity? = null) {
     val initDate = initActivity?.ts?.let { DateEx.Formatter.standardDate.parse(it) }
 
     internal val title = TextInputState(initActivity?.title ?: "")
@@ -48,7 +36,7 @@ class ActivityInputState(initActivity: Activity? = null) {
     internal val damai = TextInputState(initActivity?.damai ?: "")
     internal val maoyan = TextInputState(initActivity?.maoyan ?: "")
     internal val link = TextInputState(initActivity?.link ?: "")
-    internal var pic: Picture? by mutableStateOf(initActivity?.picPath?.let { Picture(it) })
+    internal var pic: String? by mutableStateOf(initActivity?.picPath)
     internal val pics = initActivity?.let {
         it.pics.map { name -> Picture(it.picPath(name)) }.toMutableStateList()
     } ?: mutableStateListOf()
@@ -99,7 +87,7 @@ class ActivityInputState(initActivity: Activity? = null) {
 }
 
 @Composable
-fun ActivityInfoLayout(
+internal fun ActivityInfoLayout(
     cropDialog: FloatingDialogCrop,
     input: ActivityInputState,
     onPicAdd: (Path) -> Unit,
@@ -163,35 +151,15 @@ fun ActivityInfoLayout(
             text = "轮播图(可空)",
             style = MaterialTheme.typography.titleMedium
         )
-        val pic = input.pic
-        if (pic == null) {
-            Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)
-                .clickable(onClick = { scope.launch { input.pickPicture(cropDialog, onPicAdd) } })
-            ) {
-                EmptyBox()
-            }
-        }
-        else {
-            Box(
-                modifier = Modifier.fillMaxWidth().aspectRatio(2f),
-                contentAlignment = Alignment.Center
-            ) {
-                ClickIcon(
-                    icon = Icons.Outlined.Cancel,
-                    color = MaterialTheme.colorScheme.error,
-                    size = ThemeValue.Size.ExtraIcon,
-                    modifier = Modifier.padding(ThemeValue.Padding.EqualValue)
-                        .align(Alignment.TopEnd).zIndex(2f),
-                    onClick = { onPicDelete() }
-                )
-                WebImage(
-                    uri = pic.image,
-                    modifier = Modifier.fillMaxSize().zIndex(1f),
-                    contentScale = ContentScale.Crop,
-                    onClick = { scope.launch { input.pickPicture(cropDialog, onPicAdd) } }
-                )
-            }
-        }
+        ReplaceableImage(
+            uri = input.pic,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxWidth().aspectRatio(2f),
+            onReplace = {
+                scope.launch { input.pickPicture(cropDialog, onPicAdd) }
+            },
+            onDelete = onPicDelete
+        )
         Text(
             text = "活动海报",
             style = MaterialTheme.typography.titleMedium

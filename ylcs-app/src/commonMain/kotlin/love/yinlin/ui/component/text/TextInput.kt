@@ -41,6 +41,7 @@ fun TextInput(
 	state: TextInputState,
 	hint: String,
 	inputType: InputType = InputType.COMMON,
+	readOnly: Boolean = false,
 	maxLength: Int = 0,
 	maxLines: Int = 1,
 	clearButton: Boolean = true,
@@ -69,6 +70,7 @@ fun TextInput(
 				)
 			}
 		} else null,
+		readOnly = readOnly,
 		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
 		keyboardOptions = remember(inputType) { inputType.toKeyboardOptions },
 		singleLine = maxLines.coerceAtLeast(1) == 1,

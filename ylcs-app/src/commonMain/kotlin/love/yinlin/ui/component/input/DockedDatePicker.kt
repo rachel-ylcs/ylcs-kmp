@@ -68,12 +68,7 @@ fun DockedDatePicker(
 		OutlinedTextField(
 			value = text,
 			onValueChange = { },
-			label = {
-				Text(
-					text = hint,
-					style = MaterialTheme.typography.titleMedium
-				)
-			},
+			label = { Text(text = hint, style = MaterialTheme.typography.titleMedium) },
 			readOnly = true,
 			trailingIcon = {
 				Row(

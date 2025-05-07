@@ -29,9 +29,9 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 	data class Args(val aid: Int)
 
 	private val activities = worldPart.activities
+	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
 	private val cropDialog = FloatingDialogCrop()
-	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
 	private suspend fun modifyActivity() {
 		val ts = input.ts
@@ -93,7 +93,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 		when (result) {
 			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPic = result.data
-				input.pic = Picture(it.picPath(newPic))
+				input.pic = it.picPath(newPic)
 				it.copy(pic = newPic)
 			}
 			is Data.Error -> slot.tip.error(result.message)
