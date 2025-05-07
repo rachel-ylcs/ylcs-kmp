@@ -849,7 +849,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						icon = Icons.Outlined.StopCircle,
 						onClick = {
 							currentPlaylistSheet.close()
-							launch { factory.stop() }
+							launch {
+								factory.stop()
+								app.config.lastPlaylist = ""
+								app.config.lastMusic = ""
+							}
 						}
 					)
 				}
