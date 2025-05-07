@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.DateTimeUnit
@@ -90,16 +91,16 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun BannerLayout(modifier: Modifier = Modifier) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
-
+		val isPortrait = LocalDevice.current.type == Device.Type.PORTRAIT
 		Banner(
 			pics = pics,
 			interval = 5000L,
-			gap = if (LocalDevice.current.type == Device.Type.PORTRAIT) 0.15f else 0.3f,
+			gap = if (isPortrait) 0f else 0.3f,
 			modifier = modifier
 		) { pic, index, scale ->
 			Surface(
 				modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-				shape = MaterialTheme.shapes.large,
+				shape = if (isPortrait) RectangleShape else MaterialTheme.shapes.large,
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				WebImage(

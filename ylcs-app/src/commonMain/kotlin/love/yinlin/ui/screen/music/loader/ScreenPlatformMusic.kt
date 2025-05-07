@@ -114,18 +114,27 @@ private interface PlatformMusicParser {
 
 private class QQMusicParser : PlatformMusicParser {
     override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
-        // https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
+        // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
         link.contains("c6.y.qq.com") -> Coroutines.io {
             when (val tmp = QQMusicAPI.requestMusicId(link)) {
                 is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
                 is Data.Error -> tmp
             }
         }.map { listOf(it) }
-        // https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
+        // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
         link.contains("y.qq.com") && link.contains("songDetail") -> Coroutines.io {
             QQMusicAPI.requestMusic(link.substringAfterLast("/"))
         }.map { listOf(it) }
-        // 003yJ3Ba1bDVJc
+        // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
+        link.contains("i2.y.qq.com") && link.contains("playlist") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Error()
+        }
+        // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
+        link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
+            QQMusicAPI.requestPlaylist(link.substringAfterLast("/"))
+        }
+        // 歌曲 003yJ3Ba1bDVJc
         else -> Coroutines.io {
             QQMusicAPI.requestMusic(link)
         }.map { listOf(it) }
@@ -134,24 +143,24 @@ private class QQMusicParser : PlatformMusicParser {
 
 private class NetEaseCloudParser : PlatformMusicParser {
     override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
-        // http://163cn.tv/EElG0jr
+        // 歌曲 http://163cn.tv/EElG0jr
         link.contains("163cn.tv") -> Coroutines.io {
             when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
                 is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
                 is Data.Error -> tmp
             }
         }.map { listOf(it) }
-        // https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
+        // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
         link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
             if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Error()
         }
-        // https://music.163.com/#/song?textid=1064008&id=504686858
+        // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
         link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
             if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Error()
         }.map { listOf(it) }
-        // 504686858
+        // 歌曲 504686858
         else -> Coroutines.io {
             NetEaseCloudAPI.requestMusic(link)
         }.map { listOf(it) }

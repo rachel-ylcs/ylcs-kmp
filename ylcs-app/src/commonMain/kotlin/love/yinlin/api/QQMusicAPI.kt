@@ -1,5 +1,6 @@
 package love.yinlin.api
 
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
@@ -20,7 +21,7 @@ import love.yinlin.ui.component.lyrics.LyricsLrc
 import kotlin.io.encoding.Base64
 
 object QQMusicAPI {
-    private inline fun buildUrl(url: String, data: JsonObjectScope.() -> Unit): String = "$url?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
+    private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, body: ByteArray): List<JsonObject> {
         val json = body.decodeToString().parseJson.Object
@@ -35,7 +36,7 @@ object QQMusicAPI {
         "\"mid\":\\s*\"([^\"]*)".toRegex().find(body.decodeToString())!!.groupValues[1]
     }
 
-    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> = app.client.safeGet(buildUrl("https://u.y.qq.com/cgi-bin/musicu.fcg") {
+    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> = app.client.safeGet(buildUrl {
         obj("req_0") {
             "module" with "music.pf_song_detail_svr"
             "method" with "get_song_detail_yqq"
@@ -44,9 +45,7 @@ object QQMusicAPI {
         obj("req_1") {
             "module" with "music.musichallSong.PlayLyricInfo"
             "method" with "GetPlayLyricInfo"
-            obj("param") {
-                "songMID" with id
-            }
+            obj("param") { "songMID" with id }
         }
         obj("req_2") {
             "module" with "vkey.GetVkeyServer"
@@ -72,5 +71,34 @@ object QQMusicAPI {
             audioUrl = "https://ws.stream.qqmusic.qq.com/${midUrlInfo["purl"].String}",
             lyrics = LyricsLrc.Parser(Base64.decode(lyricsBase64).decodeToString()).toString()
         )
+    }
+
+    suspend fun requestPlaylist(id: String): Data<List<PlatformMusicInfo>> {
+        val result1 = app.client.safeGet(buildUrl {
+            obj("req_0") {
+                "module" with "music.srfDissInfo.aiDissInfo"
+                "method" with "uniform_get_Dissinfo"
+                obj("param") {
+                    "disstid" with (id.toLongOrNull() ?: 0L)
+                    "orderlist" with 1
+                    "song_begin" with 0
+                    "song_num" with 1000
+                }
+            }
+        }) { body: ByteArray ->
+            val (json) = decodeData(1, body)
+            json.arr("songlist").map { it.Object["mid"].String }
+        }
+        return when (result1) {
+            is Data.Success -> {
+                val items = mutableListOf<PlatformMusicInfo>()
+                for (mid in result1.data) {
+                    val result2 = requestMusic(mid)
+                    if (result2 is Data.Success) items += result2.data
+                }
+                if (items.isEmpty()) Data.Error() else Data.Success(items)
+            }
+            is Data.Error -> result1
+        }
     }
 }

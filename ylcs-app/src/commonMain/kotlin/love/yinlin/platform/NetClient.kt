@@ -70,11 +70,15 @@ suspend inline fun <R> HttpClient.safeCall(
 
 suspend inline fun <reified T, R> HttpClient.safeGet(
 	url: String,
+	crossinline headers: HeadersBuilder.() -> Unit = {},
 	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
 	client.prepareGet(url) {
-		header(HttpHeaders.ContentType, ContentType.Text.Plain)
-		header(HttpHeaders.Accept, MimeType.ANY)
+		this.headers {
+			append(HttpHeaders.ContentType, ContentType.Text.Plain)
+			append(HttpHeaders.Accept, MimeType.ANY)
+			headers()
+		}
 	}.execute { response ->
 		val data = response.body<T>()
 		Coroutines.main { block(data) }
@@ -84,10 +88,14 @@ suspend inline fun <reified T, R> HttpClient.safeGet(
 suspend inline fun <reified U, reified T, R> HttpClient.safePost(
 	url: String,
 	data: U,
+	crossinline headers: HeadersBuilder.() -> Unit = {},
 	crossinline block: suspend (T) -> R
 ): Data<R> = this.safeCall { client ->
 	client.preparePost(url) {
-		header(HttpHeaders.Accept, MimeType.ANY)
+		this.headers {
+			append(HttpHeaders.Accept, MimeType.ANY)
+			headers()
+		}
 		setBody(data)
 	}.execute { response ->
 		val data = response.body<T>()
@@ -100,6 +108,7 @@ const val TRANSFER_BUFFER_SIZE = 1024 * 64L
 suspend inline fun HttpClient.safeDownload(
 	url: String,
 	sink: Sink,
+	crossinline headers: HeadersBuilder.() -> Unit = {},
 	crossinline isCancel: suspend () -> Boolean,
 	crossinline onGetSize: suspend (Long) -> Unit,
 	crossinline onTick: suspend (Long, Long) -> Unit,
@@ -107,7 +116,10 @@ suspend inline fun HttpClient.safeDownload(
 	var downloadedBytes = 0L
 	var totalBytes = 0L
 	client.prepareGet(url) {
-		header(HttpHeaders.Accept, MimeType.ANY)
+		this.headers {
+			append(HttpHeaders.Accept, MimeType.ANY)
+			headers()
+		}
 		onDownload { current, total ->
 			if (isCancel()) throw CancellationException()
 			if (current - downloadedBytes > TRANSFER_BUFFER_SIZE) {
