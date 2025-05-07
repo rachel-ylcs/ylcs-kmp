@@ -64,13 +64,13 @@ class LyricsLrc : LyricsEngine {
         private var lines: List<LrcLine>? = null
 
         init {
-            try {
-                val newLines = mutableListOf<LrcLine>()
-                val pattern = "\\[(\\d{2}):(\\d{2}).(\\d{2,3})](.*)".toRegex()
-                val items = source.split("\\r?\\n".toRegex())
-                for (item in items) {
-                    val line = item.trim()
-                    if (line.isEmpty()) continue
+            val newLines = mutableListOf<LrcLine>()
+            val pattern = "\\[(\\d{2}):(\\d{2})\\.(\\d{2,3})](.*)".toRegex()
+            val items = source.split("\\r?\\n".toRegex())
+            for (item in items) {
+                val line = item.trim()
+                if (line.isEmpty()) continue
+                try {
                     val result = pattern.find(line)!!.groups
                     val minutes = result[1]!!.value.toLong()
                     val seconds = result[2]!!.value.toLong()
@@ -81,9 +81,9 @@ class LyricsLrc : LyricsEngine {
                     val text = result[4]!!.value.trim()
                     if (text.isNotEmpty()) newLines += LrcLine(position, text)
                 }
-                lines = newLines.distinctBy { it.position }.sorted().ifEmpty { null }
+                catch (_: Throwable) { }
             }
-            catch (_: Throwable) {}
+            lines = newLines.distinctBy { it.position }.sorted().ifEmpty { null }
         }
 
         val paddingLyrics: List<LrcLine>? get() = lines?.let { items ->
