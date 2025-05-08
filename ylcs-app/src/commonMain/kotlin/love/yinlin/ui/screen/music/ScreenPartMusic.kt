@@ -552,13 +552,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (musicInfo == null) exitSleepMode()
 		}
 
-		LaunchedEffect(factory.currentPosition) {
-			val newLyricsText = lyrics.updateIndex(factory.currentPosition)
-			factory.floatingLyrics?.let {
-				if (it.isAttached) it.updateLyrics(newLyricsText)
-			}
-		}
-
 		Box(modifier = modifier) {
 			lyrics.Content(
 				modifier = Modifier.fillMaxSize(),
@@ -579,7 +572,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				delay(1000L)
 				sleepRemainSeconds -= 1
 			}
-			app.musicFactory.stop()
+			factory.stop()
 			sleepJob = null
 		}
 	}
@@ -768,6 +761,15 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					modifier = Modifier.fillMaxSize()
 				)
 				LyricsLayout(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.7f).padding(immersivePadding.withoutStart))
+			}
+		}
+	}
+
+	override suspend fun initialize() {
+		snapshotFlow { factory.currentPosition }.collect {
+			val newLine = lyrics.updateIndex(factory.currentPosition)
+			factory.floatingLyrics?.let {
+				if (it.isAttached) it.updateLyrics(newLine)
 			}
 		}
 	}
