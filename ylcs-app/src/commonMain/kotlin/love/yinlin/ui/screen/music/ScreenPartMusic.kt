@@ -857,7 +857,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 			Column(modifier = Modifier.fillMaxSize()) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+					modifier = Modifier.fillMaxWidth().padding(
+						horizontal = ThemeValue.Padding.HorizontalExtraSpace,
+						vertical = ThemeValue.Padding.VerticalSpace
+					),
 					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
