@@ -83,14 +83,15 @@ private fun PlayingMusicStatusCard(
 			color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.Unspecified,
 			maxLines = 1,
 			overflow = TextOverflow.MiddleEllipsis,
-			modifier = Modifier.weight(1f)
+			modifier = Modifier.weight(3f)
 		)
 		Text(
 			text = musicInfo.singer,
 			style = MaterialTheme.typography.bodySmall,
 			maxLines = 1,
 			overflow = TextOverflow.MiddleEllipsis,
-			color = MaterialTheme.colorScheme.onSurfaceVariant
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			modifier = Modifier.weight(2f)
 		)
 	}
 }

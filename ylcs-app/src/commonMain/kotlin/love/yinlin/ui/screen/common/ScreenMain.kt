@@ -21,6 +21,7 @@ import love.yinlin.common.ImmersivePadding
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.LaunchOnce
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
@@ -152,7 +153,7 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 					part.Content()
 				}
 
-				LaunchedEffect(part.firstLoad) {
+				LaunchOnce(part.firstLoad) {
 					launch { part.initialize() }
 				}
 			}
