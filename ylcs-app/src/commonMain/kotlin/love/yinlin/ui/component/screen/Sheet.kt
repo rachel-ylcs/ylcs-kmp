@@ -69,14 +69,14 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
 
     @Composable
     private fun PortraitWrapperContent(block: @Composable () -> Unit) {
-        BoxWithConstraints(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth()) {
+        BoxWithConstraints(modifier = Modifier.padding(LocalImmersivePadding.current.withoutTop).fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()
                 .then(Modifier.heightIn(maxHeight * config.min, maxHeight * config.max))
                 .then(if (config.full) Modifier.fillMaxHeight() else Modifier)
             ) {
                 // DragHandler
                 Surface(
-                    modifier = Modifier.padding(vertical = ThemeValue.Padding.EqualSpace).align(Alignment.CenterHorizontally),
+                    modifier = Modifier.padding(vertical = ThemeValue.Padding.EqualExtraSpace).align(Alignment.CenterHorizontally),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
@@ -132,10 +132,10 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
 
     @Composable
     private fun LandscapeWrapperContent(block: @Composable () -> Unit) {
-        Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+        Row(modifier = Modifier.padding(LocalImmersivePadding.current.withoutStart).fillMaxSize()) {
             // DragHandler
             Surface(
-                modifier = Modifier.padding(horizontal = ThemeValue.Padding.EqualSpace).align(Alignment.CenterVertically),
+                modifier = Modifier.padding(horizontal = ThemeValue.Padding.EqualExtraSpace).align(Alignment.CenterVertically),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
