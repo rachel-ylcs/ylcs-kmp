@@ -149,10 +149,7 @@ ELSE()
         aes/openssl/openssl_aesv8-armx.S)
 ENDIF()
 
-target_include_directories(mmkv PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${JNI_INCLUDE_DIRS}
-)
+target_include_directories(mmkv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${JNI_INCLUDE_DIRS})
 
 IF (WIN32)
     # MMKV can be used only with Unicode on Windows.
