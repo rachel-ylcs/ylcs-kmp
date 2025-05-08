@@ -12,6 +12,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -296,7 +297,10 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Portrait() {
 		Column(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.padding(ThemeValue.Padding.EqualValue),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
@@ -311,7 +315,10 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Landscape() {
 		Row(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.padding(ThemeValue.Padding.EqualValue),
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {

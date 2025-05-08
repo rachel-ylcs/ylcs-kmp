@@ -23,6 +23,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
@@ -188,7 +189,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	override fun SubContent(device: Device) {
 		StatefulBox(
 			state = state,
-			modifier = Modifier.fillMaxSize()
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
 		) {
 			PaginationGrid(
 				items = page.items,

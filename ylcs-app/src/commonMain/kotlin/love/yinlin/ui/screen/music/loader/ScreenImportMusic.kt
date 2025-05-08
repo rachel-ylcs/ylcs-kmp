@@ -22,6 +22,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
@@ -254,7 +255,9 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     @Composable
     override fun SubContent(device: Device) {
-        Box(modifier = Modifier.fillMaxSize()
+        Box(modifier = Modifier
+            .padding(LocalImmersivePadding.current)
+            .fillMaxSize()
             .padding(ThemeValue.Padding.EqualExtraValue)
             .dragAndDrop(
                 enabled = step is Step.Initial || step is Step.Prepare,

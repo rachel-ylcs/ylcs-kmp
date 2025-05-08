@@ -22,6 +22,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
@@ -235,12 +236,14 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
+			val immersivePadding = LocalImmersivePadding.current
+
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					TabBar(
@@ -262,7 +265,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 
 			StatefulBox(
 				state = state,
-				modifier = Modifier.fillMaxWidth().weight(1f)
+				modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)
 			) {
 				PaginationStaggeredGrid(
 					items = page.items,

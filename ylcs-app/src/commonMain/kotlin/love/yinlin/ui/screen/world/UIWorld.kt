@@ -13,6 +13,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -98,9 +99,11 @@ internal fun ActivityInfoLayout(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)
-            .verticalScroll(rememberScrollState()),
+    Column(modifier = Modifier
+        .padding(LocalImmersivePadding.current)
+        .fillMaxSize()
+        .padding(ThemeValue.Padding.EqualValue)
+        .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
     ) {
         TextInput(

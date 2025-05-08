@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
@@ -73,7 +74,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Portrait(weibo: Weibo) {
 		LazyColumn(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue),
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.padding(ThemeValue.Padding.EqualExtraValue),
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
 			item(key = "WeiboLayout".itemKey) {
@@ -95,7 +99,12 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun Landscape(weibo: Weibo) {
-		Row(modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue)) {
+		Row(
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.padding(ThemeValue.Padding.EqualExtraValue)
+		) {
 			Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				WeiboLayout(weibo = weibo)
 			}

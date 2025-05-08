@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.condition
@@ -104,7 +105,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 			pageCount = { previews.size }
 		)
 		Column(
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			HorizontalPager(
@@ -134,7 +135,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 
 	@Composable
 	private fun Landscape() {
-		Row(modifier = Modifier.fillMaxSize()) {
+		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			val state = rememberLazyListState(current)
 			LazyColumn(
 				modifier = Modifier.width(ThemeValue.Size.LargeImage).fillMaxHeight(),

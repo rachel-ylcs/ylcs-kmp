@@ -15,6 +15,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -125,7 +126,10 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     override fun SubContent(device: Device) {
         app.config.userProfile?.let { profile ->
             Column(
-                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier
+                    .padding(LocalImmersivePadding.current)
+                    .fillMaxSize()
+                    .padding(ThemeValue.Padding.EqualValue)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {

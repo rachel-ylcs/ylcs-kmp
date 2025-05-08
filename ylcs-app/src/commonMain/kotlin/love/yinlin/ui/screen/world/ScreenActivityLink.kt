@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
@@ -45,7 +46,11 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
             },
             ifFalse = {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.Value).verticalScroll(rememberScrollState()),
+                    modifier = Modifier
+                        .padding(LocalImmersivePadding.current)
+                        .fillMaxSize()
+                        .padding(ThemeValue.Padding.Value)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace),
                 ) {

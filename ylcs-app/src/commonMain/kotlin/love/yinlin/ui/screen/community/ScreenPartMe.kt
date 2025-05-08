@@ -36,6 +36,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
@@ -230,7 +231,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun Landscape(userProfile: UserProfile) {
-		Row(modifier = Modifier.fillMaxSize()) {
+		Row(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
 			UserProfileCard(
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true,
@@ -264,7 +265,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		val userProfile = app.config.userProfile
-		if (userProfile == null) LoginBox(Modifier.fillMaxSize())
+		if (userProfile == null) LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
 		else {
 			when (LocalDevice.current.type) {
 				Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)

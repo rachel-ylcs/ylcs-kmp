@@ -21,6 +21,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboAlbum
@@ -174,7 +175,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		albums: List<WeiboAlbum>?,
 		grid: WeiboGridData
 	) {
-		LazyColumn(modifier = Modifier.fillMaxSize()) {
+		LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			item(key = "UserInfoCard".itemKey) {
 				WebImage(
 					uri = user.background,
@@ -230,7 +231,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		albums: List<WeiboAlbum>?,
 		grid: WeiboGridData
 	) {
-		Row(modifier = Modifier.fillMaxSize()) {
+		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			Surface(
 				modifier = Modifier.width(ThemeValue.Size.CardWidth).fillMaxHeight(),
 				shadowElevation = ThemeValue.Shadow.Surface

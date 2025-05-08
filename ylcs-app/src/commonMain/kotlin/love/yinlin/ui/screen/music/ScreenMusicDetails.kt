@@ -29,6 +29,7 @@ import love.yinlin.AppModel
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
@@ -554,7 +555,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Composable
     private fun Portrait() {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().verticalScroll(rememberScrollState())) {
             MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
             MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
             MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
@@ -563,7 +564,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Composable
     private fun Landscape() {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
                 MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
                 MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))

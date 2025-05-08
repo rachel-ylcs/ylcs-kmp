@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.DateTimeUnit
@@ -26,6 +27,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.activity.Activity
@@ -71,7 +73,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+				modifier = Modifier
+					.padding(LocalImmersivePadding.current.withoutBottom)
+					.fillMaxWidth()
+					.padding(vertical = ThemeValue.Padding.VerticalSpace),
 				horizontalArrangement = Arrangement.End,
 			) {
 				ActionScope.Right.Actions {
@@ -89,19 +94,23 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun BannerLayout(modifier: Modifier = Modifier) {
+	private fun BannerLayout(
+		gap: Float,
+		shape: Shape,
+		heightConstraint: Boolean,
+		modifier: Modifier = Modifier
+	) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
-		val isPortrait = LocalDevice.current.type == Device.Type.PORTRAIT
 		BoxWithConstraints(modifier = modifier) {
 			Banner(
 				pics = pics,
 				interval = 5000L,
-				gap = if (isPortrait) 0f else 0.3f,
-				modifier = Modifier.condition(isPortrait) { heightIn(min = maxWidth / 2f) }.fillMaxWidth()
+				gap = gap,
+				modifier = Modifier.condition(heightConstraint) { heightIn(min = maxWidth / 2f) }.fillMaxWidth()
 			) { pic, index, scale ->
 				Surface(
 					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-					shape = if (isPortrait) RectangleShape else MaterialTheme.shapes.large,
+					shape = shape,
 					shadowElevation = ThemeValue.Shadow.Surface
 				) {
 					WebImage(
@@ -202,7 +211,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			BannerLayout(modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
+			BannerLayout(
+				gap = 0f,
+				shape = RectangleShape,
+				heightConstraint = true,
+				modifier = Modifier.fillMaxWidth()
+			)
 			Box(
 				modifier = Modifier.widthIn(max = ThemeValue.Size.PanelWidth).fillMaxWidth().weight(1f),
 				contentAlignment = Alignment.Center
@@ -219,7 +233,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			item(key = "Banner".itemKey) {
-				BannerLayout(modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
+				BannerLayout(
+					gap = 0.3f,
+					shape = MaterialTheme.shapes.large,
+					heightConstraint = false,
+					modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace)
+				)
 			}
 			items(
 				items = activities,
@@ -248,8 +267,16 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			ToolBar(modifier = Modifier.fillMaxWidth())
 			when (LocalDevice.current.type) {
-				Device.Type.PORTRAIT -> Portrait(modifier = Modifier.fillMaxWidth().weight(1f))
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(modifier = Modifier.fillMaxWidth().weight(1f))
+				Device.Type.PORTRAIT -> Portrait(modifier = Modifier
+					.fillMaxWidth()
+					.weight(1f)
+					.padding(LocalImmersivePadding.current.withoutTop)
+				)
+				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(modifier = Modifier
+					.fillMaxWidth()
+					.weight(1f)
+					.padding(LocalImmersivePadding.current.withoutTop)
+				)
 			}
 		}
 	}

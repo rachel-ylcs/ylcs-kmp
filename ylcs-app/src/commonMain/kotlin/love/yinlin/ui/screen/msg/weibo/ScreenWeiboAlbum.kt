@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -92,7 +93,10 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 	@Composable
 	override fun SubContent(device: Device) {
 		Column(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.Value),
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.padding(ThemeValue.Padding.Value),
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
 		) {
 			val data = caches[current]

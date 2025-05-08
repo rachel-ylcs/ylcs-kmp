@@ -42,6 +42,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -596,7 +597,10 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					.hazeSource(state = blurState)
 					.zIndex(1f)
 			)
-			Column(modifier = Modifier.fillMaxSize().zIndex(2f)) {
+			Column(modifier = Modifier.fillMaxSize()
+				.padding(LocalImmersivePadding.current.withoutBottom)
+				.zIndex(2f)
+			) {
 				ToolLayout(modifier = Modifier
 					.fillMaxWidth()
 					.padding(ThemeValue.Padding.EqualValue)
@@ -629,6 +633,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Square() {
 		Row(modifier = Modifier.fillMaxSize().background(Colors.Black)) {
+			val immersivePadding = LocalImmersivePadding.current
+
 			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
 				MusicBackground(
 					alpha = 0.3f,
@@ -637,7 +643,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						.zIndex(1f)
 				)
 				Column(
-					modifier = Modifier.fillMaxSize().zIndex(2f),
+					modifier = Modifier.fillMaxSize()
+						.padding(immersivePadding.withoutEnd)
+						.zIndex(2f),
 					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 				) {
 					ToolLayout(modifier = Modifier
@@ -681,7 +689,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					alpha = 0.7f,
 					modifier = Modifier.fillMaxSize()
 				)
-				LyricsLayout(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.7f))
+				LyricsLayout(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.7f).padding(immersivePadding.withoutStart))
 			}
 		}
 	}
@@ -689,6 +697,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Landscape() {
 		Row(modifier = Modifier.fillMaxSize().background(Colors.Black)) {
+			val immersivePadding = LocalImmersivePadding.current
+
 			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
 				MusicBackground(
 					alpha = 0.3f,
@@ -697,7 +707,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						.zIndex(1f)
 				)
 				Column(
-					modifier = Modifier.fillMaxSize().zIndex(2f),
+					modifier = Modifier.fillMaxSize()
+						.padding(immersivePadding.withoutEnd)
+						.zIndex(2f),
 					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 				) {
 					ToolLayout(modifier = Modifier
@@ -753,7 +765,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					alpha = 0.7f,
 					modifier = Modifier.fillMaxSize()
 				)
-				LyricsLayout(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.7f))
+				LyricsLayout(modifier = Modifier.fillMaxWidth().fillMaxHeight(fraction = 0.7f).padding(immersivePadding.withoutStart))
 			}
 		}
 	}

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -140,7 +141,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	override fun SubContent(device: Device) {
 		StatefulBox(
 			state = state,
-			modifier = Modifier.fillMaxSize()
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
 		) {
 			LazyVerticalGrid(
 				columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),

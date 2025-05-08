@@ -21,18 +21,6 @@ import org.jetbrains.compose.resources.Font
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
 
-enum class ThemeMode {
-	SYSTEM, LIGHT, DARK;
-
-	override fun toString(): String = when (this) {
-		SYSTEM -> "系统"
-		LIGHT -> "浅色"
-		DARK -> "深色"
-	}
-}
-
-val LocalDarkMode = localComposition<Boolean>()
-
 @Stable
 object Colors {
 	val Unspecified = Color.Unspecified

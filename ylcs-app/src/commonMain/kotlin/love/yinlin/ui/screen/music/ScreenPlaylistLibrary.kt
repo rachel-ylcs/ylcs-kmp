@@ -24,6 +24,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
@@ -333,7 +334,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun SubContent(device: Device) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             PlaylistTab(modifier = Modifier.fillMaxWidth())
             PlaylistGrid(modifier = Modifier.fillMaxWidth().weight(1f))
         }

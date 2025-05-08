@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -18,7 +19,9 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.ImmersivePadding
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
@@ -95,15 +98,19 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 	final override fun Content() {
 		BackHandler { onBack() }
 
-		Scaffold(modifier = Modifier.fillMaxSize()) {
-			Column(modifier = Modifier.fillMaxSize().padding(it)) {
+		Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
+			val immersivePadding = ImmersivePadding(padding)
+			Column(modifier = Modifier.fillMaxSize()) {
 				Surface(
 					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
 					tonalElevation = ThemeValue.Shadow.Tonal,
 					shadowElevation = ThemeValue.Shadow.Surface
 				) {
 					Box(
-						modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+						modifier = Modifier
+							.padding(immersivePadding.withoutBottom)
+							.fillMaxWidth()
+							.padding(vertical = ThemeValue.Padding.VerticalSpace),
 						contentAlignment = Alignment.Center
 					) {
 						Box(
@@ -133,18 +140,19 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 						)
 					}
 				}
-				Box(
-					modifier = Modifier.fillMaxWidth().weight(1f)
-						.background(MaterialTheme.colorScheme.background)
-				) {
-					SubContent(LocalDevice.current)
+				Box(modifier = Modifier.fillMaxWidth().weight(1f).background(MaterialTheme.colorScheme.background)) {
+					CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+						SubContent(LocalDevice.current)
+					}
 				}
 				Surface(
 					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
 					tonalElevation = ThemeValue.Shadow.Tonal,
 					shadowElevation = ThemeValue.Shadow.Surface
 				) {
-					BottomBar()
+					CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+						BottomBar()
+					}
 				}
 			}
 		}

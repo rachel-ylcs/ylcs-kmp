@@ -20,6 +20,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
@@ -169,7 +170,11 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun SubContent(device: Device) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue).verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .padding(LocalImmersivePadding.current)
+                .fillMaxSize()
+                .padding(ThemeValue.Padding.EqualValue)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             TextInput(

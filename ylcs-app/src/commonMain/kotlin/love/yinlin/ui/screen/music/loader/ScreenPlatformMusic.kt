@@ -27,6 +27,7 @@ import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
@@ -308,7 +309,10 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
     @Composable
     override fun SubContent(device: Device) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
+            modifier = Modifier
+                .padding(LocalImmersivePadding.current)
+                .fillMaxSize()
+                .padding(ThemeValue.Padding.EqualValue),
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             Row(

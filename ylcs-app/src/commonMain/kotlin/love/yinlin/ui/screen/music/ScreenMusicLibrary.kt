@@ -29,6 +29,7 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.UriGenerator
 import love.yinlin.data.music.MusicInfo
@@ -346,7 +347,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                 contentPadding = ThemeValue.Padding.EqualValue,
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
                 horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
                 itemsIndexed(
                     items = library,

@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
@@ -18,6 +19,7 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.api.WeiboAPI
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -228,12 +230,14 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
+			val immersivePadding = LocalImmersivePadding.current
+
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					TabBar(
@@ -257,7 +261,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			}
 			HorizontalPager(
 				state = pagerState,
-				modifier = Modifier.fillMaxWidth().weight(1f),
+				modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop),
 				userScrollEnabled = false
 			) {
 				Box(modifier = Modifier.fillMaxSize()) {

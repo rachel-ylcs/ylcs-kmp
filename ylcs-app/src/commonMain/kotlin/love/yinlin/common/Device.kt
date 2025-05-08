@@ -20,7 +20,7 @@ class Device private constructor(
     constructor(width: Dp, height: Dp) : this(
         size = when {
             width <= 420.dp -> Size.SMALL
-            width <= 840.dp -> Size.MEDIUM
+            width <= 900.dp -> Size.MEDIUM
             else -> Size.LARGE
         },
         type = when {

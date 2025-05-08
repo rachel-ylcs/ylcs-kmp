@@ -62,6 +62,16 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
         if (!isPlaying) play()
     }
 
+    override fun seekTo(positionMs: Long) {
+        super.seekTo(positionMs)
+        if (!isPlaying) play()
+    }
+
+    override fun seekTo(mediaItemIndex: Int, positionMs: Long) {
+        super.seekTo(mediaItemIndex, positionMs)
+        if (!isPlaying) play()
+    }
+
     override fun play() {
         if (!isPlaying) super.play()
     }
@@ -263,7 +273,6 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override suspend fun gotoIndex(index: Int) = withMainPlayer { player ->
         if (index != -1 && player.currentMediaItemIndex != index) {
             player.seekTo(index, 0L)
-            if (!player.isPlaying) player.play()
         }
     }
     override suspend fun seekTo(position: Long) = withMainPlayer { it.seekTo(position) }

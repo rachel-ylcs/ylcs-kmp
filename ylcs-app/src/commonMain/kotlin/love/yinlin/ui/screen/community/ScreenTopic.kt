@@ -22,6 +22,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
@@ -755,7 +756,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	@Composable
 	override fun BottomBar() {
 		if (details != null) {
-			BottomLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
+			BottomLayout(modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxWidth()
+				.padding(ThemeValue.Padding.EqualValue)
+			)
 		}
 	}
 

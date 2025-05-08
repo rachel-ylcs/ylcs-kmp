@@ -21,6 +21,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Topic
@@ -155,7 +156,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			canRefresh = false,
 			canLoading = page.canLoading,
 			onLoading = { requestMoreTopics() },
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
 			contentPadding = ThemeValue.Padding.EqualValue,
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 			verticalItemSpacing = ThemeValue.Padding.EqualSpace,
@@ -177,7 +178,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 
 	@Composable
 	private fun Landscape(profile: UserPublicProfile) {
-		Row(modifier = Modifier.fillMaxSize()) {
+		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			UserProfileCard(
 				profile = profile,
 				owner = false,

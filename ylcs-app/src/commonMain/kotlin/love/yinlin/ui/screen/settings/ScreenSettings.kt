@@ -306,9 +306,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				SingleSelector(
 					current = app.config.themeMode,
 					onSelected = { app.config.themeMode = it },
+					style = MaterialTheme.typography.bodySmall,
+					hasIcon = false,
 					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-					style = MaterialTheme.typography.bodySmall
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
 				) {
 					for (themeMode in ThemeMode.entries) {
 						this.Item(themeMode, themeMode.toString())
@@ -325,9 +326,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				SingleSelector(
 					current = app.config.animationSpeed,
 					onSelected = { app.config.animationSpeed = it },
+					style = MaterialTheme.typography.bodySmall,
+					hasIcon = false,
 					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-					style = MaterialTheme.typography.bodySmall
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
 				) {
 					repeat(animationSpeedValue.size) {
 						this.Item(animationSpeedValue[it], animationSpeedString[it])
@@ -379,7 +381,12 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun Portrait(userProfile: UserProfile?) {
-		Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+		Column(
+			modifier = Modifier
+				.padding(LocalImmersivePadding.current)
+				.fillMaxSize()
+				.verticalScroll(rememberScrollState())
+		) {
 			AccountSettings(
 				userProfile = userProfile,
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
@@ -393,8 +400,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Landscape(userProfile: UserProfile?) {
 		LazyVerticalStaggeredGrid(
-			columns = StaggeredGridCells.Fixed(3),
-			modifier = Modifier.fillMaxSize(),
+			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 			verticalItemSpacing = ThemeValue.Padding.EqualSpace
 		) {

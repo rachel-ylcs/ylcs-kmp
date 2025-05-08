@@ -19,6 +19,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
@@ -191,9 +192,11 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 
 	@Composable
 	private fun Portrait(activity: Activity) {
-		Column(
-			modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)
-				.verticalScroll(rememberScrollState()),
+		Column(modifier = Modifier
+			.padding(LocalImmersivePadding.current)
+			.fillMaxSize()
+			.padding(ThemeValue.Padding.EqualValue)
+			.verticalScroll(rememberScrollState()),
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			ActivityDetailsLayout(
@@ -209,7 +212,11 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 
 	@Composable
 	private fun Landscape(activity: Activity) {
-		Row(modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue)) {
+		Row(modifier = Modifier
+			.padding(LocalImmersivePadding.current)
+			.fillMaxSize()
+			.padding(ThemeValue.Padding.EqualValue)
+		) {
 			ActivityDetailsLayout(
 				activity = activity,
 				modifier = Modifier.weight(2f)
