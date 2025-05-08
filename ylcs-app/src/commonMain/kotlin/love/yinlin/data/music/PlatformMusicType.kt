@@ -1,10 +1,8 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
-import kotlinx.serialization.Serializable
 
 @Stable
-@Serializable
 enum class PlatformMusicType {
     QQMusic, NetEaseCloud, Kugou;
 

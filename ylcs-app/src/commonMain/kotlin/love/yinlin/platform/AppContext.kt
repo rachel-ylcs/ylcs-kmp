@@ -14,8 +14,6 @@ abstract class AppContext {
 		const val CRASH_KEY = "crash_key"
 	}
 
-	// 主题
-
 	// KV
 	abstract val kv: KV
 	lateinit var config: KVConfig

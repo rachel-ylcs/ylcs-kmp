@@ -2,6 +2,10 @@ package love.yinlin.common
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -15,7 +19,9 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.toJsonString
 import love.yinlin.extension.toMutableStateMap
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
@@ -35,7 +41,10 @@ class KVConfig(private val kv: KV) {
 	interface ConfigState
 	
 	@Stable
-	private abstract class ValueState<T>(private val version: String? = null) : ConfigState, ReadWriteProperty<Any?, T> {
+	private abstract class ValueState<T>(
+		private val version: String? = null,
+		private val stateFactory: (T) -> MutableState<T> = { mutableStateOf(it) }
+	) : ConfigState, ReadWriteProperty<Any?, T> {
 		abstract fun kvGet(key: String): T
 		abstract fun kvSet(key: String, value: T)
 
@@ -43,7 +52,7 @@ class KVConfig(private val kv: KV) {
 		private var state: MutableState<T>? = null
 
 		final override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-			if (state == null) state = mutableStateOf(kvGet(property.storageKey))
+			if (state == null) state = stateFactory(kvGet(property.storageKey))
 			return state!!.value
 		}
 
@@ -53,7 +62,7 @@ class KVConfig(private val kv: KV) {
 				it.value = value
 				if (oldValue != value) kvSet(property.storageKey, value)
 			} ?: run {
-				state = mutableStateOf(value)
+				state = stateFactory(value)
 				kvSet(property.storageKey, value)
 			}
 		}
@@ -189,16 +198,24 @@ class KVConfig(private val kv: KV) {
 		private var state: MutableState<Long>? = null
 
 		override fun getValue(thisRef: Any?, property: KProperty<*>): Long {
-			if (state == null) state = mutableStateOf(kv.get(property.name, default))
+			if (state == null) state = mutableLongStateOf(kv.get(property.name, default))
 			return state!!.value
 		}
 
 		override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) {
 			val newCacheValue = DateEx.CurrentLong
-			if (state == null) state = mutableStateOf(newCacheValue)
+			if (state == null) state = mutableLongStateOf(newCacheValue)
 			else state!!.value = newCacheValue
 			kv.set(property.name, newCacheValue)
 		}
+	}
+
+	private inline fun <reified T : Enum<T>> enumState(
+		default: T,
+		version: String? = null
+	) = object : ValueState<T>(version) {
+		override fun kvGet(key: String): T = kv.get<String>(key, default.toJsonString()).parseJsonValue() ?: default
+		override fun kvSet(key: String, value: T) = kv.set(key, value.toJsonString())
 	}
 
 	private fun booleanState(
@@ -212,7 +229,7 @@ class KVConfig(private val kv: KV) {
 	private fun intState(
 		default: Int,
 		version: String? = null
-	) = object : ValueState<Int>(version) {
+	) = object : ValueState<Int>(version, { mutableIntStateOf(it) }) {
 		override fun kvGet(key: String) = kv.get(key, default)
 		override fun kvSet(key: String, value: Int) { kv.set(key, value) }
 	}
@@ -220,7 +237,7 @@ class KVConfig(private val kv: KV) {
 	private fun longState(
 		default: Long,
 		version: String? = null
-	) = object : ValueState<Long>(version) {
+	) = object : ValueState<Long>(version, { mutableLongStateOf(it) }) {
 		override fun kvGet(key: String) = kv.get(key, default)
 		override fun kvSet(key: String, value: Long) { kv.set(key, value) }
 	}
@@ -228,7 +245,7 @@ class KVConfig(private val kv: KV) {
 	private fun floatState(
 		default: Float,
 		version: String? = null
-	) = object : ValueState<Float>(version) {
+	) = object : ValueState<Float>(version, { mutableFloatStateOf(it) }) {
 		override fun kvGet(key: String) = kv.get(key, default)
 		override fun kvSet(key: String, value: Float) { kv.set(key, value) }
 	}
@@ -236,7 +253,7 @@ class KVConfig(private val kv: KV) {
 	private fun doubleState(
 		default: Double,
 		version: String? = null
-	) = object : ValueState<Double>(version) {
+	) = object : ValueState<Double>(version, { mutableDoubleStateOf(it) }) {
 		override fun kvGet(key: String) = kv.get(key, default)
 		override fun kvSet(key: String, value: Double) { kv.set(key, value) }
 	}
@@ -283,7 +300,9 @@ class KVConfig(private val kv: KV) {
 	/* ------------------  系统  ------------------ */
 
 	// 主题模式
-	var themeMode: ThemeMode by jsonState { ThemeMode.SYSTEM }
+	var themeMode: ThemeMode by enumState(ThemeMode.SYSTEM)
+	// 动画速度
+	var animationSpeed: Int by intState(400)
 
 	/* ------------------  微博  ------------------ */
 
