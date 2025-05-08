@@ -32,7 +32,10 @@ class KVConfig(private val kv: KV) {
 	/* ----------------  持久化存储  ---------------- */
 
 	@Stable
-	private abstract class ValueState<T>(private val version: String? = null) : ReadWriteProperty<Any?, T> {
+	interface ConfigState
+	
+	@Stable
+	private abstract class ValueState<T>(private val version: String? = null) : ConfigState, ReadWriteProperty<Any?, T> {
 		abstract fun kvGet(key: String): T
 		abstract fun kvSet(key: String, value: T)
 
@@ -45,9 +48,14 @@ class KVConfig(private val kv: KV) {
 		}
 
 		final override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-			if (state == null) state = mutableStateOf(value)
-			else state!!.value = value
-			kvSet(property.storageKey, value)
+			state?.let {
+				val oldValue = it.value
+				it.value = value
+				if (oldValue != value) kvSet(property.storageKey, value)
+			} ?: run {
+				state = mutableStateOf(value)
+				kvSet(property.storageKey, value)
+			}
 		}
 	}
 
@@ -58,7 +66,7 @@ class KVConfig(private val kv: KV) {
 		private val serializer: KSerializer<C>,
 		stateFactory: (C) -> RC,
 		defaultFactory: () -> C
-	) {
+	) : ConfigState {
 		protected val storageKey = "$name$version"
 		protected val state: RC = stateFactory(kv.getJson(serializer, storageKey, defaultFactory))
 		val items: C = state
@@ -177,7 +185,7 @@ class KVConfig(private val kv: KV) {
 	}
 
 	@Stable
-	private class CacheState(private val kv: KV, private val default: Long = 0L) : ReadWriteProperty<Any?, Long> {
+	private class CacheState(private val kv: KV, private val default: Long = 0L) : ConfigState, ReadWriteProperty<Any?, Long> {
 		private var state: MutableState<Long>? = null
 
 		override fun getValue(thisRef: Any?, property: KProperty<*>): Long {
