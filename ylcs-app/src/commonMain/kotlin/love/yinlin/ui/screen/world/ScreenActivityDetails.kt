@@ -2,6 +2,7 @@ package love.yinlin.ui.screen.world
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
@@ -177,10 +178,12 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 					)
 				}
 			}
-			Text(
-				text = activity.content,
-				modifier = Modifier.fillMaxWidth()
-			)
+			SelectionContainer {
+				Text(
+					text = activity.content,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
 			NineGrid(
 				pics = pics,
 				modifier = Modifier.fillMaxWidth(),

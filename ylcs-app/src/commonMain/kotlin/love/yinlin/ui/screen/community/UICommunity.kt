@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -139,13 +140,15 @@ internal fun UserProfileCard(
 						)
 					}
 				}
-				Text(
-					text = profile.signature,
-					style = MaterialTheme.typography.bodySmall,
-					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth()
-				)
+				SelectionContainer {
+					Text(
+						text = profile.signature,
+						style = MaterialTheme.typography.bodySmall,
+						maxLines = 2,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
 			}
 		}
 	}

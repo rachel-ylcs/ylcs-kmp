@@ -36,6 +36,8 @@ import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.ui.component.text.RichString
+import love.yinlin.ui.component.text.RichText
 
 @Stable
 class ScreenMail(model: AppModel) : CommonSubScreen(model) {
@@ -167,12 +169,13 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 						overflow = TextOverflow.Ellipsis
 					)
 				}
-				Text(
-					text = mail.content,
+				RichText(
+					text = remember(mail) { RichString.parse(mail.content) },
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodySmall,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
+					canSelected = false,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
@@ -253,10 +256,9 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 						}
 					)
 				}
-				Text(
-					text = mail.content,
-					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
+				RichText(
+					text = remember(mail) { RichString.parse(mail.content) },
+					modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
 				)
 			}
 		}

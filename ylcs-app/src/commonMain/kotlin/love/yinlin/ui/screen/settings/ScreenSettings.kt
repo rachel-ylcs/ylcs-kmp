@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -435,10 +436,12 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 					.verticalScroll(rememberScrollState())
 			) {
-				Text(
-					text = text,
-					modifier = Modifier.fillMaxWidth()
-				)
+				SelectionContainer {
+					Text(
+						text = text,
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
 			}
 		}
 
@@ -470,10 +473,12 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				.verticalScroll(rememberScrollState())
 			) {
-				Text(
-					text = stringResource(Res.string.app_privacy_policy),
-					modifier = Modifier.fillMaxWidth()
-				)
+				SelectionContainer {
+					Text(
+						text = stringResource(Res.string.app_privacy_policy),
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
 			}
 		}
 

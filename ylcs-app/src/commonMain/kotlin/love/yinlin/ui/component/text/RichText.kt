@@ -3,6 +3,7 @@ package love.yinlin.ui.component.text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -369,8 +370,11 @@ fun RichText(
 	onLinkClick: ((String) -> Unit)? = null,
 	onTopicClick: ((String) -> Unit)? = null,
 	onAtClick: ((String) -> Unit)? = null,
+	style: TextStyle = LocalTextStyle.current,
+	color: Color = Colors.Unspecified,
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
+	canSelected: Boolean = true,
 ) {
 	val state = remember(text) { text.asState(
 		onLinkClick = onLinkClick,
@@ -392,11 +396,28 @@ fun RichText(
 		}
 	}
 
-	Text(
-		text = state.text,
-		modifier = modifier,
-		overflow = overflow,
-		maxLines = maxLines,
-		inlineContent = inlineTextContent
-	)
+	if (canSelected) {
+		SelectionContainer {
+			Text(
+				text = state.text,
+				color = color,
+				style = style,
+				modifier = modifier,
+				overflow = overflow,
+				maxLines = maxLines,
+				inlineContent = inlineTextContent
+			)
+		}
+	}
+	else {
+		Text(
+			text = state.text,
+			color = color,
+			style = style,
+			modifier = modifier,
+			overflow = overflow,
+			maxLines = maxLines,
+			inlineContent = inlineTextContent
+		)
+	}
 }

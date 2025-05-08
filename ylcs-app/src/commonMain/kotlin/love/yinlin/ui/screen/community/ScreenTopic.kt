@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -461,13 +462,15 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				level = details.level,
 				onAvatarClick = { onAvatarClick(topic.uid) }
 			)
-			Text(
-				text = topic.title,
-				style = MaterialTheme.typography.titleMedium,
-				maxLines = 2,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth()
-			)
+			SelectionContainer {
+				Text(
+					text = topic.title,
+					style = MaterialTheme.typography.titleMedium,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
 			RichText(
 				text = remember(details) { RichString.parse(details.content) },
 				modifier = Modifier.fillMaxWidth()
