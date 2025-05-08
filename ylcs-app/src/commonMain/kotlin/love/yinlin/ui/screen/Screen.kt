@@ -40,6 +40,7 @@ fun ScreenRouteScope.screens() {
 	// 听歌
     screen(::ScreenMusicLibrary)
     screen(::ScreenPlaylistLibrary)
+    screen(::ScreenFloatingLyrics)
     screen(::ScreenMusicDetails)
 
     screen(::ScreenImportMusic)

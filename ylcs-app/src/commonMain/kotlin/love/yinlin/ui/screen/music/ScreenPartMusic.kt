@@ -162,7 +162,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					icon = Icons.Outlined.Lyrics,
 					color = Colors.White
 				) {
-
+					navigate<ScreenFloatingLyrics>()
 				}
 			},
 			right = {
