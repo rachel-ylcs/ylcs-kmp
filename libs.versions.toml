@@ -18,9 +18,6 @@ coroutines = "1.10.2"
 # Android
 media3 = "1.6.1"
 
-# Desktop
-ui-graphics-android = "1.7.8"
-
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -34,6 +31,12 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [libraries]
+
+# Tooling
+compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "cmp" }
+compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp" }
+
 # Common
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -76,7 +79,6 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
-compose-uiTooling = { module = "androidx.compose.ui:ui-tooling", version = "1.7.8" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
@@ -91,8 +93,6 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
-
-ui-graphics-android = { group = "androidx.compose.ui", name = "ui-graphics-android", version.ref = "ui-graphics-android" }
 
 jna = { module = "net.java.dev.jna:jna", version = "5.14.0" }
 jna-jpms = { module = "net.java.dev.jna:jna-jpms", version = "5.14.0" }

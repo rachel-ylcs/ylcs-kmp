@@ -97,7 +97,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun BannerLayout(
 		gap: Float,
 		shape: Shape,
-		heightConstraint: Boolean,
 		modifier: Modifier = Modifier
 	) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
@@ -106,7 +105,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				pics = pics,
 				interval = 5000L,
 				gap = gap,
-				modifier = Modifier.condition(heightConstraint) { heightIn(min = maxWidth / 2f) }.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth().condition(gap == 0f) { heightIn(min = maxHeight / 2f) }
 			) { pic, index, scale ->
 				Surface(
 					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
@@ -214,7 +213,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			BannerLayout(
 				gap = 0f,
 				shape = RectangleShape,
-				heightConstraint = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 			Box(
@@ -236,7 +234,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				BannerLayout(
 					gap = 0.3f,
 					shape = MaterialTheme.shapes.large,
-					heightConstraint = false,
 					modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace)
 				)
 			}

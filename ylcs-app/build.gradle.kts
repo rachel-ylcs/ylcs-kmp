@@ -250,8 +250,9 @@ compose.resources {
 }
 
 dependencies {
-    implementation(libs.ui.graphics.android)
-    debugImplementation(libs.compose.uiTooling)
+    implementation(libs.compose.ui.graphics.android)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.android)
 }
 
 android {
