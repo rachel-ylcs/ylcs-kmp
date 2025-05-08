@@ -31,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
@@ -66,7 +67,10 @@ open class Tip(private val scope: CoroutineScope) {
     fun Land() {
         SnackbarHost(
             hostState = host,
-            modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_TIP)
+            modifier = Modifier
+                .padding(LocalImmersivePadding.current)
+                .fillMaxWidth()
+                .zIndex(Floating.Z_INDEX_TIP)
         ) {
             val color = when (type) {
                 Type.INFO -> MaterialTheme.colorScheme.secondaryContainer

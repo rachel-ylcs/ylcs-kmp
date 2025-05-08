@@ -1,5 +1,8 @@
 package love.yinlin.ui.screen
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
+import love.yinlin.common.ImmersivePadding
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.Uri
 import love.yinlin.extension.getNavType
 import love.yinlin.ui.component.screen.FloatingDialogConfirm
@@ -55,13 +60,16 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	@Composable
 	fun UI() {
 		Content()
-		Floating()
 
-		with(slot) {
-			info.Land()
-			confirm.Land()
-			loading.Land()
-			tip.Land()
+		CompositionLocalProvider(LocalImmersivePadding provides ImmersivePadding(WindowInsets.systemBars.asPaddingValues())) {
+			Floating()
+
+			with(slot) {
+				info.Land()
+				confirm.Land()
+				loading.Land()
+				tip.Land()
+			}
 		}
 	}
 }

@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.platform.app
@@ -83,6 +84,13 @@ abstract class FloatingDialog<R>() : Floating<Unit>() {
 	catch (_: CancellationException) { null }
 
 	@Composable
+	override fun Wrapper(block: @Composable (() -> Unit)) {
+		Box(modifier = Modifier.padding(LocalImmersivePadding.current)) {
+			block()
+		}
+	}
+
+	@Composable
 	fun Land() {
 		super.Land { _ -> }
 	}
@@ -96,74 +104,76 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 
 	@Composable
 	override fun Wrapper(block: @Composable () -> Unit) {
-		val sizeType = LocalDevice.current.size
+		super.Wrapper {
+			val sizeType = LocalDevice.current.size
 
-		val rachelWidth = when (sizeType) {
-			Device.Size.SMALL -> 140.dp
-			Device.Size.MEDIUM -> 150.dp
-			Device.Size.LARGE -> 160.dp
-		}
-		val minContentHeight = when (sizeType) {
-			Device.Size.SMALL -> 50.dp
-			Device.Size.MEDIUM -> 45.dp
-			Device.Size.LARGE -> 40.dp
-		}
-		val maxContentHeight = when (sizeType) {
-			Device.Size.SMALL -> 260.dp
-			Device.Size.MEDIUM -> 280.dp
-			Device.Size.LARGE -> 300.dp
-		}
-
-		Column(
-			modifier = Modifier.width(ThemeValue.Size.DialogWidth)
-				.clickableNoRipple { close() }
-				.padding(bottom = rachelWidth),
-			horizontalAlignment = Alignment.CenterHorizontally
-		) {
-			OffsetLayout(y = rachelWidth / 15.5f + ThemeValue.Padding.VerticalExtraSpace / 5) {
-				MiniIcon(
-					res = Res.drawable.img_dialog_rachel,
-					size = rachelWidth,
-					modifier = Modifier.clickableNoRipple { }
-				)
+			val rachelWidth = when (sizeType) {
+				Device.Size.SMALL -> 140.dp
+				Device.Size.MEDIUM -> 150.dp
+				Device.Size.LARGE -> 160.dp
 			}
-			Surface(
-				shape = MaterialTheme.shapes.extraLarge,
-				modifier = Modifier.fillMaxWidth().clickableNoRipple { }
-			) {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(
-						top = ThemeValue.Padding.VerticalExtraSpace * 2,
-						bottom = ThemeValue.Padding.VerticalExtraSpace,
-						start = ThemeValue.Padding.HorizontalExtraSpace,
-						end = ThemeValue.Padding.HorizontalExtraSpace
-					),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-				) {
-					title?.let {
-						Text(
-							text = it,
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
-						)
-					}
+			val minContentHeight = when (sizeType) {
+				Device.Size.SMALL -> 50.dp
+				Device.Size.MEDIUM -> 45.dp
+				Device.Size.LARGE -> 40.dp
+			}
+			val maxContentHeight = when (sizeType) {
+				Device.Size.SMALL -> 260.dp
+				Device.Size.MEDIUM -> 280.dp
+				Device.Size.LARGE -> 300.dp
+			}
 
-					Box(modifier = Modifier
-						.heightIn(min = minContentHeight, max = maxContentHeight)
-						.fillMaxWidth()
-						.verticalScroll(enabled = scrollable, state = rememberScrollState())
+			Column(
+				modifier = Modifier.width(ThemeValue.Size.DialogWidth)
+					.clickableNoRipple { close() }
+					.padding(bottom = rachelWidth),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				OffsetLayout(y = rachelWidth / 15.5f + ThemeValue.Padding.VerticalExtraSpace / 5) {
+					MiniIcon(
+						res = Res.drawable.img_dialog_rachel,
+						size = rachelWidth,
+						modifier = Modifier.clickableNoRipple { }
+					)
+				}
+				Surface(
+					shape = MaterialTheme.shapes.extraLarge,
+					modifier = Modifier.fillMaxWidth().clickableNoRipple { }
+				) {
+					Column(
+						modifier = Modifier.fillMaxWidth().padding(
+							top = ThemeValue.Padding.VerticalExtraSpace * 2,
+							bottom = ThemeValue.Padding.VerticalExtraSpace,
+							start = ThemeValue.Padding.HorizontalExtraSpace,
+							end = ThemeValue.Padding.HorizontalExtraSpace
+						),
+						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 					) {
-						block()
-					}
-					actions?.let {
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End)
+						title?.let {
+							Text(
+								text = it,
+								style = MaterialTheme.typography.titleLarge,
+								color = MaterialTheme.colorScheme.primary,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+							)
+						}
+
+						Box(modifier = Modifier
+							.heightIn(min = minContentHeight, max = maxContentHeight)
+							.fillMaxWidth()
+							.verticalScroll(enabled = scrollable, state = rememberScrollState())
 						) {
-							it()
+							block()
+						}
+						actions?.let {
+							Row(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End)
+							) {
+								it()
+							}
 						}
 					}
 				}

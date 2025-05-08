@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberValueState
 import love.yinlin.platform.app
@@ -68,21 +69,23 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     override val zIndex: Float get() = Z_INDEX_SHEET
 
     @Composable
-    private fun PortraitWrapperContent(maxHeight: Dp, block: @Composable () -> Unit) {
-        Column(modifier = Modifier.fillMaxWidth()
-            .then(Modifier.heightIn(maxHeight * config.min, maxHeight * config.max))
-            .then(if (config.full) Modifier.fillMaxHeight() else Modifier)
-        ) {
-            // DragHandler
-            Surface(
-                modifier = Modifier.padding(vertical = ThemeValue.Padding.EqualSpace).align(Alignment.CenterHorizontally),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                shape = MaterialTheme.shapes.extraLarge
+    private fun PortraitWrapperContent(block: @Composable () -> Unit) {
+        BoxWithConstraints(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth()
+                .then(Modifier.heightIn(maxHeight * config.min, maxHeight * config.max))
+                .then(if (config.full) Modifier.fillMaxHeight() else Modifier)
             ) {
-                Box(Modifier.size(width = ThemeValue.Size.ExtraIcon, height = ThemeValue.Size.ExtraIcon / 8))
+                // DragHandler
+                Surface(
+                    modifier = Modifier.padding(vertical = ThemeValue.Padding.EqualSpace).align(Alignment.CenterHorizontally),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    shape = MaterialTheme.shapes.extraLarge
+                ) {
+                    Box(Modifier.size(width = ThemeValue.Size.ExtraIcon, height = ThemeValue.Size.ExtraIcon / 8))
+                }
+                // Content
+                block()
             }
-            // Content
-            block()
         }
     }
 
@@ -124,15 +127,13 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
                     }
                 } })
         ) {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                PortraitWrapperContent(maxHeight, block)
-            }
+            PortraitWrapperContent(block)
         }
     }
 
     @Composable
     private fun LandscapeWrapperContent(block: @Composable () -> Unit) {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             // DragHandler
             Surface(
                 modifier = Modifier.padding(horizontal = ThemeValue.Padding.EqualSpace).align(Alignment.CenterVertically),
