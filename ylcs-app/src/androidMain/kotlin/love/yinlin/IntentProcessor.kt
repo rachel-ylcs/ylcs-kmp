@@ -45,16 +45,12 @@ object IntentProcessor {
         }
 
         fun process(deeplink: DeepLink, intent: Intent) {
-            when (intent.type) {
-                MimeType.TEXT -> SendText.process(deeplink, intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
-                MimeType.BINARY -> {
-                    @Suppress("DEPRECATION")
-                    val data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent.getParcelableExtra(Intent.EXTRA_STREAM, android.net.Uri::class.java)
-                    } else intent.getParcelableExtra(Intent.EXTRA_STREAM)
-                    SendBinary.process(deeplink, data!!)
-                }
-            }
+            @Suppress("DEPRECATION")
+            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(Intent.EXTRA_STREAM, android.net.Uri::class.java)
+            } else intent.getParcelableExtra(Intent.EXTRA_STREAM)
+            if (uri != null) SendBinary.process(deeplink, uri)
+            else SendText.process(deeplink, intent.getStringExtra(Intent.EXTRA_TEXT) ?: "")
         }
     }
 
