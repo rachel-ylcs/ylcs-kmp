@@ -1,6 +1,5 @@
 package love.yinlin.api
 
-import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.common.Uri
 import love.yinlin.data.Data

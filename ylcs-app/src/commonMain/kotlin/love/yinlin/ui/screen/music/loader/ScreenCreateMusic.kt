@@ -26,7 +26,6 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
-import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.ReplaceableImage

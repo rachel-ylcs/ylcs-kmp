@@ -7,7 +7,6 @@ import love.yinlin.common.DeepLink
 import love.yinlin.common.Scheme
 import love.yinlin.common.Uri
 import love.yinlin.common.toUri
-import love.yinlin.data.MimeType
 
 object IntentProcessor {
     private object ActionView {
