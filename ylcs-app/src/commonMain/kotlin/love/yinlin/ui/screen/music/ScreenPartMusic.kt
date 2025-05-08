@@ -79,7 +79,7 @@ private fun PlayingMusicStatusCard(
 		Text(
 			text = musicInfo.name,
 			style = MaterialTheme.typography.labelMedium,
-			color = if (isCurrent) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+			color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.Unspecified,
 			maxLines = 1,
 			overflow = TextOverflow.MiddleEllipsis,
 			modifier = Modifier.weight(1f)

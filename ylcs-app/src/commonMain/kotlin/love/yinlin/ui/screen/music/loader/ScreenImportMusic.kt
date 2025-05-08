@@ -10,7 +10,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,21 +18,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import io.ktor.utils.io.core.readText
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.MimeType
-import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.itemKey
-import love.yinlin.extension.parseJsonValue
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.LoadingAnimation
@@ -261,8 +254,9 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     @Composable
     override fun SubContent(device: Device) {
-        Box(
-            modifier = Modifier.fillMaxSize().dragAndDrop(
+        Box(modifier = Modifier.fillMaxSize()
+            .padding(ThemeValue.Padding.EqualExtraValue)
+            .dragAndDrop(
                 enabled = step is Step.Initial || step is Step.Prepare,
                 flag = DragFlag.FILE,
                 onDrop = {
@@ -279,7 +273,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 is Step.Initial -> {
                     Text(
                         text = currentStep.message,
-                        color = if (currentStep.isError) MaterialTheme.colorScheme.error else LocalContentColor.current,
+                        color = if (currentStep.isError) MaterialTheme.colorScheme.error else Colors.Unspecified,
                         textAlign = TextAlign.Center
                     )
                 }

@@ -11,7 +11,6 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.IndeterminateCheckBox
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +32,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
@@ -398,11 +398,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 										MiniIcon(
 											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary
+											color = if (index != todayIndex) Colors.Unspecified else MaterialTheme.colorScheme.primary
 										)
 										Text(
 											text = "${date.monthNumber}月${date.dayOfMonth}日",
-											color = if (index != todayIndex) LocalContentColor.current else MaterialTheme.colorScheme.primary,
+											color = if (index != todayIndex) Colors.Unspecified else MaterialTheme.colorScheme.primary,
 											maxLines = 1,
 											overflow = TextOverflow.Ellipsis
 										)

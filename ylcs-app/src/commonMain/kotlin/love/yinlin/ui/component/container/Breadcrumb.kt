@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
 
@@ -59,7 +59,7 @@ fun <T> Breadcrumb(
             val lastItem = index == items.size - 1
             BreadcrumbItem(
                 text = item.toString(),
-                color = if (lastItem) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                color = if (lastItem) MaterialTheme.colorScheme.primary else Colors.Unspecified,
                 onClick = { onClick(index) }
             )
             if (!lastItem) MiniIcon(icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight)

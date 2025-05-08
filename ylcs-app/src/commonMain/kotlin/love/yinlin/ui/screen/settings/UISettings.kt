@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,14 +37,15 @@ object SettingsScope {
 	fun Item(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = LocalContentColor.current,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
 		onClick: () -> Unit = {},
 		content: @Composable () -> Unit
 	) {
 		Row(
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier.heightIn(min = ThemeValue.Padding.VerticalExtraSpace * 6)
+				.fillMaxWidth()
 				.clickable(enabled = enabled, onClick = onClick)
 				.padding(ThemeValue.Padding.ExtraValue),
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
@@ -75,7 +75,7 @@ object SettingsScope {
 	fun ItemText(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = LocalContentColor.current,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		text: String,
 		maxLines: Int = 1,
 		hasDivider: Boolean = true,
@@ -104,7 +104,7 @@ object SettingsScope {
 	fun ItemExpander(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = LocalContentColor.current,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		text: String? = null,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,
@@ -140,7 +140,7 @@ object SettingsScope {
 	fun ItemExpanderSuspend(
 		title: String,
 		icon: ColorfulImageVector? = null,
-		color: Color = LocalContentColor.current,
+		color: Color = MaterialTheme.colorScheme.onSurface,
 		text: String? = null,
 		hasDivider: Boolean = true,
 		enabled: Boolean = true,

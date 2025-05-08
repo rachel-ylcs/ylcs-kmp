@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -203,6 +205,12 @@ fun LoadingButton(
 	Button(
 		modifier = modifier,
 		enabled = enabled && !isLoading,
+		colors = ButtonColors(
+			containerColor = MaterialTheme.colorScheme.primaryContainer,
+			contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+			disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
+			disabledContentColor = MaterialTheme.colorScheme.onSurface
+		),
 		onClick = {
 			scope.launch {
 				isLoading = true
@@ -215,7 +223,7 @@ fun LoadingButton(
 			isLoading = isLoading,
 			text = text,
 			icon = icon,
-			color = if (enabled) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
+			color = LocalContentColor.current
 		)
 	}
 }
@@ -241,11 +249,17 @@ fun RachelRadioButton(
 		RadioButton(
 			selected = checked,
 			enabled = enabled,
+			colors = RadioButtonColors(
+				selectedColor = MaterialTheme.colorScheme.primary,
+				unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+				disabledSelectedColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
+				disabledUnselectedColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f)
+			),
 			onClick = null
 		)
 		Text(
 			text = text,
-			color = if (enabled) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
+			color = LocalContentColor.current
 		)
 	}
 }

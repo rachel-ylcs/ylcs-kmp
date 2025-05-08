@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -23,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
@@ -78,7 +78,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         Text(
             text = musicInfo.name,
             style = MaterialTheme.typography.labelMedium,
-            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else LocalContentColor.current,
+            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else Colors.Unspecified,
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,

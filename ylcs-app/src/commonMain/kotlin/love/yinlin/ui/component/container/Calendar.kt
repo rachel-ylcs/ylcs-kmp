@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
+import love.yinlin.common.Colors
 import love.yinlin.common.Resource
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
@@ -171,7 +171,7 @@ private fun CalendarDayGrid(
 					eventTitle != null -> MaterialTheme.colorScheme.primary
 					dayIndex !in startDay..endDay -> MaterialTheme.colorScheme.onSurfaceVariant
 					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
-					else -> LocalContentColor.current
+					else -> Colors.Unspecified
 				}
 				val text = remember(eventTitle, date) { eventTitle ?: date.lunar }
 

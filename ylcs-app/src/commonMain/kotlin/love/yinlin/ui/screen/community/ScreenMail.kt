@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
@@ -148,7 +148,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 							Mail.Type.INFO -> MaterialTheme.colorScheme.primary
 							Mail.Type.CONFIRM -> MaterialTheme.colorScheme.secondary
 							Mail.Type.DECISION -> MaterialTheme.colorScheme.tertiary
-							else -> LocalContentColor.current
+							else -> Colors.Unspecified
 						}
 					)
 					Text(
