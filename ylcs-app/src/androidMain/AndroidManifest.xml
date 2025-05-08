@@ -44,8 +44,6 @@
                 <data android:scheme="content"/>
                 <data android:scheme="file"/>
                 <data android:host="*" />
-                <data android:pathPattern=".*\\.rachel" />
-                <data android:pathSuffix=".rachel" tools:targetApi="31" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -53,15 +51,6 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-        <provider
-            android:authorities="@string/music_file_provider"
-            android:name="androidx.core.content.FileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true" >
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/paths" />
-        </provider>
         <service
             android:name=".service.MusicService"
             android:enabled="true"
@@ -73,5 +62,14 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+        <provider
+            android:authorities="@string/music_file_provider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths" />
+        </provider>
     </application>
 </manifest>

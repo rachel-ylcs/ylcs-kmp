@@ -65,7 +65,7 @@ data class Uri(
     companion object {
         val Empty: Uri = Uri(Scheme(""))
 
-        fun parse(uri: String): Uri? = parseUri(decodeUri(uri))
+        fun parse(uri: String): Uri? = parseUri(uri)
 
         private val hexDigits = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
         private val defaultSet = charArrayOf('_', '-', '!', '.', '~', '\'', '(', ')', '*')
