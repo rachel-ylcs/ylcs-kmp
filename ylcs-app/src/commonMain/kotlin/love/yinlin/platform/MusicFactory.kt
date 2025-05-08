@@ -132,9 +132,15 @@ abstract class MusicFactory {
         val lastPlaylist = currentPlaylist?.name ?: ""
         app.config.lastPlaylist = lastPlaylist
         if (lastPlaylist.isNotEmpty()) musicInfo?.let { app.config.lastMusic = it.id }
+        else app.config.lastMusic = ""
     }
 
     protected fun onPlayModeChanged(mode: MusicPlayMode) {
         app.config.musicPlayMode = mode
+    }
+
+    protected fun onPlayerStop() {
+        app.config.lastPlaylist = ""
+        app.config.lastMusic = ""
     }
 }

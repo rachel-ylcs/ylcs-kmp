@@ -96,6 +96,7 @@ class ActualMusicFactory : MusicFactory() {
         currentPlaylist = null
         shuffledList = ShuffledOrder()
         controls().stop()
+        onPlayerStop()
     }
 
     private val loopPreviousIndex: Int get() = (currentIndex + musicList.size - 1) % musicList.size

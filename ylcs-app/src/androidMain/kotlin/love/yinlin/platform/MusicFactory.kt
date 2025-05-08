@@ -196,6 +196,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                             currentDuration = 0L
                             currentPlaylist = null
                             currentMusic = null
+                            onPlayerStop()
                         }
                     }
                 }
