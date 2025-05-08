@@ -6,7 +6,9 @@ import androidx.compose.runtime.*
 abstract class FloatingLyrics {
     protected var currentLyrics: String by mutableStateOf("")
 
+    abstract val canAttached: Boolean
     abstract val isAttached: Boolean
+    abstract fun applyPermission(onResult: (Boolean) -> Unit)
     abstract fun attach()
     abstract fun detach()
     abstract fun updateLyrics(lyrics: String)

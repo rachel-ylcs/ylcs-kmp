@@ -19,4 +19,13 @@ data class FloatingLyricsConfig(
     val textColor: ULong = Colors.Steel4.value,
     // 背景颜色
     val backgroundColor: ULong = Colors.Transparent.value
-)
+) {
+    val leftProgress: Float get() = left
+    val rightProgress: Float get() = right
+    val topProgress: Float get() = top / 2f
+    val textSizeProgress: Float get() = textSize / 0.75f - 1f
+    fun copyLeft(percent: Float) = this.copy(left = percent.coerceIn(0f, 1f))
+    fun copyRight(percent: Float) = this.copy(right = percent.coerceIn(0f, 1f))
+    fun copyTop(percent: Float) = this.copy(top = (percent * 2f).coerceIn(0f, 2f))
+    fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).coerceIn(0.75f, 1.5f))
+}

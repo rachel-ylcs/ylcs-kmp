@@ -1,37 +1,63 @@
 package love.yinlin.platform
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.PixelFormat
+import android.net.Uri
 import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.Box
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import love.yinlin.AppWrapper
+import love.yinlin.common.ThemeValue
+import java.util.*
 
 @Stable
 class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLyrics() {
     private val view = ComposeView(activity).apply {
         setViewTreeLifecycleOwner(activity)
         setViewTreeSavedStateRegistryOwner(activity)
-        setContent { FloatingContent() }
+        setContent {
+            AppWrapper { FloatingContent() }
+        }
     }
 
-    private val isDrawOverlays: Boolean get() = Settings.canDrawOverlays(activity)
+    override val canAttached: Boolean get() = Settings.canDrawOverlays(activity)
+
     override val isAttached: Boolean get() = view.isAttachedToWindow
 
+    override fun applyPermission(onResult: (Boolean) -> Unit) {
+        try {
+            activity.activityResultRegistry.register(
+                key = UUID.randomUUID().toString(),
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) {
+                onResult(canAttached)
+            }.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+                setData(Uri.fromParts("package", activity.packageName, null))
+            })
+        }
+        catch (_: Throwable) {}
+    }
+
     override fun attach() {
-        if (isDrawOverlays && !isAttached) {
+        if (canAttached && !isAttached) {
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -61,14 +87,23 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
 
     @Composable
     fun FloatingContent() {
-        Box(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
+        val config = app.config.floatingLyricsConfig
+
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth().background(color = Color(config.backgroundColor))) {
             Text(
                 text = currentLyrics,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                ),
+                color = Color(config.textColor),
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(
+                    start = this.maxWidth * config.left.coerceIn(0f, 1f),
+                    end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
+                    top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
+                ).fillMaxWidth()
             )
         }
     }
