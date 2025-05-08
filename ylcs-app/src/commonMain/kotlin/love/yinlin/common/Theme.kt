@@ -25,7 +25,7 @@ enum class ThemeMode {
 	SYSTEM, LIGHT, DARK;
 
 	override fun toString(): String = when (this) {
-		SYSTEM -> "跟随系统"
+		SYSTEM -> "系统"
 		LIGHT -> "浅色"
 		DARK -> "深色"
 	}

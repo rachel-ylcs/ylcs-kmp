@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.Local
 import love.yinlin.common.ThemeValue
+import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.LoadingButton
@@ -35,7 +35,7 @@ enum class BoxState {
 fun LoadingAnimation(
 	size: Dp = ThemeValue.Size.Icon,
 	color: Color = MaterialTheme.colorScheme.primary,
-	duration: Int = Local.Client.ANIMATION_DURATION,
+	duration: Int = app.config.animationSpeed,
 	num: Int = 3,
 	modifier: Modifier = Modifier
 ) {

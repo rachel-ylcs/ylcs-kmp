@@ -24,10 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
-import love.yinlin.Local
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.extension.clickableNoRipple
+import love.yinlin.platform.app
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Stable
@@ -42,7 +42,6 @@ abstract class Floating<A : Any> {
     protected abstract fun alignment(device: Device): Alignment // 对齐方式
     protected abstract fun enter(device: Device): EnterTransition // 开始动画
     protected abstract fun exit(device: Device): ExitTransition // 结束动画
-    protected open val duration: Int = Local.Client.ANIMATION_DURATION // 动画时长
     protected open val scrim: Float = 0.4f // 遮罩透明度
     protected open val zIndex: Float = Z_INDEX_COMMON // 高度
     protected open val dismissOnBackPress: Boolean = true // 返回键结束
@@ -70,7 +69,7 @@ abstract class Floating<A : Any> {
         val alpha by animateFloatAsState(
             targetValue = if (visible) (1 - scrim) else 0f,
             animationSpec = tween(
-                durationMillis = duration,
+                durationMillis = app.config.animationSpeed,
                 easing = LinearOutSlowInEasing
             )
         )
@@ -104,7 +103,7 @@ abstract class Floating<A : Any> {
 
             LaunchedEffect(visible) {
                 if (!visible) {
-                    delay(duration.toLong())
+                    delay(app.config.animationSpeed.toLong())
                     hide()
                 }
             }

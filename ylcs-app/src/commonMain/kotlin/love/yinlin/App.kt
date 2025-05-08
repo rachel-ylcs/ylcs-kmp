@@ -93,7 +93,7 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 				slideIntoContainer(
 					towards = AnimatedContentTransitionScope.SlideDirection.Start,
 					animationSpec = tween(
-						durationMillis = Local.Client.ANIMATION_DURATION,
+						durationMillis = app.config.animationSpeed,
 						easing = FastOutSlowInEasing
 					)
 				)
@@ -102,7 +102,7 @@ fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 				slideOutOfContainer(
 					towards = AnimatedContentTransitionScope.SlideDirection.End,
 					animationSpec = tween(
-						durationMillis = Local.Client.ANIMATION_DURATION,
+						durationMillis = app.config.animationSpeed,
 						easing = FastOutSlowInEasing
 					)
 				)

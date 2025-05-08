@@ -10,10 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,12 +24,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.KVConfig
-import love.yinlin.common.ThemeColor
-import love.yinlin.common.ThemeMode
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
@@ -51,6 +42,7 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
@@ -294,49 +286,54 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	@Composable
-	private fun SingleChoiceSegmentedButtonRowScope.ThemeSwitcherItem(
-		mode: ThemeMode,
-		current: ThemeMode,
-		onChanged: (ThemeMode) -> Unit
-	) {
-		SegmentedButton(
-			selected = mode == current,
-			shape = SegmentedButtonDefaults.itemShape(index = mode.ordinal, count = 3),
-			label = {
-				Text(
-					text = mode.toString(),
-					style = if (mode == current) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium
-				)
-			},
-			onClick = { if (mode != current) onChanged(mode) }
-		)
-	}
-
-	@Composable
-	private fun ThemeSwitcher(
-		mode: ThemeMode,
-		onChanged: (ThemeMode) -> Unit,
-		modifier: Modifier = Modifier
-	) {
-		SingleChoiceSegmentedButtonRow(modifier = modifier) {
-			ThemeSwitcherItem(ThemeMode.SYSTEM, mode, onChanged)
-			ThemeSwitcherItem(ThemeMode.LIGHT, mode, onChanged)
-			ThemeSwitcherItem(ThemeMode.DARK, mode, onChanged)
-		}
-	}
-
-	@Composable
 	private fun CommonSettings(modifier: Modifier = Modifier) {
 		SettingsLayout(
 			modifier = modifier,
 			title = "系统",
 			icon = Icons.Outlined.Info
 		) {
-			ThemeSwitcher(
-				mode = app.config.themeMode,
-				onChanged = { app.config.themeMode = it },
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
-			)
+			Item(
+				title = "主题",
+				icon = colorfulImageVector(
+					icon = when (app.config.themeMode) {
+						ThemeMode.SYSTEM -> Icons.Outlined.Contrast
+						ThemeMode.LIGHT -> Icons.Outlined.LightMode
+						ThemeMode.DARK -> Icons.Outlined.DarkMode
+					},
+					background = Colors.Steel4
+				)
+			) {
+				SingleSelector(
+					current = app.config.themeMode,
+					onSelected = { app.config.themeMode = it },
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					style = MaterialTheme.typography.bodySmall
+				) {
+					for (themeMode in ThemeMode.entries) {
+						this.Item(themeMode, themeMode.toString())
+					}
+				}
+			}
+
+			Item(
+				title = "动画速度",
+				icon = colorfulImageVector(icon = Icons.Outlined.Animation, background = Colors.Steel4)
+			) {
+				val animationSpeedValue = remember { arrayOf(600, 400, 200) }
+				val animationSpeedString = remember { arrayOf("慢", "正常", "快") }
+				SingleSelector(
+					current = app.config.animationSpeed,
+					onSelected = { app.config.animationSpeed = it },
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					style = MaterialTheme.typography.bodySmall
+				) {
+					repeat(animationSpeedValue.size) {
+						this.Item(animationSpeedValue[it], animationSpeedString[it])
+					}
+				}
+			}
 
 			var cacheSizeText by rememberState { OS.Storage.cacheSize.fileSizeString }
 			ItemExpanderSuspend(

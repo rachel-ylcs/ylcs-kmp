@@ -14,10 +14,6 @@ object Local {
 		// 当客户端处于生产环境时, 请求主机
 		const val DEVELOPMENT: Boolean = true
 		const val WITH_SERVER: Boolean = false
-
-		// < ------  动画时长  ------ >
-		// 基本动画时长(毫秒)
-		const val ANIMATION_DURATION = 400
 	}
 
 	// 服务器配置

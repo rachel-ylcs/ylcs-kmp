@@ -4,14 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -33,7 +29,7 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
@@ -111,34 +107,6 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
-    @Composable
-    private fun SectionSelectLayout(
-        profile: UserProfile,
-        modifier: Modifier = Modifier
-    ) {
-        FlowRow(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-            itemVerticalAlignment = Alignment.CenterVertically
-        ) {
-            for (section in Comment.Section.MovableSection) {
-                // 管理员才有发布公告权限
-                FilterChip(
-                    selected = section == input.section,
-                    onClick = { input.section = section },
-                    enabled = section != Comment.Section.NOTIFICATION || profile.hasPrivilegeVIPTopic,
-                    label = { Text(text = Comment.Section.sectionName(section)) },
-                    leadingIcon = if (section == input.section) {
-                        {
-                            MiniIcon(icon = Icons.Filled.Done)
-                        }
-                    } else null,
-                    elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = ThemeValue.Padding.ZeroSpace)
-                )
-            }
-        }
-    }
-
     override val title: String = "发表主题"
 
     @Composable
@@ -178,10 +146,19 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(text = "主题", style = MaterialTheme.typography.titleMedium)
-                SectionSelectLayout(
-                    profile = profile,
+                SingleSelector(
+                    current = input.section,
+                    onSelected = { input.section = it },
                     modifier = Modifier.fillMaxWidth()
-                )
+                ) {
+                    for (section in Comment.Section.MovableSection) {
+                        Item(
+                            item = section,
+                            title = remember(section) { Comment.Section.sectionName(section) },
+                            enabled = section != Comment.Section.NOTIFICATION || profile.hasPrivilegeVIPTopic
+                        )
+                    }
+                }
                 Text(text = "图片", style = MaterialTheme.typography.titleMedium)
                 ImageAdder(
                     maxNum = 9,

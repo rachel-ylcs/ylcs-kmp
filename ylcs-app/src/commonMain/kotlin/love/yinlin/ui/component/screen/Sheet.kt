@@ -26,6 +26,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberValueState
+import love.yinlin.platform.app
 import kotlin.math.roundToInt
 
 // SheetConfig仅在竖屏下生效
@@ -46,21 +47,21 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     }
     override fun enter(device: Device): EnterTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideInVertically(
-            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
-            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
     override fun exit(device: Device): ExitTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideOutVertically(
-            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
-            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
     }

@@ -28,6 +28,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
+import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
@@ -45,10 +46,14 @@ import kotlin.math.roundToInt
 @Stable
 abstract class FloatingDialog<R>() : Floating<Unit>() {
 	override fun alignment(device: Device): Alignment = Alignment.Center
-	override fun enter(device: Device): EnterTransition = scaleIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
-			fadeIn(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
-	override fun exit(device: Device): ExitTransition = scaleOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing)) +
-			fadeOut(tween(durationMillis = duration, easing = LinearOutSlowInEasing))
+	override fun enter(device: Device): EnterTransition = scaleIn(
+		animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)) +
+			fadeIn(tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)
+	)
+	override fun exit(device: Device): ExitTransition = scaleOut(
+		animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)) +
+			fadeOut(tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)
+	)
 	override val zIndex: Float = Z_INDEX_DIALOG
 
 	protected var continuation: CancellableContinuation<R?>? = null

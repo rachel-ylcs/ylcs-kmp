@@ -13,13 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import kotlinx.coroutines.delay
-import love.yinlin.Local
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
+import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.component.layout.Space
@@ -41,11 +41,11 @@ private fun VideoPlayerControlBar(
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(
-            animationSpec = tween(durationMillis = Local.Client.ANIMATION_DURATION, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetY = animateOffset
         ),
         exit = slideOutVertically(
-            animationSpec = tween(durationMillis = Local.Client.ANIMATION_DURATION, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetY = animateOffset
         )
     ) {
@@ -73,7 +73,7 @@ fun VideoPlayerControls(
         var isShowControls by rememberState { false }
 
         LaunchedEffect(Unit) {
-            delay(Local.Client.ANIMATION_DURATION.toLong())
+            delay(app.config.animationSpeed.toLong())
             isShowControls = true
         }
 
