@@ -19,7 +19,9 @@ class MainActivity : ComponentActivity() {
 
         appNative.musicFactory.floatingLyrics = ActualFloatingLyrics(this).apply { attach() }
 
-        setContent { AppWrapper { App() } }
+        setContent {
+            AppWrapper { App() }
+        }
     }
 
     override fun onDestroy() {

@@ -14,6 +14,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
+import love.yinlin.data.music.FloatingLyricsConfig
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
@@ -318,7 +319,9 @@ class KVConfig(private val kv: KV) {
 	// 上次播放歌曲
 	var lastMusic by stringState("")
 	// 播放模式
-	var musicPlayMode: MusicPlayMode by jsonState { MusicPlayMode.ORDER }
+	var musicPlayMode: MusicPlayMode by enumState(MusicPlayMode.ORDER)
+	// 悬浮歌词配置
+	var floatingLyricsConfig: FloatingLyricsConfig by jsonState { FloatingLyricsConfig() }
 
 	/* ------------------  社区  ------------------ */
 

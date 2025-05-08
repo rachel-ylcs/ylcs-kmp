@@ -28,9 +28,9 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     }
 
     private val isDrawOverlays: Boolean get() = Settings.canDrawOverlays(activity)
-    private val isAttached: Boolean get() = view.isAttachedToWindow
+    override val isAttached: Boolean get() = view.isAttachedToWindow
 
-    fun attach() {
+    override fun attach() {
         if (isDrawOverlays && !isAttached) {
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             val params = WindowManager.LayoutParams(
@@ -48,7 +48,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         }
     }
 
-    fun detach() {
+    override fun detach() {
         if (isAttached) {
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             manager?.removeViewImmediate(view)
@@ -56,7 +56,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     }
 
     override fun updateLyrics(lyrics: String) {
-        if (isAttached) currentLyrics = lyrics
+        currentLyrics = lyrics
     }
 
     @Composable

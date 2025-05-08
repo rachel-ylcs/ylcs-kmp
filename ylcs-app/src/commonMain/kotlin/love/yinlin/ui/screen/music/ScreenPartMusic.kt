@@ -554,7 +554,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 		LaunchedEffect(factory.currentPosition) {
 			val newLyricsText = lyrics.updateIndex(factory.currentPosition)
-            factory.floatingLyrics?.updateLyrics(newLyricsText)
+			factory.floatingLyrics?.let {
+				if (it.isAttached) it.updateLyrics(newLyricsText)
+			}
 		}
 
 		Box(modifier = modifier) {
