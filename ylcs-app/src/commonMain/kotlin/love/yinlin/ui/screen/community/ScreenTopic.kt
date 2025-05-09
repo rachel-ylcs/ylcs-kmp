@@ -650,6 +650,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				state = state,
 				hint = remember(currentSendComment) { "回复 @${currentSendComment?.name ?: "主题"}" },
 				maxLines = 5,
+				minLines = 1,
 				maxLength = 1024,
 				clearButton = false,
 				modifier = Modifier.fillMaxWidth()

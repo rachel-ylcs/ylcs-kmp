@@ -44,6 +44,7 @@ fun TextInput(
 	readOnly: Boolean = false,
 	maxLength: Int = 0,
 	maxLines: Int = 1,
+	minLines: Int = maxLines,
 	clearButton: Boolean = true,
 	modifier: Modifier = Modifier
 ) {
@@ -74,6 +75,7 @@ fun TextInput(
 		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
 		keyboardOptions = remember(inputType) { inputType.toKeyboardOptions },
 		singleLine = maxLines.coerceAtLeast(1) == 1,
+		minLines = minLines.coerceAtLeast(1),
 		maxLines = maxLines.coerceAtLeast(1),
 		isError = state.overflow,
 		modifier = modifier

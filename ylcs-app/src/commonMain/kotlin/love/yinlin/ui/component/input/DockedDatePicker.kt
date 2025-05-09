@@ -86,6 +86,7 @@ fun DockedDatePicker(
 					)
 				}
 			},
+			singleLine = true,
 			modifier = Modifier.fillMaxWidth()
 		)
 		ExpandableLayout(isExpanded = isShow) {

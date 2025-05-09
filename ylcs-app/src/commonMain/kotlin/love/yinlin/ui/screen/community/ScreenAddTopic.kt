@@ -138,6 +138,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                     hint = "标题",
                     maxLength = 48,
                     maxLines = 2,
+                    minLines = 1,
                     clearButton = false,
                     modifier = Modifier.fillMaxWidth()
                 )

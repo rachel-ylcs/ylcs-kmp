@@ -288,6 +288,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
                             )
                         }
                     },
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
