@@ -39,24 +39,24 @@
 
 ### `compose UI multiplatform`
 
-源代码目录 `composeApp`
+源代码目录 `ylcs-app`
 
 
 1. androidMain
    - 运行：`IDEA - Android App`
-   - 发布签名安装包：`composeApp:androidPublish`
+   - 发布签名安装包：`ylcs-app:androidPublish`
 2. iosMain
    - 进入iosApp目录，运行：`pod install`
    - Xcode打开`iosApp/iosApp.xcworkspace`，运行App
    - 发布签名安装包
 3. desktopMain
-   - 运行(Debug)：`composeApp:desktopRunDebug`
-   - 运行(Release)：`composeApp:desktopRunRelease`
-   - 检查模块完整性: `composeApp:desktopCheckModules`
-   - 发布可执行文件：`composeApp:desktopPublish`
+   - 运行(Debug)：`ylcs-app:desktopRunDebug`
+   - 运行(Release)：`ylcs-app:desktopRunRelease`
+   - 检查模块完整性: `ylcs-app:desktopCheckModules`
+   - 发布可执行文件：`ylcs-app:desktopPublish`
 4. wasmJsMain
-   - 浏览器运行：`composeApp:webRun`
-   - 发布网页：`composeApp:webPublish`
+   - 浏览器运行：`ylcs-app:webRun`
+   - 发布网页：`ylcs-app:webPublish`
 
 
 ### `kotlin logic multiplatform`
@@ -66,7 +66,7 @@
 
 ### `iosApp`
 
-源代码目录 `iosApp`, `composeApp/iosMain`
+源代码目录 `iosApp`, `ylcs-app/iosMain`
 
 
 ### `server`
