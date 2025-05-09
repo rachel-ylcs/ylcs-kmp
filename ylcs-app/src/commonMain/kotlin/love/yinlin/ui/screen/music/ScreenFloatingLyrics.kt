@@ -1,12 +1,10 @@
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,6 +22,7 @@ import love.yinlin.extension.OffScreenEffect
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.screen.CommonSubScreen
 
