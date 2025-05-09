@@ -79,7 +79,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         Text(
             text = musicInfo.name,
             style = MaterialTheme.typography.labelMedium,
-            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else Colors.Unspecified,
+            color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,

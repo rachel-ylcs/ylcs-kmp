@@ -399,11 +399,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 										MiniIcon(
 											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-											color = if (index != todayIndex) Colors.Unspecified else MaterialTheme.colorScheme.primary
+											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
 										)
 										Text(
 											text = "${date.monthNumber}月${date.dayOfMonth}日",
-											color = if (index != todayIndex) Colors.Unspecified else MaterialTheme.colorScheme.primary,
+											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
 											maxLines = 1,
 											overflow = TextOverflow.Ellipsis
 										)

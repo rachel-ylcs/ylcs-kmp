@@ -25,7 +25,7 @@ import love.yinlin.extension.rememberState
 fun BeautifulSlider(
     value: Float,
     modifier: Modifier = Modifier,
-    height: Dp = ThemeValue.Size.ProgressHeight,
+    height: Dp = ThemeValue.Size.SliderHeight,
     trackColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
     trackShape: Shape = MaterialTheme.shapes.medium,

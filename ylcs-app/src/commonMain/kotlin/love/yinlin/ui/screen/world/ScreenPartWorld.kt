@@ -93,34 +93,32 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	@Composable
+    @Composable
 	private fun BannerLayout(
 		gap: Float,
 		shape: Shape,
 		modifier: Modifier = Modifier
 	) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
-		BoxWithConstraints(modifier = modifier) {
-			Banner(
-				pics = pics,
-				interval = 5000L,
-				gap = gap,
-				modifier = Modifier.fillMaxWidth().condition(gap == 0f) { heightIn(min = maxHeight / 2f) }
-			) { pic, index, scale ->
-				Surface(
-					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-					shape = shape,
-					shadowElevation = ThemeValue.Shadow.Surface
-				) {
-					WebImage(
-						uri = pic.picPath ?: "",
-						contentScale = ContentScale.Crop,
-						modifier = Modifier.fillMaxSize(),
-						onClick = {
-							showActivityDetails(pic.aid)
-						}
-					)
-				}
+		Banner(
+			pics = pics,
+			interval = 5000L,
+			gap = gap,
+			modifier = modifier
+		) { pic, index, scale ->
+			Surface(
+				modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+				shape = shape,
+				shadowElevation = ThemeValue.Shadow.Surface
+			) {
+				WebImage(
+					uri = pic.picPath ?: "",
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize(),
+					onClick = {
+						showActivityDetails(pic.aid)
+					}
+				)
 			}
 		}
 	}

@@ -1,13 +1,19 @@
 package love.yinlin.ui.screen.music
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
 import love.yinlin.AppModel
 import love.yinlin.common.Device
@@ -17,6 +23,8 @@ import love.yinlin.data.music.FloatingLyricsConfig
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.screen.CommonSubScreen
 
 @Stable
@@ -47,7 +55,7 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun LineLayout(
+    private fun RowLayout(
         title: String,
         content: @Composable () -> Unit
     ) {
@@ -66,6 +74,21 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
+    @Composable
+    private fun ColumnLayout(
+        title: String,
+        content: @Composable () -> Unit
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2)
+        ) {
+            Text(text = title)
+            content()
+        }
+    }
+
     override val title: String = "悬浮歌词"
 
     @Composable
@@ -77,54 +100,90 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
             .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
         ) {
-            LineLayout("悬浮歌词模式") {
+            RowLayout("悬浮歌词模式") {
                 Switch(
                     checked = enabled,
                     onCheckedChange = { enableFloatingLyrics(it) }
                 )
             }
-            LineLayout("左侧偏移") {
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                Box(
+                    modifier = Modifier.padding(
+                        start = this.maxWidth * config.left.coerceIn(0f, 1f),
+                        end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
+                        top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
+                    ).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "这是一条测试歌词~",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                        ),
+                        color = Color(config.textColor),
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.background(color = Color(config.backgroundColor)).padding(ThemeValue.Padding.Value)
+                    )
+                }
+            }
+            RowLayout("左侧偏移") {
                 BeautifulSlider(
                     value = config.leftProgress,
-                    height = ThemeValue.Size.SliderHeight,
                     onValueChange = { config = config.copyLeft(it) },
                     onValueChangeFinished = { app.config.floatingLyricsConfig = config },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                 )
             }
-            LineLayout("右侧偏移") {
+            RowLayout("右侧偏移") {
                 BeautifulSlider(
                     value = config.rightProgress,
-                    height = ThemeValue.Size.SliderHeight,
                     onValueChange = { config = config.copyRight(it) },
                     onValueChangeFinished = { app.config.floatingLyricsConfig = config },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                 )
             }
-            LineLayout("顶部偏移") {
+            RowLayout("顶部偏移") {
                 BeautifulSlider(
                     value = config.topProgress,
-                    height = ThemeValue.Size.SliderHeight,
                     onValueChange = { config = config.copyTop(it) },
                     onValueChangeFinished = { app.config.floatingLyricsConfig = config },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                 )
             }
-            LineLayout("字体大小") {
+            RowLayout("字体大小") {
                 BeautifulSlider(
                     value = config.textSizeProgress,
-                    height = ThemeValue.Size.SliderHeight,
                     onValueChange = { config = config.copyTextSize(it) },
                     onValueChangeFinished = { app.config.floatingLyricsConfig = config },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                 )
             }
-//            LineLayout("字体颜色") {
-//
-//            }
-//            LineLayout("背景颜色") {
-//
-//            }
+            SplitLayout(
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+                gap = ThemeValue.Padding.HorizontalExtraSpace * 2,
+                left = {
+                    ColumnLayout("字体颜色") {
+                        DockedColorPicker(
+                            initialColor = Color(app.config.floatingLyricsConfig.textColor),
+                            onColorChanged = { config = config.copy(textColor = it.value) },
+                            onColorChangeFinished = { app.config.floatingLyricsConfig = config },
+                            modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        )
+                    }
+                },
+                right = {
+                    ColumnLayout("背景颜色") {
+                        DockedColorPicker(
+                            initialColor = Color(app.config.floatingLyricsConfig.backgroundColor),
+                            onColorChanged = { config = config.copy(backgroundColor = it.value) },
+                            onColorChangeFinished = { app.config.floatingLyricsConfig = config },
+                            modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        )
+                    }
+                }
+            )
         }
 
         OffScreenEffect {

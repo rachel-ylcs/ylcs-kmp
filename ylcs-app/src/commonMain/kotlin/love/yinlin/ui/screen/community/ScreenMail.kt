@@ -151,7 +151,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 							Mail.Type.INFO -> MaterialTheme.colorScheme.primary
 							Mail.Type.CONFIRM -> MaterialTheme.colorScheme.secondary
 							Mail.Type.DECISION -> MaterialTheme.colorScheme.tertiary
-							else -> Colors.Unspecified
+							else -> MaterialTheme.colorScheme.onSurface
 						}
 					)
 					Text(

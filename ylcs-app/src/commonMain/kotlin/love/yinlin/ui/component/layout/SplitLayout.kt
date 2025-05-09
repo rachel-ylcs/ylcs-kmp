@@ -14,6 +14,7 @@ import love.yinlin.ui.component.screen.ActionScope
 @Composable
 fun SplitLayout(
     modifier: Modifier = Modifier,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable BoxScope.() -> Unit = {},
     right: @Composable BoxScope.() -> Unit = {}
@@ -21,7 +22,7 @@ fun SplitLayout(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(gap),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = verticalAlignment
     ) {
         Box(
             modifier = Modifier.weight(1f),

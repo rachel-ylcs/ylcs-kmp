@@ -276,7 +276,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 is Step.Initial -> {
                     Text(
                         text = currentStep.message,
-                        color = if (currentStep.isError) MaterialTheme.colorScheme.error else Colors.Unspecified,
+                        color = if (currentStep.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Center
                     )
                 }
