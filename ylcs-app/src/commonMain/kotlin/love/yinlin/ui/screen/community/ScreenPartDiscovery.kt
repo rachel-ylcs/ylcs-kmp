@@ -57,11 +57,11 @@ private enum class DiscoveryItem(
 
 @Stable
 class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
-	var state by mutableStateOf(BoxState.EMPTY)
+	private var state by mutableStateOf(BoxState.EMPTY)
 
-	val listState = LazyStaggeredGridState()
+	private val listState = LazyStaggeredGridState()
 
-	var currentPage by mutableIntStateOf(0)
+	private var currentPage by mutableIntStateOf(0)
 	val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
 
 	@Stable
@@ -73,9 +73,10 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 			else -> item.tid
 		}
 	}
+
 	val page = DiscoveryPagination()
 
-	suspend fun requestNewData() {
+	private suspend fun requestNewData() {
 		state = BoxState.LOADING
 		val section = currentSection
 		val result = when (section) {
@@ -107,7 +108,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		else state = BoxState.NETWORK_ERROR
 	}
 
-	suspend fun requestMoreData() {
+	private suspend fun requestMoreData() {
 		val section = currentSection
 		val result = when (section) {
 			DiscoveryItem.Latest.id -> ClientAPI.request(
@@ -139,7 +140,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	fun onTopicClick(topic: Topic) {
+	private fun onTopicClick(topic: Topic) {
 		navigate(ScreenTopic.Args(topic))
 	}
 
@@ -148,7 +149,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	fun TopicCard(
+	private fun TopicCard(
 		topic: Topic,
 		cardWidth: Dp,
 		modifier: Modifier = Modifier

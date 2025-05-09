@@ -135,7 +135,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	val pagerState = object : PagerState() {
+	private val pagerState = object : PagerState() {
 		override val pageCount: Int = MsgTabItem.entries.size
 	}
 	// 当前微博
@@ -178,7 +178,6 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-
 	@Stable
 	class PhotoState {
 		val flagFirstLoad = launchFlag()
@@ -215,11 +214,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	// 图集数据
 	val photoState = PhotoState()
 
-	suspend fun onPageChanged(index: Int) {
+	private suspend fun onPageChanged(index: Int) {
 		pagerState.scrollToPage(index)
 	}
 
-	suspend fun onRefresh() {
+	private suspend fun onRefresh() {
 		when (pagerState.currentPage) {
 			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
 			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()

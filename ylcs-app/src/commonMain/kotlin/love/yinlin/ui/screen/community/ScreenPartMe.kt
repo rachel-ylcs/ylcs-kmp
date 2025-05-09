@@ -32,7 +32,6 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
@@ -64,30 +63,37 @@ import org.jetbrains.compose.resources.stringResource
 import org.ncgroup.kscan.BarcodeFormats
 import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
+import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	val scanSheet = FloatingSheet(SheetConfig(max = 0.9f, full = true))
-	val userCardSheet = FloatingSheet()
-	val signinSheet = FloatingSheet()
+	private val scanSheet = FloatingSheet(SheetConfig(max = 0.9f, full = true))
+	private val userCardSheet = FloatingSheet()
+	private val signinSheet = FloatingSheet()
 
-	fun logoff() {
+	@OptIn(ExperimentalAtomicApi::class)
+    private val isUpdateToken = AtomicBoolean(false)
+
+	fun cleanUserToken() {
 		app.config.userToken = ""
 		app.config.userProfile = null
 	}
 
+	@OptIn(ExperimentalAtomicApi::class)
 	suspend fun updateUserToken() {
 		val token = app.config.userToken
-		if (token.isNotEmpty()) {
+		if (token.isNotEmpty() && isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
 			val result = ClientAPI.request(
 				route = API.User.Account.UpdateToken,
 				data = token
 			)
+			isUpdateToken.store(false)
 			when (result) {
 				is Data.Success -> app.config.userToken = result.data
 				is Data.Error -> {
 					if (result.type == Failed.RequestError.Unauthorized) {
-						logoff()
+						cleanUserToken()
 						navigate<ScreenLogin>()
 					}
 				}

@@ -178,7 +178,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					data = token
 				)
 				// 不论是否成功均从本地设备退出登录
-				mePart.logoff()
+				mePart.cleanUserToken()
 			}
 		}
 	}
