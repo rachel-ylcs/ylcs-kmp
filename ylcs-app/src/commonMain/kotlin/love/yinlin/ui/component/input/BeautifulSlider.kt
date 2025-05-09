@@ -66,7 +66,7 @@ fun BeautifulSlider(
                         onValueChangeFinished?.invoke(newProgress)
                     }
                 }
-            },
+            }.zIndex(1f),
             contentAlignment = Alignment.CenterStart
         ) {
             // Track
@@ -94,14 +94,14 @@ fun BeautifulSlider(
                     .zIndex(2f)
                 )
             }
+        }
 
-            // Others
-            Box(
-                modifier = Modifier.fillMaxSize().zIndex(3f),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                content?.invoke(this)
-            }
+        // Others
+        Box(
+            modifier = Modifier.fillMaxSize().zIndex(4f),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            content?.invoke(this)
         }
     }
 }
