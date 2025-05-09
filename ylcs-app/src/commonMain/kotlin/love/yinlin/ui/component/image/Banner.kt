@@ -61,6 +61,7 @@ fun <T> Banner(
 		) {
 			HorizontalPager(
 				state = state,
+				beyondViewportPageCount = 1,
 				contentPadding = PaddingValues(horizontal = spacingGap),
 				modifier = Modifier.fillMaxWidth()
 			) {

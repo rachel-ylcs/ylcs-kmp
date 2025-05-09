@@ -114,6 +114,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 					val preview = previews[it]
 					if (preview.isSource) preview.pic.source else preview.pic.image
 				},
+				beyondViewportPageCount = 1,
 				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
 				val preview = previews[it]
