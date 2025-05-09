@@ -118,7 +118,8 @@ private fun LandscapeNavigation(
 				.fillMaxHeight()
 				.padding(ThemeValue.Padding.LittleSpace)
 				.verticalScroll(rememberScrollState()),
-			horizontalAlignment = Alignment.CenterHorizontally
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.SpaceEvenly
 		) {
 			for (index in TabItem.entries.indices) {
 				NavigationIcon(
