@@ -2,7 +2,6 @@ package love.yinlin
 
 import android.content.Intent
 import android.os.Build
-import androidx.lifecycle.ViewModelProvider
 import love.yinlin.common.DeepLink
 import love.yinlin.common.Scheme
 import love.yinlin.common.Uri
@@ -53,12 +52,13 @@ object IntentProcessor {
         }
     }
 
-    fun process(intent: Intent, viewModelProvider: ViewModelProvider) {
+    fun process(intent: Intent) {
         try {
-            val deeplink = viewModelProvider[AppModel::class.java].deeplink
-            when (intent.action) {
-                Intent.ACTION_VIEW -> ActionView.process(deeplink, intent.data!!)
-                Intent.ACTION_SEND -> ActionSend.process(deeplink, intent)
+            app.model?.let {
+                when (intent.action) {
+                    Intent.ACTION_VIEW -> ActionView.process(it.deeplink, intent.data!!)
+                    Intent.ACTION_SEND -> ActionSend.process(it.deeplink, intent)
+                }
             }
         }
         catch (e: Throwable) {

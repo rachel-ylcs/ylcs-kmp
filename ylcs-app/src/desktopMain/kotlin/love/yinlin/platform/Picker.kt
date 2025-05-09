@@ -1,4 +1,3 @@
-@file:JvmName("DesktopPicker")
 package love.yinlin.platform
 
 import kotlinx.io.Sink
@@ -12,9 +11,11 @@ import love.yinlin.extension.safeToSources
 import java.io.File
 
 actual object Picker {
+    var windowHandle: Long = 0L
+
     actual suspend fun pickPicture(): Source? = Coroutines.io {
         try {
-            val path = openFileDialog("选择一张图片", "图片", "*.jpg;*.png;*.webp")
+            val path = openFileDialog(windowHandle, "选择一张图片", "图片", "*.jpg;*.png;*.webp")
             File(path!!).inputStream().asSource().buffered()
         }
         catch (_: Throwable) { null }
@@ -23,7 +24,7 @@ actual object Picker {
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.io {
         try {
             require(maxNum > 0)
-            val paths = openMultipleFileDialog(maxNum, "最多选择${maxNum}张图片", "图片", "*.jpg;*.png;*.webp")
+            val paths = openMultipleFileDialog(windowHandle, maxNum, "最多选择${maxNum}张图片", "图片", "*.jpg;*.png;*.webp")
             val files = paths.map { File(it) }
             require(files.size in 1 .. maxNum)
             files.safeToSources { it.inputStream().asSource().buffered() }
@@ -33,7 +34,7 @@ actual object Picker {
 
     actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.io {
         try {
-            val path = openFileDialog("选择一个文件", "文件", filter.joinToString(";"))
+            val path = openFileDialog(windowHandle, "选择一个文件", "文件", filter.joinToString(";"))
             File(path!!).inputStream().asSource().buffered()
         }
         catch (_: Throwable) { null }
@@ -41,7 +42,7 @@ actual object Picker {
 
     actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = Coroutines.io {
         try {
-            val path = openFileDialog("选择一个文件", "文件", filter.joinToString(";"))
+            val path = openFileDialog(windowHandle, "选择一个文件", "文件", filter.joinToString(";"))
             NormalPath(path!!)
         }
         catch (_: Throwable) { null }
@@ -49,7 +50,7 @@ actual object Picker {
 
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = Coroutines.io {
         try {
-            val path = Path(saveFileDialog("保存图片", filename, "*.webp", "图片")!!)
+            val path = Path(saveFileDialog(windowHandle, "保存图片", filename, "*.webp", "图片")!!)
             path to SystemFileSystem.sink(path).buffered()
         }
         catch (_: Throwable) { null }
@@ -61,3 +62,7 @@ actual object Picker {
         if (!result) SystemFileSystem.delete(origin as Path, false)
     }
 }
+
+internal external fun openFileDialog(parent: Long, title: String, filterName: String, filter: String): String?
+internal external fun openMultipleFileDialog(parent: Long, maxNum: Int, title: String, filterName: String, filter: String): Array<String>
+internal external fun saveFileDialog(parent: Long, title: String, filename: String, ext: String, filterName: String): String?

@@ -1,5 +1,6 @@
 # IDE配置
 **/*.iml
+**/.vscode/
 **/.fleet/
 **/.idea/
 **/.kotlin/
@@ -11,25 +12,18 @@ kotlin-js-store/
 # Gradle
 .gradle/
 
-# IOS
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcodeproj/project.xcworkspace/
-!*.xcworkspace/contents.xcworkspacedata
-**/xcshareddata/WorkspaceSettings.xcsettings
+# Xcode
+xcuserdata/
+**/xcshareddata/IDEWorkspaceChecks.plist
+Pods/
+iosApp/Configuration/Version.xcconfig
 
-# CPP
-cpp/**/test/
-cpp/**/.vs/
-cpp/**/build/
-cpp/**/cmake-build-debug/
-cpp/**/cmake-build-release/
-cpp/libs/
-**/*.sln
-**/*.vcxproj
-**/*.vcxproj.filters
-**/*.vcxproj.user
+# native
+native/**/.vs/
+native/**/build/
+native/**/cmake-build-debug/
+native/**/cmake-build-release/
+native/libs/
 
 # 编译目录
 **/build/

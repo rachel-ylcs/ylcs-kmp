@@ -1,10 +1,12 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
@@ -30,6 +32,13 @@ val desktopPlatform = System.getProperty("os.name").let { when {
     else -> GradlePlatform.Linux
 } }
 
+val desktopArchitecture = System.getProperty("os.arch").let { when {
+    it.lowercase().startsWith("aarch64") -> "aarch64"
+    it.lowercase().startsWith("arm") -> "arm"
+    it.lowercase().startsWith("amd64") -> "x86_64"
+    else -> "x86"
+} }
+
 kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -41,11 +50,36 @@ kotlin {
         }
     }
 
-    iosArm64 {
-        binaries.framework {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.compilations.getByName("main") {
+            val nskeyvalueobserving by cinterops.creating
+        }
+    }
+
+    cocoapods {
+        name = rootProject.extra["appProjectName"] as String
+        version = appVersionName
+        summary = "银临茶舍 KMP Framework"
+        homepage = "https://github.com/rachel-ylcs/ylcs-kmp"
+        ios.deploymentTarget = "16.0"
+
+        framework {
             baseName = rootProject.extra["appProjectName"] as String
             isStatic = true
         }
+
+        pod("MMKV") {
+            version = "2.2.2"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+        podfile = project.file("../iosApp/Podfile")
+
+        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
+        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
     }
 
     jvm("desktop") {
@@ -198,8 +232,8 @@ kotlin {
                 }
                 GradlePlatform.Mac -> {
                     val macMain by creating {
+                        dependsOn(nonAndroidMain)
                         dependsOn(jvmMain)
-                        dependsOn(appleMain)
                         dependencies {
 
                         }
@@ -221,11 +255,24 @@ kotlin {
             }
         }
 
-        iosArm64Main.get().apply {
+        val iosMain = iosMain.get().apply {
             dependsOn(appleMain)
             dependsOn(nonDesktopMain)
             dependencies {
                 implementation(libs.ktor.apple)
+            }
+        }
+
+        listOf(
+            iosX64Main,
+            iosArm64Main,
+            iosSimulatorArm64Main
+        ).forEach {
+            it.get().apply {
+                dependsOn(iosMain)
+                dependencies {
+
+                }
             }
         }
 
@@ -337,7 +384,7 @@ compose.desktop {
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.contains("desktopRun")) {
             jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
-            jvmArgs += "-Djava.library.path=${rootProject.extra["cppLibsDir"]}"
+            jvmArgs += "-Djava.library.path=${rootProject.extra["nativeLibsDir"]}"
         }
 
         buildTypes.release.proguard {
@@ -411,6 +458,23 @@ afterEvaluate {
         dependsOn(androidCopyAPK)
     }
 
+    // 生成苹果版本号配置
+    val appleGenVersionConfig by tasks.registering {
+        val configFile = file(project.rootDir.toString() + "/iosApp/Configuration/Version.xcconfig")
+        outputs.file(configFile)
+        val content = """
+            BUNDLE_VERSION=${rootProject.extra["appVersion"]}
+            BUNDLE_SHORT_VERSION_STRING=${appVersionName}
+        """.trimIndent()
+
+        outputs.upToDateWhen {
+            configFile.takeIf { it.exists() }?.readText() == content
+        }
+        doLast {
+            configFile.writeText(content)
+        }
+    }
+
     val run = tasks.named("run")
     val runRelease = tasks.named("runRelease")
     val createReleaseDistributable = tasks.named("createReleaseDistributable")
@@ -452,7 +516,7 @@ afterEvaluate {
                         else -> it.dir("$appName/app")
                     }
                 }
-                from(rootProject.extra["cppLibsDir"])
+                from(rootProject.extra["nativeLibsDir"])
                 into(outputAppLibDir)
             }
         }
@@ -470,7 +534,7 @@ afterEvaluate {
                         else -> it.dir(appName)
                     }
                 }
-                from(srcPath.dir(desktopPlatform.toString()))
+                from(srcPath.dir("$desktopPlatform-$desktopArchitecture"))
                 into(outputAppDir)
             }
         }

@@ -1,0 +1,27 @@
+PODS:
+  - MMKV (2.2.2):
+    - MMKVCore (~> 2.2.2)
+  - MMKVCore (2.2.2)
+  - ylcs-app (3.0.0):
+    - MMKV (= 2.2.2)
+
+DEPENDENCIES:
+  - ylcs-app (from `../ylcs-app`)
+
+SPEC REPOS:
+  trunk:
+    - MMKV
+    - MMKVCore
+
+EXTERNAL SOURCES:
+  ylcs-app:
+    :path: "../ylcs-app"
+
+SPEC CHECKSUMS:
+  MMKV: b4802ebd5a7c68fc0c4a5ccb4926fbdfb62d68e0
+  MMKVCore: a255341a3746955f50da2ad9121b18cb2b346e61
+  ylcs-app: efababda6721c7fec76d0bdd32e66b446bfc940d
+
+PODFILE CHECKSUM: aac2c5739884f5015ce131bfe3ba10f40382766d
+
+COCOAPODS: 1.16.2

@@ -18,7 +18,9 @@ kotlin {
         }
     }
 
+    iosX64()
     iosArm64()
+    iosSimulatorArm64()
 
     jvm {
         compilerOptions {
@@ -62,11 +64,24 @@ kotlin {
             }
         }
 
-        iosArm64Main.get().apply {
+        val iosMain = iosMain.get().apply {
             dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
 
+            }
+        }
+
+        listOf(
+            iosX64Main,
+            iosArm64Main,
+            iosSimulatorArm64Main
+        ).forEach {
+            it.get().apply {
+                dependsOn(iosMain)
+                dependencies {
+
+                }
             }
         }
 

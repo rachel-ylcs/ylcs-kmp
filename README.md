@@ -17,10 +17,10 @@
 | 名称      | 平台  | 运行环境   |
 |---------|-----|--------|
 | Android | 安卓  | Native |
-| IOS     | 苹果  | Native |
+| iOS     | 苹果  | Native |
 | Windows | 桌面  | JVM    |
 | Linux   | 桌面  | JVM    |
-| Mac     | 桌面  | JVM    |
+| macOS   | 桌面  | JVM    |
 | Web     | 网页  | Wasm   |
 | Server  | 服务器 | JVM    |
 
@@ -45,8 +45,9 @@
 1. androidMain
    - 运行：`IDEA - Android App`
    - 发布签名安装包：`composeApp:androidPublish`
-2. iosArm64Main
-   - 运行
+2. iosMain
+   - 进入iosApp目录，运行：`pod install`
+   - Xcode打开`iosApp/iosApp.xcworkspace`，运行App
    - 发布签名安装包
 3. desktopMain
    - 运行(Debug)：`composeApp:desktopRunDebug`
@@ -65,7 +66,7 @@
 
 ### `iosApp`
 
-源代码目录 `iosApp`, `composeApp/iosArm64Main`
+源代码目录 `iosApp`, `composeApp/iosMain`
 
 
 ### `server`
@@ -92,11 +93,12 @@ MOD管理器(桌面版) `modManager`
 ### 编译与运行环境
 
 - IntelliJ IDEA 2025.1 EAP (Ultimate Edition)
+- Xcode 16.3
 - gradle 8.13-all
 - JDK 21
 - Clion 2025.1
 - Windows(可编译Android/Windows/Web/Server)
-- Mac(可编译Android/IOS/Mac/Web/Server)
+- macOS(可编译Android/iOS/macOS/Web/Server)
 - Linux(可编译Android/Linux/Web/Server)
 
 ### Common
@@ -109,11 +111,13 @@ git clone 本仓库，Gradle 同步，下载依赖，构建。
 
 ### IOS
 
-待补充。
+首先进入 iosApp 目录，执行 `pod install` 安装依赖。
+
+然后使用 Xcode 直接运行或发布。
 
 ### Desktop
 
-需要先使用 Clion 编译项目中的 C++ 库，会自动生成动态链接库文件到 libs 目录。
+需要先进入 native 目录，执行 `build.bat`(Windows) 或 `build.sh`(Linux/macOS) 脚本，会自动生成动态链接库文件到 native/libs 目录。
 
 打包时会自动将动态链接库复制到输出目录。
 

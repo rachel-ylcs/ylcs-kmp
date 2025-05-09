@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.kotlinCocoapods) apply false
     alias(libs.plugins.ktor) apply false
     alias(libs.plugins.kotlinAndroid) apply false
 }
@@ -19,11 +20,11 @@ val dirApp by extra(dirProject.dir(appProjectName))
 val dirSrc by extra(dirApp.dir("src"))
 val dirBuild by extra(dirApp.dir("build"))
 val dirIOSApp by extra(dirProject.dir("iosApp"))
-val dirCpp by extra(dirProject.dir("cpp"))
+val dirNative by extra(dirProject.dir("native"))
 val dirOutput by extra(dirProject.dir("outputs"))
 
-// Cpp
-val cppLibsDir by extra(dirCpp.dir("libs"))
+// Native
+val nativeLibsDir by extra(dirNative.dir("libs"))
 
 // App
 val appName by extra("ylcs")
@@ -54,7 +55,7 @@ val androidOutputDir by extra(dirOutput)
 val androidOutputFileName by extra("ylcs.apk")
 
 // IOS
-val iosDir by extra(dirSrc.dir("iosArm64Main"))
+val iosDir by extra(dirSrc.dir("iosMain"))
 
 // Desktop
 val desktopDir by extra(dirSrc.dir("desktopMain"))

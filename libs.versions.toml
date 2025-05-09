@@ -4,7 +4,7 @@
 kotlin = "2.2.0-Beta2"
 cmp = "1.8.0"
 cmp-stable = "1.7.3"
-agp = "8.10.0-alpha05"
+agp = "8.10.0"
 
 # Libs #
 
@@ -22,6 +22,7 @@ media3 = "1.6.1"
 gradleApplication = { id = "org.gradle.application" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }

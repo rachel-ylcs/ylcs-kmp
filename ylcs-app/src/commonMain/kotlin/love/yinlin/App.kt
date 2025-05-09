@@ -82,7 +82,11 @@ class AppModel(
 @Composable
 fun App(modifier: Modifier = Modifier.fillMaxSize()) {
 	val navController = rememberNavController()
-	val appModel = viewModel { AppModel(navController) }
+	val appModel = viewModel {
+		AppModel(navController).apply {
+			app.model = this
+		}
+	}
 
 	Box(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
 		NavHost(

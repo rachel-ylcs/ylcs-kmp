@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import ComposeApp
+import ylcs_app
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
@@ -13,9 +13,9 @@ struct ComposeView: UIViewControllerRepresentable {
 struct ContentView: View {
     var body: some View {
         ComposeView()
-                .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+                .ignoresSafeArea(.all) // Let compose handle safe area
+                .onOpenURL { url in
+                    MainViewControllerKt.onOpenURL(url: url)
+                }
     }
 }
-
-
-

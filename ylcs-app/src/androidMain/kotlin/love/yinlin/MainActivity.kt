@@ -32,6 +32,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        IntentProcessor.process(intent, ViewModelProvider(this))
+        IntentProcessor.process(intent)
     }
 }

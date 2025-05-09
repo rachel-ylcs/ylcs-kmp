@@ -5,6 +5,7 @@ import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import io.ktor.client.*
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.AppModel
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
 
@@ -22,6 +23,9 @@ abstract class AppContext {
 	// HttpClient
 	val client: HttpClient = NetClient.common
 	val fileClient: HttpClient = NetClient.file
+
+	// ViewModel
+	abstract var model: AppModel?
 
 	// 初始化部分
 

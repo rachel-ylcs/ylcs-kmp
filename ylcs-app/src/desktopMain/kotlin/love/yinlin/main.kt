@@ -16,8 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import com.sun.jna.Native
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
+import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -59,6 +61,7 @@ fun main() {
                 // MinimumSize
                 LaunchedEffect(Unit) {
                     window.minimumSize = Dimension(360, 640)
+                    Picker.windowHandle = Native.getWindowID(window)
                 }
 
                 // Content

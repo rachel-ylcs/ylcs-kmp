@@ -5,9 +5,11 @@ import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
+import love.yinlin.AppModel
 
 class ActualAppContext : AppContext() {
 	override val kv: KV = KV()
+	override var model: AppModel? = null
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
 		logger(level = Logger.Level.Error)

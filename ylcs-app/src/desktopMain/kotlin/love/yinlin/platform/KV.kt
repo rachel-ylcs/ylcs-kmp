@@ -5,12 +5,6 @@ import java.io.File
 
 @Stable
 actual class KV {
-	companion object {
-		init {
-			System.loadLibrary("mmkv")
-		}
-	}
-
 	val handle: Long = init(File(System.getProperty("user.dir"), "config").toString())
 
 	actual fun set(key: String, value: Boolean, expire: Int) = setBoolean(handle, key, value, expire)

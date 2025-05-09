@@ -7,20 +7,24 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
+import love.yinlin.AppModel
+import love.yinlin.common.Weak
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 import java.io.File
 
 class ActualAppContext : AppContext() {
-	override val kv: KV = KV()
-
-	init {
-		// 本机库
-		System.loadLibrary("ylcs")
-
-		// VLC
-		System.setProperty("jna.library.path", "${System.getProperty("user.dir")}${File.separator}vlc")
+	companion object {
+		init {
+			// 本机库
+			System.loadLibrary("ylcs_native")
+			// VLC
+			System.setProperty("jna.library.path", "${System.getProperty("user.dir")}${File.separator}vlc")
+		}
 	}
+
+	override val kv: KV = KV()
+	override var model: AppModel? by Weak()
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
 		logger(level = Logger.Level.Error)
