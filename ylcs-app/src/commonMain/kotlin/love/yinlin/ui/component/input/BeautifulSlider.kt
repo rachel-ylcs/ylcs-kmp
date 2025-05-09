@@ -98,7 +98,7 @@ fun BeautifulSlider(
 
         // Others
         Box(
-            modifier = Modifier.fillMaxSize().zIndex(4f),
+            modifier = Modifier.matchParentSize().zIndex(4f),
             contentAlignment = Alignment.CenterStart
         ) {
             content?.invoke(this)

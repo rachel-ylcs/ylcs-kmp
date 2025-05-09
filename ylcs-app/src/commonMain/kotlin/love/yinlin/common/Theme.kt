@@ -333,9 +333,9 @@ object ThemeValue {
 			Device.Size.LARGE -> 6.dp
 		}
 		val SliderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			Device.Size.SMALL -> 10.dp
-			Device.Size.MEDIUM -> 12.5.dp
-			Device.Size.LARGE -> 15.dp
+			Device.Size.SMALL -> 8.dp
+			Device.Size.MEDIUM -> 10.dp
+			Device.Size.LARGE -> 12.dp
 		}
 		val RefreshHeaderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 70.dp
