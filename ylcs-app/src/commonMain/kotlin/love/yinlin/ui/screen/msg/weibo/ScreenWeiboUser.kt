@@ -24,10 +24,10 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
+import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.itemKey
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -176,7 +176,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		grid: WeiboGridData
 	) {
 		LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-			item(key = "UserInfoCard".itemKey) {
+			item(key = ItemKey("UserInfoCard")) {
 				WebImage(
 					uri = user.background,
 					modifier = Modifier.fillMaxWidth().aspectRatio(2f),
@@ -203,7 +203,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					)
 				}
 			}
-			item(key = "Text".itemKey) {
+			item(key = ItemKey("Text")) {
 				Text(
 					text = "最新微博",
 					textAlign = TextAlign.Center,

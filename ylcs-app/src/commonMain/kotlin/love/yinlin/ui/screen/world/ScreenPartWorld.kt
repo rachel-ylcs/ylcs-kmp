@@ -30,6 +30,7 @@ import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
+import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.*
 import love.yinlin.platform.app
@@ -187,14 +188,14 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
-			item(key = "Banner".itemKey) {
+			item(key = ItemKey("Banner")) {
 				BannerLayout(
 					gap = 0f,
 					shape = RectangleShape,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
-			item(key = "Calendar".itemKey) {
+			item(key = ItemKey("Calendar")) {
 				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
 					if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
 						Action(Icons.Outlined.Add) {
@@ -254,7 +255,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				modifier = Modifier.fillMaxWidth().weight(1f),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				item(key = "Banner".itemKey) {
+				item(key = ItemKey("Banner")) {
 					BannerLayout(
 						gap = 0.3f,
 						shape = MaterialTheme.shapes.large,

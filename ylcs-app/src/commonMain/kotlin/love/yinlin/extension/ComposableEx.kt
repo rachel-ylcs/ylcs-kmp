@@ -17,7 +17,9 @@ import kotlin.time.Duration
 
 // BaseValue
 
+
 fun Offset.translate(x: Float = 0f, y: Float = 0f) = copy(x = this.x + x, y = this.y + y)
+
 
 // condition Modifier
 
@@ -31,6 +33,7 @@ inline fun Modifier.condition(value: Boolean, ifTrue: Modifier.() -> Modifier, i
 
 // clickableNoRipple
 
+
 @Composable
 fun Modifier.clickableNoRipple(enabled: Boolean = true, onClick: () -> Unit): Modifier = this.clickable(
 	interactionSource = remember { MutableInteractionSource() },
@@ -38,6 +41,7 @@ fun Modifier.clickableNoRipple(enabled: Boolean = true, onClick: () -> Unit): Mo
 	enabled = enabled,
 	onClick = onClick
 )
+
 
 // rememberState
 
@@ -110,11 +114,6 @@ inline fun OffScreenEffect(crossinline block: (isForeground: Boolean) -> Unit) {
 		}
 	}
 }
-
-// itemKey
-
-val String.itemKey get() = Unit to this
-
 
 // LaunchFlag
 

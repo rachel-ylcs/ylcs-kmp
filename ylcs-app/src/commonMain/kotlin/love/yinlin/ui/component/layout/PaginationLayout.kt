@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.api.APIConfig
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.itemKey
+import love.yinlin.data.ItemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
@@ -349,7 +349,7 @@ private fun <T> ClickPaginationColumn(
 		modifier = modifier
 	) {
 		if (header != null) {
-			item(key = "Header".itemKey) {
+			item(key = ItemKey("Header")) {
 				header()
 			}
 		}
@@ -401,7 +401,7 @@ private fun <T> ClickPaginationGrid(
 	) {
 		if (header != null) {
 			item(
-				key = "Header".itemKey,
+				key = ItemKey("Header"),
 				span = { GridItemSpan(maxLineSpan) }
 			) {
 				header()
@@ -455,7 +455,7 @@ private fun <T> ClickPaginationStaggeredGrid(
 	) {
 		if (header != null) {
 			item(
-				key = "Header".itemKey,
+				key = ItemKey("Header"),
 				span = StaggeredGridItemSpan.FullLine
 			) {
 				header()
@@ -516,7 +516,7 @@ fun <T> PaginationColumn(
 					horizontalAlignment = horizontalAlignment,
 				) {
 					if (header != null) {
-						item(key = "Header".itemKey) {
+						item(key = ItemKey("Header")) {
 							header()
 						}
 					}
@@ -583,7 +583,7 @@ fun <T> PaginationGrid(
 				) {
 					if (header != null) {
 						item(
-							key = "Header".itemKey,
+							key = ItemKey("Header"),
 							span = { GridItemSpan(maxLineSpan) }
 						) {
 							header()
@@ -649,7 +649,7 @@ fun <T> PaginationStaggeredGrid(
 				) {
 					if (header != null) {
 						item(
-							key = "Header".itemKey,
+							key = ItemKey("Header"),
 							span = StaggeredGridItemSpan.FullLine
 						) {
 							header()

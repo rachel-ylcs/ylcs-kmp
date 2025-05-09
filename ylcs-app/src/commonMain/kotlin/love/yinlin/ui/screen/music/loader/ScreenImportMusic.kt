@@ -24,9 +24,9 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
+import love.yinlin.data.ItemKey
 import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
-import love.yinlin.extension.itemKey
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.LoadingAnimation
@@ -123,7 +123,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
-            item("metadata".itemKey) {
+            item(ItemKey("Metadata")) {
                 val metadata = preview.metadata
                 Surface(
                     modifier = Modifier.fillMaxWidth(),

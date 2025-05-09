@@ -41,6 +41,13 @@ kotlin {
             }
         }
 
+        val nonAndroidMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+
+            }
+        }
+
         val nonWasmJsMain by creating {
             dependsOn(commonMain)
             dependencies {
@@ -56,6 +63,7 @@ kotlin {
         }
 
         iosArm64Main.get().apply {
+            dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
 
@@ -63,6 +71,7 @@ kotlin {
         }
 
         jvmMain.get().apply {
+            dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
 
@@ -70,7 +79,7 @@ kotlin {
         }
 
         wasmJsMain.get().apply {
-            dependsOn(commonMain)
+            dependsOn(nonAndroidMain)
             dependencies {
 
             }

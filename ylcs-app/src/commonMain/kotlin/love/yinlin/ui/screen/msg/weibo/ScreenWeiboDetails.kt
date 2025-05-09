@@ -16,9 +16,9 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
+import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.extension.itemKey
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.Space
@@ -80,11 +80,11 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 				.padding(ThemeValue.Padding.EqualExtraValue),
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
-			item(key = "WeiboLayout".itemKey) {
+			item(key = ItemKey("WeiboLayout")) {
 				WeiboLayout(weibo = weibo)
 			}
 			comments?.let { weiboComments ->
-				item(key = "HorizontalDivider".itemKey) {
+				item(key = ItemKey("HorizontalDivider")) {
 					HorizontalDivider(modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
 				}
 				items(

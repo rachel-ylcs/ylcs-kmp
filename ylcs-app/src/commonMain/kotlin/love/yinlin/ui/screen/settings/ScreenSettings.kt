@@ -27,11 +27,11 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
 import love.yinlin.data.Data
+import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
-import love.yinlin.extension.itemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -406,13 +406,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 			verticalItemSpacing = ThemeValue.Padding.EqualSpace
 		) {
-			item(key = "AccountSettings".itemKey) {
+			item(key = ItemKey("AccountSettings")) {
 				AccountSettings(
 					userProfile = userProfile,
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
-			item(key = "CommonSettings".itemKey) {
+			item(key = ItemKey("CommonSettings")) {
 				CommonSettings(
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
