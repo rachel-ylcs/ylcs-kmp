@@ -34,9 +34,11 @@ private fun BannerIndicator(
 			.clip(MaterialTheme.shapes.extraLarge)
 			.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
 	) {
-		Box(modifier = Modifier.width(width).fillMaxHeight()
-			.offset(x = offsetX).clip(MaterialTheme.shapes.extraLarge)
-			.background(MaterialTheme.colorScheme.onBackground))
+		Box(
+			modifier = Modifier.width(width).fillMaxHeight()
+				.offset(x = offsetX).clip(MaterialTheme.shapes.extraLarge)
+				.background(MaterialTheme.colorScheme.onBackground)
+		)
 	}
 }
 
