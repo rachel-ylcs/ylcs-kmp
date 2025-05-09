@@ -112,7 +112,7 @@ fun DockedColorPicker(
 
         BoxWithConstraints(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
             val radius = with(LocalDensity.current) { (maxWidth / 2f).toPx() }
-            var pickerLocation by rememberState(maxWidth, initialColor) {
+            var pickerLocation by rememberState(radius, initialColor) {
                 val hsv = initialColor.hsv
                 val angle = hsv.hue * 3.141592f / 180
                 val saturation = hsv.saturation
@@ -120,14 +120,14 @@ fun DockedColorPicker(
             }
 
             Canvas(modifier = Modifier.fillMaxSize()
-                .pointerInput(maxWidth, initialColor, onColorChanged, onColorChangeFinished) {
+                .pointerInput(radius, initialColor, onColorChanged, onColorChangeFinished) {
                     detectDragGestures(onDragEnd = { onColorChangeFinished?.invoke(pickerColor) }) { change, _ ->
                         val validOffset = getValidOffset(change.position, radius)
                         pickerLocation = validOffset
                         pickerColor = calculateColor(validOffset, radius, (pickerColor.alpha * 255).roundToInt())
                         onColorChanged?.invoke(pickerColor)
                     }
-                }.pointerInput(maxWidth, initialColor, onColorChanged, onColorChangeFinished) {
+                }.pointerInput(radius, initialColor, onColorChanged, onColorChangeFinished) {
                     detectTapGestures {
                         val validOffset = getValidOffset(it, radius)
                         pickerLocation = validOffset
