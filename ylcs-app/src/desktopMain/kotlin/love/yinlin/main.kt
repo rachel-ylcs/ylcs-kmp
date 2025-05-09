@@ -58,11 +58,8 @@ fun main() {
                 state = state,
             ) {
                 // MinimumSize
-                val density = LocalDensity.current
-                LaunchedEffect(density) {
-                    with(density) {
-                        window.minimumSize = Dimension(360.dp.roundToPx(), 640.dp.roundToPx())
-                    }
+                LaunchedEffect(Unit) {
+                    window.minimumSize = Dimension(360, 640)
                 }
 
                 // Content
