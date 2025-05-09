@@ -94,7 +94,7 @@ private fun CalendarHeader(
 	modifier: Modifier = Modifier,
 	actions: @Composable ActionScope.() -> Unit = { }
 ) {
-	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
+	val currentDate by rememberDerivedState(state) { indexShadowDate(state.settledPage) }
 
 	Row(
 		modifier = modifier.padding(start = ThemeValue.Padding.HorizontalExtraSpace, end = ThemeValue.Padding.HorizontalSpace),
@@ -102,7 +102,7 @@ private fun CalendarHeader(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			text = "${currentDate.year}年${currentDate.monthNumber}月",
+			text = remember(currentDate) { "${currentDate.year}年${currentDate.monthNumber}月" },
 			style = MaterialTheme.typography.titleLarge,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
@@ -157,7 +157,7 @@ private fun CalendarDayGrid(
 				Row(modifier = Modifier.fillMaxWidth()) {
 					repeat(7) { col ->
 						val dayIndex = row * 7 + col
-						val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
+						val date = remember(startDate, dayIndex) { startDate.plus(dayIndex, DateTimeUnit.DAY) }
 						val eventTitle = events[date]
 						val color = when {
 							date == today -> MaterialTheme.colorScheme.onPrimaryContainer
