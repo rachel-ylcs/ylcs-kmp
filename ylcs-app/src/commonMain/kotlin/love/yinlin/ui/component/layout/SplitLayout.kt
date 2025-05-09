@@ -40,6 +40,8 @@ fun SplitLayout(
 @Composable
 fun SplitActionLayout(
     modifier: Modifier = Modifier,
+    aspectRatio: Float = 1f,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable ActionScope.() -> Unit = {},
     right: @Composable ActionScope.() -> Unit = {}
@@ -47,10 +49,10 @@ fun SplitActionLayout(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(gap),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = verticalAlignment
     ) {
         Row(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(aspectRatio),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
             content = { ActionScope.Left.Actions(block = left) }
