@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
+import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberDerivedState
@@ -36,6 +37,8 @@ import kotlin.math.min
 
 @Stable
 private sealed interface TouchRegion {
+    @Stable
+    @Serializable
     enum class Vertex : TouchRegion {
         TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }

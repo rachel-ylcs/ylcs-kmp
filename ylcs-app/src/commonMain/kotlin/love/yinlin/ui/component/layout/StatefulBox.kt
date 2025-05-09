@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.Serializable
 import love.yinlin.common.ThemeValue
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -24,6 +26,8 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.LoadingButton
 import org.jetbrains.compose.resources.stringResource
 
+@Stable
+@Serializable
 enum class BoxState {
 	LOADING,
 	CONTENT,

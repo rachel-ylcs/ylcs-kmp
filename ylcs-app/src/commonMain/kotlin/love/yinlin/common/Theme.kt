@@ -213,13 +213,13 @@ private fun rachelTextStyle(
 	isBold: Boolean = false
 ): TextStyle {
 	val font = Font(Res.font.xwwk)
-	return remember(size, isBold) { baseTextStyle(font, size, isBold) }
+	return remember(font, size, isBold) { baseTextStyle(font, size, isBold) }
 }
 
 @Composable
 private fun rachelTypography(device: Device): Typography {
 	val font = Font(Res.font.xwwk)
-	return remember(device) { when (device.size) {
+	return remember(device, font) { when (device.size) {
         Device.Size.SMALL -> Typography(
 			displayLarge = baseTextStyle(font, 28.sp, true),
 			displayMedium = baseTextStyle(font, 24.sp, true),

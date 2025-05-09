@@ -1,5 +1,10 @@
 package love.yinlin.data.music
 
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
+
+@Stable
+@Serializable
 enum class MusicResourceType(
     val id: Int,
     val description: String,

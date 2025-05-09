@@ -13,8 +13,10 @@ class Device private constructor(
     val type: Type
 ) {
     @Stable
+    @Serializable
     enum class Size { SMALL, MEDIUM, LARGE; }
     @Stable
+    @Serializable
     enum class Type { PORTRAIT, LANDSCAPE, SQUARE; }
 
     constructor(width: Dp, height: Dp) : this(

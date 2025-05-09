@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
@@ -39,6 +40,8 @@ import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
 open class Tip(private val scope: CoroutineScope) {
+    @Stable
+    @Serializable
     enum class Type {
         INFO, SUCCESS, WARNING, ERROR,
     }

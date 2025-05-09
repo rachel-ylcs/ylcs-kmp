@@ -11,8 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import kotlinx.serialization.Serializable
 import love.yinlin.ui.component.image.ClickIcon
 
+@Stable
+@Serializable
 enum class InputType {
 	COMMON,
 	PASSWORD;

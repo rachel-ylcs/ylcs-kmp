@@ -4,12 +4,15 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.FilterQuality
 import kotlinx.io.Sink
 import kotlinx.io.Source
+import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.math.min
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class ImmutableImage
 
+@Stable
+@Serializable
 enum class ImageQuality {
     Low, Medium, High, Full;
 

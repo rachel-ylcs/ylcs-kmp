@@ -1,9 +1,11 @@
 package love.yinlin.common
 
 import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 import love.yinlin.extension.localComposition
 
 @Stable
+@Serializable
 enum class ThemeMode {
     SYSTEM, LIGHT, DARK;
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import love.yinlin.api.APIConfig
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.itemKey
@@ -97,6 +98,8 @@ abstract class PaginationArgs<E, out T, out A1>(
 
 // 分页 UI 实现
 
+@Stable
+@Serializable
 private enum class PaginationStatus {
 	IDLE, RUNNING, PULL, RELEASE
 }

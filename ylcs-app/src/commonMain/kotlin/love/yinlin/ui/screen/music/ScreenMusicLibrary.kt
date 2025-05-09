@@ -129,6 +129,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
 
+    @Stable
     private enum class ImportMusicItem(val text: String, val icon: ImageVector, val isImage: Boolean) {
         FromMod("从MOD导入", Icons.Outlined.Token, false),
         FromLocal("本地制作", Icons.Outlined.Unarchive, false),

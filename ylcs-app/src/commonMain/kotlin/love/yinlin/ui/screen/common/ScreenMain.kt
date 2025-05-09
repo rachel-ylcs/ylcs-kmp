@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.ImmersivePadding
@@ -32,6 +33,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+@Stable
+@Serializable
 private enum class TabItem(
 	val title: StringResource,
 	val iconNormal: DrawableResource,

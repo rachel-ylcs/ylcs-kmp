@@ -14,6 +14,8 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.random.Random
 
+@Stable
+@Serializable
 enum class MusicResourceType(
     val id: Int,
     val description: String,

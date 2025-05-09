@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
@@ -37,6 +38,8 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
 
+@Stable
+@Serializable
 private enum class DiscoveryItem(
 	val id: Int,
 	val icon: ImageVector

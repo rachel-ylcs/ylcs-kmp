@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
@@ -47,6 +48,8 @@ import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
 import love.yinlin.ui.screen.msg.weibo.WeiboGridData
 import love.yinlin.ui.screen.msg.weibo.WeiboProcessor
 
+@Stable
+@Serializable
 private enum class MsgTabItem(
 	val title: String,
 	val icon: ImageVector

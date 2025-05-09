@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -29,6 +30,8 @@ import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
+	@Stable
+	@Serializable
 	private enum class Mode {
 		Login,
 		Register,
