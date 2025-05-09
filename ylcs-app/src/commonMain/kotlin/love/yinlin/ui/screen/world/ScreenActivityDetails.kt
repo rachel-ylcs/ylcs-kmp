@@ -38,7 +38,7 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.resources.*
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.screen.common.ScreenWebpage
 
 @Composable

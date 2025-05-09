@@ -38,7 +38,7 @@ import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.SplitLayout
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import kotlin.math.abs
 
 @Stable
@@ -62,35 +62,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		DateEx.Formatter.standardDate.format(date)
 			?.findSelf(activities) { it.ts }
 				?.let { showActivityDetails(it.aid) }
-	}
-
-	@Composable
-	private fun ToolBar(modifier: Modifier = Modifier) {
-		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
-
-		Surface(
-			modifier = modifier,
-			shadowElevation = ThemeValue.Shadow.Surface
-		) {
-			Row(
-				modifier = Modifier
-					.padding(LocalImmersivePadding.current.withoutBottom)
-					.fillMaxWidth()
-					.padding(vertical = ThemeValue.Padding.VerticalSpace),
-				horizontalArrangement = Arrangement.End,
-			) {
-				ActionScope.Right.Actions {
-					if (hasPrivilegeVIPCalendar) {
-						Action(Icons.Outlined.Add) {
-							navigate<ScreenAddActivity>()
-						}
-					}
-					ActionSuspend(Icons.Outlined.Refresh) {
-						requestActivity()
-					}
-				}
-			}
-		}
 	}
 
     @Composable
@@ -124,7 +95,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun CalendarLayout(modifier: Modifier = Modifier) {
+	private fun CalendarLayout(
+		modifier: Modifier = Modifier,
+		actions: @Composable (ActionScope.() -> Unit)
+	) {
 		val events: Map<LocalDate, String> by rememberDerivedState {
 			val events = mutableMapOf<LocalDate, String>()
 			for (activity in activities) {
@@ -147,6 +121,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			Calendar(
 				state = calendarState,
 				events = events,
+				actions = actions,
 				modifier = Modifier.fillMaxWidth(),
 				onEventClick = { onDateClick(it) }
 			)
@@ -183,17 +158,20 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		) {
 			SplitLayout(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+				aspectRatio = 0.5f,
 				left = {
 					Text(
 						text = intervalString,
-						style = MaterialTheme.typography.displayLarge,
-						color = intervalColor
+						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.titleLarge else MaterialTheme.typography.displayLarge,
+						color = intervalColor,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
 					)
 				},
 				right = {
 					Text(
 						text = remember(activity) { "${activity.title} / ${activity.ts}" },
-						style = MaterialTheme.typography.titleLarge,
+						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleLarge,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)
@@ -203,37 +181,30 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
-	private fun Portrait(modifier: Modifier = Modifier) {
-		Column(
-			modifier = modifier,
-			horizontalAlignment = Alignment.CenterHorizontally
-		) {
-			BannerLayout(
-				gap = 0f,
-				shape = RectangleShape,
-				modifier = Modifier.fillMaxWidth()
-			)
-			Box(
-				modifier = Modifier.widthIn(max = ThemeValue.Size.PanelWidth).fillMaxWidth().weight(1f),
-				contentAlignment = Alignment.Center
-			) {
-				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-			}
-		}
-	}
-
-	@Composable
-	private fun Landscape(modifier: Modifier = Modifier) {
+	private fun Portrait() {
 		LazyColumn(
-			modifier = modifier,
-			horizontalAlignment = Alignment.CenterHorizontally
+			modifier = Modifier.fillMaxSize(),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 		) {
 			item(key = "Banner".itemKey) {
 				BannerLayout(
-					gap = 0.3f,
-					shape = MaterialTheme.shapes.large,
-					modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace)
+					gap = 0f,
+					shape = RectangleShape,
+					modifier = Modifier.fillMaxWidth()
 				)
+			}
+			item(key = "Calendar".itemKey) {
+				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
+					if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+						Action(Icons.Outlined.Add) {
+							navigate<ScreenAddActivity>()
+						}
+					}
+					ActionSuspend(Icons.Outlined.Refresh) {
+						requestActivity()
+					}
+				}
 			}
 			items(
 				items = activities,
@@ -253,26 +224,71 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	@Composable
+	private fun Landscape() {
+		Column(modifier = Modifier.fillMaxSize()) {
+			Surface(
+				modifier = Modifier.fillMaxWidth(),
+				shadowElevation = ThemeValue.Shadow.Surface
+			) {
+				Row(
+					modifier = Modifier
+						.padding(LocalImmersivePadding.current.withoutBottom)
+						.fillMaxWidth()
+						.padding(vertical = ThemeValue.Padding.VerticalSpace),
+					horizontalArrangement = Arrangement.End,
+				) {
+					ActionScope.Right.Actions {
+						if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+							Action(Icons.Outlined.Add) {
+								navigate<ScreenAddActivity>()
+							}
+						}
+						ActionSuspend(Icons.Outlined.Refresh) {
+							requestActivity()
+						}
+					}
+				}
+			}
+			LazyColumn(
+				modifier = Modifier.fillMaxWidth().weight(1f),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				item(key = "Banner".itemKey) {
+					BannerLayout(
+						gap = 0.3f,
+						shape = MaterialTheme.shapes.large,
+						modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace)
+					)
+				}
+				items(
+					items = activities,
+					key = { it.aid }
+				) { activity ->
+					CalendarBarItem(
+						modifier = Modifier.fillMaxWidth()
+							.padding(ThemeValue.Padding.Value)
+							.clickable {
+								activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
+									onDateClick(it)
+								}
+							},
+						activity = activity
+					)
+				}
+			}
+		}
+	}
+
 	override suspend fun initialize() {
 		requestActivity()
 	}
 
 	@Composable
 	override fun Content() {
-		Column(modifier = Modifier.fillMaxSize()) {
-			ToolBar(modifier = Modifier.fillMaxWidth())
-			when (LocalDevice.current.type) {
-				Device.Type.PORTRAIT -> Portrait(modifier = Modifier
-					.fillMaxWidth()
-					.weight(1f)
-					.padding(LocalImmersivePadding.current.withoutTop)
-				)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(modifier = Modifier
-					.fillMaxWidth()
-					.weight(1f)
-					.padding(LocalImmersivePadding.current.withoutTop)
-				)
-			}
+		when (LocalDevice.current.type) {
+			Device.Type.PORTRAIT -> Portrait()
+			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 		}
 	}
 }

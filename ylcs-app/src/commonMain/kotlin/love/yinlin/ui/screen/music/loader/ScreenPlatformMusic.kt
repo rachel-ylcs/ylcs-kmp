@@ -45,7 +45,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelRadioButton
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState

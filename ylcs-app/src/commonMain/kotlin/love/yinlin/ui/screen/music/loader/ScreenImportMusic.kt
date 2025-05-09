@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
@@ -35,7 +34,7 @@ import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult
 import love.yinlin.ui.component.platform.dragAndDrop
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath

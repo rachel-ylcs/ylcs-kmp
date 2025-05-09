@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
@@ -34,7 +33,7 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage

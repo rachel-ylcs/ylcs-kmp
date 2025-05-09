@@ -23,6 +23,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.condition
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.ui.component.layout.ActionScope
 
 private val lunarFestivalTable = mapOf(
 	101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",
@@ -91,12 +92,12 @@ private fun indexShadowDate(index: Int): LocalDate {
 private fun CalendarHeader(
 	state: CalendarState,
 	modifier: Modifier = Modifier,
-	actions: @Composable RowScope.() -> Unit = { }
+	actions: @Composable ActionScope.() -> Unit = { }
 ) {
 	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
 	Row(
-		modifier = modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace),
+		modifier = modifier.padding(start = ThemeValue.Padding.HorizontalExtraSpace, end = ThemeValue.Padding.HorizontalSpace),
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 		verticalAlignment = Alignment.CenterVertically
 	) {
@@ -107,19 +108,14 @@ private fun CalendarHeader(
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier.weight(1f)
 		)
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			actions()
+		Row(verticalAlignment = Alignment.CenterVertically) {
+			ActionScope.Right.actions()
 		}
 	}
 }
 
 @Composable
-private fun CalendarWeekGrid(
-	modifier: Modifier = Modifier
-) {
+private fun CalendarWeekGrid(modifier: Modifier = Modifier) {
 	Row(modifier = modifier) {
 		"一二三四五六日".forEach {
 			Text(
@@ -156,53 +152,51 @@ private fun CalendarDayGrid(
 		val startDate = remember(currentDate, startDay) { currentDate.minus(startDay, DateTimeUnit.DAY) }
 		val today = remember(currentDate) { DateEx.Today }
 
-		LazyVerticalGrid(
-			columns = GridCells.Fixed(7),
-			modifier = Modifier.fillMaxWidth()
-		) {
-			items(
-				count = 42,
-				key = { it }
-			) { dayIndex ->
-				val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
-				val eventTitle = events[date]
-				val color = when {
-					date == today -> MaterialTheme.colorScheme.onPrimaryContainer
-					eventTitle != null -> MaterialTheme.colorScheme.primary
-					dayIndex !in startDay..endDay -> MaterialTheme.colorScheme.onSurfaceVariant
-					date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
-					else -> Colors.Unspecified
-				}
-				val text = remember(eventTitle, date) { eventTitle ?: date.lunar }
+		Column(modifier = Modifier.fillMaxWidth()) {
+			repeat(6) { row ->
+				Row(modifier = Modifier.fillMaxWidth()) {
+					repeat(7) { col ->
+						val dayIndex = row * 7 + col
+						val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
+						val eventTitle = events[date]
+						val color = when {
+							date == today -> MaterialTheme.colorScheme.onPrimaryContainer
+							eventTitle != null -> MaterialTheme.colorScheme.primary
+							dayIndex !in startDay..endDay -> MaterialTheme.colorScheme.onSurfaceVariant
+							date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
+							else -> Colors.Unspecified
+						}
+						val text = remember(eventTitle, date) { eventTitle ?: date.lunar }
 
-				Box(
-					modifier = Modifier.fillMaxWidth().aspectRatio(1f)
-						.condition(eventTitle != null) { clickable(onClick = { onEventClick(date) }) },
-					contentAlignment = Alignment.Center
-				) {
-					if (date == today) {
-						Box(modifier = Modifier.fillMaxHeight(fraction = 0.9f).aspectRatio(1f).background(
-							color = MaterialTheme.colorScheme.primaryContainer,
-							shape = CircleShape
-						))
-					}
-					Column(horizontalAlignment = Alignment.CenterHorizontally) {
-						Text(
-							text = date.dayOfMonth.toString(),
-							color = color,
-							style = MaterialTheme.typography.labelLarge,
-							textAlign = TextAlign.Center,
-							maxLines = 1,
-							overflow = TextOverflow.Clip
-						)
-						Text(
-							text = text,
-							color = color,
-							style = ThemeStyle.bodyExtraSmall,
-							textAlign = TextAlign.Center,
-							maxLines = 1,
-							overflow = TextOverflow.Clip
-						)
+						Box(modifier = Modifier.weight(1f).aspectRatio(1f)
+							.condition(eventTitle != null) { clickable(onClick = { onEventClick(date) }) },
+							contentAlignment = Alignment.Center
+						) {
+							if (date == today) {
+								Box(modifier = Modifier.matchParentSize().background(
+									color = MaterialTheme.colorScheme.primaryContainer,
+									shape = CircleShape
+								))
+							}
+							Column(horizontalAlignment = Alignment.CenterHorizontally) {
+								Text(
+									text = date.dayOfMonth.toString(),
+									color = color,
+									style = MaterialTheme.typography.labelLarge,
+									textAlign = TextAlign.Center,
+									maxLines = 1,
+									overflow = TextOverflow.Clip
+								)
+								Text(
+									text = text,
+									color = color,
+									style = ThemeStyle.bodyExtraSmall,
+									textAlign = TextAlign.Center,
+									maxLines = 1,
+									overflow = TextOverflow.Clip
+								)
+							}
+						}
 					}
 				}
 			}
@@ -215,7 +209,7 @@ fun Calendar(
 	state: CalendarState = remember { CalendarState() },
 	events: Map<LocalDate, String> = remember { emptyMap() },
 	modifier: Modifier = Modifier,
-	actions: @Composable RowScope.() -> Unit = {},
+	actions: @Composable ActionScope.() -> Unit = {},
 	onEventClick: (LocalDate) -> Unit
 ) {
 	Column(

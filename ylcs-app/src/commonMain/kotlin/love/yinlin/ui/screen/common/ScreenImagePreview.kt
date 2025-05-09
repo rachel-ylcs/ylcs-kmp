@@ -30,7 +30,7 @@ import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.FloatingDialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 

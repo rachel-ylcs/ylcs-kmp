@@ -53,7 +53,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SheetConfig
 import love.yinlin.ui.screen.settings.ScreenSettings

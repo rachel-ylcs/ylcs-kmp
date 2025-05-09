@@ -8,10 +8,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -482,7 +484,8 @@ fun RachelTheme(content: @Composable () -> Unit) {
 		typography = rachelTypography(LocalDevice.current)
 	) {
 		CompositionLocalProvider(
-			LocalTextStyle provides MaterialTheme.typography.bodyMedium
+			LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+			//LocalDensity provides Density(LocalDensity.current.density, 1f)
 		) {
 			content()
 		}

@@ -12,11 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.ImmersivePadding
@@ -24,56 +21,9 @@ import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.screen.Screen
-
-@Stable
-sealed class ActionScope(private val ltr: Boolean) {
-	@Stable
-	object Left : ActionScope(true)
-	@Stable
-	object Right : ActionScope(false)
-
-	@Composable
-	fun Action(
-		icon: ImageVector,
-		color: Color = MaterialTheme.colorScheme.onSurface,
-		enabled: Boolean = true,
-		onClick: () -> Unit
-	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
-
-		ClickIcon(
-			icon = icon,
-			color = color,
-			enabled = enabled,
-			modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
-			onClick = onClick
-		)
-	}
-
-	@Composable
-	fun ActionSuspend(
-		icon: ImageVector,
-		color: Color = MaterialTheme.colorScheme.onSurface,
-		enabled: Boolean = true,
-		onClick: suspend CoroutineScope.() -> Unit
-	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
-
-		LoadingIcon(
-			icon = icon,
-			color = color,
-			enabled = enabled,
-			modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
-			onClick = onClick
-		)
-	}
-
-	@Composable
-	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()
-}
 
 @Stable
 abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {

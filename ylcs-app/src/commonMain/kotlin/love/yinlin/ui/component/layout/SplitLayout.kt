@@ -9,11 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import love.yinlin.common.ThemeValue
-import love.yinlin.ui.component.screen.ActionScope
 
 @Composable
 fun SplitLayout(
     modifier: Modifier = Modifier,
+    aspectRatio: Float = 1f,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable BoxScope.() -> Unit = {},
@@ -25,7 +25,7 @@ fun SplitLayout(
         verticalAlignment = verticalAlignment
     ) {
         Box(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(aspectRatio),
             contentAlignment = Alignment.CenterStart,
             content = left
         )

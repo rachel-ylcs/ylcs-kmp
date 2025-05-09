@@ -31,7 +31,7 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState

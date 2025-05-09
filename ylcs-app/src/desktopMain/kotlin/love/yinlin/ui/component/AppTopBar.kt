@@ -17,7 +17,7 @@ import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.screen.ActionScope
+import love.yinlin.ui.component.layout.ActionScope
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
