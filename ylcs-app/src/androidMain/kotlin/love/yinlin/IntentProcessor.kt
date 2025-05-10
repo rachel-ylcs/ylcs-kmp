@@ -6,6 +6,7 @@ import love.yinlin.common.DeepLink
 import love.yinlin.common.Scheme
 import love.yinlin.common.Uri
 import love.yinlin.common.toUri
+import love.yinlin.platform.app
 
 object IntentProcessor {
     private object ActionView {
