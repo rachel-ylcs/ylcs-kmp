@@ -12,6 +12,7 @@ import love.yinlin.common.Weak
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 import java.io.File
+import kotlin.io.path.Path
 
 class ActualAppContext : AppContext() {
 	companion object {
@@ -19,7 +20,8 @@ class ActualAppContext : AppContext() {
 			// 本机库
 			System.loadLibrary("ylcs_native")
 			// VLC
-			System.setProperty("jna.library.path", "${System.getProperty("user.dir")}${File.separator}vlc")
+			val jarPath = File(ActualAppContext::class.java.protectionDomain.codeSource.location.toURI())
+			System.setProperty("jna.library.path", Path(jarPath.parent, "..", "vlc").toString())
 		}
 	}
 

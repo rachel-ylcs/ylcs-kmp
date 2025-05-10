@@ -4,6 +4,8 @@
 <dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>请求将照片保存到相册的权限，用于保存下载的图片</string>
+	<key>NSCameraUsageDescription</key>
+	<string>请求摄像头权限，用于扫描二维码</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
