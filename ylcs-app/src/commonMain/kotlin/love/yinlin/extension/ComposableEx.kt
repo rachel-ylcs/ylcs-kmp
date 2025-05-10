@@ -128,15 +128,6 @@ value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {
 @OptIn(ExperimentalAtomicApi::class)
 fun launchFlag(): LaunchFlag = LaunchFlag()
 
-@OptIn(ExperimentalAtomicApi::class)
-@Composable
-inline fun LaunchOnce(flag: LaunchFlag, crossinline block: suspend CoroutineScope.() -> Unit) {
-	LaunchedEffect(Unit) {
-		flag.update(this, block)
-	}
-}
-
-
 // Composition Local
 
 

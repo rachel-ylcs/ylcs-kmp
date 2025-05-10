@@ -17,6 +17,7 @@ xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
 Pods/
 iosApp/Configuration/Version.xcconfig
+**/ylcs-app.podspec
 
 # native
 native/**/.vs/
