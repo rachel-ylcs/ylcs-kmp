@@ -250,6 +250,7 @@ kotlin {
                 implementation(libs.jna.jpms)
                 implementation(libs.jna.platform)
                 implementation(libs.jna.platform.jpms)
+                implementation(libs.appdirs)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }
