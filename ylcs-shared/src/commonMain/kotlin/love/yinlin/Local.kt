@@ -36,5 +36,5 @@ object Local {
 
 	val ClientHost: String = if (!Client.DEVELOPMENT) MAIN_HOST else if (Client.WITH_SERVER) LOCAL_HOST else SECONDARY_HOST
 	@Suppress("HttpUrlsUsage")
-	val ClientUrl: String = if (Client.DEVELOPMENT) "http://$ClientHost:$TEST_PORT" else "https://$ClientHost"
+	val ClientUrl: String = if (Client.DEVELOPMENT) "http://$ClientHost:$TEST_PORT" else "https://api.$ClientHost"
 }
