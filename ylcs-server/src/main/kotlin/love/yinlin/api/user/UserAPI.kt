@@ -167,4 +167,5 @@ fun Routing.userAPI(implMap: ImplMap) {
 	mailAPI(implMap)
 	profileAPI(implMap)
 	topicAPI(implMap)
+	rewardAPI(implMap)
 }
