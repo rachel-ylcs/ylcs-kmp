@@ -8,9 +8,10 @@ import platform.Foundation.NSURL
 import platform.UIKit.UIViewController
 
 fun MainViewController(): UIViewController {
-    val context = ActualAppContext()
-    app = context
-    context.initialize()
+    ActualAppContext().apply {
+        app = this
+        initialize()
+    }
     return ComposeUIViewController {
         AppWrapper {
             App()

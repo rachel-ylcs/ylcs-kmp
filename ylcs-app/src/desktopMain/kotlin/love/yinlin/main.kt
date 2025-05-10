@@ -33,9 +33,10 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
-    val context = ActualAppContext()
-    app = context
-    context.initialize()
+    ActualAppContext().apply {
+        app = this
+        initialize()
+    }
 
     application {
         var isOpen by rememberState { true }

@@ -3,27 +3,19 @@ package love.yinlin
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
-import love.yinlin.extension.DateEx
 import love.yinlin.platform.ActualAppContext
-import love.yinlin.platform.AppContext
 import love.yinlin.platform.app
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    val context = ActualAppContext()
-    app = context
-    context.initialize()
-
-    try {
-        ComposeViewport(document.body!!) {
-            AppWrapper {
-                App()
-            }
-        }
+    ActualAppContext().apply {
+        app = this
+        initialize()
     }
-    catch (e: Throwable) {
-        val error = e.stackTraceToString()
-        app.kv.set(AppContext.CRASH_KEY, "${DateEx.CurrentString}\n$error")
-        println(error)
+
+    ComposeViewport(document.body!!) {
+        AppWrapper {
+            App()
+        }
     }
 }
