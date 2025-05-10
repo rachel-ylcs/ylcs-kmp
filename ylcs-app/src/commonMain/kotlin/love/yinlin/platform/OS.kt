@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.MiniIcon
@@ -31,11 +31,11 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
 	) {
 		MiniIcon(
 			icon = Icons.Filled.NotificationImportant,
-			size = 50.dp
+			size = ThemeValue.Size.SmallImage
 		)
 		Text(text = UnsupportedPlatformText)
 	}

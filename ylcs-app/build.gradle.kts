@@ -384,7 +384,9 @@ compose.desktop {
         // 为调试运行提供工作目录与库目录, 但发布打包时不需要
         val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
         if (taskName.contains("desktopRun")) {
-            jvmArgs += "-Duser.dir=${rootProject.extra["desktopCurrentDir"]}"
+            val desktopCurrentDir: Directory by rootProject.extra
+            desktopCurrentDir.asFile.mkdir()
+            jvmArgs += "-Duser.dir=${desktopCurrentDir}"
             jvmArgs += "-Djava.library.path=${rootProject.extra["nativeLibsDir"]}"
         }
 
