@@ -12,7 +12,7 @@ object Local {
 		// < ------  开发环境  ------ >
 		// 当客户端处于开发环境时, 若协同服务器请求 localhost 否则请求副机
 		// 当客户端处于生产环境时, 请求主机
-		const val DEVELOPMENT: Boolean = true
+		const val DEVELOPMENT: Boolean = false
 		const val WITH_SERVER: Boolean = false
 	}
 
