@@ -100,7 +100,6 @@ jna-jpms = { module = "net.java.dev.jna:jna-jpms", version = "5.14.0" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.14.0" }
 jna-platform-jpms = { module = "net.java.dev.jna:jna-platform-jpms", version = "5.14.0" }
 vlcj = { module = "uk.co.caprica:vlcj", version = "4.10.1" }
-appdirs = { module = "net.harawata:appdirs", version = "1.4.0" }
 
 # Web
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
