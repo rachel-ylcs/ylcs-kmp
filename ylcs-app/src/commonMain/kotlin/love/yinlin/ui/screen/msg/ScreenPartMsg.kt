@@ -229,7 +229,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	}
 
 	override suspend fun initialize() {
-		weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+		launch {
+			weiboState.flagFirstLoad.update(this) {
+				weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+			}
+		}
 	}
 
 	@Composable
@@ -285,9 +289,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 			LaunchedEffect(pagerState.settledPage) {
 				when (pagerState.currentPage) {
-					MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update(this) {
-
-					}
+					// 首页 WEIBO 由 initialize 去加载
+					MsgTabItem.WEIBO.ordinal -> {}
 					MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update(this) {
 						chaohuaState.requestNewData()
 					}
