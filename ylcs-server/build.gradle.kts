@@ -24,7 +24,6 @@ dependencies {
     implementation(libs.ktor.server.config)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.negotiation)
-    implementation(libs.ktor.server.cors)
 
     implementation(libs.logback)
     implementation(libs.mysql)
