@@ -228,6 +228,10 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	override suspend fun initialize() {
+		weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+	}
+
 	@Composable
 	override fun Content() {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -282,7 +286,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			LaunchedEffect(pagerState.settledPage) {
 				when (pagerState.currentPage) {
 					MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update(this) {
-						weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+
 					}
 					MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update(this) {
 						chaohuaState.requestNewData()
