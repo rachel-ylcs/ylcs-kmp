@@ -16,7 +16,6 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
@@ -51,30 +50,6 @@ private fun PhotoFile(
 }
 
 @Composable
-private fun CombinedPhotoFolder(
-    items: List<PhotoItem.File>,
-    modifier: Modifier = Modifier
-) {
-    BoxWithConstraints(
-        modifier = modifier,
-        contentAlignment = Alignment.BottomStart
-    ) {
-        val subSize = items.size.coerceAtMost(4)
-        val gap = if (subSize > 0) maxWidth / subSize else 0.dp
-        repeat(subSize) { index ->
-            WebImage(
-                uri = items[index].thumb,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(start = gap * index)
-                    .fillMaxSize()
-                    .zIndex(index.toFloat())
-            )
-        }
-    }
-}
-
-@Composable
 private fun PhotoFolderText(
     text: String,
     modifier: Modifier = Modifier
@@ -105,8 +80,9 @@ private fun PhotoFolder(
                 modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CombinedPhotoFolder(
-                    items = item.items.map { it as PhotoItem.File },
+                WebImage(
+                    uri = (item.items.first() as PhotoItem.File).thumb,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 )
                 PhotoFolderText(
