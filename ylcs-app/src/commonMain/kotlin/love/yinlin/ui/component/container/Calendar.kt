@@ -139,7 +139,8 @@ private fun CalendarDayGrid(
 ) {
 	HorizontalPager(
 		state = state,
-		beyondViewportPageCount = 1,
+		beyondViewportPageCount = 2,
+		key = { it },
 		modifier = modifier
 	) { pageIndex ->
 		val currentDate = remember(pageIndex) { indexShadowDate(pageIndex) }

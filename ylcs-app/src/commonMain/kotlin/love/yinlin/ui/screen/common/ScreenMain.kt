@@ -22,7 +22,6 @@ import love.yinlin.common.ImmersivePadding
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
@@ -142,6 +141,8 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 	private fun PageContent(modifier: Modifier = Modifier) {
 		HorizontalPager(
 			state = pagerState,
+			key = { TabItem.entries[it] },
+			beyondViewportPageCount = TabItem.entries.size,
 			modifier = modifier
 		) {
 			val part = when (it) {
@@ -156,12 +157,23 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 				Box(modifier = Modifier.fillMaxSize()) {
 					part.Content()
 				}
+			}
+			else EmptyBox()
+		}
 
-				LaunchOnce(part.firstLoad) {
+		LaunchedEffect(pagerState.settledPage) {
+			when (pagerState.settledPage) {
+				TabItem.WORLD.ordinal -> worldPart
+				TabItem.MSG.ordinal -> msgPart
+				TabItem.MUSIC.ordinal -> musicPart
+				TabItem.DISCOVERY.ordinal -> discoveryPart
+				TabItem.ME.ordinal -> mePart
+				else -> null
+			}?.let { part ->
+				part.firstLoad.update(this) {
 					launch { part.initialize() }
 				}
 			}
-			else EmptyBox()
 		}
 	}
 

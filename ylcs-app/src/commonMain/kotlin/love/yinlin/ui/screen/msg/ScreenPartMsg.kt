@@ -260,8 +260,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					}
 				}
 			}
+
 			HorizontalPager(
 				state = pagerState,
+				key = { MsgTabItem.entries[it] },
+				beyondViewportPageCount = MsgTabItem.entries.size,
 				modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop),
 				userScrollEnabled = false
 			) {
@@ -272,6 +275,20 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 							MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(this@ScreenPartMsg)
 							MsgTabItem.PICTURES.ordinal -> ScreenPictures(this@ScreenPartMsg)
 						}
+					}
+				}
+			}
+
+			LaunchedEffect(pagerState.settledPage) {
+				when (pagerState.currentPage) {
+					MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update(this) {
+						weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+					}
+					MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update(this) {
+						chaohuaState.requestNewData()
+					}
+					MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update(this) {
+						photoState.loadPhotos()
 					}
 				}
 			}

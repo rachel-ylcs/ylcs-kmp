@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.screen.msg.ScreenPartMsg
@@ -36,9 +35,5 @@ fun ScreenChaohua(part: ScreenPartMsg) {
 				modifier = Modifier.fillMaxWidth()
 			)
 		}
-	}
-
-	LaunchOnce(part.chaohuaState.flagFirstLoad) {
-		part.chaohuaState.requestNewData()
 	}
 }

@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
-import love.yinlin.extension.LaunchOnce
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_photo_album
@@ -195,9 +194,5 @@ fun ScreenPictures(part: ScreenPartMsg) {
                 }
             }
         }
-    }
-
-    LaunchOnce(state.flagFirstLoad) {
-        state.loadPhotos()
     }
 }
