@@ -36,8 +36,8 @@ val desktopArchitecture = System.getProperty("os.arch").let { when {
     it.lowercase().startsWith("aarch64") -> "aarch64"
     it.lowercase().startsWith("arm") -> "arm"
     it.lowercase().startsWith("amd64") -> "x86_64"
-    else -> "x86"
-} }
+    else -> it
+} }!!
 
 kotlin {
     compilerOptions {
@@ -524,7 +524,7 @@ afterEvaluate {
                     when (desktopPlatform) {
                         GradlePlatform.Windows -> it.dir(appName)
                         GradlePlatform.Linux -> it.dir("$appName/bin")
-                        GradlePlatform.Mac -> it.dir("$appName.app/Contents")
+                        GradlePlatform.Mac -> it.dir("$appName.app/Contents/MacOS")
                     }
                 }
                 from(srcPath.dir("$desktopPlatform-$desktopArchitecture"))
