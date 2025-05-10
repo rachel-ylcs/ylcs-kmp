@@ -21,8 +21,8 @@ abstract class AppContext {
 	lateinit var musicFactory: MusicFactory
 
 	// HttpClient
-	val client: HttpClient = NetClient.common
-	val fileClient: HttpClient = NetClient.file
+	val client: HttpClient by lazy { NetClient.common }
+	val fileClient: HttpClient by lazy { NetClient.file }
 
 	// ViewModel
 	abstract var model: AppModel?

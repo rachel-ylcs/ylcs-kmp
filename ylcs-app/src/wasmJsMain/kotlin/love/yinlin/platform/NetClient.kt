@@ -12,16 +12,16 @@ actual object NetClient {
 	}
 
 	@Stable
-	actual val common: HttpClient = HttpClient(Js) {
+	actual val common: HttpClient by lazy { HttpClient(Js) {
 		useEngine()
 		useJson()
 		useCommonTimeout()
-	}
+	} }
 
 	@Stable
-	actual val file: HttpClient = HttpClient(Js) {
+	actual val file: HttpClient by lazy { HttpClient(Js) {
 		useEngine()
 		useJson()
 		useFileTimeout()
-	}
+	} }
 }

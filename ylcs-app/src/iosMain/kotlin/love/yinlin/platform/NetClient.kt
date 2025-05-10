@@ -17,16 +17,16 @@ actual object NetClient {
     }
 
     @Stable
-    actual val common: HttpClient = HttpClient(Darwin) {
+    actual val common: HttpClient by lazy { HttpClient(Darwin) {
         useEngine()
         useJson()
         useCommonTimeout()
-    }
+    } }
 
     @Stable
-    actual val file: HttpClient = HttpClient(Darwin) {
+    actual val file: HttpClient by lazy { HttpClient(Darwin) {
         useEngine()
         useJson()
         useFileTimeout()
-    }
+    } }
 }
