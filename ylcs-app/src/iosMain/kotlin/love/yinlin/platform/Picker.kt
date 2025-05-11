@@ -76,7 +76,7 @@ actual object Picker {
     actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
         openPicker(mimeType, filter) { url ->
             continuation.safeResume {
-                continuation.resume(url?.let { SystemFileSystem.source(it.toPath()!!).buffered() })
+                continuation.resume(url?.let { SandboxSource(it).buffered() })
             }
         }
     }
@@ -84,7 +84,7 @@ actual object Picker {
     actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = suspendCoroutine { continuation ->
         openPicker(mimeType, filter) { url ->
             continuation.safeResume {
-                continuation.resume(url?.let { NormalPath(it.path!!) })
+                continuation.resume(url?.let { SandboxPath(it) })
             }
         }
     }
@@ -103,7 +103,8 @@ actual object Picker {
         }
         documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
             override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                callback(didPickDocumentAtURL)
+                val canAccess = didPickDocumentAtURL.startAccessingSecurityScopedResource()
+                callback(if (canAccess) didPickDocumentAtURL else null)
             }
 
             override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
