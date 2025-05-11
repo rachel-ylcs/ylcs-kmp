@@ -11,13 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,7 +27,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.extension.launchFlag
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.*
 import love.yinlin.ui.screen.common.ScreenMain
@@ -127,14 +121,13 @@ fun AppWrapper(
 	content: @Composable () -> Unit
 ) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-		val device by rememberDerivedState(maxWidth, maxHeight) { Device(maxWidth, maxHeight) }
 		val isDarkMode = when (app.config.themeMode) {
 			ThemeMode.SYSTEM -> isSystemInDarkTheme()
 			ThemeMode.LIGHT -> false
 			ThemeMode.DARK -> true
 		}
 		CompositionLocalProvider(
-			LocalDevice provides device,
+			LocalDevice provides remember(maxWidth, maxHeight) { Device(maxWidth, maxHeight) },
 			LocalDarkMode provides isDarkMode
 		) {
 			MaterialTheme(
@@ -145,8 +138,7 @@ fun AppWrapper(
 				Box(modifier = Modifier.background(if (transparent) Colors.Transparent else MaterialTheme.colorScheme.background)) {
 					CompositionLocalProvider(
 						LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-						LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-						LocalDensity provides Density(LocalDensity.current.density, 1f)
+						LocalTextStyle provides MaterialTheme.typography.bodyMedium
 					) {
 						content()
 					}
