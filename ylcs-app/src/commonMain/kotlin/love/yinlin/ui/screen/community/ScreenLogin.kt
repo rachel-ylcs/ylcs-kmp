@@ -87,8 +87,12 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		val pwd = registerPwd.text
 		val pwd2 = registerPwd2.text
 		val inviter = registerInviter.text
-		if (!UserConstraint.checkName(id, inviter) || !UserConstraint.checkPassword(pwd, pwd2)) {
+		if (!UserConstraint.checkName(id) || !UserConstraint.checkPassword(pwd, pwd2)) {
 			slot.tip.error("昵称或密码不合规范")
+			return
+		}
+		if (!UserConstraint.checkName(inviter)) {
+			slot.tip.error("邀请人不合规范")
 			return
 		}
 		if (pwd != pwd2) {
