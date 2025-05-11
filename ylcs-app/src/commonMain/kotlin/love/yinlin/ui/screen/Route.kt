@@ -1,9 +1,8 @@
 package love.yinlin.ui.screen
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,9 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
-import love.yinlin.common.ImmersivePadding
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.Uri
+import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.extension.getNavType
 import love.yinlin.ui.component.screen.FloatingDialogConfirm
 import love.yinlin.ui.component.screen.FloatingDialogInfo
@@ -61,7 +60,8 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun UI() {
 		Content()
 
-		CompositionLocalProvider(LocalImmersivePadding provides ImmersivePadding(WindowInsets.systemBars.asPaddingValues())) {
+		val immersivePadding = rememberImmersivePadding()
+		CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
 			Floating()
 
 			with(slot) {

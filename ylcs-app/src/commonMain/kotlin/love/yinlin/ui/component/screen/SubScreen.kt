@@ -16,10 +16,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
 import love.yinlin.common.Device
-import love.yinlin.common.ImmersivePadding
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitActionLayout
@@ -48,61 +48,59 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 	final override fun Content() {
 		BackHandler { onBack() }
 
-		Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-			val immersivePadding = ImmersivePadding(padding)
-			Column(modifier = Modifier.fillMaxSize()) {
-				Surface(
-					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-					tonalElevation = ThemeValue.Shadow.Tonal,
-					shadowElevation = ThemeValue.Shadow.Surface
+		val immersivePadding = rememberImmersivePadding()
+		Column(modifier = Modifier.fillMaxSize()) {
+			Surface(
+				modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
+				tonalElevation = ThemeValue.Shadow.Tonal,
+				shadowElevation = ThemeValue.Shadow.Surface
+			) {
+				Box(
+					modifier = Modifier
+						.padding(immersivePadding.withoutBottom)
+						.fillMaxWidth()
+						.padding(vertical = ThemeValue.Padding.VerticalSpace),
+					contentAlignment = Alignment.Center
 				) {
 					Box(
-						modifier = Modifier
-							.padding(immersivePadding.withoutBottom)
-							.fillMaxWidth()
-							.padding(vertical = ThemeValue.Padding.VerticalSpace),
+						modifier = Modifier.fillMaxWidth().zIndex(2f),
 						contentAlignment = Alignment.Center
 					) {
-						Box(
-							modifier = Modifier.fillMaxWidth().zIndex(2f),
-							contentAlignment = Alignment.Center
-						) {
-							Text(
-								text = title,
-								style = MaterialTheme.typography.titleMedium,
-								maxLines = 1,
-								overflow = TextOverflow.Ellipsis
-							)
-						}
-						SplitActionLayout(
-							modifier = Modifier.fillMaxWidth().zIndex(1f),
-							left = {
-								ClickIcon(
-									modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
-									icon = Icons.AutoMirrored.Outlined.ArrowBack,
-									onClick = ::onBack
-								)
-								LeftActions()
-							},
-							right = {
-								RightActions()
-							}
+						Text(
+							text = title,
+							style = MaterialTheme.typography.titleMedium,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis
 						)
 					}
+					SplitActionLayout(
+						modifier = Modifier.fillMaxWidth().zIndex(1f),
+						left = {
+							ClickIcon(
+								modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
+								icon = Icons.AutoMirrored.Outlined.ArrowBack,
+								onClick = ::onBack
+							)
+							LeftActions()
+						},
+						right = {
+							RightActions()
+						}
+					)
 				}
-				Box(modifier = Modifier.fillMaxWidth().weight(1f).background(MaterialTheme.colorScheme.background)) {
-					CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
-						SubContent(LocalDevice.current)
-					}
+			}
+			Box(modifier = Modifier.fillMaxWidth().weight(1f).background(MaterialTheme.colorScheme.background)) {
+				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+					SubContent(LocalDevice.current)
 				}
-				Surface(
-					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-					tonalElevation = ThemeValue.Shadow.Tonal,
-					shadowElevation = ThemeValue.Shadow.Surface
-				) {
-					CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
-						BottomBar()
-					}
+			}
+			Surface(
+				modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
+				tonalElevation = ThemeValue.Shadow.Tonal,
+				shadowElevation = ThemeValue.Shadow.Surface
+			) {
+				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+					BottomBar()
 				}
 			}
 		}

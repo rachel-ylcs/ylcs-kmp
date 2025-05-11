@@ -7,21 +7,19 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Device
-import love.yinlin.common.ImmersivePadding
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
@@ -179,42 +177,36 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 
 	@Composable
 	private fun Portrait() {
-		Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-			val immersivePadding = ImmersivePadding(padding)
-			Column(modifier = Modifier.fillMaxSize()) {
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutBottom) {
-					PageContent(modifier = Modifier.fillMaxWidth().weight(1f))
-				}
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
-					PortraitNavigation(
-						modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-						currentPage = pagerState.currentPage,
-						onNavigate = { index ->
-							launch { pagerState.scrollToPage(index) }
-						}
-					)
-				}
+		Column(modifier = Modifier.fillMaxSize()) {
+			CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutBottom) {
+				PageContent(modifier = Modifier.fillMaxWidth().weight(1f))
+			}
+			CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutTop) {
+				PortraitNavigation(
+					modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+					currentPage = pagerState.currentPage,
+					onNavigate = { index ->
+						launch { pagerState.scrollToPage(index) }
+					}
+				)
 			}
 		}
 	}
 
 	@Composable
 	private fun Landscape() {
-		Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-			val immersivePadding = ImmersivePadding(padding)
-			Row(modifier = Modifier.fillMaxSize()) {
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutEnd) {
-					LandscapeNavigation(
-						modifier = Modifier.fillMaxHeight(),
-						currentPage = pagerState.currentPage,
-						onNavigate = { index ->
-							launch { pagerState.scrollToPage(index) }
-						}
-					)
-				}
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutStart) {
-					PageContent(modifier = Modifier.weight(1f).fillMaxHeight())
-				}
+		Row(modifier = Modifier.fillMaxSize()) {
+			CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutEnd) {
+				LandscapeNavigation(
+					modifier = Modifier.fillMaxHeight(),
+					currentPage = pagerState.currentPage,
+					onNavigate = { index ->
+						launch { pagerState.scrollToPage(index) }
+					}
+				)
+			}
+			CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutStart) {
+				PageContent(modifier = Modifier.weight(1f).fillMaxHeight())
 			}
 		}
 	}
@@ -225,9 +217,12 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 
 	@Composable
 	override fun Content() {
-		when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> Portrait()
-			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+		val immersivePadding = rememberImmersivePadding()
+		CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+			when (LocalDevice.current.type) {
+				Device.Type.PORTRAIT -> Portrait()
+				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+			}
 		}
 	}
 
