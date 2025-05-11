@@ -16,6 +16,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -120,7 +122,10 @@ fun App(
 }
 
 @Composable
-fun AppWrapper(content: @Composable () -> Unit) {
+fun AppWrapper(
+	transparent: Boolean = false,
+	content: @Composable () -> Unit
+) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 		val device by rememberDerivedState(maxWidth, maxHeight) { Device(maxWidth, maxHeight) }
 		val isDarkMode = when (app.config.themeMode) {
@@ -137,10 +142,11 @@ fun AppWrapper(content: @Composable () -> Unit) {
 				shapes = rachelShapes(LocalDevice.current),
 				typography = rachelTypography(LocalDevice.current)
 			) {
-				Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+				Box(modifier = Modifier.background(if (transparent) Colors.Transparent else MaterialTheme.colorScheme.background)) {
 					CompositionLocalProvider(
 						LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-						LocalTextStyle provides MaterialTheme.typography.bodyMedium
+						LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+						LocalDensity provides Density(LocalDensity.current.density, 1f)
 					) {
 						content()
 					}

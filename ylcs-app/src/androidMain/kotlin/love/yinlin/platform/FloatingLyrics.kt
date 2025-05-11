@@ -36,7 +36,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         setViewTreeLifecycleOwner(activity)
         setViewTreeSavedStateRegistryOwner(activity)
         setContent {
-            AppWrapper { FloatingContent() }
+            AppWrapper(transparent = true) { FloatingContent() }
         }
     }
 
