@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -124,7 +123,7 @@ object ThemeColor {
 	val onBackgroundVariant: Color @Composable get() = if (LocalDarkMode.current) Colors.Ghost else Colors.Dark
 }
 
-private val LightColorScheme = lightColorScheme(
+val LightColorScheme = lightColorScheme(
 	primary = Colors.Steel4,
 	onPrimary = Colors.Ghost,
 	primaryContainer = Colors.Steel6,
@@ -147,7 +146,7 @@ private val LightColorScheme = lightColorScheme(
 	scrim = Colors.Dark
 )
 
-private val DarkColorScheme = darkColorScheme(
+val DarkColorScheme = darkColorScheme(
 	primary = Color(0xffb0d5de),
 	onPrimary = Colors.Ghost,
 	primaryContainer = Color(0xff7da1aa),
@@ -171,7 +170,12 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-private fun rachelShapes(device: Device): Shapes = remember(device) { when (device.size) {
+fun rachelColorScheme(isDarkMode: Boolean): ColorScheme = remember(isDarkMode) {
+	if (isDarkMode) DarkColorScheme else LightColorScheme
+}
+
+@Composable
+fun rachelShapes(device: Device): Shapes = remember(device) { when (device.size) {
 	Device.Size.SMALL -> Shapes(
 		extraSmall = RoundedCornerShape(3.dp),
 		small = RoundedCornerShape(5.dp),
@@ -217,7 +221,7 @@ private fun rachelTextStyle(
 }
 
 @Composable
-private fun rachelTypography(device: Device): Typography {
+fun rachelTypography(device: Device): Typography {
 	val font = Font(Res.font.xwwk)
 	return remember(device, font) { when (device.size) {
         Device.Size.SMALL -> Typography(
@@ -470,19 +474,6 @@ object ThemeValue {
 			Device.Size.SMALL -> 1.dp
 			Device.Size.MEDIUM -> 1.5.dp
 			Device.Size.LARGE -> 2.dp
-		}
-	}
-}
-
-@Composable
-fun RachelTheme(content: @Composable () -> Unit) {
-	MaterialTheme(
-		colorScheme = if (LocalDarkMode.current) DarkColorScheme else LightColorScheme,
-		shapes = rachelShapes(LocalDevice.current),
-		typography = rachelTypography(LocalDevice.current)
-	) {
-		CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-			content()
 		}
 	}
 }

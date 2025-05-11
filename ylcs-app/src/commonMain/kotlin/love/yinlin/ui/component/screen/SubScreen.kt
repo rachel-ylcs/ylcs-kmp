@@ -1,6 +1,5 @@
 package love.yinlin.ui.component.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -89,7 +88,7 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 					)
 				}
 			}
-			Box(modifier = Modifier.fillMaxWidth().weight(1f).background(MaterialTheme.colorScheme.background)) {
+			Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
 				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
 					SubContent(LocalDevice.current)
 				}
