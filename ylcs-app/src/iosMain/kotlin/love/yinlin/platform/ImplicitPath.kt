@@ -1,6 +1,7 @@
 package love.yinlin.platform
 
 import kotlinx.io.Buffer
+import kotlinx.io.IOException
 import kotlinx.io.RawSource
 import kotlinx.io.Source
 import kotlinx.io.asSource
@@ -9,7 +10,15 @@ import platform.Foundation.NSInputStream
 import platform.Foundation.NSURL
 
 class SandboxSource(val url: NSURL) : RawSource {
-    val source: RawSource = NSInputStream(uRL = url).asSource()
+    val source: RawSource
+
+    init {
+        val canAccess = url.startAccessingSecurityScopedResource()
+        if (!canAccess) {
+            throw IOException()
+        }
+        source = NSInputStream(uRL = url).asSource()
+    }
 
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long = source.readAtMostTo(sink, byteCount)
 

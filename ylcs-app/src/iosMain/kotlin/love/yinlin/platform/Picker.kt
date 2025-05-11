@@ -103,8 +103,7 @@ actual object Picker {
         }
         documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
             override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                val canAccess = didPickDocumentAtURL.startAccessingSecurityScopedResource()
-                callback(if (canAccess) didPickDocumentAtURL else null)
+                callback(didPickDocumentAtURL)
             }
 
             override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
