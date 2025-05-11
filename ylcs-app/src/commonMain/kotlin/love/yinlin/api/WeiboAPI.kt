@@ -35,18 +35,12 @@ import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
 	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
-	private const val WEIBO_PROXY_HOST: String = "weibo.${Local.MAIN_HOST}"
+	private const val WEIBO_PROXY_HOST: String = "web.${Local.MAIN_HOST}/weibo"
 
 	private val WEIBO_HOST: String = OS.ifPlatform(
 		Platform.WebWasm,
 		ifTrue = { WEIBO_PROXY_HOST },
 		ifFalse = { WEIBO_SOURCE_HOST }
-	)
-
-	private fun transferWeiboIconUrl(src: String): String = OS.ifPlatform(
-		Platform.WebWasm,
-		ifTrue = { src.replace("n.sinaimg.cn", "$WEIBO_PROXY_HOST/icon") },
-		ifFalse = { src }
 	)
 
 	private fun transferWeiboImageUrl(src: String): String = OS.ifPlatform(
@@ -106,7 +100,7 @@ object WeiboAPI {
 					else weiboHtmlNodesTransform(childNodes, container)
 				}
 				"span" -> weiboHtmlNodesTransform(childNodes, container)
-				"img" -> node.attribute("src")?.value?.let { container.image(transferWeiboIconUrl(it)) }
+				"img" -> node.attribute("src")?.value?.let { container.image(it) }
 			}
 		}
 	}
