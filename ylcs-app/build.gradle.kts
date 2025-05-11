@@ -514,8 +514,9 @@ afterEvaluate {
                 val dirOutput: Directory by rootProject.extra
                 val outputAppLibDir = dirOutput.let {
                     when (desktopPlatform) {
+                        GradlePlatform.Windows -> it.dir("$appName/app")
+                        GradlePlatform.Linux -> it.dir("$appName/lib/app")
                         GradlePlatform.Mac -> it.dir("$appName.app/Contents/app")
-                        else -> it.dir("$appName/app")
                     }
                 }
                 from(rootProject.extra["nativeLibsDir"])
@@ -532,8 +533,9 @@ afterEvaluate {
                 val dirOutput: Directory by rootProject.extra
                 val outputAppDir = dirOutput.let {
                     when (desktopPlatform) {
+                        GradlePlatform.Windows -> it.dir(appName)
+                        GradlePlatform.Linux -> it.dir("$appName/bin")
                         GradlePlatform.Mac -> it.dir("$appName.app/Contents")
-                        else -> it.dir(appName)
                     }
                 }
                 from(srcPath.dir("$desktopPlatform-$desktopArchitecture"))
