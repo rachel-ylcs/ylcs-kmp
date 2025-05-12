@@ -12,7 +12,7 @@
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     mutation.addedNodes.forEach((node) => {
-                        if (node.nodeName === "canvas") {
+                        if (node.nodeName === "CANVAS") {
                             const loadingDiv = document.getElementById("loading");
                             loadingDiv && loadingDiv.remove();
                             const loadingScript = document.getElementById("loading-script");
