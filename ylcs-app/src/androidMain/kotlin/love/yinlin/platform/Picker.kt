@@ -72,6 +72,19 @@ actual object Picker {
         }
     }
 
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
+        continuation.safeResume {
+            appNative.activityResultRegistry!!.register(
+                key = UUID.randomUUID().toString(),
+                contract = ActivityResultContracts.CreateDocument(mimeType)
+            ) { uri ->
+                continuation.safeResume {
+                    continuation.resume(ContentPath(uri!!.toString()))
+                }
+            }.launch(filename)
+        }
+    }
+
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
         continuation.safeResume {
             val values = ContentValues()

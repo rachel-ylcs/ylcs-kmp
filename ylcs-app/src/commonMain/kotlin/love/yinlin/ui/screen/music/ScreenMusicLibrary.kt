@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Extension
@@ -38,6 +39,7 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.OS
+import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
@@ -257,6 +259,15 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
+    private suspend fun onMusicPackage() {
+        val musicFactory = app.musicFactory
+        if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        else if (slot.confirm.openSuspend(content = "打包这些歌曲成MOD吗")) {
+            val packageItems = selectIdList
+            Picker.pickFile()
+        }
+    }
+
     override suspend fun initialize() {
         resetLibrary()
     }
@@ -348,6 +359,9 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                             }
                             ActionSuspend(Icons.Outlined.Delete) {
                                 onMusicDelete()
+                            }
+                            ActionSuspend(Icons.Outlined.Archive) {
+                                onMusicPackage()
                             }
                         }
                     )
