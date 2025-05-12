@@ -158,12 +158,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			SplitLayout(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
 				aspectRatio = 0.5f,
 				left = {
 					Text(
 						text = intervalString,
-						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.titleLarge else MaterialTheme.typography.displayLarge,
+						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
 						color = intervalColor,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
@@ -172,7 +172,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				right = {
 					Text(
 						text = remember(activity) { "${activity.title} / ${activity.ts}" },
-						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleLarge,
+						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
 					)
@@ -185,8 +185,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun Portrait() {
 		LazyColumn(
 			modifier = Modifier.fillMaxSize(),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			item(key = ItemKey("Banner")) {
 				BannerLayout(
@@ -212,13 +211,11 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				key = { it.aid }
 			) { activity ->
 				CalendarBarItem(
-					modifier = Modifier.fillMaxWidth()
-						.padding(ThemeValue.Padding.Value)
-						.clickable {
-							activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
-								onDateClick(it)
-							}
-						},
+					modifier = Modifier.fillMaxWidth().clickable {
+						activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
+							onDateClick(it)
+						}
+					},
 					activity = activity
 				)
 			}
@@ -267,13 +264,11 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					key = { it.aid }
 				) { activity ->
 					CalendarBarItem(
-						modifier = Modifier.fillMaxWidth()
-							.padding(ThemeValue.Padding.Value)
-							.clickable {
-								activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
-									onDateClick(it)
-								}
-							},
+						modifier = Modifier.fillMaxWidth().clickable {
+							activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
+								onDateClick(it)
+							}
+						},
 						activity = activity
 					)
 				}
