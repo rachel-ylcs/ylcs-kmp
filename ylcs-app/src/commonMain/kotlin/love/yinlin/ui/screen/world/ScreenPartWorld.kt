@@ -88,9 +88,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						uri = pic.picPath ?: "",
 						contentScale = ContentScale.Crop,
 						modifier = Modifier.fillMaxSize(),
-						onClick = {
-							showActivityDetails(pic.aid)
-						}
+						onClick = { showActivityDetails(pic.aid) }
 					)
 				}
 			}
