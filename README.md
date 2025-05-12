@@ -92,7 +92,7 @@ MOD管理器(桌面版) `modManager`
 
 ### 编译与运行环境
 
-- IntelliJ IDEA 2025.1 EAP (Ultimate Edition)
+- IntelliJ IDEA 2025.1
 - Xcode 16.3
 - gradle 8.13-all
 - JDK 21
