@@ -94,7 +94,7 @@ object OS {
 	}
 }
 
-// ----  OS
+// ------------  OS
 
 internal expect val osPlatform: Platform
 
