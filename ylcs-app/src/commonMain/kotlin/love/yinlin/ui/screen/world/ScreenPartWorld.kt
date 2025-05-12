@@ -52,7 +52,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		val result = ClientAPI.request(
 			route = API.User.Activity.GetActivities
 		)
-		if (result is Data.Success) activities.replaceAll(result.data)
+		if (result is Data.Success) activities.replaceAll(result.data.sorted())
 	}
 
 	private fun showActivityDetails(aid: Int) {

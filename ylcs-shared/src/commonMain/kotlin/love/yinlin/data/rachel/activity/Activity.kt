@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.ServerRes
+import love.yinlin.extension.DateEx
 
 @Stable
 @Serializable
@@ -18,7 +19,19 @@ data class Activity(
 	val damai: String?, // [大麦链接]
 	val maoyan: String?, // [猫眼链接]
 	val link: String? // [活动链接]
-) {
+) : Comparable<Activity> {
+	override fun compareTo(other: Activity): Int {
+		val today = DateEx.Today.toEpochDays()
+		val day1 = (this.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Int.MAX_VALUE) - today
+		val day2 = (other.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Int.MAX_VALUE) - today
+		return if (day1 < 0) {
+			if (day2 < 0) day2 - day1 else 1
+		}
+		else {
+			if (day2 < 0) -1 else day1 - day2
+		}
+	}
+
 	val picPath: String? by lazy { pic?.let { "${Local.ClientUrl}/${ServerRes.Activity.activity(it)}" } }
 
 	fun picPath(key: String): String = "${Local.ClientUrl}/${ServerRes.Activity.activity(key)}"
