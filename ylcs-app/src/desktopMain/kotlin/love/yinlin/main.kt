@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.CropSquare
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
@@ -75,6 +76,12 @@ fun main() {
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 ) {
                                     state.isMinimized = true
+                                }
+                                Action(
+                                    icon = Icons.Outlined.CropSquare,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    state.placement = if (state.placement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
                                 }
                                 Action(
                                     icon = Icons.Outlined.Close,
