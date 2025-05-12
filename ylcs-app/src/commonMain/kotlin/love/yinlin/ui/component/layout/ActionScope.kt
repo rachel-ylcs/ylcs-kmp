@@ -1,9 +1,12 @@
 package love.yinlin.ui.component.layout
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -57,4 +60,18 @@ sealed class ActionScope(private val ltr: Boolean) {
 
 	@Composable
 	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()
+
+    @Composable
+    fun ActionLayout(
+        modifier: Modifier = Modifier,
+        block: @Composable ActionScope.() -> Unit
+    ) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = if (ltr) Arrangement.Start else Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Actions(block)
+        }
+    }
 }

@@ -101,6 +101,18 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	@OptIn(ExperimentalAtomicApi::class)
+	suspend fun updateUserProfile() {
+		val token = app.config.userToken
+		if (token.isNotEmpty() && !isUpdateToken.load()) {
+			val result = ClientAPI.request(
+				route = API.User.Profile.GetProfile,
+				data = token
+			)
+			if (result is Data.Success) app.config.userProfile = result.data
+		}
+	}
+
 	@Composable
 	private fun ToolContainer(
 		modifier: Modifier = Modifier,
@@ -268,7 +280,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	@Composable
+    @OptIn(ExperimentalAtomicApi::class)
+    @Composable
 	override fun Content() {
 		val userProfile = app.config.userProfile
 		if (userProfile == null) LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
@@ -277,6 +290,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
 				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
 			}
+		}
+
+		LaunchedEffect(Unit) {
+			updateUserProfile()
 		}
 	}
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Extension
@@ -32,18 +33,25 @@ import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.UriGenerator
+import love.yinlin.data.MimeType
+import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
+import love.yinlin.mod.ModFactory
 import love.yinlin.platform.OS
+import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.ExpandableLayout
+import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
@@ -77,8 +85,8 @@ private fun MusicCard(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        shadowElevation = ThemeValue.Shadow.Surface,
+        color = if (musicInfo.selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+        shadowElevation = ThemeValue.Shadow.MiniSurface,
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -88,21 +96,23 @@ private fun MusicCard(
                 onClick = onClick
             ),
         ) {
-            LocalFileImage(
-                path = { musicInfo.recordPath },
-                musicInfo,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.weight(3f).aspectRatio(1f)
-            )
+            Box(modifier = Modifier.aspectRatio(1f).fillMaxHeight()) {
+                LocalFileImage(
+                    path = { musicInfo.recordPath },
+                    musicInfo,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
             Column(
-                modifier = Modifier.weight(4f).fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(ThemeValue.Padding.ExtraValue),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
             ) {
                 Text(
                     text = musicInfo.name,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -110,7 +120,7 @@ private fun MusicCard(
                     text = musicInfo.singer,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -253,15 +263,36 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
+    private suspend fun onMusicPackage() {
+        val musicFactory = app.musicFactory
+        if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        else Picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
+            try {
+                slot.loading.openSuspend()
+                path.sink.use { sink ->
+                    val packageItems = selectIdList
+                    ModFactory.Merge(
+                        mediaPaths = packageItems.mapNotNull { musicFactory.musicLibrary[it]?.path },
+                        sink = sink,
+                        info = ModInfo(author = app.config.userProfile?.name ?: "无名")
+                    ).process { a, b, name -> }
+                }
+                slot.loading.close()
+                exitManagement()
+                slot.tip.success("导出成功")
+            }
+            catch (_: Throwable) {
+                slot.tip.warning("无法导出MOD")
+            }
+        }
+    }
+
     override suspend fun initialize() {
         resetLibrary()
     }
 
     override val title: String by derivedStateOf {
-        if (isManaging) "选择歌曲"
-        else if (!isSearching) "曲库"
-        else if (library.isEmpty()) "搜索为空"
-        else "搜索结果"
+        "${if (isSearching) "搜索" else "曲库"} (${if (selectIdList.isNotEmpty()) "${selectIdList.size}/" else ""}${library.size})"
     }
 
     override fun onBack() {
@@ -277,25 +308,16 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                 closeSearch()
             }
         }
-        if (isManaging) {
-            Action(Icons.Outlined.SelectAll) {
-                if (library.all { it.selected }) exitManagement()
-                else selectAll()
-            }
-        }
     }
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (isManaging) {
-            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
-                onMusicAdd()
-            }
-            ActionSuspend(Icons.Outlined.Delete) {
-                onMusicDelete()
+        if (!isManaging) {
+            ActionSuspend(Icons.Outlined.Search) {
+                openSearch()
             }
         }
-        else {
+        if (!isManaging && !isSearching) {
             ActionSuspend(Icons.Outlined.Add) {
                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
                 else {
@@ -333,9 +355,6 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     }
                 }
             }
-            ActionSuspend(Icons.Outlined.Search) {
-                openSearch()
-            }
         }
     }
 
@@ -343,24 +362,48 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun SubContent(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
-            ) {
-                itemsIndexed(
-                    items = library,
-                    key = { index, item -> item.id }
-                ) { index, item ->
-                    MusicCard(
-                        musicInfo = item,
-                        enableLongClick = !isManaging,
-                        onLongClick = { onCardLongClick(index) },
-                        onClick = { onCardClick(index) },
-                        modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+                ExpandableLayout(isExpanded = isManaging) {
+                    SplitActionLayout(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+                        left = {
+                            Action(Icons.Outlined.SelectAll) {
+                                if (library.all { it.selected }) exitManagement()
+                                else selectAll()
+                            }
+                        },
+                        right = {
+                            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+                                onMusicAdd()
+                            }
+                            ActionSuspend(Icons.Outlined.Delete) {
+                                onMusicDelete()
+                            }
+                            ActionSuspend(Icons.Outlined.Archive) {
+                                onMusicPackage()
+                            }
+                        }
                     )
+                }
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                    contentPadding = ThemeValue.Padding.EqualValue,
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
+                    itemsIndexed(
+                        items = library,
+                        key = { index, item -> item.id }
+                    ) { index, item ->
+                        MusicCard(
+                            musicInfo = item,
+                            enableLongClick = !isManaging,
+                            onLongClick = { onCardLongClick(index) },
+                            onClick = { onCardClick(index) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

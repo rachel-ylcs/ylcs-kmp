@@ -89,6 +89,11 @@ actual object Picker {
         }
     }
 
+    // TODO:
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
+        continuation.resume(null)
+    }
+
     private inline fun openPicker(mimeType: List<String>, filter: List<String>, crossinline callback: (NSURL?) -> Unit) {
         val picker = UIDocumentPickerViewController(
             forOpeningContentTypes = filter

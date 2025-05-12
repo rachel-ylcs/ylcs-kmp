@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +37,8 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_privacy_policy
-import love.yinlin.resources.default_name
-import love.yinlin.resources.default_signature
 import love.yinlin.ui.component.image.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.image.NoImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.input.SingleSelector
@@ -49,6 +47,7 @@ import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.screen.community.ScreenLogin
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
@@ -225,64 +224,63 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			title = "账号",
 			icon = Icons.Outlined.AccountCircle
 		) {
-			Item(
-				title = "头像",
-				onClick = {
-					if (userProfile != null) launch { modifyUserAvatar() }
-				}
-			) {
-				if (userProfile == null) NoImage()
-				else WebImage(
-					uri = userProfile.avatarPath,
-					key = app.config.cacheUserAvatar,
-					contentScale = ContentScale.Crop,
-					circle = true,
-					modifier = Modifier.size(ThemeValue.Size.SmallImage)
-						.shadow(ThemeValue.Shadow.Icon, CircleShape)
+			if (userProfile == null) {
+				ItemExpander(
+					title = "登录",
+					icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Login, background = ThemeColor.warning),
+					color = ThemeColor.warning,
+					hasDivider = false,
+					onClick = { navigate<ScreenLogin>() }
 				)
 			}
-			ItemText(
-				title = "ID",
-				text = userProfile?.name ?: stringResource(Res.string.default_name),
-				onClick = {
-					if (userProfile != null) launch { modifyUserId(userProfile.name) }
+			else {
+				Item(
+					title = "头像",
+					onClick = { launch { modifyUserAvatar() } }
+				) {
+					WebImage(
+						uri = userProfile.avatarPath,
+						key = app.config.cacheUserAvatar,
+						contentScale = ContentScale.Crop,
+						circle = true,
+						modifier = Modifier.size(ThemeValue.Size.SmallImage)
+							.shadow(ThemeValue.Shadow.Icon, CircleShape)
+					)
 				}
-			)
-			ItemText(
-				title = "个性签名",
-				text = userProfile?.signature ?: stringResource(Res.string.default_signature),
-				maxLines = 2,
-				onClick = {
-					if (userProfile != null) launch { modifyUserSignature(userProfile.signature) }
+				ItemText(
+					title = "ID",
+					text = userProfile.name,
+					onClick = { launch { modifyUserId(userProfile.name) } }
+				)
+				ItemText(
+					title = "个性签名",
+					text = userProfile.signature,
+					maxLines = 2,
+					onClick = { launch { modifyUserSignature(userProfile.signature) } }
+				)
+				Item(
+					title = "背景墙",
+					onClick = { launch { modifyUserWall() } }
+				) {
+					WebImage(
+						uri = userProfile.wallPath,
+						key = app.config.cacheUserWall,
+						modifier = Modifier.width(ThemeValue.Size.LargeImage).aspectRatio(1.77778f)
+							.shadow(ThemeValue.Shadow.Icon)
+					)
 				}
-			)
-			Item(
-				title = "背景墙",
-				onClick = {
-					if (userProfile != null) launch { modifyUserWall() }
-				}
-			) {
-				if (userProfile == null) {
-					NoImage(width = ThemeValue.Size.LargeImage, height = ThemeValue.Size.LargeImage / 1.77778f)
-				}
-				else WebImage(
-					uri = userProfile.wallPath,
-					key = app.config.cacheUserWall,
-					modifier = Modifier.width(ThemeValue.Size.LargeImage).aspectRatio(1.77778f)
-						.shadow(ThemeValue.Shadow.Icon)
+				ItemText(
+					title = "邀请人",
+					text = userProfile.inviterName ?: ""
+				)
+				ItemExpanderSuspend(
+					title = "退出登录",
+					icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Logout, background = ThemeColor.warning),
+					color = ThemeColor.warning,
+					hasDivider = false,
+					onClick = { logoff() }
 				)
 			}
-			ItemText(
-				title = "邀请人",
-				text = userProfile?.inviterName ?: ""
-			)
-			ItemExpanderSuspend(
-				title = "退出登录",
-				icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Logout, background = ThemeColor.warning),
-				color = ThemeColor.warning,
-				hasDivider = false,
-				onClick = { logoff() }
-			)
 		}
 	}
 
@@ -301,7 +299,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 						ThemeMode.LIGHT -> Icons.Outlined.LightMode
 						ThemeMode.DARK -> Icons.Outlined.DarkMode
 					},
-					background = Colors.Steel4
+					background = MaterialTheme.colorScheme.primaryContainer
 				)
 			) {
 				SingleSelector(
@@ -320,10 +318,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
 			Item(
 				title = "动画速度",
-				icon = colorfulImageVector(icon = Icons.Outlined.Animation, background = Colors.Steel4)
+				icon = colorfulImageVector(icon = Icons.Outlined.Animation, background = MaterialTheme.colorScheme.primaryContainer)
 			) {
-				val animationSpeedValue = remember { arrayOf(600, 400, 200) }
-				val animationSpeedString = remember { arrayOf("慢", "正常", "快") }
+				val animationSpeedValue = remember { intArrayOf(600, 400, 200) }
+				val animationSpeedString = remember { arrayOf("慢", "标准", "快") }
 				SingleSelector(
 					current = app.config.animationSpeed,
 					onSelected = { app.config.animationSpeed = it },
@@ -334,6 +332,26 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				) {
 					repeat(animationSpeedValue.size) {
 						this.Item(animationSpeedValue[it], animationSpeedString[it])
+					}
+				}
+			}
+
+			Item(
+				title = "字体大小",
+				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer)
+			) {
+				val fontScaleValue = remember { floatArrayOf(0.75f, 1f, 1.25f) }
+				val fontScaleString = remember { arrayOf("小", "标准", "大") }
+				SingleSelector(
+					current = app.config.fontScale,
+					onSelected = { app.config.fontScale = it },
+					style = MaterialTheme.typography.bodySmall,
+					hasIcon = false,
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+				) {
+					repeat(fontScaleValue.size) {
+						this.Item(fontScaleValue[it], fontScaleString[it])
 					}
 				}
 			}

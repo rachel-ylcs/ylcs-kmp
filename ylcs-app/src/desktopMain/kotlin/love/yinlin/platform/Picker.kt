@@ -48,6 +48,14 @@ actual object Picker {
         catch (_: Throwable) { null }
     }
 
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = Coroutines.io {
+        try {
+            val path = saveFileDialog(windowHandle, "保存文件", filename, filter, "文件")
+            NormalPath(path!!)
+        }
+        catch (_: Throwable) { null }
+    }
+
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = Coroutines.io {
         try {
             val path = Path(saveFileDialog(windowHandle, "保存图片", filename, "*.webp", "图片")!!)

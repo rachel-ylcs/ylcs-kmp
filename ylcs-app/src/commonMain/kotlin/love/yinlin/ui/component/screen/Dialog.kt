@@ -258,8 +258,6 @@ open class FloatingDialogInput(
 	val minLines: Int = maxLines,
 	val clearButton: Boolean = maxLines == 1
 ) : FloatingRachelDialog<String>() {
-	final override val dismissOnBackPress: Boolean = false
-	final override val dismissOnClickOutside: Boolean = false
 	final override val scrollable: Boolean = false
 
 	override val title: String? = null

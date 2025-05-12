@@ -71,11 +71,6 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			is Data.Success -> {
 				val token = result1.data
 				app.config.userToken = token
-				val result2 = ClientAPI.request(
-					route = API.User.Profile.GetProfile,
-					data = token
-				)
-				if (result2 is Data.Success) app.config.userProfile = result2.data
 				pop()
 			}
 			is Data.Error -> slot.tip.error(result1.message)

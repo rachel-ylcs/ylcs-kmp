@@ -304,6 +304,8 @@ class KVConfig(private val kv: KV) {
 	var themeMode: ThemeMode by enumState(ThemeMode.SYSTEM)
 	// 动画速度
 	var animationSpeed: Int by intState(400)
+	// 字体大小
+	var fontScale: Float by floatState(1f)
 
 	/* ------------------  微博  ------------------ */
 
