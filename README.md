@@ -1,6 +1,6 @@
 <div align="center">
     <h1>银临茶舍跨平台 App</h1>
-    <p>集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 水群：828049503</p>
+    <p>集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503</p>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android"/>
 		<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
