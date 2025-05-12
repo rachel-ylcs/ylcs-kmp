@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.2.0-Beta2"
 cmp = "1.8.0"
-cmp-stable = "1.7.3"
+material3-icon-old = "1.7.3"
 agp = "8.10.0-alpha05"
 
 # Libs #
@@ -46,8 +46,8 @@ compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", v
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
-compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "cmp-stable" }
-compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "cmp-stable" }
+compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material3-icon-old" }
+compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
