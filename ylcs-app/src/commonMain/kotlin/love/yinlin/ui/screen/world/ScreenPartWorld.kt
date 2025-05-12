@@ -72,25 +72,27 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		modifier: Modifier = Modifier
 	) {
 		val pics by rememberDerivedState { activities.filter { it.pic != null } }
-		Banner(
-			pics = pics,
-			interval = 5000L,
-			gap = gap,
-			modifier = modifier
-		) { pic, index, scale ->
-			Surface(
-				modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-				shape = shape,
-				shadowElevation = ThemeValue.Shadow.Surface
-			) {
-				WebImage(
-					uri = pic.picPath ?: "",
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.fillMaxSize(),
-					onClick = {
-						showActivityDetails(pic.aid)
-					}
-				)
+		BoxWithConstraints(modifier = modifier) {
+			Banner(
+				pics = pics,
+				interval = 5000L,
+				gap = gap,
+				modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
+			) { pic, index, scale ->
+				Surface(
+					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+					shape = shape,
+					shadowElevation = ThemeValue.Shadow.Surface
+				) {
+					WebImage(
+						uri = pic.picPath ?: "",
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.fillMaxSize(),
+						onClick = {
+							showActivityDetails(pic.aid)
+						}
+					)
+				}
 			}
 		}
 	}
