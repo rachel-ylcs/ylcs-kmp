@@ -168,7 +168,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ")
 				}
 			}
-			Item("店铺", Icons.Filled.Store) {
+			Item("店铺", ExtraIcons.Taobao) {
 				launch {
 					if (!OS.Application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
 				}
