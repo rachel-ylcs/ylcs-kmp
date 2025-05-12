@@ -258,10 +258,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     override val title: String by derivedStateOf {
-        if (isManaging) "选择歌曲"
-        else if (!isSearching) "曲库"
-        else if (library.isEmpty()) "搜索为空"
-        else "搜索结果"
+        "${if (isSearching) "搜索" else "曲库"} (${if (selectIdList.isNotEmpty()) "${selectIdList.size}/" else ""}${library.size})"
     }
 
     override fun onBack() {
