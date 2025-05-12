@@ -141,7 +141,7 @@ fun AppWrapper(
 					CompositionLocalProvider(
 						LocalContentColor provides MaterialTheme.colorScheme.onBackground,
 						LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-						LocalDensity provides Density(LocalDensity.current.density, 1f)
+						LocalDensity provides Density(LocalDensity.current.density, app.config.fontScale)
 					) {
 						content()
 					}

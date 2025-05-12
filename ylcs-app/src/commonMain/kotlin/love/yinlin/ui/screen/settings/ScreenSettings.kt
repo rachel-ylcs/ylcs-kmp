@@ -322,8 +322,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				title = "动画速度",
 				icon = colorfulImageVector(icon = Icons.Outlined.Animation, background = Colors.Steel4)
 			) {
-				val animationSpeedValue = remember { arrayOf(600, 400, 200) }
-				val animationSpeedString = remember { arrayOf("慢", "正常", "快") }
+				val animationSpeedValue = remember { intArrayOf(600, 400, 200) }
+				val animationSpeedString = remember { arrayOf("慢", "标准", "快") }
 				SingleSelector(
 					current = app.config.animationSpeed,
 					onSelected = { app.config.animationSpeed = it },
@@ -334,6 +334,26 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				) {
 					repeat(animationSpeedValue.size) {
 						this.Item(animationSpeedValue[it], animationSpeedString[it])
+					}
+				}
+			}
+
+			Item(
+				title = "字体大小",
+				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = Colors.Steel4)
+			) {
+				val fontScaleValue = remember { floatArrayOf(0.75f, 1f, 1.25f) }
+				val fontScaleString = remember { arrayOf("小", "标准", "大") }
+				SingleSelector(
+					current = app.config.fontScale,
+					onSelected = { app.config.fontScale = it },
+					style = MaterialTheme.typography.bodySmall,
+					hasIcon = false,
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+				) {
+					repeat(fontScaleValue.size) {
+						this.Item(fontScaleValue[it], fontScaleString[it])
 					}
 				}
 			}
