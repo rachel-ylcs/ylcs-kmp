@@ -33,11 +33,15 @@ import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.UriGenerator
+import love.yinlin.data.MimeType
+import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
+import love.yinlin.mod.ModFactory
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
@@ -262,9 +266,24 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     private suspend fun onMusicPackage() {
         val musicFactory = app.musicFactory
         if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
-        else if (slot.confirm.openSuspend(content = "打包这些歌曲成MOD吗")) {
-            val packageItems = selectIdList
-            Picker.pickFile()
+        else Picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
+            try {
+                slot.loading.openSuspend()
+                path.sink.use { sink ->
+                    val packageItems = selectIdList
+                    ModFactory.Merge(
+                        mediaPaths = packageItems.mapNotNull { musicFactory.musicLibrary[it]?.path },
+                        sink = sink,
+                        info = ModInfo(author = app.config.userProfile?.name ?: "无名")
+                    ).process { a, b, name -> }
+                }
+                slot.loading.close()
+                exitManagement()
+                slot.tip.success("导出成功")
+            }
+            catch (_: Throwable) {
+                slot.tip.warning("无法导出MOD")
+            }
         }
     }
 
