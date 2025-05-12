@@ -82,7 +82,7 @@ fun VideoPlayerControls(
             VideoPlayerControlBar(
                 visible = isShowControls,
                 animateOffset = { -it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth(),
                 content = topBar
             )
         }
