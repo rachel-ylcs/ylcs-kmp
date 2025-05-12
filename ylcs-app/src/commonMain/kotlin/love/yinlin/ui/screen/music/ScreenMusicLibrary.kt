@@ -44,6 +44,8 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.ExpandableLayout
+import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
@@ -78,7 +80,7 @@ private fun MusicCard(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
         color = if (musicInfo.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        shadowElevation = ThemeValue.Shadow.Surface,
+        shadowElevation = ThemeValue.Shadow.MiniSurface,
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -88,21 +90,23 @@ private fun MusicCard(
                 onClick = onClick
             ),
         ) {
-            LocalFileImage(
-                path = { musicInfo.recordPath },
-                musicInfo,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.weight(3f).aspectRatio(1f)
-            )
+            Box(modifier = Modifier.aspectRatio(1f).fillMaxHeight()) {
+                LocalFileImage(
+                    path = { musicInfo.recordPath },
+                    musicInfo,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
             Column(
-                modifier = Modifier.weight(4f).fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(ThemeValue.Padding.ExtraValue),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
             ) {
                 Text(
                     text = musicInfo.name,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -110,7 +114,7 @@ private fun MusicCard(
                     text = musicInfo.singer,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -274,25 +278,16 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                 closeSearch()
             }
         }
-        if (isManaging) {
-            Action(Icons.Outlined.SelectAll) {
-                if (library.all { it.selected }) exitManagement()
-                else selectAll()
-            }
-        }
     }
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (isManaging) {
-            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
-                onMusicAdd()
-            }
-            ActionSuspend(Icons.Outlined.Delete) {
-                onMusicDelete()
+        if (!isManaging) {
+            ActionSuspend(Icons.Outlined.Search) {
+                openSearch()
             }
         }
-        else {
+        if (!isManaging && !isSearching) {
             ActionSuspend(Icons.Outlined.Add) {
                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
                 else {
@@ -330,9 +325,6 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     }
                 }
             }
-            ActionSuspend(Icons.Outlined.Search) {
-                openSearch()
-            }
         }
     }
 
@@ -340,24 +332,45 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun SubContent(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
-            ) {
-                itemsIndexed(
-                    items = library,
-                    key = { index, item -> item.id }
-                ) { index, item ->
-                    MusicCard(
-                        musicInfo = item,
-                        enableLongClick = !isManaging,
-                        onLongClick = { onCardLongClick(index) },
-                        onClick = { onCardClick(index) },
-                        modifier = Modifier.fillMaxWidth()
+            Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+                ExpandableLayout(isExpanded = isManaging) {
+                    SplitActionLayout(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+                        left = {
+                            Action(Icons.Outlined.SelectAll) {
+                                if (library.all { it.selected }) exitManagement()
+                                else selectAll()
+                            }
+                        },
+                        right = {
+                            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+                                onMusicAdd()
+                            }
+                            ActionSuspend(Icons.Outlined.Delete) {
+                                onMusicDelete()
+                            }
+                        }
                     )
+                }
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                    contentPadding = ThemeValue.Padding.EqualValue,
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) {
+                    itemsIndexed(
+                        items = library,
+                        key = { index, item -> item.id }
+                    ) { index, item ->
+                        MusicCard(
+                            musicInfo = item,
+                            enableLongClick = !isManaging,
+                            onLongClick = { onCardLongClick(index) },
+                            onClick = { onCardClick(index) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

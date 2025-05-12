@@ -468,6 +468,11 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 1.5.dp
 			Device.Size.LARGE -> 2.dp
 		}
+		val MiniSurface: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 2.dp
+			Device.Size.MEDIUM -> 2.25.dp
+			Device.Size.LARGE -> 2.5.dp
+		}
 		val Surface: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 4.dp
 			Device.Size.MEDIUM -> 4.5.dp

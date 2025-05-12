@@ -83,13 +83,15 @@ class AppModel(
 @Composable
 fun App(
 	navController: NavHostController = rememberNavController(),
-	appModel: AppModel = viewModel { AppModel(navController).apply {
-		app.model = this
-	} },
 	modifier: Modifier = Modifier.fillMaxSize()
 ) {
+	val appModel: AppModel = viewModel {
+		AppModel(navController).apply {
+			app.model = this
+		}
+	}
 	NavHost(
-		modifier = modifier,
+		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		navController = navController,
 		startDestination = route<ScreenMain>(),
 		enterTransition = {
@@ -118,10 +120,7 @@ fun App(
 }
 
 @Composable
-fun AppWrapper(
-	transparent: Boolean = false,
-	content: @Composable () -> Unit
-) {
+fun AppWrapper(content: @Composable () -> Unit) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 		val isDarkMode = when (app.config.themeMode) {
 			ThemeMode.SYSTEM -> isSystemInDarkTheme()
@@ -137,14 +136,12 @@ fun AppWrapper(
 				shapes = rachelShapes(LocalDevice.current),
 				typography = rachelTypography(LocalDevice.current)
 			) {
-				Box(modifier = Modifier.background(if (transparent) Colors.Transparent else MaterialTheme.colorScheme.background)) {
-					CompositionLocalProvider(
-						LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-						LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-						LocalDensity provides Density(LocalDensity.current.density, app.config.fontScale)
-					) {
-						content()
-					}
+				CompositionLocalProvider(
+					LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+					LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+					LocalDensity provides Density(LocalDensity.current.density, app.config.fontScale)
+				) {
+					content()
 				}
 			}
 		}
