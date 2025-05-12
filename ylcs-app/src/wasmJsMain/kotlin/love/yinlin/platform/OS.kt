@@ -6,7 +6,10 @@ import love.yinlin.common.Uri
 
 actual val osPlatform: Platform = Platform.WebWasm
 
-actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = false
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
+	osNetOpenUrl(uri.toString())
+	return true
+}
 
 actual fun osNetOpenUrl(url: String) {
 	window.open(url, "_blank")

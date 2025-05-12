@@ -8,6 +8,8 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 
 @Serializable(Scheme.Serializer::class)
 data class Scheme(val name: String) {
@@ -232,17 +234,39 @@ object UriGenerator {
         query = "src_type=internal&version=1&uin=$id&card_type=person&source=qrcode"
     )
 
-    fun qqGroup(id: String): Uri = Uri(
-        scheme = Scheme.QQ,
-        host = "card",
-        path = "/show_pslcard",
-        query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
+    fun qqGroup(id: String): Uri = OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = {
+            Uri(
+                scheme = Scheme.QQ,
+                host = "card",
+                path = "/show_pslcard",
+                query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
+            )
+        },
+        ifFalse = {
+            Uri(
+                scheme = Scheme.Https,
+                host = "qm.qq.com",
+                path = "/cgi-bin/qm/qr",
+                query = "_wv=1027&k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R&group_code=828049503"
+            )
+        }
     )
 
-    fun taobao(shopId: String): Uri = Uri(
-        scheme = Scheme.Taobao,
-        host = "shop.m.taobao.com",
-        path = "/shop/shop_index.html",
-        query = "shop_id=$shopId"
+    fun taobao(shopId: String): Uri = OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = { Uri(
+            scheme = Scheme.Taobao,
+            host = "shop.m.taobao.com",
+            path = "/shop/shop_index.html",
+            query = "shop_id=$shopId"
+        ) },
+        ifFalse = {
+            Uri(
+                scheme = Scheme.Https,
+                host = "shop280201975.taobao.com"
+            )
+        }
     )
 }

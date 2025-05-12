@@ -17,7 +17,10 @@ actual val osPlatform: Platform = System.getProperty("os.name").let {
 	}
 }
 
-actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = false
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
+	osNetOpenUrl(uri.toString())
+	return true
+}
 
 actual fun osNetOpenUrl(url: String) {
 	try {
