@@ -9,7 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -204,7 +203,7 @@ private fun baseTextStyle(
 	size: TextUnit,
 	isBold: Boolean = false
 ): TextStyle = TextStyle(
-	fontFamily = FontFamily(font),
+	fontFamily = font,
 	fontWeight = if (isBold) FontWeight.SemiBold else FontWeight.Light,
 	fontSize = size,
 	lineHeight = size * 1.5f,
