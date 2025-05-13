@@ -863,7 +863,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
 			) {
-				item(ItemKey("Header")) {
+				item(key = ItemKey("Header")) {
 					Row(
 						modifier = Modifier.fillMaxWidth().padding(
 							start = ThemeValue.Padding.HorizontalExtraSpace,

@@ -1,7 +1,10 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -10,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.IndeterminateCheckBox
+import androidx.compose.material.icons.outlined.Paid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,16 +45,20 @@ import love.yinlin.common.Uri
 import love.yinlin.common.UriGenerator
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
+import love.yinlin.data.ItemKey
+import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.*
+import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.FloatingArgsSheet
@@ -65,6 +73,43 @@ import org.ncgroup.kscan.BarcodeResult
 import org.ncgroup.kscan.ScannerView
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
+
+@Composable
+private fun LevelItem(
+	index: Int,
+	item: Pair<Int, Int>,
+	modifier: Modifier = Modifier
+) {
+	val level = index + 1
+	Row(
+		modifier = modifier,
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Text(level.toString())
+		Box(
+			modifier = Modifier.weight(1f),
+			contentAlignment = Alignment.Center
+		) {
+			RachelText(
+				text = remember(item) {
+					if (item.second != Int.MAX_VALUE) "${item.first} ~ ${item.second}"
+					else "> ${item.first}"
+				},
+				icon = Icons.Outlined.Paid
+			)
+		}
+		Box(
+			modifier = Modifier.offset(y = -ThemeValue.Padding.LittleSpace),
+			contentAlignment = Alignment.Center
+		) {
+			UserLabel(
+				label = "",
+				level = level
+			)
+		}
+	}
+}
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
@@ -465,15 +510,24 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 
 		levelSheet.Land { profile ->
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-			) {
-				UserProfileLevelInfo(
-					profile = remember(profile) { profile.publicProfile },
-					owner = true,
-					modifier = Modifier.fillMaxWidth()
-				)
+			LazyColumn(modifier = Modifier.fillMaxWidth()) {
+				item(key = ItemKey("Profile")) {
+					UserProfileLevelInfo(
+						profile = remember(profile) { profile.publicProfile },
+						owner = true,
+						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
+					)
+				}
+				itemsIndexed(
+					items = UserLevel.levelTable,
+					key = { index, item -> index }
+				) { index, item ->
+					LevelItem(
+						index = index,
+						item = item,
+						modifier = Modifier.fillMaxWidth().clickable {}.padding(ThemeValue.Padding.Value)
+					)
+				}
 			}
 		}
 	}

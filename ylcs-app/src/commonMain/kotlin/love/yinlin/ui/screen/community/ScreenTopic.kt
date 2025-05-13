@@ -797,9 +797,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 						num = page.pageNum
 					)?.let { page.moreData(it) }
 				},
-				contentPadding = ThemeValue.Padding.Value,
 				itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
 			) { subComment ->
 				SubCommentBar(
 					subComment = subComment,

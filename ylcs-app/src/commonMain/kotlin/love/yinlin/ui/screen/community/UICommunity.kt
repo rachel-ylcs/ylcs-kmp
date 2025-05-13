@@ -33,7 +33,6 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.clickableNoRipple
-import love.yinlin.extension.condition
 import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon

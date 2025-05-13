@@ -1,6 +1,5 @@
 package love.yinlin.ui.component.common
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
@@ -22,7 +20,6 @@ import love.yinlin.common.LocalDarkMode
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeStyle
 import love.yinlin.extension.clickableNoRipple
-import love.yinlin.extension.condition
 import org.jetbrains.compose.resources.DrawableResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage
@@ -39,21 +36,17 @@ private object UserLabelMeta {
 
 	fun label(level: Int): String = labelNameFromLevel.getOrNull(level) ?: labelNameFromLevel[0]
 
-	fun image(level: Int, darkMode: Boolean): Pair<DrawableResource, Color> {
-		val drawable = when (level) {
-			in 1..4 -> Res.drawable.img_label_fucaoweiying
-			in 5..8 -> Res.drawable.img_label_pifuduhai
-			in 9..12 -> Res.drawable.img_label_fenghuaxueyue
-			in 13..16 -> Res.drawable.img_label_liuli
-			in 17..20 -> if (darkMode) Res.drawable.img_label_lidishigongfen2 else Res.drawable.img_label_lidishigongfen1
-			in 21..99 -> Res.drawable.img_label_shanseyouwuzhong
-			else -> Res.drawable.img_label_fucaoweiying
-		}
-		val color = if (darkMode && level in 17 .. 20) Colors.White else Colors.Black
-		return drawable to color
+	fun image(level: Int, darkMode: Boolean): DrawableResource = when (level) {
+		in 1..4 -> Res.drawable.img_label_fucaoweiying
+		in 5..8 -> Res.drawable.img_label_pifuduhai
+		in 9..12 -> Res.drawable.img_label_fenghuaxueyue
+		in 13..16 -> Res.drawable.img_label_liuli
+		in 17..20 -> if (darkMode) Res.drawable.img_label_lidishigongfen2 else Res.drawable.img_label_lidishigongfen1
+		in 21..99 -> Res.drawable.img_label_shanseyouwuzhong
+		else -> Res.drawable.img_label_fucaoweiying
 	}
 
-	fun image(name: String): Pair<DrawableResource, Color> = Res.drawable.img_label_special to Colors.Black
+	fun image(name: String): DrawableResource = Res.drawable.img_label_special
 }
 
 @Composable
@@ -63,7 +56,7 @@ fun UserLabel(
 	onClick: () -> Unit = {}
 ) {
 	val isDarkMode = LocalDarkMode.current
-	val (img, color) = remember(label, level, isDarkMode) {
+	val img = remember(label, level, isDarkMode) {
 		if (label.isEmpty()) UserLabelMeta.image(level, isDarkMode)
 		else UserLabelMeta.image(label)
 	}
@@ -94,7 +87,7 @@ fun UserLabel(
 		Text(
 			modifier = Modifier.fillMaxSize().padding(padding),
 			text = text,
-			color = color.copy(alpha = 0.8f),
+			color = if (isDarkMode) Colors.White else Colors.Dark,
 			style = ThemeStyle.bodyExtraSmall,
 			textAlign = TextAlign.Center,
 			maxLines = 1,

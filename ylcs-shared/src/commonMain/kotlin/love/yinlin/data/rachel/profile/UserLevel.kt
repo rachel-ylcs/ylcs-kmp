@@ -9,6 +9,7 @@ object UserLevel {
 		300, 350, 420, 500,
 		600, 720, 850, 1000,
 		1200, 1500, 2000, 3000,
+		Int.MAX_VALUE
 	)
 
 	fun level(num: Int): Int {
@@ -19,4 +20,6 @@ object UserLevel {
 		}
 		return 1
 	}
+
+	val levelTable: List<Pair<Int, Int>> = List(Default.size - 1) { Default[it] to Default[it + 1] }
 }
