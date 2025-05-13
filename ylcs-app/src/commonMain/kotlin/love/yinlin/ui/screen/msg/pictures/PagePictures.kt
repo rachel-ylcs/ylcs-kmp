@@ -13,10 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.zIndex
+import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.rememberDerivedState
@@ -52,10 +53,12 @@ private fun PhotoFile(
 @Composable
 private fun PhotoFolderText(
     text: String,
+    color: Color = Colors.Unspecified,
     modifier: Modifier = Modifier
 ) {
     Text(
         text = text,
+        color = color,
         textAlign = TextAlign.Center,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -75,36 +78,28 @@ private fun PhotoFolder(
         modifier = modifier,
         shadowElevation = ThemeValue.Shadow.Surface
     ) {
-        if (isAlbum) {
-            Column(
-                modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isAlbum) {
                 WebImage(
                     uri = (item.items.first() as PhotoItem.File).thumb,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 )
-                PhotoFolderText(
-                    text = item.name,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
-                )
             }
-        }
-        else {
-            Box(
-                modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
-                contentAlignment = Alignment.BottomCenter
-            ) {
+            else {
                 MiniImage(
                     res = Res.drawable.img_photo_album,
-                    modifier = Modifier.fillMaxSize().zIndex(1f)
-                )
-                PhotoFolderText(
-                    text = item.name,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = ThemeValue.Padding.VerticalExtraSpace).zIndex(2f)
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
+            PhotoFolderText(
+                text = item.name,
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+            )
         }
     }
 }
