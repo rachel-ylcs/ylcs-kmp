@@ -24,15 +24,8 @@ class SandboxSource(val url: NSURL) : RawSource {
     }
 }
 
-class SandboxSink(val url: NSURL) : RawSink {
-    val sink: RawSink
-    init {
-        val canAccess = url.startAccessingSecurityScopedResource()
-        if (!canAccess) {
-            throw IOException()
-        }
-        sink = NSOutputStream(uRL = url, append = false).asSink()
-    }
+class SandboxSink(val url: NSURL, val onClosed: () -> Unit = {}) : RawSink {
+    val sink = NSOutputStream(uRL = url, append = false).asSink()
 
     override fun write(source: Buffer, byteCount: Long) {
         sink.write(source, byteCount)
@@ -44,12 +37,23 @@ class SandboxSink(val url: NSURL) : RawSink {
 
     override fun close() {
         sink.close()
-        url.stopAccessingSecurityScopedResource()
+        onClosed()
     }
 }
 
-open class SandboxPath(val url: NSURL) : ImplicitPath {
+open class SandboxPath(val url: NSURL, val parentUrl: NSURL? = null) : ImplicitPath {
+    init {
+        parentUrl?.let {
+            val canAccess = parentUrl.startAccessingSecurityScopedResource()
+            if (!canAccess) {
+                throw IOException()
+            }
+        }
+    }
+
     override val path: String get() = url.path!!
     override val source: Source get() = SandboxSource(url).buffered()
-    override val sink: Sink get() = SandboxSink(url).buffered()
+    override val sink: Sink get() = SandboxSink(url) {
+        parentUrl?.stopAccessingSecurityScopedResource()
+    }.buffered()
 }
