@@ -19,6 +19,19 @@ class Device private constructor(
     @Serializable
     enum class Type { PORTRAIT, LANDSCAPE, SQUARE; }
 
+    constructor(width: Dp) : this(
+        size = when {
+            width <= 420.dp -> Size.SMALL
+            width <= 900.dp -> Size.MEDIUM
+            else -> Size.LARGE
+        },
+        type = when {
+            width <= 420.dp -> Type.PORTRAIT
+            width <= 900.dp -> Type.SQUARE
+            else -> Type.LANDSCAPE
+        }
+    )
+
     constructor(width: Dp, height: Dp) : this(
         size = when {
             width <= 420.dp -> Size.SMALL

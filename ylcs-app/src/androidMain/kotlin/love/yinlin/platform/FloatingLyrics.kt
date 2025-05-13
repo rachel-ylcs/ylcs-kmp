@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,7 +27,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import love.yinlin.AppWrapper
+import love.yinlin.DeviceWrapper
+import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import java.util.*
 
@@ -36,7 +38,9 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         setViewTreeLifecycleOwner(activity)
         setViewTreeSavedStateRegistryOwner(activity)
         setContent {
-            AppWrapper { FloatingContent() }
+            ContentWrapper {
+                FloatingContent()
+            }
         }
     }
 
@@ -113,6 +117,18 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    fun ContentWrapper(content: @Composable () -> Unit) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            DeviceWrapper(
+                device = remember(this.maxWidth) { Device(this.maxWidth) },
+                themeMode = app.config.themeMode,
+                fontScale = 1f,
+                content = content
+            )
         }
     }
 }

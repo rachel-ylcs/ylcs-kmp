@@ -119,30 +119,46 @@ fun App(
 }
 
 @Composable
-fun AppWrapper(content: @Composable () -> Unit) {
-	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-		val isDarkMode = when (app.config.themeMode) {
-			ThemeMode.SYSTEM -> isSystemInDarkTheme()
-			ThemeMode.LIGHT -> false
-			ThemeMode.DARK -> true
-		}
-		CompositionLocalProvider(
-			LocalDevice provides remember(maxWidth, maxHeight) { Device(maxWidth, maxHeight) },
-			LocalDarkMode provides isDarkMode
+fun DeviceWrapper(
+	device: Device,
+	themeMode: ThemeMode,
+	fontScale: Float,
+	content: @Composable () -> Unit
+) {
+	val isDarkMode = when (themeMode) {
+		ThemeMode.SYSTEM -> isSystemInDarkTheme()
+		ThemeMode.LIGHT -> false
+		ThemeMode.DARK -> true
+	}
+
+	CompositionLocalProvider(
+		LocalDevice provides device,
+		LocalDarkMode provides isDarkMode
+	) {
+		MaterialTheme(
+			colorScheme = rachelColorScheme(isDarkMode),
+			shapes = rachelShapes(device),
+			typography = rachelTypography(device)
 		) {
-			MaterialTheme(
-				colorScheme = rachelColorScheme(isDarkMode),
-				shapes = rachelShapes(LocalDevice.current),
-				typography = rachelTypography(LocalDevice.current)
+			CompositionLocalProvider(
+				LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+				LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+				LocalDensity provides Density(LocalDensity.current.density, fontScale)
 			) {
-				CompositionLocalProvider(
-					LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-					LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-					LocalDensity provides Density(LocalDensity.current.density, app.config.fontScale)
-				) {
-					content()
-				}
+				content()
 			}
 		}
+	}
+}
+
+@Composable
+fun AppWrapper(content: @Composable () -> Unit) {
+	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+		DeviceWrapper(
+			device = remember(maxWidth, maxHeight) { Device(maxWidth, maxHeight) },
+			themeMode = app.config.themeMode,
+			fontScale = app.config.fontScale,
+			content = content
+		)
 	}
 }
