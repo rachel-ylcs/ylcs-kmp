@@ -94,6 +94,10 @@ class ActualMusicFactory : MusicFactory() {
         avPlayer?.pause()
         avPlayer?.seekToTime(CMTimeMake(0, 1))
         currentPosition = 0L
+        musicList = emptyList()
+        currentPlaylist = null
+        currentMusic = null
+        currentIndex = -1
     }
 
     override suspend fun gotoPrevious() {
