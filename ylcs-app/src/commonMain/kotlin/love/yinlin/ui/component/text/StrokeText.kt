@@ -44,7 +44,7 @@ fun StrokeText(
     style: TextStyle = LocalTextStyle.current
 ) {
     Box {
-        val borderWidth = with(LocalDensity.current) { style.fontSize.toPx() / 8f }
+        val borderWidth = with(LocalDensity.current) { style.fontSize.toPx() / 12f }
         Text(
             text = text,
             modifier = modifier.semantics { hideFromAccessibility() }.zIndex(1f),

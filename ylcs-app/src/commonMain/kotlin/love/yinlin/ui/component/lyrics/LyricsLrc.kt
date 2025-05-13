@@ -51,7 +51,7 @@ private fun LyricsLrcLine(
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
     val color = if (isCurrent) Color(app.config.floatingLyricsConfig.textColor) else Colors.White
     val alpha = 1 / (offset + 1f)
-    val borderWidth = with(LocalDensity.current) { fontSize.toPx() / 8f }
+    val borderWidth = with(LocalDensity.current) { fontSize.toPx() / 12f }
 
     Box {
         Text(
