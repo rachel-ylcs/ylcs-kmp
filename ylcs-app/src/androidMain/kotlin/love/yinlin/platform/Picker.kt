@@ -97,9 +97,21 @@ actual object Picker {
         }
     }
 
-    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) = Unit
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = suspendCoroutine { continuation ->
+        continuation.safeResume {
+            val values = ContentValues()
+            values.put(MediaStore.Video.Media.DISPLAY_NAME, filename)
+            values.put(MediaStore.Video.Media.MIME_TYPE, MimeType.VIDEO)
+            values.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES)
+            val resolver = appNative.context.contentResolver
+            val uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)!!
+            continuation.resume(uri to resolver.openOutputStream(uri)!!.asSink().buffered())
+        }
+    }
 
-    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) {
+    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Unit
+
+    actual suspend fun cleanSave(origin: Any, result: Boolean) {
         if (!result) appNative.context.contentResolver.delete(origin as Uri, null, null)
     }
 }

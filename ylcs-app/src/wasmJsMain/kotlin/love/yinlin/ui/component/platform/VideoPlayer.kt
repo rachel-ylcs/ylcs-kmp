@@ -8,7 +8,8 @@ import love.yinlin.platform.UnsupportedComponent
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onDownload: () -> Unit
 ) {
     UnsupportedComponent(modifier = modifier)
 }

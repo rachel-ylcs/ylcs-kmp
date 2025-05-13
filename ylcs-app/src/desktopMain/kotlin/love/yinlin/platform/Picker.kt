@@ -64,9 +64,17 @@ actual object Picker {
         catch (_: Throwable) { null }
     }
 
-    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) = Unit
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = Coroutines.io {
+        try {
+            val path = Path(saveFileDialog(windowHandle, "保存视频", filename, "*.mp4", "视频")!!)
+            path to SystemFileSystem.sink(path).buffered()
+        }
+        catch (_: Throwable) { null }
+    }
 
-    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) {
+    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Unit
+
+    actual suspend fun cleanSave(origin: Any, result: Boolean) {
         if (!result) SystemFileSystem.delete(origin as Path, false)
     }
 }

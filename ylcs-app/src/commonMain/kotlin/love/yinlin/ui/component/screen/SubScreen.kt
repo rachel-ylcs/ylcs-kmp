@@ -26,7 +26,7 @@ import love.yinlin.ui.screen.Screen
 
 @Stable
 abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
-	protected abstract val title: String
+	protected abstract val title: String?
 
 	protected open fun onBack() { pop() }
 
@@ -49,47 +49,51 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 
 		val immersivePadding = rememberImmersivePadding()
 		Column(modifier = Modifier.fillMaxSize()) {
-			Surface(
-				modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-				tonalElevation = ThemeValue.Shadow.Tonal,
-				shadowElevation = ThemeValue.Shadow.Surface
-			) {
-				Box(
-					modifier = Modifier
-						.padding(immersivePadding.withoutBottom)
-						.fillMaxWidth()
-						.padding(vertical = ThemeValue.Padding.VerticalSpace),
-					contentAlignment = Alignment.Center
+			title?.let { titleString ->
+				Surface(
+					modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
+					tonalElevation = ThemeValue.Shadow.Tonal,
+					shadowElevation = ThemeValue.Shadow.Surface
 				) {
 					Box(
-						modifier = Modifier.fillMaxWidth().zIndex(2f),
+						modifier = Modifier
+							.padding(immersivePadding.withoutBottom)
+							.fillMaxWidth()
+							.padding(vertical = ThemeValue.Padding.VerticalSpace),
 						contentAlignment = Alignment.Center
 					) {
-						Text(
-							text = title,
-							style = MaterialTheme.typography.titleMedium,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis
+						Box(
+							modifier = Modifier.fillMaxWidth().zIndex(2f),
+							contentAlignment = Alignment.Center
+						) {
+							Text(
+								text = titleString,
+								style = MaterialTheme.typography.titleMedium,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis
+							)
+						}
+						SplitActionLayout(
+							modifier = Modifier.fillMaxWidth().zIndex(1f),
+							left = {
+								ClickIcon(
+									modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
+									icon = Icons.AutoMirrored.Outlined.ArrowBack,
+									onClick = ::onBack
+								)
+								LeftActions()
+							},
+							right = {
+								RightActions()
+							}
 						)
 					}
-					SplitActionLayout(
-						modifier = Modifier.fillMaxWidth().zIndex(1f),
-						left = {
-							ClickIcon(
-								modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
-								icon = Icons.AutoMirrored.Outlined.ArrowBack,
-								onClick = ::onBack
-							)
-							LeftActions()
-						},
-						right = {
-							RightActions()
-						}
-					)
 				}
 			}
 			Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+				CompositionLocalProvider(
+					LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop)
+				) {
 					SubContent(LocalDevice.current)
 				}
 			}
@@ -98,7 +102,9 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 				tonalElevation = ThemeValue.Shadow.Tonal,
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
-				CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutTop) {
+				CompositionLocalProvider(
+					LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop)
+				) {
 					BottomBar()
 				}
 			}

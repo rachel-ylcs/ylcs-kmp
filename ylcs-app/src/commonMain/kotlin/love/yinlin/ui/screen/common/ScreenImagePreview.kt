@@ -68,10 +68,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 							if (total != 0L) downloadDialog.progress = current / total.toFloat()
 						}
 					)
-					if (result) Picker.actualSavePicture(filename, origin, sink)
+					if (result) Picker.actualSave(filename, origin, sink)
 					result
 				}
-				Picker.cleanSavePicture(origin, result)
+				Picker.cleanSave(origin, result)
 				downloadDialog.close()
 			}
 		}

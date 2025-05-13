@@ -5,8 +5,10 @@ import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +31,7 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.layout.SplitActionLayout
 
 private class VideoPlayerState {
     var controller by mutableStateOf<Player?>(null)
@@ -87,7 +90,8 @@ private class VideoPlayerState {
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onDownload: () -> Unit
 ) {
     val context = LocalContext.current
     val state by rememberState { VideoPlayerState() }
@@ -138,10 +142,22 @@ actual fun VideoPlayer(
                 duration = state.duration,
                 onProgressClick = { state.seekTo(it) },
                 topBar = {
-                    ClickIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
-                        color = Colors.White,
-                        onClick = onBack
+                    SplitActionLayout(
+                        modifier = Modifier.fillMaxWidth(),
+                        left = {
+                            ClickIcon(
+                                icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                                color = Colors.White,
+                                onClick = onBack
+                            )
+                        },
+                        right = {
+                            ClickIcon(
+                                icon = Icons.Outlined.Download,
+                                color = Colors.White,
+                                onClick = onDownload
+                            )
+                        }
                     )
                 }
             )

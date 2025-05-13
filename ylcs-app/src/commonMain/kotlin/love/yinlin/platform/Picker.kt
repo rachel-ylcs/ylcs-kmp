@@ -13,6 +13,7 @@ expect object Picker {
     suspend fun savePath(filename: String, mimeType: String = MimeType.ANY, filter: String = "*.*"): ImplicitPath?
 
     suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>?
-    suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink)
-    suspend fun cleanSavePicture(origin: Any, result: Boolean)
+    suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>?
+    suspend fun actualSave(filename: String, origin: Any, sink: Sink)
+    suspend fun cleanSave(origin: Any, result: Boolean)
 }

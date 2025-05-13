@@ -125,8 +125,10 @@ actual object Picker {
         return buffer to buffer
     }
 
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSavePicture(filename)
+
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun actualSavePicture(filename: String, origin: Any, sink: Sink) {
+    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
         Coroutines.io {
             val bytes = (origin as Buffer).readBytes()
             val data = bytes.toNSData()
@@ -135,5 +137,5 @@ actual object Picker {
         }
     }
 
-    actual suspend fun cleanSavePicture(origin: Any, result: Boolean) = Unit
+    actual suspend fun cleanSave(origin: Any, result: Boolean) = Unit
 }

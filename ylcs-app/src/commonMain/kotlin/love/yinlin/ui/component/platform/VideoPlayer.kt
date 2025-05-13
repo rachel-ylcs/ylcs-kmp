@@ -29,7 +29,8 @@ import love.yinlin.ui.component.layout.Space
 expect fun VideoPlayer(
     url: String,
     modifier: Modifier = Modifier,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onDownload: () -> Unit
 )
 
 @Composable
