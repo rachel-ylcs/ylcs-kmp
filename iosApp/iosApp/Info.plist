@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>请求使用摄像头权限，用于扫描二维码</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>请求将照片保存到相册的权限，用于保存下载的图片</string>
 	<key>CFBundleDevelopmentRegion</key>
