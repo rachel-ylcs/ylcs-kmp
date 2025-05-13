@@ -34,6 +34,7 @@ import dev.chrisbanes.haze.hazeSource
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -769,7 +770,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	override suspend fun initialize() {
-		snapshotFlow { factory.currentPosition }.collect {
+		snapshotFlow { factory.currentPosition }.collectLatest {
 			val newLine = lyrics.updateIndex(factory.currentPosition)
 			factory.floatingLyrics?.let {
 				if (it.isAttached) it.updateLyrics(newLine)

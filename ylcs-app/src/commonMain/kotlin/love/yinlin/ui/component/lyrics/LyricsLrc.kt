@@ -15,13 +15,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.extension.timeString
+import love.yinlin.platform.app
 import kotlin.math.abs
 
 @Stable
@@ -41,21 +49,44 @@ private fun LyricsLrcLine(
 ) {
     val fontSize = MaterialTheme.typography.headlineSmall.fontSize / (offset / 30f + 1f)
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
-    val color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.White
-    val alpha = 2 / (offset + 2f)
+    val color = if (isCurrent) Color(app.config.floatingLyricsConfig.textColor) else Colors.White
+    val alpha = 1 / (offset + 1f)
+    val borderWidth = with(LocalDensity.current) { fontSize.toPx() / 8f }
 
-    Text(
-        text = text,
-        color = color,
-        style = MaterialTheme.typography.headlineMedium.copy(
-            fontSize = fontSize,
-            fontWeight = fontWeight
-        ),
-        textAlign = TextAlign.Center,
-        maxLines = 1,
-        overflow = TextOverflow.MiddleEllipsis,
-        modifier = Modifier.alpha(alpha)
-    )
+    Box {
+        Text(
+            text = text,
+            color = color,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontSize = fontSize,
+                fontWeight = fontWeight
+            ),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.MiddleEllipsis,
+            modifier = Modifier.alpha(alpha).zIndex(2f)
+        )
+        if (isCurrent) {
+            Text(
+                text = text,
+                color = Colors.White,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = fontSize,
+                    fontWeight = fontWeight,
+                    shadow = null,
+                    drawStyle = Stroke(
+                        width = borderWidth,
+                        join = StrokeJoin.Round
+                    )
+                ),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                textDecoration = null,
+                modifier = Modifier.semantics { hideFromAccessibility() }.alpha(alpha).zIndex(1f)
+            )
+        }
+    }
 }
 
 @Stable
@@ -175,10 +206,11 @@ class LyricsLrc : LyricsEngine {
                             },
                         contentAlignment = Alignment.Center
                     ) {
+                        val offset = abs(listState.firstVisibleItemIndex + 3 - index)
                         LyricsLrcLine(
                             text = item.text,
-                            isCurrent = index == currentIndex,
-                            offset = abs(listState.firstVisibleItemIndex + 3 - index),
+                            isCurrent = index == currentIndex && offset == 0,
+                            offset = offset,
                         )
                     }
                 }
