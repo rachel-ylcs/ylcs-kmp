@@ -44,12 +44,11 @@ data class LrcLine(
 @Composable
 private fun LyricsLrcLine(
     text: String,
-    isCurrent: Boolean,
     offset: Int
 ) {
     val fontSize = MaterialTheme.typography.headlineSmall.fontSize / (offset / 30f + 1f)
-    val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
-    val color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.White
+    val fontWeight = if (offset == 0) FontWeight.Bold else FontWeight.Light
+    val color = if (offset == 0) MaterialTheme.colorScheme.primary else Colors.White
     val alpha = 1 / (offset + 1f)
     val (borderWidth, shadowWidth) = with(LocalDensity.current) {
         val fontSizePx = fontSize.toPx()
@@ -69,7 +68,7 @@ private fun LyricsLrcLine(
             overflow = TextOverflow.MiddleEllipsis,
             modifier = Modifier.alpha(alpha).zIndex(2f)
         )
-        if (isCurrent) {
+        if (offset == 0) {
             Text(
                 text = text,
                 color = Colors.Dark,
@@ -128,13 +127,13 @@ class LyricsLrc : LyricsEngine {
 
         val paddingLyrics: List<LrcLine>? get() = lines?.let { items ->
             val startTime = items.first().position
-            buildList(capacity = 9 + items.size) {
+            buildList(capacity = 10 + items.size) {
                 // 插入6个空并均分起始时间
                 repeat(6) { add(LrcLine(startTime / 6 * it, "")) }
                 // 插入原歌词
                 addAll(items)
                 // 插入永久3个空
-                repeat(3) { add(LrcLine(Long.MAX_VALUE - it, "")) }
+                repeat(4) { add(LrcLine(Long.MAX_VALUE - it, "")) }
             }
         }
 
@@ -213,11 +212,9 @@ class LyricsLrc : LyricsEngine {
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        val offset = abs(listState.firstVisibleItemIndex + 3 - index)
                         LyricsLrcLine(
                             text = item.text,
-                            isCurrent = index == currentIndex && offset == 0,
-                            offset = offset,
+                            offset = abs(listState.firstVisibleItemIndex + 3 - index),
                         )
                     }
                 }
