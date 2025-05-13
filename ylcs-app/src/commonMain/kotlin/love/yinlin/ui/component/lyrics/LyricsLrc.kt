@@ -15,7 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.extension.timeString
-import love.yinlin.platform.app
 import kotlin.math.abs
 
 @Stable
@@ -49,9 +49,12 @@ private fun LyricsLrcLine(
 ) {
     val fontSize = MaterialTheme.typography.headlineSmall.fontSize / (offset / 30f + 1f)
     val fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Light
-    val color = if (isCurrent) Color(app.config.floatingLyricsConfig.textColor) else Colors.White
+    val color = if (isCurrent) MaterialTheme.colorScheme.primary else Colors.White
     val alpha = 1 / (offset + 1f)
-    val borderWidth = with(LocalDensity.current) { fontSize.toPx() / 12f }
+    val (borderWidth, shadowWidth) = with(LocalDensity.current) {
+        val fontSizePx = fontSize.toPx()
+        fontSizePx / 16f to fontSizePx / 24f
+    }
 
     Box {
         Text(
@@ -69,11 +72,15 @@ private fun LyricsLrcLine(
         if (isCurrent) {
             Text(
                 text = text,
-                color = Colors.White,
+                color = Colors.Dark,
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = fontSize,
                     fontWeight = fontWeight,
-                    shadow = null,
+                    shadow = Shadow(
+                        color = Colors.Black,
+                        offset = Offset(shadowWidth, shadowWidth),
+                        blurRadius = shadowWidth
+                    ),
                     drawStyle = Stroke(
                         width = borderWidth,
                         join = StrokeJoin.Round
