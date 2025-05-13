@@ -83,7 +83,7 @@ private fun LyricsLrcLine(
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
                 textDecoration = null,
-                modifier = Modifier.semantics { hideFromAccessibility() }.alpha(alpha).zIndex(1f)
+                modifier = Modifier.semantics { hideFromAccessibility() }.alpha(0.7f).zIndex(1f)
             )
         }
     }
