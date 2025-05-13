@@ -19,6 +19,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.FloatingLyricsConfig
 import love.yinlin.extension.OffScreenEffect
+import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.component.input.DockedColorPicker
@@ -31,24 +32,30 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
     private var enabled: Boolean by mutableStateOf(app.musicFactory.floatingLyrics?.isAttached ?: false)
     private var config: FloatingLyricsConfig by mutableStateOf(app.config.floatingLyricsConfig)
 
+    private fun FloatingLyrics.updateEnabledStatus() {
+        launch {
+            delay(300)
+            enabled = isAttached
+        }
+    }
+
     private fun enableFloatingLyrics(value: Boolean) {
         app.musicFactory.floatingLyrics?.let { floatingLyrics ->
             if (value) {
                 if (floatingLyrics.canAttached) {
                     floatingLyrics.attach()
-                    launch {
-                        delay(300)
-                        enabled = floatingLyrics.isAttached
+                    floatingLyrics.updateEnabledStatus()
+                }
+                else {
+                    floatingLyrics.applyPermission {
+                        if (it) floatingLyrics.attach()
+                        floatingLyrics.updateEnabledStatus()
                     }
                 }
-                else floatingLyrics.applyPermission { enabled = it }
             }
             else {
                 floatingLyrics.detach()
-                launch {
-                    delay(300)
-                    enabled = floatingLyrics.isAttached
-                }
+                floatingLyrics.updateEnabledStatus()
             }
         }
     }
@@ -189,20 +196,7 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
             app.musicFactory.floatingLyrics?.let { floatingLyrics ->
                 if (!floatingLyrics.canAttached && floatingLyrics.isAttached) {
                     floatingLyrics.detach()
-                    launch {
-                        delay(300)
-                        enabled = floatingLyrics.isAttached
-                    }
-                }
-                else {
-                    if (floatingLyrics.canAttached && !floatingLyrics.isAttached) {
-                        floatingLyrics.attach()
-                        launch {
-                            delay(300)
-                            enabled = floatingLyrics.isAttached
-                        }
-                    }
-                    else enabled = floatingLyrics.isAttached
+                    floatingLyrics.updateEnabledStatus()
                 }
             }
         }
