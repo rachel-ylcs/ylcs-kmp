@@ -3,6 +3,7 @@ package love.yinlin.platform
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
 import love.yinlin.common.Uri
+import love.yinlin.common.toNSUrl
 import platform.Foundation.NSHomeDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.NSFileManager
@@ -11,17 +12,26 @@ import platform.UIKit.UIApplication
 
 actual val osPlatform: Platform = Platform.IOS
 
-actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = false
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
+    try {
+        val application = UIApplication.sharedApplication
+        val url = uri.toNSUrl()
+        if (application.canOpenURL(url)) {
+            application.openURL(url)
+            return true
+        }
+    }
+    catch (_: Throwable) {}
+    return false
+}
 
 actual fun osNetOpenUrl(url: String) {
     try {
-        val application = UIApplication.sharedApplication
-        val uri = NSURL(string = url)
-        if (application.canOpenURL(uri)) {
-            application.openURL(uri)
+        NSURL.URLWithString(url)?.let {
+            UIApplication.sharedApplication.openURL(it)
         }
     }
-    catch (_: Throwable) { }
+    catch (_: Throwable) {}
 }
 
 actual val osStorageDataPath: Path get() = Path(NSHomeDirectory(), "Documents")

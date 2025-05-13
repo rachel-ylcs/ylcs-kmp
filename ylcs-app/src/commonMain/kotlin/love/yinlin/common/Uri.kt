@@ -259,13 +259,13 @@ object UriGenerator {
         ifTrue = { Uri(
             scheme = Scheme.Taobao,
             host = "shop.m.taobao.com",
-            path = "/shop/shop_index.html",
+            path = "/shop/shop_index.htm",
             query = "shop_id=$shopId"
         ) },
         ifFalse = {
             Uri(
                 scheme = Scheme.Https,
-                host = "shop280201975.taobao.com"
+                host = "shop$shopId.taobao.com"
             )
         }
     )
