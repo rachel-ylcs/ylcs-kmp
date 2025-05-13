@@ -167,7 +167,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 			val state = remember { TextInputState() }
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {

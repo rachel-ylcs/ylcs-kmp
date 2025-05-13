@@ -827,7 +827,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 		sendCoinSheet.Land { onClose ->
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				Text(

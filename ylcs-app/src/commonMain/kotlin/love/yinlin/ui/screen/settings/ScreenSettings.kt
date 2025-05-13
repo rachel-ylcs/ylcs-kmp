@@ -450,9 +450,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	override fun Floating() {
 		crashLogSheet.Land {
 			val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
-			Box(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
-					.verticalScroll(rememberScrollState())
+			Box(modifier = Modifier.fillMaxWidth()
+				.padding(ThemeValue.Padding.SheetValue)
+				.verticalScroll(rememberScrollState())
 			) {
 				SelectionContainer {
 					Text(
@@ -467,7 +467,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			val state = remember { TextInputState() }
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				horizontalAlignment = Alignment.End,
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
@@ -488,7 +488,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		privacyPolicySheet.Land {
-			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+			Box(modifier = Modifier.fillMaxWidth()
+				.padding(ThemeValue.Padding.SheetValue)
 				.verticalScroll(rememberScrollState())
 			) {
 				SelectionContainer {
@@ -501,7 +502,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		aboutSheet.Land {
-			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)) {
+			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
 			}
 		}

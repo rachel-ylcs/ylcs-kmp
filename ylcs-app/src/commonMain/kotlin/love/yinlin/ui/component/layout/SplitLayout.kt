@@ -14,14 +14,14 @@ import love.yinlin.common.ThemeValue
 fun SplitLayout(
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
+    horizontalArrangement: Dp = ThemeValue.Padding.HorizontalSpace,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable BoxScope.() -> Unit = {},
     right: @Composable BoxScope.() -> Unit = {}
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(gap),
+        horizontalArrangement = Arrangement.spacedBy(horizontalArrangement),
         verticalAlignment = verticalAlignment
     ) {
         Box(
@@ -41,14 +41,14 @@ fun SplitLayout(
 fun SplitActionLayout(
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
+    horizontalArrangement: Dp = ThemeValue.Padding.HorizontalSpace,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    gap: Dp = ThemeValue.Padding.HorizontalSpace,
     left: @Composable ActionScope.() -> Unit = {},
     right: @Composable ActionScope.() -> Unit = {}
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(gap),
+        horizontalArrangement = Arrangement.spacedBy(horizontalArrangement),
         verticalAlignment = verticalAlignment
     ) {
         Row(

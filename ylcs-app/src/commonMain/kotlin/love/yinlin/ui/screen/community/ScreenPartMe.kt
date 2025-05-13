@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -49,11 +48,12 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SheetConfig
 import love.yinlin.ui.screen.settings.ScreenSettings
@@ -69,8 +69,9 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private val scanSheet = FloatingSheet(SheetConfig(max = 0.9f, full = true))
-	private val userCardSheet = FloatingSheet()
-	private val signinSheet = FloatingSheet()
+	private val userCardSheet = FloatingArgsSheet<UserProfile>()
+	private val signinSheet = FloatingArgsSheet<UserProfile>()
+	private val levelSheet = FloatingArgsSheet<UserProfile>()
 
 	@OptIn(ExperimentalAtomicApi::class)
     private val isUpdateToken = AtomicBoolean(false)
@@ -125,7 +126,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
 			Item("名片", Icons.Filled.AccountBox) {
-				if (app.config.userToken.isNotEmpty()) userCardSheet.open()
+				app.config.userProfile?.let {
+					userCardSheet.open(it)
+				} ?: slot.tip.warning("请先登录")
 			}
 			Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
 		}
@@ -141,13 +144,21 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			shape = shape,
 			title = "个人空间"
 		) {
-			Item("签到", Icons.Filled.EventAvailable) { signinSheet.open() }
+			Item("签到", Icons.Filled.EventAvailable) {
+				app.config.userProfile?.let {
+					signinSheet.open(it)
+				} ?: slot.tip.warning("请先登录")
+			}
 			Item("好友", Icons.Filled.Group) { }
 			Item("主题", Icons.AutoMirrored.Filled.Article) {
-				app.config.userProfile?.let { navigate(ScreenUserCard.Args(it.uid)) }
+				app.config.userProfile?.let {
+					navigate(ScreenUserCard.Args(it.uid))
+				} ?: slot.tip.warning("请先登录")
 			}
 			Item("邮箱", Icons.Filled.Mail) {
-				if (app.config.userToken.isNotEmpty()) navigate<ScreenMail>()
+				app.config.userProfile?.let {
+					navigate<ScreenMail>()
+				} ?: slot.tip.warning("请先登录")
 			}
 			Item("徽章", Icons.Filled.MilitaryTech) { }
 		}
@@ -235,7 +246,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			UserProfileCard(
 				modifier = Modifier.fillMaxWidth(),
 				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true
+				owner = true,
+				onLevelClick = { levelSheet.open(userProfile) }
 			)
 			ToolContainer(modifier = Modifier.fillMaxWidth())
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
@@ -254,7 +266,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true,
 				shape = MaterialTheme.shapes.large,
-				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue)
+				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+				onLevelClick = { levelSheet.open(userProfile) }
 			)
 			Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				ToolContainer(
@@ -299,68 +312,64 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	override fun Floating() {
-		userCardSheet.Land {
-			val profile = app.config.userProfile
-			if (profile == null) EmptyBox()
-			else {
-				Column(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-				) {
-					WebImage(
-						uri = profile.avatarPath,
-						key = app.config.cacheUserWall,
-						contentScale = ContentScale.Crop,
-						circle = true,
-						modifier = Modifier.size(ThemeValue.Size.LargeImage)
-							.shadow(ThemeValue.Shadow.Icon, CircleShape)
-					)
-					Text(
-						text = profile.name,
-						style = MaterialTheme.typography.displaySmall,
-						color = MaterialTheme.colorScheme.primary
-					)
-					Text(
-						text = "扫我添加好友",
-						style = MaterialTheme.typography.bodyLarge
-					)
+		userCardSheet.Land { profile ->
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			) {
+				WebImage(
+					uri = profile.avatarPath,
+					key = app.config.cacheUserWall,
+					contentScale = ContentScale.Crop,
+					circle = true,
+					modifier = Modifier.size(ThemeValue.Size.LargeImage)
+						.shadow(ThemeValue.Shadow.Icon, CircleShape)
+				)
+				Text(
+					text = profile.name,
+					style = MaterialTheme.typography.displaySmall,
+					color = MaterialTheme.colorScheme.primary
+				)
+				Text(
+					text = "扫我添加好友",
+					style = MaterialTheme.typography.bodyLarge
+				)
 
-					val primaryColor = MaterialTheme.colorScheme.primary
-					val secondaryColor = MaterialTheme.colorScheme.secondary
-					val logoPainter = painterResource(Res.drawable.img_logo)
-					val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${profile.uid}") {
-						logo {
-							painter = logoPainter
-							padding = QrLogoPadding.Natural(1f)
-							shape = QrLogoShape.circle()
-							size = 0.2f
-						}
-						shapes {
-							ball = QrBallShape.circle()
-							darkPixel = QrPixelShape.roundCorners()
-							frame = QrFrameShape.roundCorners(0.25f)
-						}
-						colors {
-							dark = QrBrush.brush {
-								Brush.linearGradient(
-									0f to primaryColor.copy(alpha = 0.9f),
-									1f to secondaryColor.copy(0.9f),
-									end = Offset(it, it)
-								)
-							}
-							frame = QrBrush.solid(primaryColor)
-						}
+				val primaryColor = MaterialTheme.colorScheme.primary
+				val secondaryColor = MaterialTheme.colorScheme.secondary
+				val logoPainter = painterResource(Res.drawable.img_logo)
+				val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${profile.uid}") {
+					logo {
+						painter = logoPainter
+						padding = QrLogoPadding.Natural(1f)
+						shape = QrLogoShape.circle()
+						size = 0.2f
 					}
-					Image(
-						painter = qrcodePainter,
-						contentDescription = null,
-						modifier = Modifier.size(ThemeValue.Size.ExtraLargeImage)
-					)
-					Space()
+					shapes {
+						ball = QrBallShape.circle()
+						darkPixel = QrPixelShape.roundCorners()
+						frame = QrFrameShape.roundCorners(0.25f)
+					}
+					colors {
+						dark = QrBrush.brush {
+							Brush.linearGradient(
+								0f to primaryColor.copy(alpha = 0.9f),
+								1f to secondaryColor.copy(0.9f),
+								end = Offset(it, it)
+							)
+						}
+						frame = QrBrush.solid(primaryColor)
+					}
 				}
+				MiniImage(
+					painter = qrcodePainter,
+					modifier = Modifier.size(ThemeValue.Size.ExtraLargeImage)
+				)
+				Space()
 			}
 		}
+
 		scanSheet.Land {
 			ScannerView(
 				modifier = Modifier.fillMaxWidth(),
@@ -380,14 +389,15 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 			)
 		}
-		signinSheet.Land {
+
+		signinSheet.Land { profile ->
 			var data by rememberState { BooleanArray(8) { false } }
 			var todayIndex: Int by rememberState { -1 }
 			var todaySignin by rememberState { true }
 			val today = remember { DateEx.Today }
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
@@ -451,6 +461,19 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 						data = BooleanArray(8) { ((value shr it) and 1) == 1 }
 					}
 				}
+			}
+		}
+
+		levelSheet.Land { profile ->
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				UserProfileLevelInfo(
+					profile = remember(profile) { profile.publicProfile },
+					owner = true,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		}
 	}

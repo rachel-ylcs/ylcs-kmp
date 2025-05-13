@@ -161,7 +161,7 @@ class ScreenFloatingLyrics(model: AppModel) : CommonSubScreen(model) {
             }
             SplitLayout(
                 modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                gap = ThemeValue.Padding.HorizontalExtraSpace * 2,
+                horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace * 2,
                 left = {
                     ColumnLayout("字体颜色") {
                         DockedColorPicker(

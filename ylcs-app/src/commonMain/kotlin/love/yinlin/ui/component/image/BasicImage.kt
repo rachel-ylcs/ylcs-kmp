@@ -14,11 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.min
 import com.github.panpf.sketch.*
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
@@ -61,18 +61,6 @@ fun MiniIcon(
 	}
 }
 
-@Composable
-fun NoImage(
-	width: Dp = ThemeValue.Size.Icon,
-	height: Dp = ThemeValue.Size.Icon,
-	color: Color = MaterialTheme.colorScheme.onSurface
-) = MiniIcon(
-	icon = Icons.AutoMirrored.Filled.Help,
-	color = color,
-	size = min(width, height),
-	modifier = Modifier.size(width = width, height = height)
-)
-
 @Stable
 data class ColorfulImageVector(
 	val icon: ImageVector,
@@ -91,12 +79,19 @@ fun colorfulImageVector(
 fun ColorfulIcon(
 	icon: ColorfulImageVector,
 	size: Dp = ThemeValue.Size.Icon
-) = MiniIcon(
-	icon = icon.icon,
-	color = icon.color.copy(alpha = 0.8f),
-	size = size,
-	modifier = Modifier.clip(CircleShape).background(icon.background.copy(alpha = 0.6f))
-)
+) {
+	Box(
+		modifier = Modifier.clip(CircleShape).background(icon.background.copy(alpha = 0.6f)),
+		contentAlignment = Alignment.Center
+	) {
+		Icon(
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * 1.5f).size(size),
+			imageVector = icon.icon,
+			contentDescription = null,
+			tint = icon.color.copy(alpha = 0.8f),
+		)
+	}
+}
 
 @Composable
 fun ClickIcon(
@@ -260,10 +255,31 @@ fun MiniImage(
 		contentAlignment = Alignment.Center
 	) {
 		Image(
-			modifier = modifier,
+			painter = painterResource(res),
+			modifier = Modifier.matchParentSize(),
 			contentScale = contentScale,
 			alpha = alpha,
-			painter = painterResource(res),
+			contentDescription = null
+		)
+	}
+}
+
+@Composable
+fun MiniImage(
+	painter: Painter,
+	contentScale: ContentScale = ContentScale.Fit,
+	alpha: Float = 1f,
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier,
+		contentAlignment = Alignment.Center
+	) {
+		Image(
+			painter = painter,
+			modifier = Modifier.matchParentSize(),
+			contentScale = contentScale,
+			alpha = alpha,
 			contentDescription = null
 		)
 	}

@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.clickableNoRipple
+import love.yinlin.extension.condition
 import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
@@ -79,11 +81,69 @@ internal fun PortraitValue(
 }
 
 @Composable
+internal fun UserProfileLevelInfo(
+	profile: UserPublicProfile,
+	owner: Boolean,
+	modifier: Modifier = Modifier,
+	onLevelClick: () -> Unit = {}
+) {
+	Box(modifier = modifier) {
+		Row(
+			modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+				WebImage(
+					uri = profile.avatarPath,
+					key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
+					contentScale = ContentScale.Crop,
+					circle = true,
+					modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
+				)
+			}
+			Column(
+				modifier = Modifier.weight(1f),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				Text(
+					text = profile.name,
+					style = MaterialTheme.typography.labelLarge,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier.fillMaxWidth()
+				)
+				UserLabel(
+					label = profile.label,
+					level = profile.level,
+					onClick = onLevelClick
+				)
+			}
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				PortraitValue(
+					value = profile.level.toString(),
+					title = "等级",
+					modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
+				)
+				PortraitValue(
+					value = profile.coin.toString(),
+					title = "银币"
+				)
+			}
+		}
+	}
+}
+
+@Composable
 internal fun UserProfileCard(
 	profile: UserPublicProfile,
 	owner: Boolean,
 	shape: Shape = RectangleShape,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onLevelClick: () -> Unit = {}
 ) {
 	Surface(
 		modifier = modifier,
@@ -100,46 +160,12 @@ internal fun UserProfileCard(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
-				Row(
-					modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
-				) {
-					Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
-						WebImage(
-							uri = profile.avatarPath,
-							key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
-							contentScale = ContentScale.Crop,
-							circle = true,
-							modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
-						)
-					}
-					Column(
-						modifier = Modifier.weight(1f),
-						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-					) {
-						Text(
-							text = profile.name,
-							style = MaterialTheme.typography.labelLarge,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier.fillMaxWidth()
-						)
-						UserLabel(label = profile.label, level = profile.level)
-					}
-					Row(
-						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						PortraitValue(
-							value = profile.level.toString(),
-							title = "等级"
-						)
-						PortraitValue(
-							value = profile.coin.toString(),
-							title = "银币"
-						)
-					}
-				}
+				UserProfileLevelInfo(
+					profile = profile,
+					owner = owner,
+					modifier = Modifier.fillMaxWidth(),
+					onLevelClick = onLevelClick
+				)
 				SelectionContainer {
 					Text(
 						text = profile.signature,

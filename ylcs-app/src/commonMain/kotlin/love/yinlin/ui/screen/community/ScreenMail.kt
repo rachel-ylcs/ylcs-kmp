@@ -216,7 +216,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	override fun Floating() {
 		mailDetailsSheet.Land { mail ->
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				Text(

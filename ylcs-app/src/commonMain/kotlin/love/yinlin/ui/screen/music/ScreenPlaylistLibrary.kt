@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
@@ -80,17 +81,19 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
             style = MaterialTheme.typography.labelMedium,
             color = if (musicInfo.isDeleted) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
+            textAlign = TextAlign.Start,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,
-            modifier = Modifier.weight(3f)
+            modifier = Modifier.weight(2f)
         )
         Text(
             text = musicInfo.singer,
             style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.End,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(2f)
+            modifier = Modifier.weight(1f)
         )
         ClickIcon(
             icon = Icons.Outlined.DragHandle,
@@ -347,7 +350,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
             val state = remember { TextInputState() }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualValue),
+                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.SheetValue),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "本地歌单", modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))

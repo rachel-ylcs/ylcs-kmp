@@ -1,5 +1,6 @@
 package love.yinlin.ui.component.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,8 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDarkMode
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeStyle
+import love.yinlin.extension.clickableNoRipple
+import love.yinlin.extension.condition
 import org.jetbrains.compose.resources.DrawableResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage
@@ -56,7 +59,8 @@ private object UserLabelMeta {
 @Composable
 fun UserLabel(
 	label: String,
-	level: Int
+	level: Int,
+	onClick: () -> Unit = {}
 ) {
 	val isDarkMode = LocalDarkMode.current
 	val (img, color) = remember(label, level, isDarkMode) {
@@ -80,7 +84,7 @@ fun UserLabel(
 	}
 
 	Box(
-		modifier = Modifier.size(size),
+		modifier = Modifier.size(size).clickableNoRipple(onClick = onClick),
 		contentAlignment = Alignment.Center
 	) {
 		MiniImage(

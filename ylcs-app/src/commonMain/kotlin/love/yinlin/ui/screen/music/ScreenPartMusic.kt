@@ -44,6 +44,7 @@ import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.ItemKey
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
@@ -70,30 +71,31 @@ private fun PlayingMusicStatusCard(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier
 ) {
-	Row(
+	SplitLayout(
 		modifier = modifier.clickable {
 			if (!isCurrent) onClick()
 		}.padding(ThemeValue.Padding.ExtraValue),
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Text(
-			text = musicInfo.name,
-			style = MaterialTheme.typography.labelMedium,
-			color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-			maxLines = 1,
-			overflow = TextOverflow.MiddleEllipsis,
-			modifier = Modifier.weight(3f)
-		)
-		Text(
-			text = musicInfo.singer,
-			style = MaterialTheme.typography.bodySmall,
-			maxLines = 1,
-			overflow = TextOverflow.MiddleEllipsis,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
-			modifier = Modifier.weight(2f)
-		)
-	}
+		horizontalArrangement = ThemeValue.Padding.HorizontalSpace,
+		aspectRatio = 2f,
+		left = {
+			Text(
+				text = musicInfo.name,
+				style = MaterialTheme.typography.labelMedium,
+				color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+				maxLines = 1,
+				overflow = TextOverflow.MiddleEllipsis
+			)
+		},
+		right = {
+			Text(
+				text = musicInfo.singer,
+				style = MaterialTheme.typography.bodySmall,
+				maxLines = 1,
+				overflow = TextOverflow.MiddleEllipsis,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+			)
+		}
+	)
 }
 
 @Stable
@@ -795,7 +797,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			val state = rememberTimePickerState(is24Hour = true)
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
@@ -855,48 +857,51 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				if (isEmptyList) currentPlaylistSheet.close()
 			}
 
-			Column(modifier = Modifier.fillMaxSize()) {
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Text(
-						text = factory.currentPlaylist?.name ?: "",
-						style = MaterialTheme.typography.titleLarge,
-						color = MaterialTheme.colorScheme.primary,
-						modifier = Modifier.weight(1f)
-					)
-					ClickIcon(
-						icon = Icons.Outlined.StopCircle,
-						onClick = {
-							currentPlaylistSheet.close()
-							launch { factory.stop() }
-						}
-					)
-				}
+			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
 
-				HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
-
-				val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
-				LazyColumn(
-					modifier = Modifier.fillMaxWidth().weight(1f),
-					state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
-				) {
-					itemsIndexed(
-						items = factory.musicList,
-						key = { _, musicInfo -> musicInfo.id }
-					) { index, musicInfo ->
-						PlayingMusicStatusCard(
-							musicInfo = musicInfo,
-							isCurrent = index == currentIndex,
+			LazyColumn(
+				modifier = Modifier.fillMaxWidth(),
+				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
+			) {
+				item(ItemKey("Header")) {
+					Row(
+						modifier = Modifier.fillMaxWidth().padding(
+							start = ThemeValue.Padding.HorizontalExtraSpace,
+							end = ThemeValue.Padding.HorizontalExtraSpace,
+							top = ThemeValue.Padding.VerticalExtraSpace
+						),
+						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							text = factory.currentPlaylist?.name ?: "",
+							style = MaterialTheme.typography.titleLarge,
+							color = MaterialTheme.colorScheme.primary,
+							modifier = Modifier.weight(1f)
+						)
+						ClickIcon(
+							icon = Icons.Outlined.StopCircle,
 							onClick = {
 								currentPlaylistSheet.close()
-								launch { factory.gotoIndex(index) }
-							},
-							modifier = Modifier.fillMaxWidth()
+								launch { factory.stop() }
+							}
 						)
 					}
+					HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
+				}
+				itemsIndexed(
+					items = factory.musicList,
+					key = { _, musicInfo -> musicInfo.id }
+				) { index, musicInfo ->
+					PlayingMusicStatusCard(
+						musicInfo = musicInfo,
+						isCurrent = index == currentIndex,
+						onClick = {
+							currentPlaylistSheet.close()
+							launch { factory.gotoIndex(index) }
+						},
+						modifier = Modifier.fillMaxWidth()
+					)
 				}
 			}
 		}

@@ -376,8 +376,8 @@ object ThemeValue {
 		}
 		val SheetWidth: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 360.dp
-			Device.Size.MEDIUM -> 450.dp
-			Device.Size.LARGE -> 500.dp
+			Device.Size.MEDIUM -> 400.dp
+			Device.Size.LARGE -> 450.dp
 		}
 		val PanelWidth: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 360.dp
@@ -435,6 +435,10 @@ object ThemeValue {
 		val Value: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalSpace, vertical = VerticalSpace)
 		val EqualExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualExtraSpace, vertical = EqualExtraSpace)
 		val ExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
+		val SheetValue: PaddingValues @Composable get() = when (LocalDevice.current.type) {
+			Device.Type.PORTRAIT -> PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
+			else -> PaddingValues(top = HorizontalExtraSpace, bottom = HorizontalExtraSpace, end = HorizontalExtraSpace)
+		}
 	}
 
 	@Stable

@@ -167,7 +167,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 val album = remember { TextInputState(musicInfo?.album ?: "") }
 
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
@@ -242,7 +242,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             @Composable
             override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "暂未开放")
