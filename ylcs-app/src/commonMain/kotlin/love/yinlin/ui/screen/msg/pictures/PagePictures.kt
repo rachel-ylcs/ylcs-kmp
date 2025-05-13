@@ -92,7 +92,7 @@ private fun PhotoFolder(
             else {
                 MiniImage(
                     res = Res.drawable.img_photo_album,
-                    contentScale = ContentScale.FillWidth,
+                    contentScale = ContentScale.FillBounds,
                     modifier = Modifier.fillMaxWidth().weight(1f)
                 )
             }
