@@ -30,46 +30,48 @@ actual object Picker {
     actual suspend fun pickPicture(): Source? = pickPicture(1)?.getOrNull(0)
 
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
-        continuation.safeResume {
-            val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
-                selectionLimit = maxNum.toLong()
-                selection = PHPickerConfigurationSelectionOrdered
-                filter = PHPickerFilter.imagesFilter()
-            }
-            val picker = PHPickerViewController(configuration)
-            val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
-                val images = mutableListOf<Path>()
-                var processedImages = 0
-                results.forEach {
-                    it.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
-                            url, error ->
-                        val tempUrl = copyToTempDir(url)
-                        tempUrl?.toPath()?.let { path -> images.add(path) }
-                        processedImages++
-                        if (processedImages == results.size) {
-                            continuation.resume(images.safeToSources {
-                                SystemFileSystem.source(it).buffered()
-                            })
+        Coroutines.startMain {
+            continuation.safeResume {
+                val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
+                    selectionLimit = maxNum.toLong()
+                    selection = PHPickerConfigurationSelectionOrdered
+                    filter = PHPickerFilter.imagesFilter()
+                }
+                val picker = PHPickerViewController(configuration)
+                val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
+                    val images = mutableListOf<Path>()
+                    var processedImages = 0
+                    results.forEach {
+                        it.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
+                                url, error ->
+                            val tempUrl = copyToTempDir(url)
+                            tempUrl?.toPath()?.let { path -> images.add(path) }
+                            processedImages++
+                            if (processedImages == results.size) {
+                                continuation.resume(images.safeToSources {
+                                    SystemFileSystem.source(it).buffered()
+                                })
+                            }
                         }
                     }
                 }
-            }
-            phPickerDelegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
-                override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
-                    picker.dismissViewControllerAnimated(true, null)
-                    val results = didFinishPicking.mapNotNull { it as PHPickerResult }
-                    onImagesPicked(results)
+                phPickerDelegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
+                    override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
+                        picker.dismissViewControllerAnimated(true, null)
+                        val results = didFinishPicking.mapNotNull { it as PHPickerResult }
+                        onImagesPicked(results)
+                    }
                 }
-            }
-            phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {
-                override fun presentationControllerDidDismiss(presentationController: UIPresentationController) {
-                    onImagesPicked(emptyList())
+                phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {
+                    override fun presentationControllerDidDismiss(presentationController: UIPresentationController) {
+                        onImagesPicked(emptyList())
+                    }
                 }
+                picker.delegate = phPickerDelegate
+                picker.presentationController?.delegate = phPickerDismissDelegate
+                val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+                rootViewController?.presentViewController(picker, true, null)
             }
-            picker.delegate = phPickerDelegate
-            picker.presentationController?.delegate = phPickerDismissDelegate
-            val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-            rootViewController?.presentViewController(picker, true, null)
         }
     }
 
@@ -89,35 +91,56 @@ actual object Picker {
         }
     }
 
-    // TODO:
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
-        continuation.resume(null)
+    private inline fun openPicker(mimeType: List<String>, filter: List<String>, crossinline callback: (NSURL?) -> Unit) {
+        Coroutines.startMain {
+            val picker = UIDocumentPickerViewController(
+                forOpeningContentTypes = filter
+                    .map { it.substringAfterLast(".") }
+                    .mapNotNull { UTType.typeWithFilenameExtension(it) }
+                    .ifEmpty {
+                        mimeType.mapNotNull {
+                            UTType.typeWithMIMEType(it)
+                        }
+                    }
+                    .ifEmpty { listOf(UTTypeContent) }
+            ).apply {
+                allowsMultipleSelection = false
+            }
+            documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
+                override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
+                    callback(didPickDocumentAtURL)
+                }
+
+                override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+                    callback(null)
+                }
+            }
+            picker.delegate = documentPickerDelegate
+            val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+            rootViewController?.presentViewController(picker, true, null)
+        }
     }
 
-    private inline fun openPicker(mimeType: List<String>, filter: List<String>, crossinline callback: (NSURL?) -> Unit) {
-        val picker = UIDocumentPickerViewController(
-            forOpeningContentTypes = filter
-                .map { it.substringAfterLast(".") }
-                .mapNotNull { UTType.typeWithFilenameExtension(it) }
-                .ifEmpty { mimeType.mapNotNull {
-                    UTType.typeWithMIMEType(it)
-                } }
-                .ifEmpty { listOf(UTTypeContent) }
-        ).apply {
-            allowsMultipleSelection = false
-        }
-        documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
-            override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                callback(didPickDocumentAtURL)
-            }
+    @OptIn(ExperimentalForeignApi::class)
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
+        Coroutines.startMain {
+            var picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
+            documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
+                override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
+                    val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
+                    continuation.safeResume {
+                        continuation.resume(fileUrl?.let { SandboxPath(it, didPickDocumentAtURL) })
+                    }
+                }
 
-            override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
-                callback(null)
+                override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+                    continuation.resume(null)
+                }
             }
+            picker.delegate = documentPickerDelegate
+            val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+            rootViewController?.presentViewController(picker, true, null)
         }
-        picker.delegate = documentPickerDelegate
-        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-        rootViewController?.presentViewController(picker, true, null)
     }
 
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
