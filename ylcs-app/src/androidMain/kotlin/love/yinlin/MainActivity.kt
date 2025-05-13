@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.core.view.WindowInsetsControllerCompat
+import love.yinlin.common.LocalDarkMode
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.appNative
 
@@ -20,7 +22,13 @@ class MainActivity : ComponentActivity() {
         appNative.musicFactory.floatingLyrics = ActualFloatingLyrics(this).apply { attach() }
 
         setContent {
-            AppWrapper { App() }
+            AppWrapper {
+                val isDarkMode = LocalDarkMode.current
+                LaunchedEffect(isDarkMode) {
+                    WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isDarkMode
+                }
+                App()
+            }
         }
     }
 
