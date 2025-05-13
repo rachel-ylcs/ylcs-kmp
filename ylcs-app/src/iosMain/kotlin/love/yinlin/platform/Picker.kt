@@ -145,20 +145,39 @@ actual object Picker {
 
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()
-        return buffer to buffer
+        return Photo(filename, buffer) to buffer
     }
 
-    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSavePicture(filename)
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? {
+        val path = Path(osStorageTempPath, filename)
+        val url = NSURL.fileURLWithPath(path.toString())
+        return Video(filename, url) to SystemFileSystem.sink(path, false).buffered()
+    }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
-        Coroutines.io {
-            val bytes = (origin as Buffer).readBytes()
-            val data = bytes.toNSData()
-            val image = UIImage(data)
-            UIImageWriteToSavedPhotosAlbum(image, null, null, null)
+    actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
+        when (origin) {
+            is Photo -> {
+                val bytes = origin.buffer.readBytes()
+                val data = bytes.toNSData()
+                val image = UIImage(data)
+                UIImageWriteToSavedPhotosAlbum(image, null, null, null)
+            }
+            is Video -> {
+                val isCompatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(origin.url.path!!)
+                if (isCompatible) {
+                    UISaveVideoAtPathToSavedPhotosAlbum(origin.url.path!!, null, null, null)
+                }
+            }
         }
     }
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) = Unit
+    actual suspend fun cleanSave(origin: Any, result: Boolean) {
+        if (origin is Video) {
+//            origin.url.toPath()?.let { SystemFileSystem.delete(it) }
+        }
+    }
 }
+
+internal data class Photo(val filename: String, val buffer: Buffer)
+internal data class Video(val filename: String, val url: NSURL)

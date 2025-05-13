@@ -4,10 +4,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
 import love.yinlin.common.Uri
 import love.yinlin.common.toNSUrl
-import platform.Foundation.NSHomeDirectory
-import platform.Foundation.NSURL
-import platform.Foundation.NSFileManager
-import platform.Foundation.temporaryDirectory
+import platform.Foundation.*
 import platform.UIKit.UIApplication
 
 actual val osPlatform: Platform = Platform.IOS
@@ -34,9 +31,16 @@ actual fun osNetOpenUrl(url: String) {
     catch (_: Throwable) {}
 }
 
-actual val osStorageDataPath: Path get() = Path(NSHomeDirectory(), "Documents")
+fun osStorageSearchPath(directory: NSSearchPathDirectory): Path {
+    val paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
+    return Path(paths[0]!! as String)
+}
 
-actual val osStorageCachePath: Path get() = Path(NSHomeDirectory(), "tmp")
+actual val osStorageDataPath: Path get() = osStorageSearchPath(NSDocumentDirectory)
+
+actual val osStorageCachePath: Path get() = osStorageSearchPath(NSCachesDirectory)
+
+val osStorageTempPath: Path get() = Path(NSTemporaryDirectory())
 
 @OptIn(ExperimentalForeignApi::class)
 fun copyToTempDir(url: NSURL?): NSURL? {
