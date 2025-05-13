@@ -132,7 +132,7 @@ class LyricsLrc : LyricsEngine {
                 repeat(6) { add(LrcLine(startTime / 6 * it, "")) }
                 // 插入原歌词
                 addAll(items)
-                // 插入永久3个空
+                // 插入永久4个空
                 repeat(4) { add(LrcLine(Long.MAX_VALUE - it, "")) }
             }
         }
