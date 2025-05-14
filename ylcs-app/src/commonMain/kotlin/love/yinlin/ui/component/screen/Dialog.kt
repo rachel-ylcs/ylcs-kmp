@@ -28,7 +28,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.clickableNoRipple
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon

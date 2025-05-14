@@ -26,7 +26,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
-import love.yinlin.extension.clickableNoRipple
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 
 @OptIn(ExperimentalComposeUiApi::class)

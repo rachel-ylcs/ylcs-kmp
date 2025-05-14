@@ -23,7 +23,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
-import love.yinlin.extension.condition
+import love.yinlin.ui.component.node.condition
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app

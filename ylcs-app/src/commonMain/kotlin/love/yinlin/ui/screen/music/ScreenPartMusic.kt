@@ -59,6 +59,7 @@ import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenVideo
 import org.jetbrains.compose.resources.painterResource

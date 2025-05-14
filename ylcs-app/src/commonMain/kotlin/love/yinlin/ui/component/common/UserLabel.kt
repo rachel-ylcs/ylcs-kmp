@@ -23,7 +23,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDarkMode
 import love.yinlin.common.LocalDevice
-import love.yinlin.extension.clickableNoRipple
+import love.yinlin.ui.component.node.clickableNoRipple
 import org.jetbrains.compose.resources.DrawableResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage

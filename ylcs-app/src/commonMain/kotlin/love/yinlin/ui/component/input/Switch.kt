@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.clickableNoRipple
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 
 @Composable

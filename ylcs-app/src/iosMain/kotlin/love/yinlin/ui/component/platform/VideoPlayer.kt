@@ -9,7 +9,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LifecycleStartEffect
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.common.Colors
-import love.yinlin.extension.clickableNoRipple
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.CustomUI
 import platform.AVFoundation.*

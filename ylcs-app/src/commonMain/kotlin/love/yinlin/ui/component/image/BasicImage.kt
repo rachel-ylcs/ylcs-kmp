@@ -4,8 +4,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +29,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.condition
+import love.yinlin.ui.component.node.condition
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ImageQuality
 import love.yinlin.resources.Res

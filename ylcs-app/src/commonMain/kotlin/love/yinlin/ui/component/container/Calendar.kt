@@ -19,7 +19,7 @@ import love.yinlin.common.Resource
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.condition
+import love.yinlin.ui.component.node.condition
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.ui.component.layout.ActionScope
 

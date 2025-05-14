@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,11 +26,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpRect
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.timeString
+import love.yinlin.ui.component.layout.fadingEdges
 import kotlin.math.abs
 
 @Stable
@@ -49,7 +54,6 @@ private fun LyricsLrcLine(
     val fontSize = MaterialTheme.typography.headlineSmall.fontSize / (offset / 30f + 1f)
     val fontWeight = if (offset == 0) FontWeight.Bold else FontWeight.Light
     val color = if (offset == 0) MaterialTheme.colorScheme.primary else Colors.White
-    val alpha = 1 / (offset + 1f)
     val (borderWidth, shadowWidth) = with(LocalDensity.current) {
         val fontSizePx = fontSize.toPx()
         fontSizePx / 16f to fontSizePx / 24f
@@ -66,7 +70,7 @@ private fun LyricsLrcLine(
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.MiddleEllipsis,
-            modifier = Modifier.alpha(alpha).zIndex(2f)
+            modifier = Modifier.zIndex(2f)
         )
         if (offset == 0) {
             Text(
@@ -194,28 +198,37 @@ class LyricsLrc : LyricsEngine {
             }.collect { isDragging = it }
         }
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            lines?.let { lines ->
-                itemsIndexed(
-                    items = lines,
-                    key = { index, item -> item.position }
-                ) { index, item ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillParentMaxHeight(0.142857f)
-                            .clickable(enabled = item.text.isNotEmpty()) {
-                                onLyricsClick(item.position)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        LyricsLrcLine(
-                            text = item.text,
-                            offset = abs(listState.firstVisibleItemIndex + 3 - index),
-                        )
+        BoxWithConstraints(modifier = modifier) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize().fadingEdges(
+                    edges = DpRect(
+                        left = ThemeValue.Padding.ZeroSpace,
+                        top = maxHeight * 3 / 7,
+                        right = ThemeValue.Padding.ZeroSpace,
+                        bottom = maxHeight * 3 / 7
+                    )
+                )
+            ) {
+                lines?.let { lines ->
+                    itemsIndexed(
+                        items = lines,
+                        key = { index, item -> item.position }
+                    ) { index, item ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillParentMaxHeight(0.142857f)
+                                .clickable(enabled = item.text.isNotEmpty()) {
+                                    onLyricsClick(item.position)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LyricsLrcLine(
+                                text = item.text,
+                                offset = abs(listState.firstVisibleItemIndex + 3 - index),
+                            )
+                        }
                     }
                 }
             }
