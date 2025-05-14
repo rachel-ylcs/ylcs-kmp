@@ -125,7 +125,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 
 			Column(
 				modifier = Modifier.width(ThemeValue.Size.DialogWidth)
-					.clickableNoRipple { close() }
+					.clickableNoRipple { if (dismissOnClickOutside) close() }
 					.padding(bottom = rachelWidth),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {

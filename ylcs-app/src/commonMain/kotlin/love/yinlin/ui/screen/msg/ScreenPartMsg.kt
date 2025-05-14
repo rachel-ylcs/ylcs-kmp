@@ -27,26 +27,17 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.String
 import love.yinlin.extension.launchFlag
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Platform
-import love.yinlin.platform.app
-import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.platform.*
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
-import love.yinlin.ui.screen.msg.weibo.LocalWeiboProcessor
-import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
-import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboFollows
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
-import love.yinlin.ui.screen.msg.weibo.WeiboGridData
-import love.yinlin.ui.screen.msg.weibo.WeiboProcessor
+import love.yinlin.ui.screen.msg.weibo.*
 
 @Stable
 @Serializable
@@ -143,6 +134,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	// 当前微博
 	var currentWeibo: Weibo? = null
 
+	private val downloadVideoDialog = FloatingDownloadDialog()
+
 	val processor = object : WeiboProcessor {
 		override fun onWeiboClick(weibo: Weibo) {
 			currentWeibo = weibo
@@ -177,6 +170,16 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 		override fun onWeiboVideoClick(pic: Picture) {
 			navigate(ScreenVideo.Args(pic.video))
+		}
+
+		override fun onWeiboVideoDownload(url: String) {
+			val filename = url.substringAfterLast('/').substringBefore('?')
+			launch {
+				Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+					val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+					Picker.cleanSave(origin, result)
+				}
+			}
 		}
 	}
 
@@ -300,5 +303,10 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		downloadVideoDialog.Land()
 	}
 }

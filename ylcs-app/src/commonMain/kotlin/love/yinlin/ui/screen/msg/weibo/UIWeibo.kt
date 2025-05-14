@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
@@ -30,6 +33,7 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.localComposition
+import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
@@ -45,6 +49,7 @@ interface WeiboProcessor {
 	fun onWeiboAtClick(arg: String)
 	fun onWeiboPicClick(pics: List<Picture>, current: Int)
 	fun onWeiboVideoClick(pic: Picture)
+	fun onWeiboVideoDownload(url: String)
 }
 
 val LocalWeiboProcessor = localComposition<WeiboProcessor>()
@@ -194,12 +199,23 @@ fun WeiboLayout(weibo: Weibo) {
 	)
 	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
 	if (weibo.pictures.isNotEmpty()) {
-		NineGrid(
-			pics = weibo.pictures,
-			modifier = Modifier.fillMaxWidth(),
-			onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
-			onVideoClick = { processor.onWeiboVideoClick(it) }
-		)
+		Box(modifier = Modifier.fillMaxWidth()) {
+			NineGrid(
+				pics = weibo.pictures,
+				modifier = Modifier.fillMaxWidth().zIndex(1f),
+				onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
+				onVideoClick = { processor.onWeiboVideoClick(it) }
+			)
+
+			val video = remember(weibo) { weibo.pictures.find { it.isVideo }?.video }
+			if (video != null) {
+				ClickIcon(
+					icon = Icons.Outlined.Download,
+					onClick = { processor.onWeiboVideoDownload(video) },
+					modifier = Modifier.align(Alignment.TopStart).zIndex(2f)
+				)
+			}
+		}
 		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
 	}
 	WeiboDataBar(

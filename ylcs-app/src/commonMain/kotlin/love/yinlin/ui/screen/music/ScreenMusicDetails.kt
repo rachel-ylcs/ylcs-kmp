@@ -42,7 +42,7 @@ import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.FloatingDialogCrop
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon

@@ -24,15 +24,12 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.ui.component.node.condition
-import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.Picker
-import love.yinlin.platform.app
-import love.yinlin.platform.safeDownload
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.screen.FloatingDialogProgress
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePreview.Args>(model) {
@@ -48,7 +45,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	private val previews: List<PreviewPicture> = args.images.map { PreviewPicture(it) }
 	private var current: Int by mutableIntStateOf(args.index)
 
-	private val downloadDialog = FloatingDialogProgress()
+	private val downloadDialog = FloatingDownloadDialog()
 
 	private fun downloadPicture() {
 		val preview = previews[current]
@@ -56,23 +53,8 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		launch {
 			Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
-				downloadDialog.openSuspend()
-				val result = sink.use {
-					val result = app.fileClient.safeDownload(
-						url = url,
-						sink = it,
-						isCancel = { !downloadDialog.isOpen },
-						onGetSize = { total -> downloadDialog.total = total.fileSizeString },
-						onTick = { current, total ->
-							downloadDialog.current = current.fileSizeString
-							if (total != 0L) downloadDialog.progress = current / total.toFloat()
-						}
-					)
-					if (result) Picker.actualSave(filename, origin, sink)
-					result
-				}
+				val result = downloadDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
 				Picker.cleanSave(origin, result)
-				downloadDialog.close()
 			}
 		}
 	}

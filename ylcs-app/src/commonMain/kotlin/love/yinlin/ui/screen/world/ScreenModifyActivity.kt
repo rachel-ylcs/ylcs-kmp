@@ -17,7 +17,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.*
-import love.yinlin.ui.component.image.FloatingDialogCrop
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import kotlin.collections.plus

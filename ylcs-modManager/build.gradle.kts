@@ -55,7 +55,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            packageName = "love.yinlin.mod.ModManager"
+            packageName = "ModManager"
 
             targetFormats(TargetFormat.Exe)
         }

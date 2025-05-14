@@ -28,7 +28,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.FloatingDialogCrop
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.layout.ActionScope

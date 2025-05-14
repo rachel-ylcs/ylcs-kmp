@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.image
+package love.yinlin.ui.component.screen.dialog
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -29,6 +29,8 @@ import love.yinlin.extension.rememberState
 import love.yinlin.extension.translate
 import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.rememberWebImageState
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.screen.FloatingDialog
 import kotlin.coroutines.resume

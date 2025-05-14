@@ -47,8 +47,7 @@ private class VideoPlayerView(var player: AVPlayer?) : UIView(CGRectMake(0.0, 0.
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
-    onBack: () -> Unit,
-    onDownload: () -> Unit
+    onBack: () -> Unit
 ) {
     val player: MutableState<VideoPlayerView?> = rememberState { null }
 

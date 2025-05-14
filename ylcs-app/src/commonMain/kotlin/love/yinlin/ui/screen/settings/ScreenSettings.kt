@@ -37,7 +37,7 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_privacy_policy
-import love.yinlin.ui.component.image.FloatingDialogCrop
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
