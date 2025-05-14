@@ -5,5 +5,5 @@ import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 
 fun Routing.friendAPI(implMap: ImplMap) {
-    
+
 }
