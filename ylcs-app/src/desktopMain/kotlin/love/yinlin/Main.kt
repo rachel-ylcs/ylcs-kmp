@@ -1,13 +1,16 @@
 package love.yinlin
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CropSquare
 import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.Rocket
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.sun.jna.Native
+import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Picker
@@ -29,6 +33,7 @@ import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
+import kotlin.system.exitProcess
 
 fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
@@ -70,7 +75,20 @@ fun main() {
                 AppWrapper {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
-                            AppTopBar {
+                            AppTopBar(modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .padding(
+                                    top = ThemeValue.Padding.VerticalExtraSpace,
+                                    bottom = ThemeValue.Padding.VerticalExtraSpace,
+                                    start = ThemeValue.Padding.HorizontalExtraSpace
+                                )
+                            ) {
+                                Action(
+                                    icon = Icons.Outlined.Rocket,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    exitProcess(0)
+                                }
                                 Action(
                                     icon = Icons.Outlined.Remove,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer

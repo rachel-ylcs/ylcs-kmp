@@ -37,6 +37,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.KVConfig
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.Scheme
@@ -124,6 +125,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	fun cleanUserToken() {
 		app.config.userToken = ""
 		app.config.userProfile = null
+		app.config.cacheUserAvatar = KVConfig.UPDATE
+		app.config.cacheUserWall = KVConfig.UPDATE
 	}
 
 	@OptIn(ExperimentalAtomicApi::class)
