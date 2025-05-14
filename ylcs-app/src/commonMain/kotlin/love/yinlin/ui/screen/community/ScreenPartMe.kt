@@ -51,6 +51,8 @@ import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberTrue
+import love.yinlin.extension.rememberValueState
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -440,8 +442,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 
 		signinSheet.Land { profile ->
 			var data by rememberState { BooleanArray(8) { false } }
-			var todayIndex: Int by rememberState { -1 }
-			var todaySignin by rememberState { true }
+			var todayIndex by rememberValueState(-1)
+			var todaySignin by rememberTrue()
 			val today = remember { DateEx.Today }
 
 			Column(

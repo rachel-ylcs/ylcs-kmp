@@ -19,7 +19,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberFalse
+import love.yinlin.extension.rememberFloatState
 
 @Composable
 fun BeautifulSlider(
@@ -37,8 +38,8 @@ fun BeautifulSlider(
     content: (@Composable BoxScope.() -> Unit)? = null
 ) {
     BoxWithConstraints(modifier = modifier) {
-        var isSliding by rememberState { false }
-        var percent by rememberState { value.coerceIn(0f, 1f) }
+        var isSliding by rememberFalse()
+        var percent by rememberFloatState { value.coerceIn(0f, 1f) }
         val offsetX = maxWidth * percent
 
         LaunchedEffect(value) {

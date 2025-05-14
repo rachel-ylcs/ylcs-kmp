@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -72,7 +73,7 @@ private fun PhotoFolder(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val isAlbum by rememberDerivedState { item.items.isNotEmpty() && item.items.all { it is PhotoItem.File } }
+    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.all { it is PhotoItem.File } }
 
     Surface(
         modifier = modifier,

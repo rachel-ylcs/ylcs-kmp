@@ -46,7 +46,7 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
 import org.jetbrains.compose.resources.stringResource
 
@@ -464,7 +464,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		feedbackSheet.Land { onClose ->
-			val state = remember { TextInputState() }
+			val state = rememberTextInputState()
 
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),

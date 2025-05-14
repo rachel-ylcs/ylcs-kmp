@@ -17,8 +17,8 @@ import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberFalse
 import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.extension.rememberState
 import love.yinlin.extension.timeString
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
@@ -71,7 +71,7 @@ fun VideoPlayerControls(
     rightAction: (@Composable RowScope.() -> Unit)? = null
 ) {
     Column(modifier = modifier.clipToBounds()) {
-        var isShowControls by rememberState { false }
+        var isShowControls by rememberFalse()
 
         LaunchedEffect(Unit) {
             delay(app.config.animationSpeed.toLong())

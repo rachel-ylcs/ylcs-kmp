@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberFalse
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
@@ -147,7 +148,7 @@ object SettingsScope {
 		onClick: suspend () -> Unit = {}
 	) {
 		val scope = rememberCoroutineScope()
-		var isLoading by rememberState { false }
+		var isLoading by rememberFalse()
 
 		Item(
 			title = title,

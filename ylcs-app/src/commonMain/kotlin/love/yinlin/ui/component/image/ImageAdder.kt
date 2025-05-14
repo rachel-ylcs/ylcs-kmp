@@ -34,13 +34,13 @@ fun ImageAdder(
 	onDelete: (Int) -> Unit,
 	onClick: (Int) -> Unit
 ) {
-	val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
-
 	FlowRow(
 		modifier = modifier,
 		horizontalArrangement = Arrangement.spacedBy(space),
 		verticalArrangement = Arrangement.spacedBy(space)
 	) {
+		val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
+
 		actualPics.forEachIndexed { index, pic ->
 			Box(
 				modifier = Modifier.size(size),

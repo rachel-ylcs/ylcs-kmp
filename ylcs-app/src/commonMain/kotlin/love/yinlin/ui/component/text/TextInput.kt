@@ -40,6 +40,9 @@ class TextInputState(str: String = "") {
 }
 
 @Composable
+fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState() }
+
+@Composable
 fun TextInput(
 	state: TextInputState,
 	hint: String,

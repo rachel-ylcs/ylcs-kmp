@@ -75,13 +75,12 @@ abstract class Floating<A : Any> {
         )
 
         val device = LocalDevice.current
-        Box(
-            modifier = Modifier.fillMaxSize()
-                .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
-                .zIndex(zIndex)
-                .clickableNoRipple {
-                    if (dismissOnClickOutside) close()
-                },
+        Box(modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
+            .zIndex(zIndex)
+            .clickableNoRipple {
+                if (dismissOnClickOutside) close()
+            },
             contentAlignment = remember(device) { alignment(device) }
         ) {
             AnimatedVisibility(

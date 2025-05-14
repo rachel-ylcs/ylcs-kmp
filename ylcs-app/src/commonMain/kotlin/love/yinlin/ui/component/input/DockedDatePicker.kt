@@ -32,7 +32,7 @@ fun DockedDatePicker(
 	onDateSelected: (LocalDate?) -> Unit,
 	modifier: Modifier = Modifier
 ) {
-	var isShow by rememberState { false }
+	var isShow by rememberFalse()
 	val datePickerState = rememberDatePickerState(selectableDates = remember {
 		val today = DateEx.Today
 		val start = today.minus(6, DateTimeUnit.MONTH)

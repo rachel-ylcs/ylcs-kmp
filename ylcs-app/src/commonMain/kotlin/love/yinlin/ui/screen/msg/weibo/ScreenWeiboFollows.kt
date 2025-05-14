@@ -17,7 +17,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +43,7 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.component.text.rememberTextInputState
 
 @Composable
 private fun WeiboUserItem(
@@ -164,7 +163,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	override fun Floating() {
 		importSheet.Land {
-			val state = remember { TextInputState() }
+			val state = rememberTextInputState()
 
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),

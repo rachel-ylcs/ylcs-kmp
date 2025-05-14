@@ -80,7 +80,7 @@ fun <T> Banner(
 		}
 	}
 
-	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }
+	val autoplay by rememberDerivedState(interval) { interval > 0L && pics.size > 1 }
 	val isForeground = rememberOffScreenState()
 
 	if (autoplay && isForeground) {

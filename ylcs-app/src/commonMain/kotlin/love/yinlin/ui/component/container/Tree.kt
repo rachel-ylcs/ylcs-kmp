@@ -23,8 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberFalse
 import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
@@ -42,7 +42,7 @@ data class TreeScope(
         children: @Composable (TreeScope.() -> Unit)? = null
     ) {
         val expandable = children != null
-        var expended by rememberState { false }
+        var expended by rememberFalse()
 
         Column {
             Row(

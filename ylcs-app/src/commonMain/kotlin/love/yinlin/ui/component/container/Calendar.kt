@@ -92,7 +92,7 @@ private fun CalendarHeader(
 	modifier: Modifier = Modifier,
 	actions: @Composable ActionScope.() -> Unit = { }
 ) {
-	val currentDate by rememberDerivedState(state) { indexShadowDate(state.settledPage) }
+	val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
 	Row(
 		modifier = modifier.padding(start = ThemeValue.Padding.HorizontalExtraSpace, end = ThemeValue.Padding.HorizontalSpace),

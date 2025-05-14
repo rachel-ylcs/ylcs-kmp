@@ -186,7 +186,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		musicInfo: MusicInfo,
 		modifier: Modifier = Modifier
 	) {
-		var lastDegree by rememberState { 0f }
+		var lastDegree by rememberValueState(0f)
 		val animation by rememberState { Animatable(0f) }
 		val isForeground = rememberOffScreenState()
 
@@ -395,7 +395,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicProgressLayout(modifier: Modifier = Modifier) {
-		var currentTime by rememberState(factory.currentDuration) { 0L }
+		var currentTime by rememberValueState(0L, factory.currentDuration)
 
 		LaunchedEffect(factory.currentPosition) {
 			val position = factory.currentPosition
@@ -483,7 +483,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun MusicToolLayout(modifier: Modifier = Modifier) {
 		EqualRow(modifier = modifier) {
 			EqualItem {
-				var hasAnimation by rememberState { false }
+				var hasAnimation by rememberFalse()
 
 				LaunchedEffect(factory.currentMusic) {
 					hasAnimation = factory.currentMusic?.AnimationPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true
@@ -498,7 +498,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 			}
 			EqualItem {
-				var hasVideo by rememberState { false }
+				var hasVideo by rememberFalse()
 
 				LaunchedEffect(factory.currentMusic) {
 					hasVideo = factory.currentMusic?.videoPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true

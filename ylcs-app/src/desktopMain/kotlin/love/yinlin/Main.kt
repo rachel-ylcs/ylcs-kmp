@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.sun.jna.Native
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberTrue
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
@@ -43,7 +43,7 @@ fun main() {
     }
 
     application {
-        var isOpen by rememberState { true }
+        var isOpen by rememberTrue()
 
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,

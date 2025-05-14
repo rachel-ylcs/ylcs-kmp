@@ -42,7 +42,7 @@ import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.component.text.rememberTextInputState
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -347,7 +347,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun Floating() {
         cloudBackupSheet.Land {
             var playlists: Map<String, List<PlaylistPreviewItem>> by rememberState { emptyMap() }
-            val state = remember { TextInputState() }
+            val state = rememberTextInputState()
 
             Column(
                 modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.SheetValue),

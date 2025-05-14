@@ -37,7 +37,7 @@ import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.findAssign
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberFalse
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
@@ -386,7 +386,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Composable
     private fun MusicLyricsLayout(modifier: Modifier = Modifier) {
-        var isExpanded by rememberState { false }
+        var isExpanded by rememberFalse()
 
         Surface(
             modifier = modifier,

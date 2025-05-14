@@ -29,8 +29,8 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberFalse
 import love.yinlin.ui.component.node.condition
-import love.yinlin.extension.rememberState
 import love.yinlin.platform.ImageQuality
 import love.yinlin.resources.Res
 import love.yinlin.resources.placeholder_pic
@@ -164,7 +164,7 @@ fun LoadingIcon(
 	onClick: suspend CoroutineScope.() -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var isLoading by rememberState { false }
+	var isLoading by rememberFalse()
 
 	if (isLoading) {
 		LoadingCircle(

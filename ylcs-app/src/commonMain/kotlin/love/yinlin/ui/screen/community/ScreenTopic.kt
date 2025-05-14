@@ -45,7 +45,7 @@ import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -448,7 +448,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
-		val pics by rememberDerivedState { details.pics.map { Picture(topic.picPath(it)) } }
+		val pics = remember(details, topic) { details.pics.map { Picture(topic.picPath(it)) } }
 
 		Column(
 			modifier = modifier,
@@ -615,7 +615,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	private fun BottomLayout(modifier: Modifier = Modifier) {
-		val state = remember(currentSendComment) { TextInputState() }
+		val state = rememberTextInputState(currentSendComment)
 
 		Column(
 			modifier = modifier,

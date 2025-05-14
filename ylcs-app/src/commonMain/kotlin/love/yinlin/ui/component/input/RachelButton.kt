@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberFalse
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable
@@ -169,7 +169,7 @@ fun LoadingRachelButton(
 	onClick: suspend CoroutineScope.() -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var isLoading by rememberState { false }
+	var isLoading by rememberFalse()
 
 	TextButton(
 		modifier = modifier,
@@ -200,7 +200,7 @@ fun LoadingButton(
 	onClick: suspend CoroutineScope.() -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var isLoading by rememberState { false }
+	var isLoading by rememberFalse()
 
 	Button(
 		modifier = modifier,

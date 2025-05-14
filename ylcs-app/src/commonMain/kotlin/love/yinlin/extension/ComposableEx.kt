@@ -31,16 +31,25 @@ inline fun <T> rememberState(vararg keys: Any?, crossinline init: () -> T) =
 	remember(*keys) { mutableStateOf(init()) }
 
 @Composable
+fun rememberFalse(vararg keys: Any?) = remember(*keys) { mutableStateOf(false) }
+@Composable
+fun rememberTrue(vararg keys: Any?) = remember(*keys) { mutableStateOf(true) }
+@Composable
 fun rememberValueState(value: Int, vararg keys: Any?) = remember(*keys) { mutableIntStateOf(value) }
-
+@Composable
+inline fun rememberIntState(vararg keys: Any?, crossinline init: () -> Int) = remember(*keys) { mutableIntStateOf(init()) }
 @Composable
 fun rememberValueState(value: Long, vararg keys: Any?) = remember(*keys) { mutableLongStateOf(value) }
-
+@Composable
+inline fun rememberLongState(vararg keys: Any?, crossinline init: () -> Long) = remember(*keys) { mutableLongStateOf(init()) }
 @Composable
 fun rememberValueState(value: Float, vararg keys: Any?) = remember(*keys) { mutableFloatStateOf(value) }
-
+@Composable
+inline fun rememberFloatState(vararg keys: Any?, crossinline init: () -> Float) = remember(*keys) { mutableFloatStateOf(init()) }
 @Composable
 fun rememberValueState(value: Double, vararg keys: Any?) = remember(*keys) { mutableDoubleStateOf(value) }
+@Composable
+inline fun rememberDoubleState(vararg keys: Any?, crossinline init: () -> Double) = remember(*keys) { mutableDoubleStateOf(init()) }
 
 @Composable
 fun <T> rememberDerivedState(calculation: () -> T) =
@@ -62,7 +71,7 @@ fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
 
 @Composable
 fun rememberOffScreenState(): Boolean {
-	var value by rememberState { false }
+	var value by rememberFalse()
 	LifecycleStartEffect(Unit) {
 		value = true
 		onStopOrDispose {
