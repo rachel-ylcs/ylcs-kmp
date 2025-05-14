@@ -209,39 +209,8 @@ kotlin {
         }
 
         val desktopMain by getting {
-            when (desktopPlatform) {
-                GradlePlatform.Windows -> {
-                    val windowsMain by creating {
-                        dependsOn(nonAndroidMain)
-                        dependsOn(jvmMain)
-                        dependencies {
-
-                        }
-                    }
-                    dependsOn(windowsMain)
-                }
-                GradlePlatform.Linux -> {
-                    val linuxMain by creating {
-                        dependsOn(nonAndroidMain)
-                        dependsOn(jvmMain)
-                        dependencies {
-
-                        }
-                    }
-                    dependsOn(linuxMain)
-                }
-                GradlePlatform.Mac -> {
-                    val macMain by creating {
-                        dependsOn(nonAndroidMain)
-                        dependsOn(jvmMain)
-                        dependencies {
-
-                        }
-                    }
-                    dependsOn(macMain)
-                }
-            }
-
+            dependsOn(nonAndroidMain)
+            dependsOn(jvmMain)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)

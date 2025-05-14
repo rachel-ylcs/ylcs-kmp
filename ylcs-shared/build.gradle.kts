@@ -86,7 +86,6 @@ kotlin {
         }
 
         jvmMain.get().apply {
-            dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
 
