@@ -7,7 +7,6 @@ import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.profile.UserConstraint
-import love.yinlin.logger
 import love.yinlin.platform.Platform
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -132,20 +131,20 @@ object AN {
 	fun throwExpireToken(tokenString: String): Int {
 		val token = parseToken(tokenString)
 		// keyToken 可能是 null 或 已经失效的 token
-		val saveTokenString = Redis.use { it.get(token.key) }
+		val saveTokenString = Redis.use { it.get(token.key) }!!
 		return if (saveTokenString == tokenString) token.uid else throw TokenExpireError(token.uid)
 	}
 
 	fun throwReGenerateToken(srcTokenString: String): String {
 		val token = parseToken(srcTokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }
+		val saveTokenString = Redis.use { it.get(token.key) }!!
 		return if (saveTokenString == srcTokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
 			else throw TokenExpireError(token.uid)
 	}
 
 	fun removeToken(tokenString: String) {
 		val token = parseToken(tokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }
+		val saveTokenString = Redis.use { it.get(token.key) }!!
 		if (saveTokenString == tokenString) Redis.use { it.del(token.key) }
 		else throw TokenExpireError(token.uid)
 	}
