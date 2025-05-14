@@ -242,7 +242,9 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				navigate(ScreenModifyActivity.Args(args.aid))
 			}
 			ActionSuspend(Icons.Outlined.Delete) {
-				deleteActivity()
+				if (slot.confirm.openSuspend(content = "删除活动")) {
+					deleteActivity()
+				}
 			}
 		}
 	}
