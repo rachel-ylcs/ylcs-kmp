@@ -77,6 +77,7 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
@@ -95,11 +96,9 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 
-jna = { module = "net.java.dev.jna:jna", version = "5.14.0" }
-jna-jpms = { module = "net.java.dev.jna:jna-jpms", version = "5.14.0" }
-jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.14.0" }
-jna-platform-jpms = { module = "net.java.dev.jna:jna-platform-jpms", version = "5.14.0" }
-vlcj = { module = "uk.co.caprica:vlcj", version = "4.10.1" }
+jna = { module = "net.java.dev.jna:jna", version = "5.17.0" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.17.0" }
+vlcj = { module = "uk.co.caprica:vlcj", version = "4.11.0" }
 
 # Web
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }

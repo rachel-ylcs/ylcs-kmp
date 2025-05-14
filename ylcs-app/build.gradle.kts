@@ -185,6 +185,7 @@ kotlin {
             dependsOn(nonWasmJsMain)
             dependencies {
                 implementation(libs.ktor.okhttp)
+                implementation(libs.ktor.java)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar"))))
             }
@@ -215,10 +216,6 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
                 implementation(libs.vlcj)
-                implementation(libs.jna)
-                implementation(libs.jna.jpms)
-                implementation(libs.jna.platform)
-                implementation(libs.jna.platform.jpms)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
             }
@@ -252,6 +249,17 @@ kotlin {
                 implementation(libs.ktor.js)
             }
         }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            if (requested.group == "net.java.dev.jna" && requested.name == "jna-jpms") useTarget(libs.jna)
+            else if (requested.group == "net.java.dev.jna" && requested.name == "jna-platform-jpms") useTarget(libs.jna.platform)
+        }
+        force(libs.jna)
+        force(libs.jna.platform)
     }
 }
 
