@@ -4,6 +4,7 @@ package love.yinlin.platform
 import kotlinx.io.files.Path
 import love.yinlin.Local
 import love.yinlin.common.Uri
+import net.harawata.appdirs.AppDirsFactory
 import java.awt.Desktop
 import java.net.URI
 import java.nio.file.Files
@@ -34,16 +35,8 @@ actual fun osNetOpenUrl(url: String) {
 
 val osAppPath: Path get() {
 	val workingDir = Path(System.getProperty("user.dir"))
-	val homeDir = Path(System.getProperty("user.home"))
-	return if (Files.isWritable(Paths.get(workingDir.toString()))) workingDir else {
-		when (osPlatform) {
-            Platform.Windows -> System.getenv("APPDATA")?.let { Path(it, Local.APP_NAME) } ?: workingDir
-            Platform.Linux -> Path(System.getenv("XDG_DATA_HOME")?.let { Path(it) }
-				?: Path(homeDir, ".local", "share"), Local.APP_NAME)
-            Platform.MacOS -> Path(homeDir, "Library", "Application Support", Local.APP_NAME)
-            else -> workingDir
-        }
-	}
+	return if (Files.isWritable(Paths.get(workingDir.toString()))) workingDir
+		else Path(AppDirsFactory.getInstance().getUserDataDir(Local.APP_NAME, null, null, true))
 }
 
 actual val osStorageDataPath: Path get() = Path(osAppPath, "data")
