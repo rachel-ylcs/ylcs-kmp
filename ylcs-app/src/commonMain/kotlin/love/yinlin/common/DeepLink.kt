@@ -25,6 +25,7 @@ class DeepLink(private val model: AppModel) {
 
     fun process(uri: Uri) {
         when (uri.scheme) {
+            Scheme.File -> schemeContent(uri)
             Scheme.Content -> schemeContent(uri)
             Scheme.Rachel -> schemeRachel(uri)
             Scheme.QQMusic -> {

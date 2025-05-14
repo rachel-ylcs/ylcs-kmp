@@ -174,7 +174,8 @@ actual object Picker {
 
     actual suspend fun cleanSave(origin: Any, result: Boolean) {
         if (origin is Video) {
-//            origin.url.toPath()?.let { SystemFileSystem.delete(it) }
+            // 此时保存到相册的动作未完成，还不能删除临时文件
+            // origin.url.toPath()?.let { SystemFileSystem.delete(it) }
         }
     }
 }
