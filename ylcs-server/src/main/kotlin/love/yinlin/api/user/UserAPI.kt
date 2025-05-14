@@ -162,9 +162,10 @@ fun Routing.userAPI(implMap: ImplMap) {
 	accountAPI(implMap)
 	activityAPI(implMap)
 	backupAPI(implMap)
+	friendAPI(implMap)
 	infoAPI(implMap)
 	mailAPI(implMap)
 	profileAPI(implMap)
-	topicAPI(implMap)
 	rewardAPI(implMap)
+	topicAPI(implMap)
 }
