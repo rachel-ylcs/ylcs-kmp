@@ -30,6 +30,10 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val name: String, val pwd: String)
 			}
+			object ChangePassword :APIPostRequest<ChangePassword.Request>(this,"changePassword"){
+				@Serializable
+				data class Request(val name:String ,val oldPwd:String, val newPwd:String)
+			}
 		}
 
 		object Activity : APINode(this, "activity") {
