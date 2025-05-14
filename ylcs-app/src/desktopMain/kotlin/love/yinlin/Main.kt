@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CropSquare
 import androidx.compose.material.icons.outlined.Remove
-import androidx.compose.material.icons.outlined.Rocket
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,6 @@ import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
-import kotlin.system.exitProcess
 
 fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
@@ -83,12 +81,6 @@ fun main() {
                                     start = ThemeValue.Padding.HorizontalExtraSpace
                                 )
                             ) {
-                                Action(
-                                    icon = Icons.Outlined.Rocket,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                                ) {
-                                    exitProcess(0)
-                                }
                                 Action(
                                     icon = Icons.Outlined.Remove,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
