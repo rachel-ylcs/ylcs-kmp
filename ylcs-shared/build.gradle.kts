@@ -22,7 +22,7 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    jvm {
+    jvm("desktop") {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
         }
@@ -85,7 +85,8 @@ kotlin {
             }
         }
 
-        jvmMain.get().apply {
+        val desktopMain by getting {
+            dependsOn(nonAndroidMain)
             dependsOn(nonWasmJsMain)
             dependencies {
 
