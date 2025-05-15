@@ -157,8 +157,6 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			canLoading = page.canLoading,
 			onLoading = { requestMoreTopics() },
 			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-			contentPadding = ThemeValue.Padding.EqualValue,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 			verticalItemSpacing = ThemeValue.Padding.EqualSpace,
 			header = {
 				UserProfileCard(
@@ -171,7 +169,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			TopicCard(
 				topic = topic,
 				cardWidth = ThemeValue.Size.CellWidth,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
 			)
 		}
 	}
