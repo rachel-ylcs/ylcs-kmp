@@ -131,22 +131,26 @@ object AN {
 	fun throwExpireToken(tokenString: String): Int {
 		val token = parseToken(tokenString)
 		// keyToken 可能是 null 或 已经失效的 token
-		val saveTokenString = Redis.use { it.get(token.key) }!!
-		return if (saveTokenString == tokenString) token.uid else throw TokenExpireError(token.uid)
+		val saveTokenString = Redis.use { it.get(token.key) }
+		return if (saveTokenString == tokenString) token.uid
+			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
+			else throw TokenExpireError(token.uid)
 	}
 
-	fun throwReGenerateToken(srcTokenString: String): String {
-		val token = parseToken(srcTokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }!!
-		return if (saveTokenString == srcTokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
+	fun throwReGenerateToken(tokenString: String): String {
+		val token = parseToken(tokenString)
+		val saveTokenString = Redis.use { it.get(token.key) }
+		return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
+			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
 			else throw TokenExpireError(token.uid)
 	}
 
 	fun removeToken(tokenString: String) {
 		val token = parseToken(tokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }!!
+		val saveTokenString = Redis.use { it.get(token.key) }
 		if (saveTokenString == tokenString) Redis.use { it.del(token.key) }
-		else throw TokenExpireError(token.uid)
+			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
+			else throw TokenExpireError(token.uid)
 	}
 
 	fun removeAllTokens(uid: Int) {
@@ -162,7 +166,7 @@ fun Routing.userAPI(implMap: ImplMap) {
 	accountAPI(implMap)
 	activityAPI(implMap)
 	backupAPI(implMap)
-	friendAPI(implMap)
+	followsAPI(implMap)
 	infoAPI(implMap)
 	mailAPI(implMap)
 	profileAPI(implMap)

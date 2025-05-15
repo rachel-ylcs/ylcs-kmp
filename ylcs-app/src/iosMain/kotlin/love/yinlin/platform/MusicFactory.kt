@@ -8,16 +8,22 @@ import androidx.compose.runtime.setValue
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
+import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
+import love.yinlin.ui.screen.music.recordPath
 import platform.darwin.*
 import platform.Foundation.NSKeyValueObservingProtocol
 import platform.Foundation.*
 import platform.AVFoundation.*
 import platform.CoreMedia.*
 import platform.AVFAudio.*
+import platform.MediaPlayer.*
+import platform.UIKit.*
 
 @OptIn(ExperimentalForeignApi::class)
 class ActualMusicFactory : MusicFactory() {
+    private var interruptionObserver: NSObjectProtocol? = null
+
     private var avPlayer: AVPlayer? = null
     private var currentIndex = -1
     private lateinit var playerObserver: NSObject
@@ -34,13 +40,39 @@ class ActualMusicFactory : MusicFactory() {
     override var currentDuration: Long by mutableLongStateOf(0L)
     override var currentMusic: MusicInfo? by mutableStateOf(null)
 
+    enum class AudioSessionInterruption {
+        Began, Ended, Failed;
+    }
+
     override suspend fun init() {
         if (isInit) return
 
         AVAudioSession.sharedInstance().apply {
             try {
+                interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                    AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
+                ) { notification ->
+                    val userInfo = notification?.userInfo
+                    userInfo?.let {
+                        val interruptionType = it[AVAudioSessionInterruptionTypeKey] as Long
+                        when (interruptionType.toULong()) {
+                            AVAudioSessionInterruptionTypeBegan -> {
+                                handleAudioSessionInterruption(AudioSessionInterruption.Began, null)
+                            }
+                            AVAudioSessionInterruptionTypeEnded -> {
+                                val options = userInfo[AVAudioSessionInterruptionOptionKey] as UInt
+                                val shouldResume = options and AVAudioSessionInterruptionFlags_ShouldResume
+                                handleAudioSessionInterruption(AudioSessionInterruption.Ended, shouldResume)
+                            }
+                            else -> {
+                                handleAudioSessionInterruption(AudioSessionInterruption.Failed, null)
+                            }
+                        }
+                    }
+                }
                 setCategory(AVAudioSessionCategoryPlayback, null)
                 setActive(true, null)
+                setupNowPlayingInfoCenter()
             } catch (e: Throwable) {
                 error = e
             }
@@ -56,10 +88,14 @@ class ActualMusicFactory : MusicFactory() {
                 val newValue = change!![NSKeyValueChangeNewKey]
                 when (keyPath) {
                     "timeControlStatus" -> isPlaying = newValue == AVPlayerTimeControlStatusPlaying
-                    "currentItem" -> if (newValue == null) currentDuration = 0L
+                    "currentItem" -> {
+                        if (newValue == null) currentDuration = 0L
+                        updatePlayingMetadata()
+                    }
                     "status" -> if (newValue == AVPlayerItemStatusReadyToPlay)
                         avPlayer?.currentItem?.let {
                             currentDuration = CMTimeGetSeconds(it.duration).toLong() * 1000
+                            updatePlayingInfo()
                         }
                     else -> println("Unknown observed $keyPath:$newValue")
                 }
@@ -74,7 +110,10 @@ class ActualMusicFactory : MusicFactory() {
             CMTimeMake(1, 2), // 0.5秒
             dispatch_get_main_queue()
         ) { time ->
-            currentPosition = (CMTimeGetSeconds(time) * 1000).toLong()
+            if (isPlaying) {
+                currentPosition = (CMTimeGetSeconds(time) * 1000).toLong()
+                updatePlayingInfo()
+            }
         }
     }
 
@@ -93,11 +132,13 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun stop(): Unit = Coroutines.main {
         avPlayer?.pause()
         avPlayer?.seekToTime(CMTimeMake(0, 1))
+        setPlayerItem(null)
         currentPosition = 0L
         musicList = emptyList()
         currentPlaylist = null
         currentMusic = null
         currentIndex = -1
+        updatePlayingMetadata()
     }
 
     override suspend fun gotoPrevious() {
@@ -189,8 +230,6 @@ class ActualMusicFactory : MusicFactory() {
         currentMusic = musicList[index]
         setPlayerItem(currentMusic)
 
-        setupEndTimeObserver()
-
         if (play) {
             avPlayer?.play()
         }
@@ -211,29 +250,111 @@ class ActualMusicFactory : MusicFactory() {
             }
         }
         avPlayer?.replaceCurrentItemWithPlayerItem(playerItem)
+        setupEndTimeObserver()
     }
 
     private fun setupEndTimeObserver() {
         endTimeObserver?.let {
             NSNotificationCenter.defaultCenter.removeObserver(it)
+            endTimeObserver = null
         }
 
-        endTimeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
-            AVPlayerItemDidPlayToEndTimeNotification,
-            avPlayer?.currentItem,
-            null
-        ) { _ ->
-            Coroutines.startMain {
-                when (playMode) {
-                    MusicPlayMode.LOOP -> {
-                        avPlayer?.seekToTime(CMTimeMake(0, 1))
-                        avPlayer?.play()
-                    }
-                    else -> {
-                        gotoNext()
+        avPlayer?.currentItem?.let {
+            endTimeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                AVPlayerItemDidPlayToEndTimeNotification, it, null) { _ ->
+                Coroutines.startMain {
+                    when (playMode) {
+                        MusicPlayMode.LOOP -> {
+                            avPlayer?.seekToTime(CMTimeMake(0, 1))
+                            avPlayer?.play()
+                        }
+                        else -> {
+                            gotoNext()
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun handleAudioSessionInterruption(type: AudioSessionInterruption, arg: Any?) {
+        when (type) {
+            AudioSessionInterruption.Began -> {}
+            AudioSessionInterruption.Ended -> {
+                val shouldPlay = arg as Boolean
+                if (isReady && shouldPlay) {
+                    avPlayer?.play()
+                }
+            }
+            AudioSessionInterruption.Failed -> {}
+        }
+    }
+
+    private fun setupNowPlayingInfoCenter() {
+        // 加上下面这行才能后台播放，否则后台切歌的时候会被suspend
+        UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
+        val commandCenter = MPRemoteCommandCenter.sharedCommandCenter()
+        commandCenter.playCommand.addTargetWithHandler { event ->
+            Coroutines.startMain {
+                play()
+            }
+            MPRemoteCommandHandlerStatusSuccess
+        }
+        commandCenter.pauseCommand.addTargetWithHandler { event ->
+            Coroutines.startMain {
+                pause()
+            }
+            MPRemoteCommandHandlerStatusSuccess
+        }
+        commandCenter.previousTrackCommand.addTargetWithHandler { event ->
+            Coroutines.startMain {
+                gotoPrevious()
+            }
+            MPRemoteCommandHandlerStatusSuccess
+        }
+        commandCenter.nextTrackCommand.addTargetWithHandler { event ->
+            Coroutines.startMain {
+                gotoNext()
+            }
+            MPRemoteCommandHandlerStatusSuccess
+        }
+        commandCenter.changePlaybackPositionCommand.addTargetWithHandler { event ->
+            val event = event as? MPChangePlaybackPositionCommandEvent
+            Coroutines.startMain {
+                event?.let {
+                    seekTo((it.positionTime * 1000).roundToLong())
+                }
+            }
+            MPRemoteCommandHandlerStatusSuccess
+        }
+    }
+
+    private fun updatePlayingMetadata() {
+        val nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter()
+        if (currentMusic == null) {
+            nowPlayingInfoCenter.nowPlayingInfo = null
+            return
+        }
+        val artwork = currentMusic?.let { MPMediaItemArtwork(UIImage(contentsOfFile = it.recordPath.toString())) }
+        var nowPlayingInfo = mutableMapOf<Any?, Any?>()
+        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = NSURL.fileURLWithPath(currentMusic?.audioPath?.toString()!!)
+        nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaTypeAudio
+        nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = false
+        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
+        nowPlayingInfo[MPMediaItemPropertyTitle] = currentMusic?.name
+        nowPlayingInfo[MPMediaItemPropertyArtist] = currentMusic?.singer
+        nowPlayingInfo[MPMediaItemPropertyComposer] = currentMusic?.composer
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = currentMusic?.album
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
+    }
+
+    private fun updatePlayingInfo() {
+        val nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter()
+        var nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = currentDuration / 1000.0f
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentPosition / 1000.0f
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = avPlayer?.rate
+        nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 }

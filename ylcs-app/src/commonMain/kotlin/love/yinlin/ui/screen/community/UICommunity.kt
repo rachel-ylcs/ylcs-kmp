@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +33,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
@@ -40,6 +40,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.ui.component.layout.EqualItem
+import love.yinlin.ui.component.node.clickableNoRipple
 
 @Composable
 internal fun BoxText(
@@ -80,11 +81,12 @@ internal fun PortraitValue(
 }
 
 @Composable
-internal fun UserProfileLevelInfo(
+internal fun UserProfileInfo(
 	profile: UserPublicProfile,
 	owner: Boolean,
 	modifier: Modifier = Modifier,
-	onLevelClick: () -> Unit = {}
+	onLevelClick: () -> Unit = {},
+	content: @Composable RowScope.(onLevelClick: () -> Unit) -> Unit = {}
 ) {
 	Box(modifier = modifier) {
 		Row(
@@ -118,20 +120,7 @@ internal fun UserProfileLevelInfo(
 					onClick = onLevelClick
 				)
 			}
-			Row(
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				PortraitValue(
-					value = profile.level.toString(),
-					title = "等级",
-					modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
-				)
-				PortraitValue(
-					value = profile.coin.toString(),
-					title = "银币"
-				)
-			}
+			content(onLevelClick)
 		}
 	}
 }
@@ -159,7 +148,7 @@ internal fun UserProfileCard(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
-				UserProfileLevelInfo(
+				UserProfileInfo(
 					profile = profile,
 					owner = owner,
 					modifier = Modifier.fillMaxWidth(),
@@ -172,6 +161,21 @@ internal fun UserProfileCard(
 						maxLines = 2,
 						overflow = TextOverflow.Ellipsis,
 						modifier = Modifier.fillMaxWidth()
+					)
+				}
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					PortraitValue(
+						value = profile.level.toString(),
+						title = "等级",
+						modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
+					)
+					PortraitValue(
+						value = profile.coin.toString(),
+						title = "银币"
 					)
 				}
 			}

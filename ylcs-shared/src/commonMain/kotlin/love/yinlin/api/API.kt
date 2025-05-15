@@ -2,6 +2,9 @@ package love.yinlin.api
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.data.rachel.follows.BlockedUserInfo
+import love.yinlin.data.rachel.follows.FollowInfo
+import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Comment
@@ -30,9 +33,10 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val name: String, val pwd: String)
 			}
-			object ChangePassword :APIPostRequest<ChangePassword.Request>(this,"changePassword"){
+
+			object ChangePassword : APIPostRequest<ChangePassword.Request>(this,"changePassword") {
 				@Serializable
-				data class Request(val name:String ,val oldPwd:String, val newPwd:String)
+				data class Request(val token: String, val oldPwd: String, val newPwd: String)
 			}
 		}
 
@@ -97,6 +101,43 @@ object API : APINode(null, "") {
 			}
 
 			object DownloadPlaylist : APIPost<String, JsonObject>(this, "downloadPlaylist")
+		}
+
+		object Follows : APINode(this, "follows") {
+			object FollowUser : APIPostRequest<FollowUser.Request>(this, "followUser") {
+				@Serializable
+				data class Request(val token: String, val uid: Int)
+			}
+
+			object UnfollowUser : APIPostRequest<UnfollowUser.Request>(this, "unfollowUser") {
+				@Serializable
+				data class Request(val token: String, val uid: Int)
+			}
+
+			object GetFollows : APIPost<GetFollows.Request, List<FollowInfo>>(this, "getFollows") {
+				@Serializable
+				data class Request(val token: String, val score: Int = Int.MAX_VALUE, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object GetFollowers : APIPost<GetFollowers.Request, List<FollowerInfo>>(this, "getFollowers") {
+				@Serializable
+				data class Request(val token: String, val score: Int = Int.MAX_VALUE, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object BlockUser : APIPostRequest<BlockUser.Request>(this, "blockUser") {
+				@Serializable
+				data class Request(val token: String, val uid: Int)
+			}
+
+			object UnblockUser : APIPostRequest<UnblockUser.Request>(this, "unblockUser") {
+				@Serializable
+				data class Request(val token: String, val uid: Int)
+			}
+
+			object GetBlockedUsers : APIPost<GetBlockedUsers.Request, List<BlockedUserInfo>>(this, "getBlockedUsers") {
+				@Serializable
+				data class Request(val token: String, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
 		}
 
 		object Info : APINode(this, "info") {

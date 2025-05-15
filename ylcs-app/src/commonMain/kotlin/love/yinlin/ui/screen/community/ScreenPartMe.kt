@@ -64,6 +64,7 @@ import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SheetConfig
@@ -517,11 +518,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		levelSheet.Land { profile ->
 			LazyColumn(modifier = Modifier.fillMaxWidth()) {
 				item(key = ItemKey("Profile")) {
-					UserProfileLevelInfo(
+					UserProfileInfo(
 						profile = remember(profile) { profile.publicProfile },
 						owner = true,
 						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
-					)
+					) { onLevelClick ->
+						Row(
+							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							PortraitValue(
+								value = profile.level.toString(),
+								title = "等级",
+								modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
+							)
+							PortraitValue(
+								value = profile.coin.toString(),
+								title = "银币"
+							)
+						}
+					}
 				}
 				itemsIndexed(
 					items = UserLevel.levelTable,

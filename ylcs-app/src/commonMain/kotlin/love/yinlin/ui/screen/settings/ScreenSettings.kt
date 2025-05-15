@@ -33,6 +33,7 @@ import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -41,10 +42,12 @@ import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
@@ -56,6 +59,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private val feedbackSheet = FloatingSheet()
 	private val privacyPolicySheet = FloatingSheet()
 	private val aboutSheet = FloatingSheet()
+	private val passwordModifySheet = FloatingSheet()
 
 	private val cropDialog = FloatingDialogCrop()
 
@@ -168,6 +172,27 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 	}
 
+	private suspend fun modifyPassword(oldPwd: String, newPwd: String) {
+		val token = app.config.userToken
+		if (token.isNotEmpty()) {
+			val result = ClientAPI.request(
+				route = API.User.Account.ChangePassword,
+				data = API.User.Account.ChangePassword.Request(
+					token = token,
+					oldPwd = oldPwd,
+					newPwd = newPwd
+				)
+			)
+			when (result) {
+				is Data.Success -> {
+					slot.tip.success("修改密码成功, 请重新登录")
+					mePart.cleanUserToken()
+				}
+				is Data.Error -> slot.tip.error(result.message)
+			}
+		}
+	}
+
 	private suspend fun logoff() {
 		val token = app.config.userToken
 		if (token.isNotEmpty()) {
@@ -272,6 +297,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				ItemText(
 					title = "邀请人",
 					text = userProfile.inviterName ?: ""
+				)
+				ItemExpander(
+					title = "修改密码",
+					icon = colorfulImageVector(icon = Icons.Outlined.Password, background = Colors.Orange4),
+					onClick = { passwordModifySheet.open() }
 				)
 				ItemExpanderSuspend(
 					title = "退出登录",
@@ -504,6 +534,56 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		aboutSheet.Land {
 			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
+			}
+		}
+
+		passwordModifySheet.Land {
+			val oldPassword = rememberTextInputState()
+			val newPassword1 = rememberTextInputState()
+			val newPassword2 = rememberTextInputState()
+
+			val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				horizontalAlignment = Alignment.End,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				LoadingRachelButton(
+					text = "提交",
+					icon = Icons.Outlined.Check,
+					enabled = canSubmit,
+					onClick = {
+						val oldPwd = oldPassword.text
+						val newPwd1 = newPassword1.text
+						val newPwd2 = newPassword2.text
+						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
+						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
+						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
+						else modifyPassword(oldPwd, newPwd1)
+					}
+				)
+				TextInput(
+					state = oldPassword,
+					hint = "旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword1,
+					hint = "确认旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword2,
+					hint = "新密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		}
 
