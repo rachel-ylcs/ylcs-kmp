@@ -65,7 +65,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 //	}
 	api(API.User.Topic.GetHotTopics) { (offset, num) ->
 		val topics = DB.throwQuerySQL("""
-        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum,rawSection,name,score
+        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
         FROM topic
         LEFT JOIN user
           ON topic.uid = user.uid

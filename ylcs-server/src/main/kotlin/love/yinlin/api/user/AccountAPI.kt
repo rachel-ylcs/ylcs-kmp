@@ -138,7 +138,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		AN.removeAllTokens(user["uid"].Int)
 		"\"${name}\"修改密码成功".successObject
 	}
-	
+
 	api(API.User.Account.ChangePassword) { (name, oldPwd, newPwd) ->
 		VN.throwName(name)
 		VN.throwPassword(oldPwd, newPwd)
