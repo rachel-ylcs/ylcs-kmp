@@ -8,11 +8,13 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.LifecycleStartEffect
 import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.common.Colors
+import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.rememberState
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI
 import love.yinlin.ui.component.image.ClickIcon
 import platform.AVFoundation.*
@@ -66,6 +68,7 @@ private class VideoPlayerView(var player: AVPlayer?) : UIView(CGRectMake(0.0, 0.
     }
 
     fun release() {
+        player?.pause()
         removeTimeObserver()
         player?.removeObserver(playerObserver, "timeControlStatus")
         player?.currentItem?.removeObserver(playerObserver, "status")
@@ -116,16 +119,29 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
+    val wasMusicPlaying = rememberState { false }
     val state: MutableState<VideoPlayerView?> = rememberState { null }
 
-    LifecycleStartEffect(Unit) {
-        state.value?.player?.let {
-            if (!it.isPlaying) it.play()
-        }
-        onStopOrDispose {
-            state.value?.player?.let {
-                if (it.isPlaying) it.pause()
+    DisposableEffect(Unit) {
+        wasMusicPlaying.value = app.musicFactory.isPlaying
+        if (wasMusicPlaying.value) {
+            Coroutines.startMain {
+                app.musicFactory.pause()
             }
+        }
+        onDispose {
+            if (wasMusicPlaying.value) {
+                Coroutines.startMain {
+                    app.musicFactory.play()
+                }
+            }
+        }
+    }
+
+    OffScreenEffect { isForeground ->
+        state.value?.player?.let {
+            if (isForeground) it.play()
+            else it.pause()
         }
     }
 
