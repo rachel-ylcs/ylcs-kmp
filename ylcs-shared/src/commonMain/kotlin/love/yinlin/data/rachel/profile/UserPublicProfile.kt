@@ -13,6 +13,8 @@ data class UserPublicProfile(
 	val signature: String,
 	val label: String,
 	val coin: Int,
+	val follows: Int,
+	val followers: Int,
 ) {
 	val level: Int by lazy { UserLevel.level(coin) }
 
