@@ -139,16 +139,18 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		"\"${name}\"修改密码成功".successObject
 	}
 
-	api(API.User.Account.ChangePassword) { (name, oldPwd, newPwd) ->
-		VN.throwName(name)
+	api(API.User.Account.ChangePassword) { (token, oldPwd, newPwd) ->
 		VN.throwPassword(oldPwd, newPwd)
-		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name)
-		if (user == null) return@api "非法操作，ID不存在".failedData
-		if (user["pwd"].String != oldPwd.md5) "原密码错误".failedData
+		val uid = AN.throwExpireToken(token)
+		val user = DB.throwGetUser(uid, "pwd")
+		val oldPwdMd5 = oldPwd.md5
+		val newPwdMd5 = newPwd.md5
+		if (user["pwd"].String != oldPwdMd5) "原密码错误".failedData
+		else if (oldPwdMd5 == newPwdMd5) "原密码与新密码相同".failedData
 		else {
-			DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", newPwd.md5, name)
-			AN.removeAllTokens(user["uid"].Int)
-			"密码修改成功".successData
+			DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE uid = ?", newPwdMd5, uid)
+			AN.removeAllTokens(uid)
+			"修改密码成功".successData
 		}
 	}
 }

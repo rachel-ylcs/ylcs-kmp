@@ -36,7 +36,7 @@ object API : APINode(null, "") {
 
 			object ChangePassword : APIPostRequest<ChangePassword.Request>(this,"changePassword") {
 				@Serializable
-				data class Request(val name: String, val oldPwd: String, val newPwd: String)
+				data class Request(val token: String, val oldPwd: String, val newPwd: String)
 			}
 		}
 

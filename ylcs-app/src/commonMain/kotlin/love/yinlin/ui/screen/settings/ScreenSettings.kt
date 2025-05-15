@@ -33,6 +33,7 @@ import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -41,6 +42,7 @@ import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -56,6 +58,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private val feedbackSheet = FloatingSheet()
 	private val privacyPolicySheet = FloatingSheet()
 	private val aboutSheet = FloatingSheet()
+	private val passwordModifySheet = FloatingSheet()
 
 	private val cropDialog = FloatingDialogCrop()
 
@@ -168,6 +171,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 	}
 
+	private suspend fun modifyPassword(oldPassword: String, newPassword: String) {
+
+	}
+
 	private suspend fun logoff() {
 		val token = app.config.userToken
 		if (token.isNotEmpty()) {
@@ -272,6 +279,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				ItemText(
 					title = "邀请人",
 					text = userProfile.inviterName ?: ""
+				)
+				ItemExpander(
+					title = "修改密码",
+					icon = colorfulImageVector(icon = Icons.Outlined.Password, background = Colors.Orange4),
+					onClick = { passwordModifySheet.open() }
 				)
 				ItemExpanderSuspend(
 					title = "退出登录",
@@ -504,6 +516,27 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		aboutSheet.Land {
 			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)) {
 				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
+			}
+		}
+
+		passwordModifySheet.Land {
+			val oldPassword1 = rememberTextInputState()
+			val oldPassword2 = rememberTextInputState()
+			val newPassword = rememberTextInputState()
+
+			val canSubmit by rememberDerivedState { oldPassword1.ok && oldPassword2.ok && newPassword.ok }
+
+			Column(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)) {
+				LoadingRachelButton(
+					text = "提交",
+					icon = Icons.Outlined.Check,
+					enabled = canSubmit,
+					onClick = {
+						if (oldPassword1 != oldPassword2) slot.tip.warning("两次输入密码不同")
+						else if (oldPassword1 == newPassword) slot.tip.warning("旧密码与新密码相同")
+
+					}
+				)
 			}
 		}
 
