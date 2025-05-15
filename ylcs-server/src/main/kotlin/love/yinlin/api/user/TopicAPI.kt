@@ -53,44 +53,17 @@ fun Routing.topicAPI(implMap: ImplMap) {
 
 	api(API.User.Topic.GetHotTopics) { (offset, num) ->
 		val topics = DB.throwQuerySQL("""
-            SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
-            FROM topic
-            LEFT JOIN user
-            ON topic.uid = user.uid
-            WHERE isDeleted = 0 AND coinNum < ?
-            ORDER BY coinNum DESC, ts ASC
-            LIMIT ?
-        """, offset, num.coercePageNum)
+        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
+        FROM topic
+        LEFT JOIN user
+          ON topic.uid = user.uid
+        WHERE isDeleted = 0
+          AND coinNum < ?
+        ORDER BY score DESC, ts ASC
+        LIMIT ?
+    """, offset, num.coercePageNum)
 		Data.Success(topics.to())
 	}
-//	api(API.User.Topic.GetHotTopics) { (offset, num) ->
-//		val topics = DB.throwQuerySQL("""
-//        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
-//        FROM topic
-//        LEFT JOIN user
-//          ON topic.uid = user.uid
-//        WHERE isDeleted = 0
-//          AND coinNum < ?
-//        ORDER BY score DESC, ts ASC
-//        LIMIT ?
-//    """, offset, num.coercePageNum)
-//		Data.Success(topics.to())
-//	}
-
-//	api(API.User.Topic.GetHotTopics) { (offset, num) ->
-//		val topics = DB.throwQuerySQL("""
-//        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum,rawSection,name,score
-//        FROM topic
-//        LEFT JOIN user
-//          ON topic.uid = user.uid
-//        WHERE isDeleted = 0
-//          AND coinNum < ?
-//        ORDER BY score DESC, ts ASC
-//        LIMIT ?
-//    """, offset, num.coercePageNum)
-//		Data.Success(topics.to())
-//	}
-// 冲突部分
 
 	api(API.User.Topic.GetSectionTopics) { (section, offset, num) ->
 		val topics = DB.throwQuerySQL("""
