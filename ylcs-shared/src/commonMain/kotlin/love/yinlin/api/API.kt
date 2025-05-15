@@ -116,12 +116,12 @@ object API : APINode(null, "") {
 
 			object GetFollows : APIPost<GetFollows.Request, List<FollowInfo>>(this, "getFollows") {
 				@Serializable
-				data class Request(val token: String, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val token: String, val score: Int = Int.MAX_VALUE, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetFollowers : APIPost<GetFollowers.Request, List<FollowerInfo>>(this, "getFollowers") {
 				@Serializable
-				data class Request(val token: String, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val token: String, val score: Int = Int.MAX_VALUE, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object BlockUser : APIPostRequest<BlockUser.Request>(this, "blockUser") {
@@ -136,7 +136,7 @@ object API : APINode(null, "") {
 
 			object GetBlockedUsers : APIPost<GetBlockedUsers.Request, List<BlockedUserInfo>>(this, "getBlockedUsers") {
 				@Serializable
-				data class Request(val token: String, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val token: String, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 		}
 
