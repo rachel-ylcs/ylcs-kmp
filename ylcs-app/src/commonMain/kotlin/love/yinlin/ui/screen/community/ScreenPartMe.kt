@@ -381,10 +381,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					style = MaterialTheme.typography.displaySmall,
 					color = MaterialTheme.colorScheme.primary
 				)
-				Text(
-					text = "关注我",
-					style = MaterialTheme.typography.bodyLarge
-				)
 
 				val primaryColor = MaterialTheme.colorScheme.primary
 				val secondaryColor = MaterialTheme.colorScheme.secondary

@@ -21,6 +21,7 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
 import javax.swing.SwingUtilities
 
+@Stable
 private class VideoPlayerState(val url: String) {
     var component = mutableStateOf<CallbackMediaPlayerComponent?>(null)
 

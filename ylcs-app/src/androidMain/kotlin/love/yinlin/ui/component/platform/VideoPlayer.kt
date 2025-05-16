@@ -30,6 +30,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.ui.component.image.ClickIcon
 
+@Stable
 private class VideoPlayerState {
     var controller by mutableStateOf<Player?>(null)
 
