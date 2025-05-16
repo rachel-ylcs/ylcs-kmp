@@ -24,8 +24,9 @@ data class Comment(
 	val coin: Int // [用户银币]
 ) : Comparable<Comment> {
 	object Section {
-		const val LATEST = -1
-		const val HOT = -2
+		const val LATEST_TOPIC = -1
+		const val LATEST_COMMENT = -2
+		const val HOT = -3
 
 		const val UNGROUPED = 0
 		const val NOTIFICATION = 1
@@ -38,7 +39,8 @@ data class Comment(
 		)
 
 		fun sectionName(section: Int): String = when (section) {
-			LATEST -> "最新"
+			LATEST_TOPIC -> "新主题"
+			LATEST_COMMENT -> "新回复"
 			HOT -> "热门"
 			NOTIFICATION -> "公告"
 			WATER -> "水贴"

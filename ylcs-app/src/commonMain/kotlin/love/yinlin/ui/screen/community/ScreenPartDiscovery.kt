@@ -44,7 +44,8 @@ private enum class DiscoveryItem(
     val id: Int,
     val icon: ImageVector
 ) {
-    Latest(Comment.Section.LATEST, Icons.Filled.NewReleases),
+    LatestTopic(Comment.Section.LATEST_TOPIC, Icons.Filled.NewReleases),
+    LatestComment(Comment.Section.LATEST_COMMENT, Icons.Filled.NewReleases),
     Hot(Comment.Section.HOT, Icons.Filled.LocalFireDepartment),
     Notification(Comment.Section.NOTIFICATION, Icons.Filled.Campaign),
     Water(Comment.Section.WATER, Icons.Filled.WaterDrop),
@@ -75,9 +76,15 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
         state = BoxState.LOADING
         val section = currentSection
         val result = when (section) {
-            DiscoveryItem.Latest.id -> ClientAPI.request(
+            DiscoveryItem.LatestTopic.id -> ClientAPI.request(
                 route = API.User.Topic.GetLatestTopics,
                 data = API.User.Topic.GetLatestTopics.Request(
+                    num = page.pageNum
+                )
+            )
+            DiscoveryItem.LatestComment.id -> ClientAPI.request(
+                route = API.User.Topic.GetLatestComments,
+                data = API.User.Topic.GetLatestComments.Request(
                     num = page.pageNum
                 )
             )
@@ -105,9 +112,16 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     private suspend fun requestMoreData() {
         val section = currentSection
         val result = when (section) {
-            DiscoveryItem.Latest.id -> ClientAPI.request(
+            DiscoveryItem.LatestTopic.id -> ClientAPI.request(
                 route = API.User.Topic.GetLatestTopics,
                 data = API.User.Topic.GetLatestTopics.Request(
+                    tid = page.offset,
+                    num = page.pageNum
+                )
+            )
+            DiscoveryItem.LatestComment.id -> ClientAPI.request(
+                route = API.User.Topic.GetLatestComments,
+                data = API.User.Topic.GetLatestComments.Request(
                     tid = page.offset,
                     num = page.pageNum
                 )

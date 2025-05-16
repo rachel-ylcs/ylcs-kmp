@@ -89,7 +89,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
             is Data.Success -> {
                 val (tid, pic) = result.data
                 val currentSection = discoveryPart.currentSection
-                if (currentSection == Comment.Section.LATEST || currentSection == section) {
+                if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
                     discoveryPart.page.items.add(0, Topic(
                         tid = tid,
                         uid = profile.uid,
