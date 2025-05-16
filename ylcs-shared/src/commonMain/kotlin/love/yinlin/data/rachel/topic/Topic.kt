@@ -21,6 +21,7 @@ data class Topic(
 	// section: Int [所属板块]
 	val rawSection: Int, // [原始板块]
 	val name: String, // [用户昵称]
+	val score: Double = 0.0
 ) {
 	val picPath: String by lazy { pic?.let { picPath(it) } ?: "" }
 

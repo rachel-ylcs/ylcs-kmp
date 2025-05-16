@@ -32,11 +32,11 @@ import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.PaginationArgs
 
 @Stable
 @Serializable
@@ -66,17 +66,10 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     private var currentPage by mutableIntStateOf(0)
     val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
 
-    @Stable
-    class DiscoveryPagination : Pagination<Topic, Int>(Int.MAX_VALUE) {
-        var section = Comment.Section.LATEST
-        override fun offset(item: Topic): Int = when (section) {
-            DiscoveryItem.Latest.id -> item.tid
-            DiscoveryItem.Hot.id -> item.coinNum
-            else -> item.tid
-        }
+    val page = object : PaginationArgs<Topic, Int, Double>(Int.MAX_VALUE, Double.MAX_VALUE) {
+        override fun offset(item: Topic): Int = item.tid
+        override fun arg1(item: Topic): Double = item.score
     }
-
-    val page = DiscoveryPagination()
 
     private suspend fun requestNewData() {
         state = BoxState.LOADING
@@ -103,7 +96,6 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
             )
         }
         if (result is Data.Success) {
-            page.section = section
             state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
             listState.scrollToItem(0)
         }
@@ -116,14 +108,15 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
             DiscoveryItem.Latest.id -> ClientAPI.request(
                 route = API.User.Topic.GetLatestTopics,
                 data = API.User.Topic.GetLatestTopics.Request(
-                    offset = page.offset,
+                    tid = page.offset,
                     num = page.pageNum
                 )
             )
             DiscoveryItem.Hot.id -> ClientAPI.request(
                 route = API.User.Topic.GetHotTopics,
                 data = API.User.Topic.GetHotTopics.Request(
-                    offset = page.offset,
+                    score = page.arg1,
+                    tid = page.offset,
                     num = page.pageNum
                 )
             )
@@ -131,15 +124,12 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 route = API.User.Topic.GetSectionTopics,
                 data = API.User.Topic.GetSectionTopics.Request(
                     section = section,
-                    offset = page.offset,
+                    tid = page.offset,
                     num = page.pageNum
                 )
             )
         }
-        if (result is Data.Success) {
-            page.section = section
-            page.moreData(result.data)
-        }
+        if (result is Data.Success) page.moreData(result.data)
     }
 
     private fun onTopicClick(topic: Topic) {

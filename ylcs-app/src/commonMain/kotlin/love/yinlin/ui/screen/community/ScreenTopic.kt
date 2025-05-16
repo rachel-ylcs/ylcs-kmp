@@ -198,20 +198,20 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			data = API.User.Topic.GetTopicComments.Request(
 				tid = topic.tid,
 				rawSection = topic.rawSection,
-				offset = commentPage.offset,
+				cid = commentPage.offset,
 				isTop = commentPage.arg1
 			)
 		)
 		if (result is Data.Success) commentPage.moreData(result.data)
 	}
 
-	private suspend fun requestSubComments(cid: Int, offset: Int, num: Int): List<SubComment>? {
+	private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
 		val result = ClientAPI.request(
 			route = API.User.Topic.GetTopicSubComments,
 			data = API.User.Topic.GetTopicSubComments.Request(
-				cid = cid,
+				pid = pid,
 				rawSection = topic.rawSection,
-				offset = offset,
+				cid = cid,
 				num = num
 			)
 		)
@@ -792,8 +792,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				canLoading = page.canLoading,
 				onLoading = {
 					requestSubComments(
-						cid = comment.cid,
-						offset = page.offset,
+						pid = comment.cid,
+						cid = page.offset,
 						num = page.pageNum
 					)?.let { page.moreData(it) }
 				},
@@ -817,8 +817,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 			LaunchedEffect(Unit) {
 				requestSubComments(
-					cid = comment.cid,
-					offset = page.offset,
+					pid = comment.cid,
+					cid = page.offset,
 					num = page.pageNum
 				)?.let { page.newData(it) }
 			}

@@ -73,7 +73,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			data = API.User.Topic.GetTopics.Request(
 				uid = args.uid,
 				isTop = page.arg1,
-				offset = page.offset,
+				tid = page.offset,
 				num = page.pageNum
 			)
 		)

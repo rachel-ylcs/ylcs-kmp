@@ -18,8 +18,8 @@ data class UserProfile(
 	val coin: Int, // [银币]
 	// playlist: JsonObject [云歌单]
 	// signin: Binary [签到记录]
-	val follows: Int, // [关注数]
-	val followers: Int, // [粉丝数]
+	val follows: Int = 0, // [关注数]
+	val followers: Int = 0, // [粉丝数]
 ) {
 	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
 

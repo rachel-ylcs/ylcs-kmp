@@ -72,7 +72,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 			data = API.User.Mail.GetMails.Request(
 				token = app.config.userToken,
 				isProcessed = page.arg1,
-				offset = page.offset,
+				mid = page.offset,
 				num = page.pageNum
 			)
 		)

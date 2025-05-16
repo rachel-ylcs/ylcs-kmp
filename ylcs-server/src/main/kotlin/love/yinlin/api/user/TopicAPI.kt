@@ -21,7 +21,7 @@ import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.values
 
 fun Routing.topicAPI(implMap: ImplMap) {
-	api(API.User.Topic.GetTopics) { (uid, isTop, offset, num) ->
+	api(API.User.Topic.GetTopics) { (uid, isTop, tid, num) ->
 		VN.throwId(uid)
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
@@ -34,47 +34,46 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			}
             ORDER BY isTop DESC, tid DESC
 			LIMIT ?
-		""", uid, offset, num.coercePageNum)
+		""", uid, tid, num.coercePageNum)
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetLatestTopics) { (offset, num) ->
+	api(API.User.Topic.GetLatestTopics) { (tid, num) ->
 		val topics = DB.throwQuerySQL("""
             SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
             FROM topic
             LEFT JOIN user
             ON topic.uid = user.uid
             WHERE isDeleted = 0 AND tid < ?
-            ORDER BY ts DESC
+            ORDER BY tid DESC
             LIMIT ?
-        """, offset, num.coercePageNum)
+        """, tid, num.coercePageNum)
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetHotTopics) { (offset, num) ->
+	api(API.User.Topic.GetHotTopics) { (score, tid, num) ->
 		val topics = DB.throwQuerySQL("""
-        SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
-        FROM topic
-        LEFT JOIN user
-          ON topic.uid = user.uid
-        WHERE isDeleted = 0
-          AND coinNum < ?
-        ORDER BY score DESC, ts ASC
-        LIMIT ?
-    """, offset, num.coercePageNum)
+			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
+			FROM topic
+			LEFT JOIN user
+			ON topic.uid = user.uid
+			WHERE isDeleted = 0 AND (score < ? OR (score = ? AND tid < ?))
+			ORDER BY score DESC, tid DESC
+			LIMIT ?
+		""", score, score, tid, num.coercePageNum)
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetSectionTopics) { (section, offset, num) ->
+	api(API.User.Topic.GetSectionTopics) { (section, tid, num) ->
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
 			FROM topic
 			LEFT JOIN user
 			ON topic.uid = user.uid
 			WHERE section = ? AND isDeleted = 0 AND tid < ?
-			ORDER BY ts DESC
+			ORDER BY tid DESC
 			LIMIT ?
-		""", section, offset, num.coercePageNum)
+		""", section, tid, num.coercePageNum)
 		Data.Success(topics.to())
 	}
 
@@ -90,7 +89,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetTopicComments) { (tid, rawSection, isTop, offset, num) ->
+	api(API.User.Topic.GetTopicComments) { (tid, rawSection, isTop, cid, num) ->
 		VN.throwId(tid)
 		val tableName = VN.throwSection(rawSection)
 		val comments = DB.throwQuerySQL("""
@@ -104,12 +103,12 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			}
             ORDER BY isTop DESC, cid ASC
 			LIMIT ?
-		""", tid, offset, num.coercePageNum)
+		""", tid, cid, num.coercePageNum)
 		Data.Success(comments.to())
 	}
 
-	api(API.User.Topic.GetTopicSubComments) { (cid, rawSection, offset, num) ->
-		VN.throwId(cid)
+	api(API.User.Topic.GetTopicSubComments) { (pid, rawSection, cid, num) ->
+		VN.throwId(pid)
 		val tableName = VN.throwSection(rawSection)
 		val subComments = DB.throwQuerySQL("""
 			SELECT cid, user.uid, ts, content, name, label, coin
@@ -119,7 +118,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			WHERE pid = ? AND isDeleted = 0 AND cid > ?
 			ORDER BY cid ASC
 			LIMIT ?
-		""", cid, offset, num.coercePageNum)
+		""", pid, cid, num.coercePageNum)
 		Data.Success(subComments.to())
 	}
 

@@ -150,7 +150,7 @@ object API : APINode(null, "") {
 		object Mail : APINode(this, "mail") {
 			object GetMails : APIPost<GetMails.Request, List<love.yinlin.data.rachel.mail.Mail>>(this, "getMails") {
 				@Serializable
-				data class Request(val token: String, val isProcessed: Boolean = false, val offset: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val token: String, val isProcessed: Boolean = false, val mid: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object ProcessMail : APIPostRequest<ProcessMail.Request>(this, "processMail") {
@@ -198,34 +198,34 @@ object API : APINode(null, "") {
 		object Topic : APINode(this, "topic") {
 			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getTopics") {
 				@Serializable
-				data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val uid: Int, val isTop: Boolean = true, val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetLatestTopics : APIPost<GetLatestTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopics") {
 				@Serializable
-				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getHotTopics") {
 				@Serializable
-				data class Request(val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val score: Double = Double.MAX_VALUE, val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetSectionTopics : APIPost<GetSectionTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getSectionTopics") {
 				@Serializable
-				data class Request(val section: Int, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val section: Int, val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetTopicDetails : APIPost<Int, TopicDetails>(this, "getTopicDetails")
 
 			object GetTopicComments : APIPost<GetTopicComments.Request, List<Comment>>(this, "getTopicComments") {
 				@Serializable
-				data class Request(val tid: Int, val rawSection: Int, val isTop: Boolean = true, val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val tid: Int, val rawSection: Int, val isTop: Boolean = true, val cid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetTopicSubComments : APIPost<GetTopicSubComments.Request, List<SubComment>>(this, "getTopicSubComments") {
 				@Serializable
-				data class Request(val cid: Int, val rawSection: Int, val offset: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val pid: Int, val rawSection: Int, val cid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
