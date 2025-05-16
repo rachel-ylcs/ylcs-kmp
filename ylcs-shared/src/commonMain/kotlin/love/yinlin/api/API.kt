@@ -192,10 +192,7 @@ object API : APINode(null, "") {
 				data class Files(val wall: APIFile)
 			}
 
-			object ResetPicture : APIPostRequest<ResetPicture.Request>(this, "resetPicture") {
-				@Serializable
-				data class Request(val token: String)
-			}
+			object ResetPicture : APIPostRequest<String>(this, "resetPicture")
 
 			object Signin : APIPost<String, Signin.Response>(this, "signin") {
 				@Serializable

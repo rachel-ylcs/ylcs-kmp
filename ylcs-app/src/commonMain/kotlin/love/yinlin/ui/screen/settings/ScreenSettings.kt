@@ -162,9 +162,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				)
 				when (result) {
 					is Data.Success -> {
-						app.config.userProfile = profile.copy(
-							signature = text
-						)
+						app.config.userProfile = profile.copy(signature = text)
 					}
 					is Data.Error -> slot.tip.error(result.message)
 				}
@@ -189,6 +187,25 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					mePart.cleanUserToken()
 				}
 				is Data.Error -> slot.tip.error(result.message)
+			}
+		}
+	}
+
+	private suspend fun resetPicture() {
+		val token = app.config.userToken
+		if (token.isNotEmpty()) {
+			if (slot.confirm.openSuspend(content = "重置默认头像与背景墙")) {
+				val result = ClientAPI.request(
+					route = API.User.Profile.ResetPicture,
+					data = token
+				)
+				when (result) {
+					is Data.Success -> {
+						app.config.cacheUserAvatar = KVConfig.UPDATE
+						app.config.cacheUserWall = KVConfig.UPDATE
+					}
+					is Data.Error -> slot.tip.error(result.message)
+				}
 			}
 		}
 	}
@@ -302,6 +319,12 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					title = "修改密码",
 					icon = colorfulImageVector(icon = Icons.Outlined.Password, background = Colors.Orange4),
 					onClick = { passwordModifySheet.open() }
+				)
+				ItemExpanderSuspend(
+					title = "重置默认图片",
+					icon = colorfulImageVector(icon = ExtraIcons.ResetPicture, background = ThemeColor.warning),
+					color = ThemeColor.warning,
+					onClick = { resetPicture() }
 				)
 				ItemExpanderSuspend(
 					title = "退出登录",

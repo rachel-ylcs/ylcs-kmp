@@ -93,7 +93,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.ResetPicture) { (token) ->
+	api(API.User.Profile.ResetPicture) { token ->
 		val uid = AN.throwExpireToken(token)
 		val userPath = ServerRes.Users.User(uid)
 		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
