@@ -83,8 +83,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 )
             )
             DiscoveryItem.LatestComment.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestComments,
-                data = API.User.Topic.GetLatestComments.Request(
+                route = API.User.Topic.GetLatestTopicsByComment,
+                data = API.User.Topic.GetLatestTopicsByComment.Request(
                     num = page.pageNum
                 )
             )
@@ -120,8 +120,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 )
             )
             DiscoveryItem.LatestComment.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestComments,
-                data = API.User.Topic.GetLatestComments.Request(
+                route = API.User.Topic.GetLatestTopicsByComment,
+                data = API.User.Topic.GetLatestTopicsByComment.Request(
                     tid = page.offset,
                     num = page.pageNum
                 )
