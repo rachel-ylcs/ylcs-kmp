@@ -131,7 +131,8 @@ internal fun UserProfileCard(
 	owner: Boolean,
 	shape: Shape = RectangleShape,
 	modifier: Modifier = Modifier,
-	onLevelClick: () -> Unit = {}
+	onLevelClick: () -> Unit = {},
+	onFollowClick: (Int) -> Unit = {}
 ) {
 	Surface(
 		modifier = modifier,
@@ -179,11 +180,13 @@ internal fun UserProfileCard(
 					)
 					PortraitValue(
 						value = profile.follows.toString(),
-						title = "关注"
+						title = "关注",
+						modifier = Modifier.clickableNoRipple { onFollowClick(FollowTabItem.FOLLOWS.ordinal) }
 					)
 					PortraitValue(
 						value = profile.followers.toString(),
-						title = "粉丝"
+						title = "粉丝",
+						modifier = Modifier.clickableNoRipple { onFollowClick(FollowTabItem.FOLLOWERS.ordinal) }
 					)
 				}
 			}

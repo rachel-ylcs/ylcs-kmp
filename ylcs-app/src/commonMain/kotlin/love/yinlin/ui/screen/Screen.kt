@@ -53,4 +53,5 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenTopic, type<Topic>())
     screen(::ScreenMail)
     screen(::ScreenAddTopic)
+    screen(::ScreenFollows)
 }

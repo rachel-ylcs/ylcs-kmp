@@ -71,7 +71,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
     api(API.User.Follows.GetFollowers) { (token, score, fid, num) ->
         val uid1 = AN.throwExpireToken(token)
         val followers = DB.throwQuerySQL("""
-            SELECT fid, uid1 AS uid, name
+            SELECT fid, uid1 AS uid, name, score
             FROM follows
             LEFT JOIN user
             ON follows.uid1 = user.uid

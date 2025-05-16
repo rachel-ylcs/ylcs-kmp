@@ -200,7 +200,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					signinSheet.open(it)
 				} ?: slot.tip.warning("请先登录")
 			}
-			Item("好友", Icons.Filled.Group) { }
 			Item("主题", Icons.AutoMirrored.Filled.Article) {
 				app.config.userProfile?.let {
 					navigate(ScreenUserCard.Args(it.uid))
@@ -298,7 +297,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				modifier = Modifier.fillMaxWidth(),
 				profile = remember(userProfile) { userProfile.publicProfile },
 				owner = true,
-				onLevelClick = { levelSheet.open(userProfile) }
+				onLevelClick = { levelSheet.open(userProfile) },
+				onFollowClick = { navigate(ScreenFollows.Args(it)) }
 			)
 			ToolContainer(modifier = Modifier.fillMaxWidth())
 			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
@@ -318,7 +318,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				owner = true,
 				shape = MaterialTheme.shapes.large,
 				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
-				onLevelClick = { levelSheet.open(userProfile) }
+				onLevelClick = { levelSheet.open(userProfile) },
+				onFollowClick = { navigate(ScreenFollows.Args(it)) }
 			)
 			Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				ToolContainer(
