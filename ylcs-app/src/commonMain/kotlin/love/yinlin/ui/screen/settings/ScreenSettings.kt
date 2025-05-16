@@ -272,7 +272,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Login, background = ThemeColor.warning),
 					color = ThemeColor.warning,
 					hasDivider = false,
-					onClick = { navigate<ScreenLogin>() }
+					onClick = {
+						pop()
+						navigate<ScreenLogin>()
+					}
 				)
 			}
 			else {
@@ -323,7 +326,6 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				ItemExpanderSuspend(
 					title = "重置默认图片",
 					icon = colorfulImageVector(icon = ExtraIcons.ResetPicture, background = ThemeColor.warning),
-					color = ThemeColor.warning,
 					onClick = { resetPicture() }
 				)
 				ItemExpanderSuspend(
