@@ -1,18 +1,39 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.Local
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
+import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
+import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
-import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.extension.DateEx
+import love.yinlin.platform.app
+import love.yinlin.ui.component.container.TabBar
+import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationArgs
+import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
@@ -29,27 +50,209 @@ enum class FollowTabItem(val title: String) {
 }
 
 @Stable
+@Serializable
+private data class FollowItem(val fid: Long, val uid: Int, val name: String) {
+    val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+}
+
+@Composable
+private fun FollowItemLayout(
+    item: FollowItem,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+    ) {
+        WebImage(
+            uri = item.avatarPath,
+            key = DateEx.TodayString,
+            contentScale = ContentScale.Crop,
+            circle = true,
+            modifier = Modifier.size(ThemeValue.Size.ExtraIcon)
+        )
+        Text(
+            text = item.name,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Stable
 class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>(model) {
     @Stable
     @Serializable
     data class Args(val tab: Int)
 
-    private val tab by mutableStateOf(FollowTabItem.fromInt(args.tab))
+    private var tab by mutableStateOf(FollowTabItem.fromInt(args.tab))
+    private val gridState = LazyGridState()
 
-    val pageFollows = object : PaginationArgs<FollowInfo, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollows = object : PaginationArgs<FollowInfo, Int, Long>(Int.MAX_VALUE, 0L) {
         override fun offset(item: FollowInfo): Int = item.score
         override fun arg1(item: FollowInfo): Long = item.fid
     }
 
-    val pageFollowers = object : PaginationArgs<FollowerInfo, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollowers = object : PaginationArgs<FollowerInfo, Int, Long>(Int.MAX_VALUE, 0L) {
         override fun offset(item: FollowerInfo): Int = item.score
         override fun arg1(item: FollowerInfo): Long = item.fid
+    }
+
+    private val pageBlockUsers = object : Pagination<BlockedUserInfo, Long>(0L) {
+        override fun offset(item: BlockedUserInfo): Long = item.fid
+    }
+
+    private val items by derivedStateOf {
+        when (tab) {
+            FollowTabItem.FOLLOWS -> pageFollows.items.map { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.FOLLOWERS -> pageFollowers.items.map { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.BLOCK_USERS -> pageBlockUsers.items.map { FollowItem(it.fid, it.uid, it.name) }
+        }
+    }
+
+    private val page by derivedStateOf {
+        when (tab) {
+            FollowTabItem.FOLLOWS -> pageFollows
+            FollowTabItem.FOLLOWERS -> pageFollowers
+            FollowTabItem.BLOCK_USERS -> pageBlockUsers
+        }
+    }
+
+    private suspend fun requestNewData() {
+        when (tab) {
+            FollowTabItem.FOLLOWS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetFollows,
+                    data = API.User.Follows.GetFollows.Request(
+                        token = app.config.userToken,
+                        num = pageFollows.pageNum
+                    )
+                )
+                when (result) {
+                    is Data.Success -> pageFollows.newData(result.data)
+                    is Data.Error -> slot.tip.error(result.message)
+                }
+            }
+            FollowTabItem.FOLLOWERS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetFollowers,
+                    data = API.User.Follows.GetFollowers.Request(
+                        token = app.config.userToken,
+                        num = pageFollowers.pageNum
+                    )
+                )
+                when (result) {
+                    is Data.Success -> pageFollowers.newData(result.data)
+                    is Data.Error -> slot.tip.error(result.message)
+                }
+            }
+            FollowTabItem.BLOCK_USERS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetBlockedUsers,
+                    data = API.User.Follows.GetBlockedUsers.Request(
+                        token = app.config.userToken,
+                        num = pageBlockUsers.pageNum
+                    )
+                )
+                when (result) {
+                    is Data.Success -> pageBlockUsers.newData(result.data)
+                    is Data.Error -> slot.tip.error(result.message)
+                }
+            }
+        }
+        gridState.scrollToItem(0)
+    }
+
+    private suspend fun requestMoreData() {
+        when (tab) {
+            FollowTabItem.FOLLOWS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetFollows,
+                    data = API.User.Follows.GetFollows.Request(
+                        token = app.config.userToken,
+                        score = pageFollows.offset,
+                        fid = pageFollows.arg1,
+                        num = pageFollows.pageNum
+                    )
+                )
+                if (result is Data.Success) pageFollows.moreData(result.data)
+            }
+            FollowTabItem.FOLLOWERS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetFollowers,
+                    data = API.User.Follows.GetFollowers.Request(
+                        token = app.config.userToken,
+                        score = pageFollowers.offset,
+                        fid = pageFollowers.arg1,
+                        num = pageFollowers.pageNum
+                    )
+                )
+                if (result is Data.Success) pageFollowers.moreData(result.data)
+            }
+            FollowTabItem.BLOCK_USERS -> {
+                val result = ClientAPI.request(
+                    route = API.User.Follows.GetBlockedUsers,
+                    data = API.User.Follows.GetBlockedUsers.Request(
+                        token = app.config.userToken,
+                        fid = pageBlockUsers.offset,
+                        num = pageBlockUsers.pageNum
+                    )
+                )
+                if (result is Data.Success) pageBlockUsers.moreData(result.data)
+            }
+        }
     }
 
     override val title: String? by derivedStateOf { tab.title }
 
     @Composable
-    override fun SubContent(device: Device) {
+    override fun ActionScope.RightActions() {
+        ActionSuspend(Icons.Outlined.Refresh) { requestNewData() }
+    }
 
+    override suspend fun initialize() {
+        requestNewData()
+    }
+
+    @Composable
+    override fun SubContent(device: Device) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shadowElevation = ThemeValue.Shadow.Surface
+            ) {
+                TabBar(
+                    currentPage = tab.ordinal,
+                    onNavigate = {
+                        tab = FollowTabItem.fromInt(it)
+                        launch { if (items.isEmpty()) requestNewData() }
+                    },
+                    items = remember { FollowTabItem.entries.map { it.title } },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                if (items.isEmpty()) EmptyBox()
+                else PaginationGrid(
+                    items = items,
+                    key = { it.fid },
+                    columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                    state = gridState,
+                    canRefresh = true,
+                    canLoading = page.canLoading,
+                    onRefresh = { requestNewData() },
+                    onLoading = { requestMoreData() },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    FollowItemLayout(
+                        item = it,
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { navigate(ScreenUserCard.Args(it.uid)) }
+                    )
+                }
+            }
+        }
     }
 }
