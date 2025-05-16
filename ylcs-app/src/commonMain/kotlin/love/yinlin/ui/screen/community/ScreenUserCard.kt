@@ -240,12 +240,6 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	@Composable
 	private fun Portrait(profile: UserPublicProfile) {
 		if (profile.status.canShowTopics) {
-			UserProfileCardLayout(
-				profile = profile,
-				modifier = Modifier.fillMaxWidth()
-			)
-		}
-		else {
 			PaginationStaggeredGrid(
 				items = page.items,
 				key = { it.tid },
@@ -269,6 +263,12 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
 				)
 			}
+		}
+		else {
+			UserProfileCardLayout(
+				profile = profile,
+				modifier = Modifier.fillMaxWidth()
+			)
 		}
 	}
 
