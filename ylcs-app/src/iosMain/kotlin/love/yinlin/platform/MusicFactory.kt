@@ -242,7 +242,7 @@ class ActualMusicFactory : MusicFactory() {
             val asset = AVURLAsset.URLAssetWithURL(url, mapOf(
                 // https://stackoverflow.com/questions/9290972
                 "AVURLAssetOutOfBandMIMETypeKey" to "audio/flac",
-                AVURLAssetPreferPreciseDurationAndTimingKey to 1
+                AVURLAssetPreferPreciseDurationAndTimingKey to true
             ))
             AVPlayerItem.playerItemWithAsset(asset).let {
                 it.addObserver(playerObserver, "status", NSKeyValueObservingOptionNew, null)
@@ -291,8 +291,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     private fun setupNowPlayingInfoCenter() {
-        // 加上下面这行才能后台播放，否则后台切歌的时候会被suspend
-        UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
+        Coroutines.startMain {
+            // 加上下面这行才能后台播放，否则后台切歌的时候会被suspend
+            UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
+        }
         val commandCenter = MPRemoteCommandCenter.sharedCommandCenter()
         commandCenter.playCommand.addTargetWithHandler { event ->
             Coroutines.startMain {
