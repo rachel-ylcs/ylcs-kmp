@@ -42,6 +42,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
             """, uid1, uid2, uid1, uid2)
             "关注成功".successData
         }
+        else if (relationship1 == true) "已被拉黑".failedData
         else "已关注对方".failedData
     }
 
