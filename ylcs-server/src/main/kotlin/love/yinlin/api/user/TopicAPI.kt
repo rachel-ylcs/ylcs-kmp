@@ -58,8 +58,6 @@ fun Routing.topicAPI(implMap: ImplMap) {
       	-- 这里的做法是：先把五张表合并，再过滤 tid < 传入的maxtid，按 ts 倒序取 coercePageNum 数量
       	SELECT tid
       	FROM (
-       		 SELECT tid, ts FROM comment
-        	 UNION ALL
         	 SELECT tid, ts FROM comment_activity
         	 UNION ALL
         	 SELECT tid, ts FROM comment_discussion
