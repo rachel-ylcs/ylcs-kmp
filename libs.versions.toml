@@ -76,7 +76,6 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }

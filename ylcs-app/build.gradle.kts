@@ -184,7 +184,6 @@ kotlin {
             dependsOn(nonWasmJsMain)
             dependencies {
                 implementation(libs.ktor.okhttp)
-                implementation(libs.ktor.java)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar"))))
             }
