@@ -205,6 +205,20 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
         }
     }
 
+    private suspend fun unBlockUser(item: FollowItem) {
+        val result = ClientAPI.request(
+            route = API.User.Follows.UnblockUser,
+            data = API.User.Follows.UnblockUser.Request(
+                token = app.config.userToken,
+                uid = item.uid
+            )
+        )
+        when (result) {
+            is Data.Success -> pageBlockUsers.items.removeAll { it.fid == item.fid }
+            is Data.Error -> slot.tip.error(result.message)
+        }
+    }
+
     override val title: String? by derivedStateOf { tab.title }
 
     @Composable
@@ -249,7 +263,14 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     FollowItemLayout(
                         item = it,
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navigate(ScreenUserCard.Args(it.uid)) }
+                        onClick = {
+                            if (tab != FollowTabItem.BLOCK_USERS) navigate(ScreenUserCard.Args(it.uid))
+                            else {
+                                launch {
+                                    if (slot.confirm.openSuspend(content = "取消拉黑")) unBlockUser(it)
+                                }
+                            }
+                        }
                     )
                 }
             }

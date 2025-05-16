@@ -384,7 +384,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					color = MaterialTheme.colorScheme.primary
 				)
 				Text(
-					text = "扫我添加好友",
+					text = "关注我",
 					style = MaterialTheme.typography.bodyLarge
 				)
 

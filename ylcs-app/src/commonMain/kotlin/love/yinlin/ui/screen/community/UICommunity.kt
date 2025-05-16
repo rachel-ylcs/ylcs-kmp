@@ -2,17 +2,7 @@ package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +27,9 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
-import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.node.clickableNoRipple
 
 @Composable
@@ -132,7 +122,8 @@ internal fun UserProfileCard(
 	shape: Shape = RectangleShape,
 	modifier: Modifier = Modifier,
 	onLevelClick: () -> Unit = {},
-	onFollowClick: (Int) -> Unit = {}
+	onFollowClick: (Int) -> Unit = {},
+	content: @Composable (RowScope.(() -> Unit) -> Unit) = {}
 ) {
 	Surface(
 		modifier = modifier,
@@ -153,7 +144,8 @@ internal fun UserProfileCard(
 					profile = profile,
 					owner = owner,
 					modifier = Modifier.fillMaxWidth(),
-					onLevelClick = onLevelClick
+					onLevelClick = onLevelClick,
+					content = content
 				)
 				SelectionContainer {
 					Text(

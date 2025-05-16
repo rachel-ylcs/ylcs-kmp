@@ -6,6 +6,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Paid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -13,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -24,8 +29,11 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
+import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.platform.app
+import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.EmptyBox
@@ -51,7 +59,10 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	private suspend fun requestUserProfile() {
 		val result = ClientAPI.request(
 			route = API.User.Profile.GetPublicProfile,
-			data = args.uid
+			data = API.User.Profile.GetPublicProfile.Request(
+				token = app.config.userToken.ifEmpty { null },
+				uid = args.uid
+			)
 		)
 		if (result is Data.Success) profile = result.data
 	}
@@ -78,6 +89,48 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		if (result is Data.Success) page.moreData(result.data)
+	}
+
+	private suspend fun followUser(profile: UserPublicProfile) {
+		val result = ClientAPI.request(
+			route = API.User.Follows.FollowUser,
+			data = API.User.Follows.FollowUser.Request(
+				token = app.config.userToken,
+				uid = profile.uid
+			)
+		)
+		when (result) {
+			is Data.Success -> this.profile = profile.copy(status = FollowStatus.FOLLOW)
+			is Data.Error -> slot.tip.error(result.message)
+		}
+	}
+
+	private suspend fun unfollowUser(profile: UserPublicProfile) {
+		val result = ClientAPI.request(
+			route = API.User.Follows.UnfollowUser,
+			data = API.User.Follows.UnfollowUser.Request(
+				token = app.config.userToken,
+				uid = profile.uid
+			)
+		)
+		when (result) {
+			is Data.Success -> this.profile = profile.copy(status = FollowStatus.UNFOLLOW)
+			is Data.Error -> slot.tip.error(result.message)
+		}
+	}
+
+	private suspend fun blockUser(profile: UserPublicProfile) {
+		val result = ClientAPI.request(
+			route = API.User.Follows.BlockUser,
+			data = API.User.Follows.BlockUser.Request(
+				token = app.config.userToken,
+				uid = profile.uid
+			)
+		)
+		when (result) {
+			is Data.Success -> this.profile = profile.copy(status = FollowStatus.BLOCK)
+			is Data.Error -> slot.tip.error(result.message)
+		}
 	}
 
 	private fun onTopicClick(topic: Topic) {
@@ -147,43 +200,52 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	}
 
 	@Composable
-	private fun Portrait(profile: UserPublicProfile) {
-		PaginationStaggeredGrid(
-			items = page.items,
-			key = { it.tid },
-			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
-			state = listState,
-			canRefresh = false,
-			canLoading = page.canLoading,
-			onLoading = { requestMoreTopics() },
-			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-			verticalItemSpacing = ThemeValue.Padding.EqualSpace,
-			header = {
-				UserProfileCard(
-					modifier = Modifier.fillMaxWidth(),
-					profile = profile,
-					owner = false
-				)
+	private fun UserProfileCardLayout(
+		profile: UserPublicProfile,
+		shape: Shape = RectangleShape,
+		modifier: Modifier = Modifier
+	) {
+		UserProfileCard(
+			profile = profile,
+			owner = false,
+			shape = shape,
+			modifier = modifier
+		) {
+			Row(
+				horizontalArrangement = Arrangement.End,
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				val status = profile.status
+				when (val isFollowed = status.isFollowed) {
+					null -> {}
+					else -> LoadingIcon(
+						icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+						color = MaterialTheme.colorScheme.primary,
+						onClick = { if (isFollowed) unfollowUser(profile) else followUser(profile) }
+					)
+				}
+				if (status.canBlock) {
+					LoadingIcon(
+						icon = Icons.Filled.Block,
+						color = MaterialTheme.colorScheme.error,
+						onClick = {
+							if (slot.confirm.openSuspend(content = "拉黑对方")) blockUser(profile)
+						}
+					)
+				}
 			}
-		) {  topic ->
-			TopicCard(
-				topic = topic,
-				cardWidth = ThemeValue.Size.CellWidth,
-				modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
-			)
 		}
 	}
 
 	@Composable
-	private fun Landscape(profile: UserPublicProfile) {
-		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-			UserProfileCard(
+	private fun Portrait(profile: UserPublicProfile) {
+		if (profile.status.canShowTopics) {
+			UserProfileCardLayout(
 				profile = profile,
-				owner = false,
-				shape = MaterialTheme.shapes.large,
-				modifier = Modifier.width(ThemeValue.Size.PanelWidth)
-					.padding(ThemeValue.Padding.EqualExtraValue)
+				modifier = Modifier.fillMaxWidth()
 			)
+		}
+		else {
 			PaginationStaggeredGrid(
 				items = page.items,
 				key = { it.tid },
@@ -192,16 +254,52 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				canRefresh = false,
 				canLoading = page.canLoading,
 				onLoading = { requestMoreTopics() },
-				modifier = Modifier.weight(1f).fillMaxHeight(),
-				contentPadding = ThemeValue.Padding.EqualValue,
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-				verticalItemSpacing = ThemeValue.Padding.EqualSpace
+				modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+				verticalItemSpacing = ThemeValue.Padding.EqualSpace,
+				header = {
+					UserProfileCardLayout(
+						profile = profile,
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
 			) {  topic ->
 				TopicCard(
 					topic = topic,
 					cardWidth = ThemeValue.Size.CellWidth,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
 				)
+			}
+		}
+	}
+
+	@Composable
+	private fun Landscape(profile: UserPublicProfile) {
+		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+			UserProfileCardLayout(
+				profile = profile,
+				shape = MaterialTheme.shapes.large,
+				modifier = Modifier.width(ThemeValue.Size.PanelWidth).padding(ThemeValue.Padding.EqualExtraValue)
+			)
+			if (profile.status.canShowTopics) {
+				PaginationStaggeredGrid(
+					items = page.items,
+					key = { it.tid },
+					columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+					state = listState,
+					canRefresh = false,
+					canLoading = page.canLoading,
+					onLoading = { requestMoreTopics() },
+					modifier = Modifier.weight(1f).fillMaxHeight(),
+					contentPadding = ThemeValue.Padding.EqualValue,
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+					verticalItemSpacing = ThemeValue.Padding.EqualSpace
+				) {  topic ->
+					TopicCard(
+						topic = topic,
+						cardWidth = ThemeValue.Size.CellWidth,
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
 			}
 		}
 	}

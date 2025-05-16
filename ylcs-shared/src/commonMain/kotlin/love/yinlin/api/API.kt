@@ -167,7 +167,10 @@ object API : APINode(null, "") {
 		object Profile : APINode(this, "profile") {
 			object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
 
-			object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
+			object GetPublicProfile : APIPost<GetPublicProfile.Request, UserPublicProfile>(this, "getPublicProfile") {
+				@Serializable
+				data class Request(val token: String?, val uid: Int)
+			}
 
 			object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
 				@Serializable

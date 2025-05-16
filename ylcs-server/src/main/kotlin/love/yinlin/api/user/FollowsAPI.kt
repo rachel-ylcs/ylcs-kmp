@@ -9,49 +9,58 @@ import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.extension.Boolean
+import love.yinlin.extension.Int
 import love.yinlin.extension.Long
+import love.yinlin.extension.Object
 import love.yinlin.extension.to
 import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.values
 
+fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
+    val follow = querySQL("""
+            SELECT uid1, isBlocked FROM follows WHERE (uid1 = ? AND uid2 = ?) OR (uid1 = ? AND uid2 = ?)
+        """, uid1, uid2, uid2, uid1)?.map { it.Object } ?: emptyList()
+    val relationship1 = follow.find { it["uid1"].Int == uid1 }?.get("isBlocked")?.Boolean
+    val relationship2 = follow.find { it["uid1"].Int == uid2 }?.get("isBlocked")?.Boolean
+    return relationship1 to relationship2
+}
+
 fun Routing.followsAPI(implMap: ImplMap) {
     api(API.User.Follows.FollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能关注自己哦".failedData
-        val follow = DB.querySQLSingle("SELECT isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
-        // 拉黑对方并不影响自己关注 Ta
-        if (follow == null) DB.throwTransaction {
+        val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
+        if (relationship1 == null && relationship2 != true) DB.throwTransaction {
             it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
             it.throwExecuteSQL("""
-                    UPDATE user
-                    SET
-                        follows = CASE WHEN uid = ? THEN follows + 1 ELSE follows END,
-                        followers = CASE WHEN uid = ? THEN followers + 1 ELSE followers END
-                    WHERE uid IN (?, ?)
-                """, uid1, uid2, uid1, uid2)
+                UPDATE user
+                SET
+                    follows = CASE WHEN uid = ? THEN follows + 1 ELSE follows END,
+                    followers = CASE WHEN uid = ? THEN followers + 1 ELSE followers END
+                WHERE uid IN (?, ?)
+            """, uid1, uid2, uid1, uid2)
             "关注成功".successData
         }
-        else if (follow["isBlocked"].Boolean) "已被对方拉黑".failedData
         else "已关注对方".failedData
     }
 
     api(API.User.Follows.UnfollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能关注自己哦".failedData
-        val follow = DB.querySQLSingle("SELECT fid FROM follows WHERE uid1 = ? AND uid2 = ? AND isBlocked = 0", uid1, uid2)
-        if (follow == null) "未关注对方".failedData
-        else DB.throwTransaction {
-            it.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
+        val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
+        if (relationship1 == false && relationship2 != true) DB.throwTransaction {
+            it.throwExecuteSQL("DELETE FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
             it.throwExecuteSQL("""
-                    UPDATE user
-                    SET
-                        follows = CASE WHEN uid = ? THEN GREATEST(0, follows - 1) ELSE follows END,
-                        followers = CASE WHEN uid = ? THEN GREATEST(0, followers - 1) ELSE followers END
-                    WHERE uid IN (?, ?)
-                """, uid1, uid2, uid1, uid2)
+                UPDATE user
+                SET
+                    follows = CASE WHEN uid = ? THEN GREATEST(0, follows - 1) ELSE follows END,
+                    followers = CASE WHEN uid = ? THEN GREATEST(0, followers - 1) ELSE followers END
+                WHERE uid IN (?, ?)
+            """, uid1, uid2, uid1, uid2)
             "取消关注成功".successData
         }
+        else "未关注对方".failedData
     }
 
     api(API.User.Follows.GetFollows) { (token, score, fid, num) ->

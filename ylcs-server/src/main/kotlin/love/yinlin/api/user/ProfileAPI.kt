@@ -11,9 +11,16 @@ import love.yinlin.api.successData
 import love.yinlin.copy
 import love.yinlin.currentTS
 import love.yinlin.data.Data
+import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.extension.Boolean
+import love.yinlin.extension.Int
 import love.yinlin.extension.JsonConverter
+import love.yinlin.extension.Object
+import love.yinlin.extension.String
+import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
+import love.yinlin.extension.toJson
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -32,12 +39,26 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		Data.Success(user.to())
 	}
 
-	api(API.User.Profile.GetPublicProfile) { uid ->
-		VN.throwId(uid)
+	api(API.User.Profile.GetPublicProfile) { (token, uid2) ->
+		VN.throwId(uid2)
+		val uid1 = token?.let { AN.throwExpireToken(it) }
 		val user = DB.throwQuerySQLSingle("""
 			SELECT uid, name, signature, label, coin, follows, followers FROM user WHERE uid = ?
-		""", uid)
-		Data.Success(user.to())
+		""", uid2)
+		val status = if (uid1 == null) FollowStatus.UNAUTHORIZE else {
+			val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
+			if (relationship2 != true) when (relationship1) {
+				null -> FollowStatus.UNFOLLOW
+				true -> FollowStatus.BLOCKED
+				false -> FollowStatus.FOLLOW
+			}
+			else if (relationship1 == true) FollowStatus.BIDIRECTIONAL_BLOCK
+			else FollowStatus.BLOCK
+		}
+		Data.Success(makeObject {
+			merge(user)
+			"status" with status.toJson()
+		}.to())
 	}
 
 	api(API.User.Profile.UpdateName) { (token, name) ->
