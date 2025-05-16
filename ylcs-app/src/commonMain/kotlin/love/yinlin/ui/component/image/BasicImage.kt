@@ -76,10 +76,14 @@ fun colorfulImageVector(
 @Composable
 fun ColorfulIcon(
 	icon: ColorfulImageVector,
-	size: Dp = ThemeValue.Size.Icon
+	size: Dp = ThemeValue.Size.Icon,
+	onClick: (() -> Unit)? = null
 ) {
 	Box(
-		modifier = Modifier.clip(CircleShape).background(icon.background.copy(alpha = 0.6f)),
+		modifier = Modifier
+			.clip(CircleShape)
+			.condition(onClick != null) { clickable { onClick?.invoke() } }
+			.background(icon.background.copy(alpha = 0.6f)),
 		contentAlignment = Alignment.Center
 	) {
 		Icon(

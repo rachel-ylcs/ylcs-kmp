@@ -420,7 +420,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			QrcodeScanner(
 				modifier = Modifier.fillMaxWidth(),
 				onResult = { result ->
-					scanSheet.close()
 					try {
 						val uri = Uri.parse(result)!!
 						if (uri.scheme == Scheme.Rachel) deeplink(uri)
@@ -428,6 +427,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					catch (_: Throwable) {
 						slot.tip.warning("不能识别此信息")
 					}
+					scanSheet.close()
 				}
 			)
 		}

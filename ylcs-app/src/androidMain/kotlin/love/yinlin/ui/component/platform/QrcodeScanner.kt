@@ -1,10 +1,15 @@
 package love.yinlin.ui.component.platform
 
+import android.graphics.BitmapFactory
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
+import androidx.compose.material.icons.outlined.FlashOff
+import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -13,9 +18,20 @@ import com.king.view.viewfinderview.ViewfinderView
 import com.king.zxing.DecodeConfig
 import com.king.zxing.DecodeFormatManager
 import com.king.zxing.analyze.QRCodeAnalyzer
+import com.king.zxing.util.CodeUtils
+import kotlinx.coroutines.launch
+import kotlinx.io.asInputStream
+import love.yinlin.common.Colors
+import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberFalse
+import love.yinlin.extension.rememberState
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.Picker
 import love.yinlin.platform.appNative
 import love.yinlin.ui.CustomUI
-import java.util.UUID
+import love.yinlin.ui.component.image.ColorfulIcon
+import love.yinlin.ui.component.image.colorfulImageVector
+import java.util.*
 
 @Stable
 private class QrCodeScannerState {
@@ -29,6 +45,7 @@ actual fun QrcodeScanner(
     modifier: Modifier,
     onResult: (String) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
     val state = remember { QrCodeScannerState() }
 
@@ -76,5 +93,51 @@ actual fun QrcodeScanner(
                 view
             }
         )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(ThemeValue.Padding.VerticalExtraSpace * 4)
+                .zIndex(3f),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ColorfulIcon(
+                icon = colorfulImageVector(
+                    icon = Icons.Outlined.AddPhotoAlternate,
+                    color = Colors.White,
+                    background = Colors.Dark
+                ),
+                size = ThemeValue.Size.ExtraIcon,
+                onClick = {
+                    scope.launch {
+                        Coroutines.io {
+                            Picker.pickPicture()?.use { picture ->
+                                val bitmap = BitmapFactory.decodeStream(picture.asInputStream())
+                                val text = CodeUtils.parseQRCode(bitmap)
+                                bitmap.recycle()
+                                if (text != null) Coroutines.main { onResult(text) }
+                            }
+                        }
+                    }
+                }
+            )
+
+            var flashEnabled by rememberState { state.cameraScan?.isTorchEnabled == true }
+            ColorfulIcon(
+                icon = colorfulImageVector(
+                    icon = if (flashEnabled) Icons.Outlined.FlashOn else Icons.Outlined.FlashOff,
+                    color = Colors.White,
+                    background = Colors.Dark
+                ),
+                size = ThemeValue.Size.ExtraIcon,
+                onClick = {
+                    state.cameraScan?.let { cameraScan ->
+                        if (cameraScan.isTorchEnabled) cameraScan.enableTorch(false)
+                        else cameraScan.enableTorch(true)
+                        flashEnabled = cameraScan.isTorchEnabled
+                    }
+                }
+            )
+        }
     }
 }
