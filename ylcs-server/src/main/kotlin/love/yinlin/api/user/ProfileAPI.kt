@@ -95,6 +95,22 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		"更新成功".successData
 	}
 
+	api(API.User.Profile.ResetWall) { (token) ->
+		val uid = AN.throwExpireToken(token)
+		val userPath=ServerRes.Users.User(uid)
+		ServerRes.Assets.DefaultWall.copy(userPath.wall)
+		// 恢复默认背景
+		"恢复默认背景".successData
+	}
+
+	api(API.User.Profile.ResetAvatar) { (token) ->
+		val uid = AN.throwExpireToken(token)
+		val userPath=ServerRes.Users.User(uid)
+		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
+		// 恢复默认头像
+		"恢复默认头像".successData
+	}
+
 	api(API.User.Profile.Signin) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "signin")

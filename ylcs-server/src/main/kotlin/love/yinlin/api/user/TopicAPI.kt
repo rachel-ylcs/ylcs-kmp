@@ -51,6 +51,45 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
+	api(API.User.Topic.GetLatestComments) { (tid, num) ->
+		val topics = DB.throwQuerySQL(
+			"""
+    	WITH latest_tids AS (
+      	-- 这里的做法是：先把五张表合并，再过滤 tid < 传入的maxtid，按 ts 倒序取 coercePageNum 数量
+      	SELECT tid
+      	FROM (
+       		 SELECT tid, ts FROM comment
+        	 UNION ALL
+        	 SELECT tid, ts FROM comment_activity
+        	 UNION ALL
+        	 SELECT tid, ts FROM comment_discussion
+        	 UNION ALL
+        	 SELECT tid, ts FROM comment_notification
+        	 UNION ALL
+        	 SELECT tid, ts FROM comment_water
+      		) AS all_comments
+        WHERE tid < ?
+        ORDER BY ts DESC
+        LIMIT ? )
+    	SELECT
+      		t.tid,
+      		u.uid,
+      		t.title,
+      		t.pics->>'$[0]' AS pic,
+      		t.isTop,
+      		t.coinNum,
+      		t.commentNum,
+      		t.rawSection,
+      		u.name
+    	FROM latest_tids lt
+    	JOIN topic t    ON t.tid = lt.tid
+    		LEFT JOIN user u ON t.uid = u.uid
+    	WHERE t.isDeleted = 0
+    	ORDER BY t.tid DESC
+""", tid, num.coercePageNum)
+		Data.Success(topics.to())
+	}
+
 	api(API.User.Topic.GetHotTopics) { (score, tid, num) ->
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score

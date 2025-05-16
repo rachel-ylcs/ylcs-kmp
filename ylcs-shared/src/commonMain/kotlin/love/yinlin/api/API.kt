@@ -187,6 +187,16 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val signature: String)
 			}
 
+			object ResetWall : APIPostRequest<ResetWall.Request>(this, "resetWall") {
+				@Serializable
+				data class Request(val token: String)
+			}
+
+			object ResetAvatar : APIPostRequest<ResetAvatar.Request>(this, "resetAvatar") {
+				@Serializable
+				data class Request(val token: String)
+			}
+
 			object UpdateWall : APIFormRequest<String, UpdateWall.Files>(this, "updateWall") {
 				@Serializable
 				data class Files(val wall: APIFile)
@@ -207,7 +217,11 @@ object API : APINode(null, "") {
 			object GetLatestTopics : APIPost<GetLatestTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopics") {
 				@Serializable
 				data class Request(val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
-			}
+			}//这是根据主题的创建时间判断最新
+			object GetLatestComments : APIPost<GetLatestComments.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopicsByComment") {
+				@Serializable
+				data class Request(val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+			} //这是根据所有回复的时间判断最新
 
 			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getHotTopics") {
 				@Serializable
