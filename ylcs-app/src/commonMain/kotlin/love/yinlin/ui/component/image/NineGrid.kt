@@ -25,7 +25,7 @@ fun NineGrid(
 	if (size == 1) {
 		val pic = pics[0]
 		Box(
-			modifier = modifier.height(ThemeValue.Size.ExtraLargeImage),
+			modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraLargeImage else ThemeValue.Size.CardWidth),
 			contentAlignment = Alignment.Center
 		) {
 			WebImage(
