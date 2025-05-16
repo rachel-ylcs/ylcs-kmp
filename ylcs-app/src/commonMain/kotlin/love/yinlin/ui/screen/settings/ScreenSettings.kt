@@ -428,7 +428,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			ItemExpanderSuspend(
 				title = "检查更新",
 				icon = colorfulImageVector(icon = Icons.Outlined.RocketLaunch, background = Colors.Yellow4),
-				text = "3.0.0",
+				text = Local.VERSION_NAME,
 				onClick = { checkUpdate() }
 			)
 
