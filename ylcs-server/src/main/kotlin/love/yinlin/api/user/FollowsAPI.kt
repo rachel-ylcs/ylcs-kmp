@@ -11,6 +11,8 @@ import love.yinlin.data.Data
 import love.yinlin.extension.Boolean
 import love.yinlin.extension.Long
 import love.yinlin.extension.to
+import love.yinlin.throwExecuteSQL
+import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.values
 
 fun Routing.followsAPI(implMap: ImplMap) {
@@ -19,8 +21,15 @@ fun Routing.followsAPI(implMap: ImplMap) {
         if (uid1 == uid2) return@api "不能关注自己哦".failedData
         val follow = DB.querySQLSingle("SELECT isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
         // 拉黑对方并不影响自己关注 Ta
-        if (follow == null) {
-            DB.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
+        if (follow == null) DB.throwTransaction {
+            it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
+            it.throwExecuteSQL("""
+                    UPDATE user
+                    SET
+                        follows = CASE WHEN uid = ? THEN follows + 1 ELSE follows END,
+                        followers = CASE WHEN uid = ? THEN followers + 1 ELSE followers END
+                    WHERE uid IN (?, ?)
+                """, uid1, uid2, uid1, uid2)
             "关注成功".successData
         }
         else if (follow["isBlocked"].Boolean) "已被对方拉黑".failedData
@@ -32,8 +41,15 @@ fun Routing.followsAPI(implMap: ImplMap) {
         if (uid1 == uid2) return@api "不能关注自己哦".failedData
         val follow = DB.querySQLSingle("SELECT fid FROM follows WHERE uid1 = ? AND uid2 = ? AND isBlocked = 0", uid1, uid2)
         if (follow == null) "未关注对方".failedData
-        else {
-            DB.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
+        else DB.throwTransaction {
+            it.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
+            it.throwExecuteSQL("""
+                    UPDATE user
+                    SET
+                        follows = CASE WHEN uid = ? THEN GREATEST(0, follows - 1) ELSE follows END,
+                        followers = CASE WHEN uid = ? THEN GREATEST(0, followers - 1) ELSE followers END
+                    WHERE uid IN (?, ?)
+                """, uid1, uid2, uid1, uid2)
             "取消关注成功".successData
         }
     }
@@ -70,14 +86,25 @@ fun Routing.followsAPI(implMap: ImplMap) {
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能拉黑自己哦".failedData
         val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
-        if (follow == null) DB.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2, isBlocked) ${values(3)}", uid2, uid1, true)
-        else if (!follow["isBlocked"].Boolean) DB.throwExecuteSQL("UPDATE follows SET isBlocked = 1 WHERE fid = ?", follow["fid"].Long)
-        "拉黑成功".successData
+        DB.throwTransaction {
+            if (follow == null) it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2, isBlocked) ${values(3)}", uid2, uid1, true)
+            else if (!follow["isBlocked"].Boolean) {
+                it.throwExecuteSQL("UPDATE follows SET isBlocked = 1 WHERE fid = ?", follow["fid"].Long)
+                it.throwExecuteSQL("""
+                    UPDATE user
+                    SET
+                        follows = CASE WHEN uid = ? THEN GREATEST(0, follows - 1) ELSE follows END,
+                        followers = CASE WHEN uid = ? THEN GREATEST(0, followers - 1) ELSE followers END
+                    WHERE uid IN (?, ?)
+                """, uid2, uid1, uid2, uid1)
+            }
+            "拉黑成功".successData
+        }
     }
 
     api(API.User.Follows.UnblockUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
-        if (uid1 == uid2) return@api "不能拉黑自己哦".failedData
+        VN.throwIf(uid1 == uid2)
         val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
         if (follow != null && follow["isBlocked"].Boolean) DB.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
         "已取消拉黑".successData
