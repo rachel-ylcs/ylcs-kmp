@@ -50,8 +50,8 @@ compose-material3-icons = { module = "org.jetbrains.compose.material:material-ic
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.1" }
-kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.6.0" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.2" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.7.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
 
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-beta01" }
@@ -69,7 +69,7 @@ sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.r
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.2.0" }
 
-tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.1" }
+tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.3" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.0" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.4.3" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
@@ -88,6 +88,7 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
+scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.2.0" }
 
 # Apple
 ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
@@ -109,7 +110,7 @@ ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor"
 ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.15" }
-mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.2.1" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.18" }
+mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.3.0" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "5.3.0-beta1" }
+redis = { module = "redis.clients:jedis", version = "6.0.0" }
