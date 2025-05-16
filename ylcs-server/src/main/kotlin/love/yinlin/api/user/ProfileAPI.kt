@@ -21,7 +21,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 	api(API.User.Profile.GetProfile) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
-            SELECT u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u2.name AS inviterName, follows, followers
+            SELECT u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.follows, u1.followers, u2.name AS inviterName
             FROM user AS u1
             LEFT JOIN user AS u2
             ON u1.inviter = u2.uid

@@ -177,6 +177,14 @@ internal fun UserProfileCard(
 						value = profile.coin.toString(),
 						title = "银币"
 					)
+					PortraitValue(
+						value = profile.follows.toString(),
+						title = "关注"
+					)
+					PortraitValue(
+						value = profile.followers.toString(),
+						title = "粉丝"
+					)
 				}
 			}
 		}
