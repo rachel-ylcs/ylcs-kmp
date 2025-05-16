@@ -16,7 +16,7 @@ mmkv = "2.2.2"
 coroutines = "1.10.2"
 
 # Android
-media3 = "1.6.1"
+media3 = "1.7.0-alpha01"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
