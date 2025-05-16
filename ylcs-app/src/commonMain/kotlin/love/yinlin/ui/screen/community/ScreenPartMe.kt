@@ -374,7 +374,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			) {
 				WebImage(
 					uri = profile.avatarPath,
-					key = app.config.cacheUserWall,
+					key = app.config.cacheUserAvatar,
 					contentScale = ContentScale.Crop,
 					circle = true,
 					modifier = Modifier.size(ThemeValue.Size.LargeImage)
