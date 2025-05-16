@@ -23,6 +23,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
+import love.yinlin.platform.Coroutines
 import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.WebImage
@@ -52,9 +53,11 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		val url = if (preview.isSource) preview.pic.source else preview.pic.image
 		val filename = url.substringAfterLast('/').substringBefore('?')
 		launch {
-			Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
-				val result = downloadDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-				Picker.cleanSave(origin, result)
+			Coroutines.io {
+				Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+					val result = downloadDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+					Picker.cleanSave(origin, result)
+				}
 			}
 		}
 	}

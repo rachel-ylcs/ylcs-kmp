@@ -48,6 +48,7 @@ interface WeiboProcessor {
 	fun onWeiboTopicClick(arg: String)
 	fun onWeiboAtClick(arg: String)
 	fun onWeiboPicClick(pics: List<Picture>, current: Int)
+	fun onWeiboPicsDownload(pics: List<Picture>)
 	fun onWeiboVideoClick(pic: Picture)
 	fun onWeiboVideoDownload(url: String)
 }
@@ -202,19 +203,26 @@ fun WeiboLayout(weibo: Weibo) {
 		Box(modifier = Modifier.fillMaxWidth()) {
 			NineGrid(
 				pics = weibo.pictures,
-				modifier = Modifier.fillMaxWidth().zIndex(1f),
+				modifier = Modifier.fillMaxWidth(),
 				onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
 				onVideoClick = { processor.onWeiboVideoClick(it) }
 			)
-
+		}
+		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+		Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.End,
+			verticalAlignment = Alignment.CenterVertically
+		) {
 			val video = remember(weibo) { weibo.pictures.find { it.isVideo }?.video }
-			if (video != null) {
-				ClickIcon(
-					icon = Icons.Outlined.Download,
-					onClick = { processor.onWeiboVideoDownload(video) },
-					modifier = Modifier.align(Alignment.TopStart).zIndex(2f)
-				)
-			}
+			if (video != null) ClickIcon(
+				icon = Icons.Outlined.Download,
+				onClick = { processor.onWeiboVideoDownload(video) }
+			)
+			else ClickIcon(
+				icon = Icons.Outlined.Download,
+				onClick = { processor.onWeiboPicsDownload(weibo.pictures) }
+			)
 		}
 		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
 	}

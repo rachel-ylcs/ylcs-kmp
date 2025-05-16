@@ -168,6 +168,41 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			navigate(ScreenImagePreview.Args(pics, current))
 		}
 
+		override fun onWeiboPicsDownload(pics: List<Picture>) {
+			OS.ifPlatform(
+				*Platform.Phone,
+				ifTrue = {
+					launch {
+						slot.loading.openSuspend()
+						Coroutines.io {
+							for (pic in pics) {
+								val url = pic.source
+								val filename = url.substringAfterLast('/').substringBefore('?')
+								Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+									val result = sink.use {
+										val result = app.fileClient.safeDownload(
+											url = url,
+											sink = it,
+											isCancel = { false },
+											onGetSize = {},
+											onTick = { _, _ -> }
+										)
+										if (result) Picker.actualSave(filename, origin, sink)
+										result
+									}
+									Picker.cleanSave(origin, result)
+								}
+							}
+						}
+						slot.loading.close()
+					}
+				},
+				ifFalse = {
+					slot.tip.warning(UnsupportedPlatformText)
+				}
+			)
+		}
+
 		override fun onWeiboVideoClick(pic: Picture) {
 			navigate(ScreenVideo.Args(pic.video))
 		}
@@ -175,9 +210,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		override fun onWeiboVideoDownload(url: String) {
 			val filename = url.substringAfterLast('/').substringBefore('?')
 			launch {
-				Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-					val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-					Picker.cleanSave(origin, result)
+				Coroutines.io {
+					Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+						val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+						Picker.cleanSave(origin, result)
+					}
 				}
 			}
 		}
