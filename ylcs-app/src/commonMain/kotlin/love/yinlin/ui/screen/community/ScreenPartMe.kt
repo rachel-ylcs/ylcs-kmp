@@ -65,6 +65,7 @@ import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SheetConfig
@@ -72,9 +73,6 @@ import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.ncgroup.kscan.BarcodeFormats
-import org.ncgroup.kscan.BarcodeResult
-import org.ncgroup.kscan.ScannerView
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
@@ -423,20 +421,16 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 
 		scanSheet.Land {
-			ScannerView(
+			QrcodeScanner(
 				modifier = Modifier.fillMaxWidth(),
-				codeTypes = listOf(BarcodeFormats.FORMAT_QR_CODE),
-				showUi = false,
-				result = {
+				onResult = { result ->
 					scanSheet.close()
-					if (it is BarcodeResult.OnSuccess) {
-						try {
-							val uri = Uri.parse(it.barcode.data)!!
-							if (uri.scheme == Scheme.Rachel) deeplink(uri)
-						}
-						catch (_: Throwable) {
-							slot.tip.warning("不能识别此信息")
-						}
+					try {
+						val uri = Uri.parse(result)!!
+						if (uri.scheme == Scheme.Rachel) deeplink(uri)
+					}
+					catch (_: Throwable) {
+						slot.tip.warning("不能识别此信息")
 					}
 				}
 			)

@@ -147,7 +147,6 @@ kotlin {
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
-                implementation(libs.tool.scan)
                 implementation(libs.tool.qrcode)
             }
         }
