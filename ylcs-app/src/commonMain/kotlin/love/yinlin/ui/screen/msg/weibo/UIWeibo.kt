@@ -188,7 +188,7 @@ fun WeiboLayout(weibo: Weibo) {
 		time = weibo.timeString,
 		location = weibo.location
 	)
-	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 	RichText(
 		text = weibo.text,
 		modifier = Modifier.fillMaxWidth(),
@@ -197,7 +197,7 @@ fun WeiboLayout(weibo: Weibo) {
 		onTopicClick = { processor.onWeiboTopicClick(it) },
 		onAtClick = { processor.onWeiboAtClick(it) }
 	)
-	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 	if (weibo.pictures.isNotEmpty()) {
 		NineGrid(
 			pics = weibo.pictures,
@@ -205,7 +205,7 @@ fun WeiboLayout(weibo: Weibo) {
 			onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
 			onVideoClick = { processor.onWeiboVideoClick(it) }
 		)
-		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.End,
@@ -221,7 +221,7 @@ fun WeiboLayout(weibo: Weibo) {
 				onClick = { processor.onWeiboPicsDownload(weibo.pictures) }
 			)
 		}
-		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 	}
 	WeiboDataBar(
 		like = weibo.likeNum,
