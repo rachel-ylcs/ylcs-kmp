@@ -299,6 +299,11 @@ object ThemeStyle {
 object ThemeValue {
 	@Stable
 	object Size {
+		val Little: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
+		}
 		val MicroIcon: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 18.dp
 			Device.Size.MEDIUM -> 20.dp

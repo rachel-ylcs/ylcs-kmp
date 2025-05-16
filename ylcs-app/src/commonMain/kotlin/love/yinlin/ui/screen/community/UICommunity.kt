@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen.community
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,7 +21,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
+import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
@@ -31,6 +37,7 @@ import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.ui.component.node.clickableNoRipple
+import kotlin.math.max
 
 @Composable
 internal fun BoxText(
@@ -189,7 +196,7 @@ internal fun UserProfileCard(
 @Stable
 data class TipButtonScope(private val equalRowScope: EqualRowScope) {
 	@Composable
-	fun Item(text: String, icon: ImageVector, onClick: () -> Unit) {
+	fun Item(text: String, icon: ImageVector, label: Int = 0, onClick: () -> Unit) {
 		equalRowScope.EqualItem {
 			Column(
 				modifier = Modifier
@@ -199,7 +206,38 @@ data class TipButtonScope(private val equalRowScope: EqualRowScope) {
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				MiniIcon(icon = icon)
+				Box {
+					MiniIcon(
+						icon = icon,
+						modifier = Modifier.zIndex(1f)
+					)
+					if (label > 0) {
+						val labelString = remember(label) { if (label < 10) label.toString() else "+" }
+						Layout(
+							modifier = Modifier.background(color = MaterialTheme.colorScheme.error, shape = CircleShape)
+								.align(Alignment.TopEnd).zIndex(2f),
+							measurePolicy = { measurables, constraints ->
+								val textPlaceable = measurables.first().measure(constraints)
+								val boxSize = max(textPlaceable.width, textPlaceable.height)
+								layout(boxSize, boxSize) {
+									textPlaceable.placeRelative(
+										x = (boxSize - textPlaceable.width) / 2,
+										y = (boxSize - textPlaceable.height) / 2
+									)
+								}
+							},
+							content = {
+								Text(
+									text = labelString,
+									color = MaterialTheme.colorScheme.onError,
+									textAlign = TextAlign.Center,
+									maxLines = 1,
+									overflow = TextOverflow.Clip
+								)
+							}
+						)
+					}
+				}
 				Text(
 					text = text,
 					maxLines = 1,

@@ -32,11 +32,11 @@ fun Switch(
         contentAlignment = Alignment.CenterStart
     ) {
         val offsetX by animateDpAsState(
-            targetValue = if (checked) ThemeValue.Size.SmallImage / 2 else ThemeValue.Padding.LittleSpace,
+            targetValue = if (checked) ThemeValue.Size.SmallImage / 2 else ThemeValue.Size.Little,
             animationSpec = tween(durationMillis = duration),
         )
         Box(modifier = Modifier.offset(x = offsetX)
-            .size(ThemeValue.Size.SmallImage / 2 - ThemeValue.Padding.LittleSpace * 2)
+            .size(ThemeValue.Size.SmallImage / 2 - ThemeValue.Size.Little * 2)
             .clip(RoundedCornerShape(50))
             .background(MaterialTheme.colorScheme.background)
         )

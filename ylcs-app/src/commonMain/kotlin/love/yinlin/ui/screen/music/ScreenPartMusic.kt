@@ -345,7 +345,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						horizontalBias = hotpot / duration.toFloat() * 2 - 1,
 						verticalBias = 0f
 					))
-					.width((ThemeValue.Size.ProgressHeight + ThemeValue.Padding.LittleSpace) * 2)
+					.width((ThemeValue.Size.ProgressHeight + ThemeValue.Size.Little) * 2)
 					.height(ThemeValue.Size.ProgressHeight * 2)
 					.clickableNoRipple {
 						launch {

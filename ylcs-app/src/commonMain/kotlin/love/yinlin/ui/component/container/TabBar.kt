@@ -36,7 +36,7 @@ private fun <T> TabBar(
 			if (currentPage < tabPositions.size) {
 				TabRowDefaults.SecondaryIndicator(
 					modifier = Modifier.tabIndicatorOffset(tabPositions[currentPage]),
-					height = ThemeValue.Padding.LittleSpace,
+					height = ThemeValue.Size.Little,
 					color = MaterialTheme.colorScheme.primary
 				)
 			}
