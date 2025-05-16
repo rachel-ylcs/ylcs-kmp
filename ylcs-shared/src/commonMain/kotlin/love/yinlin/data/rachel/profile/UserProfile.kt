@@ -21,6 +21,7 @@ data class UserProfile(
 	// signin: Binary [签到记录]
 	val follows: Int = 0, // [关注数]
 	val followers: Int = 0, // [粉丝数]
+	val mailNotificationCount: Int = 0, // [未读邮件数]
 ) {
 	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
 

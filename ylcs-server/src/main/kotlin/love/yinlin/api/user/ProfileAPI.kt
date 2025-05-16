@@ -13,11 +13,7 @@ import love.yinlin.currentTS
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
-import love.yinlin.extension.Boolean
-import love.yinlin.extension.Int
 import love.yinlin.extension.JsonConverter
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -28,12 +24,14 @@ fun Routing.profileAPI(implMap: ImplMap) {
 	api(API.User.Profile.GetProfile) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
-            SELECT u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.follows, u1.followers, u2.name AS inviterName
+            SELECT
+				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.follows, u1.followers, u2.name AS inviterName,
+				(SELECT COUNT(*) FROM mail WHERE processed = 0 AND uid = ?) AS mailNotificationCount
             FROM user AS u1
             LEFT JOIN user AS u2
             ON u1.inviter = u2.uid
             WHERE u1.uid = ?
-        """, uid)
+        """, uid, uid)
 		// 更新最后上线时间
 		DB.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", currentTS, uid)
 		Data.Success(user.to())
@@ -95,20 +93,12 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.ResetWall) { (token) ->
+	api(API.User.Profile.ResetPicture) { (token) ->
 		val uid = AN.throwExpireToken(token)
-		val userPath=ServerRes.Users.User(uid)
-		ServerRes.Assets.DefaultWall.copy(userPath.wall)
-		// 恢复默认背景
-		"恢复默认背景".successData
-	}
-
-	api(API.User.Profile.ResetAvatar) { (token) ->
-		val uid = AN.throwExpireToken(token)
-		val userPath=ServerRes.Users.User(uid)
+		val userPath = ServerRes.Users.User(uid)
 		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
-		// 恢复默认头像
-		"恢复默认头像".successData
+		ServerRes.Assets.DefaultWall.copy(userPath.wall)
+		"重置成功".successData
 	}
 
 	api(API.User.Profile.Signin) { token ->

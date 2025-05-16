@@ -203,7 +203,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					navigate(ScreenUserCard.Args(it.uid))
 				} ?: slot.tip.warning("请先登录")
 			}
-			Item("邮箱", Icons.Filled.Mail) {
+			Item(
+				text = "邮箱",
+				icon = Icons.Filled.Mail,
+				label = app.config.userProfile?.mailNotificationCount ?: 0
+			) {
 				app.config.userProfile?.let {
 					navigate<ScreenMail>()
 				} ?: slot.tip.warning("请先登录")

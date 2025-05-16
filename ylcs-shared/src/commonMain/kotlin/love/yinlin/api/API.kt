@@ -187,19 +187,14 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val signature: String)
 			}
 
-			object ResetWall : APIPostRequest<ResetWall.Request>(this, "resetWall") {
-				@Serializable
-				data class Request(val token: String)
-			}
-
-			object ResetAvatar : APIPostRequest<ResetAvatar.Request>(this, "resetAvatar") {
-				@Serializable
-				data class Request(val token: String)
-			}
-
 			object UpdateWall : APIFormRequest<String, UpdateWall.Files>(this, "updateWall") {
 				@Serializable
 				data class Files(val wall: APIFile)
+			}
+
+			object ResetPicture : APIPostRequest<ResetPicture.Request>(this, "resetPicture") {
+				@Serializable
+				data class Request(val token: String)
 			}
 
 			object Signin : APIPost<String, Signin.Response>(this, "signin") {
