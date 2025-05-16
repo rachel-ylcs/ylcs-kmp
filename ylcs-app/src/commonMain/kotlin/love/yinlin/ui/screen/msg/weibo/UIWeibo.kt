@@ -199,16 +199,18 @@ fun WeiboLayout(weibo: Weibo) {
 		onAtClick = { processor.onWeiboAtClick(it) }
 	)
 	Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
-	if (weibo.pictures.isNotEmpty()) {
-		Box(modifier = Modifier.fillMaxWidth()) {
+	Box(modifier = Modifier.fillMaxWidth().heightIn(min = ThemeValue.Size.MicroCellWidth)) {
+		if (weibo.pictures.isNotEmpty()) {
 			NineGrid(
 				pics = weibo.pictures,
 				modifier = Modifier.fillMaxWidth(),
 				onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
 				onVideoClick = { processor.onWeiboVideoClick(it) }
 			)
+			Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
 		}
-		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+	}
+	if (weibo.pictures.isNotEmpty()) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalArrangement = Arrangement.End,
