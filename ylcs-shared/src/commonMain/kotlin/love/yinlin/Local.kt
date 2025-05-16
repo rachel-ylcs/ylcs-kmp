@@ -4,8 +4,8 @@ package love.yinlin
 object Local {
 	const val APP_NAME: String = "ylcs"
 	const val NAME: String = "银临茶舍"
-	const val VERSION: Int = 300
-	const val VERSION_NAME: String = "3.0.0"
+	const val VERSION: Int = 301
+	const val VERSION_NAME: String = "3.0.1"
 
 	// 客户端配置
 	object Client {
