@@ -16,6 +16,7 @@ mmkv = "2.2.2"
 coroutines = "1.10.2"
 
 # Android
+cmp-android = "1.8.1"
 media3 = "1.6.1"
 
 [plugins]
@@ -34,9 +35,9 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 [libraries]
 
 # Tooling
-compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "cmp" }
-compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp" }
+compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "cmp-android" }
+compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp-android" }
 
 # Common
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
@@ -78,7 +79,7 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.0" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.1" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
