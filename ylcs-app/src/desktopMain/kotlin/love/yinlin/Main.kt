@@ -23,7 +23,9 @@ import com.sun.jna.Native
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberTrue
 import love.yinlin.platform.ActualAppContext
+import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -32,6 +34,7 @@ import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
+import java.awt.Rectangle
 
 fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
@@ -92,6 +95,19 @@ fun main() {
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 ) {
                                     state.placement = if (state.placement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
+                                    // See https://github.com/JetBrains/compose-multiplatform/issues/1724
+                                    OS.ifPlatform(Platform.Windows) {
+                                        if (state.placement == WindowPlacement.Maximized) {
+                                            val screenBounds = window.graphicsConfiguration.bounds
+                                            val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
+                                            window.maximizedBounds = Rectangle(
+                                                screenBounds.x + screenInsets.left,
+                                                screenBounds.y + screenInsets.top,
+                                                screenBounds.width - screenInsets.left - screenInsets.right,
+                                                screenBounds.height - screenInsets.top - screenInsets.bottom
+                                            )
+                                        }
+                                    }
                                 }
                                 Action(
                                     icon = Icons.Outlined.Close,
