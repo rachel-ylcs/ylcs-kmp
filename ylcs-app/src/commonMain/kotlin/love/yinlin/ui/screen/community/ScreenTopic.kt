@@ -156,7 +156,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	private var details: TopicDetails? by mutableStateOf(null)
 	private var topic: Topic by mutableStateOf(args.currentTopic)
 
-	private val commentPage = object : PaginationArgs<Comment, Int, Boolean>(0, true) {
+	private val commentPage = object : PaginationArgs<Comment, Int, Int, Boolean>(0, true) {
+		override fun distinctValue(item: Comment): Int = item.cid
 		override fun offset(item: Comment): Int = item.cid
 		override fun arg1(item: Comment): Boolean = item.isTop
 	}
@@ -781,7 +782,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	@Composable
 	override fun Floating() {
 		subCommentSheet.Land { comment ->
-			val page = remember(comment) { object : Pagination<SubComment, Int>(0) {
+			val page = remember(comment) { object : Pagination<SubComment, Int, Int>(0) {
+				override fun distinctValue(item: SubComment): Int = item.cid
 				override fun offset(item: SubComment): Int = item.cid
 			} }
 

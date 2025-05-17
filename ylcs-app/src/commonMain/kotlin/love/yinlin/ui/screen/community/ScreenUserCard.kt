@@ -51,7 +51,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 
 	private val listState = LazyStaggeredGridState()
 
-	private val page = object : PaginationArgs<Topic, Int, Boolean>(Int.MAX_VALUE, true) {
+	private val page = object : PaginationArgs<Topic, Int, Int, Boolean>(Int.MAX_VALUE, true) {
+		override fun distinctValue(item: Topic): Int = item.tid
 		override fun offset(item: Topic): Int = item.tid
 		override fun arg1(item: Topic): Boolean = item.isTop
 	}

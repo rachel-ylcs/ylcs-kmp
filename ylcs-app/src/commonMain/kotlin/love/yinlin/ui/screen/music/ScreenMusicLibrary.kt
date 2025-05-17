@@ -229,7 +229,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     val oldItems = playlist.items
                     val newItems = mutableListOf<String>()
                     for (item in addItems) {
-                        if (!oldItems.contains(item)) newItems += item
+                        if (item !in oldItems) newItems += item
                     }
                     if (newItems.isNotEmpty()) {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)

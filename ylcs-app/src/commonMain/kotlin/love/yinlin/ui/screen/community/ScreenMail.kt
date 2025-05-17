@@ -43,7 +43,8 @@ import love.yinlin.ui.component.text.RichText
 class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	private var state by mutableStateOf(BoxState.EMPTY)
 
-	private val page = object : PaginationArgs<Mail, Long, Boolean>(Long.MAX_VALUE, false) {
+	private val page = object : PaginationArgs<Mail, Long, Long, Boolean>(Long.MAX_VALUE, false) {
+		override fun distinctValue(item: Mail): Long = item.mid
 		override fun offset(item: Mail): Long = item.mid
 		override fun arg1(item: Mail): Boolean = item.processed
 	}

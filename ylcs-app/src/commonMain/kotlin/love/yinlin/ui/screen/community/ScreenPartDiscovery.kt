@@ -67,7 +67,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     private var currentPage by mutableIntStateOf(0)
     val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
 
-    val page = object : PaginationArgs<Topic, Int, Double>(Int.MAX_VALUE, Double.MAX_VALUE) {
+    val page = object : PaginationArgs<Topic, Int, Int, Double>(Int.MAX_VALUE, Double.MAX_VALUE) {
+        override fun distinctValue(item: Topic): Int = item.tid
         override fun offset(item: Topic): Int = item.tid
         override fun arg1(item: Topic): Double = item.score
     }

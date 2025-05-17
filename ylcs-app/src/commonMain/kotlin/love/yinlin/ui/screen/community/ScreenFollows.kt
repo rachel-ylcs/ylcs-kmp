@@ -90,17 +90,20 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
     private var tab by mutableStateOf(FollowTabItem.fromInt(args.tab))
     private val gridState = LazyGridState()
 
-    private val pageFollows = object : PaginationArgs<FollowInfo, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(Int.MAX_VALUE, 0L) {
+        override fun distinctValue(item: FollowInfo): Long = item.fid
         override fun offset(item: FollowInfo): Int = item.score
         override fun arg1(item: FollowInfo): Long = item.fid
     }
 
-    private val pageFollowers = object : PaginationArgs<FollowerInfo, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollowers = object : PaginationArgs<FollowerInfo, Long, Int, Long>(Int.MAX_VALUE, 0L) {
+        override fun distinctValue(item: FollowerInfo): Long = item.fid
         override fun offset(item: FollowerInfo): Int = item.score
         override fun arg1(item: FollowerInfo): Long = item.fid
     }
 
-    private val pageBlockUsers = object : Pagination<BlockedUserInfo, Long>(0L) {
+    private val pageBlockUsers = object : Pagination<BlockedUserInfo, Long, Long>(0L) {
+        override fun distinctValue(item: BlockedUserInfo): Long = item.fid
         override fun offset(item: BlockedUserInfo): Long = item.fid
     }
 

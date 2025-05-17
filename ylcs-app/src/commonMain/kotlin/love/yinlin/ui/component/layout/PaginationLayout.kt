@@ -43,15 +43,16 @@ import kotlin.math.absoluteValue
 
 // 分页数据实现
 @Stable
-abstract class Pagination<E, out T>(
+abstract class Pagination<E, K, out T>(
 	private val default: T,
 	val pageNum: Int = APIConfig.MIN_PAGE_NUM
 ) {
 	val items = mutableStateListOf<E>()
 	var canLoading by mutableStateOf(false)
 
-	private var mOffset: T = default
+	abstract fun distinctValue(item: E): K
 	abstract fun offset(item: E): T
+	private var mOffset: T = default
 	val offset: T get() = mOffset
 
 	open fun processArgs(last: E?) {}
@@ -71,7 +72,8 @@ abstract class Pagination<E, out T>(
 			processArgs(null)
 		}
 		else {
-			items += newItems
+			val existingItems = items.map { distinctValue(it) }.toSet()
+			items += newItems.filter { distinctValue(it) !in existingItems }
 			val last = newItems.lastOrNull()
 			mOffset = last?.let { offset(it) } ?: default
 			processArgs(last)
@@ -82,13 +84,13 @@ abstract class Pagination<E, out T>(
 }
 
 @Stable
-abstract class PaginationArgs<E, out T, out A1>(
+abstract class PaginationArgs<E, K, out T, out A1>(
 	default: T,
 	private val default1: A1,
 	pageNum: Int = APIConfig.MIN_PAGE_NUM
-) : Pagination<E, T>(default, pageNum) {
-	private var mArg1: A1 = default1
+) : Pagination<E, K, T>(default, pageNum) {
 	abstract fun arg1(item: E): A1
+	private var mArg1: A1 = default1
 	val arg1: A1 get() = mArg1
 
 	override fun processArgs(last: E?) {

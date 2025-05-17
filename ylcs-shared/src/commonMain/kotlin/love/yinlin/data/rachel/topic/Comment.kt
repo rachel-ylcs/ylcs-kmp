@@ -39,8 +39,8 @@ data class Comment(
 		)
 
 		fun sectionName(section: Int): String = when (section) {
-			LATEST_TOPIC -> "新主题"
-			LATEST_COMMENT -> "新回复"
+			LATEST_TOPIC -> "最新"
+			LATEST_COMMENT -> "回复"
 			HOT -> "热门"
 			NOTIFICATION -> "公告"
 			WATER -> "水贴"
