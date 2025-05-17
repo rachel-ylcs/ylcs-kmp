@@ -143,34 +143,24 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 			beyondViewportPageCount = TabItem.entries.size,
 			modifier = modifier
 		) {
-			val part = when (it) {
-				TabItem.WORLD.ordinal -> worldPart
-				TabItem.MSG.ordinal -> msgPart
-				TabItem.MUSIC.ordinal -> musicPart
-				TabItem.DISCOVERY.ordinal -> discoveryPart
-				TabItem.ME.ordinal -> mePart
-				else -> null
-			}
-			if (part != null) {
+			parts.getOrNull(it)?.let { part ->
 				Box(modifier = Modifier.fillMaxSize()) {
 					part.Content()
 				}
-			}
-			else EmptyBox()
+			} ?: EmptyBox()
 		}
 
 		LaunchedEffect(pagerState.settledPage) {
-			when (pagerState.settledPage) {
-				TabItem.WORLD.ordinal -> worldPart
-				TabItem.MSG.ordinal -> msgPart
-				TabItem.MUSIC.ordinal -> musicPart
-				TabItem.DISCOVERY.ordinal -> discoveryPart
-				TabItem.ME.ordinal -> mePart
-				else -> null
-			}?.let { part ->
-				part.firstLoad.update(this) {
+			parts.getOrNull(pagerState.settledPage)?.let { part ->
+				part.firstLoad.update {
 					launch { part.initialize() }
 				}
+			}
+		}
+
+		LaunchedEffect(Unit) {
+            parts.getOrNull(pagerState.settledPage)?.let { part ->
+				part.firstLoad.check { part.update() }
 			}
 		}
 	}
@@ -228,14 +218,7 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 
 	@Composable
 	override fun Floating() {
-		when (pagerState.settledPage) {
-			TabItem.WORLD.ordinal -> worldPart
-			TabItem.MSG.ordinal -> msgPart
-			TabItem.MUSIC.ordinal -> musicPart
-			TabItem.DISCOVERY.ordinal -> discoveryPart
-			TabItem.ME.ordinal -> mePart
-			else -> null
-		}?.Floating()
+		parts.getOrNull(pagerState.settledPage)?.Floating()
 
 		with(model.slot) {
 			info.Land()

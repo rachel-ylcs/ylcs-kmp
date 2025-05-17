@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.common.LocalImmersivePadding
@@ -44,15 +46,21 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun pop() = model.pop()
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
+	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) {
+		launch { snapshotFlow(state).collectLatest(action) }
+	}
+
 	val worldPart = model.worldPart
 	val msgPart = model.msgPart
 	val musicPart = model.musicPart
 	val discoveryPart = model.discoveryPart
 	val mePart = model.mePart
+	val parts = model.parts
 
 	val slot = SubScreenSlot(viewModelScope)
 
 	open suspend fun initialize() {}
+	open fun finalize() {}
 
 	@Composable
 	protected abstract fun Content()
@@ -77,6 +85,11 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 				tip.Land()
 			}
 		}
+	}
+
+	final override fun onCleared() {
+		super.onCleared()
+		finalize()
 	}
 }
 

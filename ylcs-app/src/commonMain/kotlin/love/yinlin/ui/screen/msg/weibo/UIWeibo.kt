@@ -2,6 +2,7 @@ package love.yinlin.ui.screen.msg.weibo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -58,6 +59,7 @@ val LocalWeiboProcessor = localComposition<WeiboProcessor>()
 class WeiboGridData {
 	var state by mutableStateOf(BoxState.EMPTY)
 	var items by mutableStateOf(emptyList<Weibo>())
+	val listState = LazyStaggeredGridState()
 
 	suspend fun requestWeibo(users: List<String>) {
 		if (state != BoxState.LOADING) {
@@ -252,12 +254,14 @@ fun WeiboCard(
 
 @Composable
 fun WeiboGrid(
+	state: LazyStaggeredGridState,
 	items: List<Weibo>,
 	modifier: Modifier = Modifier
 ) {
 	LazyVerticalStaggeredGrid(
 		columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
 		modifier = modifier,
+		state = state,
 		contentPadding = ThemeValue.Padding.EqualValue,
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 		verticalItemSpacing = ThemeValue.Padding.EqualSpace

@@ -160,7 +160,7 @@ class LyricsLrc : LyricsEngine {
     suspend fun reset() {
         lines = null
         currentIndex = -1
-        listState.animateScrollToItem(0)
+        listState.scrollToItem(0)
     }
 
     override fun updateIndex(position: Long): String? {

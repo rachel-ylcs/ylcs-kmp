@@ -25,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.extension.launchFlag
@@ -48,7 +49,12 @@ abstract class ScreenPart(val model: AppModel) {
 	inline fun <reified T : Screen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
+	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) {
+		launch { snapshotFlow(state).collectLatest(action) }
+	}
+
 	open suspend fun initialize() {}
+	open suspend fun update() {}
 
 	@Composable
 	abstract fun Content()
@@ -68,6 +74,7 @@ class AppModel(
 	val musicPart = ScreenPartMusic(this)
 	val discoveryPart = ScreenPartDiscovery(this)
 	val mePart = ScreenPartMe(this)
+	val parts = arrayOf(worldPart, msgPart, musicPart, discoveryPart, mePart)
 
 	val slot = SubScreenSlot(viewModelScope)
 

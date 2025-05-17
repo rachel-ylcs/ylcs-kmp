@@ -11,9 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.IndeterminateCheckBox
-import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,24 +33,13 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.KVConfig
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.Scheme
-import love.yinlin.common.ThemeValue
-import love.yinlin.common.Uri
-import love.yinlin.common.UriGenerator
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.Failed
 import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.rememberState
-import love.yinlin.extension.rememberTrue
-import love.yinlin.extension.rememberValueState
+import love.yinlin.extension.*
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -347,21 +334,19 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	override suspend fun update() {
+		updateUserProfile()
+	}
+
     @OptIn(ExperimentalAtomicApi::class)
     @Composable
 	override fun Content() {
-		val userProfile = app.config.userProfile
-		if (userProfile == null) LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
-		else {
+		app.config.userProfile?.let { userProfile ->
 			when (LocalDevice.current.type) {
 				Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
 				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
 			}
-		}
-
-		LaunchedEffect(Unit) {
-			updateUserProfile()
-		}
+		} ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
 	}
 
 	@Composable

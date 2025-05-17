@@ -34,7 +34,6 @@ import dev.chrisbanes.haze.hazeSource
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -107,6 +106,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
 
+	private var currentDebounceTime by mutableLongStateOf(0L)
+	private var hasAnimation by mutableStateOf(false)
+	private var hasVideo by mutableStateOf(false)
 	private var lyrics = LyricsLrc()
 
 	private var sleepJob: Job? by mutableStateOf(null)
@@ -116,17 +118,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private val sleepModeSheet = FloatingSheet()
 
 	@Composable
-	private fun Modifier.hazeBlur(radius: Dp): Modifier {
-		val isForeground = rememberOffScreenState()
-		return if (isForeground) hazeEffect(
-			state = blurState,
-			style = HazeStyle(
-				blurRadius = radius,
-				backgroundColor = Colors.Dark,
-				tint = null,
-			)
-		) else this
-	}
+	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
+		state = blurState,
+		style = HazeStyle(
+			blurRadius = radius,
+			backgroundColor = Colors.Dark,
+			tint = null
+		)
+	)
 
 	@Composable
 	private fun MusicBackground(
@@ -186,13 +185,13 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		musicInfo: MusicInfo,
 		modifier: Modifier = Modifier
 	) {
+		var animationRecord by rememberState { Animatable(0f) }
 		var lastDegree by rememberValueState(0f)
-		val animation by rememberState { Animatable(0f) }
 		val isForeground = rememberOffScreenState()
 
 		LaunchedEffect(factory.isPlaying, isForeground) {
 			if (factory.isPlaying && isForeground) {
-				animation.animateTo(
+				animationRecord.animateTo(
 					targetValue = 360f + lastDegree,
 					animationSpec = infiniteRepeatable(
 						animation = tween(durationMillis = 15000, easing = LinearEasing),
@@ -203,8 +202,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 			else {
-				animation.snapTo(lastDegree)
-				animation.stop()
+				animationRecord.snapTo(lastDegree)
+				animationRecord.stop()
 			}
 		}
 
@@ -213,7 +212,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			musicInfo,
 			contentScale = ContentScale.Crop,
 			circle = true,
-			modifier = modifier.rotate(degrees = animation.value)
+			modifier = modifier.rotate(degrees = animationRecord.value)
 		)
 	}
 
@@ -395,25 +394,18 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun MusicProgressLayout(modifier: Modifier = Modifier) {
-		var currentTime by rememberValueState(0L, factory.currentDuration)
-
-		LaunchedEffect(factory.currentPosition) {
-			val position = factory.currentPosition
-			if (abs(position - currentTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentTime = position
-		}
-
 		Column(
 			modifier = modifier,
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
 		) {
 			MusicProgressText(
-				currentTime = currentTime,
+				currentTime = currentDebounceTime,
 				duration = factory.currentDuration,
 				modifier = Modifier.fillMaxWidth()
 			)
 
 			MusicProgressBar(
-				currentTime = currentTime,
+				currentTime = currentDebounceTime,
 				duration = factory.currentDuration,
 				chorus = factory.currentMusic?.chorus,
 				modifier = Modifier.fillMaxWidth().height(ThemeValue.Size.ProgressHeight * 2)
@@ -483,13 +475,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun MusicToolLayout(modifier: Modifier = Modifier) {
 		EqualRow(modifier = modifier) {
 			EqualItem {
-				var hasAnimation by rememberFalse()
-
-				LaunchedEffect(factory.currentMusic) {
-					hasAnimation = factory.currentMusic?.AnimationPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true
-					if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
-				}
-
 				ClickIcon(
 					icon = Icons.Outlined.GifBox,
 					color = if (isAnimationBackground) MaterialTheme.colorScheme.primary else Colors.White,
@@ -498,18 +483,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				)
 			}
 			EqualItem {
-				var hasVideo by rememberFalse()
-
-				LaunchedEffect(factory.currentMusic) {
-					hasVideo = factory.currentMusic?.videoPath?.let { SystemFileSystem.metadataOrNull(it) }?.isRegularFile == true
-				}
-
 				ClickIcon(
 					icon = Icons.Outlined.MusicVideo,
 					color = Colors.White,
 					enabled = hasVideo,
 					onClick = {
-						if (hasVideo) launch {
+						launch {
 							factory.pause()
 							navigate(ScreenVideo.Args(factory.currentMusic?.videoPath.toString()))
 						}
@@ -539,24 +518,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
-		LaunchedEffect(factory.currentMusic) {
-			val musicInfo = factory.currentMusic
-
-			lyrics.reset()
-			musicInfo?.lyricsPath?.let { path ->
-				try {
-					Coroutines.io {
-						SystemFileSystem.source(path).buffered().use { source ->
-							lyrics.parseLrcString(source.readText())
-						}
-					}
-				}
-				catch (_: Throwable) { }
-			}
-
-			if (musicInfo == null) exitSleepMode()
-		}
-
 		Box(modifier = modifier) {
 			lyrics.Content(
 				modifier = Modifier.fillMaxSize(),
@@ -771,11 +732,41 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	}
 
 	override suspend fun initialize() {
-		snapshotFlow { factory.currentPosition }.collectLatest {
-			val newLine = lyrics.updateIndex(factory.currentPosition)
+		monitor(state = { factory.currentPosition }) { position ->
+			// 处理进度条
+			if (abs(position - currentDebounceTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentDebounceTime = position
+			// 处理歌词
+			val newLine = lyrics.updateIndex(position)
+			// 处理悬浮歌词
 			factory.floatingLyrics?.let {
 				if (it.isAttached) it.updateLyrics(newLine)
 			}
+		}
+		monitor(state = { factory.currentMusic }) { musicInfo ->
+			lyrics.reset()
+
+			if (musicInfo != null) {
+				try {
+					Coroutines.io {
+						SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
+							lyrics.parseLrcString(source.readText())
+						}
+						hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
+						hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
+					}
+				}
+				catch (_: Throwable) { }
+			}
+			else {
+				hasAnimation = false
+				hasVideo = false
+				exitSleepMode()
+			}
+
+			if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
+		}
+		monitor(state = { factory.error }) { error ->
+			error?.let { slot.tip.error(it.message) }
 		}
 	}
 
@@ -785,10 +776,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			Device.Type.PORTRAIT -> Portrait()
 			Device.Type.SQUARE -> Square()
 			Device.Type.LANDSCAPE -> Landscape()
-		}
-
-		LaunchedEffect(factory.error) {
-			factory.error?.let { slot.tip.error(it.message) }
 		}
 	}
 

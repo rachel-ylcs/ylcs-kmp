@@ -289,6 +289,10 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
 
     override suspend fun initialize() {
         resetLibrary()
+        monitor(state = { app.musicFactory.musicLibrary }) {
+            if (isManaging) exitManagement()
+            if (!isSearching) resetLibrary()
+        }
     }
 
     override val title: String by derivedStateOf {
@@ -406,11 +410,6 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                     }
                 }
             }
-        }
-
-        LaunchedEffect(app.musicFactory.musicLibrary) {
-            if (isManaging) exitManagement()
-            if (!isSearching) resetLibrary()
         }
     }
 

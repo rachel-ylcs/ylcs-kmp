@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -285,6 +286,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					modifier = Modifier.fillMaxSize()
 				) {
 					WeiboGrid(
+						state = rememberLazyStaggeredGridState(),
 						modifier = Modifier.fillMaxSize(),
 						items = grid.items
 					)

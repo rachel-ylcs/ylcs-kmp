@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Checkbox
@@ -45,6 +45,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 
 	private val previews: List<PreviewPicture> = args.images.map { PreviewPicture(it) }
 	private var current: Int by mutableIntStateOf(args.index)
+	private val pagerState = PagerState(current) { previews.size }
 
 	private val downloadDialog = FloatingDownloadDialog()
 
@@ -85,16 +86,12 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 
 	@Composable
 	private fun Portrait() {
-		val state = rememberPagerState(
-			initialPage = current,
-			pageCount = { previews.size }
-		)
 		Column(
 			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			HorizontalPager(
-				state = state,
+				state = pagerState,
 				key = {
 					val preview = previews[it]
 					if (preview.isSource) preview.pic.source else preview.pic.image
@@ -112,10 +109,6 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 				current = current,
 				modifier = Modifier.fillMaxWidth()
 			)
-		}
-
-		LaunchedEffect(state.currentPage) {
-			current = state.currentPage
 		}
 	}
 
@@ -160,6 +153,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	}
 
 	override val title: String by derivedStateOf { "${current + 1} / ${previews.size}" }
+
+	override suspend fun initialize() {
+		monitor(state = { pagerState.settledPage }) { current = it }
+	}
 
 	@Composable
 	override fun ActionScope.RightActions() {

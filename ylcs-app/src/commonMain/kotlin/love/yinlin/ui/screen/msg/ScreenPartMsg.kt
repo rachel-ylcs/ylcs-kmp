@@ -1,8 +1,6 @@
 package love.yinlin.ui.screen.msg
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Refresh
@@ -128,9 +126,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	private val pagerState = object : PagerState() {
-		override val pageCount: Int = MsgTabItem.entries.size
-	}
+	private var currentPage by mutableIntStateOf(0)
+
 	// 当前微博
 	var currentWeibo: Weibo? = null
 
@@ -256,12 +253,22 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	// 图集数据
 	val photoState = PhotoState()
 
-	private suspend fun onPageChanged(index: Int) {
-		pagerState.scrollToPage(index)
+	private fun requestNewData() {
+		when (currentPage) {
+			MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update {
+				launch { weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id }) }
+			}
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update {
+				launch { chaohuaState.requestNewData() }
+			}
+			MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update {
+				launch { photoState.loadPhotos() }
+			}
+		}
 	}
 
 	private suspend fun onRefresh() {
-		when (pagerState.currentPage) {
+		when (currentPage) {
 			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
 			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
 			MsgTabItem.PICTURES.ordinal -> photoState.loadPhotos()
@@ -269,11 +276,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	}
 
 	override suspend fun initialize() {
-		launch {
-			weiboState.flagFirstLoad.update(this) {
-				weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
-			}
-		}
+		requestNewData()
 	}
 
 	@Composable
@@ -290,9 +293,10 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					TabBar(
-						currentPage = pagerState.currentPage,
+						currentPage = currentPage,
 						onNavigate = {
-							launch { onPageChanged(it) }
+							currentPage = it
+							requestNewData()
 						},
 						items = MsgTabItem.items,
 						modifier = Modifier.weight(1f)
@@ -309,33 +313,20 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				}
 			}
 
-			HorizontalPager(
-				state = pagerState,
-				key = { MsgTabItem.entries[it] },
-				beyondViewportPageCount = MsgTabItem.entries.size,
-				modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop),
-				userScrollEnabled = false
-			) {
-				Box(modifier = Modifier.fillMaxSize()) {
-					CompositionLocalProvider(LocalWeiboProcessor provides processor) {
-						when (it) {
-							MsgTabItem.WEIBO.ordinal -> ScreenWeibo(this@ScreenPartMsg)
-							MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(this@ScreenPartMsg)
-							MsgTabItem.PICTURES.ordinal -> ScreenPictures(this@ScreenPartMsg)
-						}
-					}
-				}
-			}
-
-			LaunchedEffect(pagerState.settledPage) {
-				when (pagerState.currentPage) {
-					// 首页 WEIBO 由 initialize 去加载
-					MsgTabItem.WEIBO.ordinal -> {}
-					MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update(this) {
-						chaohuaState.requestNewData()
-					}
-					MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update(this) {
-						photoState.loadPhotos()
+			Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)) {
+				CompositionLocalProvider(LocalWeiboProcessor provides processor) {
+					when (currentPage) {
+						MsgTabItem.WEIBO.ordinal -> ScreenWeibo(
+							state = weiboState.grid.listState,
+							part = this@ScreenPartMsg
+						)
+						MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(
+							state = chaohuaState.grid.listState,
+							part = this@ScreenPartMsg
+						)
+						MsgTabItem.PICTURES.ordinal -> ScreenPictures(
+							part = this@ScreenPartMsg
+						)
 					}
 				}
 			}

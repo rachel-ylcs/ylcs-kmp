@@ -3,7 +3,6 @@ package love.yinlin.extension
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.compose.LifecycleStartEffect
-import kotlinx.coroutines.CoroutineScope
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.jvm.JvmInline
@@ -96,8 +95,12 @@ inline fun OffScreenEffect(crossinline block: (isForeground: Boolean) -> Unit) {
 @OptIn(ExperimentalAtomicApi::class)
 @JvmInline
 value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {
-	suspend inline fun update(scope: CoroutineScope, crossinline block: suspend CoroutineScope.() -> Unit) {
-		if (value.compareAndSet(expectedValue = false, newValue = true)) scope.block()
+	inline fun update(crossinline block: () -> Unit) {
+		if (value.compareAndSet(expectedValue = false, newValue = true)) block()
+	}
+
+	inline fun check(block: () -> Unit) {
+		if (value.load()) block()
 	}
 }
 
