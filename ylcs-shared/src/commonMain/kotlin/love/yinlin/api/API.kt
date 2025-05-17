@@ -12,6 +12,7 @@ import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
 
+
 object API : APINode(null, "") {
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {
@@ -213,7 +214,7 @@ object API : APINode(null, "") {
 
 			object GetLatestTopicsByComment : APIPost<GetLatestTopicsByComment.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopicsByComment") {
 				@Serializable
-				data class Request(val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val lastMaxTs: String, val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getHotTopics") {

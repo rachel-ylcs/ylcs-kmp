@@ -19,7 +19,7 @@ import love.yinlin.extension.to
 import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.values
-
+import java.sql.Timestamp
 fun Routing.topicAPI(implMap: ImplMap) {
 	api(API.User.Topic.GetTopics) { (uid, isTop, tid, num) ->
 		VN.throwId(uid)
@@ -55,43 +55,51 @@ fun Routing.topicAPI(implMap: ImplMap) {
 //		Data.Success(emptyList())
 //	}
 
-	api(API.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
+	api(API.User.Topic.GetLatestTopicsByComment) { (lastMaxTs, tid, num) ->
+		val lastMaxTs_Timestamp: Timestamp = if (lastMaxTs == "") {
+			Timestamp(System.currentTimeMillis())
+		} else {
+			Timestamp.valueOf(lastMaxTs)
+		}
+
 		val topics = DB.throwQuerySQL(
 			"""
-		WITH latest_tids AS (
-		  -- 合并表后按 tid 分组，取最大 ts 并去重
-		  SELECT tid, MAX(ts) as max_ts
-		  FROM (
-			SELECT tid, ts FROM comment_activity
-			UNION ALL
-			SELECT tid, ts FROM comment_discussion
-			UNION ALL
-			SELECT tid, ts FROM comment_notification
-			UNION ALL
-			SELECT tid, ts FROM comment_water
-		  ) AS all_comments
-		  WHERE tid < ?
-		  GROUP BY tid          -- 按 tid 去重，确保唯一性
-		  ORDER BY max_ts DESC  -- 按max_ts即所有表的最新时间排序
-		  LIMIT ?               
+        WITH latest_tids AS (
+            SELECT tid, MAX(ts) as max_ts
+            FROM (
+                SELECT tid, ts FROM comment_activity
+                UNION ALL
+                SELECT tid, ts FROM comment_discussion
+                UNION ALL
+                SELECT tid, ts FROM comment_notification
+                UNION ALL
+                SELECT tid, ts FROM comment_water
+            ) AS all_comments
+            GROUP BY tid
+            HAVING (MAX(ts) < ?) OR (MAX(ts) = ? AND tid < ?)
+            ORDER BY max_ts DESC, tid DESC     
+            LIMIT ?
+        )
+        SELECT
+            t.tid,
+            u.uid,
+            t.title,
+            t.pics->>'${'$'}[0]' AS pic,
+            t.isTop,
+            t.coinNum,
+            t.commentNum,
+            t.rawSection,
+            u.name,
+            CAST(lt.max_ts AS CHAR) AS lastMaxTs  -- 转换为字符串
+        FROM latest_tids lt
+        JOIN topic t ON t.tid = lt.tid
+        LEFT JOIN user u ON t.uid = u.uid
+        WHERE t.isDeleted = 0
+        ORDER BY lt.max_ts DESC, lt.tid DESC
+        """,
+			lastMaxTs_Timestamp, lastMaxTs_Timestamp, tid, num.coercePageNum
 		)
-		SELECT
-		  t.tid,
-		  u.uid,
-		  t.title,
-		  t.pics->>'${'$'}[0]' AS pic,
-		  t.isTop,
-		  t.coinNum,
-		  t.commentNum,
-		  t.rawSection,
-		  u.name
-		FROM latest_tids lt
-		JOIN topic t ON t.tid = lt.tid
-		LEFT JOIN user u ON t.uid = u.uid
-		WHERE t.isDeleted = 0
-		ORDER BY lt.max_ts DESC     -- 按 tid 倒序输出
-""", tid, num.coercePageNum)
-		Data.Success(topics.to())
+		Data.Success(data = topics.to())
 	}
 
 	api(API.User.Topic.GetHotTopics) { (score, tid, num) ->
