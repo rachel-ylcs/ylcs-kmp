@@ -51,10 +51,6 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-//	api(API.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
-//		Data.Success(emptyList())
-//	}
-
 	api(API.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
 		val topics = DB.throwQuerySQL(
 			"""

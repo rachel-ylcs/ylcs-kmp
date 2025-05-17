@@ -134,7 +134,7 @@ class LyricsLrc : LyricsEngine {
                 // 插入6个空并均分起始时间
                 repeat(6) { add(LrcLine(startTime / 6 * it, "")) }
                 // 插入原歌词
-                addAll(items)
+                this += items
                 // 插入永久4个空
                 repeat(4) { add(LrcLine(Long.MAX_VALUE - it, "")) }
             }
@@ -163,13 +163,13 @@ class LyricsLrc : LyricsEngine {
         listState.animateScrollToItem(0)
     }
 
-    override fun updateIndex(position: Long): String {
+    override fun updateIndex(position: Long): String? {
         val newIndex = lines?.let { items ->
             val index = items.indexOfFirst { it.position > position } - 1
             if (index >= 0) index else -1
         } ?: -1
         currentIndex = newIndex
-        return lines?.getOrNull(newIndex)?.text ?: ""
+        return lines?.getOrNull(newIndex)?.text
     }
 
     fun parseLrcString(source: String) {

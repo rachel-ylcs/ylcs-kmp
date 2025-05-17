@@ -214,7 +214,7 @@ object API : APINode(null, "") {
 
 			object GetLatestTopicsByComment : APIPost<GetLatestTopicsByComment.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getLatestTopicsByComment") {
 				@Serializable
-				data class Request( val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val tid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetHotTopics : APIPost<GetHotTopics.Request, List<love.yinlin.data.rachel.topic.Topic>>(this, "getHotTopics") {

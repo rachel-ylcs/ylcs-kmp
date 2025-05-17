@@ -18,6 +18,7 @@ data class Scheme(val name: String) {
         val Https = Scheme("https")
         val File = Scheme("file")
         val Content = Scheme("content")
+        val Package = Scheme("scheme")
         val Rachel = Scheme("rachel")
         val NetEaseCloud = Scheme("nec")
         val QQMusic = Scheme("qm")

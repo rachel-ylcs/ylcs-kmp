@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 
 @Stable
 interface LyricsEngine {
-    fun updateIndex(position: Long): String
+    fun updateIndex(position: Long): String?
 
     @Composable fun Content(
         modifier: Modifier = Modifier,

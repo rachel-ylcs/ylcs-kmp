@@ -29,6 +29,7 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Device
+import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
 import java.util.*
 
@@ -56,7 +57,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
             ) {
                 onResult(canAttached)
             }.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-                setData(Uri.fromParts("package", activity.packageName, null))
+                setData(Uri.fromParts(Scheme.Package.toString(), activity.packageName, null))
             })
         }
         catch (_: Throwable) {}
@@ -87,14 +88,14 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         }
     }
 
-    override fun updateLyrics(lyrics: String) {
+    override fun updateLyrics(lyrics: String?) {
         currentLyrics = lyrics
     }
 
     @Composable
     fun FloatingContent() {
         val config = app.config.floatingLyricsConfig
-        if (currentLyrics.isNotEmpty()) {
+        currentLyrics?.let { lyrics ->
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier.padding(
@@ -105,7 +106,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = currentLyrics,
+                        text = lyrics,
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                         ),
