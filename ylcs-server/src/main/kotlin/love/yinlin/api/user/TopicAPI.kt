@@ -55,17 +55,26 @@ fun Routing.topicAPI(implMap: ImplMap) {
 //		Data.Success(emptyList())
 //	}
 
-	api(API.User.Topic.GetLatestTopicsByComment) { (lastMaxTs, tid, num) ->
-		val lastMaxTs_Timestamp: Timestamp = if (lastMaxTs == "") {
-			Timestamp(System.currentTimeMillis())
-		} else {
-			Timestamp.valueOf(lastMaxTs)
-		}
-
+	api(API.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
 		val topics = DB.throwQuerySQL(
 			"""
-        WITH latest_tids AS (
-            SELECT tid, MAX(ts) as max_ts
+        WITH
+        -- 1. 先把 base_ts 算出来
+        base AS (
+            SELECT COALESCE(MAX(ts), NOW()) AS base_ts
+            FROM (
+                SELECT ts FROM comment_activity    WHERE tid = ?
+                UNION ALL
+                SELECT ts FROM comment_discussion  WHERE tid = ?
+                UNION ALL
+                SELECT ts FROM comment_notification WHERE tid = ?
+                UNION ALL
+                SELECT ts FROM comment_water       WHERE tid = ?
+            ) AS tid_ts
+        ),
+        -- 2. 再做 latest_tids 去重、分页
+        latest_tids AS (
+            SELECT tid, MAX(ts) AS max_ts
             FROM (
                 SELECT tid, ts FROM comment_activity
                 UNION ALL
@@ -76,31 +85,35 @@ fun Routing.topicAPI(implMap: ImplMap) {
                 SELECT tid, ts FROM comment_water
             ) AS all_comments
             GROUP BY tid
-            HAVING (MAX(ts) < ?) OR (MAX(ts) = ? AND tid < ?)
-            ORDER BY max_ts DESC, tid DESC     
+            HAVING (MAX(ts) < (SELECT base_ts FROM base))
+                OR (MAX(ts) = (SELECT base_ts FROM base) AND tid < ?)
+            ORDER BY max_ts DESC, tid DESC
             LIMIT ?
         )
         SELECT
             t.tid,
             u.uid,
             t.title,
-            t.pics->>'${'$'}[0]' AS pic,
+            t.pics->>'$[0]' AS pic,
             t.isTop,
             t.coinNum,
             t.commentNum,
             t.rawSection,
             u.name,
-            CAST(lt.max_ts AS CHAR) AS lastMaxTs  -- 转换为字符串
+            CAST(lt.max_ts AS CHAR) AS lastMaxTs
         FROM latest_tids lt
         JOIN topic t ON t.tid = lt.tid
         LEFT JOIN user u ON t.uid = u.uid
         WHERE t.isDeleted = 0
         ORDER BY lt.max_ts DESC, lt.tid DESC
         """,
-			lastMaxTs_Timestamp, lastMaxTs_Timestamp, tid, num.coercePageNum
+			// 四次 tid 用来算 base_ts，再一次用在 HAVING 中
+			tid, tid, tid, tid,
+			tid, num.coercePageNum
 		)
 		Data.Success(data = topics.to())
 	}
+
 
 	api(API.User.Topic.GetHotTopics) { (score, tid, num) ->
 		val topics = DB.throwQuerySQL("""
