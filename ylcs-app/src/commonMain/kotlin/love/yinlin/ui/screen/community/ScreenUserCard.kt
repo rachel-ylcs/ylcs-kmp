@@ -100,7 +100,10 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		when (result) {
-			is Data.Success -> this.profile = profile.copy(status = FollowStatus.FOLLOW)
+			is Data.Success -> this.profile = profile.copy(
+				status = FollowStatus.FOLLOW,
+				followers = profile.followers + 1
+			)
 			is Data.Error -> slot.tip.error(result.message)
 		}
 	}
@@ -114,7 +117,10 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		when (result) {
-			is Data.Success -> this.profile = profile.copy(status = FollowStatus.UNFOLLOW)
+			is Data.Success -> this.profile = profile.copy(
+				status = FollowStatus.UNFOLLOW,
+				followers = profile.followers - 1
+			)
 			is Data.Error -> slot.tip.error(result.message)
 		}
 	}

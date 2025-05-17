@@ -19,7 +19,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
 
     }
 
-    override fun updateLyrics(lyrics: String) {
+    override fun updateLyrics(lyrics: String?) {
 
     }
 }
