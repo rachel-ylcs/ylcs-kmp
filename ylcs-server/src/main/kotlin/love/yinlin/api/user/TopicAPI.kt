@@ -84,7 +84,6 @@ fun Routing.topicAPI(implMap: ImplMap) {
             HAVING (MAX(ts) < (SELECT base_ts FROM base))
                 OR (MAX(ts) = (SELECT base_ts FROM base) AND tid < ?)
             ORDER BY max_ts DESC, tid DESC
-            LIMIT ?
         )
         SELECT
             t.tid,
@@ -102,6 +101,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
         LEFT JOIN user u ON t.uid = u.uid
         WHERE t.isDeleted = 0
         ORDER BY lt.max_ts DESC, lt.tid DESC
+		LIMIT ?
         """,
 			// 四次 tid 用来算 base_ts，再一次用在 HAVING 中
 			tid, tid, tid, tid,
