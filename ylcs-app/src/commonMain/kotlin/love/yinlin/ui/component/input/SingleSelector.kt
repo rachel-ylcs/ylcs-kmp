@@ -51,7 +51,9 @@ class SingleSelectorScope<T>(
             }
             Text(
                 text = title,
-                color = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                color = if (enabled) {
+                    if (item == current) MaterialTheme.colorScheme.onSecondaryContainer else textStyle.color
+                } else MaterialTheme.colorScheme.surfaceVariant,
                 style = textStyle,
                 maxLines = 1,
                 overflow = TextOverflow.Clip
