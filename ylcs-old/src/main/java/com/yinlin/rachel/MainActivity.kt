@@ -268,7 +268,7 @@ fun getKVData(context: Context) {
     MMKV.initialize(context, MMKVLogLevel.LevelNone)
     val kv = MMKV.defaultMMKV()
     runCatching {
-        val userString = kv.decodeString("weibo_users", "") ?: ""
+        val userString = kv.decodeString("weibo_users/20241115", "") ?: ""
         val users  = Json.decodeFromString<List<OldUser>>(userString)
         weibo = Json.encodeToString(users.map { NewUser(it.userId, it.name) })
     }
@@ -311,6 +311,7 @@ fun TransferMod() {
     LaunchedEffect(Unit) {
         val names = mutableSetOf<String>()
 
+        info = ""
         withContext(Dispatchers.IO) {
             try {
                 step = 1
@@ -396,7 +397,11 @@ fun TransferMod() {
                         }
                         data?.let { allData += it }
                     }
-                    catch (_: Throwable) {}
+                    catch (e: Throwable) {
+                        withContext(Dispatchers.Main) {
+                            info = e.message.toString()
+                        }
+                    }
                 }
 
                 step = 2
@@ -427,6 +432,7 @@ fun TransferMod() {
                 progress = 0f
                 total = tmpList.size
 
+                if (tmpList.isEmpty()) progress = 1f
                 for ((index, files) in tmpList.withIndex()) {
                     val contentValues = ContentValues().apply {
                         put(MediaStore.Downloads.DISPLAY_NAME, "银临茶舍MOD迁移包${index + 1}_${System.currentTimeMillis()}.rachel")
@@ -447,9 +453,11 @@ fun TransferMod() {
                 }
             }
             catch (e: Throwable) {
-                println(e.stackTraceToString())
-                info = "迁移失败\n\n${e.stackTraceToString()}"
-                isTransfer = false
+                withContext(Dispatchers.Main) {
+                    println(e.stackTraceToString())
+                    info = "迁移失败\n\n${e.stackTraceToString()}"
+                    isTransfer = false
+                }
             }
         }
     }
