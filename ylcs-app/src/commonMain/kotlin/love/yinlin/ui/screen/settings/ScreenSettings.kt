@@ -470,7 +470,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
 			ItemSwitch(
 				title = "音频焦点",
-				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer),
+				icon = colorfulImageVector(icon = Icons.Outlined.MusicNote, background = MaterialTheme.colorScheme.primaryContainer),
 				hasDivider = false,
 				checked = app.config.audioFocus,
 				onCheckedChange = {
