@@ -22,7 +22,7 @@ class FfmpegRenderersFactory(context: Context) : DefaultRenderersFactory(context
             .setAudioAttributes(AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
                 .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                .build(), keepFocus)
+                .build(), !keepFocus)
             .setHandleAudioBecomingNoisy(true)
             .setRenderersFactory(FfmpegRenderersFactory(context))
             .build()

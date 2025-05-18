@@ -314,6 +314,9 @@ class KVConfig(private val kv: KV) {
 
 	/* ------------------  听歌  ------------------ */
 
+	// 音频焦点
+	var audioFocus by booleanState(true)
+
 	// 歌单
 	val playlistLibrary = mapState<String, MusicPlaylist>("playlistLibrary")
 	// 上次播放列表

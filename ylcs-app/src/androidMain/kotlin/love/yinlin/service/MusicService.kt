@@ -23,6 +23,7 @@ import love.yinlin.R
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.platform.ForwardPlayer
+import love.yinlin.platform.app
 import love.yinlin.platform.mergePlayMode
 
 object CustomCommands {
@@ -94,8 +95,7 @@ class MusicService : MediaSessionService() {
         }.build()
 
         override fun onCustomCommand(session: MediaSession, controller: MediaSession.ControllerInfo, customCommand: SessionCommand, args: Bundle): ListenableFuture<SessionResult> {
-            val player = exoPlayer
-            if (player == null) return Futures.immediateFuture(SessionResult(SessionError.ERROR_SESSION_DISCONNECTED))
+            val player = exoPlayer ?: return Futures.immediateFuture(SessionResult(SessionError.ERROR_SESSION_DISCONNECTED))
             return when (customCommand) {
                 CustomCommands.SetMode -> {
                     val playMode = if (args.isEmpty) mergePlayMode(player.repeatMode, player.shuffleModeEnabled).next
@@ -130,9 +130,8 @@ class MusicService : MediaSessionService() {
         super.onCreate()
 
         val context = this
-        val keepFocus = true
 
-        val ffmpegPlayer = FfmpegRenderersFactory.build(this, keepFocus)
+        val ffmpegPlayer = FfmpegRenderersFactory.build(this, app.config.audioFocus)
         val forwardPlayer = ForwardPlayer(ffmpegPlayer)
         exoPlayer = ffmpegPlayer
         session = MediaSession.Builder(context, forwardPlayer)

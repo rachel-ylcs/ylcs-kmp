@@ -28,6 +28,7 @@ import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
+import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 
 @Stable
@@ -94,7 +95,7 @@ actual fun VideoPlayer(
     val state by rememberState { VideoPlayerState() }
 
     DisposableEffect(Unit) {
-        state.controller = FfmpegRenderersFactory.build(context, false).apply {
+        state.controller = FfmpegRenderersFactory.build(context, app.config.audioFocus).apply {
             repeatMode = Player.REPEAT_MODE_ONE
             addListener(state.listener)
             setMediaItem(MediaItem.fromUri(url))

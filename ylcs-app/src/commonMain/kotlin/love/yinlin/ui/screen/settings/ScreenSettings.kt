@@ -340,11 +340,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	@Composable
-	private fun CommonSettings(modifier: Modifier = Modifier) {
+	private fun PreferencesSettings(modifier: Modifier = Modifier) {
 		SettingsLayout(
 			modifier = modifier,
-			title = "系统",
-			icon = Icons.Outlined.Info
+			title = "偏好",
+			icon = Icons.Outlined.Construction
 		) {
 			Item(
 				title = "主题",
@@ -411,6 +411,23 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				}
 			}
 
+			ItemSwitch(
+				title = "音频焦点",
+				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer),
+				hasDivider = false,
+				checked = app.config.audioFocus,
+				onCheckedChange = { app.config.audioFocus = it }
+			)
+		}
+	}
+
+	@Composable
+	private fun ApplicationSettings(modifier: Modifier = Modifier) {
+		SettingsLayout(
+			modifier = modifier,
+			title = "应用",
+			icon = Icons.Outlined.Info
+		) {
 			var cacheSizeText by rememberState { OS.Storage.cacheSize.fileSizeString }
 			ItemExpanderSuspend(
 				title = "清理缓存",
@@ -465,7 +482,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				userProfile = userProfile,
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 			)
-			CommonSettings(
+			PreferencesSettings(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+			)
+			ApplicationSettings(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 			)
 		}
@@ -475,9 +495,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private fun Landscape(userProfile: UserProfile?) {
 		LazyVerticalStaggeredGrid(
 			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
-			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-			verticalItemSpacing = ThemeValue.Padding.EqualSpace
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
 		) {
 			item(key = ItemKey("AccountSettings")) {
 				AccountSettings(
@@ -485,8 +503,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
-			item(key = ItemKey("CommonSettings")) {
-				CommonSettings(
+			item(key = ItemKey("PreferencesSettings")) {
+				PreferencesSettings(
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+				)
+			}
+			item(key = ItemKey("ApplicationSettings")) {
+				ApplicationSettings(
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}

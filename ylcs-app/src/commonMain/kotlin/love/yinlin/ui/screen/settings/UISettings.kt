@@ -26,6 +26,7 @@ import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.StaticLoadingIcon
+import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.Space
 
 object SettingsScope {
@@ -97,6 +98,32 @@ object SettingsScope {
 				style = MaterialTheme.typography.bodySmall,
 				maxLines = maxLines,
 				overflow = TextOverflow.Ellipsis
+			)
+		}
+	}
+
+	@Composable
+	fun ItemSwitch(
+		title: String,
+		icon: ColorfulImageVector? = null,
+		color: Color = MaterialTheme.colorScheme.onSurface,
+		enabled: Boolean = true,
+		hasDivider: Boolean = true,
+		checked: Boolean,
+		onCheckedChange: (Boolean) -> Unit = {}
+	) {
+		Item(
+			title = title,
+			icon = icon,
+			color = color,
+			hasDivider = hasDivider,
+			enabled = enabled,
+			onClick = {}
+		) {
+			Switch(
+				checked = checked,
+				onCheckedChange = onCheckedChange,
+				enabled = enabled
 			)
 		}
 	}
