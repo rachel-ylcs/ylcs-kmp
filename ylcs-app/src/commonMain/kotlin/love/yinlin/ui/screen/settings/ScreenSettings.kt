@@ -452,7 +452,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				title = "字体大小",
 				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer)
 			) {
-				val fontScaleValue = remember { floatArrayOf(0.75f, 1f, 1.25f) }
+				val fontScaleValue = remember { floatArrayOf(0.83333f, 1f, 1.2f) }
 				val fontScaleString = remember { arrayOf("小", "标准", "大") }
 				SingleSelector(
 					current = app.config.fontScale,
