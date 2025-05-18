@@ -101,7 +101,10 @@ internal fun UserProfileInfo(
 					modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
 				)
 			}
-			Column(modifier = Modifier.weight(1f)) {
+			Column(
+				modifier = Modifier.weight(1f),
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+			) {
 				Text(
 					text = profile.name,
 					style = MaterialTheme.typography.labelLarge,

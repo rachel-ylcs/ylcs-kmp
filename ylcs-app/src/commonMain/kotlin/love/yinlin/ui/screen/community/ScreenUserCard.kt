@@ -219,7 +219,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			modifier = modifier
 		) {
 			Row(
-				horizontalArrangement = Arrangement.End,
+				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.End),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				val status = profile.status
