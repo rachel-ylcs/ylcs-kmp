@@ -107,7 +107,7 @@ private fun PhotoFolder(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ScreenPictures(part: ScreenPartMsg) {
+fun PagePictures(part: ScreenPartMsg) {
     val state = part.photoState
     val current by rememberDerivedState { state.stack.last() }
     val canBack by rememberDerivedState { state.stack.size > 1 }

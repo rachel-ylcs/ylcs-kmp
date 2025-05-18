@@ -8,7 +8,7 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Composable
-fun ScreenWeibo(
+fun PageWeibo(
 	part: ScreenPartMsg,
 	state: LazyStaggeredGridState
 ) {

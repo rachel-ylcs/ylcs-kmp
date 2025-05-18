@@ -13,7 +13,7 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 
 @Composable
-fun ScreenChaohua(
+fun PageChaohua(
 	part: ScreenPartMsg,
 	state: LazyStaggeredGridState
 ) {

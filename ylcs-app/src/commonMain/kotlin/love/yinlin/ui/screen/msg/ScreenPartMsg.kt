@@ -34,7 +34,7 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage
-import love.yinlin.ui.screen.msg.pictures.ScreenPictures
+import love.yinlin.ui.screen.msg.pictures.PagePictures
 import love.yinlin.ui.screen.msg.weibo.*
 
 @Stable
@@ -246,11 +246,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	// 微博数据
 	val weiboState = WeiboState()
-	// 超话数据
 	val chaohuaState = ChaohuaState()
-	// 图集数据
 	val photoState = PhotoState()
 
 	private fun requestNewData() {
@@ -316,15 +313,15 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)) {
 				CompositionLocalProvider(LocalWeiboProcessor provides processor) {
 					when (currentPage) {
-						MsgTabItem.WEIBO.ordinal -> ScreenWeibo(
+						MsgTabItem.WEIBO.ordinal -> PageWeibo(
 							state = weiboState.grid.listState,
 							part = this@ScreenPartMsg
 						)
-						MsgTabItem.CHAOHUA.ordinal -> ScreenChaohua(
+						MsgTabItem.CHAOHUA.ordinal -> PageChaohua(
 							state = chaohuaState.grid.listState,
 							part = this@ScreenPartMsg
 						)
-						MsgTabItem.PICTURES.ordinal -> ScreenPictures(
+						MsgTabItem.PICTURES.ordinal -> PagePictures(
 							part = this@ScreenPartMsg
 						)
 					}
