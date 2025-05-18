@@ -25,7 +25,7 @@ fun NineGrid(
 	if (size == 1) {
 		val pic = pics[0]
 		Box(
-			modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraLargeImage else ThemeValue.Size.CardWidth),
+			modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraImage else ThemeValue.Size.CardWidth),
 			contentAlignment = Alignment.Center
 		) {
 			WebImage(
@@ -39,7 +39,7 @@ fun NineGrid(
 			if (pic.isVideo) {
 				MiniIcon(
 					icon = Icons.Outlined.SmartDisplay,
-					size = ThemeValue.Size.SmallImage,
+					size = ThemeValue.Size.Image,
 					color = Colors.White,
 					modifier = Modifier.zIndex(2f)
 				)

@@ -36,6 +36,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.node.clickableNoRipple
 import kotlin.math.max
 
@@ -100,10 +101,7 @@ internal fun UserProfileInfo(
 					modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
 				)
 			}
-			Column(
-				modifier = Modifier.weight(1f),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-			) {
+			Column(modifier = Modifier.weight(1f)) {
 				Text(
 					text = profile.name,
 					style = MaterialTheme.typography.labelLarge,
@@ -145,7 +143,7 @@ internal fun UserProfileCard(
 			)
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
 			) {
 				UserProfileInfo(
 					profile = profile,

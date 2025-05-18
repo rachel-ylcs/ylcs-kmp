@@ -52,17 +52,17 @@ private fun WeiboUserItem(
 	onClick: () -> Unit
 ) {
 	Row(
-		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue),
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 	) {
-		if (user.avatar.isEmpty()) LoadingCircle(size = ThemeValue.Size.ExtraIcon)
+		if (user.avatar.isEmpty()) LoadingCircle(size = ThemeValue.Size.MicroImage)
 		else WebImage(
 			uri = user.avatar,
 			key = DateEx.TodayString,
 			contentScale = ContentScale.Crop,
 			circle = true,
-			modifier = Modifier.size(ThemeValue.Size.ExtraIcon)
+			modifier = Modifier.size(ThemeValue.Size.MicroImage)
 		)
 		Text(
 			text = user.name,

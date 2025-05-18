@@ -314,12 +314,32 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 24.dp
 			Device.Size.LARGE -> 26.dp
 		}
-		val ExtraIcon: Dp @Composable get() = when (LocalDevice.current.size) {
+		val MediumIcon: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 26.dp
 			Device.Size.MEDIUM -> 28.dp
 			Device.Size.LARGE -> 30.dp
 		}
-		val SmallImage: Dp @Composable get() = when (LocalDevice.current.size) {
+		val LargeIcon: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 30.dp
+			Device.Size.MEDIUM -> 32.dp
+			Device.Size.LARGE -> 34.dp
+		}
+		val ExtraIcon: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 34.dp
+			Device.Size.MEDIUM -> 36.dp
+			Device.Size.LARGE -> 38.dp
+		}
+		val SmallInput: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 36.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 44.dp
+		}
+		val MicroImage: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 32.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 48.dp
+		}
+		val Image: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 48.dp
 			Device.Size.MEDIUM -> 56.dp
 			Device.Size.LARGE -> 64.dp
@@ -334,7 +354,7 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 125.dp
 			Device.Size.LARGE -> 150.dp
 		}
-		val ExtraLargeImage: Dp @Composable get() = when (LocalDevice.current.size) {
+		val ExtraImage: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 200.dp
 			Device.Size.MEDIUM -> 225.dp
 			Device.Size.LARGE -> 250.dp

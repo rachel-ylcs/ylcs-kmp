@@ -367,7 +367,7 @@ abstract class ListDialogChoice(title: String? = null) : FloatingDialogChoice(ti
 	override fun Icon(index: Int) {
 		MiniIcon(
 			icon = remember(index) { iconFactory(index) },
-			size = ThemeValue.Size.ExtraIcon
+			size = ThemeValue.Size.MediumIcon
 		)
 	}
 }

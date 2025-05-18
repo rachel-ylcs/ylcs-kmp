@@ -160,8 +160,8 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Icon(index: Int) {
             val item = ImportMusicItem.entries[index]
-            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.ExtraIcon)
-            else MiniIcon(icon = item.icon, size = ThemeValue.Size.ExtraIcon)
+            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.MediumIcon)
+            else MiniIcon(icon = item.icon, size = ThemeValue.Size.MediumIcon)
         }
     }
 

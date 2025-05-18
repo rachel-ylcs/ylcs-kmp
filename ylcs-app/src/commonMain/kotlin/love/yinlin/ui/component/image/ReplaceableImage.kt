@@ -49,7 +49,7 @@ fun ReplaceableImage(
                 ClickIcon(
                     icon = Icons.Outlined.Cancel,
                     color = MaterialTheme.colorScheme.error,
-                    size = ThemeValue.Size.ExtraIcon,
+                    size = ThemeValue.Size.MediumIcon,
                     modifier = Modifier.align(Alignment.TopEnd).zIndex(2f),
                     onClick = onDelete
                 )

@@ -146,12 +146,12 @@ private fun DefaultSwipePaginationHeader(
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
-			size = ThemeValue.Size.ExtraIcon,
+			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowDownward,
-			size = ThemeValue.Size.ExtraIcon,
+			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
@@ -177,12 +177,12 @@ private fun DefaultSwipePaginationFooter(
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
 		if (status == PaginationStatus.RUNNING) LoadingAnimation(
-			size = ThemeValue.Size.ExtraIcon,
+			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		else MiniIcon(
 			icon = Icons.Outlined.ArrowUpward,
-			size = ThemeValue.Size.ExtraIcon,
+			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
 		Text(
@@ -318,8 +318,8 @@ private fun DefaultClickPaginationIndicator(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 		) {
-			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = ThemeValue.Size.ExtraIcon)
-			else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.ExtraIcon)
+			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = ThemeValue.Size.MediumIcon)
+			else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.MediumIcon)
 			Text(text = if (status == PaginationStatus.RUNNING) "加载中..." else "加载更多")
 		}
 	}

@@ -43,10 +43,10 @@ private fun UserInfoCard(
 	modifier: Modifier = Modifier
 ) {
 	Row(
-		modifier = modifier.padding(ThemeValue.Padding.Value),
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+		modifier = modifier.padding(ThemeValue.Padding.ExtraValue),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
 	) {
-		OffsetLayout(y = -ThemeValue.Size.MediumImage / 4) {
+		OffsetLayout(y = -ThemeValue.Size.MediumImage / 3) {
 			WebImage(
 				uri = user.info.avatar,
 				key = DateEx.TodayString,
@@ -112,7 +112,7 @@ private fun UserAlbumItem(
 	) {
 		WebImage(
 			uri = album.pic,
-			modifier = Modifier.size(ThemeValue.Size.SmallImage)
+			modifier = Modifier.size(ThemeValue.Size.Image)
 		)
 		Column(
 			modifier = Modifier.weight(1f),
@@ -234,7 +234,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	) {
 		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			Surface(
-				modifier = Modifier.width(ThemeValue.Size.CardWidth).fillMaxHeight(),
+				modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight(),
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				Column(modifier = Modifier.fillMaxSize()) {

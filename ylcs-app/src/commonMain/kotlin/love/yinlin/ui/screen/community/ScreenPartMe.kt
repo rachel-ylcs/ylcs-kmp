@@ -265,7 +265,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				) {
 					MiniIcon(
 						res = Res.drawable.img_not_login,
-						size = ThemeValue.Size.ExtraLargeImage
+						size = ThemeValue.Size.ExtraImage
 					)
 					RachelButton(
 						text = stringResource(Res.string.login),
@@ -399,7 +399,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 				MiniImage(
 					painter = qrcodePainter,
-					modifier = Modifier.size(ThemeValue.Size.ExtraLargeImage)
+					modifier = Modifier.size(ThemeValue.Size.ExtraImage)
 				)
 				Space()
 			}

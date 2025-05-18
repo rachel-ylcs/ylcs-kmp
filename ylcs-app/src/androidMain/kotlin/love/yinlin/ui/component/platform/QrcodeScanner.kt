@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
@@ -107,7 +106,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.ExtraIcon,
+                size = ThemeValue.Size.MediumIcon,
                 onClick = {
                     scope.launch {
                         Coroutines.io {
@@ -129,7 +128,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.ExtraIcon,
+                size = ThemeValue.Size.MediumIcon,
                 onClick = {
                     state.cameraScan?.let { cameraScan ->
                         if (cameraScan.isTorchEnabled) cameraScan.enableTorch(false)

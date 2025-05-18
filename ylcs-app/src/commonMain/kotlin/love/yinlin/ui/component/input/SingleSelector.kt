@@ -1,21 +1,25 @@
 package love.yinlin.ui.component.input
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
 class SingleSelectorScope<T>(
@@ -26,28 +30,33 @@ class SingleSelectorScope<T>(
 ) {
     @Composable
     fun Item(item: T, title: String, enabled: Boolean = true) {
-        FilterChip(
-            selected = item == current,
-            onClick = { if (current != item) onSelected(item) },
-            enabled = enabled,
-            label = {
-                Text(
-                    text = title,
-                    style = textStyle,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+        val selected = current == item
+        Row(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable(enabled = enabled) { if (!selected) onSelected(item) }
+                .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else Colors.Transparent)
+                .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
+                .padding(ThemeValue.Padding.Value),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace / 2),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (hasIcon && item == current) {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    tint = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier.size(ThemeValue.Size.MicroIcon * 0.8f),
+                    contentDescription = null
                 )
-            },
-            leadingIcon = if (hasIcon && item == current) {
-                {
-                    MiniIcon(
-                        icon = Icons.Filled.Done,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            } else null,
-            elevation = FilterChipDefaults.filterChipElevation(hoveredElevation = ThemeValue.Padding.ZeroSpace)
-        )
+            }
+            Text(
+                text = title,
+                color = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                style = textStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Clip
+            )
+        }
     }
 }
 

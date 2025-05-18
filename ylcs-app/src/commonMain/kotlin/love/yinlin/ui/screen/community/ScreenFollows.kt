@@ -62,16 +62,16 @@ private fun FollowItemLayout(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
     ) {
         WebImage(
             uri = item.avatarPath,
             key = DateEx.TodayString,
             contentScale = ContentScale.Crop,
             circle = true,
-            modifier = Modifier.size(ThemeValue.Size.ExtraIcon)
+            modifier = Modifier.size(ThemeValue.Size.MicroImage)
         )
         Text(
             text = item.name,

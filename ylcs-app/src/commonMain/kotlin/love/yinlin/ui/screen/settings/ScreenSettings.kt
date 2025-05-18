@@ -288,7 +288,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 						key = app.config.cacheUserAvatar,
 						contentScale = ContentScale.Crop,
 						circle = true,
-						modifier = Modifier.size(ThemeValue.Size.SmallImage)
+						modifier = Modifier.size(ThemeValue.Size.Image)
 							.shadow(ThemeValue.Shadow.Icon, CircleShape)
 					)
 				}
@@ -416,7 +416,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer),
 				hasDivider = false,
 				checked = app.config.audioFocus,
-				onCheckedChange = { app.config.audioFocus = it }
+				onCheckedChange = {
+					app.config.audioFocus = it
+					slot.tip.success("重启APP后生效")
+				}
 			)
 		}
 	}

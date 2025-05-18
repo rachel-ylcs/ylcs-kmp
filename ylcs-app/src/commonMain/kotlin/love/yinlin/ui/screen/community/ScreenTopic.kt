@@ -124,7 +124,7 @@ private fun CoinLayout(
 							2 -> MaterialTheme.colorScheme.secondary
 							else -> MaterialTheme.colorScheme.primary
 						},
-						size = ThemeValue.Size.ExtraIcon * (1 - num / 20f)
+						size = ThemeValue.Size.MediumIcon * (1 - num / 20f)
 					)
 				}
 			}

@@ -35,7 +35,7 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 	) {
 		MiniIcon(
 			icon = Icons.Filled.NotificationImportant,
-			size = ThemeValue.Size.SmallImage
+			size = ThemeValue.Size.Image
 		)
 		Text(text = UnsupportedPlatformText)
 	}

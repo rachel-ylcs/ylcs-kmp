@@ -80,7 +80,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
-                    Box(Modifier.size(width = ThemeValue.Size.ExtraIcon, height = ThemeValue.Size.ExtraIcon / 8))
+                    Box(Modifier.size(width = ThemeValue.Size.MediumIcon, height = ThemeValue.Size.MediumIcon / 8))
                 }
                 // Content
                 block()
@@ -139,7 +139,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
-                Box(Modifier.size(width = ThemeValue.Size.ExtraIcon / 8, height = ThemeValue.Size.ExtraIcon))
+                Box(Modifier.size(width = ThemeValue.Size.MediumIcon / 8, height = ThemeValue.Size.MediumIcon))
             }
             // Content
             block()

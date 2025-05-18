@@ -23,8 +23,9 @@ fun Switch(
     enabled: Boolean = true,
     duration: Int = app.config.animationSpeed / 2
 ) {
+    val width = ThemeValue.Size.SmallInput
     Box(modifier = Modifier
-        .size(ThemeValue.Size.SmallImage, ThemeValue.Size.SmallImage / 2)
+        .size(width, width / 2)
         .clip(RoundedCornerShape(50))
         .background(if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
         .alpha(if (enabled) 1f else 0.7f)
@@ -32,11 +33,11 @@ fun Switch(
         contentAlignment = Alignment.CenterStart
     ) {
         val offsetX by animateDpAsState(
-            targetValue = if (checked) ThemeValue.Size.SmallImage / 2 else ThemeValue.Size.Little,
+            targetValue = if (checked) width / 2 else width / 24,
             animationSpec = tween(durationMillis = duration),
         )
         Box(modifier = Modifier.offset(x = offsetX)
-            .size(ThemeValue.Size.SmallImage / 2 - ThemeValue.Size.Little * 2)
+            .size(width / 2 - width / 12)
             .clip(RoundedCornerShape(50))
             .background(MaterialTheme.colorScheme.background)
         )

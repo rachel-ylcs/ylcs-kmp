@@ -146,7 +146,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.showstart?.let { showstart ->
 					ClickIcon(
 						res = Res.drawable.img_showstart,
-						size = ThemeValue.Size.ExtraIcon,
+						size = ThemeValue.Size.MediumIcon,
 						onClick = {
 							launch {
 								val uri = Uri.parse(showstart)
@@ -159,21 +159,21 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.damai?.let { damai ->
 					ClickIcon(
 						res = Res.drawable.img_damai,
-						size = ThemeValue.Size.ExtraIcon,
+						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
 				}
 				activity.maoyan?.let { maoyan ->
 					ClickIcon(
 						res = Res.drawable.img_maoyan,
-						size = ThemeValue.Size.ExtraIcon,
+						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink("https://show.maoyan.com/qqw#/detail/${maoyan}") }
 					)
 				}
 				activity.link?.let { link ->
 					ClickIcon(
 						icon = Icons.Outlined.Link,
-						size = ThemeValue.Size.ExtraIcon,
+						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink(link) }
 					)
 				}

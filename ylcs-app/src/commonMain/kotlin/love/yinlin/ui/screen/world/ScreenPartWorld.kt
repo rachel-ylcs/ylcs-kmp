@@ -158,7 +158,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			SplitLayout(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraSpace * 1.5f),
 				aspectRatio = 0.5f,
 				left = {
 					Text(
