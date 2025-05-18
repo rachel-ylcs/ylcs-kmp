@@ -122,17 +122,19 @@ actual fun VideoPlayer(
     val wasMusicPlaying = rememberState { false }
     val state: MutableState<VideoPlayerView?> = rememberState { null }
 
-    DisposableEffect(Unit) {
-        wasMusicPlaying.value = app.musicFactory.isPlaying
-        if (wasMusicPlaying.value) {
-            Coroutines.startMain {
-                app.musicFactory.pause()
-            }
-        }
-        onDispose {
+    if (app.config.audioFocus) {
+        DisposableEffect(Unit) {
+            wasMusicPlaying.value = app.musicFactory.isPlaying
             if (wasMusicPlaying.value) {
                 Coroutines.startMain {
-                    app.musicFactory.play()
+                    app.musicFactory.pause()
+                }
+            }
+            onDispose {
+                if (wasMusicPlaying.value) {
+                    Coroutines.startMain {
+                        app.musicFactory.play()
+                    }
                 }
             }
         }
