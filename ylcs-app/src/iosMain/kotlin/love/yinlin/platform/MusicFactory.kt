@@ -52,16 +52,15 @@ class ActualMusicFactory : MusicFactory() {
                 interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
                     AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
                 ) { notification ->
-                    val userInfo = notification?.userInfo
-                    userInfo?.let {
-                        val interruptionType = it[AVAudioSessionInterruptionTypeKey] as Long
+                    notification?.userInfo?.let { userInfo ->
+                        val interruptionType = userInfo[AVAudioSessionInterruptionTypeKey] as Long
                         when (interruptionType.toULong()) {
                             AVAudioSessionInterruptionTypeBegan -> {
                                 handleAudioSessionInterruption(AudioSessionInterruption.Began, null)
                             }
                             AVAudioSessionInterruptionTypeEnded -> {
-                                val options = userInfo[AVAudioSessionInterruptionOptionKey] as UInt
-                                val shouldResume = options and AVAudioSessionInterruptionFlags_ShouldResume
+                                val options = userInfo[AVAudioSessionInterruptionOptionKey] as Long
+                                val shouldResume = (options.toULong() and AVAudioSessionInterruptionOptionShouldResume) != 0UL
                                 handleAudioSessionInterruption(AudioSessionInterruption.Ended, shouldResume)
                             }
                             else -> {
@@ -70,7 +69,8 @@ class ActualMusicFactory : MusicFactory() {
                         }
                     }
                 }
-                setCategory(AVAudioSessionCategoryPlayback, null)
+                val options = if (app.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
+                setCategory(AVAudioSessionCategoryPlayback, options, null)
                 setActive(true, null)
                 setupNowPlayingInfoCenter()
             } catch (e: Throwable) {
@@ -279,7 +279,9 @@ class ActualMusicFactory : MusicFactory() {
 
     private fun handleAudioSessionInterruption(type: AudioSessionInterruption, arg: Any?) {
         when (type) {
-            AudioSessionInterruption.Began -> {}
+            AudioSessionInterruption.Began -> {
+                isPlaying = false
+            }
             AudioSessionInterruption.Ended -> {
                 val shouldPlay = arg as Boolean
                 if (isReady && shouldPlay) {
@@ -338,7 +340,7 @@ class ActualMusicFactory : MusicFactory() {
             return
         }
         val artwork = currentMusic?.let { MPMediaItemArtwork(UIImage(contentsOfFile = it.recordPath.toString())) }
-        var nowPlayingInfo = mutableMapOf<Any?, Any?>()
+        val nowPlayingInfo = mutableMapOf<Any?, Any?>()
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = NSURL.fileURLWithPath(currentMusic?.audioPath?.toString()!!)
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaTypeAudio
         nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = false
@@ -353,7 +355,7 @@ class ActualMusicFactory : MusicFactory() {
 
     private fun updatePlayingInfo() {
         val nowPlayingInfoCenter = MPNowPlayingInfoCenter.defaultCenter()
-        var nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
+        val nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = currentDuration / 1000.0f
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentPosition / 1000.0f
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = avPlayer?.rate
