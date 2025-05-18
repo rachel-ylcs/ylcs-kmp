@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.Font
 @Stable
 object Colors {
 	val Unspecified = Color.Unspecified
-	val Transparent = Color(0x00000000)
+	val Transparent = Color(0x00000000L)
 	val White = Color(0xffffffff)
 	val Ghost = Color(0xfff8f8ff)
 	val Black = Color(0xff000000)
@@ -113,6 +113,9 @@ object Colors {
 	val Steel6 = Color(0xff2471a3)
 	val Steel7 = Color(0xff1f618d)
 	val Steel8 = Color(0xff1a5276)
+
+	fun from(value: Int) = Color(value)
+	fun from(value: Long) = Color(value)
 }
 
 @Stable

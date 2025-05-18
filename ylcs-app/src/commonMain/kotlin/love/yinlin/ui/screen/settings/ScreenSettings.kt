@@ -1,12 +1,11 @@
 package love.yinlin.ui.screen.settings
 
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -16,8 +15,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -36,22 +40,75 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.*
-import love.yinlin.resources.Res
-import love.yinlin.resources.app_privacy_policy
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
-import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.resources.*
+import love.yinlin.ui.component.image.*
 import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.SingleSelector
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+
+@Stable
+private data class ContributorGroup(
+	val title: String,
+	val icon: ImageVector,
+	val color: Color,
+	val names: List<String>
+)
+
+@Composable
+private fun ContributorList(
+	contributors: Array<ContributorGroup>,
+	modifier: Modifier = Modifier
+) {
+	Column(modifier = modifier) {
+		for (contributor in contributors) {
+			Row(modifier = Modifier.fillMaxWidth()) {
+				Row(
+					modifier = Modifier.weight(1f)
+						.background(contributor.color.copy(alpha = 0.7f))
+						.padding(ThemeValue.Padding.Value),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.CenterHorizontally),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					MiniIcon(
+						icon = contributor.icon,
+						size = ThemeValue.Size.MicroIcon
+					)
+					Text(
+						text = contributor.title,
+						style = MaterialTheme.typography.labelMedium,
+						textAlign = TextAlign.Center,
+						maxLines = 1,
+						overflow = TextOverflow.Clip
+					)
+				}
+				Column(modifier = Modifier.padding(ThemeValue.Border.Small / 2).weight(2f).border(
+					width = ThemeValue.Border.Small,
+					color = contributor.color.copy(0.7f)
+				)) {
+					for (name in contributor.names) {
+						Text(
+							text = name,
+							textAlign = TextAlign.Center,
+							modifier = Modifier.fillMaxWidth().clickable {}.padding(ThemeValue.Padding.ExtraValue),
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis
+						)
+					}
+				}
+			}
+		}
+	}
+}
 
 @Stable
 class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
@@ -529,6 +586,56 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	override fun Floating() {
+		passwordModifySheet.Land {
+			val oldPassword = rememberTextInputState()
+			val newPassword1 = rememberTextInputState()
+			val newPassword2 = rememberTextInputState()
+
+			val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				horizontalAlignment = Alignment.End,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				LoadingRachelButton(
+					text = "提交",
+					icon = Icons.Outlined.Check,
+					enabled = canSubmit,
+					onClick = {
+						val oldPwd = oldPassword.text
+						val newPwd1 = newPassword1.text
+						val newPwd2 = newPassword2.text
+						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
+						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
+						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
+						else modifyPassword(oldPwd, newPwd1)
+					}
+				)
+				TextInput(
+					state = oldPassword,
+					hint = "旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword1,
+					hint = "确认旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword2,
+					hint = "新密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+
 		crashLogSheet.Land {
 			val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
 			Box(modifier = Modifier.fillMaxWidth()
@@ -583,56 +690,86 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		}
 
 		aboutSheet.Land {
-			Box(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)) {
-				Text(text = "${Local.NAME} ${Local.VERSION_NAME}")
-			}
-		}
-
-		passwordModifySheet.Land {
-			val oldPassword = rememberTextInputState()
-			val newPassword1 = rememberTextInputState()
-			val newPassword2 = rememberTextInputState()
-
-			val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
-
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-				horizontalAlignment = Alignment.End,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				modifier = Modifier.fillMaxWidth()
+					.padding(ThemeValue.Padding.EqualExtraValue)
+					.verticalScroll(rememberScrollState()),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2f)
 			) {
-				LoadingRachelButton(
-					text = "提交",
-					icon = Icons.Outlined.Check,
-					enabled = canSubmit,
-					onClick = {
-						val oldPwd = oldPassword.text
-						val newPwd1 = newPassword1.text
-						val newPwd2 = newPassword2.text
-						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
-						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
-						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
-						else modifyPassword(oldPwd, newPwd1)
-					}
+				MiniImage(
+					res = Res.drawable.img_logo,
+					modifier = Modifier.size(ThemeValue.Size.MediumImage).clip(CircleShape)
 				)
-				TextInput(
-					state = oldPassword,
-					hint = "旧密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
-					modifier = Modifier.fillMaxWidth()
+				Text(
+					text = Local.NAME,
+					style = MaterialTheme.typography.titleLarge,
+					color = MaterialTheme.colorScheme.primary
 				)
-				TextInput(
-					state = newPassword1,
-					hint = "确认旧密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
-					modifier = Modifier.fillMaxWidth()
+				Text(
+					text = Local.VERSION_NAME,
+					style = MaterialTheme.typography.bodyLarge
 				)
-				TextInput(
-					state = newPassword2,
-					hint = "新密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
+				Text(
+					text = stringResource(Res.string.app_description),
+					modifier = Modifier.fillMaxWidth(),
+					textAlign = TextAlign.Center,
+					overflow = TextOverflow.Ellipsis
+				)
+				Space()
+				Text(
+					text = "支持平台",
+					style = MaterialTheme.typography.labelLarge,
+				)
+				FlowRow(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				) {
+					MiniIcon(icon = Icons.Outlined.Android)
+					MiniIcon(icon = ExtraIcons.IOS)
+					MiniIcon(icon = ExtraIcons.Windows)
+					MiniIcon(icon = ExtraIcons.Linux)
+					MiniIcon(icon = ExtraIcons.MacOS)
+					MiniIcon(icon = ExtraIcons.WasmJs)
+					MiniIcon(icon = Icons.Outlined.Dns)
+				}
+				Row(
+					modifier = Modifier.clip(MaterialTheme.shapes.large)
+						.background(MaterialTheme.colorScheme.tertiaryContainer)
+						.clickable {
+							launch {
+								OS.Net.openUrl(getString(Res.string.app_repository))
+							}
+						}.padding(ThemeValue.Padding.Value),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					MiniIcon(
+						icon = ExtraIcons.Github,
+						color = MaterialTheme.colorScheme.onTertiaryContainer
+					)
+					Text(
+						text = "Github ylcs-kmp",
+						color = MaterialTheme.colorScheme.onTertiaryContainer,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+				Space()
+				Text(
+					text = "项目组",
+					style = MaterialTheme.typography.labelLarge,
+				)
+				ContributorList(
+					contributors = remember { arrayOf(
+						ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf("方旖旎", "木棠", "竹香满亭")),
+						ContributorGroup("运营", Icons.Outlined.Store, Colors.Steel4, listOf("思懿", "清逸", "青栀")),
+						ContributorGroup("宣发", Icons.Outlined.Campaign, Colors.Red4, listOf("姜辞", "晨晨")),
+						ContributorGroup("经办", Icons.Outlined.LocalFireDepartment, Colors.Orange4, listOf("寒山", "南溟", "韩非", "泸沽寻临", "名字不太喵", "圈圈临")),
+						ContributorGroup("数据", Icons.Outlined.Token, Colors.Purple4, listOf("鲤鱼焙梨", "海屿悼词", "冰临", "银小临")),
+						ContributorGroup("开发", Icons.Outlined.Code, Colors.Green4, listOf("焦骨", "青尘", "yingfeng", "桃花坞里桃花庵", "双花", "苏晚卿")),
+					) },
 					modifier = Modifier.fillMaxWidth()
 				)
 			}

@@ -3,6 +3,10 @@
 
     <string name="app_name">银临茶舍</string>
 
+    <string name="app_repository">https://github.com/rachel-ylcs/ylcs-kmp</string>
+
+    <string name="app_description">集资讯、听歌、美图、论坛、社交于一体的小银子聚集地</string>
+
     <string name="app_privacy_policy">
 银临茶舍是银临粉丝自制的 App，一个集资讯、听歌、美图、论坛、社交于一体的小银子聚集地。
 我们非常重视用户的隐私保护，银临茶舍绝不会在未经您允许的情景下收集您的任何隐私内容。

@@ -149,8 +149,8 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		override fun build(context: RichContext) {
 			val id = context.id
 			context.builder.appendInlineContent(id, " ")
-			context.content.put(id, this)
-		}
+            context.content[id] = this
+        }
 
 		@Composable
 		override fun draw() {
@@ -325,7 +325,7 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 						RICH_TYPE_STYLE -> {
 							container.style(
 								textSize = obj[RICH_ARG_TEXT_SIZE]?.Int?.sp,
-								color = obj[RICH_ARG_COLOR]?.Int?.let { Color(it) },
+								color = obj[RICH_ARG_COLOR]?.Int?.let { Colors.from(it) },
 								bold = obj[RICH_ARG_BOLD]?.Boolean == true,
 								italic = obj[RICH_ARG_ITALIC]?.Boolean == true,
 								underline = obj[RICH_ARG_UNDERLINE]?.Boolean == true,
