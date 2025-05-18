@@ -8,5 +8,4 @@ import kotlinx.serialization.Serializable
 data class ServerStatus(
     val targetVersion: Int, // [服务器最新版本]
     val minVersion: Int, // [最低兼容版本]
-    val downloadUrl: String // [更新链接]
 )
