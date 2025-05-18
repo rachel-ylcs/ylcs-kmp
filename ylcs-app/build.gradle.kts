@@ -203,6 +203,7 @@ kotlin {
 
                 implementation(libs.mmkv.android)
                 implementation(libs.scan.android)
+                implementation(libs.scan.camera.android)
 
                 implementation(fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar"))))
             }
