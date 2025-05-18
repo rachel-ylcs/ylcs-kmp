@@ -91,7 +91,7 @@ private fun ContributorList(
 						overflow = TextOverflow.Clip
 					)
 				}
-				Column(modifier = Modifier.padding(ThemeValue.Border.Small / 2).weight(2f).border(
+				Column(modifier = Modifier.padding(vertical = ThemeValue.Border.Small / 2).weight(2f).border(
 					width = ThemeValue.Border.Small,
 					color = contributor.color.copy(0.7f)
 				)) {
