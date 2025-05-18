@@ -76,6 +76,10 @@ kotlin {
             version = "2.2.2"
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
+        pod("SGQRCode") {
+            version = "4.1.0"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
         podfile = project.file("../iosApp/Podfile")
 
         xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
