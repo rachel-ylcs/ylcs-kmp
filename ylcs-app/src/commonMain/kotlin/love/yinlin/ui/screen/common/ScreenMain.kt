@@ -140,7 +140,7 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 		HorizontalPager(
 			state = pagerState,
 			key = { TabItem.entries[it] },
-			beyondViewportPageCount = TabItem.entries.size,
+			beyondViewportPageCount = 0,
 			modifier = modifier
 		) {
 			parts.getOrNull(it)?.let { part ->
