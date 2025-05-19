@@ -199,7 +199,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     abstract fun Content(args: A)
 
     @Composable
-    fun Land() = super.Land(::Content)
+    fun Land() = super.Land { Content(it) }
 }
 
 @Stable
