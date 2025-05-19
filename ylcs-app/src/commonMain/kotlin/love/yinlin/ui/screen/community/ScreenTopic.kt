@@ -799,13 +799,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 						num = page.pageNum
 					)?.let { page.moreData(it) }
 				},
-				itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
+				itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalExtraSpace),
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
 			) { subComment ->
 				SubCommentBar(
 					subComment = subComment,
 					parentComment = comment,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalSpace),
+					modifier = Modifier.fillMaxWidth(),
 					onDelete = {
 						page.items -= subComment
 						commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {

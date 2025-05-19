@@ -30,7 +30,7 @@ import love.yinlin.extension.launchFlag
 import love.yinlin.platform.*
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.screen.FABInfo
+import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
@@ -311,9 +311,14 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		MsgTabItem.PICTURES.ordinal -> photoState.listState.firstVisibleItemIndex == 0 && photoState.listState.firstVisibleItemScrollOffset == 0
 		else -> true
 	} }
-	override val fabIcon: ImageVector by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
-	override val fabMenus: Array<FABInfo> = arrayOf(
-		FABInfo(Icons.Outlined.Refresh) {
+
+	override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
+
+	override val fabMenus: Array<FABAction> = arrayOf(
+		FABAction(Icons.Filled.AccountCircle) {
+			navigate<ScreenWeiboFollows>()
+		},
+		FABAction(Icons.Outlined.Refresh) {
 			launch {
 				when (currentPage) {
 					MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
@@ -321,11 +326,9 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					MsgTabItem.PICTURES.ordinal -> photoState.loadPhotos()
 				}
 			}
-		},
-		FABInfo(Icons.Filled.AccountCircle) {
-			navigate<ScreenWeiboFollows>()
 		}
 	)
+
 	override suspend fun onFabClick() {
 		when (currentPage) {
 			MsgTabItem.WEIBO.ordinal -> weiboState.grid.listState.animateScrollToItem(0)

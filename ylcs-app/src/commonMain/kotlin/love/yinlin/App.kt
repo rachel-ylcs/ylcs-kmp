@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
-import love.yinlin.ui.component.screen.FABInfo
+import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.*
 import love.yinlin.ui.screen.common.ScreenMain
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
@@ -63,7 +63,7 @@ abstract class ScreenPart(val model: AppModel) {
 
 	open val fabIcon: ImageVector? get() = null
 	open val fabCanExpand: Boolean get() = false
-	open val fabMenus: Array<FABInfo> = emptyArray()
+	open val fabMenus: Array<FABAction> = emptyArray()
 	open suspend fun onFabClick() {}
 
 	@Composable

@@ -37,6 +37,7 @@ import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.PaginationArgs
+import love.yinlin.ui.component.screen.FABAction
 
 @Stable
 @Serializable
@@ -250,25 +251,15 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = ThemeValue.Shadow.Surface
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TabBar(
-                        currentPage = currentPage,
-                        onNavigate = {
-                            currentPage = it
-                            launch { requestNewData() }
-                        },
-                        items = DiscoveryItem.items,
-                        modifier = Modifier.weight(1f).padding(end = ThemeValue.Padding.HorizontalSpace)
-                    )
-                    ActionScope.Right.Actions {
-                        Action(Icons.Outlined.Add) {
-                            navigate<ScreenAddTopic>()
-                        }
-                    }
-                }
+                TabBar(
+                    currentPage = currentPage,
+                    onNavigate = {
+                        currentPage = it
+                        launch { requestNewData() }
+                    },
+                    items = DiscoveryItem.items,
+                    modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom)
+                )
             }
 
             StatefulBox(
@@ -297,5 +288,22 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 }
             }
         }
+    }
+
+    override val fabCanExpand: Boolean get() = listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
+
+    override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
+
+    override val fabMenus: Array<FABAction> = arrayOf(
+        FABAction(Icons.Outlined.Edit) {
+            navigate<ScreenAddTopic>()
+        },
+        FABAction(Icons.Outlined.Refresh) {
+            launch { requestNewData() }
+        }
+    )
+
+    override suspend fun onFabClick() {
+        listState.animateScrollToItem(0)
     }
 }

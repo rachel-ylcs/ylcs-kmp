@@ -27,7 +27,7 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.node.condition
 
 @Stable
-data class FABInfo(
+data class FABAction(
     val icon: ImageVector,
     val onClick: suspend () -> Unit = {}
 )
@@ -71,7 +71,7 @@ fun FABLayout(
     icon: ImageVector,
     canExpand: Boolean,
     onClick: suspend () -> Unit,
-    menus: Array<FABInfo>
+    menus: Array<FABAction>
 ) {
     Box(
         modifier = Modifier.fillMaxSize().zIndex(Floating.Z_INDEX_FAB),
@@ -111,7 +111,7 @@ fun FABLayout(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.FAB / 2)
                 ) {
-                    menus.forEachIndexed { index, info ->
+                    menus.forEachIndexed { index, action ->
                         val delay = (menus.size - 1 - index) * duration / menus.size
                         AnimatedVisibility(
                             visible = expanded,
@@ -120,9 +120,9 @@ fun FABLayout(
                             exit = fadeOut(tween(duration)) +
                                     slideOutHorizontally(tween(durationMillis = duration))
                         ) {
-                            FABIcon(icon = info.icon) {
+                            FABIcon(icon = action.icon) {
                                 expanded = false
-                                info.onClick()
+                                action.onClick()
                             }
                         }
                     }

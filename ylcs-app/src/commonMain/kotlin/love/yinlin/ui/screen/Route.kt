@@ -65,7 +65,7 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 
 	protected open val fabIcon: ImageVector? get() = null
 	protected open val fabCanExpand: Boolean get() = false
-	protected open val fabMenus: Array<FABInfo> = emptyArray()
+	protected open val fabMenus: Array<FABAction> = emptyArray()
 	protected open suspend fun onFabClick() {}
 
 	@Composable
