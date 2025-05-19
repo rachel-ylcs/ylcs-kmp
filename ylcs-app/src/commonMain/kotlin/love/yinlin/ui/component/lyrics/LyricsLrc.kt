@@ -27,6 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpRect
+import androidx.compose.ui.util.fastDistinctBy
+import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
@@ -123,7 +126,7 @@ class LyricsLrc : LyricsEngine {
                 }
                 catch (_: Throwable) { }
             }
-            lines = newLines.filter { it.position > 100L }.distinctBy { it.position }.sorted().ifEmpty { null }
+            lines = newLines.fastFilter { it.position > 100L }.fastDistinctBy { it.position }.sorted().ifEmpty { null }
         }
 
         val ok: Boolean get() = lines != null
@@ -141,11 +144,11 @@ class LyricsLrc : LyricsEngine {
         }
 
         val plainText: String get() = lines?.let { items ->
-            items.joinToString("\n") { it.text }
+            items.fastJoinToString("\n") { it.text }
         } ?: ""
 
         override fun toString(): String = lines?.let { items ->
-            items.joinToString("\n") {
+            items.fastJoinToString("\n") {
                 val milliseconds = (it.position % 1000) / 10
                 "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
             }

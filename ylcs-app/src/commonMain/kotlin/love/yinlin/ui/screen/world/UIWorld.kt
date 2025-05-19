@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
@@ -39,7 +40,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     internal val link = TextInputState(initActivity?.link ?: "")
     internal var pic: String? by mutableStateOf(initActivity?.picPath)
     internal val pics = initActivity?.let {
-        it.pics.map { name -> Picture(it.picPath(name)) }.toMutableStateList()
+        it.pics.fastMap { name -> Picture(it.picPath(name)) }.toMutableStateList()
     } ?: mutableStateListOf()
 
     // [活动要求]

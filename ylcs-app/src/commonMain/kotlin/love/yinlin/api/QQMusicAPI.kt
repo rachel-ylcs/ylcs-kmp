@@ -1,5 +1,7 @@
 package love.yinlin.api
 
+import androidx.compose.ui.util.fastJoinToString
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.common.Uri
 import love.yinlin.data.Data
@@ -64,7 +66,7 @@ object QQMusicAPI {
         PlatformMusicInfo(
             id = trackInfo["mid"].String,
             name = trackInfo["name"].String,
-            singer = trackInfo.arr("singer").joinToString(",") { it.Object["name"].String },
+            singer = trackInfo.arr("singer").fastJoinToString(",") { it.Object["name"].String },
             time = (trackInfo["interval"].Long * 1000).timeString,
             pic = "https://y.qq.com/music/photo_new/T002R300x300M000${trackInfo.obj("album")["pmid"].String}.jpg?max_age=2592000",
             audioUrl = "https://ws.stream.qqmusic.qq.com/${midUrlInfo["purl"].String}",
@@ -86,7 +88,7 @@ object QQMusicAPI {
             }
         }) { body: ByteArray ->
             val (json) = decodeData(1, body)
-            json.arr("songlist").map { it.Object["mid"].String }
+            json.arr("songlist").fastMap { it.Object["mid"].String }
         }
         return when (result1) {
             is Data.Success -> {

@@ -25,6 +25,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastAll
+import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastMap
+import androidx.compose.ui.util.fastMapNotNull
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -134,7 +139,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
-    private val selectIdList: List<String> get() = library.filter { it.selected }.map { it.id }
+    private val selectIdList: List<String> get() = library.fastFilter { it.selected }.fastMap { it.id }
 
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
@@ -158,13 +163,13 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     private fun selectAll() {
-        library.forEachIndexed { index, musicInfo ->
+        library.fastForEachIndexed { index, musicInfo ->
             if (!musicInfo.selected) library[index] = musicInfo.copy(selected = true)
         }
     }
 
     private fun exitManagement() {
-        library.forEachIndexed { index, musicInfo ->
+        library.fastForEachIndexed { index, musicInfo ->
             if (musicInfo.selected) library[index] = musicInfo.copy(selected = false)
         }
     }
@@ -216,8 +221,8 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                         val musicFactory = app.musicFactory
                         if (musicFactory.currentPlaylist?.name == name) {
                             musicFactory.addMedias(newItems
-                                .filter { id -> musicFactory.musicList.find { it.id == id } == null }
-                                .mapNotNull { musicFactory.musicLibrary[it] })
+                                .fastFilter { id -> musicFactory.musicList.find { it.id == id } == null }
+                                .fastMapNotNull { musicFactory.musicLibrary[it] })
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")
                     }
@@ -251,7 +256,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                 path.sink.use { sink ->
                     val packageItems = selectIdList
                     ModFactory.Merge(
-                        mediaPaths = packageItems.mapNotNull { musicFactory.musicLibrary[it]?.path },
+                        mediaPaths = packageItems.fastMapNotNull { musicFactory.musicLibrary[it]?.path },
                         sink = sink,
                         info = ModInfo(author = app.config.userProfile?.name ?: "无名")
                     ).process { a, b, name -> }
@@ -351,7 +356,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                         modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
                         left = {
                             Action(Icons.Outlined.SelectAll) {
-                                if (library.all { it.selected }) exitManagement()
+                                if (library.fastAll { it.selected }) exitManagement()
                                 else selectAll()
                             }
                         },

@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -19,6 +20,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
 import love.yinlin.extension.*
@@ -364,6 +367,15 @@ inline fun buildRichString(content: RichContainer.() -> Unit): RichString {
 }
 
 @Composable
+private fun SelectableContainer(
+	enabled: Boolean,
+	content: @Composable () -> Unit
+) {
+	if (enabled) SelectionContainer(content = content)
+	else content()
+}
+
+@Composable
 fun RichText(
 	text: RichString,
 	modifier: Modifier = Modifier,
@@ -396,20 +408,7 @@ fun RichText(
 		}
 	}
 
-	if (canSelected) {
-		SelectionContainer {
-			Text(
-				text = state.text,
-				color = color,
-				style = style,
-				modifier = modifier,
-				overflow = overflow,
-				maxLines = maxLines,
-				inlineContent = inlineTextContent
-			)
-		}
-	}
-	else {
+	SelectableContainer(canSelected) {
 		Text(
 			text = state.text,
 			color = color,
@@ -420,4 +419,11 @@ fun RichText(
 			inlineContent = inlineTextContent
 		)
 	}
+}
+
+@Composable
+fun RichTextInput(
+
+) {
+	
 }

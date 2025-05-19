@@ -28,6 +28,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.api.APIConfig
@@ -72,8 +74,8 @@ abstract class Pagination<E, K, out T>(
 			processArgs(null)
 		}
 		else {
-			val existingItems = items.map { distinctValue(it) }.toSet()
-			items += newItems.filter { distinctValue(it) !in existingItems }
+			val existingItems = items.fastMap { distinctValue(it) }.toSet()
+			items += newItems.fastFilter { distinctValue(it) !in existingItems }
 			val last = newItems.lastOrNull()
 			mOffset = last?.let { offset(it) } ?: default
 			processArgs(last)

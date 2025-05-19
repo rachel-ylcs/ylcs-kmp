@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
@@ -199,7 +200,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 						icon = Icons.Outlined.Upload,
 						onClick = {
 							try {
-								state.text = app.config.weiboUsers.items.map { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
+								state.text = app.config.weiboUsers.items.fastMap { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
 							}
 							catch (e: Throwable) {
 								slot.tip.error(e.message ?: "导出失败")

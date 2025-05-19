@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import io.ktor.utils.io.core.writeText
 import kotlinx.io.buffered
@@ -320,7 +321,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                PlatformMusicType.entries.forEach {
+                PlatformMusicType.entries.fastForEach {
                     RachelRadioButton(
                         checked = platformType == it,
                         text = it.description,

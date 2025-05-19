@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
@@ -43,7 +44,7 @@ private fun <T> TabBar(
 		},
 		divider = {}
 	) {
-		items.forEachIndexed { index, item ->
+		items.fastForEachIndexed { index, item ->
 			val isSelected = currentPage == index
 			Box(
 				modifier = Modifier.combinedClickable(

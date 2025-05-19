@@ -26,7 +26,7 @@ abstract class MusicFactory {
             try {
                 val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
                 val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
-                musicLibrary.put(info.id, info)
+                musicLibrary[info.id] = info
             }
             catch (_: Throwable) { }
         }

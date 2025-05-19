@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
@@ -133,7 +134,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 		when (result) {
 			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPics = result.data
-				input.pics += newPics.map { pic -> Picture(it.picPath(pic)) }
+				input.pics += newPics.fastMap { pic -> Picture(it.picPath(pic)) }
 				it.copy(pics = it.pics + newPics)
 			}
 			is Data.Error -> slot.tip.error(result.message)

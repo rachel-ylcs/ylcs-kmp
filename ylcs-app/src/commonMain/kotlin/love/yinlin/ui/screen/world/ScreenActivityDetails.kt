@@ -15,6 +15,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -132,7 +133,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 		modifier: Modifier = Modifier
 	) {
 		val pics = remember(activity) {
-			activity.pics.map { Picture(activity.picPath(it)) }
+			activity.pics.fastMap { Picture(activity.picPath(it)) }
 		}
 
 		Column(

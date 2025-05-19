@@ -1,5 +1,7 @@
 package love.yinlin.api
 
+import androidx.compose.ui.util.fastJoinToString
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
@@ -24,7 +26,7 @@ object NetEaseCloudAPI {
     private fun getCloudMusic(json: JsonObject): PlatformMusicInfo = PlatformMusicInfo(
         id = json["id"].String,
         name = json["name"].String,
-        singer = json.arr("artists").joinToString(",") { it.Object["name"].String },
+        singer = json.arr("artists").fastJoinToString(",") { it.Object["name"].String },
         time = json["duration"].Long.timeString,
         pic = json.obj("album")["picUrl"].String,
         audioUrl = "https://$NETEASECLOUD_HOST/${Container.mp3(json["id"].String)}",
@@ -57,7 +59,7 @@ object NetEaseCloudAPI {
         val result1 = app.client.safeGet(
             url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
         ) { json: JsonObject ->
-            json.obj("result").arr("tracks").map {
+            json.obj("result").arr("tracks").fastMap {
                 getCloudMusic(it.Object)
             }
         }

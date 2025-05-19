@@ -11,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -50,7 +51,7 @@ private enum class MsgTabItem(
 
 	companion object {
 		@Stable
-		val items = MsgTabItem.entries.map { it.title to it.icon }
+		val items = MsgTabItem.entries.fastMap { it.title to it.icon }
 	}
 }
 
@@ -76,7 +77,7 @@ sealed class PhotoItem(val name: String) {
 			for ((key, value) in json) {
 				items += when (value) {
 					is JsonObject -> parseJson(key, value)
-					is JsonArray -> Folder(key, value.map { File(it.String) })
+					is JsonArray -> Folder(key, value.fastMap { File(it.String) })
 					else -> error("")
 				}
 			}

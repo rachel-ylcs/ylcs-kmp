@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
@@ -55,7 +56,7 @@ private enum class DiscoveryItem(
 
     companion object {
         @Stable
-        val items = DiscoveryItem.entries.map { Comment.Section.sectionName(it.id) to it.icon }
+        val items = DiscoveryItem.entries.fastMap { Comment.Section.sectionName(it.id) to it.icon }
     }
 }
 

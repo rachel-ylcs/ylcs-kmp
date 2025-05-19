@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastAll
+import androidx.compose.ui.util.fastMap
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
@@ -74,7 +76,7 @@ private fun PhotoFolder(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.all { it is PhotoItem.File } }
+    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
 
     Surface(
         modifier = modifier,
@@ -155,7 +157,7 @@ fun PagePictures(
                             item = item,
                             modifier = Modifier.fillMaxWidth().aspectRatio(0.66667f),
                             onClick = {
-                                val pics = current.items.map {
+                                val pics = current.items.fastMap {
                                     val file = it as PhotoItem.File
                                     Picture(file.thumb, file.source)
                                 }

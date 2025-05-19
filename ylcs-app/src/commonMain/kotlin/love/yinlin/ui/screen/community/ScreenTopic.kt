@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -442,7 +443,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
-		val pics = remember(details, topic) { details.pics.map { Picture(topic.picPath(it)) } }
+		val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it)) } }
 
 		Column(
 			modifier = modifier,
@@ -858,7 +859,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	}
 
 	private val moveTopicDialog = FloatingDialogChoice.fromItems(
-		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
+		items = Comment.Section.MovableSection.fastMap { Comment.Section.sectionName(it) },
 		title = "移动主题板块"
 	)
 

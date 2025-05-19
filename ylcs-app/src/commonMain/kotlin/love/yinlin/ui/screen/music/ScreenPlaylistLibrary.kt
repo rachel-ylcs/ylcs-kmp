@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -227,7 +228,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                 val playlist = playlistLibrary[tabs[currentPage]]
                 if (playlist != null) {
                     val musicLibrary = app.musicFactory.musicLibrary
-                    library.replaceAll(playlist.items.map {
+                    library.replaceAll(playlist.items.fastMap {
                         val musicInfo = musicLibrary[it]
                         if (musicInfo != null) MusicStatusPreview(musicInfo) else MusicStatusPreview(it)
                     })
@@ -277,7 +278,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     private fun decodePlaylist(map: Map<String, MusicPlaylist>): Map<String, List<PlaylistPreviewItem>> {
         val musicLibrary = app.musicFactory.musicLibrary
         return map.mapValues { (_, playlist) ->
-            playlist.items.map { id -> PlaylistPreviewItem(id, musicLibrary[id]?.name ?: "未知[id=$id]") }
+            playlist.items.fastMap { id -> PlaylistPreviewItem(id, musicLibrary[id]?.name ?: "未知[id=$id]") }
         }
     }
 
@@ -429,7 +430,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                 if (!app.musicFactory.isReady) {
                                     if (slot.confirm.openSuspend(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
                                         val items = playlists.mapValues { (name, value) ->
-                                            MusicPlaylist(name, value.map { it.id })
+                                            MusicPlaylist(name, value.fastMap { it.id })
                                         }
                                         playlistLibrary.replaceAll(items)
                                         if (items.isNotEmpty()) currentPage = 0

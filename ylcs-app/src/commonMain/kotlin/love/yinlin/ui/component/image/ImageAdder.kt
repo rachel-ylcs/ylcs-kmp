@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
@@ -41,7 +42,7 @@ fun ImageAdder(
 	) {
 		val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
 
-		actualPics.forEachIndexed { index, pic ->
+		actualPics.fastForEachIndexed { index, pic ->
 			Box(
 				modifier = Modifier.size(size),
 				contentAlignment = Alignment.TopEnd

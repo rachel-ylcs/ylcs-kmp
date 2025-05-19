@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastFilter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.until
@@ -71,7 +72,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		shape: Shape,
 		modifier: Modifier = Modifier
 	) {
-		val pics by rememberDerivedState { activities.filter { it.pic != null } }
+		val pics by rememberDerivedState { activities.fastFilter { it.pic != null } }
 		BoxWithConstraints(modifier = modifier) {
 			Banner(
 				pics = pics,

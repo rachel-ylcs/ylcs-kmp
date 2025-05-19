@@ -1,5 +1,7 @@
 package love.yinlin.api
 
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -145,7 +147,7 @@ object ClientAPI {
 			return addFile(value)
 		}
 		override fun file(values: Sources<RawSource>?): APIFiles = listOf(addFile(values?.let { v ->
-			v.forEach { sources += it }
+			v.fastForEach { sources += it }
 			if (v.isEmpty()) null else v
 		}))
 	}
@@ -163,7 +165,7 @@ object ClientAPI {
 			if (item is JsonArray) {
 				val value = fileScope.map[item.first().String]
 				if (value == null) ignoreFiles += name
-				else (value as? Sources<*>)?.forEachIndexed { index, item ->
+				else (value as? Sources<*>)?.fastForEachIndexed { index, item ->
 					builder.addFormFile("#$name!$index", item)
 				}
 			}

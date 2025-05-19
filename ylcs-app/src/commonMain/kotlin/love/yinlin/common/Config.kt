@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
@@ -108,13 +110,13 @@ class KVConfig(private val kv: KV) {
 
 		operator fun get(index: Int): T = state[index]
 
-		inline fun <R> map(transform: (T) -> R): List<R> = items.map(transform)
+		inline fun <R> map(transform: (T) -> R): List<R> = items.fastMap(transform)
 
 		operator fun iterator(): Iterator<T> = state.iterator()
 
 		fun withIndex(): Iterable<IndexedValue<T>> = state.withIndex()
 
-		inline fun contains(predicate: (T) -> Boolean): Boolean = items.find(predicate) != null
+		inline fun contains(predicate: (T) -> Boolean): Boolean = items.fastAny(predicate)
 
 		operator fun plusAssign(item: T) {
 			state += item

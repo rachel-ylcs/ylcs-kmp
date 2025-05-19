@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
@@ -43,7 +44,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		var isSource: Boolean by mutableStateOf(false)
 	}
 
-	private val previews: List<PreviewPicture> = args.images.map { PreviewPicture(it) }
+	private val previews: List<PreviewPicture> = args.images.fastMap { PreviewPicture(it) }
 	private var current: Int by mutableIntStateOf(args.index)
 	private val pagerState = PagerState(current) { previews.size }
 

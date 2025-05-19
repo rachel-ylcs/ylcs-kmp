@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
@@ -109,9 +110,9 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
 
     private val items by derivedStateOf {
         when (tab) {
-            FollowTabItem.FOLLOWS -> pageFollows.items.map { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.FOLLOWERS -> pageFollowers.items.map { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.BLOCK_USERS -> pageBlockUsers.items.map { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.FOLLOWS -> pageFollows.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.FOLLOWERS -> pageFollowers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.BLOCK_USERS -> pageBlockUsers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
         }
     }
 
@@ -246,7 +247,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         tab = FollowTabItem.fromInt(it)
                         launch { if (items.isEmpty()) requestNewData() }
                     },
-                    items = remember { FollowTabItem.entries.map { it.title } },
+                    items = remember { FollowTabItem.entries.fastMap { it.title } },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

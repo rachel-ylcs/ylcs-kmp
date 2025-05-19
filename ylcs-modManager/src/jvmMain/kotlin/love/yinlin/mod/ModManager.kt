@@ -20,6 +20,8 @@ import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
@@ -216,7 +218,7 @@ private fun MergeUI(
             itemVerticalAlignment = Alignment.CenterVertically,
             maxItemsInEachRow = 5
         ) {
-            MusicResourceType.entries.forEach { type ->
+            MusicResourceType.entries.fastForEach { type ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -249,7 +251,7 @@ private fun MergeUI(
                 if (!saveName.endsWith(".rachel")) saveName += ".rachel"
                 val savePath = Path(output, saveName)
                 val filter = buildList {
-                    filters.forEachIndexed { index, v ->
+                    filters.fastForEachIndexed { index, v ->
                         if (v) add(MusicResourceType.entries[index])
                     }
                 }
