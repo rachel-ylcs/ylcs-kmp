@@ -71,7 +71,7 @@ sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.2.0" }
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.3" }
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.0" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.1" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.4.3" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
