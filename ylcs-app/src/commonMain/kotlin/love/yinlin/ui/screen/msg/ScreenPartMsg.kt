@@ -89,13 +89,13 @@ sealed class PhotoItem(val name: String) {
 class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	@Stable
 	class WeiboState {
-		val flagFirstLoad = launchFlag()
+		val firstLoad = launchFlag()
 		val grid = WeiboGridData()
 	}
 
 	@Stable
 	class ChaohuaState {
-		val flagFirstLoad = launchFlag()
+		val firstLoad = launchFlag()
 		val grid = WeiboGridData()
 		var sinceId: Long = 0L
 		var canLoading by mutableStateOf(false)
@@ -220,7 +220,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 	@Stable
 	class PhotoState {
-		val flagFirstLoad = launchFlag()
+		val firstLoad = launchFlag()
 		var photos by mutableStateOf(PhotoItem.Home)
 		var stack = mutableStateListOf(photos)
 		var state by mutableStateOf(BoxState.EMPTY)
@@ -254,9 +254,9 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 	private suspend fun initializeNewData() {
 		when (currentPage) {
-			MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update { weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id }) }
-			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update { chaohuaState.requestNewData() }
-			MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update { photoState.loadPhotos() }
+			MsgTabItem.WEIBO.ordinal -> weiboState.firstLoad { weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id }) }
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.firstLoad { chaohuaState.requestNewData() }
+			MsgTabItem.PICTURES.ordinal -> photoState.firstLoad { photoState.loadPhotos() }
 		}
 	}
 

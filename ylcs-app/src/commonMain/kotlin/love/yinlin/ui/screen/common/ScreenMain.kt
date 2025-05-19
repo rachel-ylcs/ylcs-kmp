@@ -161,18 +161,12 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 
 		LaunchedEffect(pagerState.settledPage) {
 			parts.getOrNull(pagerState.settledPage)?.let { part ->
-				launch {
-					part.firstLoad.update {
+				part.firstLoad(update = { part.update() }) {
+					launch {
 						part.initialize()
 						part.update()
 					}
 				}
-			}
-		}
-
-		LaunchedEffect(Unit) {
-            parts.getOrNull(pagerState.settledPage)?.let { part ->
-				part.firstLoad.check { part.update() }
 			}
 		}
 	}

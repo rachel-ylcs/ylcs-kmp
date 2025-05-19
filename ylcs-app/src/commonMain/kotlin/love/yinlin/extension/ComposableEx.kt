@@ -95,12 +95,9 @@ inline fun OffScreenEffect(crossinline block: (isForeground: Boolean) -> Unit) {
 @OptIn(ExperimentalAtomicApi::class)
 @JvmInline
 value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {
-	suspend inline fun update(crossinline block: suspend () -> Unit) {
-		if (value.compareAndSet(expectedValue = false, newValue = true)) block()
-	}
-
-	inline fun check(block: () -> Unit) {
-		if (value.load()) block()
+	inline operator fun invoke(update: () -> Unit = {}, init: () -> Unit) {
+		if (value.compareAndSet(expectedValue = false, newValue = true)) init()
+		else update()
 	}
 }
 
