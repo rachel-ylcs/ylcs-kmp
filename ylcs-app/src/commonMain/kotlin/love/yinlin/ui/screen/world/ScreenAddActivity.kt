@@ -24,8 +24,6 @@ import love.yinlin.ui.screen.common.ScreenImagePreview
 class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 	private val input = ActivityInputState()
 
-	private val cropDialog = FloatingDialogCrop()
-
 	private suspend fun addActivity() {
 		val activity = Activity(
 			aid = 0,
@@ -89,6 +87,8 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 			onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
 		)
 	}
+
+	private val cropDialog = FloatingDialogCrop()
 
 	@Composable
 	override fun Floating() {

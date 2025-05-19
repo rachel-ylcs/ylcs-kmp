@@ -114,20 +114,6 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
     private val library = mutableStateListOf<MusicStatusPreview>()
 
-    private val cloudBackupSheet = FloatingSheet()
-
-    private val inputPlaylistNameDialog = FloatingDialogInput(
-        hint = "歌单名",
-        maxLength = 16
-    )
-
-    private val processPlaylistDialog = FloatingDialogChoice.fromIconItems(
-        items = listOf(
-            "重命名" to Icons.Outlined.Edit,
-            "删除" to Icons.Outlined.Delete
-        )
-    )
-
     private suspend fun addPlaylist() {
         val name = inputPlaylistNameDialog.openSuspend()
         if (name != null) {
@@ -343,10 +329,17 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
-    @Composable
-    override fun Floating() {
-        cloudBackupSheet.Land {
-            var playlists: Map<String, List<PlaylistPreviewItem>> by rememberState { emptyMap() }
+    private val cloudBackupSheet = object : FloatingSheet() {
+        var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
+
+        override suspend fun initialize() {
+            playlists = emptyMap()
+            val result = downloadCloudPlaylist()
+            if (result is Data.Success) playlists = result.data
+        }
+
+        @Composable
+        override fun Content() {
             val state = rememberTextInputState()
 
             Column(
@@ -471,12 +464,21 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     }
                 }
             }
-
-            LaunchedEffect(Unit) {
-                val result = downloadCloudPlaylist()
-                if (result is Data.Success) playlists = result.data
-            }
         }
+    }
+
+    private val inputPlaylistNameDialog = FloatingDialogInput(hint = "歌单名", maxLength = 16)
+
+    private val processPlaylistDialog = FloatingDialogChoice.fromIconItems(
+        items = listOf(
+            "重命名" to Icons.Outlined.Edit,
+            "删除" to Icons.Outlined.Delete
+        )
+    )
+
+    @Composable
+    override fun Floating() {
+        cloudBackupSheet.Land()
         inputPlaylistNameDialog.Land()
         processPlaylistDialog.Land()
     }

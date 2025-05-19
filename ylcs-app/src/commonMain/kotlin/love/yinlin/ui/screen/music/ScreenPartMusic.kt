@@ -114,9 +114,6 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var sleepJob: Job? by mutableStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
-	private val currentPlaylistSheet = FloatingSheet()
-	private val sleepModeSheet = FloatingSheet()
-
 	@Composable
 	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
 		state = blurState,
@@ -779,10 +776,69 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+	private val currentPlaylistSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
+			val isEmptyList by rememberDerivedState { factory.musicList.isEmpty() }
+
+			LaunchedEffect(isEmptyList) {
+				if (isEmptyList) close()
+			}
+
+			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
+
+			LazyColumn(
+				modifier = Modifier.fillMaxWidth(),
+				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
+			) {
+				item(key = ItemKey("Header")) {
+					Row(
+						modifier = Modifier.fillMaxWidth().padding(
+							start = ThemeValue.Padding.HorizontalExtraSpace,
+							end = ThemeValue.Padding.HorizontalExtraSpace,
+							top = ThemeValue.Padding.VerticalExtraSpace
+						),
+						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Text(
+							text = factory.currentPlaylist?.name ?: "",
+							style = MaterialTheme.typography.titleLarge,
+							color = MaterialTheme.colorScheme.primary,
+							modifier = Modifier.weight(1f)
+						)
+						ClickIcon(
+							icon = Icons.Outlined.StopCircle,
+							onClick = {
+								close()
+								launch { factory.stop() }
+							}
+						)
+					}
+					HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
+				}
+				itemsIndexed(
+					items = factory.musicList,
+					key = { _, musicInfo -> musicInfo.id }
+				) { index, musicInfo ->
+					PlayingMusicStatusCard(
+						musicInfo = musicInfo,
+						isCurrent = index == currentIndex,
+						onClick = {
+							close()
+							launch { factory.gotoIndex(index) }
+						},
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
+			}
+		}
+	}
+
 	@OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-	override fun Floating() {
-		sleepModeSheet.Land {
+    private val sleepModeSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			val state = rememberTimePickerState(is24Hour = true)
 
 			Column(
@@ -839,60 +895,11 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
-		currentPlaylistSheet.Land {
-			val isEmptyList by rememberDerivedState { factory.musicList.isEmpty() }
+	}
 
-			LaunchedEffect(isEmptyList) {
-				if (isEmptyList) currentPlaylistSheet.close()
-			}
-
-			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
-
-			LazyColumn(
-				modifier = Modifier.fillMaxWidth(),
-				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
-			) {
-				item(key = ItemKey("Header")) {
-					Row(
-						modifier = Modifier.fillMaxWidth().padding(
-							start = ThemeValue.Padding.HorizontalExtraSpace,
-							end = ThemeValue.Padding.HorizontalExtraSpace,
-							top = ThemeValue.Padding.VerticalExtraSpace
-						),
-						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = factory.currentPlaylist?.name ?: "",
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary,
-							modifier = Modifier.weight(1f)
-						)
-						ClickIcon(
-							icon = Icons.Outlined.StopCircle,
-							onClick = {
-								currentPlaylistSheet.close()
-								launch { factory.stop() }
-							}
-						)
-					}
-					HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
-				}
-				itemsIndexed(
-					items = factory.musicList,
-					key = { _, musicInfo -> musicInfo.id }
-				) { index, musicInfo ->
-					PlayingMusicStatusCard(
-						musicInfo = musicInfo,
-						isCurrent = index == currentIndex,
-						onClick = {
-							currentPlaylistSheet.close()
-							launch { factory.gotoIndex(index) }
-						},
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
+    @Composable
+	override fun Floating() {
+		sleepModeSheet.Land()
+		currentPlaylistSheet.Land()
 	}
 }

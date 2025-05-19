@@ -61,8 +61,6 @@ private class MusicInfoState {
 class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
     private val input = MusicInfoState()
 
-    private val cropDialog = FloatingDialogCrop()
-
     override val title: String = "创建MOD"
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
@@ -294,6 +292,8 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             }
         }
     }
+
+    private val cropDialog = FloatingDialogCrop()
 
     @Composable
     override fun Floating() {

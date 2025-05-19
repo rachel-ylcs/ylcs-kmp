@@ -29,22 +29,14 @@ import love.yinlin.extension.rememberValueState
 import love.yinlin.platform.app
 import kotlin.math.roundToInt
 
-// SheetConfig仅在竖屏下生效
-@Stable
-data class SheetConfig(
-    // 竖屏配置
-    val min: Float = 0.3f,
-    val max: Float = 0.7f,
-    val full: Boolean = false
-)
-
 @Suppress("DuplicatedCode")
 @Stable
-open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetConfig()) : Floating<A>() {
+abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     override fun alignment(device: Device): Alignment = when (device.type) {
         Device.Type.PORTRAIT -> Alignment.BottomCenter
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
     }
+
     override fun enter(device: Device): EnterTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideInVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
@@ -55,6 +47,7 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
             initialOffsetX = { it }
         )
     }
+
     override fun exit(device: Device): ExitTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideOutVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
@@ -65,14 +58,19 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
             targetOffsetX = { it }
         )
     }
+
     override val zIndex: Float get() = Z_INDEX_SHEET
+
+    open val minHeightRatio: Float = 0.3f
+    open val maxHeightRatio: Float = 0.7f
+    open val initFullScreen: Boolean = false
 
     @Composable
     private fun PortraitWrapperContent(block: @Composable () -> Unit) {
         BoxWithConstraints(modifier = Modifier.padding(LocalImmersivePadding.current.withoutTop).fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()
-                .then(Modifier.heightIn(maxHeight * config.min, maxHeight * config.max))
-                .then(if (config.full) Modifier.fillMaxHeight() else Modifier)
+                .then(Modifier.heightIn(maxHeight * minHeightRatio, maxHeight * maxHeightRatio))
+                .then(if (initFullScreen) Modifier.fillMaxHeight() else Modifier)
             ) {
                 // DragHandler
                 Surface(
@@ -190,15 +188,31 @@ open class FloatingArgsSheet<A : Any>(private val config: SheetConfig = SheetCon
     }
 
     @Composable
-    override fun Wrapper(block: @Composable () -> Unit) {
+    final override fun Wrapper(block: @Composable () -> Unit) {
         when (LocalDevice.current.type) {
             Device.Type.PORTRAIT -> PortraitWrapper(block)
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> LandscapeWrapper(block)
         }
     }
+
+    @Composable
+    abstract fun Content(args: A)
+
+    @Composable
+    fun Land() = super.Land(::Content)
 }
 
 @Stable
-class FloatingSheet(config: SheetConfig = SheetConfig()) : FloatingArgsSheet<Unit>(config) {
+abstract class FloatingSheet : FloatingArgsSheet<Unit>() {
     fun open() { open(Unit) }
+
+    open suspend fun initialize() {}
+
+    final override suspend fun initialize(args: Unit) = initialize()
+
+    @Composable
+    abstract fun Content()
+
+    @Composable
+    final override fun Content(args: Unit) = Content()
 }

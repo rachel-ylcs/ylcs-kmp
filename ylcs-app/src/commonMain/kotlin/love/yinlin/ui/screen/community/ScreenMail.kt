@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
@@ -48,8 +47,6 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 		override fun offset(item: Mail): Long = item.mid
 		override fun arg1(item: Mail): Boolean = item.processed
 	}
-
-	private val mailDetailsSheet = FloatingArgsSheet<Mail>()
 
 	private suspend fun requestNewMails() {
 		if (state != BoxState.LOADING) {
@@ -213,15 +210,15 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 		}
 	}
 
-	@Composable
-	override fun Floating() {
-		mailDetailsSheet.Land { mail ->
+	private val mailDetailsSheet = object : FloatingArgsSheet<Mail>() {
+		@Composable
+		override fun Content(args: Mail) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
 			) {
 				Text(
-					text = mail.title,
+					text = args.title,
 					style = MaterialTheme.typography.titleLarge,
 					textAlign = TextAlign.Center,
 					maxLines = 1,
@@ -233,35 +230,40 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					if (mail.withYes) RachelButton(
+					if (args.withYes) RachelButton(
 						text = "接受",
 						icon = Icons.Outlined.CheckCircle,
 						onClick = {
-							launch { onProcessMail("接受此邮件结果?", mail.mid, true) }
+							launch { onProcessMail("接受此邮件结果?", args.mid, true) }
 						}
 					)
-					if (mail.withNo) RachelButton(
+					if (args.withNo) RachelButton(
 						text = "拒绝",
 						icon = Icons.Outlined.Cancel,
 						color = MaterialTheme.colorScheme.error,
 						onClick = {
-							launch { onProcessMail("拒绝此邮件结果?", mail.mid, false) }
+							launch { onProcessMail("拒绝此邮件结果?", args.mid, false) }
 						}
 					)
-					if (mail.processed) RachelButton(
+					if (args.processed) RachelButton(
 						text = "删除",
 						icon = Icons.Outlined.Delete,
 						color = MaterialTheme.colorScheme.secondary,
 						onClick = {
-							launch { onDeleteMail(mail.mid) }
+							launch { onDeleteMail(args.mid) }
 						}
 					)
 				}
 				RichText(
-					text = remember(mail) { RichString.parse(mail.content) },
+					text = remember(args) { RichString.parse(args.content) },
 					modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
 				)
 			}
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		mailDetailsSheet.Land()
 	}
 }

@@ -161,17 +161,10 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		override fun offset(item: Comment): Int = item.cid
 		override fun arg1(item: Comment): Boolean = item.isTop
 	}
+
 	private val commentState = LazyListState()
 
 	private var currentSendComment: Comment? by mutableStateOf(null)
-
-	private val subCommentSheet = FloatingArgsSheet<Comment>()
-	private val sendCoinSheet = FloatingSheet()
-
-	private val moveTopicDialog = FloatingDialogChoice.fromItems(
-		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
-		title = "移动主题板块"
-	)
 
 	private suspend fun requestTopic() {
 		val result = ClientAPI.request(
@@ -779,14 +772,26 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		} ?: EmptyBox()
 	}
 
-	@Composable
-	override fun Floating() {
-		subCommentSheet.Land { comment ->
-			val page = remember(comment) { object : Pagination<SubComment, Int, Int>(0) {
+	private val subCommentSheet = object : FloatingArgsSheet<Comment>() {
+		var page: Pagination<SubComment, Int, Int> by mutableStateOf(object : Pagination<SubComment, Int, Int>(0) {
+			override fun distinctValue(item: SubComment): Int = item.cid
+			override fun offset(item: SubComment): Int = item.cid
+		})
+
+		override suspend fun initialize(args: Comment) {
+			page = object : Pagination<SubComment, Int, Int>(0) {
 				override fun distinctValue(item: SubComment): Int = item.cid
 				override fun offset(item: SubComment): Int = item.cid
-			} }
+			}
+			requestSubComments(
+				pid = args.cid,
+				cid = page.offset,
+				num = page.pageNum
+			)?.let { page.newData(it) }
+		}
 
+		@Composable
+		override fun Content(args: Comment) {
 			PaginationColumn(
 				items = page.items,
 				key = { it.cid },
@@ -794,7 +799,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				canLoading = page.canLoading,
 				onLoading = {
 					requestSubComments(
-						pid = comment.cid,
+						pid = args.cid,
 						cid = page.offset,
 						num = page.pageNum
 					)?.let { page.moreData(it) }
@@ -804,29 +809,24 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			) { subComment ->
 				SubCommentBar(
 					subComment = subComment,
-					parentComment = comment,
+					parentComment = args,
 					modifier = Modifier.fillMaxWidth(),
 					onDelete = {
 						page.items -= subComment
-						commentPage.items.findAssign(predicate = { it.cid == comment.cid }) {
+						commentPage.items.findAssign(predicate = { it.cid == args.cid }) {
 							it.copy(subCommentNum = it.subCommentNum - 1)
 						}
 						// 楼中楼最后一条回复删除后隐藏楼中楼
-						if (page.items.isEmpty()) subCommentSheet.close()
+						if (page.items.isEmpty()) close()
 					}
 				)
 			}
-
-			LaunchedEffect(Unit) {
-				requestSubComments(
-					pid = comment.cid,
-					cid = page.offset,
-					num = page.pageNum
-				)?.let { page.newData(it) }
-			}
 		}
+	}
 
-		sendCoinSheet.Land { onClose ->
+	private val sendCoinSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
@@ -847,7 +847,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 							num = it + 1,
 							modifier = Modifier.weight(1f).aspectRatio(1f),
 							onClick = { num ->
-								sendCoinSheet.close()
+								close()
 								launch { onSendCoin(num) }
 							}
 						)
@@ -855,7 +855,17 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				}
 			}
 		}
+	}
 
+	private val moveTopicDialog = FloatingDialogChoice.fromItems(
+		items = Comment.Section.MovableSection.map { Comment.Section.sectionName(it) },
+		title = "移动主题板块"
+	)
+
+	@Composable
+	override fun Floating() {
+		subCommentSheet.Land()
+		sendCoinSheet.Land()
 		moveTopicDialog.Land()
 	}
 }

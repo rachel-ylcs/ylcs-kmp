@@ -75,14 +75,8 @@ private fun WeiboUserItem(
 @Stable
 class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	private var isLocal by mutableStateOf(true)
-	private val searchDialog = FloatingDialogInput(
-		hint = "输入微博用户昵称关键字",
-		maxLength = 16
-	)
 	private var state by mutableStateOf(BoxState.CONTENT)
 	private var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
-
-	private val importSheet = FloatingSheet()
 
 	private suspend fun refreshLocalUser() {
 		val weiboUsers = app.config.weiboUsers
@@ -160,9 +154,9 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 		}
 	}
 
-	@Composable
-	override fun Floating() {
-		importSheet.Land {
+	private val importSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			val state = rememberTextInputState()
 
 			Column(
@@ -215,7 +209,13 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 				}
 			}
 		}
+	}
 
+	private val searchDialog = FloatingDialogInput(hint = "输入微博用户昵称关键字", maxLength = 16)
+
+	@Composable
+	override fun Floating() {
+		importSheet.Land()
 		searchDialog.Land()
 	}
 }

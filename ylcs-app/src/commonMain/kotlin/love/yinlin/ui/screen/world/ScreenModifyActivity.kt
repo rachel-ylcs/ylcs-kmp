@@ -31,8 +31,6 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 	private val activities = worldPart.activities
 	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
-	private val cropDialog = FloatingDialogCrop()
-
 	private suspend fun modifyActivity() {
 		val ts = input.ts
 		val title = input.titleString
@@ -217,6 +215,8 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			onPicsClick = { _, index -> launch { modifyPictures(index) } }
 		)
 	}
+
+	private val cropDialog = FloatingDialogCrop()
 
 	@Composable
 	override fun Floating() {

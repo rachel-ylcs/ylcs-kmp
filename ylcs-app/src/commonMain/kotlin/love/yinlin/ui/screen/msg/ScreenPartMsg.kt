@@ -132,8 +132,6 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	// 当前微博
 	var currentWeibo: Weibo? = null
 
-	private val downloadVideoDialog = FloatingDownloadDialog()
-
 	val processor = object : WeiboProcessor {
 		override fun onWeiboClick(weibo: Weibo) {
 			currentWeibo = weibo
@@ -336,6 +334,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			MsgTabItem.PICTURES.ordinal -> photoState.listState.animateScrollToItem(0)
 		}
 	}
+
+	private val downloadVideoDialog = FloatingDownloadDialog()
 
 	@Composable
 	override fun Floating() {

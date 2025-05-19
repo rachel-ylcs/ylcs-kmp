@@ -47,8 +47,6 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	private var current: Int by mutableIntStateOf(args.index)
 	private val pagerState = PagerState(current) { previews.size }
 
-	private val downloadDialog = FloatingDownloadDialog()
-
 	private fun downloadPicture() {
 		val preview = previews[current]
 		val url = if (preview.isSource) preview.pic.source else preview.pic.image
@@ -170,6 +168,8 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		Device.Type.PORTRAIT -> Portrait()
 		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 	}
+
+	private val downloadDialog = FloatingDownloadDialog()
 
 	@Composable
 	override fun Floating() {

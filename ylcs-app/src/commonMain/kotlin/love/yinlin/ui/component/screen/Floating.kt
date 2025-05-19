@@ -59,6 +59,8 @@ abstract class Floating<A : Any> {
         visible = false
     }
 
+    protected open suspend fun initialize(args: A) {}
+
     @Composable
     protected open fun Wrapper(block: @Composable () -> Unit) = block()
 
@@ -115,6 +117,10 @@ abstract class Floating<A : Any> {
             AnimatedFloatingContent(visible = visible) {
                 Wrapper {
                     block(args)
+                }
+
+                LaunchedEffect(Unit) {
+                    initialize(args)
                 }
             }
         }

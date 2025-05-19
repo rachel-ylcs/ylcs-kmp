@@ -55,7 +55,6 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.screen.SheetConfig
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
@@ -102,11 +101,6 @@ private fun LevelItem(
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	private val scanSheet = FloatingSheet(SheetConfig(max = 0.9f, full = true))
-	private val userCardSheet = FloatingArgsSheet<UserProfile>()
-	private val signinSheet = FloatingArgsSheet<UserProfile>()
-	private val levelSheet = FloatingArgsSheet<UserProfile>()
-
 	@OptIn(ExperimentalAtomicApi::class)
     private val isUpdateToken = AtomicBoolean(false)
 
@@ -349,16 +343,38 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		} ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
 	}
 
-	@Composable
-	override fun Floating() {
-		userCardSheet.Land { profile ->
+	private val scanSheet = object : FloatingSheet() {
+		override val maxHeightRatio: Float = 0.9f
+		override val initFullScreen: Boolean = true
+
+		@Composable
+		override fun Content() {
+			QrcodeScanner(
+				modifier = Modifier.fillMaxWidth(),
+				onResult = { result ->
+					try {
+						val uri = Uri.parse(result)!!
+						if (uri.scheme == Scheme.Rachel) deeplink(uri)
+					}
+					catch (_: Throwable) {
+						slot.tip.warning("不能识别此信息")
+					}
+					close()
+				}
+			)
+		}
+	}
+
+	private val userCardSheet = object : FloatingArgsSheet<UserProfile>() {
+		@Composable
+		override fun Content(args: UserProfile) {
 			Column(
 				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 			) {
 				WebImage(
-					uri = profile.avatarPath,
+					uri = args.avatarPath,
 					key = app.config.cacheUserAvatar,
 					contentScale = ContentScale.Crop,
 					circle = true,
@@ -366,7 +382,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 						.shadow(ThemeValue.Shadow.Icon, CircleShape)
 				)
 				Text(
-					text = profile.name,
+					text = args.name,
 					style = MaterialTheme.typography.displaySmall,
 					color = MaterialTheme.colorScheme.primary
 				)
@@ -374,7 +390,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				val primaryColor = MaterialTheme.colorScheme.primary
 				val secondaryColor = MaterialTheme.colorScheme.secondary
 				val logoPainter = painterResource(Res.drawable.img_logo)
-				val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${profile.uid}") {
+				val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${args.uid}") {
 					logo {
 						painter = logoPainter
 						padding = QrLogoPadding.Natural(1f)
@@ -404,27 +420,32 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				Space()
 			}
 		}
+	}
 
-		scanSheet.Land {
-			QrcodeScanner(
-				modifier = Modifier.fillMaxWidth(),
-				onResult = { result ->
-					try {
-						val uri = Uri.parse(result)!!
-						if (uri.scheme == Scheme.Rachel) deeplink(uri)
-					}
-					catch (_: Throwable) {
-						slot.tip.warning("不能识别此信息")
-					}
-					scanSheet.close()
-				}
+	private val signinSheet = object : FloatingArgsSheet<UserProfile>() {
+		var signinData by mutableStateOf(BooleanArray(8) { false })
+		var todayIndex by mutableIntStateOf(-1)
+		var todaySignin by mutableStateOf(true)
+
+		override suspend fun initialize(args: UserProfile) {
+			signinData = BooleanArray(8) { false }
+			todayIndex = -1
+			todaySignin = true
+			val result = ClientAPI.request(
+				route = API.User.Profile.Signin,
+				data = app.config.userToken
 			)
+			if (result is Data.Success) {
+				with(result.data) {
+					todaySignin = status
+					todayIndex = index
+					signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
+				}
+			}
 		}
 
-		signinSheet.Land { profile ->
-			var data by rememberState { BooleanArray(8) { false } }
-			var todayIndex by rememberValueState(-1)
-			var todaySignin by rememberTrue()
+		@Composable
+		override fun Content(args: UserProfile) {
 			val today = remember { DateEx.Today }
 
 			Column(
@@ -462,7 +483,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
 										MiniIcon(
-											icon = if (data[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+											icon = if (signinData[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
 											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
 										)
 										Text(
@@ -479,27 +500,16 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 				Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
 			}
-
-			LaunchedEffect(Unit) {
-				val result = ClientAPI.request(
-					route = API.User.Profile.Signin,
-					data = app.config.userToken
-				)
-				if (result is Data.Success) {
-					with(result.data) {
-						todaySignin = status
-						todayIndex = index
-						data = BooleanArray(8) { ((value shr it) and 1) == 1 }
-					}
-				}
-			}
 		}
+	}
 
-		levelSheet.Land { profile ->
+	private val levelSheet = object : FloatingArgsSheet<UserProfile>() {
+		@Composable
+		override fun Content(args: UserProfile) {
 			LazyColumn(modifier = Modifier.fillMaxWidth()) {
 				item(key = ItemKey("Profile")) {
 					UserProfileInfo(
-						profile = remember(profile) { profile.publicProfile },
+						profile = remember(args) { args.publicProfile },
 						owner = true,
 						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
 					) { onLevelClick ->
@@ -508,12 +518,12 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 							verticalAlignment = Alignment.CenterVertically
 						) {
 							PortraitValue(
-								value = profile.level.toString(),
+								value = args.level.toString(),
 								title = "等级",
 								modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
 							)
 							PortraitValue(
-								value = profile.coin.toString(),
+								value = args.coin.toString(),
 								title = "银币"
 							)
 						}
@@ -531,5 +541,13 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 			}
 		}
+	}
+
+	@Composable
+	override fun Floating() {
+		scanSheet.Land()
+		userCardSheet.Land()
+		signinSheet.Land()
+		levelSheet.Land()
 	}
 }

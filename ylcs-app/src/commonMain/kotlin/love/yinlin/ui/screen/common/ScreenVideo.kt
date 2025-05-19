@@ -17,8 +17,6 @@ class ScreenVideo(model: AppModel, val args: Args) : SubScreen<ScreenVideo.Args>
     @Serializable
     data class Args(val url: String)
 
-    private val downloadDialog = FloatingDialogProgress()
-
     override val title: String? = null
 
     @Composable
@@ -29,6 +27,8 @@ class ScreenVideo(model: AppModel, val args: Args) : SubScreen<ScreenVideo.Args>
             onBack = { onBack() }
         )
     }
+
+    private val downloadDialog = FloatingDialogProgress()
 
     @Composable
     override fun Floating() {

@@ -317,9 +317,6 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     private var lyricsText by mutableStateOf("")
     private val resources = mutableStateListOf<ResourceItem>()
 
-    private val cropDialog = FloatingDialogCrop()
-    private val modifySheet = FloatingArgsSheet<ResourceItem>()
-
     @Composable
     private fun MusicMetadataLayout(modifier: Modifier = Modifier) {
         musicInfo?.let { info ->
@@ -590,14 +587,18 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
     }
 
+    private val modifySheet = object : FloatingArgsSheet<ResourceItem>() {
+        @Composable
+        override fun Content(args: ResourceItem) {
+            with(args.onModify) { ModifyLayout(args) }
+        }
+    }
+
+    private val cropDialog = FloatingDialogCrop()
+
     @Composable
     override fun Floating() {
-        modifySheet.Land {
-            with(it.onModify) {
-                ModifyLayout(it)
-            }
-        }
-
+        modifySheet.Land()
         cropDialog.Land()
     }
 }

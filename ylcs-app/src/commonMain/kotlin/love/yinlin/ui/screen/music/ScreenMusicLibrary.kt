@@ -151,27 +151,6 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         FromGroup2("MOD工坊2群", Icons.Outlined.Extension, false),
     }
 
-    private val importDialog = object : FloatingDialogChoice() {
-        override val num: Int = ImportMusicItem.entries.size
-
-        @Composable
-        override fun Name(index: Int) = Text(text = ImportMusicItem.entries[index].text, modifier = Modifier.fillMaxWidth())
-
-        @Composable
-        override fun Icon(index: Int) {
-            val item = ImportMusicItem.entries[index]
-            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.MediumIcon)
-            else MiniIcon(icon = item.icon, size = ThemeValue.Size.MediumIcon)
-        }
-    }
-
-    private val searchDialog = FloatingDialogInput(
-        hint = "歌曲名",
-        maxLength = 32
-    )
-
-    private val addMusicDialog = FloatingDialogDynamicChoice("添加到歌单")
-
     private fun resetLibrary() {
         library.replaceAll(app.musicFactory.musicLibrary.map {
             MusicInfoPreview(it.value)
@@ -412,6 +391,24 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
             }
         }
     }
+
+    private val importDialog = object : FloatingDialogChoice() {
+        override val num: Int = ImportMusicItem.entries.size
+
+        @Composable
+        override fun Name(index: Int) = Text(text = ImportMusicItem.entries[index].text, modifier = Modifier.fillMaxWidth())
+
+        @Composable
+        override fun Icon(index: Int) {
+            val item = ImportMusicItem.entries[index]
+            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.MediumIcon)
+            else MiniIcon(icon = item.icon, size = ThemeValue.Size.MediumIcon)
+        }
+    }
+
+    private val searchDialog = FloatingDialogInput(hint = "歌曲名", maxLength = 32)
+
+    private val addMusicDialog = FloatingDialogDynamicChoice("添加到歌单")
 
     @Composable
     override fun Floating() {

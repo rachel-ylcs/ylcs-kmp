@@ -112,26 +112,6 @@ private fun ContributorList(
 
 @Stable
 class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
-	private val crashLogSheet = FloatingSheet()
-	private val feedbackSheet = FloatingSheet()
-	private val privacyPolicySheet = FloatingSheet()
-	private val aboutSheet = FloatingSheet()
-	private val passwordModifySheet = FloatingSheet()
-
-	private val cropDialog = FloatingDialogCrop()
-
-	private val idModifyDialog = FloatingDialogInput(
-		hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
-		maxLength = UserConstraint.MAX_NAME_LENGTH
-	)
-
-	private val signatureModifyDialog = FloatingDialogInput(
-		hint = "修改个性签名",
-		maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
-		maxLines = 3,
-		clearButton = false
-	)
-
 	private suspend fun pickPicture(aspectRatio: Float): Path? {
 		return Picker.pickPicture()?.use { source ->
 			OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
@@ -584,59 +564,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 		Device.Type.LANDSCAPE -> Landscape(app.config.userProfile)
 	}
 
-	@Composable
-	override fun Floating() {
-		passwordModifySheet.Land {
-			val oldPassword = rememberTextInputState()
-			val newPassword1 = rememberTextInputState()
-			val newPassword2 = rememberTextInputState()
-
-			val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
-
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-				horizontalAlignment = Alignment.End,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-			) {
-				LoadingRachelButton(
-					text = "提交",
-					icon = Icons.Outlined.Check,
-					enabled = canSubmit,
-					onClick = {
-						val oldPwd = oldPassword.text
-						val newPwd1 = newPassword1.text
-						val newPwd2 = newPassword2.text
-						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
-						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
-						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
-						else modifyPassword(oldPwd, newPwd1)
-					}
-				)
-				TextInput(
-					state = oldPassword,
-					hint = "旧密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
-					modifier = Modifier.fillMaxWidth()
-				)
-				TextInput(
-					state = newPassword1,
-					hint = "确认旧密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
-					modifier = Modifier.fillMaxWidth()
-				)
-				TextInput(
-					state = newPassword2,
-					hint = "新密码",
-					inputType = InputType.PASSWORD,
-					maxLength = UserConstraint.MAX_PWD_LENGTH,
-					modifier = Modifier.fillMaxWidth()
-				)
-			}
-		}
-
-		crashLogSheet.Land {
+	private val crashLogSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
 			Box(modifier = Modifier.fillMaxWidth()
 				.padding(ThemeValue.Padding.SheetValue)
@@ -650,8 +580,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				}
 			}
 		}
+	}
 
-		feedbackSheet.Land { onClose ->
+	private val feedbackSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			val state = rememberTextInputState()
 
 			Column(
@@ -674,8 +607,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				)
 			}
 		}
+	}
 
-		privacyPolicySheet.Land {
+	private val privacyPolicySheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			Box(modifier = Modifier.fillMaxWidth()
 				.padding(ThemeValue.Padding.SheetValue)
 				.verticalScroll(rememberScrollState())
@@ -688,8 +624,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				}
 			}
 		}
+	}
 
-		aboutSheet.Land {
+	private val aboutSheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
 			Column(
 				modifier = Modifier.fillMaxWidth()
 					.padding(ThemeValue.Padding.EqualExtraValue)
@@ -774,7 +713,82 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				)
 			}
 		}
+	}
 
+	private val passwordModifySheet = object : FloatingSheet() {
+		@Composable
+		override fun Content() {
+			val oldPassword = rememberTextInputState()
+			val newPassword1 = rememberTextInputState()
+			val newPassword2 = rememberTextInputState()
+
+			val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
+
+			Column(
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+				horizontalAlignment = Alignment.End,
+				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			) {
+				LoadingRachelButton(
+					text = "提交",
+					icon = Icons.Outlined.Check,
+					enabled = canSubmit,
+					onClick = {
+						val oldPwd = oldPassword.text
+						val newPwd1 = newPassword1.text
+						val newPwd2 = newPassword2.text
+						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
+						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
+						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
+						else modifyPassword(oldPwd, newPwd1)
+					}
+				)
+				TextInput(
+					state = oldPassword,
+					hint = "旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword1,
+					hint = "确认旧密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+				TextInput(
+					state = newPassword2,
+					hint = "新密码",
+					inputType = InputType.PASSWORD,
+					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					modifier = Modifier.fillMaxWidth()
+				)
+			}
+		}
+	}
+
+	private val cropDialog = FloatingDialogCrop()
+
+	private val idModifyDialog = FloatingDialogInput(
+		hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
+		maxLength = UserConstraint.MAX_NAME_LENGTH
+	)
+
+	private val signatureModifyDialog = FloatingDialogInput(
+		hint = "修改个性签名",
+		maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
+		maxLines = 3,
+		clearButton = false
+	)
+
+	@Composable
+	override fun Floating() {
+		passwordModifySheet.Land()
+		crashLogSheet.Land()
+		feedbackSheet.Land()
+		privacyPolicySheet.Land()
+		aboutSheet.Land()
 		cropDialog.Land()
 		idModifyDialog.Land()
 		signatureModifyDialog.Land()
