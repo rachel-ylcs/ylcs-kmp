@@ -337,6 +337,11 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 40.dp
 			Device.Size.LARGE -> 44.dp
 		}
+		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 40.dp
+			Device.Size.MEDIUM -> 44.dp
+			Device.Size.LARGE -> 48.dp
+		}
 		val MicroImage: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 32.dp
 			Device.Size.MEDIUM -> 40.dp
@@ -463,6 +468,11 @@ object ThemeValue {
 		val Value: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalSpace, vertical = VerticalSpace)
 		val EqualExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualExtraSpace, vertical = EqualExtraSpace)
 		val ExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
+		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 16.dp
+			Device.Size.MEDIUM -> 20.dp
+			Device.Size.LARGE -> 24.dp
+		}
 		val SheetValue: PaddingValues @Composable get() = when (LocalDevice.current.type) {
 			Device.Type.PORTRAIT -> PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
 			else -> PaddingValues(top = HorizontalExtraSpace, bottom = HorizontalExtraSpace, end = HorizontalExtraSpace)

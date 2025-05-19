@@ -3,6 +3,7 @@ package love.yinlin.ui.screen.msg.pictures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Surface
@@ -107,17 +108,20 @@ private fun PhotoFolder(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PagePictures(part: ScreenPartMsg) {
-    val state = part.photoState
-    val current by rememberDerivedState { state.stack.last() }
-    val canBack by rememberDerivedState { state.stack.size > 1 }
+fun PagePictures(
+    part: ScreenPartMsg,
+    state: LazyGridState,
+) {
+    val photoState = part.photoState
+    val current by rememberDerivedState { photoState.stack.last() }
+    val canBack by rememberDerivedState { photoState.stack.size > 1 }
 
     BackHandler(canBack) {
-        state.stack.removeLastOrNull()
+        photoState.stack.removeLastOrNull()
     }
 
     StatefulBox(
-        state = state.state,
+        state = photoState.state,
         modifier = Modifier.fillMaxSize()
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -127,15 +131,16 @@ fun PagePictures(part: ScreenPartMsg) {
                 shadowElevation = ThemeValue.Shadow.Surface
             ) {
                 Breadcrumb(
-                    items = state.stack,
+                    items = photoState.stack,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        state.stack.removeRange(it + 1, state.stack.size)
+                        photoState.stack.removeRange(it + 1, photoState.stack.size)
                     }
                 )
             }
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                state = state,
                 contentPadding = ThemeValue.Padding.EqualValue,
                 horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
@@ -160,7 +165,7 @@ fun PagePictures(part: ScreenPartMsg) {
                         is PhotoItem.Folder -> PhotoFolder(
                             item = item,
                             modifier = Modifier.fillMaxWidth().aspectRatio(0.66667f),
-                            onClick = { state.stack += item }
+                            onClick = { photoState.stack += item }
                         )
                     }
                 }

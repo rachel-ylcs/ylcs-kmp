@@ -12,6 +12,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.lifecycle.ViewModel
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.app
+import love.yinlin.ui.component.screen.FABInfo
 import love.yinlin.ui.screen.*
 import love.yinlin.ui.screen.common.ScreenMain
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
@@ -58,6 +60,11 @@ abstract class ScreenPart(val model: AppModel) {
 
 	@Composable
 	abstract fun Content()
+
+	open val fabIcon: ImageVector? get() = null
+	open val fabCanExpand: Boolean get() = false
+	open val fabMenus: Array<FABInfo> = emptyArray()
+	open suspend fun onFabClick() {}
 
 	@Composable
 	open fun Floating() {}

@@ -8,6 +8,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,10 +23,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.Uri
 import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.extension.getNavType
-import love.yinlin.ui.component.screen.FloatingDialogConfirm
-import love.yinlin.ui.component.screen.FloatingDialogInfo
-import love.yinlin.ui.component.screen.FloatingDialogLoading
-import love.yinlin.ui.component.screen.Tip
+import love.yinlin.ui.component.screen.*
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -65,6 +63,11 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	@Composable
 	protected abstract fun Content()
 
+	protected open val fabIcon: ImageVector? get() = null
+	protected open val fabCanExpand: Boolean get() = false
+	protected open val fabMenus: Array<FABInfo> = emptyArray()
+	protected open suspend fun onFabClick() {}
+
 	@Composable
 	protected open fun Floating() {}
 
@@ -72,6 +75,15 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun UI() {
 		Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
 			Content()
+		}
+
+		fabIcon?.let {
+			FABLayout(
+				icon = it,
+				canExpand = fabCanExpand,
+				onClick = ::onFabClick,
+				menus = fabMenus
+			)
 		}
 
 		val immersivePadding = rememberImmersivePadding()

@@ -1,12 +1,14 @@
 package love.yinlin.ui.screen.msg
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
@@ -27,9 +29,8 @@ import love.yinlin.extension.String
 import love.yinlin.extension.launchFlag
 import love.yinlin.platform.*
 import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.ui.component.screen.FABInfo
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
@@ -223,6 +224,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		var photos by mutableStateOf(PhotoItem.Home)
 		var stack = mutableStateListOf(photos)
 		var state by mutableStateOf(BoxState.EMPTY)
+		val listState = LazyGridState()
 
 		suspend fun loadPhotos() {
 			if (state != BoxState.LOADING) {
@@ -250,30 +252,16 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	val chaohuaState = ChaohuaState()
 	val photoState = PhotoState()
 
-	private fun requestNewData() {
+	private suspend fun initializeNewData() {
 		when (currentPage) {
-			MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update {
-				launch { weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id }) }
-			}
-			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update {
-				launch { chaohuaState.requestNewData() }
-			}
-			MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update {
-				launch { photoState.loadPhotos() }
-			}
-		}
-	}
-
-	private suspend fun onRefresh() {
-		when (currentPage) {
-			MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
-			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
-			MsgTabItem.PICTURES.ordinal -> photoState.loadPhotos()
+			MsgTabItem.WEIBO.ordinal -> weiboState.flagFirstLoad.update { weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id }) }
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.flagFirstLoad.update { chaohuaState.requestNewData() }
+			MsgTabItem.PICTURES.ordinal -> photoState.flagFirstLoad.update { photoState.loadPhotos() }
 		}
 	}
 
 	override suspend fun initialize() {
-		requestNewData()
+		initializeNewData()
 	}
 
 	@Composable
@@ -285,48 +273,64 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
-				Row(
+				TabBar(
+					currentPage = currentPage,
+					onNavigate = {
+						currentPage = it
+						launch { initializeNewData() }
+					},
+					items = MsgTabItem.items,
 					modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					TabBar(
-						currentPage = currentPage,
-						onNavigate = {
-							currentPage = it
-							requestNewData()
-						},
-						items = MsgTabItem.items,
-						modifier = Modifier.weight(1f)
-					)
-					Space()
-					ActionScope.Right.Actions {
-						ActionSuspend(Icons.Outlined.Refresh) {
-							onRefresh()
-						}
-						Action(Icons.Filled.AccountCircle) {
-							navigate<ScreenWeiboFollows>()
-						}
-					}
-				}
+				)
 			}
 
 			Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)) {
 				CompositionLocalProvider(LocalWeiboProcessor provides processor) {
 					when (currentPage) {
 						MsgTabItem.WEIBO.ordinal -> PageWeibo(
-							state = weiboState.grid.listState,
-							part = this@ScreenPartMsg
+							part = this@ScreenPartMsg,
+							state = weiboState.grid.listState
 						)
 						MsgTabItem.CHAOHUA.ordinal -> PageChaohua(
-							state = chaohuaState.grid.listState,
-							part = this@ScreenPartMsg
+							part = this@ScreenPartMsg,
+							state = chaohuaState.grid.listState
 						)
 						MsgTabItem.PICTURES.ordinal -> PagePictures(
-							part = this@ScreenPartMsg
+							part = this@ScreenPartMsg,
+							state = photoState.listState
 						)
 					}
 				}
 			}
+		}
+	}
+
+	override val fabCanExpand: Boolean by derivedStateOf { when (currentPage) {
+		MsgTabItem.WEIBO.ordinal -> weiboState.grid.listState.firstVisibleItemIndex == 0 && weiboState.grid.listState.firstVisibleItemScrollOffset == 0
+		MsgTabItem.CHAOHUA.ordinal -> chaohuaState.grid.listState.firstVisibleItemIndex == 0 && chaohuaState.grid.listState.firstVisibleItemScrollOffset == 0
+		MsgTabItem.PICTURES.ordinal -> photoState.listState.firstVisibleItemIndex == 0 && photoState.listState.firstVisibleItemScrollOffset == 0
+		else -> true
+	} }
+	override val fabIcon: ImageVector by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
+	override val fabMenus: Array<FABInfo> = arrayOf(
+		FABInfo(Icons.Outlined.Refresh) {
+			launch {
+				when (currentPage) {
+					MsgTabItem.WEIBO.ordinal -> weiboState.grid.requestWeibo(app.config.weiboUsers.map { it.id })
+					MsgTabItem.CHAOHUA.ordinal -> chaohuaState.requestNewData()
+					MsgTabItem.PICTURES.ordinal -> photoState.loadPhotos()
+				}
+			}
+		},
+		FABInfo(Icons.Filled.AccountCircle) {
+			navigate<ScreenWeiboFollows>()
+		}
+	)
+	override suspend fun onFabClick() {
+		when (currentPage) {
+			MsgTabItem.WEIBO.ordinal -> weiboState.grid.listState.animateScrollToItem(0)
+			MsgTabItem.CHAOHUA.ordinal -> chaohuaState.grid.listState.animateScrollToItem(0)
+			MsgTabItem.PICTURES.ordinal -> photoState.listState.animateScrollToItem(0)
 		}
 	}
 

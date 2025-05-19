@@ -34,6 +34,7 @@ import love.yinlin.platform.app
 abstract class Floating<A : Any> {
     companion object {
         const val Z_INDEX_COMMON = 5f
+        const val Z_INDEX_FAB = 8f
         const val Z_INDEX_SHEET = 10f
         const val Z_INDEX_DIALOG = 20f
         const val Z_INDEX_TIP = 30f

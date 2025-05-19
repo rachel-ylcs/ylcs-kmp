@@ -25,6 +25,7 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.ui.component.screen.FABLayout
 import love.yinlin.ui.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -146,14 +147,25 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 			parts.getOrNull(it)?.let { part ->
 				Box(modifier = Modifier.fillMaxSize()) {
 					part.Content()
+					part.fabIcon?.let { icon ->
+						FABLayout(
+							icon = icon,
+							canExpand = part.fabCanExpand,
+							onClick = part::onFabClick,
+							menus = part.fabMenus
+						)
+					}
 				}
 			} ?: EmptyBox()
 		}
 
 		LaunchedEffect(pagerState.settledPage) {
 			parts.getOrNull(pagerState.settledPage)?.let { part ->
-				part.firstLoad.update {
-					launch { part.initialize() }
+				launch {
+					part.firstLoad.update {
+						part.initialize()
+						part.update()
+					}
 				}
 			}
 		}
