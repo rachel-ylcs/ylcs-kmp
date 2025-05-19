@@ -93,7 +93,7 @@ fun UserLabel(
 				modifier = Modifier.fillMaxSize().padding(padding),
 				text = text,
 				color = if (isDarkMode) Colors.White else Colors.Dark,
-				style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+				style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
 				textAlign = TextAlign.Center,
 				maxLines = 1,
 				overflow = TextOverflow.Clip
