@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -20,8 +19,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
 import love.yinlin.extension.*
@@ -425,5 +422,5 @@ fun RichText(
 fun RichTextInput(
 
 ) {
-	
+
 }
