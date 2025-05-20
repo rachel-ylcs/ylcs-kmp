@@ -27,24 +27,24 @@ import love.yinlin.ui.component.image.WebImage
 
 // RichString DSL
 
-private const val RICH_ARG_TYPE = "t"
-private const val RICH_ARG_MEMBER = "m"
-private const val RICH_ARG_URI = "u"
-private const val RICH_ARG_TEXT = "tx"
-private const val RICH_ARG_WIDTH = "w"
-private const val RICH_ARG_HEIGHT = "h"
-private const val RICH_ARG_TEXT_SIZE = "s"
-private const val RICH_ARG_COLOR = "c"
-private const val RICH_ARG_BOLD = "b"
-private const val RICH_ARG_ITALIC = "i"
-private const val RICH_ARG_UNDERLINE = "u"
-private const val RICH_ARG_STRIKETHROUGH = "d"
-private const val RICH_TYPE_ROOT = "r"
-private const val RICH_TYPE_IMAGE = "img"
-private const val RICH_TYPE_LINK = "lk"
-private const val RICH_TYPE_TOPIC = "tp"
-private const val RICH_TYPE_AT = "at"
-private const val RICH_TYPE_STYLE = "s"
+internal const val RICH_ARG_TYPE = "t"
+internal const val RICH_ARG_MEMBER = "m"
+internal const val RICH_ARG_URI = "u"
+internal const val RICH_ARG_TEXT = "tx"
+internal const val RICH_ARG_WIDTH = "w"
+internal const val RICH_ARG_HEIGHT = "h"
+internal const val RICH_ARG_TEXT_SIZE = "s"
+internal const val RICH_ARG_COLOR = "c"
+internal const val RICH_ARG_BOLD = "b"
+internal const val RICH_ARG_ITALIC = "i"
+internal const val RICH_ARG_UNDERLINE = "u"
+internal const val RICH_ARG_STRIKETHROUGH = "d"
+internal const val RICH_TYPE_ROOT = "r"
+internal const val RICH_TYPE_IMAGE = "img"
+internal const val RICH_TYPE_LINK = "lk"
+internal const val RICH_TYPE_TOPIC = "tp"
+internal const val RICH_TYPE_AT = "at"
+internal const val RICH_TYPE_STYLE = "s"
 
 @Stable
 interface RichDrawable {
@@ -353,7 +353,7 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 						}
 					}
 				}
-				else -> error("Unsupported Element")
+				else -> {}
 			}
 		}
 
