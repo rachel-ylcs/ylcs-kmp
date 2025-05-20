@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.serialization.Serializable
 import love.yinlin.ui.component.image.ClickIcon
@@ -33,8 +34,11 @@ enum class InputType {
 
 @Stable
 class TextInputState(str: String = "") {
-	var text: String by mutableStateOf(str)
+	var value: TextFieldValue by mutableStateOf(TextFieldValue(str))
 	var overflow: Boolean by mutableStateOf(false)
+
+	var text: String get() = value.text
+		set(value) { this.value = TextFieldValue(value) }
 
 	val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
 }
@@ -45,7 +49,7 @@ fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState
 @Composable
 fun TextInput(
 	state: TextInputState,
-	hint: String,
+	hint: String? = null,
 	inputType: InputType = InputType.COMMON,
 	readOnly: Boolean = false,
 	maxLength: Int = 0,
@@ -55,17 +59,17 @@ fun TextInput(
 	modifier: Modifier = Modifier
 ) {
 	OutlinedTextField(
-		value = state.text,
+		value = state.value,
 		onValueChange = {
-			state.text = it
-			state.overflow = maxLength > 0 && it.length > maxLength
+			state.value = it
+			state.overflow = maxLength > 0 && it.text.length > maxLength
 		},
-		label = {
+		label = hint?.let { label -> {
 			Text(
-				text = hint,
+				text = label,
 				style = MaterialTheme.typography.titleMedium
 			)
-		},
+		} },
 		trailingIcon = if (clearButton) {
 			{
 				ClickIcon(

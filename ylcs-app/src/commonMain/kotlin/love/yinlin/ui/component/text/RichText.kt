@@ -1,5 +1,6 @@
 package love.yinlin.ui.component.text
 
+import KottieAnimation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -8,6 +9,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,10 +22,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
+import kottieComposition.KottieCompositionSpec
+import kottieComposition.animateKottieCompositionAsState
+import kottieComposition.rememberKottieComposition
 import love.yinlin.common.Colors
+import love.yinlin.common.EmojiManager
 import love.yinlin.extension.*
 import love.yinlin.platform.ImageQuality
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
+import org.jetbrains.compose.resources.painterResource
+import utils.KottieConstants
 
 // RichString DSL
 
@@ -40,6 +49,7 @@ internal const val RICH_ARG_ITALIC = "i"
 internal const val RICH_ARG_UNDERLINE = "u"
 internal const val RICH_ARG_STRIKETHROUGH = "d"
 internal const val RICH_TYPE_ROOT = "r"
+internal const val RICH_TYPE_EMOJI = "em"
 internal const val RICH_TYPE_IMAGE = "img"
 internal const val RICH_TYPE_LINK = "lk"
 internal const val RICH_TYPE_TOPIC = "tp"
@@ -124,11 +134,44 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	fun text(str: String) = makeItem(Text(str))
 
 	@Stable
-	protected class Emoji(private val id: Int) : RichItem {
+	protected class Emoji(private val id: Int) : RichItem, RichDrawable {
+		override val width: Float get() = 3f
+		override val height: Float get() = 3f
+
 		override val json: JsonElement = id.json
 
 		override fun build(context: RichContext) {
-			// TODO: 表情包支持
+			val id = context.id
+			context.builder.appendInlineContent(id, " ")
+			context.content[id] = this
+		}
+
+		@Composable
+		override fun draw() {
+			if (id >= 10000) {
+				EmojiManager.lottieMap[id]?.let {
+					val isForeground = rememberOffScreenState()
+					val composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(it))
+					val animationState by animateKottieCompositionAsState(
+						composition = composition,
+						isPlaying = isForeground,
+						iterations = KottieConstants.IterateForever
+					)
+					KottieAnimation(
+						composition = composition,
+						progress = { animationState.progress },
+						modifier = Modifier.fillMaxSize()
+					)
+				}
+			}
+			else {
+				EmojiManager.emojiMap[id]?.let {
+					MiniImage(
+						painter = painterResource(it),
+						modifier = Modifier.fillMaxSize()
+					)
+				}
+			}
 		}
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
@@ -411,7 +454,7 @@ fun RichText(
 				placeholder = Placeholder(
 					width = fontSize * drawable.width,
 					height = fontSize * drawable.height,
-					placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
+					placeholderVerticalAlign = PlaceholderVerticalAlign.TextTop
 				)
 			) {
 				drawable.draw()

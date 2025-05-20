@@ -152,6 +152,7 @@ kotlin {
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
                 implementation(libs.tool.qrcode)
+                implementation(libs.tool.lottie)
             }
         }
 

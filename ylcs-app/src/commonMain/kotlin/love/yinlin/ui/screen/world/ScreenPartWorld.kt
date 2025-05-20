@@ -41,6 +41,8 @@ import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.text.RichEditor
+import love.yinlin.ui.component.text.RichEditorState
 import kotlin.math.abs
 
 @Stable
@@ -226,7 +228,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Landscape() {
 		Column(modifier = Modifier.fillMaxSize()) {
-
+			RichEditor(
+				state = remember { RichEditorState() },
+				modifier = Modifier.fillMaxWidth()
+			)
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface
