@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
 
@@ -100,37 +101,66 @@ private object RichEditorParser {
 }
 
 @Stable
-class RichEditorState {
+private enum class RichEditorPage {
+    CONTENT, EMOJI, IMAGE, LINK, TOPIC, AT
+}
+
+@Stable
+open class RichEditorState {
     val inputState = TextInputState()
 
     var enablePreview by mutableStateOf(false)
 
-    val richString: RichString get() = RichEditorParser.parse(inputState.value.text)
-}
+    open val useEmoji: Boolean get() = true
+    open val useImage: Boolean get() = false
+    open val useLink: Boolean get() = true
+    open val useTopic: Boolean get() = true
+    open val useAt: Boolean get() = false
 
-@Composable
-private fun RichEditorContent(
-    state: RichEditorState,
-    maxLength: Int = 0,
-    maxLines: Int = 1,
-    minLines: Int = maxLines,
-    modifier: Modifier = Modifier
-) {
-    TextInput(
-        state = state.inputState,
-        maxLength = maxLength,
-        maxLines = maxLines,
-        minLines = minLines,
-        clearButton = false,
-        modifier = modifier
-    )
-    if (state.enablePreview) {
-        RichText(
-            text = remember(state.inputState.text) { state.richString },
+    @Composable
+    open fun EmojiLayout(onClose: () -> Unit) {
+
+    }
+
+    @Composable
+    open fun ImageLayout(onClose: () -> Unit) {}
+
+    @Composable
+    open fun LinkLayout(onClose: () -> Unit) {
+
+    }
+
+    @Composable
+    open fun TopicLayout(onClose: () -> Unit) {
+
+    }
+
+    @Composable
+    open fun AtLayout(onClose: () -> Unit) {}
+
+    @Composable
+    fun RichEditorContent(
+        maxLength: Int = 0,
+        maxLines: Int = 1,
+        minLines: Int = maxLines,
+        modifier: Modifier = Modifier
+    ) {
+        TextInput(
+            state = inputState,
+            maxLength = maxLength,
             maxLines = maxLines,
-            canSelected = false,
-            modifier = modifier.verticalScroll(rememberScrollState())
+            minLines = minLines,
+            clearButton = false,
+            modifier = modifier
         )
+        if (enablePreview) {
+            RichText(
+                text = remember(inputState.value.text) { RichEditorParser.parse(inputState.value.text) },
+                maxLines = maxLines,
+                canSelected = false,
+                modifier = modifier.verticalScroll(rememberScrollState())
+            )
+        }
     }
 }
 
@@ -148,6 +178,9 @@ fun RichEditor(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
+            var currentPage by rememberState { RichEditorPage.CONTENT }
+            val onClose = { currentPage = RichEditorPage.CONTENT }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
@@ -159,45 +192,43 @@ fun RichEditor(
                     onClick = { state.enablePreview = !state.enablePreview }
                 )
                 ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
-                    Action(Icons.Outlined.AddReaction) {
-
-                    }
-                    Action(Icons.Outlined.AddPhotoAlternate) {
-
-                    }
-                    Action(Icons.Outlined.Link) {
-
-                    }
-                    Action(Icons.Outlined.AlternateEmail) {
-
-                    }
-                    Action(Icons.Outlined.Tag) {
-
-                    }
+                    if (state.useEmoji) Action(Icons.Outlined.AddReaction) { currentPage = RichEditorPage.EMOJI }
+                    if (state.useImage) Action(Icons.Outlined.AddPhotoAlternate) { currentPage = RichEditorPage.IMAGE }
+                    if (state.useLink) Action(Icons.Outlined.Link) { currentPage = RichEditorPage.LINK }
+                    if (state.useTopic) Action(Icons.Outlined.Tag) { currentPage = RichEditorPage.TOPIC }
+                    if (state.useAt) Action(Icons.Outlined.AlternateEmail) { currentPage = RichEditorPage.AT }
                 }
             }
-            if (LocalDevice.current.type == Device.Type.PORTRAIT) {
-                RichEditorContent(
-                    state = state,
-                    maxLength = maxLength,
-                    maxLines = maxLines,
-                    minLines = minLines,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
-                ) {
-                    RichEditorContent(
-                        state = state,
-                        maxLength = maxLength,
-                        maxLines = maxLines,
-                        minLines = minLines,
-                        modifier = Modifier.weight(1f)
-                    )
+
+            when (currentPage) {
+                RichEditorPage.CONTENT -> {
+                    if (LocalDevice.current.type == Device.Type.PORTRAIT) {
+                        state.RichEditorContent(
+                            maxLength = maxLength,
+                            maxLines = maxLines,
+                            minLines = minLines,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+                        ) {
+                            state.RichEditorContent(
+                                maxLength = maxLength,
+                                maxLines = maxLines,
+                                minLines = minLines,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
+                RichEditorPage.EMOJI -> state.EmojiLayout(onClose)
+                RichEditorPage.IMAGE -> state.ImageLayout(onClose)
+                RichEditorPage.LINK -> state.LinkLayout(onClose)
+                RichEditorPage.TOPIC -> state.TopicLayout(onClose)
+                RichEditorPage.AT -> state.AtLayout(onClose)
             }
         }
     }
