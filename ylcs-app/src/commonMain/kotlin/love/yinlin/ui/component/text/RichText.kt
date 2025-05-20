@@ -29,8 +29,10 @@ import love.yinlin.ui.component.image.WebImage
 
 private const val RICH_ARG_TYPE = "t"
 private const val RICH_ARG_MEMBER = "m"
-private const val RICH_ARG_URI = "uri"
-private const val RICH_ARG_TEXT = "text"
+private const val RICH_ARG_URI = "u"
+private const val RICH_ARG_TEXT = "tx"
+private const val RICH_ARG_WIDTH = "w"
+private const val RICH_ARG_HEIGHT = "h"
 private const val RICH_ARG_TEXT_SIZE = "s"
 private const val RICH_ARG_COLOR = "c"
 private const val RICH_ARG_BOLD = "b"
@@ -46,6 +48,8 @@ private const val RICH_TYPE_STYLE = "s"
 
 @Stable
 interface RichDrawable {
+	val width: Float
+	val height: Float
 	@Composable fun draw()
 }
 
@@ -140,10 +144,16 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	fun br() = makeItem(Br())
 
 	@Stable
-	protected class Image(private val uri: String) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
+	protected class Image(
+        private val uri: String,
+        override val width: Float,
+        override val height: Float
+	) : RichObject(RICH_TYPE_IMAGE), RichDrawable {
 		override val map: JsonObject = makeObject {
 			merge(super.map)
 			RICH_ARG_URI with uri
+			RICH_ARG_WIDTH with width
+			RICH_ARG_HEIGHT with height
 		}
 
 		override fun build(context: RichContext) {
@@ -161,7 +171,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 			)
 		}
 	}
-	fun image(uri: String) = makeItem(Image(uri))
+	fun image(uri: String, width: Float = 1f, height: Float = 1f) = makeItem(Image(uri, width, height))
 
 	@Stable
 	protected class Link(private val uri: String, private val text: String) : RichObject(RICH_TYPE_LINK) {
@@ -318,7 +328,11 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 				}
 				is JsonObject -> {
 					when (obj[RICH_ARG_TYPE].String) {
-						RICH_TYPE_IMAGE -> container.image(obj[RICH_ARG_URI].String)
+						RICH_TYPE_IMAGE -> container.image(
+							uri = obj[RICH_ARG_URI].String,
+							width = obj[RICH_ARG_WIDTH].FloatNull ?: 1f,
+							height = obj[RICH_ARG_HEIGHT].FloatNull ?: 1f
+						)
 						RICH_TYPE_LINK -> container.link(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
 						RICH_TYPE_TOPIC -> container.topic(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
 						RICH_TYPE_AT -> container.at(obj[RICH_ARG_URI].String, obj[RICH_ARG_TEXT].String)
@@ -392,15 +406,15 @@ fun RichText(
 	) }
 	val fontSize = LocalTextStyle.current.fontSize
 	val inlineTextContent = remember(state) {
-		state.content.mapValues { drawable ->
+		state.content.mapValues { (_, drawable) ->
 			InlineTextContent(
 				placeholder = Placeholder(
-					width = fontSize * 1.25f,
-					height = fontSize,
+					width = fontSize * drawable.width,
+					height = fontSize * drawable.height,
 					placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
 				)
 			) {
-				drawable.value.draw()
+				drawable.draw()
 			}
 		}
 	}
@@ -416,11 +430,4 @@ fun RichText(
 			inlineContent = inlineTextContent
 		)
 	}
-}
-
-@Composable
-fun RichTextInput(
-
-) {
-
 }

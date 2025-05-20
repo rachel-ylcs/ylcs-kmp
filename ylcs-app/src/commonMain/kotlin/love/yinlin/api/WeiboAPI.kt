@@ -100,7 +100,7 @@ object WeiboAPI {
 					else weiboHtmlNodesTransform(childNodes, container)
 				}
 				"span" -> weiboHtmlNodesTransform(childNodes, container)
-				"img" -> node.attribute("src")?.value?.let { container.image(it) }
+				"img" -> node.attribute("src")?.value?.let { container.image(it, 1.25f, 1f) }
 			}
 		}
 	}
@@ -151,7 +151,7 @@ object WeiboAPI {
 		blogs = blogs["retweeted_status"]?.Object ?: blogs // 转发微博
 		// 图片微博
 		val pictures = mutableListOf<Picture>()
-		if (blogs.contains("pics")) {
+		if ("pics" in blogs) {
 			for (picItem in blogs.arr("pics")) {
 				val pic = picItem.Object
 				pictures += Picture(
@@ -159,12 +159,12 @@ object WeiboAPI {
 					source = transferWeiboImageUrl(pic.obj("large")["url"].String)
 				)
 			}
-		} else if (blogs.contains("page_info")) {
+		} else if ("page_info" in blogs) {
 			val pageInfo = blogs.obj("page_info")
 			if (pageInfo["type"].String == "video") {
 				val urls = pageInfo.obj("urls")
-				val videoUrl = if (urls.contains("mp4_720p_mp4")) urls["mp4_720p_mp4"].String
-				else if (urls.contains("mp4_hd_mp4")) urls["mp4_hd_mp4"].String
+				val videoUrl = if ("mp4_720p_mp4" in urls) urls["mp4_720p_mp4"].String
+				else if ("mp4_hd_mp4" in urls) urls["mp4_hd_mp4"].String
 				else urls["mp4_ld_mp4"].String
 				val videoPicUrl = pageInfo.obj("page_pic")["url"].String
 				pictures += Picture(
@@ -198,7 +198,7 @@ object WeiboAPI {
 		// 提取内容
 		val text = card["text"].String
 		// 带图片
-		val pic = if (card.containsKey("pic")) {
+		val pic = if ("pic" in card) {
 			card.obj("pic").let {
 				Picture(
 					image = transferWeiboImageUrl(it["url"].String),

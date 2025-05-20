@@ -226,6 +226,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Landscape() {
 		Column(modifier = Modifier.fillMaxSize()) {
+
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface

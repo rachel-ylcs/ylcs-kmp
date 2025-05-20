@@ -17,7 +17,7 @@ coroutines = "1.10.2"
 
 # Android
 cmp-android = "1.8.1"
-media3 = "1.6.1"
+media3 = "1.8.0-alpha01"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }

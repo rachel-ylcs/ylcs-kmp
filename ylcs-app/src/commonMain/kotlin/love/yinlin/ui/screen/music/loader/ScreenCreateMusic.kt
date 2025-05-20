@@ -84,7 +84,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             // 1. 检查ID
             val id = input.id.text
             val name = input.name.text
-            if (app.musicFactory.musicLibrary.contains(id)) {
+            if (id in app.musicFactory.musicLibrary) {
                 slot.tip.warning("ID已存在")
                 return
             }
