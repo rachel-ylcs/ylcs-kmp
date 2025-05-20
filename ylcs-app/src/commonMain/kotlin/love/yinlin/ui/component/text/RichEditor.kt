@@ -1,10 +1,15 @@
 package love.yinlin.ui.component.text
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,6 +20,8 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -114,7 +121,7 @@ open class RichEditorState {
     open val useEmoji: Boolean get() = true
     open val useImage: Boolean get() = false
     open val useLink: Boolean get() = true
-    open val useTopic: Boolean get() = true
+    open val useTopic: Boolean get() = false
     open val useAt: Boolean get() = false
 
     @Composable
@@ -131,9 +138,7 @@ open class RichEditorState {
     }
 
     @Composable
-    open fun TopicLayout(onClose: () -> Unit) {
-
-    }
+    open fun TopicLayout(onClose: () -> Unit) {}
 
     @Composable
     open fun AtLayout(onClose: () -> Unit) {}
@@ -141,25 +146,30 @@ open class RichEditorState {
     @Composable
     fun RichEditorContent(
         maxLength: Int = 0,
-        maxLines: Int = 1,
-        minLines: Int = maxLines,
         modifier: Modifier = Modifier
     ) {
+        val textModifier = if (enablePreview) modifier.aspectRatio(2.5f) else modifier
         TextInput(
             state = inputState,
             maxLength = maxLength,
-            maxLines = maxLines,
-            minLines = minLines,
+            maxLines = if (enablePreview) Int.MAX_VALUE else 5,
+            minLines = if (enablePreview) Int.MAX_VALUE else 1,
             clearButton = false,
-            modifier = modifier
+            modifier = textModifier
         )
         if (enablePreview) {
-            RichText(
-                text = remember(inputState.value.text) { RichEditorParser.parse(inputState.value.text) },
-                maxLines = maxLines,
-                canSelected = false,
-                modifier = modifier.verticalScroll(rememberScrollState())
-            )
+            Box(modifier = textModifier
+                .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
+                .padding(OutlinedTextFieldDefaults.contentPadding())
+                .verticalScroll(rememberScrollState())
+            ) {
+                RichText(
+                    text = remember(inputState.value.text) { RichEditorParser.parse(inputState.value.text) },
+                    maxLines = Int.MAX_VALUE,
+                    canSelected = false,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -168,8 +178,6 @@ open class RichEditorState {
 fun RichEditor(
     state: RichEditorState,
     maxLength: Int = 0,
-    maxLines: Int = 1,
-    minLines: Int = maxLines,
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
@@ -191,7 +199,7 @@ fun RichEditor(
                     color = if (state.enablePreview) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     onClick = { state.enablePreview = !state.enablePreview }
                 )
-                ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
+                if (state.enablePreview) ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
                     if (state.useEmoji) Action(Icons.Outlined.AddReaction) { currentPage = RichEditorPage.EMOJI }
                     if (state.useImage) Action(Icons.Outlined.AddPhotoAlternate) { currentPage = RichEditorPage.IMAGE }
                     if (state.useLink) Action(Icons.Outlined.Link) { currentPage = RichEditorPage.LINK }
@@ -205,8 +213,6 @@ fun RichEditor(
                     if (LocalDevice.current.type == Device.Type.PORTRAIT) {
                         state.RichEditorContent(
                             maxLength = maxLength,
-                            maxLines = maxLines,
-                            minLines = minLines,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -217,8 +223,6 @@ fun RichEditor(
                         ) {
                             state.RichEditorContent(
                                 maxLength = maxLength,
-                                maxLines = maxLines,
-                                minLines = minLines,
                                 modifier = Modifier.weight(1f)
                             )
                         }

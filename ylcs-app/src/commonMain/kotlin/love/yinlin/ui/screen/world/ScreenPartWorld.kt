@@ -196,6 +196,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					shape = RectangleShape,
 					modifier = Modifier.fillMaxWidth()
 				)
+				RichEditor(
+					state = remember { RichEditorState() },
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 			item(key = ItemKey("Calendar")) {
 				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
