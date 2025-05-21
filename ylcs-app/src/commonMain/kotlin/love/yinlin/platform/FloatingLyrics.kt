@@ -1,35 +1,59 @@
 package love.yinlin.platform
 
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import love.yinlin.DeviceWrapper
-import love.yinlin.common.Device
+import kotlinx.serialization.Serializable
+import love.yinlin.common.Colors
 
 @Stable
 abstract class FloatingLyrics {
-    protected var currentLyrics: String? by mutableStateOf(null)
+    @Stable
+    @Serializable
+    data class AndroidConfig(
+        // 左侧偏移 0.0 ~ 1.0
+        val left: Float = 0f,
+        // 右侧偏移 0.0 ~ 1.0
+        val right: Float = 1f,
+        // 纵向偏移 0.0 ~ 2.0
+        val top: Float = 1f,
+        // 字体大小 0.75 ~ 1.5
+        val textSize: Float = 1f,
+        // 字体颜色
+        val textColor: ULong = Colors.Steel4.value,
+        // 背景颜色
+        val backgroundColor: ULong = Colors.Transparent.value
+    ) {
+        val leftProgress: Float get() = left
+        val rightProgress: Float get() = right
+        val topProgress: Float get() = top / 2f
+        val textSizeProgress: Float get() = textSize / 0.75f - 1f
+        fun copyLeft(percent: Float) = this.copy(left = percent.coerceIn(0f, 1f))
+        fun copyRight(percent: Float) = this.copy(right = percent.coerceIn(0f, 1f))
+        fun copyTop(percent: Float) = this.copy(top = (percent * 2f).coerceIn(0f, 2f))
+        fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).coerceIn(0.75f, 1.5f))
+    }
 
-    abstract val canAttached: Boolean
+    @Stable
+    @Serializable
+    data class IOSConfig(
+        // 字体颜色
+        val textColor: ULong = Colors.Steel4.value,
+        // 背景颜色
+        val backgroundColor: ULong = Colors.Transparent.value
+    )
+
+    @Stable
+    @Serializable
+    data class DesktopConfig(
+        // 字体颜色
+        val textColor: ULong = Colors.Steel4.value,
+        // 背景颜色
+        val backgroundColor: ULong = Colors.Transparent.value
+    )
+
     abstract val isAttached: Boolean
-    abstract fun applyPermission(onResult: (Boolean) -> Unit)
-    abstract fun attach()
-    abstract fun detach()
+
     abstract fun updateLyrics(lyrics: String?)
 
     @Composable
-    fun ContentWrapper(content: @Composable () -> Unit) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            DeviceWrapper(
-                device = remember(this.maxWidth) { Device(this.maxWidth) },
-                themeMode = app.config.themeMode,
-                fontScale = 1f,
-                content = content
-            )
-        }
-    }
-
-    @Composable
-    abstract fun FloatingContent()
+    abstract fun Content()
 }

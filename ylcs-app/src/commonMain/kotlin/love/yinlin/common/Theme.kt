@@ -116,6 +116,7 @@ object Colors {
 
 	fun from(value: Int) = Color(value)
 	fun from(value: Long) = Color(value)
+	fun from(value: ULong) = Color(value)
 }
 
 @Stable

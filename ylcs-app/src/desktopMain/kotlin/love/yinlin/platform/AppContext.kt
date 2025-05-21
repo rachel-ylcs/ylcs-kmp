@@ -57,7 +57,7 @@ class ActualAppContext : AppContext() {
 			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
 		}
 		// 创建悬浮歌词
-		appNative.musicFactory.floatingLyrics = ActualFloatingLyrics().apply { attach() }
+		appNative.musicFactory.floatingLyrics = ActualFloatingLyrics().apply { isAttached = true }
 	}
 }
 

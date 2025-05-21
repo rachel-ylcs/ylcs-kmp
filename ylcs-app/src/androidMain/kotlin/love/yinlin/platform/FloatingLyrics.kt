@@ -10,14 +10,10 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,27 +22,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import love.yinlin.DeviceWrapper
+import love.yinlin.common.Device
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
-import java.util.*
+import java.util.UUID
 
 @Stable
 class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLyrics() {
     private val view = ComposeView(activity).apply {
         setViewTreeLifecycleOwner(activity)
         setViewTreeSavedStateRegistryOwner(activity)
-        setContent {
-            ContentWrapper {
-                FloatingContent()
-            }
-        }
+        setContent { ContentWrapper() }
     }
 
-    override val canAttached: Boolean get() = Settings.canDrawOverlays(activity)
+    private var currentLyrics: String? by mutableStateOf(null)
+
+    val canAttached: Boolean get() = Settings.canDrawOverlays(activity)
 
     override val isAttached: Boolean get() = view.isAttachedToWindow
 
-    override fun applyPermission(onResult: (Boolean) -> Unit) {
+    fun applyPermission(onResult: (Boolean) -> Unit) {
         try {
             activity.activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
@@ -60,7 +56,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         catch (_: Throwable) {}
     }
 
-    override fun attach() {
+    fun attach() {
         if (canAttached && !isAttached) {
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             val params = WindowManager.LayoutParams(
@@ -78,7 +74,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         }
     }
 
-    override fun detach() {
+    fun detach() {
         if (isAttached) {
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             manager?.removeViewImmediate(view)
@@ -90,8 +86,21 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     }
 
     @Composable
-    override fun FloatingContent() {
-        val config = app.config.floatingLyricsConfig
+    private fun ContentWrapper() {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            DeviceWrapper(
+                device = remember(this.maxWidth) { Device(this.maxWidth) },
+                themeMode = app.config.themeMode,
+                fontScale = 1f
+            ) {
+                Content()
+            }
+        }
+    }
+
+    @Composable
+    override fun Content() {
+        val config = app.config.floatingLyricsAndroidConfig
         currentLyrics?.let { lyrics ->
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 Box(

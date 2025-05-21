@@ -16,7 +16,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
-import love.yinlin.data.music.FloatingLyricsConfig
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
@@ -27,6 +26,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toJsonString
 import love.yinlin.extension.toMutableStateMap
+import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
@@ -328,8 +328,12 @@ class KVConfig(private val kv: KV) {
 	var lastMusic by stringState("")
 	// 播放模式
 	var musicPlayMode: MusicPlayMode by enumState(MusicPlayMode.ORDER)
-	// 悬浮歌词配置
-	var floatingLyricsConfig: FloatingLyricsConfig by jsonState { FloatingLyricsConfig() }
+	// Android悬浮歌词配置
+	var floatingLyricsAndroidConfig: FloatingLyrics.AndroidConfig by jsonState { FloatingLyrics.AndroidConfig() }
+	// iOS悬浮歌词配置
+	var floatingLyricsIOSConfig: FloatingLyrics.IOSConfig by jsonState { FloatingLyrics.IOSConfig() }
+	// 桌面悬浮歌词配置
+	var floatingLyricsDesktopConfig: FloatingLyrics.DesktopConfig by jsonState { FloatingLyrics.DesktopConfig() }
 
 	/* ------------------  社区  ------------------ */
 

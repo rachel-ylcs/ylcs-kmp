@@ -1,19 +1,14 @@
 package love.yinlin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.CropSquare
-import androidx.compose.material.icons.outlined.Remove
-import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -27,12 +22,10 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.platform.appNative
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
@@ -139,35 +132,8 @@ fun main() {
             }
         }
 
-        if (appNative.musicFactory.floatingLyrics?.isAttached == true) {
-            Window(
-                onCloseRequest = {},
-                state = rememberWindowState(
-                    placement = WindowPlacement.Floating,
-                    isMinimized = false,
-                    position = WindowPosition.Aligned(Alignment.BottomCenter),
-                    width = 1200.dp,
-                    height = 100.dp
-                ),
-                title = "",
-                undecorated = true,
-                transparent = true,
-                resizable = false,
-                focusable = false,
-                alwaysOnTop = true
-            ) {
-                LaunchedEffect(Unit) {
-                    TransparentWindow.run(window)
-                }
-
-                Box(modifier = Modifier.fillMaxSize()) {
-                    app.musicFactory.floatingLyrics?.apply {
-                        ContentWrapper {
-                            FloatingContent()
-                        }
-                    }
-                }
-            }
+        app.musicFactory.floatingLyrics?.let {
+            if (it.isAttached) it.Content()
         }
     }
 }
