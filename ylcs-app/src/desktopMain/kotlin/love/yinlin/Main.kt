@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.sun.jna.Native
 import kotlinx.coroutines.launch
-import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.Platform
@@ -157,11 +157,15 @@ fun main() {
                 alwaysOnTop = true
             ) {
                 LaunchedEffect(Unit) {
-                    
+                    TransparentWindow.run(window)
                 }
 
                 Box(modifier = Modifier.fillMaxSize()) {
-                    Text(text = "这是桌面歌词这是桌面歌词这是桌面歌词这是桌面歌词这是桌面歌词这是桌面歌词")
+                    app.musicFactory.floatingLyrics?.apply {
+                        ContentWrapper {
+                            FloatingContent()
+                        }
+                    }
                 }
             }
         }
