@@ -20,5 +20,6 @@ object MimeType {
 	const val MP4 = "video/mp4"
 
 	const val BINARY = "application/octet-stream"
+	const val ZIP = "application/zip"
 	const val APK = "application/vnd.android.package-archive"
 }

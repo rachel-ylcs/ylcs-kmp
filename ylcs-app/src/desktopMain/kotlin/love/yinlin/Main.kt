@@ -10,9 +10,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CropSquare
 import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,9 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.sun.jna.Native
+import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.MimeType
 import love.yinlin.extension.rememberTrue
 import love.yinlin.platform.ActualAppContext
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.NormalPath
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.Platform
@@ -47,6 +53,7 @@ fun main() {
 
     application {
         var isOpen by rememberTrue()
+        val scope = rememberCoroutineScope()
 
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
@@ -84,6 +91,18 @@ fun main() {
                                     start = ThemeValue.Padding.HorizontalExtraSpace
                                 )
                             ) {
+                                Action(
+                                    icon = Icons.Outlined.RocketLaunch,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    scope.launch {
+                                        Picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
+                                            Coroutines.io {
+                                                AutoUpdate.start(path.path)
+                                            }
+                                        }
+                                    }
+                                }
                                 Action(
                                     icon = Icons.Outlined.Remove,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
