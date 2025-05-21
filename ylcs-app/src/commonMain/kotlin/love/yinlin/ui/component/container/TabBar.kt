@@ -54,7 +54,7 @@ private fun <T> TabBar(
 					onLongClick = {
 						if (currentPage == index) onLongClick?.invoke(index)
 					}
-				).padding(ThemeValue.Padding.Value),
+				).padding(horizontal = ThemeValue.Padding.EqualSpace, vertical = ThemeValue.Padding.VerticalSpace),
 				contentAlignment = Alignment.Center
 			) {
 				content(isSelected, item)
@@ -80,7 +80,7 @@ fun TabBar(
 		modifier = modifier
 	) { isSelected, (title, icon) ->
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			MiniIcon(

@@ -23,10 +23,10 @@ import love.yinlin.common.EmojiManager
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
-import love.yinlin.extension.rememberValueState
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.ActionScope
 import org.jetbrains.compose.resources.painterResource
 
@@ -116,7 +116,7 @@ open class RichEditorState {
     open val useTopic: Boolean get() = false
     open val useAt: Boolean get() = false
 
-    var emojiClassify by mutableIntStateOf(0)
+    private var emojiClassify by mutableIntStateOf(0)
 
     @Composable
     open fun EmojiLayout(modifier: Modifier, focusRequester: FocusRequester, onClose: (String?) -> Unit) {
@@ -154,7 +154,38 @@ open class RichEditorState {
 
     @Composable
     open fun LinkLayout(modifier: Modifier, onClose: (String?) -> Unit) {
-
+        val title = remember { TextInputState() }
+        val link = remember { TextInputState() }
+        Column(
+            modifier = modifier.verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextInput(
+                    state = title,
+                    hint = "标题",
+                    maxLength = 16,
+                    modifier = Modifier.weight(1f)
+                )
+                RachelButton(
+                    text = "插入",
+                    icon = Icons.Outlined.InsertLink,
+                    enabled = title.ok && link.ok,
+                    onClick = { onClose("[lk|${title.text}|${link.text}]") }
+                )
+            }
+            TextInput(
+                state = link,
+                hint = "链接",
+                maxLength = 256,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 
     @Composable
@@ -170,7 +201,7 @@ open class RichEditorState {
         maxLength: Int = 0,
         modifier: Modifier = Modifier
     ) {
-        val layoutModifier = if (enablePreview) modifier.aspectRatio(2.5f) else modifier
+        val layoutModifier = if (enablePreview) modifier.aspectRatio(2f) else modifier
         val focusRequester = remember { FocusRequester() }
         when (currentPage) {
             RichEditorPage.CONTENT -> {
@@ -238,20 +269,50 @@ fun RichEditor(
                     }
                 )
                 if (state.enablePreview) ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
-                    if (state.useEmoji) Action(Icons.Outlined.AddReaction) {
-                        currentPage = if (currentPage == RichEditorPage.EMOJI) RichEditorPage.CONTENT else RichEditorPage.EMOJI
+                    if (state.useEmoji) {
+                        val isActive = currentPage == RichEditorPage.EMOJI
+                        Action(
+                            icon = Icons.Outlined.AddReaction,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        ) {
+                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.EMOJI
+                        }
                     }
-                    if (state.useImage) Action(Icons.Outlined.AddPhotoAlternate) {
-                        currentPage = if (currentPage == RichEditorPage.IMAGE) RichEditorPage.CONTENT else RichEditorPage.IMAGE
+                    if (state.useImage) {
+                        val isActive = currentPage == RichEditorPage.IMAGE
+                        Action(
+                            icon = Icons.Outlined.AddPhotoAlternate,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        ) {
+                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.IMAGE
+                        }
                     }
-                    if (state.useLink) Action(Icons.Outlined.Link) {
-                        currentPage = if (currentPage == RichEditorPage.LINK) RichEditorPage.CONTENT else RichEditorPage.LINK
+                    if (state.useLink) {
+                        val isActive = currentPage == RichEditorPage.LINK
+                        Action(
+                            icon = Icons.Outlined.InsertLink,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        ) {
+                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.LINK
+                        }
                     }
-                    if (state.useTopic) Action(Icons.Outlined.Tag) {
-                        currentPage = if (currentPage == RichEditorPage.TOPIC) RichEditorPage.CONTENT else RichEditorPage.TOPIC
+                    if (state.useTopic) {
+                        val isActive = currentPage == RichEditorPage.TOPIC
+                        Action(
+                            icon = Icons.Outlined.Tag,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        ) {
+                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.TOPIC
+                        }
                     }
-                    if (state.useAt) Action(Icons.Outlined.AlternateEmail) {
-                        currentPage = if (currentPage == RichEditorPage.AT) RichEditorPage.CONTENT else RichEditorPage.AT
+                    if (state.useAt) {
+                        val isActive = currentPage == RichEditorPage.AT
+                        Action(
+                            icon = Icons.Outlined.AlternateEmail,
+                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        ) {
+                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.AT
+                        }
                     }
                 }
             }
