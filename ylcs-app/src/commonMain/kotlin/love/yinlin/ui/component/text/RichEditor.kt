@@ -1,47 +1,30 @@
 package love.yinlin.ui.component.text
 
-import KottieAnimation
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddPhotoAlternate
-import androidx.compose.material.icons.outlined.AddReaction
-import androidx.compose.material.icons.outlined.AlternateEmail
-import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.Preview
-import androidx.compose.material.icons.outlined.Tag
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import kottieComposition.KottieCompositionSpec
-import kottieComposition.rememberKottieComposition
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import love.yinlin.common.Device
-import love.yinlin.common.Emoji
 import love.yinlin.common.EmojiManager
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberValueState
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.ActionScope
@@ -108,7 +91,7 @@ private object RichEditorParser {
                 }
                 else {
                     currentNormal.append(data.substring(markStart, length))
-                    index = length // 结束循环
+                    index = length
                 }
             }
         }
@@ -133,38 +116,34 @@ open class RichEditorState {
     open val useTopic: Boolean get() = false
     open val useAt: Boolean get() = false
 
-    @Composable
-    open fun EmojiLayout(modifier: Modifier, onClose: (String?) -> Unit) {
-        val emojiMap = remember { EmojiManager.toList() }
+    var emojiClassify by mutableIntStateOf(0)
 
-        LazyVerticalGrid(
-            columns = GridCells.FixedSize(ThemeValue.Size.Icon),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-            modifier = modifier
-        ) {
-            items(
-                items = emojiMap,
-                key = { it.id }
-            ) { emoji ->
-                Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
-                    onClose("[em|${emoji.id}]")
-                }) {
-                    when (emoji) {
-                        is Emoji.Image -> {
-                            MiniImage(
-                                painter = painterResource(emoji.res),
-                                modifier = Modifier.fillMaxSize()
-                            )
+    @Composable
+    open fun EmojiLayout(modifier: Modifier, focusRequester: FocusRequester, onClose: (String?) -> Unit) {
+        Column(modifier = modifier) {
+            TabBar(
+                currentPage = emojiClassify,
+                onNavigate = { emojiClassify = it },
+                items = remember { EmojiManager.classifyMap.map { it.title } },
+                modifier = Modifier.fillMaxWidth()
+            )
+            LazyVerticalGrid(
+                columns = GridCells.FixedSize(ThemeValue.Size.Icon),
+                contentPadding = ThemeValue.Padding.EqualValue,
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            ) {
+                items(
+                    items = EmojiManager.classifyMap[emojiClassify].items,
+                    key = { it.id }
+                ) { emoji ->
+                    MiniImage(
+                        painter = painterResource(emoji.res),
+                        modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
+                            onClose("[em|${emoji.id}]")
                         }
-                        is Emoji.Lottie -> {
-                            KottieAnimation(
-                                composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(emoji.data)),
-                                progress = { 0f },
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
+                    )
                 }
             }
         }
@@ -192,6 +171,7 @@ open class RichEditorState {
         modifier: Modifier = Modifier
     ) {
         val layoutModifier = if (enablePreview) modifier.aspectRatio(2.5f) else modifier
+        val focusRequester = remember { FocusRequester() }
         when (currentPage) {
             RichEditorPage.CONTENT -> {
                 TextInput(
@@ -200,10 +180,14 @@ open class RichEditorState {
                     maxLines = if (enablePreview) Int.MAX_VALUE else 5,
                     minLines = if (enablePreview) Int.MAX_VALUE else 1,
                     clearButton = false,
-                    modifier = layoutModifier
+                    modifier = layoutModifier.focusRequester(focusRequester)
                 )
+
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
             }
-            RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, onClose)
+            RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, focusRequester, onClose)
             RichEditorPage.IMAGE -> ImageLayout(layoutModifier, onClose)
             RichEditorPage.LINK -> LinkLayout(layoutModifier, onClose)
             RichEditorPage.TOPIC -> TopicLayout(layoutModifier, onClose)

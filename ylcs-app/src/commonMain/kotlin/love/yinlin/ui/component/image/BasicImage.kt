@@ -336,7 +336,7 @@ fun WebImage(
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
-	placeholder: DrawableResource = Res.drawable.placeholder_pic,
+	placeholder: DrawableResource? = Res.drawable.placeholder_pic,
 	state: AsyncImageState = rememberWebImageState(quality, placeholder, true),
 	onClick: (() -> Unit)? = null
 ) {

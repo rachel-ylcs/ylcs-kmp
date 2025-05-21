@@ -116,8 +116,7 @@ fun TabBar(
 			text = title,
 			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center,
-			modifier = Modifier.padding(ThemeValue.Padding.Value)
+			textAlign = TextAlign.Center
 		)
 	}
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import com.github.panpf.sketch.fetch.newComposeResourceUri
 import kotlinx.serialization.json.*
 import kottieComposition.KottieCompositionSpec
 import kottieComposition.animateKottieCompositionAsState
@@ -30,6 +31,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.EmojiManager
 import love.yinlin.extension.*
 import love.yinlin.platform.ImageQuality
+import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import org.jetbrains.compose.resources.painterResource
@@ -151,9 +153,17 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		override fun draw() {
 			when (val emoji = EmojiManager[id]) {
 				null -> Box(modifier = Modifier.fillMaxSize())
-				is love.yinlin.common.Emoji.Image -> {
+				is love.yinlin.common.Emoji.Static -> {
 					MiniImage(
 						painter = painterResource(emoji.res),
+						modifier = Modifier.fillMaxSize()
+					)
+				}
+				is love.yinlin.common.Emoji.Dynamic -> {
+					WebImage(
+						uri = newComposeResourceUri(Res.getUri("drawable/emoji${emoji.id}.webp")),
+						quality = ImageQuality.Low,
+						placeholder = null,
 						modifier = Modifier.fillMaxSize()
 					)
 				}
