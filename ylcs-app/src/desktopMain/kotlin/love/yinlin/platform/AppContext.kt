@@ -56,6 +56,8 @@ class ActualAppContext : AppContext() {
 		Thread.setDefaultUncaughtExceptionHandler { _, e ->
 			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
 		}
+		// 创建悬浮歌词
+		appNative.musicFactory.floatingLyrics = ActualFloatingLyrics().apply { attach() }
 	}
 }
 
