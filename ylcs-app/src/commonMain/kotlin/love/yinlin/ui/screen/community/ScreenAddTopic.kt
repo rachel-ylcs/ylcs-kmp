@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -21,6 +22,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
+import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.ImageCompress
@@ -104,6 +106,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                         name = profile.name
                     ))
                 }
+                app.config.editedTopic = null
                 pop()
             }
             is Data.Error -> slot.tip.error(result.message)
@@ -111,6 +114,30 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     }
 
     override val title: String = "发表主题"
+
+    override fun onBack() {
+        val title = input.title.text
+        val content = input.content.inputState.text
+        val pics = input.pics.map { it.image }
+        if (title.isNotEmpty() || content.isNotEmpty() || pics.isNotEmpty()) {
+            app.config.editedTopic = EditedTopic(
+                title = title,
+                content = content,
+                section = input.section,
+                pics = pics
+            )
+        }
+        else if (app.config.editedTopic != null) app.config.editedTopic = null
+        pop()
+    }
+
+    @Composable
+    override fun ActionScope.LeftActions() {
+        Action(Icons.Outlined.Close) {
+            app.config.editedTopic = null
+            pop()
+        }
+    }
 
     @Composable
     override fun ActionScope.RightActions() {
@@ -121,6 +148,15 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
             val profile = app.config.userProfile
             if (profile != null) addTopic(profile = profile)
             else slot.tip.warning("请先登录")
+        }
+    }
+
+    override suspend fun initialize() {
+        app.config.editedTopic?.let { editedTopic ->
+            input.title.text = editedTopic.title
+            input.content.inputState.text = editedTopic.content
+            input.section = editedTopic.section
+            input.pics += editedTopic.pics.map { Picture(it) }
         }
     }
 

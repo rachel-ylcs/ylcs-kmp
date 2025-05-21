@@ -20,6 +20,7 @@ import love.yinlin.data.music.FloatingLyricsConfig
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
+import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
@@ -340,4 +341,7 @@ class KVConfig(private val kv: KV) {
 	var cacheUserAvatar: Long by CacheState(kv)
 	// 用户 背景墙缓存键
 	var cacheUserWall: Long by CacheState(kv)
+
+	// 待编辑主题
+	var editedTopic: EditedTopic? by jsonState { null }
 }
