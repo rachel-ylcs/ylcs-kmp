@@ -1,15 +1,19 @@
 package love.yinlin.ui.component.text
 
+import KottieAnimation
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,7 +24,6 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Preview
 import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -31,12 +34,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kottieComposition.KottieCompositionSpec
+import kottieComposition.rememberKottieComposition
 import love.yinlin.common.Device
+import love.yinlin.common.Emoji
+import love.yinlin.common.EmojiManager
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.ActionScope
+import org.jetbrains.compose.resources.painterResource
 
 @Stable
 private object RichEditorParser {
@@ -108,7 +117,7 @@ private object RichEditorParser {
 }
 
 @Stable
-private enum class RichEditorPage {
+enum class RichEditorPage {
     CONTENT, EMOJI, IMAGE, LINK, TOPIC, AT
 }
 
@@ -125,40 +134,83 @@ open class RichEditorState {
     open val useAt: Boolean get() = false
 
     @Composable
-    open fun EmojiLayout(onClose: () -> Unit) {
+    open fun EmojiLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+        val emojiMap = remember { EmojiManager.toList() }
+
+        LazyVerticalGrid(
+            columns = GridCells.FixedSize(ThemeValue.Size.Icon),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+            modifier = modifier
+        ) {
+            items(
+                items = emojiMap,
+                key = { it.id }
+            ) { emoji ->
+                Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
+                    onClose("[em|${emoji.id}]")
+                }) {
+                    when (emoji) {
+                        is Emoji.Image -> {
+                            MiniImage(
+                                painter = painterResource(emoji.res),
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        is Emoji.Lottie -> {
+                            KottieAnimation(
+                                composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(emoji.data)),
+                                progress = { 0f },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    open fun ImageLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
+
+    @Composable
+    open fun LinkLayout(modifier: Modifier, onClose: (String?) -> Unit) {
 
     }
 
     @Composable
-    open fun ImageLayout(onClose: () -> Unit) {}
+    open fun TopicLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
 
     @Composable
-    open fun LinkLayout(onClose: () -> Unit) {
-
-    }
-
-    @Composable
-    open fun TopicLayout(onClose: () -> Unit) {}
-
-    @Composable
-    open fun AtLayout(onClose: () -> Unit) {}
+    open fun AtLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
 
     @Composable
     fun RichEditorContent(
+        currentPage: RichEditorPage,
+        onClose: (String?) -> Unit,
         maxLength: Int = 0,
         modifier: Modifier = Modifier
     ) {
-        val textModifier = if (enablePreview) modifier.aspectRatio(2.5f) else modifier
-        TextInput(
-            state = inputState,
-            maxLength = maxLength,
-            maxLines = if (enablePreview) Int.MAX_VALUE else 5,
-            minLines = if (enablePreview) Int.MAX_VALUE else 1,
-            clearButton = false,
-            modifier = textModifier
-        )
+        val layoutModifier = if (enablePreview) modifier.aspectRatio(2.5f) else modifier
+        when (currentPage) {
+            RichEditorPage.CONTENT -> {
+                TextInput(
+                    state = inputState,
+                    maxLength = maxLength,
+                    maxLines = if (enablePreview) Int.MAX_VALUE else 5,
+                    minLines = if (enablePreview) Int.MAX_VALUE else 1,
+                    clearButton = false,
+                    modifier = layoutModifier
+                )
+            }
+            RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, onClose)
+            RichEditorPage.IMAGE -> ImageLayout(layoutModifier, onClose)
+            RichEditorPage.LINK -> LinkLayout(layoutModifier, onClose)
+            RichEditorPage.TOPIC -> TopicLayout(layoutModifier, onClose)
+            RichEditorPage.AT -> AtLayout(layoutModifier, onClose)
+        }
         if (enablePreview) {
-            Box(modifier = textModifier
+            Box(modifier = layoutModifier
                 .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
                 .padding(OutlinedTextFieldDefaults.contentPadding())
                 .verticalScroll(rememberScrollState())
@@ -187,7 +239,6 @@ fun RichEditor(
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             var currentPage by rememberState { RichEditorPage.CONTENT }
-            val onClose = { currentPage = RichEditorPage.CONTENT }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -197,42 +248,56 @@ fun RichEditor(
                 ClickIcon(
                     icon = Icons.Outlined.Preview,
                     color = if (state.enablePreview) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    onClick = { state.enablePreview = !state.enablePreview }
+                    onClick = {
+                        state.enablePreview = !state.enablePreview
+                        currentPage = RichEditorPage.CONTENT
+                    }
                 )
                 if (state.enablePreview) ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
-                    if (state.useEmoji) Action(Icons.Outlined.AddReaction) { currentPage = RichEditorPage.EMOJI }
-                    if (state.useImage) Action(Icons.Outlined.AddPhotoAlternate) { currentPage = RichEditorPage.IMAGE }
-                    if (state.useLink) Action(Icons.Outlined.Link) { currentPage = RichEditorPage.LINK }
-                    if (state.useTopic) Action(Icons.Outlined.Tag) { currentPage = RichEditorPage.TOPIC }
-                    if (state.useAt) Action(Icons.Outlined.AlternateEmail) { currentPage = RichEditorPage.AT }
+                    if (state.useEmoji) Action(Icons.Outlined.AddReaction) {
+                        currentPage = if (currentPage == RichEditorPage.EMOJI) RichEditorPage.CONTENT else RichEditorPage.EMOJI
+                    }
+                    if (state.useImage) Action(Icons.Outlined.AddPhotoAlternate) {
+                        currentPage = if (currentPage == RichEditorPage.IMAGE) RichEditorPage.CONTENT else RichEditorPage.IMAGE
+                    }
+                    if (state.useLink) Action(Icons.Outlined.Link) {
+                        currentPage = if (currentPage == RichEditorPage.LINK) RichEditorPage.CONTENT else RichEditorPage.LINK
+                    }
+                    if (state.useTopic) Action(Icons.Outlined.Tag) {
+                        currentPage = if (currentPage == RichEditorPage.TOPIC) RichEditorPage.CONTENT else RichEditorPage.TOPIC
+                    }
+                    if (state.useAt) Action(Icons.Outlined.AlternateEmail) {
+                        currentPage = if (currentPage == RichEditorPage.AT) RichEditorPage.CONTENT else RichEditorPage.AT
+                    }
                 }
             }
 
-            when (currentPage) {
-                RichEditorPage.CONTENT -> {
-                    if (LocalDevice.current.type == Device.Type.PORTRAIT) {
-                        state.RichEditorContent(
-                            maxLength = maxLength,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
-                        ) {
-                            state.RichEditorContent(
-                                maxLength = maxLength,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
+            if (LocalDevice.current.type == Device.Type.PORTRAIT) {
+                state.RichEditorContent(
+                    currentPage = currentPage,
+                    onClose = { result ->
+                        if (!result.isNullOrEmpty()) state.inputState.insert(result)
+                        currentPage = RichEditorPage.CONTENT
+                    },
+                    maxLength = maxLength,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+                ) {
+                    state.RichEditorContent(
+                        currentPage = currentPage,
+                        onClose = { result ->
+                            if (!result.isNullOrEmpty()) state.inputState.insert(result)
+                            currentPage = RichEditorPage.CONTENT
+                        },
+                        maxLength = maxLength,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-                RichEditorPage.EMOJI -> state.EmojiLayout(onClose)
-                RichEditorPage.IMAGE -> state.ImageLayout(onClose)
-                RichEditorPage.LINK -> state.LinkLayout(onClose)
-                RichEditorPage.TOPIC -> state.TopicLayout(onClose)
-                RichEditorPage.AT -> state.AtLayout(onClose)
             }
         }
     }

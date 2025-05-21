@@ -1,6 +1,7 @@
 package love.yinlin.ui.component.text
 
 import KottieAnimation
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -148,10 +149,17 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		@Composable
 		override fun draw() {
-			if (id >= 10000) {
-				EmojiManager.lottieMap[id]?.let {
+			when (val emoji = EmojiManager[id]) {
+				null -> Box(modifier = Modifier.fillMaxSize())
+				is love.yinlin.common.Emoji.Image -> {
+					MiniImage(
+						painter = painterResource(emoji.res),
+						modifier = Modifier.fillMaxSize()
+					)
+				}
+				is love.yinlin.common.Emoji.Lottie -> {
 					val isForeground = rememberOffScreenState()
-					val composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(it))
+					val composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(emoji.data))
 					val animationState by animateKottieCompositionAsState(
 						composition = composition,
 						isPlaying = isForeground,
@@ -160,14 +168,6 @@ abstract class RichContainer(type: String) : RichObject(type) {
 					KottieAnimation(
 						composition = composition,
 						progress = { animationState.progress },
-						modifier = Modifier.fillMaxSize()
-					)
-				}
-			}
-			else {
-				EmojiManager.emojiMap[id]?.let {
-					MiniImage(
-						painter = painterResource(it),
 						modifier = Modifier.fillMaxSize()
 					)
 				}

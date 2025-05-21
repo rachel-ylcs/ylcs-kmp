@@ -8,6 +8,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,6 +42,14 @@ class TextInputState(str: String = "") {
 		set(value) { this.value = TextFieldValue(value) }
 
 	val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
+
+	fun insert(str: String) {
+		val selection = value.selection
+		value = value.copy(
+			text = value.text.replaceRange(selection.start, selection.end, str),
+			selection = TextRange(selection.start + str.length)
+		)
+	}
 }
 
 @Composable
