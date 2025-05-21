@@ -3,6 +3,9 @@ package love.yinlin.ui.screen.community
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -18,11 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
@@ -36,6 +42,7 @@ import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
@@ -43,10 +50,10 @@ import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.*
+import love.yinlin.ui.component.text.RichEditor
+import love.yinlin.ui.component.text.RichEditorState
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Composable
@@ -149,6 +156,40 @@ private fun CoinLayout(
 }
 
 @Stable
+private data class AtInfo(val uid: Int, val name: String) {
+	override fun equals(other: Any?): Boolean = other is AtInfo && other.uid == uid
+	override fun hashCode(): Int = uid
+
+	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+}
+
+@Composable
+private fun AtUserItem(
+	info: AtInfo,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+	) {
+		WebImage(
+			uri = info.avatarPath,
+			key = DateEx.TodayString,
+			contentScale = ContentScale.Crop,
+			circle = true,
+			modifier = Modifier.size(ThemeValue.Size.MicroImage)
+		)
+		Text(
+			text = info.name,
+			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier.weight(1f)
+		)
+	}
+}
+
+@Stable
 class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(model) {
 	@Stable
 	@Serializable
@@ -166,6 +207,42 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	private val commentState = LazyListState()
 
 	private var currentSendComment: Comment? by mutableStateOf(null)
+
+	private val sendCommentState = object : RichEditorState() {
+		override val useImage: Boolean = true
+		override val useAt: Boolean = true
+
+		@Composable
+		override fun AtLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+			val userList = remember(details, commentPage.items) {
+				val userSet = mutableSetOf(AtInfo(topic.uid, topic.name))
+				commentPage.items.fastForEach { userSet.add(AtInfo(it.uid, it.name)) }
+				userSet -= AtInfo(app.config.userProfile?.uid ?: 0, "")
+				userSet.toList()
+			}
+
+			LazyVerticalGrid(
+				columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+				modifier = modifier
+			) {
+				items(
+					items = userList,
+					key = { it.uid }
+				) {
+					AtUserItem(
+						info = it,
+						onClick = { onClose("[at|${it.uid}|@${it.name}]") },
+						modifier = Modifier.fillMaxWidth()
+					)
+				}
+			}
+		}
+
+		@Composable
+		override fun ImageLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+			UnsupportedComponent(modifier = modifier)
+		}
+	}
 
 	private suspend fun requestTopic() {
 		val result = ClientAPI.request(
@@ -610,8 +687,6 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	private fun BottomLayout(modifier: Modifier = Modifier) {
-		val state = rememberTextInputState(currentSendComment)
-
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -633,22 +708,20 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					}
 					ActionSuspend(
 						icon = Icons.AutoMirrored.Filled.Send,
-						enabled = state.text.isNotEmpty()
+						enabled = sendCommentState.inputState.value.text.isNotEmpty()
 					) {
-						if (onSendComment(state.text)) {
-							state.text = ""
+						if (onSendComment(sendCommentState.richString.toString())) {
+							sendCommentState.inputState.text = ""
+							sendCommentState.enablePreview = false
 						}
 					}
 				}
 			)
-			TextInput(
-				state = state,
+			RichEditor(
+				state = sendCommentState,
 				hint = remember(currentSendComment) { "回复 @${currentSendComment?.name ?: "主题"}" },
-				maxLines = 5,
-				minLines = 1,
-				maxLength = 1024,
-				clearButton = false,
-				modifier = Modifier.fillMaxWidth()
+				maxLength = 256,
+				modifier = Modifier.fillMaxWidth(),
 			)
 		}
 	}
@@ -754,7 +827,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	override fun BottomBar() {
-		if (details != null) {
+		if (details != null && app.config.userProfile != null) {
 			BottomLayout(modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxWidth()

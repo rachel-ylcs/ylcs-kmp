@@ -113,10 +113,12 @@ open class RichEditorState {
     open val useEmoji: Boolean get() = true
     open val useImage: Boolean get() = false
     open val useLink: Boolean get() = true
-    open val useTopic: Boolean get() = false
+    open val useTopic: Boolean get() = true
     open val useAt: Boolean get() = false
 
     private var emojiClassify by mutableIntStateOf(0)
+
+    val richString: RichString get() = RichEditorParser.parse(inputState.value.text)
 
     @Composable
     open fun EmojiLayout(modifier: Modifier, focusRequester: FocusRequester, onClose: (String?) -> Unit) {
@@ -158,7 +160,6 @@ open class RichEditorState {
         val link = remember { TextInputState() }
         Column(
             modifier = modifier.verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             Row(
@@ -176,7 +177,7 @@ open class RichEditorState {
                     text = "插入",
                     icon = Icons.Outlined.InsertLink,
                     enabled = title.ok && link.ok,
-                    onClick = { onClose("[lk|${title.text}|${link.text}]") }
+                    onClick = { onClose("[lk|${link.text}|${title.text}]") }
                 )
             }
             TextInput(
@@ -189,7 +190,40 @@ open class RichEditorState {
     }
 
     @Composable
-    open fun TopicLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
+    open fun TopicLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+        val title = remember { TextInputState() }
+        val topic = remember { TextInputState() }
+        Column(
+            modifier = modifier.verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextInput(
+                    state = title,
+                    hint = "标题",
+                    maxLength = 16,
+                    modifier = Modifier.weight(1f)
+                )
+                RachelButton(
+                    text = "插入",
+                    icon = Icons.Outlined.Tag,
+                    enabled = title.ok && topic.ok,
+                    onClick = { onClose("[tp|${topic.text}|#${title.text}#]") }
+                )
+            }
+            TextInput(
+                state = topic,
+                hint = "链接",
+                maxLength = 32,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 
     @Composable
     open fun AtLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
@@ -197,45 +231,52 @@ open class RichEditorState {
     @Composable
     fun RichEditorContent(
         currentPage: RichEditorPage,
+        hint: String? = null,
+        focusRequester: FocusRequester,
         onClose: (String?) -> Unit,
         maxLength: Int = 0,
         modifier: Modifier = Modifier
     ) {
         val layoutModifier = if (enablePreview) modifier.aspectRatio(2f) else modifier
-        val focusRequester = remember { FocusRequester() }
-        when (currentPage) {
-            RichEditorPage.CONTENT -> {
-                TextInput(
-                    state = inputState,
-                    maxLength = maxLength,
-                    maxLines = if (enablePreview) Int.MAX_VALUE else 5,
-                    minLines = if (enablePreview) Int.MAX_VALUE else 1,
-                    clearButton = false,
-                    modifier = layoutModifier.focusRequester(focusRequester)
-                )
 
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
-            }
-            RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, focusRequester, onClose)
-            RichEditorPage.IMAGE -> ImageLayout(layoutModifier, onClose)
-            RichEditorPage.LINK -> LinkLayout(layoutModifier, onClose)
-            RichEditorPage.TOPIC -> TopicLayout(layoutModifier, onClose)
-            RichEditorPage.AT -> AtLayout(layoutModifier, onClose)
-        }
-        if (enablePreview) {
-            Box(modifier = layoutModifier
-                .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
-                .padding(OutlinedTextFieldDefaults.contentPadding())
-                .verticalScroll(rememberScrollState())
-            ) {
-                RichText(
-                    text = remember(inputState.value.text) { RichEditorParser.parse(inputState.value.text) },
-                    maxLines = Int.MAX_VALUE,
-                    canSelected = false,
-                    modifier = Modifier.fillMaxWidth()
+        TextInput(
+            state = inputState,
+            hint = hint,
+            maxLength = maxLength,
+            maxLines = if (enablePreview) Int.MAX_VALUE else 5,
+            minLines = if (enablePreview) Int.MAX_VALUE else 1,
+            leadingIcon = {
+                ClickIcon(
+                    icon = Icons.Outlined.Preview,
+                    color = if (enablePreview) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    onClick = { enablePreview = !enablePreview }
                 )
+            },
+            clearButton = false,
+            modifier = layoutModifier.focusRequester(focusRequester)
+        )
+
+        if (enablePreview) {
+            when (currentPage) {
+                RichEditorPage.CONTENT -> {
+                    Box(modifier = layoutModifier
+                        .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
+                        .padding(OutlinedTextFieldDefaults.contentPadding())
+                        .verticalScroll(rememberScrollState())
+                    ) {
+                        RichText(
+                            text = remember(inputState.value.text) { richString },
+                            maxLines = Int.MAX_VALUE,
+                            canSelected = false,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, focusRequester, onClose)
+                RichEditorPage.IMAGE -> ImageLayout(layoutModifier, onClose)
+                RichEditorPage.LINK -> LinkLayout(layoutModifier, onClose)
+                RichEditorPage.TOPIC -> TopicLayout(layoutModifier, onClose)
+                RichEditorPage.AT -> AtLayout(layoutModifier, onClose)
             }
         }
     }
@@ -244,6 +285,7 @@ open class RichEditorState {
 @Composable
 fun RichEditor(
     state: RichEditorState,
+    hint: String? = null,
     maxLength: Int = 0,
     modifier: Modifier = Modifier
 ) {
@@ -254,21 +296,14 @@ fun RichEditor(
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             var currentPage by rememberState { RichEditorPage.CONTENT }
+            val focusRequester = remember { FocusRequester() }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ClickIcon(
-                    icon = Icons.Outlined.Preview,
-                    color = if (state.enablePreview) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    onClick = {
-                        state.enablePreview = !state.enablePreview
-                        currentPage = RichEditorPage.CONTENT
-                    }
-                )
-                if (state.enablePreview) ActionScope.Right.ActionLayout(modifier = Modifier.weight(1f)) {
+            LaunchedEffect(state.enablePreview) {
+                currentPage = RichEditorPage.CONTENT
+            }
+
+            if (state.enablePreview) {
+                ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
                     if (state.useEmoji) {
                         val isActive = currentPage == RichEditorPage.EMOJI
                         Action(
@@ -320,10 +355,13 @@ fun RichEditor(
             if (LocalDevice.current.type == Device.Type.PORTRAIT) {
                 state.RichEditorContent(
                     currentPage = currentPage,
+                    focusRequester = focusRequester,
                     onClose = { result ->
                         if (!result.isNullOrEmpty()) state.inputState.insert(result)
+                        focusRequester.requestFocus()
                         currentPage = RichEditorPage.CONTENT
                     },
+                    hint = hint,
                     maxLength = maxLength,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -335,10 +373,13 @@ fun RichEditor(
                 ) {
                     state.RichEditorContent(
                         currentPage = currentPage,
+                        focusRequester = focusRequester,
                         onClose = { result ->
                             if (!result.isNullOrEmpty()) state.inputState.insert(result)
+                            focusRequester.requestFocus()
                             currentPage = RichEditorPage.CONTENT
                         },
+                        hint = hint,
                         maxLength = maxLength,
                         modifier = Modifier.weight(1f)
                     )

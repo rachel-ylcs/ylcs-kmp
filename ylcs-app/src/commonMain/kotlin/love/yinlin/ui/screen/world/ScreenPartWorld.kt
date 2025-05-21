@@ -41,8 +41,6 @@ import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.text.RichEditor
-import love.yinlin.ui.component.text.RichEditorState
 import kotlin.math.abs
 
 @Stable
@@ -161,7 +159,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			shadowElevation = ThemeValue.Shadow.Surface
 		) {
 			SplitLayout(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraSpace * 1.5f),
+				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraSpace),
 				aspectRatio = 0.5f,
 				left = {
 					Text(
@@ -196,10 +194,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					shape = RectangleShape,
 					modifier = Modifier.fillMaxWidth()
 				)
-				RichEditor(
-					state = remember { RichEditorState() },
-					modifier = Modifier.fillMaxWidth()
-				)
 			}
 			item(key = ItemKey("Calendar")) {
 				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
@@ -232,10 +226,6 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun Landscape() {
 		Column(modifier = Modifier.fillMaxSize()) {
-			RichEditor(
-				state = remember { RichEditorState() },
-				modifier = Modifier.fillMaxWidth()
-			)
 			Surface(
 				modifier = Modifier.fillMaxWidth(),
 				shadowElevation = ThemeValue.Shadow.Surface

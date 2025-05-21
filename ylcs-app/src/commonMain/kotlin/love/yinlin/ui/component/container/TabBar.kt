@@ -54,7 +54,7 @@ private fun <T> TabBar(
 					onLongClick = {
 						if (currentPage == index) onLongClick?.invoke(index)
 					}
-				).padding(horizontal = ThemeValue.Padding.EqualSpace, vertical = ThemeValue.Padding.VerticalSpace),
+				).padding(ThemeValue.Padding.EqualSpace),
 				contentAlignment = Alignment.Center
 			) {
 				content(isSelected, item)

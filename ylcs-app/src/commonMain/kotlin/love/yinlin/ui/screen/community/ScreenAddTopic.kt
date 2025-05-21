@@ -34,6 +34,8 @@ import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.text.RichEditor
+import love.yinlin.ui.component.text.RichEditorState
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.common.ScreenImagePreview
@@ -43,11 +45,11 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     @Stable
     private class InputState {
         val title = TextInputState()
-        val content = TextInputState()
+        val content = RichEditorState()
         var section by mutableIntStateOf(Comment.Section.WATER)
         val pics = mutableStateListOf<Picture>()
 
-        val canSubmit by derivedStateOf { title.ok && content.ok }
+        val canSubmit by derivedStateOf { title.ok && content.inputState.ok }
     }
 
     private val input = InputState()
@@ -76,7 +78,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
             data = API.User.Topic.SendTopic.Request(
                 token = app.config.userToken,
                 title = title,
-                content = input.content.text,
+                content = input.content.richString.toString(),
                 section = section
             ),
             files = {
@@ -142,12 +144,9 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                     clearButton = false,
                     modifier = Modifier.fillMaxWidth()
                 )
-                TextInput(
+                RichEditor(
                     state = input.content,
-                    hint = "内容",
                     maxLength = 512,
-                    maxLines = 10,
-                    clearButton = false,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(text = "主题", style = MaterialTheme.typography.titleMedium)

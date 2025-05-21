@@ -53,7 +53,7 @@ private fun WeiboUserItem(
 	onClick: () -> Unit
 ) {
 	Row(
-		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue),
+		modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 	) {

@@ -59,6 +59,7 @@ fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState
 fun TextInput(
 	state: TextInputState,
 	hint: String? = null,
+	leadingIcon: @Composable (() -> Unit)? = null,
 	inputType: InputType = InputType.COMMON,
 	readOnly: Boolean = false,
 	maxLength: Int = 0,
@@ -79,6 +80,7 @@ fun TextInput(
 				style = MaterialTheme.typography.titleMedium
 			)
 		} },
+		leadingIcon = leadingIcon,
 		trailingIcon = if (clearButton) {
 			{
 				ClickIcon(
