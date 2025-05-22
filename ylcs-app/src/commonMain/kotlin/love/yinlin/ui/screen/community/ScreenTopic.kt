@@ -213,7 +213,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		override val useAt: Boolean = true
 
 		@Composable
-		override fun AtLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+		override fun AtLayout(modifier: Modifier) {
 			val userList = remember(details, commentPage.items) {
 				val userSet = mutableSetOf(AtInfo(topic.uid, topic.name))
 				commentPage.items.fastForEach { userSet.add(AtInfo(it.uid, it.name)) }
@@ -231,7 +231,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				) {
 					AtUserItem(
 						info = it,
-						onClick = { onClose("[at|${it.uid}|@${it.name}]") },
+						onClick = { closeLayout("[at|${it.uid}|@${it.name}]") },
 						modifier = Modifier.fillMaxWidth()
 					)
 				}
@@ -239,7 +239,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		}
 
 		@Composable
-		override fun ImageLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+		override fun ImageLayout(modifier: Modifier) {
 			UnsupportedComponent(modifier = modifier)
 		}
 	}
@@ -708,11 +708,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					}
 					ActionSuspend(
 						icon = Icons.AutoMirrored.Filled.Send,
-						enabled = sendCommentState.inputState.value.text.isNotEmpty()
+						enabled = sendCommentState.ok
 					) {
 						if (onSendComment(sendCommentState.richString.toString())) {
-							sendCommentState.inputState.text = ""
-							sendCommentState.enablePreview = false
+							sendCommentState.text = ""
+							sendCommentState.closePreview()
 						}
 					}
 				}

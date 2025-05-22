@@ -22,7 +22,6 @@ import love.yinlin.common.Device
 import love.yinlin.common.EmojiManager
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
@@ -106,22 +105,35 @@ enum class RichEditorPage {
 
 @Stable
 open class RichEditorState {
-    val inputState = TextInputState()
+    private val inputState = TextInputState()
+    private val focusRequester = FocusRequester()
 
-    var enablePreview by mutableStateOf(false)
+    private var enablePreview by mutableStateOf(false)
+    private var currentPage by mutableStateOf(RichEditorPage.CONTENT)
 
-    open val useEmoji: Boolean get() = true
-    open val useImage: Boolean get() = false
-    open val useLink: Boolean get() = true
-    open val useTopic: Boolean get() = true
-    open val useAt: Boolean get() = false
+    protected open val useEmoji: Boolean get() = true
+    protected open val useImage: Boolean get() = false
+    protected open val useLink: Boolean get() = true
+    protected open val useTopic: Boolean get() = true
+    protected open val useAt: Boolean get() = false
 
     private var emojiClassify by mutableIntStateOf(0)
 
     val richString: RichString get() = RichEditorParser.parse(inputState.value.text)
+    var text: String get() = inputState.value.text
+        set(value) { inputState.text = value }
+    val ok: Boolean by derivedStateOf { inputState.ok }
+
+    protected fun closeLayout(result: String?) {
+        if (!result.isNullOrEmpty()) inputState.insert(result)
+        focusRequester.requestFocus()
+        currentPage = RichEditorPage.CONTENT
+    }
+
+    fun closePreview() { enablePreview = false }
 
     @Composable
-    open fun EmojiLayout(modifier: Modifier, focusRequester: FocusRequester, onClose: (String?) -> Unit) {
+    protected open fun EmojiLayout(modifier: Modifier) {
         Column(modifier = modifier) {
             TabBar(
                 currentPage = emojiClassify,
@@ -143,7 +155,7 @@ open class RichEditorState {
                     MiniImage(
                         painter = painterResource(emoji.res),
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
-                            onClose("[em|${emoji.id}]")
+                            closeLayout("[em|${emoji.id}]")
                         }
                     )
                 }
@@ -152,10 +164,10 @@ open class RichEditorState {
     }
 
     @Composable
-    open fun ImageLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
+    protected open fun ImageLayout(modifier: Modifier) {}
 
     @Composable
-    open fun LinkLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+    protected open fun LinkLayout(modifier: Modifier) {
         val title = remember { TextInputState() }
         val link = remember { TextInputState() }
         Column(
@@ -177,7 +189,7 @@ open class RichEditorState {
                     text = "插入",
                     icon = Icons.Outlined.InsertLink,
                     enabled = title.ok && link.ok,
-                    onClick = { onClose("[lk|${link.text}|${title.text}]") }
+                    onClick = { closeLayout("[lk|${link.text}|${title.text}]") }
                 )
             }
             TextInput(
@@ -190,7 +202,7 @@ open class RichEditorState {
     }
 
     @Composable
-    open fun TopicLayout(modifier: Modifier, onClose: (String?) -> Unit) {
+    protected open fun TopicLayout(modifier: Modifier) {
         val title = remember { TextInputState() }
         val topic = remember { TextInputState() }
         Column(
@@ -213,7 +225,7 @@ open class RichEditorState {
                     text = "插入",
                     icon = Icons.Outlined.Tag,
                     enabled = title.ok && topic.ok,
-                    onClick = { onClose("[tp|${topic.text}|#${title.text}#]") }
+                    onClick = { closeLayout("[tp|${topic.text}|#${title.text}#]") }
                 )
             }
             TextInput(
@@ -226,25 +238,20 @@ open class RichEditorState {
     }
 
     @Composable
-    open fun AtLayout(modifier: Modifier, onClose: (String?) -> Unit) {}
+    protected open fun AtLayout(modifier: Modifier) {}
 
     @Composable
-    fun RichEditorContent(
-        currentPage: RichEditorPage,
-        hint: String? = null,
-        focusRequester: FocusRequester,
-        onClose: (String?) -> Unit,
-        maxLength: Int = 0,
+    private fun InputLayout(
+        hint: String?,
+        maxLength: Int,
         modifier: Modifier = Modifier
     ) {
-        val layoutModifier = if (enablePreview) modifier.aspectRatio(2f) else modifier
-
         TextInput(
             state = inputState,
             hint = hint,
             maxLength = maxLength,
-            maxLines = if (enablePreview) Int.MAX_VALUE else 5,
-            minLines = if (enablePreview) Int.MAX_VALUE else 1,
+            maxLines = 10,
+            minLines = if (enablePreview) 10 else 1,
             leadingIcon = {
                 ClickIcon(
                     icon = Icons.Outlined.Preview,
@@ -253,30 +260,175 @@ open class RichEditorState {
                 )
             },
             clearButton = false,
-            modifier = layoutModifier.focusRequester(focusRequester)
+            modifier = modifier.focusRequester(focusRequester)
         )
+    }
 
-        if (enablePreview) {
+    @Composable
+    private fun PreviewText(modifier: Modifier = Modifier) {
+        Box(modifier = modifier) {
             when (currentPage) {
                 RichEditorPage.CONTENT -> {
-                    Box(modifier = layoutModifier
+                    Box(modifier = Modifier.fillMaxSize()
                         .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
                         .padding(OutlinedTextFieldDefaults.contentPadding())
-                        .verticalScroll(rememberScrollState())
                     ) {
                         RichText(
                             text = remember(inputState.value.text) { richString },
                             maxLines = Int.MAX_VALUE,
                             canSelected = false,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                         )
                     }
                 }
-                RichEditorPage.EMOJI -> EmojiLayout(layoutModifier, focusRequester, onClose)
-                RichEditorPage.IMAGE -> ImageLayout(layoutModifier, onClose)
-                RichEditorPage.LINK -> LinkLayout(layoutModifier, onClose)
-                RichEditorPage.TOPIC -> TopicLayout(layoutModifier, onClose)
-                RichEditorPage.AT -> AtLayout(layoutModifier, onClose)
+                RichEditorPage.EMOJI -> EmojiLayout(modifier = Modifier.fillMaxSize())
+                RichEditorPage.IMAGE -> ImageLayout(modifier = Modifier.fillMaxSize())
+                RichEditorPage.LINK -> LinkLayout(modifier = Modifier.fillMaxSize())
+                RichEditorPage.TOPIC -> TopicLayout(modifier = Modifier.fillMaxSize())
+                RichEditorPage.AT -> AtLayout(modifier = Modifier.fillMaxSize())
+            }
+        }
+    }
+
+    @Composable
+    private fun PortraitPreviewLayout(
+        hint: String?,
+        maxLength: Int,
+        modifier: Modifier = Modifier
+    ) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        ) {
+            InputLayout(
+                hint = hint,
+                maxLength = maxLength,
+                modifier = Modifier.fillMaxWidth().aspectRatio(2f)
+            )
+            PreviewText(modifier = Modifier.fillMaxWidth().aspectRatio(2f))
+        }
+    }
+
+    @Composable
+    private fun LandscapePreviewLayout(
+        hint: String?,
+        maxLength: Int,
+        modifier: Modifier = Modifier
+    ) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            InputLayout(
+                hint = hint,
+                maxLength = maxLength,
+                modifier = Modifier.weight(1f).aspectRatio(2f)
+            )
+            PreviewText(modifier = Modifier.weight(1f).aspectRatio(2f))
+        }
+    }
+
+    @Composable
+    private fun PreviewLayout(
+        hint: String?,
+        maxLength: Int,
+        modifier: Modifier = Modifier
+    ) {
+        if (LocalDevice.current.type == Device.Type.PORTRAIT) {
+            PortraitPreviewLayout(
+                hint = hint,
+                maxLength = maxLength,
+                modifier = modifier
+            )
+        }
+        else {
+            LandscapePreviewLayout(
+                hint = hint,
+                maxLength = maxLength,
+                modifier = modifier
+            )
+        }
+    }
+
+    @Composable
+    fun Content(
+        hint: String? = null,
+        maxLength: Int = 0,
+        modifier: Modifier = Modifier
+    ) {
+        LaunchedEffect(enablePreview) {
+            currentPage = RichEditorPage.CONTENT
+        }
+
+        Surface(modifier = modifier) {
+            if (enablePreview) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                ) {
+                    ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
+                        if (useEmoji) {
+                            val isActive = currentPage == RichEditorPage.EMOJI
+                            Action(
+                                icon = Icons.Outlined.AddReaction,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) {
+                                currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.EMOJI
+                            }
+                        }
+                        if (useImage) {
+                            val isActive = currentPage == RichEditorPage.IMAGE
+                            Action(
+                                icon = Icons.Outlined.AddPhotoAlternate,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) {
+                                currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.IMAGE
+                            }
+                        }
+                        if (useLink) {
+                            val isActive = currentPage == RichEditorPage.LINK
+                            Action(
+                                icon = Icons.Outlined.InsertLink,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) {
+                                currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.LINK
+                            }
+                        }
+                        if (useTopic) {
+                            val isActive = currentPage == RichEditorPage.TOPIC
+                            Action(
+                                icon = Icons.Outlined.Tag,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) {
+                                currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.TOPIC
+                            }
+                        }
+                        if (useAt) {
+                            val isActive = currentPage == RichEditorPage.AT
+                            Action(
+                                icon = Icons.Outlined.AlternateEmail,
+                                color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            ) {
+                                currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.AT
+                            }
+                        }
+                    }
+                    PreviewLayout(
+                        hint = hint,
+                        maxLength = maxLength,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            else {
+                InputLayout(
+                    hint = hint,
+                    maxLength = maxLength,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -288,103 +440,4 @@ fun RichEditor(
     hint: String? = null,
     maxLength: Int = 0,
     modifier: Modifier = Modifier
-) {
-    Surface(modifier = modifier) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-        ) {
-            var currentPage by rememberState { RichEditorPage.CONTENT }
-            val focusRequester = remember { FocusRequester() }
-
-            LaunchedEffect(state.enablePreview) {
-                currentPage = RichEditorPage.CONTENT
-            }
-
-            if (state.enablePreview) {
-                ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
-                    if (state.useEmoji) {
-                        val isActive = currentPage == RichEditorPage.EMOJI
-                        Action(
-                            icon = Icons.Outlined.AddReaction,
-                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.EMOJI
-                        }
-                    }
-                    if (state.useImage) {
-                        val isActive = currentPage == RichEditorPage.IMAGE
-                        Action(
-                            icon = Icons.Outlined.AddPhotoAlternate,
-                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.IMAGE
-                        }
-                    }
-                    if (state.useLink) {
-                        val isActive = currentPage == RichEditorPage.LINK
-                        Action(
-                            icon = Icons.Outlined.InsertLink,
-                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.LINK
-                        }
-                    }
-                    if (state.useTopic) {
-                        val isActive = currentPage == RichEditorPage.TOPIC
-                        Action(
-                            icon = Icons.Outlined.Tag,
-                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.TOPIC
-                        }
-                    }
-                    if (state.useAt) {
-                        val isActive = currentPage == RichEditorPage.AT
-                        Action(
-                            icon = Icons.Outlined.AlternateEmail,
-                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            currentPage = if (isActive) RichEditorPage.CONTENT else RichEditorPage.AT
-                        }
-                    }
-                }
-            }
-
-            if (LocalDevice.current.type == Device.Type.PORTRAIT) {
-                state.RichEditorContent(
-                    currentPage = currentPage,
-                    focusRequester = focusRequester,
-                    onClose = { result ->
-                        if (!result.isNullOrEmpty()) state.inputState.insert(result)
-                        focusRequester.requestFocus()
-                        currentPage = RichEditorPage.CONTENT
-                    },
-                    hint = hint,
-                    maxLength = maxLength,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
-                ) {
-                    state.RichEditorContent(
-                        currentPage = currentPage,
-                        focusRequester = focusRequester,
-                        onClose = { result ->
-                            if (!result.isNullOrEmpty()) state.inputState.insert(result)
-                            focusRequester.requestFocus()
-                            currentPage = RichEditorPage.CONTENT
-                        },
-                        hint = hint,
-                        maxLength = maxLength,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-        }
-    }
-}
+) = state.Content(hint = hint, maxLength = maxLength, modifier = modifier)

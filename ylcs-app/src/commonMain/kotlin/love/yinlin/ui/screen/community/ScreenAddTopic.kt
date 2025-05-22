@@ -51,7 +51,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
         var section by mutableIntStateOf(Comment.Section.WATER)
         val pics = mutableStateListOf<Picture>()
 
-        val canSubmit by derivedStateOf { title.ok && content.inputState.ok }
+        val canSubmit by derivedStateOf { title.ok && content.ok }
     }
 
     private val input = InputState()
@@ -117,7 +117,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
 
     override fun onBack() {
         val title = input.title.text
-        val content = input.content.inputState.text
+        val content = input.content.text
         val pics = input.pics.map { it.image }
         if (title.isNotEmpty() || content.isNotEmpty() || pics.isNotEmpty()) {
             app.config.editedTopic = EditedTopic(
@@ -154,7 +154,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     override suspend fun initialize() {
         app.config.editedTopic?.let { editedTopic ->
             input.title.text = editedTopic.title
-            input.content.inputState.text = editedTopic.content
+            input.content.text = editedTopic.content
             input.section = editedTopic.section
             input.pics += editedTopic.pics.map { Picture(it) }
         }
