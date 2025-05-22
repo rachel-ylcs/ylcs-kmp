@@ -32,6 +32,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun WeiboCommentCard(comment: WeiboComment) {
+		val processor = LocalWeiboProcessor.current
 		Column(modifier = Modifier.fillMaxWidth()) {
 			WeiboUserBar(
 				info = comment.info,
@@ -41,7 +42,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 			Space()
 			RichText(
 				text = comment.text,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
+				onLinkClick = { processor.onWeiboLinkClick(it) },
+				onTopicClick = { processor.onWeiboTopicClick(it) },
+				onAtClick = { processor.onWeiboAtClick(it) }
 			)
 			Space()
 			val subComments = comment.subComments
@@ -61,7 +65,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 							Space()
 							RichText(
 								text = subComment.text,
-								modifier = Modifier.fillMaxWidth()
+								modifier = Modifier.fillMaxWidth(),
+								onLinkClick = { processor.onWeiboLinkClick(it) },
+								onTopicClick = { processor.onWeiboTopicClick(it) },
+								onAtClick = { processor.onWeiboAtClick(it) }
 							)
 							Space()
 						}

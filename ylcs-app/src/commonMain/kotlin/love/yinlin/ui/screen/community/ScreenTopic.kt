@@ -55,6 +55,7 @@ import love.yinlin.ui.component.text.RichEditorState
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.common.ScreenImagePreview
+import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 
 @Composable
 private fun UserBar(
@@ -519,6 +520,21 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	}
 
 	@Composable
+	private fun RichTextLayout(
+		text: RichString,
+		modifier: Modifier = Modifier
+	) {
+		RichText(
+			text = text,
+			fixLineHeight = true,
+			onLinkClick = { gotoWebPage(it) },
+			onTopicClick = {},
+			onAtClick = { navigate(ScreenUserCard.Args(it.toIntOrNull() ?: 0)) },
+			modifier = modifier
+		)
+	}
+
+	@Composable
 	private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
 		val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it)) } }
 
@@ -543,9 +559,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
-			RichText(
+			RichTextLayout(
 				text = remember(details) { RichString.parse(details.content) },
-				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 			if (pics.isNotEmpty()) {
@@ -580,9 +595,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
 				if (comment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
 			}
-			RichText(
+			RichTextLayout(
 				text = remember(comment) { RichString.parse(comment.content) },
-				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 			Row(
@@ -680,9 +694,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					}
 				}
 			}
-			RichText(
+			RichTextLayout(
 				text = remember(subComment) { RichString.parse(subComment.content) },
-				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 		}

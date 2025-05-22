@@ -37,6 +37,7 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
+import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 
 @Stable
 class ScreenMail(model: AppModel) : CommonSubScreen(model) {
@@ -167,13 +168,12 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 						overflow = TextOverflow.Ellipsis
 					)
 				}
-				RichText(
-					text = remember(mail) { RichString.parse(mail.content) },
+				Text(
+					text = mail.content,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodySmall,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					canSelected = false,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
@@ -256,6 +256,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				}
 				RichText(
 					text = remember(args) { RichString.parse(args.content) },
+					onLinkClick = { gotoWebPage(it) },
 					modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
 				)
 			}

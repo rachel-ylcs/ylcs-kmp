@@ -35,7 +35,7 @@ import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
-import love.yinlin.ui.screen.common.ScreenWebpage
+import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 import love.yinlin.ui.screen.msg.pictures.PagePictures
 import love.yinlin.ui.screen.msg.weibo.*
 
@@ -141,18 +141,6 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
 		override fun onWeiboAvatarClick(info: WeiboUserInfo) {
 			navigate(ScreenWeiboUser.Args(info.id))
-		}
-
-		private fun gotoWebPage(arg: String) {
-			OS.ifPlatform(
-				Platform.WebWasm, *Platform.Desktop,
-				ifTrue = {
-					OS.Net.openUrl(arg)
-				},
-				ifFalse = {
-					navigate(ScreenWebpage.Args(arg))
-				}
-			)
 		}
 
 		override fun onWeiboLinkClick(arg: String) = gotoWebPage(arg)
