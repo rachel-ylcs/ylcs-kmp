@@ -3,6 +3,7 @@ package love.yinlin.ui.component.text
 import KottieAnimation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.panpf.sketch.fetch.newComposeResourceUri
 import kotlinx.serialization.json.*
@@ -145,7 +147,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override fun build(context: RichContext) {
 			val id = context.id
-			context.builder.appendInlineContent(id, " ")
+			context.builder.appendInlineContent(id, "\uFFFD")
 			context.content[id] = this
 		}
 
@@ -211,17 +213,19 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override fun build(context: RichContext) {
 			val id = context.id
-			context.builder.appendInlineContent(id, " ")
+			context.builder.appendInlineContent(id, "\uFFFD")
             context.content[id] = this
         }
 
 		@Composable
 		override fun draw() {
-			WebImage(
-				uri = uri,
-				quality = ImageQuality.Low,
-				modifier = Modifier.fillMaxSize()
-			)
+			Box(modifier = Modifier.fillMaxSize().padding(horizontal = 0.5.dp * width)) {
+				WebImage(
+					uri = uri,
+					quality = ImageQuality.Low,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
 		}
 	}
 	fun image(uri: String, width: Float = 1f, height: Float = 1f) = makeItem(Image(uri, width, height))
@@ -451,6 +455,7 @@ fun RichText(
 	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
 	canSelected: Boolean = true,
+	fixLineHeight: Boolean = false,
 ) {
 	val state = remember(text) { text.asState(
 		onLinkClick = onLinkClick,
@@ -464,7 +469,7 @@ fun RichText(
 				placeholder = Placeholder(
 					width = fontSize * drawable.width,
 					height = fontSize * drawable.height,
-					placeholderVerticalAlign = PlaceholderVerticalAlign.TextTop
+					placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
 				)
 			) {
 				drawable.draw()
@@ -476,7 +481,7 @@ fun RichText(
 		Text(
 			text = state.text,
 			color = color,
-			style = style,
+			style = if (fixLineHeight) style.copy(lineHeight = TextUnit.Unspecified) else style, // what the fuck bug
 			modifier = modifier,
 			overflow = overflow,
 			maxLines = maxLines,

@@ -100,7 +100,7 @@ object WeiboAPI {
 					else weiboHtmlNodesTransform(childNodes, container)
 				}
 				"span" -> weiboHtmlNodesTransform(childNodes, container)
-				"img" -> node.attribute("src")?.value?.let { container.image(it, 1.25f, 1f) }
+				"img" -> node.attribute("src")?.value?.let { container.image(it) }
 			}
 		}
 	}

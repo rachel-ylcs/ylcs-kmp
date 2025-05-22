@@ -545,6 +545,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			}
 			RichText(
 				text = remember(details) { RichString.parse(details.content) },
+				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 			if (pics.isNotEmpty()) {
@@ -581,6 +582,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			}
 			RichText(
 				text = remember(comment) { RichString.parse(comment.content) },
+				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 			Row(
@@ -680,6 +682,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			}
 			RichText(
 				text = remember(subComment) { RichString.parse(subComment.content) },
+				fixLineHeight = true,
 				modifier = Modifier.fillMaxWidth()
 			)
 		}

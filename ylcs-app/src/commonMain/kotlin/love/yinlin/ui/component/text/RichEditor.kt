@@ -277,6 +277,7 @@ open class RichEditorState {
                             text = remember(inputState.value.text) { richString },
                             maxLines = Int.MAX_VALUE,
                             canSelected = false,
+                            fixLineHeight = true,
                             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                         )
                     }
