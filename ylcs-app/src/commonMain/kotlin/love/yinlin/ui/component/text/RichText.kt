@@ -140,8 +140,15 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 	@Stable
 	protected class Emoji(private val id: Int) : RichItem, RichDrawable {
-		override val width: Float get() = 3f
-		override val height: Float get() = 3f
+		override val width: Float get() = when (EmojiManager[id]) {
+			null, is love.yinlin.common.Emoji.Lottie -> 1f
+			else -> 3f
+		}
+
+		override val height: Float get() = when (EmojiManager[id]) {
+			null, is love.yinlin.common.Emoji.Lottie -> 1f
+			else -> 3f
+		}
 
 		override val json: JsonElement = id.json
 
