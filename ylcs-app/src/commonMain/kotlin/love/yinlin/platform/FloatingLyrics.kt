@@ -44,6 +44,16 @@ abstract class FloatingLyrics {
     @Stable
     @Serializable
     data class DesktopConfig(
+        // 左边
+        val x: Float = 0f,
+        // 顶边
+        val y: Float = 0f,
+        // 宽度
+        val width: Float = 800f,
+        // 高度
+        val height: Float = 100f,
+        // 字体大小 0.75 ~ 1.5
+        val textSize: Float = 1f,
         // 字体颜色
         val textColor: ULong = Colors.Steel4.value,
         // 背景颜色

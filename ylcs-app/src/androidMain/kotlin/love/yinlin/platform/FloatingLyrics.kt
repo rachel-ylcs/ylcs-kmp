@@ -16,13 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.DeviceWrapper
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
@@ -116,11 +116,11 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                         ),
-                        color = Color(config.textColor),
+                        color = Colors.from(config.textColor),
                         textAlign = TextAlign.Center,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.background(color = Color(config.backgroundColor)).padding(ThemeValue.Padding.Value)
+                        modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
                     )
                 }
             }
