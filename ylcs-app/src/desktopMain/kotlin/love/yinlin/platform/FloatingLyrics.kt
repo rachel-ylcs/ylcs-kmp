@@ -22,7 +22,9 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.rememberWindowState
+import com.sun.jna.Library
 import com.sun.jna.Native
+import com.sun.jna.Pointer
 import com.sun.jna.platform.win32.User32
 import com.sun.jna.platform.win32.WinDef
 import com.sun.jna.platform.win32.WinUser
@@ -36,6 +38,17 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.node.condition
+
+@Suppress("FunctionName")
+interface ObjCRuntime : Library {
+    companion object {
+        val INSTANCE: ObjCRuntime = Native.load("objc", ObjCRuntime::class.java)
+    }
+
+    fun objc_getClass(className: String?): Pointer?
+    fun sel_registerName(selectorName: String?): Pointer?
+    fun objc_msgSend(receiver: Pointer?, selector: Pointer?, vararg args: Any?): Pointer?
+}
 
 @Stable
 class ActualFloatingLyrics : FloatingLyrics() {
@@ -61,7 +74,11 @@ class ActualFloatingLyrics : FloatingLyrics() {
 
             }
             Platform.MacOS -> {
-
+                val objc: ObjCRuntime = ObjCRuntime.INSTANCE
+                val nsWindowClass: Pointer? = objc.objc_getClass("NSWindow")
+                val nsWindow = Pointer(window.windowHandle)
+                val setIgnoresMouseEventsSel: Pointer? = objc.sel_registerName("setIgnoresMouseEvents:")
+                objc.objc_msgSend(nsWindow, setIgnoresMouseEventsSel, enabled)
             }
             else -> {}
         }
