@@ -19,7 +19,10 @@ class MainActivity : ComponentActivity() {
 
         appNative.activityResultRegistry = activityResultRegistry
 
-        appNative.musicFactory.floatingLyrics = ActualFloatingLyrics(this).apply { attach() }
+        ActualFloatingLyrics(this).also {
+            appNative.musicFactory.floatingLyrics = it
+            if (appNative.config.enabledFloatingLyrics) it.attach()
+        }
 
         setContent {
             AppWrapper {

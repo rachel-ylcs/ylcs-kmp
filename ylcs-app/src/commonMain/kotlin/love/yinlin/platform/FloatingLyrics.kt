@@ -1,6 +1,7 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 
@@ -49,16 +50,19 @@ abstract class FloatingLyrics {
         // 顶边
         val y: Float = 0f,
         // 宽度
-        val width: Float = 800f,
+        val width: Float = 600f,
         // 高度
-        val height: Float = 100f,
+        val height: Float = 50f,
         // 字体大小 0.75 ~ 1.5
         val textSize: Float = 1f,
         // 字体颜色
         val textColor: ULong = Colors.Steel4.value,
         // 背景颜色
         val backgroundColor: ULong = Colors.Transparent.value
-    )
+    ) {
+        val textSizeProgress: Float get() = textSize / 0.75f - 1f
+        fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).coerceIn(0.75f, 1.5f))
+    }
 
     abstract val isAttached: Boolean
 

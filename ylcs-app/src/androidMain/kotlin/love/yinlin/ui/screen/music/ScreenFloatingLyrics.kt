@@ -1,3 +1,4 @@
+@file:JvmName("AndroidScreenFloatingLyrics")
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.background
@@ -7,6 +8,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -17,6 +20,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.OffScreenEffect
+import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
@@ -28,7 +32,7 @@ import love.yinlin.ui.component.layout.SplitLayout
 private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyrics) {
     launch {
         delay(200)
-        enabled = floatingLyrics.isAttached
+        app.config.enabledFloatingLyrics = floatingLyrics.isAttached
     }
 }
 
@@ -54,42 +58,9 @@ private fun ScreenFloatingLyrics.enableFloatingLyrics(value: Boolean) {
 }
 
 @Composable
-private fun RowLayout(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace * 2),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = title)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-private fun ColumnLayout(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2)
-    ) {
-        Text(text = title)
-        content()
-    }
-}
-
-@Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
+    var androidConfig by rememberState { app.config.floatingLyricsAndroidConfig }
+
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -99,10 +70,11 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     ) {
         RowLayout("悬浮歌词模式") {
             Switch(
-                checked = enabled,
+                checked = app.config.enabledFloatingLyrics,
                 onCheckedChange = { enableFloatingLyrics(it) }
             )
         }
+
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier.padding(
@@ -125,6 +97,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 )
             }
         }
+
         RowLayout("左侧偏移") {
             BeautifulSlider(
                 value = androidConfig.leftProgress,
@@ -133,6 +106,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
             )
         }
+
         RowLayout("右侧偏移") {
             BeautifulSlider(
                 value = androidConfig.rightProgress,
@@ -141,6 +115,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
             )
         }
+
         RowLayout("顶部偏移") {
             BeautifulSlider(
                 value = androidConfig.topProgress,
@@ -149,6 +124,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
             )
         }
+
         RowLayout("字体大小") {
             BeautifulSlider(
                 value = androidConfig.textSizeProgress,
@@ -157,6 +133,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
             )
         }
+
         SplitLayout(
             modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
             horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace * 2,

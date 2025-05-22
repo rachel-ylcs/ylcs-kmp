@@ -328,6 +328,8 @@ class KVConfig(private val kv: KV) {
 	var lastMusic by stringState("")
 	// 播放模式
 	var musicPlayMode: MusicPlayMode by enumState(MusicPlayMode.ORDER)
+	// 开启悬浮歌词
+	var enabledFloatingLyrics by booleanState(true)
 	// Android悬浮歌词配置
 	var floatingLyricsAndroidConfig: FloatingLyrics.AndroidConfig by jsonState { FloatingLyrics.AndroidConfig() }
 	// iOS悬浮歌词配置

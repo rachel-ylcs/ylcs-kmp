@@ -133,7 +133,7 @@ fun main() {
         }
 
         app.musicFactory.floatingLyrics?.let {
-            if (it.isAttached) it.Content()
+            if (it.isAttached && app.config.enabledFloatingLyrics) it.Content()
         }
     }
 }

@@ -151,19 +151,22 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					icon = Icons.Outlined.LibraryMusic,
 					color = Colors.White
 				) {
-					navigate<ScreenMusicLibrary>()
+					if (app.musicFactory.isInit) navigate<ScreenMusicLibrary>()
+					else slot.tip.warning("播放器尚未初始化")
 				}
 				Action(
 					icon = Icons.AutoMirrored.Outlined.QueueMusic,
 					color = Colors.White
 				) {
-					navigate<ScreenPlaylistLibrary>()
+					if (app.musicFactory.isInit) navigate<ScreenPlaylistLibrary>()
+					else slot.tip.warning("播放器尚未初始化")
 				}
 				Action(
 					icon = Icons.Outlined.Lyrics,
 					color = Colors.White
 				) {
-					navigate<ScreenFloatingLyrics>()
+					if (app.musicFactory.isInit) navigate<ScreenFloatingLyrics>()
+					else slot.tip.warning("播放器尚未初始化")
 				}
 			},
 			right = {

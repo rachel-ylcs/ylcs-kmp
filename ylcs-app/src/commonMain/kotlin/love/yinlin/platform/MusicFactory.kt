@@ -18,7 +18,7 @@ abstract class MusicFactory {
     }
 
     // 初始化
-    protected abstract val isInit: Boolean
+    abstract val isInit: Boolean
 
     private fun initLibrary() = Coroutines.startIO {
         val musicPath = OS.Storage.musicPath
