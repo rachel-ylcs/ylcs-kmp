@@ -59,26 +59,26 @@ fun Routing.topicAPI(implMap: ImplMap) {
         base AS (
             SELECT COALESCE(MAX(ts), NOW()) AS base_ts
             FROM (
-                SELECT ts FROM comment_activity    WHERE tid = ?
+                SELECT ts FROM comment_activity    WHERE tid = ? AND isDeleted=0
                 UNION ALL
-                SELECT ts FROM comment_discussion  WHERE tid = ?
+                SELECT ts FROM comment_discussion  WHERE tid = ? AND isDeleted=0
                 UNION ALL
-                SELECT ts FROM comment_notification WHERE tid = ?
+                SELECT ts FROM comment_notification WHERE tid = ? AND isDeleted=0
                 UNION ALL
-                SELECT ts FROM comment_water       WHERE tid = ?
+                SELECT ts FROM comment_water       WHERE tid = ? AND isDeleted=0
             ) AS tid_ts
         ),
         -- 2. 再做 latest_tids 去重、分页
         latest_tids AS (
             SELECT tid, MAX(ts) AS max_ts
             FROM (
-                SELECT tid, ts FROM comment_activity
+                SELECT tid, ts FROM comment_activity WHERE isDeleted=0
                 UNION ALL
-                SELECT tid, ts FROM comment_discussion
+                SELECT tid, ts FROM comment_discussion WHERE isDeleted=0
                 UNION ALL
-                SELECT tid, ts FROM comment_notification
+                SELECT tid, ts FROM comment_notification WHERE isDeleted=0
                 UNION ALL
-                SELECT tid, ts FROM comment_water
+                SELECT tid, ts FROM comment_water WHERE isDeleted=0
             ) AS all_comments
             GROUP BY tid
             HAVING (MAX(ts) < (SELECT base_ts FROM base))
