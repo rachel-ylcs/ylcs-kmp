@@ -301,12 +301,12 @@ open class RichEditorState {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
+            PreviewText(modifier = Modifier.fillMaxWidth().aspectRatio(2f))
             InputLayout(
                 hint = hint,
                 maxLength = maxLength,
                 modifier = Modifier.fillMaxWidth().aspectRatio(2f)
             )
-            PreviewText(modifier = Modifier.fillMaxWidth().aspectRatio(2f))
         }
     }
 
