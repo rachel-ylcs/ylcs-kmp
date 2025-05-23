@@ -1,6 +1,7 @@
 package love.yinlin.ui.screen.community
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,6 +53,7 @@ import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
@@ -531,12 +533,18 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 				itemsIndexed(
 					items = UserLevel.levelTable,
-					key = { index, item -> index }
+					key = { index, _ -> index }
 				) { index, item ->
 					LevelItem(
 						index = index,
 						item = item,
-						modifier = Modifier.fillMaxWidth().clickable {}.padding(ThemeValue.Padding.Value)
+						modifier = Modifier.fillMaxWidth()
+							.condition(index + 1 == app.config.userProfile?.level) {
+								border(
+									width = ThemeValue.Border.Small,
+									color = MaterialTheme.colorScheme.primary
+								)
+							}.clickable {}.padding(ThemeValue.Padding.Value)
 					)
 				}
 			}
