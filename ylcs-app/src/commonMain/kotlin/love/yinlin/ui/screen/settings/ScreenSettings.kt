@@ -53,38 +53,46 @@ import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
+import love.yinlin.ui.screen.community.ScreenUserCard
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
+
+@Stable
+private data class Contributor(
+	val name: String,
+	val uid: Int
+)
 
 @Stable
 private data class ContributorGroup(
 	val title: String,
 	val icon: ImageVector,
 	val color: Color,
-	val names: List<String>
+	val names: List<Contributor>
 )
 
 @Composable
 private fun ContributorList(
 	contributors: Array<ContributorGroup>,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onClick: (Contributor) -> Unit
 ) {
 	Column(modifier = modifier) {
-		for (contributor in contributors) {
+		for (contributorGroup in contributors) {
 			Row(modifier = Modifier.fillMaxWidth()) {
 				Row(
 					modifier = Modifier.weight(1f)
-						.background(contributor.color.copy(alpha = 0.7f))
+						.background(contributorGroup.color.copy(alpha = 0.7f))
 						.padding(ThemeValue.Padding.Value),
 					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.CenterHorizontally),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					MiniIcon(
-						icon = contributor.icon,
+						icon = contributorGroup.icon,
 						size = ThemeValue.Size.MicroIcon
 					)
 					Text(
-						text = contributor.title,
+						text = contributorGroup.title,
 						style = MaterialTheme.typography.labelMedium,
 						textAlign = TextAlign.Center,
 						maxLines = 1,
@@ -93,13 +101,15 @@ private fun ContributorList(
 				}
 				Column(modifier = Modifier.padding(vertical = ThemeValue.Border.Small / 2).weight(2f).border(
 					width = ThemeValue.Border.Small,
-					color = contributor.color.copy(0.7f)
+					color = contributorGroup.color.copy(0.7f)
 				)) {
-					for (name in contributor.names) {
+					for (contributor in contributorGroup.names) {
 						Text(
-							text = name,
+							text = contributor.name,
 							textAlign = TextAlign.Center,
-							modifier = Modifier.fillMaxWidth().clickable {}.padding(ThemeValue.Padding.ExtraValue),
+							modifier = Modifier.fillMaxWidth()
+								.clickable { onClick(contributor) }
+								.padding(ThemeValue.Padding.ExtraValue),
 							maxLines = 1,
 							overflow = TextOverflow.Ellipsis
 						)
@@ -702,14 +712,45 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				)
 				ContributorList(
 					contributors = remember { arrayOf(
-						ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf("方旖旎", "木棠", "竹香满亭")),
-						ContributorGroup("运营", Icons.Outlined.Store, Colors.Steel4, listOf("思懿", "清逸", "青栀")),
-						ContributorGroup("宣发", Icons.Outlined.Campaign, Colors.Red4, listOf("姜辞", "晨晨")),
-						ContributorGroup("经办", Icons.Outlined.LocalFireDepartment, Colors.Orange4, listOf("寒山", "南溟", "韩非", "泸沽寻临", "名字不太喵", "圈圈临")),
-						ContributorGroup("数据", Icons.Outlined.Token, Colors.Purple4, listOf("鲤鱼焙梨", "海屿悼词", "冰临", "银小临")),
-						ContributorGroup("开发", Icons.Outlined.Code, Colors.Green4, listOf("焦骨", "青尘", "yingfeng", "桃花坞里桃花庵", "双花", "苏晚卿")),
+						ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf(
+							Contributor("方旖旎", 7),
+							Contributor("木棠", 1563),
+							Contributor("竹香满亭", 11)
+						)),
+						ContributorGroup("运营", Icons.Outlined.Store, Colors.Steel4, listOf(
+							Contributor("思懿", 6),
+							Contributor("清逸", 74),
+							Contributor("青栀", 87)
+						)),
+						ContributorGroup("宣发", Icons.Outlined.Campaign, Colors.Red4, listOf(
+							Contributor("姜辞", 5),
+							Contributor("晨晨", 15)
+						)),
+						ContributorGroup("经办", Icons.Outlined.LocalFireDepartment, Colors.Orange4, listOf(
+							Contributor("寒山", 1),
+							Contributor("南溟", 3),
+							Contributor("韩非", 12),
+							Contributor("泸沽寻临", 8),
+							Contributor("名字不太喵", 18),
+							Contributor("圈圈临", 2)
+						)),
+						ContributorGroup("数据", Icons.Outlined.Token, Colors.Purple4, listOf(
+							Contributor("鲤鱼焙梨", 13),
+							Contributor("海屿悼词", 9),
+							Contributor("冰临", 17),
+							Contributor("银小临", 16)
+						)),
+						ContributorGroup("开发", Icons.Outlined.Code, Colors.Green4, listOf(
+							Contributor("焦骨", 10),
+							Contributor("青尘", 1524),
+							Contributor("yingfeng", 14),
+							Contributor("桃花坞里桃花庵", 20),
+							Contributor("双花", 429),
+							Contributor("苏晚卿", 359)
+						)),
 					) },
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
+					onClick = { navigate(ScreenUserCard.Args(it.uid)) }
 				)
 			}
 		}
