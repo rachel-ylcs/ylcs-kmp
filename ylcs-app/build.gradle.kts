@@ -72,6 +72,11 @@ kotlin {
             isStatic = true
         }
 
+        pod("YLCSCore") {
+            moduleName = "YLCSCore"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+            source = path(project.file("../iosApp/core"))
+        }
         pod("MMKV") {
             version = "2.2.2"
             extraOpts += listOf("-compiler-option", "-fmodules")

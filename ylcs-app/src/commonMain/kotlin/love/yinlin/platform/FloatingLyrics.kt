@@ -36,11 +36,16 @@ abstract class FloatingLyrics {
     @Stable
     @Serializable
     data class IOSConfig(
+        // 字体大小 0.75 ~ 1.5
+        val textSize: Float = 1f,
         // 字体颜色
         val textColor: ULong = Colors.Steel4.value,
         // 背景颜色
         val backgroundColor: ULong = Colors.Transparent.value
-    )
+    ) {
+        val textSizeProgress: Float get() = textSize / 0.75f - 1f
+        fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).coerceIn(0.75f, 1.5f))
+    }
 
     @Stable
     @Serializable

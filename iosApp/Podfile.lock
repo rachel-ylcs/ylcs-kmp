@@ -6,9 +6,12 @@ PODS:
   - ylcs-app (3.0.2):
     - MMKV (= 2.2.2)
     - SGQRCode (= 4.1.0)
+    - YLCSCore
+  - YLCSCore (0.0.1)
 
 DEPENDENCIES:
   - ylcs-app (from `../ylcs-app`)
+  - YLCSCore (from `../iosApp/core`)
 
 SPEC REPOS:
   trunk:
@@ -19,13 +22,16 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   ylcs-app:
     :path: "../ylcs-app"
+  YLCSCore:
+    :path: "../iosApp/core"
 
 SPEC CHECKSUMS:
   MMKV: b4802ebd5a7c68fc0c4a5ccb4926fbdfb62d68e0
   MMKVCore: a255341a3746955f50da2ad9121b18cb2b346e61
   SGQRCode: 6ad664d63f38f2842503bc5087812c5a3136d924
-  ylcs-app: 9263b104f4badef9efa88b3172fe1596a4bb154e
+  ylcs-app: fa8a6e90ce5b2c8e5e4133e19767e8d692eee807
+  YLCSCore: ca05d5345f1c351ecfec8f32aac8eecb7975e02d
 
-PODFILE CHECKSUM: aac2c5739884f5015ce131bfe3ba10f40382766d
+PODFILE CHECKSUM: 0d47abdc2df72fd63ed28a56de89ba9cf72c25a3
 
 COCOAPODS: 1.16.2
