@@ -28,9 +28,8 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	api(API.User.Account.Login) { (name, pwd, platform) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
-		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name)
-		if (user == null) return@api "ID未注册".failedData
-		if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
+        val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failedData
+        if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
 		val uid = user["uid"].Int
 		// 根据 uid, platform, timestamp 生成 token
 		val token = Token(uid, platform)
@@ -103,14 +102,12 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		VN.throwName(name)
 		VN.throwPassword(pwd)
 
-		val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name)
-		if (user == null) return@api "ID\"${name}\"未注册".failedData
-		val inviterUid = user["inviter"].IntNull ?: return@api "原始ID请联系管理员修改密码".failedData
+        val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name) ?: return@api "ID\"${name}\"未注册".failedData
+        val inviterUid = user["inviter"].IntNull ?: return@api "原始ID请联系管理员修改密码".failedData
 
 		// 检查邀请人是否有审核资格
-		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid)
-		if (inviter == null) return@api "邀请人不存在".failedData
-		val inviterName = inviter["name"].String
+        val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid) ?: return@api "邀请人不存在".failedData
+        val inviterName = inviter["name"].String
 		if (!UserPrivilege.vipAccount(inviter["privilege"].Int))
 			return@api "邀请人\"${inviterName}\"无审核资格".failedData
 		// 查询ID是否注册过或是否正在审批
@@ -131,9 +128,8 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	implMap[Mail.Filter.FORGOT_PASSWORD] = ImplContext@ {
 		val name = it.param1
 		val pwd = it.param2
-		val user = DB.querySQLSingle("SELECT uid FROM user WHERE name = ?", name)
-		if (user == null) return@ImplContext "用户不存在".failedObject
-		DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
+        val user = DB.querySQLSingle("SELECT uid FROM user WHERE name = ?", name) ?: return@ImplContext "用户不存在".failedObject
+        DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
 		// 清除修改密码用户的 Token
 		AN.removeAllTokens(user["uid"].Int)
 		"\"${name}\"修改密码成功".successObject
