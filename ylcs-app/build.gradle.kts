@@ -50,11 +50,12 @@ kotlin {
         }
     }
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
+    buildList {
+        add(iosArm64())
+        if (desktopPlatform == GradlePlatform.Mac) {
+            add(if (desktopArchitecture == "aarch64") iosSimulatorArm64() else iosX64())
+        }
+    }.forEach {
         it.compilations.getByName("main") {
             val nskeyvalueobserving by cinterops.creating
         }
@@ -239,11 +240,12 @@ kotlin {
             }
         }
 
-        listOf(
-            iosX64Main,
-            iosArm64Main,
-            iosSimulatorArm64Main
-        ).forEach {
+        buildList {
+            add(iosArm64Main)
+            if (desktopPlatform == GradlePlatform.Mac) {
+                add(if (desktopArchitecture == "aarch64") iosSimulatorArm64Main else iosX64Main)
+            }
+        }.forEach {
             it.get().apply {
                 dependsOn(iosMain)
                 dependencies {
