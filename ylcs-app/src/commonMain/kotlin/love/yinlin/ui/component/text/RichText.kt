@@ -176,7 +176,6 @@ abstract class RichContainer(type: String) : RichObject(type) {
 					)
 				}
 				is love.yinlin.common.Emoji.Lottie -> {
-					val isForeground = rememberOffScreenState()
 					val composition by rememberLottieComposition(emoji) {
 						LottieCompositionSpec.JsonString(emoji.data)
 					}
@@ -184,7 +183,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 						painter = rememberLottiePainter(
 							composition = composition,
 							iterations = Compottie.IterateForever,
-							isPlaying = isForeground
+							isPlaying = rememberOffScreenState()
 						),
 						modifier = Modifier.fillMaxSize()
 					)

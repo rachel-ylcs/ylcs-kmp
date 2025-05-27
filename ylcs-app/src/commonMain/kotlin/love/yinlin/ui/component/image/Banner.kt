@@ -81,9 +81,8 @@ fun <T> Banner(
 	}
 
 	val autoplay by rememberDerivedState(interval, pics) { interval > 0L && pics.size > 1 }
-	val isForeground = rememberOffScreenState()
 
-	if (autoplay && isForeground) {
+	if (autoplay && rememberOffScreenState()) {
 		LaunchedEffect(state.settledPage) {
 			delay(interval)
 			if (pics.isNotEmpty() && state.pageCount != 0) {
