@@ -1,6 +1,5 @@
 package love.yinlin.ui.component.text
 
-import KottieAnimation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,10 +24,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.panpf.sketch.fetch.newComposeResourceUri
+import io.github.alexzhirkevich.compottie.Compottie
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.serialization.json.*
-import kottieComposition.KottieCompositionSpec
-import kottieComposition.animateKottieCompositionAsState
-import kottieComposition.rememberKottieComposition
 import love.yinlin.common.Colors
 import love.yinlin.common.EmojiManager
 import love.yinlin.extension.*
@@ -37,7 +37,6 @@ import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import org.jetbrains.compose.resources.painterResource
-import utils.KottieConstants
 
 // RichString DSL
 
@@ -178,15 +177,15 @@ abstract class RichContainer(type: String) : RichObject(type) {
 				}
 				is love.yinlin.common.Emoji.Lottie -> {
 					val isForeground = rememberOffScreenState()
-					val composition = rememberKottieComposition(spec = KottieCompositionSpec.JsonString(emoji.data))
-					val animationState by animateKottieCompositionAsState(
-						composition = composition,
-						isPlaying = isForeground,
-						iterations = KottieConstants.IterateForever
-					)
-					KottieAnimation(
-						composition = composition,
-						progress = { animationState.progress },
+					val composition by rememberLottieComposition(emoji) {
+						LottieCompositionSpec.JsonString(emoji.data)
+					}
+					MiniImage(
+						painter = rememberLottiePainter(
+							composition = composition,
+							iterations = Compottie.IterateForever,
+							isPlaying = isForeground
+						),
 						modifier = Modifier.fillMaxSize()
 					)
 				}

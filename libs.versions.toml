@@ -74,7 +74,7 @@ tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.3" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.2" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.4.3" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
-tool-lottie = { module = "io.github.ismai117:kottie", version = "2.0.1" }
+tool-lottie = { module = "io.github.alexzhirkevich:compottie", version = "2.0.0-rc04" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
