@@ -124,12 +124,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			isUpdateToken.store(false)
 			when (result) {
 				is Data.Success -> app.config.userToken = result.data
-				is Data.Error -> {
-					if (result.type == Failed.RequestError.Unauthorized) {
-						cleanUserToken()
-						navigate<ScreenLogin>()
-					}
+				is Data.Error if result.type == Failed.RequestError.Unauthorized -> {
+					cleanUserToken()
+					navigate<ScreenLogin>()
 				}
+				else -> {}
 			}
 		}
 	}
