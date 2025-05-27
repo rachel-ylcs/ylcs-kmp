@@ -41,6 +41,7 @@ jobs:
 
     release:
         name: Release New Version
+        needs: [package-android]
         runs-on: ubuntu-latest
         permissions:
             contents: write
