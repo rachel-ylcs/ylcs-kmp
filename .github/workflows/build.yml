@@ -1,53 +1,184 @@
 name: build
 
 on:
-    push:
-        tags:
-            - '*'
-        branches:
-            - main
-        paths-ignore:
-            - '**.md'
+  push:
+    tags:
+      - '*'
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
 
 jobs:
-    package-android:
-        name: Package Android
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+  package-android:
+    name: Package Android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-            - name: Setup JDK
-              uses: actions/setup-java@v4
-              with:
-                  distribution: temurin
-                  java-version: 21
-                  cache: gradle
-                  cache-dependency-path: |
-                    ~/*.gradle*
-                    ~/**/gradle-wrapper.properties
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
 
-            - name: Setup Android SDK
-              uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-            - name: Run
-              run: ./gradlew ylcs-app:androidPublish
+      - name: Build
+        run: ./gradlew ylcs-app:androidPublish
 
-            - name: Upload APK
-              uses: actions/upload-artifact@v4
-              with:
-                  name: apk-files
-                  path: outputs/ylcs.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-files
+          path: outputs/ylcs.apk
 
-    release:
-        name: Release New Version
-        needs: [package-android]
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-        steps:
-            - name: Download APK
-              uses: actions/download-artifact@v4
-              with:
-                name: apk-files
-                path: ./downloaded
+  package-ios:
+    name: Package iOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+  package-windows:
+    name: Package Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:desktopPublish
+
+      - name: Compress
+        run: cd outputs/ylcs; zip -r "[Windows]银临茶舍.zip" *; cd -
+
+      - name: Upload Zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe-files
+          path: outputs/[Windows]银临茶舍.zip
+
+  package-linux:
+    name: Package Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:desktopPublish
+
+  package-macos:
+    name: Package MacOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:desktopPublish
+
+  package-wasmjs:
+    name: Package WasmJs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:webPublish
+
+      - name: Compress
+        run: cd outputs/web; zip -r "[Web]银临茶舍.zip" *; cd -
+
+      - name: Upload Zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe-files
+          path: outputs/[Web]银临茶舍.zip
+
+  package-server:
+    name: Package Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ~/*.gradle*
+            ~/**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-server:serverPublish
+
+      - name: Upload Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-files
+          path: outputs/ylcs.jar
+
+  release:
+    name: Release New Version
+    needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-wasmjs, package-server]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-files
+          path: ./downloaded
