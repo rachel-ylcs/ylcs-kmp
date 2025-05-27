@@ -175,7 +175,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	private suspend fun modifyUserId(initText: String) {
 		idModifyDialog.openSuspend(initText)?.let { text ->
 			val profile = app.config.userProfile
-			if (profile != null) launch {
+			if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) launch {
 				val result = ClientAPI.request(
 					route = API.User.Profile.UpdateName,
 					data = API.User.Profile.UpdateName.Request(
