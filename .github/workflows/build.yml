@@ -1,0 +1,52 @@
+name: build
+
+on:
+    push:
+        tags:
+            - 'v*'
+        branches:
+            - main
+        paths-ignore:
+            - '**.md'
+
+jobs:
+    package-android:
+        name: Package Android
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Setup JDK
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 21
+                  cache: gradle
+                  cache-dependency-path: |
+                    ~/*.gradle*
+                    ~/**/gradle-wrapper.properties
+
+            - name: Setup Android SDK
+              uses: android-actions/setup-android@v3
+
+            - name: Run
+              run: ./gradlew ylcs-app:androidPublish
+
+            - name: Upload APK
+              uses: actions/upload-artifact@v4
+              with:
+                  name: apk-files
+                  path: outputs/ylcs.apk
+
+    release:
+        name: Release New Version
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Download APK
+              uses: actions/download-artifact@v4
+              with:
+                name: apk-files
+                path: ./downloaded
