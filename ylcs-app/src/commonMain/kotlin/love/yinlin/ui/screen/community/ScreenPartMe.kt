@@ -443,6 +443,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					todayIndex = index
 					signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
 				}
+				if (!todaySignin) app.config.userProfile = args.copy(coin = args.coin + 1)
 			}
 		}
 
