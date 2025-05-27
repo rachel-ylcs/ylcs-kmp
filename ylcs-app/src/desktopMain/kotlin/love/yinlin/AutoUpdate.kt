@@ -44,6 +44,12 @@ object AutoUpdate {
         "ping -n 3 localhost >nul 2>&1 & (if exist $newName (rmdir /s /q app && ren $newName app))"
     )
 
+    // TODO
+    private fun linuxScript(newName: String) = emptyArray<String>()
+
+    // TODO
+    private fun macOSScript(newName: String) = emptyArray<String>()
+
     private fun startScript(currentDir: Path, newName: String) {
         ProcessBuilder(*windowsScript(newName)).inheritIO().start()
     }

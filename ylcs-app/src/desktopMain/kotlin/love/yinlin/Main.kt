@@ -39,6 +39,8 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
+    SingleInstance.check()
+
     ActualAppContext().apply {
         app = this
         initialize()
@@ -67,6 +69,17 @@ fun main() {
             // MinimumSize
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
+                // See https://github.com/JetBrains/compose-multiplatform/issues/1724
+                OS.ifPlatform(Platform.Windows) {
+                    val screenBounds = window.graphicsConfiguration.bounds
+                    val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
+                    window.maximizedBounds = Rectangle(
+                        screenBounds.x + screenInsets.left,
+                        screenBounds.y + screenInsets.top,
+                        screenBounds.width - screenInsets.left - screenInsets.right,
+                        screenBounds.height - screenInsets.top - screenInsets.bottom
+                    )
+                }
                 Picker.windowHandle = Native.getWindowID(window)
             }
 
@@ -105,19 +118,6 @@ fun main() {
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 state.placement = if (state.placement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
-                                // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                                OS.ifPlatform(Platform.Windows) {
-                                    if (state.placement == WindowPlacement.Maximized) {
-                                        val screenBounds = window.graphicsConfiguration.bounds
-                                        val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
-                                        window.maximizedBounds = Rectangle(
-                                            screenBounds.x + screenInsets.left,
-                                            screenBounds.y + screenInsets.top,
-                                            screenBounds.width - screenInsets.left - screenInsets.right,
-                                            screenBounds.height - screenInsets.top - screenInsets.bottom
-                                        )
-                                    }
-                                }
                             }
                             Action(
                                 icon = Icons.Outlined.Close,

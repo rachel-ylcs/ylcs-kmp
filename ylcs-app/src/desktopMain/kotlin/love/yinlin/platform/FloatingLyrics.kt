@@ -71,11 +71,10 @@ class ActualFloatingLyrics : FloatingLyrics() {
                 User32.INSTANCE.SetWindowLong(hwnd, WinUser.GWL_EXSTYLE, exStyle)
             }
             Platform.Linux -> {
-
+                // TODO
             }
             Platform.MacOS -> {
                 val objc: ObjCRuntime = ObjCRuntime.INSTANCE
-                val nsWindowClass: Pointer? = objc.objc_getClass("NSWindow")
                 val nsWindow = Pointer(window.windowHandle)
                 val setIgnoresMouseEventsSel: Pointer? = objc.sel_registerName("setIgnoresMouseEvents:")
                 objc.objc_msgSend(nsWindow, setIgnoresMouseEventsSel, enabled)
