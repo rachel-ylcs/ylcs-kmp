@@ -169,16 +169,3 @@ jobs:
         with:
           name: jar-files
           path: outputs/ylcs.jar
-
-  release:
-    name: Release New Version
-    needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-wasmjs, package-server]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: apk-files
-          path: ./downloaded
