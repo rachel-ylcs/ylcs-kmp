@@ -24,8 +24,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -60,8 +60,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Build
         run: ./gradlew ylcs-app:desktopPublish
@@ -89,8 +89,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Build
         run: ./gradlew ylcs-app:desktopPublish
@@ -109,8 +109,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Build
         run: ./gradlew ylcs-app:desktopPublish
@@ -129,8 +129,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Build
         run: ./gradlew ylcs-app:webPublish
@@ -158,8 +158,8 @@ jobs:
           java-version: 21
           cache: gradle
           cache-dependency-path: |
-            ~/*.gradle*
-            ~/**/gradle-wrapper.properties
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
 
       - name: Build
         run: ./gradlew ylcs-server:serverPublish
