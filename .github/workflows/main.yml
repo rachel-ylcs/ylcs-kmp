@@ -24,4 +24,13 @@ jobs:
                   java-version: 21
 
             - name: Setup Android SDK
-              uses: android-actions/setup-android@v4
+              uses: android-actions/setup-android@v3
+
+            - name: Run
+              run: ./gradlew ylcs-app:androidPublish
+
+            - name: Upload APK
+              uses: actions/upload-artifact@v4
+              with:
+                  name: apk-files
+                  path: outputs/ylcs.apk
