@@ -1,1 +1,24 @@
+name: ylcs-kmp-build
 
+on:
+    push:
+        tags:
+            - '*'
+        branches:
+            - main
+        paths-ignore:
+            - '**.md'
+
+jobs:
+    package-android:
+        name: Package Android
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Setup JDK
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 21

@@ -177,11 +177,9 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
             super.onTimelineChanged(timeline, reason)
             withPlayer { player ->
                 when (reason) {
-                    Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED -> {
+                    Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED if timeline !is Timeline.RemotableTimeline -> {
                         // timeline可能是 Timeline.RemotableTimeline 或 PlaylistTimeline
-                        if (timeline !is Timeline.RemotableTimeline) {
-                            musicList = timeline.extractMediaItems.mapNotNull { musicLibrary[it.mediaId] }
-                        }
+                        musicList = timeline.extractMediaItems.mapNotNull { musicLibrary[it.mediaId] }
                     }
                     Player.TIMELINE_CHANGE_REASON_SOURCE_UPDATE -> { }
                 }

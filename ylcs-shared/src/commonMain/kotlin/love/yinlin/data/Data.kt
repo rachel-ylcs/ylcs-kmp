@@ -21,7 +21,7 @@ sealed interface Data<out D> {
 	data class Success<out D>(val data: D, val message: String? = null) : Data<D>
 }
 
-inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> = when(this) {
+inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> = when (this) {
 	is Data.Error -> this
 	is Data.Success -> Data.Success(map(data), message)
 }
