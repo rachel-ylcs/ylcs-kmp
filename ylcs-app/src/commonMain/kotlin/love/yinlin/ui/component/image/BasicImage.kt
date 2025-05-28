@@ -90,7 +90,7 @@ fun ColorfulIcon(
 			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * 1.5f).size(size),
 			imageVector = icon.icon,
 			contentDescription = null,
-			tint = icon.color.copy(alpha = 0.8f),
+			tint = Colors.Ghost,
 		)
 	}
 }
