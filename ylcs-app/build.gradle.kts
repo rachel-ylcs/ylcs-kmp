@@ -154,11 +154,13 @@ kotlin {
                 implementation(libs.sketch.webp)
                 implementation(libs.sketch.zoom)
 
+                implementation(libs.lottie)
+                implementation(libs.lottie.dot)
+
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
                 implementation(libs.tool.qrcode)
-                implementation(libs.tool.lottie)
             }
         }
 

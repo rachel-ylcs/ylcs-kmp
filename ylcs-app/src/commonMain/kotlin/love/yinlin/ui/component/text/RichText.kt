@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.panpf.sketch.fetch.newComposeResourceUri
 import io.github.alexzhirkevich.compottie.Compottie
+import io.github.alexzhirkevich.compottie.DotLottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
@@ -141,13 +142,13 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	protected class Emoji(private val id: Int) : RichItem, RichDrawable {
 		override val width: Float get() = when (EmojiManager[id]) {
 			null -> 1f
-			is love.yinlin.common.Emoji.Lottie -> 1.2f
+			is love.yinlin.common.Emoji.Lottie -> 1.25f
 			else -> 3f
 		}
 
 		override val height: Float get() = when (EmojiManager[id]) {
 			null -> 1f
-			is love.yinlin.common.Emoji.Lottie -> 1.2f
+			is love.yinlin.common.Emoji.Lottie -> 1.25f
 			else -> 3f
 		}
 
@@ -171,7 +172,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 				}
 				is love.yinlin.common.Emoji.Dynamic -> {
 					WebImage(
-						uri = newComposeResourceUri(Res.getUri("drawable/emoji${emoji.id}.webp")),
+						uri = newComposeResourceUri(emoji.resPath),
 						quality = ImageQuality.Low,
 						placeholder = null,
 						modifier = Modifier.fillMaxSize()
@@ -179,7 +180,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 				}
 				is love.yinlin.common.Emoji.Lottie -> {
 					val composition by rememberLottieComposition(emoji) {
-						LottieCompositionSpec.JsonString(emoji.data)
+						LottieCompositionSpec.DotLottie(archive = EmojiManager.lottieMap, emoji.id.toString())
 					}
 					MiniImage(
 						painter = rememberLottiePainter(

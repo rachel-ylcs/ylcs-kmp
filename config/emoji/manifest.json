@@ -1,0 +1,24 @@
+{
+    "animations": [
+        { "loop": true, "id": "2001" },
+        { "loop": true, "id": "2002" },
+        { "loop": true, "id": "2003" },
+        { "loop": true, "id": "2004" },
+        { "loop": true, "id": "2005" },
+        { "loop": true, "id": "2006" },
+        { "loop": true, "id": "2007" },
+        { "loop": true, "id": "2008" },
+        { "loop": true, "id": "2009" },
+        { "loop": true, "id": "2010" },
+        { "loop": true, "id": "2011" },
+        { "loop": true, "id": "2012" },
+        { "loop": true, "id": "2013" },
+        { "loop": true, "id": "2014" },
+        { "loop": true, "id": "2015" },
+        { "loop": true, "id": "2016" },
+        { "loop": true, "id": "2017" }
+    ],
+    "version": "1.0",
+    "author": "ylcs",
+    "generator": "ylcs-emoji"
+}
