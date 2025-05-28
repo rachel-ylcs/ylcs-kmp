@@ -30,11 +30,11 @@ object EmojiManager {
     const val STATIC_BEGIN = 0
     const val STATIC_LOGO = STATIC_BEGIN
     const val STATIC_CLASSICS_BEGIN = STATIC_LOGO + 1
-    const val STATIC_CLASSICS_END = 2
+    const val STATIC_CLASSICS_END = 3
     // 动态区块 1001 - 2000
     const val DYNAMIC_BEGIN = 1001
     const val DYNAMIC_CLASSICS_BEGIN = DYNAMIC_BEGIN
-    const val DYNAMIC_CLASSICS_END = 1001
+    const val DYNAMIC_CLASSICS_END = 1008
     // LOTTIE区块 2001 - 3000
     const val LOTTIE_BEGIN = 2001
     const val LOTTIE_QQ_BEGIN = LOTTIE_BEGIN
