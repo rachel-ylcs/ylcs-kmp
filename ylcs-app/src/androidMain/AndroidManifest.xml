@@ -25,7 +25,7 @@
         android:label="银临茶舍"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar" >
+        android:theme="@style/Rachel.Theme" >
         <activity
             android:exported="true"
             android:name=".MainActivity"
