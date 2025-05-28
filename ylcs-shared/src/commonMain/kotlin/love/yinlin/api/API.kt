@@ -25,6 +25,8 @@ object API : APINode(null, "") {
 
 			object UpdateToken : APIPost<String, String>(this, "updateToken")
 
+			object QueryTokenMutexMap: APIGetResponse<List<String>>(this, "queryTokenMutexMap")
+
 			object Register : APIPostRequest<Register.Request>(this, "register") {
 				@Serializable
 				data class Request(val name: String, val pwd: String, val inviterName: String)

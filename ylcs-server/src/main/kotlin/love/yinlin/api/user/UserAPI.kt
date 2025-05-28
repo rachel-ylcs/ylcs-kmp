@@ -1,6 +1,7 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
+import kotlinx.coroutines.sync.Mutex
 import love.yinlin.DB
 import love.yinlin.Redis
 import love.yinlin.api.ImplMap
@@ -14,6 +15,7 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
 import java.util.Base64
+import java.util.concurrent.ConcurrentHashMap
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -137,12 +139,26 @@ object AN {
 			else throw TokenExpireError(token.uid)
 	}
 
+	private val updateTokenMutexMap = ConcurrentHashMap<String, Mutex>()
+
+	val queryTokenMutexMap: List<String> get() = updateTokenMutexMap.keys.toList()
+
 	fun throwReGenerateToken(tokenString: String): String {
 		val token = parseToken(tokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }
-		return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
+
+		val mutex = updateTokenMutexMap.computeIfAbsent(tokenString) { Mutex() }
+		if (!mutex.tryLock()) error("请求过多")
+
+		try {
+			val saveTokenString = Redis.use { it.get(token.key) }
+			return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
 			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
 			else throw TokenExpireError(token.uid)
+		}
+		finally {
+		    mutex.unlock()
+			updateTokenMutexMap -= tokenString
+		}
 	}
 
 	fun removeToken(tokenString: String) {
