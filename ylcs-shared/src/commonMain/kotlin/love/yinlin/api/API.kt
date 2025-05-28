@@ -295,6 +295,37 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val tid: Int, val pid: Int, val cid: Int, val rawSection: Int)
 			}
 		}
+		object Song: APINode(this ,"song")
+		{
+			object GetSong: APIPost<GetSong.Request,List<love.yinlin.data.rachel.song.Song>>(this,"getSong") {
+				@Serializable
+				data class Request(val sid:Int =0 , val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object GetSongComment: APIPost<GetSongComment.Request, List<love.yinlin.data.rachel.song.SongComment>>(this,"getSongComment")
+			{
+				@Serializable
+				data class Request(val sid:Int, val cid: Int=Int.MAX_VALUE,val num:Int= APIConfig.MIN_PAGE_NUM)
+			}
+
+			object SendSongComment : APIPost<SendSongComment.Request, Int>(this, "sendSongComment") {
+				@Serializable
+				data class Request(val token: String, val sid: Int, val content: String)
+			}
+
+
+			object DeleteSongComment : APIPostRequest<DeleteSongComment.Request>(this, "deleteSongComment") {
+				@Serializable
+				data class Request(val token: String, val cid: Int)
+			}
+			object UpdateSongComment : APIPostRequest<UpdateSongComment.Request>(this,"updateSongComment")
+			{
+				@Serializable
+				data class Request(val token:String,val cid:Int,val content:String)
+			}
+
+
+		}
 	}
 
 	object Test : APINode(this, "test") {
