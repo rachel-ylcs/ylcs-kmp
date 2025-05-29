@@ -715,7 +715,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 						ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf(
 							Contributor("方旖旎", 7),
 							Contributor("木棠", 1563),
-							Contributor("竹香满亭", 11)
+							Contributor("竹香满亭", 11),
+							Contributor("尘落", 89)
 						)),
 						ContributorGroup("运营", Icons.Outlined.Store, Colors.Steel4, listOf(
 							Contributor("思懿", 6),
