@@ -54,7 +54,11 @@ private class VideoPlayerState(val url: String) {
         override fun playing(mediaPlayer: MediaPlayer) { isPlaying = true }
         override fun paused(mediaPlayer: MediaPlayer) { isPlaying = false }
         override fun timeChanged(mediaPlayer: MediaPlayer, newTime: Long) { position = newTime }
-        override fun stopped(mediaPlayer: MediaPlayer) { mediaPlayer.media().play(url) }
+        override fun stopped(mediaPlayer: MediaPlayer) {
+            SwingUtilities.invokeLater {
+                mediaPlayer.media().play(url)
+            }
+        }
         override fun error(mediaPlayer: MediaPlayer) { mediaPlayer.controls().stop() }
     }
 
