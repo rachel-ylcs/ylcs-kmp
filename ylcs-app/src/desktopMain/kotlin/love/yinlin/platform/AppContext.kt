@@ -10,28 +10,9 @@ import com.github.panpf.sketch.util.Logger
 import love.yinlin.AppModel
 import love.yinlin.common.Weak
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.Platform.*
 import okio.Path.Companion.toPath
-import kotlin.io.path.Path
 
 class ActualAppContext : AppContext() {
-	companion object {
-		init {
-			// 本机库
-			System.loadLibrary("ylcs_native")
-			// VLC
-			val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
-				when (OS.platform) {
-					Windows -> it.resolve("vlc")
-					Linux -> it.resolve("bin/vlc")
-                    MacOS -> it.resolve("MacOS/vlc")
-					else -> it
-				}
-			}
-			System.setProperty("jna.library.path", vlcPath.toString())
-		}
-	}
-
 	override val kv: KV = KV()
 	override var model: AppModel? by Weak()
 

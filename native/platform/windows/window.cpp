@@ -1,7 +1,6 @@
 #include "platform.h"
 
 #include <Windows.h>
-#include <WinUser.h>
 
 void ylcs_window_set_click_through(void *handle, bool enable) {
     HWND hwnd = (HWND)handle;

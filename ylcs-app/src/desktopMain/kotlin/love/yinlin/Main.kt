@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import com.sun.jna.Native
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
@@ -24,7 +23,7 @@ import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
+import love.yinlin.platform.Platform.*
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -34,12 +33,37 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
 import java.awt.Rectangle
+import kotlin.io.path.Path
+import kotlin.system.exitProcess
+
+private object LibraryLoader {
+    init {
+        // 本机库
+        System.loadLibrary("ylcs_native")
+        // VLC
+        val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
+            when (OS.platform) {
+                Windows -> it.resolve("vlc")
+                Linux -> it.resolve("bin/vlc")
+                MacOS -> it.resolve("MacOS/vlc")
+                else -> it
+            }
+        }
+        System.setProperty("jna.library.path", vlcPath.toString())
+    }
+}
 
 fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
-    SingleInstance.check()
+    LibraryLoader.run {
+        if (!requestSingleInstance()) {
+            releaseSingleInstance()
+            exitProcess(0)
+        }
+        Runtime.getRuntime().addShutdownHook(Thread(::releaseSingleInstance))
+    }
 
     ActualAppContext().apply {
         app = this
@@ -70,7 +94,7 @@ fun main() {
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
                 // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                OS.ifPlatform(Platform.Windows) {
+                OS.ifPlatform(Windows) {
                     val screenBounds = window.graphicsConfiguration.bounds
                     val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
                     window.maximizedBounds = Rectangle(
@@ -80,7 +104,7 @@ fun main() {
                         screenBounds.height - screenInsets.top - screenInsets.bottom
                     )
                 }
-                Picker.windowHandle = Native.getWindowID(window)
+                Picker.windowHandle = window.windowHandle
             }
 
             // Content
@@ -137,3 +161,6 @@ fun main() {
         }
     }
 }
+
+private external fun requestSingleInstance(): Boolean
+private external fun releaseSingleInstance(): Unit

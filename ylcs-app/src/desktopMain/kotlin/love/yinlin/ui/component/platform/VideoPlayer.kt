@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,13 +25,12 @@ import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
 import javax.swing.SwingUtilities
 
-@Suppress("UNCHECKED_CAST")
-internal val PLAYER_ARGS: Array<String> get() {
-    val clazz = Class.forName("uk.co.caprica.vlcj.player.component.MediaPlayerComponentDefaults")
-    val field = clazz.getDeclaredField("EMBEDDED_MEDIA_PLAYER_ARGS")
-    field.isAccessible = true
-    return field.get(null) as Array<String>
-}
+internal val PLAYER_ARGS = arrayOf(
+    "--video-title=ylcs video output",
+    "--no-snapshot-preview",
+    "--quiet",
+    "--intf=dummy"
+)
 
 @Stable
 private class VideoPlayerState(val url: String) {
