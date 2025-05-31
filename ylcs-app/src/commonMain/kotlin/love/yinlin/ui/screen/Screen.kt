@@ -43,6 +43,7 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenFloatingLyrics)
     screen(::ScreenMusicDetails)
 
+    screen(::ScreenMusicModFactory)
     screen(::ScreenImportMusic)
     screen(::ScreenCreateMusic)
     screen(::ScreenPlatformMusic, type<PlatformMusicType>())

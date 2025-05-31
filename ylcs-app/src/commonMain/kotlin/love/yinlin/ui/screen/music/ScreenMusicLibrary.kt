@@ -7,15 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Archive
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Extension
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.SelectAll
-import androidx.compose.material.icons.outlined.Token
-import androidx.compose.material.icons.outlined.Unarchive
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,7 +29,6 @@ import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.common.UriGenerator
 import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
@@ -55,9 +46,8 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.ExpandableLayout
-import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -146,14 +136,12 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
 
     @Stable
     private enum class ImportMusicItem(val text: String, val icon: ImageVector, val isImage: Boolean) {
-        FromMod("从MOD导入", Icons.Outlined.Token, false),
+        FromFactory("MOD工坊", Icons.Outlined.Factory, false),
+        FromMod("导入MOD", Icons.Outlined.Extension, false),
         FromLocal("本地制作", Icons.Outlined.Unarchive, false),
         FromQQMusic("QQ音乐", ExtraIcons.QQMusic, true),
         FromNetEaseCloudMusic("网易云音乐", ExtraIcons.NetEaseCloudMusic, true),
         FromKugouMusic("酷狗音乐", ExtraIcons.KugouMusic, true),
-        FromGroup0("MOD工坊0群", Icons.Outlined.Extension, false),
-        FromGroup1("MOD工坊1群", Icons.Outlined.Extension, false),
-        FromGroup2("MOD工坊2群", Icons.Outlined.Extension, false),
     }
 
     private fun resetLibrary() {
@@ -259,7 +247,7 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
                         mediaPaths = packageItems.fastMapNotNull { musicFactory.musicLibrary[it]?.path },
                         sink = sink,
                         info = ModInfo(author = app.config.userProfile?.name ?: "无名")
-                    ).process { a, b, name -> }
+                    ).process { _, _, _ -> }
                 }
                 slot.loading.close()
                 exitManagement()
@@ -291,9 +279,10 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.LeftActions() {
-        if (isSearching) {
-            Action(Icons.Outlined.Close) {
-                closeSearch()
+        if (isManaging) {
+            Action(Icons.Outlined.SelectAll) {
+                if (library.fastAll { it.selected }) exitManagement()
+                else selectAll()
             }
         }
     }
@@ -301,46 +290,14 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun ActionScope.RightActions() {
         if (!isManaging) {
-            ActionSuspend(Icons.Outlined.Search) {
-                openSearch()
+            if (isSearching) {
+                Action(Icons.Outlined.Home) {
+                    closeSearch()
+                }
             }
-        }
-        if (!isManaging && !isSearching) {
-            ActionSuspend(Icons.Outlined.Add) {
-                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
-                else {
-                    when (importDialog.openSuspend()) {
-                        ImportMusicItem.FromMod.ordinal -> {
-                            pop()
-                            navigate(ScreenImportMusic.Args(null))
-                        }
-                        ImportMusicItem.FromLocal.ordinal -> {
-                            pop()
-                            navigate<ScreenCreateMusic>()
-                        }
-                        ImportMusicItem.FromQQMusic.ordinal -> {
-                            pop()
-                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
-                        }
-                        ImportMusicItem.FromNetEaseCloudMusic.ordinal -> {
-                            pop()
-                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
-                        }
-                        ImportMusicItem.FromKugouMusic.ordinal -> {
-                            pop()
-                            navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
-                        }
-                        ImportMusicItem.FromGroup0.ordinal -> {
-                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("836289670"))) slot.tip.warning("未安装QQ")
-                        }
-                        ImportMusicItem.FromGroup1.ordinal -> {
-                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("971218639"))) slot.tip.warning("未安装QQ")
-                        }
-                        ImportMusicItem.FromGroup2.ordinal -> {
-                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("942459444"))) slot.tip.warning("未安装QQ")
-                        }
-                        else -> {}
-                    }
+            else {
+                ActionSuspend(Icons.Outlined.Search) {
+                    openSearch()
                 }
             }
         }
@@ -350,49 +307,57 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun SubContent(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
-            Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-                ExpandableLayout(isExpanded = isManaging) {
-                    SplitActionLayout(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
-                        left = {
-                            Action(Icons.Outlined.SelectAll) {
-                                if (library.fastAll { it.selected }) exitManagement()
-                                else selectAll()
-                            }
-                        },
-                        right = {
-                            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd) {
-                                onMusicAdd()
-                            }
-                            ActionSuspend(Icons.Outlined.Delete) {
-                                onMusicDelete()
-                            }
-                            ActionSuspend(Icons.Outlined.Archive) {
-                                onMusicPackage()
-                            }
-                        }
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                contentPadding = ThemeValue.Padding.EqualValue,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
+            ) {
+                itemsIndexed(
+                    items = library,
+                    key = { _, item -> item.id }
+                ) { index, item ->
+                    MusicCard(
+                        musicInfo = item,
+                        enableLongClick = !isManaging,
+                        onLongClick = { onCardLongClick(index) },
+                        onClick = { onCardClick(index) },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
-                    contentPadding = ThemeValue.Padding.EqualValue,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                ) {
-                    itemsIndexed(
-                        items = library,
-                        key = { index, item -> item.id }
-                    ) { index, item ->
-                        MusicCard(
-                            musicInfo = item,
-                            enableLongClick = !isManaging,
-                            onLongClick = { onCardLongClick(index) },
-                            onClick = { onCardClick(index) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
+            }
+        }
+    }
+
+    override val fabCanExpand: Boolean by derivedStateOf { isManaging }
+
+    override val fabIcon: ImageVector by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.Token }
+
+    override val fabMenus: Array<FABAction> = arrayOf(
+        FABAction(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+            launch { onMusicAdd() }
+        },
+        FABAction(Icons.Outlined.Delete) {
+            launch { onMusicDelete() }
+        },
+        FABAction(Icons.Outlined.Archive) {
+            launch { onMusicPackage() }
+        }
+    )
+
+    override suspend fun onFabClick() {
+        if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        else {
+            val result = importDialog.openSuspend() ?: return
+            pop()
+            when (result) {
+                ImportMusicItem.FromFactory.ordinal -> navigate<ScreenMusicModFactory>()
+                ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
+                ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
+                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
+                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
+                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
             }
         }
     }

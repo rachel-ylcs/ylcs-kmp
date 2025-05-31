@@ -29,20 +29,20 @@ import love.yinlin.ui.component.node.condition
 @Stable
 data class FABAction(
     val icon: ImageVector,
-    val onClick: suspend () -> Unit = {}
+    val onClick: () -> Unit = {}
 )
 
 @Composable
 private fun FABIcon(
     icon: ImageVector,
-    onClick: suspend () -> Unit
+    onClick: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    Box(modifier = Modifier.size(ThemeValue.Size.FAB)
-        .clip(CircleShape).clickable {
-            scope.launch { onClick() }
-        }
-        .background(MaterialTheme.colorScheme.primaryContainer),
+    Box(
+        modifier = Modifier
+            .size(ThemeValue.Size.FAB)
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         MiniIcon(
@@ -60,7 +60,11 @@ private fun FABMainIcon(
 ) {
     Box(modifier = modifier) {
         Box(modifier = Modifier.padding(bottom = ThemeValue.Shadow.Icon).shadow(ThemeValue.Shadow.Icon, CircleShape)) {
-            FABIcon(icon = icon, onClick = onClick)
+            val scope = rememberCoroutineScope()
+
+            FABIcon(icon = icon) {
+                scope.launch { onClick() }
+            }
         }
     }
 }
