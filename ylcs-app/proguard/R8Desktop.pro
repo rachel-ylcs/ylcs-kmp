@@ -14,5 +14,9 @@
 # Keep DiscoveryDirectoryProviders loaded via SPI
 -keep class * implements uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider { *; }
 -keep interface uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider { *; }
+# Keep EMBEDDED_MEDIA_PLAYER_ARGS used by reflect
+-keep class uk.co.caprica.vlcj.player.component.MediaPlayerComponentDefaults {
+    static java.lang.String[] EMBEDDED_MEDIA_PLAYER_ARGS;
+}
 
 # ----------------------------------------- App ----------------------------------------------- #

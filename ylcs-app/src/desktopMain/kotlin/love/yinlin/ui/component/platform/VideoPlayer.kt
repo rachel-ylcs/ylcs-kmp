@@ -1,29 +1,44 @@
 @file:JvmName("DesktopVideoPlayer")
 package love.yinlin.ui.component.platform
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.rememberState
-import love.yinlin.ui.component.CustomUI
 import love.yinlin.ui.component.image.ClickIcon
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
-import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
 import javax.swing.SwingUtilities
 
+@Suppress("UNCHECKED_CAST")
+internal val PLAYER_ARGS: Array<String> get() {
+    val clazz = Class.forName("uk.co.caprica.vlcj.player.component.MediaPlayerComponentDefaults")
+    val field = clazz.getDeclaredField("EMBEDDED_MEDIA_PLAYER_ARGS")
+    field.isAccessible = true
+    return field.get(null) as Array<String>
+}
+
 @Stable
 private class VideoPlayerState(val url: String) {
-    var component = mutableStateOf<CallbackMediaPlayerComponent?>(null)
+    var playerFactory by mutableStateOf<MediaPlayerFactory?>(null)
+    var player by mutableStateOf<EmbeddedMediaPlayer?>(null)
+    var surface by mutableStateOf<ComposeVideoSurface?>(null)
 
     var isPlaying by mutableStateOf(false)
     var position by mutableLongStateOf(0L)
@@ -36,26 +51,26 @@ private class VideoPlayerState(val url: String) {
     }
 
     val playerListener = object : MediaPlayerEventAdapter() {
-        override fun playing(mediaPlayer: MediaPlayer?) { isPlaying = true }
-        override fun paused(mediaPlayer: MediaPlayer?) { isPlaying = false }
-        override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { position = newTime }
-        override fun stopped(mediaPlayer: MediaPlayer?) { mediaPlayer?.media()?.play(url) }
-        override fun error(mediaPlayer: MediaPlayer?) { mediaPlayer?.controls()?.stop() }
+        override fun playing(mediaPlayer: MediaPlayer) { isPlaying = true }
+        override fun paused(mediaPlayer: MediaPlayer) { isPlaying = false }
+        override fun timeChanged(mediaPlayer: MediaPlayer, newTime: Long) { position = newTime }
+        override fun stopped(mediaPlayer: MediaPlayer) {
+            SwingUtilities.invokeLater {
+                mediaPlayer.media().play(url)
+            }
+        }
+        override fun error(mediaPlayer: MediaPlayer) { mediaPlayer.controls().stop() }
     }
 
-    inline fun withPlayer(block: (EmbeddedMediaPlayer) -> Unit) {
-        component.value?.mediaPlayer()?.let(block)
-    }
-
-    fun play() = withPlayer { player ->
+    fun play() = player?.let { player ->
         if (!player.status().isPlaying) player.controls().play()
     }
 
-    fun pause() = withPlayer { player ->
+    fun pause() = player?.let { player ->
         if (player.status().isPlaying) player.controls().pause()
     }
 
-    fun seekTo(value: Long) = withPlayer { player ->
+    fun seekTo(value: Long) = player?.let { player ->
         player.controls().setTime(value)
         play()
     }
@@ -69,37 +84,47 @@ actual fun VideoPlayer(
 ) {
     val state by rememberState { VideoPlayerState(url) }
 
+    DisposableEffect(Unit) {
+        state.playerFactory = MediaPlayerFactory(*PLAYER_ARGS)
+        state.player = state.playerFactory
+                            ?.mediaPlayers()
+                            ?.newEmbeddedMediaPlayer()
+        state.surface = ComposeVideoSurface()
+        state.player?.apply {
+            videoSurface().set(state.surface)
+            SwingUtilities.invokeLater {
+                events().apply {
+                    addMediaEventListener(state.eventListener)
+                    addMediaPlayerEventListener(state.playerListener)
+                }
+                media().play(url)
+            }
+        }
+        onDispose {
+            state.player?.events()?.apply {
+                removeMediaEventListener(state.eventListener)
+                removeMediaPlayerEventListener(state.playerListener)
+            }
+            state.player?.release()
+            state.playerFactory?.release()
+        }
+    }
+
     OffScreenEffect { isForeground ->
         if (isForeground) state.play()
         else state.pause()
     }
 
     Box(modifier = modifier) {
-        CustomUI(
-            view = state.component,
-            modifier = Modifier.fillMaxSize().zIndex(1f),
-            factory = {
-                val component = CallbackMediaPlayerComponent()
-                SwingUtilities.invokeLater {
-                    component.mediaPlayer().apply {
-                        events().apply {
-                            addMediaEventListener(state.eventListener)
-                            addMediaPlayerEventListener(state.playerListener)
-                        }
-                        media().play(url)
-                    }
-                }
-                component
-            },
-            release = { component, onRelease ->
-                component.mediaPlayer().events().apply {
-                    removeMediaEventListener(state.eventListener)
-                    removeMediaPlayerEventListener(state.playerListener)
-                }
-                component.release()
-                onRelease()
-            }
-        )
+        state.surface?.bitmap?.value?.let { bitmap ->
+            Image(
+                bitmap,
+                modifier = Modifier.fillMaxSize().background(Color.Black).zIndex(1f),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+            )
+        }
 
         VideoPlayerControls(
             modifier = Modifier.fillMaxSize().zIndex(2f),

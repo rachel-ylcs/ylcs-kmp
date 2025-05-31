@@ -31,6 +31,7 @@ find_package(JNI REQUIRED)
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(mmkv)
 add_subdirectory(nativefiledialog)
+add_subdirectory(platform)
 
 add_library(ylcs_native SHARED
     main.cpp
@@ -45,11 +46,13 @@ target_link_libraries(ylcs_native
     ${JNI_LIBRARIES}
     mmkv
     nfd
+    platform
 )
 
 add_dependencies(ylcs_native
     mmkv
     nfd
+    platform
 )
 
 set_target_properties(ylcs_native PROPERTIES
