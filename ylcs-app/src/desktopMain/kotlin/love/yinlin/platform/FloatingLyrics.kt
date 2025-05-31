@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
@@ -22,12 +21,6 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.rememberWindowState
-import com.sun.jna.Library
-import com.sun.jna.Native
-import com.sun.jna.Pointer
-import com.sun.jna.platform.win32.User32
-import com.sun.jna.platform.win32.WinDef
-import com.sun.jna.platform.win32.WinUser
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
@@ -38,17 +31,6 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.node.condition
-
-@Suppress("FunctionName")
-interface ObjCRuntime : Library {
-    companion object {
-        val INSTANCE: ObjCRuntime = Native.load("objc", ObjCRuntime::class.java)
-    }
-
-    fun objc_getClass(className: String?): Pointer?
-    fun sel_registerName(selectorName: String?): Pointer?
-    fun objc_msgSend(receiver: Pointer?, selector: Pointer?, vararg args: Any?): Pointer?
-}
 
 @Stable
 class ActualFloatingLyrics : FloatingLyrics() {
@@ -61,27 +43,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
         currentLyrics = lyrics
     }
 
-    private fun modifyWindow(enabled: Boolean, window: ComposeWindow) {
-        when (OS.platform) {
-            Platform.Windows -> {
-                val hwnd = WinDef.HWND(Native.getComponentPointer(window))
-                var exStyle = User32.INSTANCE.GetWindowLong(hwnd, WinUser.GWL_EXSTYLE)
-                exStyle = exStyle or 0x00000080 // WS_EX_TOOLWINDOW
-                exStyle = if (enabled) exStyle or WinUser.WS_EX_TRANSPARENT else exStyle and WinUser.WS_EX_TRANSPARENT.inv()
-                User32.INSTANCE.SetWindowLong(hwnd, WinUser.GWL_EXSTYLE, exStyle)
-            }
-            Platform.Linux -> {
-                // TODO
-            }
-            Platform.MacOS -> {
-                val objc: ObjCRuntime = ObjCRuntime.INSTANCE
-                val nsWindow = Pointer(window.windowHandle)
-                val setIgnoresMouseEventsSel: Pointer? = objc.sel_registerName("setIgnoresMouseEvents:")
-                objc.objc_msgSend(nsWindow, setIgnoresMouseEventsSel, enabled)
-            }
-            else -> {}
-        }
-    }
+    private external fun modifyWindow(windowHandle: Long, clickThrough: Boolean)
 
     @Composable
     private fun WindowScope.DragArea(enabled: Boolean, content: @Composable () -> Unit) {
@@ -112,7 +74,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
                 alwaysOnTop = true
             ) {
                 LaunchedEffect(floatingLyrics.canMove) {
-                    modifyWindow(!floatingLyrics.canMove, window)
+                    modifyWindow(window.windowHandle, !floatingLyrics.canMove)
                 }
 
                 LaunchedEffect(state) {

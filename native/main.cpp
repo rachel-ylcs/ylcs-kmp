@@ -4,6 +4,7 @@
 #define FORCE_POSIX
 #include "mmkv/MMKV.h"
 #include "nfd.hpp"
+#include "platform.h"
 
 using namespace mmkv;
 
@@ -340,5 +341,9 @@ extern "C" {
 			return s2j(env, pathStr);
 		}
 		return nullptr;
+	}
+
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_ActualFloatingLyrics_modifyWindow(JNIEnv* env, jobject, jlong window, jboolean clickThrough) {
+		ylcs_window_set_click_through((void*)window, (bool)clickThrough);
 	}
 }
