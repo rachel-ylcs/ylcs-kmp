@@ -34,7 +34,11 @@ add_subdirectory(nativefiledialog)
 add_subdirectory(platform)
 
 add_library(ylcs_native SHARED
-    main.cpp
+    ylcs_jni.h
+    ylcs_jni.cpp
+    ylcs_mmkv.cpp
+    ylcs_nativefiledialog.cpp
+    ylcs_platform.cpp
 )
 
 target_include_directories(ylcs_native PRIVATE

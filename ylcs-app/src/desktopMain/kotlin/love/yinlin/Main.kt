@@ -23,7 +23,7 @@ import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform.*
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -43,9 +43,9 @@ private object LibraryLoader {
         // VLC
         val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
             when (OS.platform) {
-                Windows -> it.resolve("vlc")
-                Linux -> it.resolve("bin/vlc")
-                MacOS -> it.resolve("MacOS/vlc")
+                Platform.Windows -> it.resolve("vlc")
+                Platform.Linux -> it.resolve("bin/vlc")
+                Platform.MacOS -> it.resolve("MacOS/vlc")
                 else -> it
             }
         }
@@ -94,7 +94,7 @@ fun main() {
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
                 // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                OS.ifPlatform(Windows) {
+                OS.ifPlatform(Platform.Windows) {
                     val screenBounds = window.graphicsConfiguration.bounds
                     val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
                     window.maximizedBounds = Rectangle(
@@ -163,4 +163,4 @@ fun main() {
 }
 
 private external fun requestSingleInstance(): Boolean
-private external fun releaseSingleInstance(): Unit
+private external fun releaseSingleInstance()
