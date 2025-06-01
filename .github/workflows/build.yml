@@ -20,6 +20,7 @@ on:
 
 jobs:
   changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
       android: ${{ steps.filter.outputs.android }}
@@ -33,7 +34,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect file changes
+      - name: Detect File Changes
         uses: dorny/paths-filter@v3
         id: filter
         with:
