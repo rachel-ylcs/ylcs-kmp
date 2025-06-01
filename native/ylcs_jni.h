@@ -2,10 +2,10 @@
 #define PLATFORM_JNI_H
 
 #include <jni.h>
-#define FORCE_POSIX
 
 #include <string>
 #include <string_view>
+#include <exception>
 
 inline std::string j2s(JNIEnv* env, jstring str) {
     if (!str) return "";

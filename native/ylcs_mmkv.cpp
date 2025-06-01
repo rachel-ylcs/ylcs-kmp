@@ -1,4 +1,5 @@
 #include "ylcs_jni.h"
+#define FORCE_POSIX
 #include "mmkv/MMKV.h"
 
 using namespace mmkv;
