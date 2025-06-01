@@ -152,6 +152,22 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
+      - name: Setup MSVC
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v3
+        with:
+          arch: x64
+
+      - name: Build Native (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd native && ./build.bat
+
+      - name: Build Native (macOS/Linux)
+        if: runner.os != 'Windows'
+        run: |
+          cd native && ./build.sh
+
       - name: Build Desktop
         run: ./gradlew ylcs-app:desktopJar
 
