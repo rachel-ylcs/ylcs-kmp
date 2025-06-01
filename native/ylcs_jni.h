@@ -5,7 +5,7 @@
 
 #include <string>
 #include <string_view>
-#include <exception>
+#include <stdexcept>
 
 inline std::string j2s(JNIEnv* env, jstring str) {
     if (!str) return "";
