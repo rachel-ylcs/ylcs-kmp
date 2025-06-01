@@ -17,6 +17,7 @@ object AutoUpdate {
         var entryName = entry.getName()
         entryName = entryName.replace('\\', '/')
         while (entryName.startsWith("/")) entryName = entryName.substring(1)
+        if (entryName.startsWith("app/")) entryName = entryName.replaceFirst("app/", "")
         val entryPath: Path = targetDir.resolve(entryName).normalize()
         if (!entryPath.startsWith(targetDir)) error(entry.getName())
         if (entry.isDirectory) Files.createDirectories(entryPath)
@@ -44,32 +45,31 @@ object AutoUpdate {
         "ping -n 3 localhost >nul 2>&1 & (if exist $newName (rmdir /s /q app && ren $newName app))"
     )
 
-    // TODO
-    private fun linuxScript(newName: String) = emptyArray<String>()
-
-    // TODO
-    private fun macOSScript(newName: String) = emptyArray<String>()
+    private fun unixScript(currentDir: Path, newName: String) = arrayOf(
+        "sh", "-c", "sleep 3 && cd $currentDir && (if [ -d $newName ]; then rm -rf app && mv $newName app; fi)"
+    )
 
     private fun startScript(currentDir: Path, newName: String) {
-        ProcessBuilder(*windowsScript(newName)).inheritIO().start()
+        ProcessBuilder(*OS.ifPlatform(
+            Platform.Windows,
+            ifTrue = { windowsScript(newName) },
+            ifFalse = { unixScript(currentDir, newName) })
+        ).inheritIO().start()
     }
 
     fun start(filename: String) {
-        if (OS.platform != Platform.Windows) return
         try {
-            val currentDir = Paths.get("").toAbsolutePath()
+            val currentDir = Paths.get(System.getProperty("compose.application.resources.dir"))
+                                    .parent.parent.toAbsolutePath()
 
             // 1. 解压更新包到当前目录
             val zipPath = File(filename)
-            unzipPackage(currentDir, zipPath)
-            // 2. 重命名
-            val unzipPath = currentDir.resolve(zipPath.nameWithoutExtension)
             val newName = System.currentTimeMillis().toString()
-            val targetPath = currentDir.resolve(newName)
-            unzipPath.toFile().renameTo(targetPath.toFile())
-            // 3. 启动脚本
+            val unzipPath = currentDir.resolve(newName)
+            unzipPackage(unzipPath, zipPath)
+            // 2. 启动脚本
             startScript(currentDir, newName)
-            // 4. 结束自身进程
+            // 3. 结束自身进程
             exitProcess(0)
         }
         catch (_: Throwable) { }
