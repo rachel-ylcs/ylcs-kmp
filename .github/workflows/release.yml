@@ -264,7 +264,7 @@ jobs:
           mode: "COMMIT"
           configurationJson: |
             {
-              "template": "#{{CHANGELOG}}\n\n#{{CONTRIBUTORS}}",
+              "template": "#{{CHANGELOG}}\n\n## 贡献者\n#{{CONTRIBUTORS}}",
               "categories": [
                 {
                     "title": "## 新功能",
@@ -288,12 +288,12 @@ jobs:
                 },
                 {
                     "title": "## 杂项",
-                    "labels": []
+                    "labels": ["build", "chore", "ci", "update", "revert", "rollback"]
                 }
               ],
               "label_extractor": [
                 {
-                  "pattern": "^(build|chore|ci|docs|doc|feat|feature|fix|bug|imporve|perf|refactor|revert|rollback|style){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                  "pattern": "^(build|chore|ci|docs?|feat|feature|fix|bug|imporve|perf|refactor|update|revert|rollback|style|ui){1}(\\([\\w\\-\\.]+\\))?(!)?:(.*)",
                   "on_property": "title",
                   "target": "$1"
                 }
