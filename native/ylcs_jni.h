@@ -31,7 +31,7 @@ inline std::wstring j2w(JNIEnv* env, jstring str) {
     env->ReleaseStringChars(str, p);
     return result;
 #else
-    throw std::exception { "You should not use std::wstring in non Windows environments" };
+    throw std::runtime_error { "You should not use std::wstring in non Windows environments" };
 #endif
 }
 
@@ -39,7 +39,7 @@ inline jstring w2j(JNIEnv* env, std::wstring_view str) {
 #if defined(_WIN32)
     return env->NewString(reinterpret_cast<jchar const*>(str.data()), static_cast<jsize>(str.length()));
 #else
-    throw std::exception { "You should not use std::wstring in non Windows environments" };
+    throw std::runtime_error { "You should not use std::wstring in non Windows environments" };
 #endif
 }
 
