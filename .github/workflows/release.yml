@@ -254,6 +254,8 @@ jobs:
     if: ${{ always() }}
     needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-web, package-server]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 发布 Release 需要写权限
     steps:
       - name: Generate Changelog
         uses: mikepenz/release-changelog-builder-action@v5
