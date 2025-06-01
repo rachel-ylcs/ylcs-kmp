@@ -99,6 +99,7 @@ jobs:
       - name: Build
         run: |
           cd native && ./build.bat
+          cd ..
           ./gradlew ylcs-app:desktopPublish
 
       - name: Compress
@@ -120,6 +121,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -133,6 +139,7 @@ jobs:
       - name: Build
         run: |
           cd native && ./build.sh
+          cd ..
           ./gradlew ylcs-app:desktopPublish
 
       - name: Compress
@@ -166,6 +173,7 @@ jobs:
       - name: Build
         run: |
           cd native && ./build.sh
+          cd ..
           ./gradlew ylcs-app:desktopPublish
 
       - name: Compress
@@ -243,6 +251,7 @@ jobs:
 
   publish-release:
     name: Publish Release
+    if: ${{ always() }}
     needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-web, package-server]
     runs-on: ubuntu-latest
     steps:

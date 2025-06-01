@@ -9,7 +9,11 @@
         <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript"/>
         <img src="https://img.shields.io/badge/Platform-Server-orange.svg?logo=openjdk"/>
     </div>
-    <br>
+    <div>
+        <img src="https://img.shields.io/github/v/tag/rachel-ylcs/ylcs-kmp"/>
+        <img src="https://img.shields.io/github/v/release/rachel-ylcs/ylcs-kmp"/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg"/>
+    </div>
 </div>
 
 ## 跨平台特性
