@@ -1,17 +1,91 @@
-name: build
+name: Build
 
 on:
   push:
-    tags:
-      - '*'
     branches:
       - main
     paths-ignore:
       - '**.md'
+      - 'docs/**'
+      - 'design-PS/**'
+      - 'design-AE/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'design-PS/**'
+      - 'design-AE/**'
 
 jobs:
-  package-android:
-    name: Package Android
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      android: ${{ steps.filter.outputs.android }}
+      ios: ${{ steps.filter.outputs.ios }}
+      desktop: ${{ steps.filter.outputs.desktop }}
+      web: ${{ steps.filter.outputs.web }}
+      server: ${{ steps.filter.outputs.server }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            common: &common
+              - 'gradle/**'
+              - 'ylcs-shared/**'
+              - 'gradle.properties'
+              - 'settings.gradle.kts'
+              - 'build.gradle.kts'
+              - 'libs.versions.toml'
+            client: &client
+              - *common
+              - 'ylcs-music/**'
+              - 'ylcs-app/libs/**'
+              - 'ylcs-app/proguard/R8Common.pro'
+              - 'ylcs-app/src/commonMain/**'
+              - 'ylcs-app/build.gradle.kts'
+            android:
+              - *client
+              - 'ylcs-app/proguard/R8Android.pro'
+              - 'ylcs-app/src/jvmMain/**'
+              - 'ylcs-app/src/nonDesktopMain/**'
+              - 'ylcs-app/src/androidMain/**'
+            ios:
+              - *client
+              - 'iosApp/**'
+              - 'ylcs-app/src/nativeInterop/**'
+              - 'ylcs-app/src/appleMain/**'
+              - 'ylcs-app/src/nonAndroidMain/**'
+              - 'ylcs-app/src/nonDesktopMain/**'
+              - 'ylcs-app/src/iosMain/**'
+            desktop:
+              - *client
+              - 'native/**'
+              - 'ylcs-app/proguard/R8Desktop.pro'
+              - 'ylcs-app/src/jvmMain/**'
+              - 'ylcs-app/src/nonAndroidMain/**'
+              - 'ylcs-app/src/desktopMain/**'
+            web:
+              - *client
+              - 'ylcs-app/src/nonAndroidMain/**'
+              - 'ylcs-app/src/nonDesktopMain/**'
+              - 'ylcs-app/src/wasmJsMain/**'
+            server:
+              - *common
+              - 'ylcs-server/**'
+
+  build-android:
+    name: Build Android
+    needs: changes
+    if: ${{ needs.changes.outputs.android == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -30,73 +104,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build
-        run: ./gradlew ylcs-app:androidPublish
+      - name: Build Android
+        run: ./gradlew ylcs-app:assembleDebug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-files
-          path: outputs/ylcs.apk
-
-  package-ios:
-    name: Package iOS
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-  package-windows:
-    name: Package Windows
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktopPublish
-
-      - name: Compress
-        run: cd outputs/ylcs; zip -r "[Windows]银临茶舍.zip" *; cd -
-
-      - name: Upload Zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: exe-files
-          path: outputs/[Windows]银临茶舍.zip
-
-  package-linux:
-    name: Package Linux
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktopPublish
-
-  package-macos:
-    name: Package MacOS
+  build-ios:
+    name: Build iOS
+    needs: changes
+    if: ${{ needs.changes.outputs.ios == 'true' }}
     runs-on: macos-latest
     steps:
       - name: Checkout Code
@@ -112,11 +126,38 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build
-        run: ./gradlew ylcs-app:desktopPublish
+      - name: Build iOS
+        run: ./gradlew ylcs-app:iosArm64Binaries
 
-  package-wasmjs:
-    name: Package WasmJs
+  build-desktop:
+    name: Build Desktop
+    needs: changes
+    if: ${{ needs.changes.outputs.desktop == 'true' }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build Desktop
+        run: ./gradlew ylcs-app:desktopJar
+
+  build-web:
+    name: Build Web
+    needs: changes
+    if: ${{ needs.changes.outputs.web == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -132,20 +173,13 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build
-        run: ./gradlew ylcs-app:webPublish
+      - name: Build Web
+        run: ./gradlew ylcs-app:wasmJsJar
 
-      - name: Compress
-        run: cd outputs/web; zip -r "[Web]银临茶舍.zip" *; cd -
-
-      - name: Upload Zip
-        uses: actions/upload-artifact@v4
-        with:
-          name: exe-files
-          path: outputs/[Web]银临茶舍.zip
-
-  package-server:
-    name: Package Server
+  build-server:
+    name: Build Server
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -161,11 +195,5 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build
-        run: ./gradlew ylcs-server:serverPublish
-
-      - name: Upload Jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar-files
-          path: outputs/ylcs.jar
+      - name: Build Server
+        run: ./gradlew ylcs-server:build

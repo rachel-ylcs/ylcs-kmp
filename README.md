@@ -3,7 +3,7 @@
     <p>集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503</p>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android"/>
-		<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
+        <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
         <img src="https://img.shields.io/badge/Platform-Windows-blue.svg?logo=esotericsoftware"/>
         <img src="https://img.shields.io/badge/Platform-Linux-red.svg?logo=linux"/>
         <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript"/>
@@ -41,7 +41,6 @@
 
 源代码目录 `ylcs-app`
 
-
 1. androidMain
    - 运行：`IDEA - Android App`
    - 发布签名安装包：`ylcs-app:androidPublish`
@@ -58,35 +57,30 @@
    - 浏览器运行：`ylcs-app:webRun`
    - 发布网页：`ylcs-app:webPublish`
 
-
-### `kotlin logic multiplatform`
-
-源代码目录 `shared`
-
-
 ### `iosApp`
 
 源代码目录 `iosApp`, `ylcs-app/iosMain`
 
+### `kotlin logic multiplatform`
 
 ### `server`
 
-源代码目录 `server`
+源代码目录 `ylcs-server`
 
 - 运行： `IDEA - Ktor`
-- 发布可执行文件：`server:serverPublish`
+- 发布可执行文件：`ylcs-server:serverPublish`
 
 ### `shared`
 
-共享数据与代码目录 `shared`
+共享数据与代码目录 `ylcs-shared`
 
 ### `music`
 
-MOD核心实现 `music`
+MOD核心实现 `ylcs-music`
 
 ### `modManager`
 
-MOD管理器(桌面版) `modManager`
+MOD管理器(桌面版) `ylcs-modManager`
 
 ## 部署
 
@@ -151,7 +145,6 @@ Redis 和 MySQL 配置可在 `resources` 中的 `config.properties` 配置
 
 ### 服务端资源引用 ServerRes
 
-
 ```kotlin
 // 示例
 object ServerRes : ResNode("public") {
@@ -189,12 +182,12 @@ object ServerRes : ResNode("public") {
 路径只需要提供名称，而不需要像其他框架般补全完整路径。
 
 **例 1** 访问 UID 为 8 的用户的头像
-``` kotlin
+```kotlin
 ServerRes.Users.User(8).avatar
 ```
 
 **例 2** 访问 UID 为 8 的用户的图片(图片 ID 是 123)
-``` kotlin
+```kotlin
 ServerRes.Users.User(8).Pics().pic(123)
 ```
 
@@ -315,7 +308,6 @@ val result = ClientAPI.request(
 且接受服务器的响应 result 也与公共接口中定义的完全一致，自动识别响应数据模型。
 
 编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。
-
 
 ## Music模组协议
 
