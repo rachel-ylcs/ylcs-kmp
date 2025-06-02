@@ -17,6 +17,8 @@ import love.yinlin.platform.Platform
 object API : APINode(null, "") {
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {
+			object GetInviters : APIPostResponse<List<String>>(this, "getInviters")
+
 			object Login : APIPost<Login.Request, String>(this, "login") {
 				@Serializable
 				data class Request(val name: String, val pwd: String, val platform: Platform)

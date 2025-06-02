@@ -19,7 +19,7 @@ import love.yinlin.extension.to
 import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.values
-import java.sql.Timestamp
+
 fun Routing.topicAPI(implMap: ImplMap) {
 	api(API.User.Topic.GetTopics) { (uid, isTop, tid, num) ->
 		VN.throwId(uid)
