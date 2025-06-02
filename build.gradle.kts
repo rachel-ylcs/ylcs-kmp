@@ -28,8 +28,8 @@ val nativeLibsDir by extra(dirNative.dir("libs"))
 
 // App
 val appName by extra("ylcs")
-val appVersion by extra(302)
-val appVersionName by extra("3.0.2")
+val appVersion by extra(303)
+val appVersionName by extra("3.0.3")
 val appPackageName by extra("love.yinlin")
 val appMainClass by extra("${appPackageName}.MainKt")
 
