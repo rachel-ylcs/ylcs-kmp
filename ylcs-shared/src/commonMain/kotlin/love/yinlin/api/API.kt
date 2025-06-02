@@ -7,6 +7,7 @@ import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.TopicDetails
@@ -295,17 +296,16 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val tid: Int, val pid: Int, val cid: Int, val rawSection: Int)
 			}
 		}
-		object Song: APINode(this ,"song")
-		{
-			object GetSong: APIPost<GetSong.Request,List<love.yinlin.data.rachel.song.Song>>(this,"getSong") {
+
+		object Song: APINode(this, "song") {
+			object GetSongs : APIPost<GetSongs.Request, List<love.yinlin.data.rachel.song.Song>>(this, "getSongs") {
 				@Serializable
-				data class Request(val sid:Int =0 , val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val sid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetSongComment: APIPost<GetSongComment.Request, List<love.yinlin.data.rachel.song.SongComment>>(this,"getSongComment")
-			{
+			object GetSongComments : APIPost<GetSongComments.Request, List<SongComment>>(this, "getSongComments") {
 				@Serializable
-				data class Request(val sid:Int, val cid: Int=Int.MAX_VALUE,val num:Int= APIConfig.MIN_PAGE_NUM)
+				data class Request(val sid: Int, val cid: Int = Int.MAX_VALUE, val num : Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object SendSongComment : APIPost<SendSongComment.Request, Int>(this, "sendSongComment") {
@@ -313,18 +313,10 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val sid: Int, val content: String)
 			}
 
-
 			object DeleteSongComment : APIPostRequest<DeleteSongComment.Request>(this, "deleteSongComment") {
 				@Serializable
 				data class Request(val token: String, val cid: Int)
 			}
-			object UpdateSongComment : APIPostRequest<UpdateSongComment.Request>(this,"updateSongComment")
-			{
-				@Serializable
-				data class Request(val token:String,val cid:Int,val content:String)
-			}
-
-
 		}
 	}
 
