@@ -28,7 +28,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	api(API.User.Account.Login) { (name, pwd, platform) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
-        val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failedData
+		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failedData
 		if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
 		val uid = user["uid"].Int
 		// 根据 uid, platform, timestamp 生成 token

@@ -8,6 +8,7 @@ import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.logger
 import love.yinlin.platform.Platform
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -149,14 +150,26 @@ object AN {
 		val mutex = updateTokenMutexMap.computeIfAbsent(tokenString) { Mutex() }
 		if (!mutex.tryLock()) error("请求过多")
 
+		var errorDebug = ""
+
 		try {
 			val saveTokenString = Redis.use { it.get(token.key) }
+			errorDebug = """
+				[regression] 登录信息失效
+				[src tokenString] |$tokenString|
+				[src token] |$token|
+				[save tokenString] |$saveTokenString|
+			"""
 			return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
 			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
 			else throw TokenExpireError(token.uid)
 		}
+		catch (e: TokenExpireError) {
+			logger.warn(errorDebug)
+			throw e
+		}
 		finally {
-		    mutex.unlock()
+			mutex.unlock()
 			updateTokenMutexMap -= tokenString
 		}
 	}
