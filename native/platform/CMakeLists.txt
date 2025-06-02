@@ -25,3 +25,7 @@ target_include_directories(platform
 if(WIN32)
     target_compile_definitions(platform PRIVATE UNICODE _UNICODE)
 endif()
+
+set_target_properties(platform PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
