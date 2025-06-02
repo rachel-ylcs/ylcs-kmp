@@ -19,8 +19,8 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.deleteRecursively
 import love.yinlin.extension.Int
 import love.yinlin.extension.IntNull
+import love.yinlin.extension.Object
 import love.yinlin.extension.String
-import love.yinlin.extension.to
 import love.yinlin.md5
 import love.yinlin.mkdir
 import love.yinlin.values
@@ -28,7 +28,7 @@ import love.yinlin.values
 fun Routing.accountAPI(implMap: ImplMap) {
 	api(API.User.Account.GetInviters) { ->
 		val inviters = DB.throwQuerySQL("SELECT name FROM user WHERE (privilege & ${UserPrivilege.VIP_ACCOUNT}) != 0")
-		Data.Success(inviters.to())
+		Data.Success(inviters.map { it.Object["name"].String })
 	}
 
 	api(API.User.Account.Login) { (name, pwd, platform) ->

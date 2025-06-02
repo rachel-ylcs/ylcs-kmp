@@ -3,11 +3,17 @@ package love.yinlin.ui.screen.community
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.VerifiedUser
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -17,6 +23,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.LoadingButton
@@ -26,6 +33,7 @@ import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
+import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 
 @Stable
@@ -37,6 +45,8 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Register,
 		ForgotPassword
 	}
+
+	private var inviters by mutableStateOf(emptyList<String>())
 
 	private var mode by mutableStateOf(Mode.Login)
 	private val loginId = TextInputState()
@@ -220,12 +230,38 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				inputType = InputType.PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH
 			)
-			TextInput(
-				modifier = Modifier.fillMaxWidth(),
-				state = registerInviter,
-				hint = "邀请人昵称",
-				maxLength = UserConstraint.MAX_NAME_LENGTH
-			)
+
+			Box(modifier = Modifier.fillMaxWidth()) {
+				var inviterMenuExpanded by rememberFalse()
+				TextInput(
+					modifier = Modifier.fillMaxWidth(),
+					state = registerInviter,
+					hint = "邀请人昵称",
+					leadingIcon = {
+						ClickIcon(
+							icon = Icons.Outlined.FilterAlt,
+							onClick = { inviterMenuExpanded = true }
+						)
+					},
+					maxLength = UserConstraint.MAX_NAME_LENGTH
+				)
+				DropdownMenu(
+					expanded = inviterMenuExpanded,
+					onDismissRequest = { inviterMenuExpanded = false },
+					modifier = Modifier.fillMaxHeight(fraction = 0.5f)
+				) {
+					inviters.fastForEach { inviter ->
+						DropdownMenuItem(
+							text = { Text(text = inviter) },
+							onClick = {
+								registerInviter.text = inviter
+								inviterMenuExpanded = false
+							}
+						)
+					}
+				}
+			}
+
 			Text(
 				text = "返回登录",
 				color = MaterialTheme.colorScheme.primary,
@@ -348,6 +384,11 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			Mode.Register -> "注册"
 			Mode.ForgotPassword -> "忘记密码"
 		}
+	}
+
+	override suspend fun initialize() {
+		val result = ClientAPI.request(route = API.User.Account.GetInviters)
+		if (result is Data.Success) inviters = result.data
 	}
 
 	@Composable
