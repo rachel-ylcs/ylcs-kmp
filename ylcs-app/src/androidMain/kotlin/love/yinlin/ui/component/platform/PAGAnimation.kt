@@ -104,7 +104,8 @@ actual fun PAGAnimation(
         update = {
             state.player?.composition = PAGFile.Load(state.data)
         },
-        release = { _, onRelease ->
+        release = { view, onRelease ->
+            view.surfaceTextureListener = null
             state.releasePlayer()
             onRelease()
         },
