@@ -1,11 +1,16 @@
 package love.yinlin.ui.screen.common
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import love.yinlin.AppModel
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.resources.Res
 import love.yinlin.ui.component.platform.PAGAnimation
@@ -29,9 +34,17 @@ class ScreenTest(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun SubContent(device: Device) {
-        PAGAnimation(
-            state = state,
-            modifier = Modifier.fillMaxSize()
-        )
+        Box(
+            Modifier.fillMaxSize().background(Colors.Green4),
+            contentAlignment = Alignment.Center
+        ) {
+            PAGAnimation(
+                state = state,
+                modifier = Modifier.fillMaxSize()
+            )
+            Text(
+                text = "Test Animation"
+            )
+        }
     }
 }
