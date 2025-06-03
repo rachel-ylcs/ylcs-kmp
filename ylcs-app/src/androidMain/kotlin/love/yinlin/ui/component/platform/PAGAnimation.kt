@@ -99,7 +99,9 @@ actual fun PAGAnimation(
             }
         },
         update = {
-            state.player?.composition = PAGFile.Load(state.data)
+            state.player?.let { player ->
+                player.composition = PAGFile.Load(state.data)
+            }
         },
         release = { view, onRelease ->
             view.surfaceTextureListener = null
