@@ -25,6 +25,6 @@ object Local {
 	private const val TEST_PORT: Int = 1211
 
 	val ServerHost: String = LOCAL_HOST
-	val ClientHost: String = if (!Client.DEVELOPMENT) MAIN_HOST else LOCAL_HOST
+	val ClientHost: String = if (Client.DEVELOPMENT) LOCAL_HOST else MAIN_HOST
 	val ClientUrl: String = if (Client.DEVELOPMENT) "http://$ClientHost:$TEST_PORT" else "https://api.$ClientHost"
 }

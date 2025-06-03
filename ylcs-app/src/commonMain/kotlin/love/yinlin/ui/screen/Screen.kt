@@ -18,6 +18,7 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenMain)
 
     // 通用
+    screen(::ScreenTest)
     screen(::ScreenWebpage)
     screen(::ScreenImagePreview, type<List<Picture>>())
     screen(::ScreenVideo)

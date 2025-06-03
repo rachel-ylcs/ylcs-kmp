@@ -1,12 +1,9 @@
 package love.yinlin.ui.component.platform
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.BoxWithConstraints
+import android.graphics.SurfaceTexture
+import android.view.TextureView
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalDensity
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.rememberState
 import love.yinlin.ui.CustomUI
@@ -61,7 +58,18 @@ actual class PAGState {
     actual var data: ByteArray by mutableStateOf(ByteArray(0))
     actual var progress: Double by mutableDoubleStateOf(0.0)
 
-    val player = PAGPlayer()
+    var player: PAGPlayer? = null
+    val surface = mutableStateOf<TextureView?>(null)
+
+    fun releasePlayer() {
+        player?.apply {
+            surface?.release()
+            surface = null
+            composition = null
+            release()
+        }
+        player = null
+    }
 }
 
 @Composable
@@ -69,49 +77,40 @@ actual fun PAGAnimation(
     state: PAGState,
     modifier: Modifier
 ) {
-    BoxWithConstraints(modifier = modifier) {
-        val (width, height) = with(LocalDensity.current) { maxWidth.roundToPx() to maxHeight.roundToPx() }
-
-        LaunchedEffect(width, height) {
-            state.player.surface = PAGSurface.MakeOffscreen(width, height)
-        }
-
-        LaunchedEffect(state.data) {
-            try {
-                state.player.composition = PAGFile.Load(state.data)
+    CustomUI(
+        view = state.surface,
+        factory = { context ->
+            state.releasePlayer()
+            state.player = PAGPlayer().apply {
+                setCacheEnabled(true)
+                setUseDiskCache(true)
+                setScaleMode(PAGScaleMode.LetterBox)
             }
-            catch (e: Throwable) {
-                println(e.stackTraceToString())
-            }
-        }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                state.player.apply {
-                    surface?.release()
-                    surface = null
-                    composition = null
-                    release()
+            TextureView(context).apply {
+                surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                    override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+                        state.player?.surface = PAGSurface.FromSurfaceTexture(surface)
+                    }
+                    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {}
+                    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean = true
+                    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
                 }
             }
-        }
+        },
+        update = {
+            state.player?.composition = PAGFile.Load(state.data)
+        },
+        release = { _, onRelease ->
+            state.releasePlayer()
+            onRelease()
+        },
+        modifier = modifier
+    )
 
-        var bitmap: ImageBitmap? by rememberState { null }
-
-        LaunchedEffect(state.progress) {
-            state.player.progress = state.progress
-            state.player.flush()
-            state.player.surface?.makeSnapshot()?.let {
-                bitmap = it.asImageBitmap()
-            }
-        }
-
-        bitmap?.let {
-            Image(
-                bitmap = it,
-                contentDescription = null,
-                modifier = Modifier.matchParentSize()
-            )
+    LaunchedEffect(state.progress) {
+        state.player?.let {
+            it.progress = state.progress
+            it.flush()
         }
     }
 }

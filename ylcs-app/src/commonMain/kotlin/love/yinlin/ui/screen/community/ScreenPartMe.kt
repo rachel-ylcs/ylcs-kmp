@@ -31,6 +31,7 @@ import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import love.yinlin.AppModel
+import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -57,6 +58,7 @@ import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.ui.screen.common.ScreenTest
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.world.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
@@ -233,6 +235,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			Item("活动", Icons.Filled.Link) {
 				navigate<ScreenActivityLink>()
+			}
+			Item("测试", Icons.Filled.BugReport) {
+				navigate<ScreenTest>()
 			}
 		}
 	}
