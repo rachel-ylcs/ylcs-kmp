@@ -14,6 +14,7 @@ coroutines = "1.10.2"
 ktor = "3.1.3"
 sketch = "4.1.0"
 mmkv = "2.2.2"
+pag = "4.4.31-harfbuzz"
 lottie = "2.0.0-rc04"
 
 # Android
@@ -92,6 +93,7 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
+pag-android = { module = "com.tencent.tav:libpag", version.ref = "pag" }
 scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.2.0" }
 scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.3.1" }
 

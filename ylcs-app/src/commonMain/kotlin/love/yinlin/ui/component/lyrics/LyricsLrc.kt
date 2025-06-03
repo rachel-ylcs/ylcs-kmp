@@ -215,7 +215,7 @@ class LyricsLrc : LyricsEngine {
                 lines?.let { lines ->
                     itemsIndexed(
                         items = lines,
-                        key = { index, item -> item.position }
+                        key = { _, item -> item.position }
                     ) { index, item ->
                         Box(
                             modifier = Modifier

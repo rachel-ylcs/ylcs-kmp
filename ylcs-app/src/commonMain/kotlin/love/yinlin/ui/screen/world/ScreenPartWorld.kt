@@ -33,14 +33,17 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.activity.Activity
-import love.yinlin.extension.*
+import love.yinlin.extension.DateEx
+import love.yinlin.extension.findSelf
+import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.replaceAll
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.SplitLayout
 import kotlin.math.abs
 
 @Stable
@@ -79,7 +82,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				interval = 5000L,
 				gap = gap,
 				modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
-			) { pic, index, scale ->
+			) { pic, _, scale ->
 				Surface(
 					modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
 					shape = shape,
