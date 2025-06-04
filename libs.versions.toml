@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.2.0-RC"
+kotlin = "2.2.0-RC2"
 cmp = "1.8.1"
 agp = "8.11.0-alpha03"
 
