@@ -128,7 +128,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build iOS
-        run: ./gradlew ylcs-app:iosArm64Binaries
+        run: ./gradlew ylcs-app:linkPodDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop
