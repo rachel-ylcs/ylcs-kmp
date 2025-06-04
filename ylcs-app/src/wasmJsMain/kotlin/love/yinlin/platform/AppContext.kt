@@ -6,12 +6,10 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import kotlinx.browser.window
-import love.yinlin.AppModel
 import love.yinlin.extension.DateEx
 
 class ActualAppContext : AppContext() {
 	override val kv: KV = KV()
-	override var model: AppModel? = null
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
 		logger(level = Logger.Level.Error)

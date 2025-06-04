@@ -98,11 +98,17 @@ fun App(
 	navController: NavHostController = rememberNavController(),
 	modifier: Modifier = Modifier.fillMaxSize()
 ) {
-	val appModel: AppModel = viewModel {
-		AppModel(navController).apply {
-			app.model = this
+	val appModel: AppModel = viewModel { AppModel(navController) }
+
+	DisposableEffect(Unit) {
+		DeepLinkHandler.listener = { uri ->
+			appModel.deeplink.process(uri)
+		}
+		onDispose {
+			DeepLinkHandler.listener = null
 		}
 	}
+
 	NavHost(
 		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		navController = navController,

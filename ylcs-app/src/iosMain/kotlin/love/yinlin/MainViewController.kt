@@ -3,6 +3,7 @@ package love.yinlin
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.delay
+import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.toUri
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.ActualFloatingLyrics
@@ -46,5 +47,5 @@ fun MainViewController(): UIViewController {
 }
 
 fun onOpenURL(url: NSURL) {
-    app.model?.deeplink?.process(url.toUri())
+    DeepLinkHandler.onOpenUri(url.toUri())
 }

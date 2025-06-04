@@ -9,7 +9,6 @@ import com.github.panpf.sketch.util.Logger
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
-import love.yinlin.AppModel
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 import platform.Foundation.NSSetUncaughtExceptionHandler
@@ -19,7 +18,6 @@ import kotlin.experimental.ExperimentalNativeApi
 @OptIn(ExperimentalForeignApi::class)
 class ActualAppContext : AppContext() {
     override val kv: KV = KV()
-    override var model: AppModel? = null
 
     override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
         logger(level = Logger.Level.Error)
