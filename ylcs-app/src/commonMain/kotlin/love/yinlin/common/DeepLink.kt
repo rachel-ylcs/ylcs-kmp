@@ -7,6 +7,27 @@ import love.yinlin.ui.screen.community.ScreenUserCard
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
 import love.yinlin.ui.screen.music.loader.ScreenPlatformMusic
 
+object DeepLinkHandler {
+    private var cached: Uri? = null
+
+    var listener: ((uri: Uri) -> Unit)? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                cached?.let { value.invoke(it) }
+                cached = null
+            }
+        }
+
+    fun onOpenUri(uri: Uri) {
+        cached = uri
+        listener?.let {
+            it.invoke(uri)
+            cached = null
+        }
+    }
+}
+
 class DeepLink(private val model: AppModel) {
     private fun schemeContent(uri: Uri) {
         if (!app.musicFactory.isReady) model.navigate(ScreenImportMusic.Args(uri.toString()))

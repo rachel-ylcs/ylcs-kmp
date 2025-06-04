@@ -8,14 +8,11 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
-import love.yinlin.AppModel
-import love.yinlin.common.Weak
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
 class ActualAppContext(val context: Context) : AppContext() {
 	override val kv: KV = KV(context)
-	override var model: AppModel? by Weak()
 
 	var activityResultRegistry: ActivityResultRegistry? = null
 

@@ -24,6 +24,10 @@ class MainActivity : ComponentActivity() {
             if (appNative.config.enabledFloatingLyrics) it.attach()
         }
 
+        intent?.let {
+            IntentProcessor.process(it)
+        }
+
         setContent {
             AppWrapper {
                 val isDarkMode = LocalDarkMode.current

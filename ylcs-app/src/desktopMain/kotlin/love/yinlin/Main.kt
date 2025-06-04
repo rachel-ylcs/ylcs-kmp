@@ -17,7 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import kotlinx.coroutines.launch
+import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.ThemeValue
+import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.Coroutines
@@ -31,6 +33,7 @@ import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Rectangle
 import kotlin.io.path.Path
@@ -68,6 +71,12 @@ fun main() {
     ActualAppContext().apply {
         app = this
         initialize()
+    }
+
+    OS.ifPlatform(Platform.MacOS) {
+        Desktop.getDesktop().setOpenURIHandler { event ->
+            DeepLinkHandler.onOpenUri(event.uri.toUri())
+        }
     }
 
     application(exitProcessOnExit = true) {
