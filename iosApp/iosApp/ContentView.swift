@@ -15,7 +15,7 @@ struct ContentView: View {
         ComposeView()
                 .ignoresSafeArea(.all) // Let compose handle safe area
                 .onOpenURL { url in
-                    MainViewControllerKt.onOpenURL(url: url)
+                    DeepLinkHandler.shared.onOpenUri(uri: UriKt.toUri(url))
                 }
     }
 }

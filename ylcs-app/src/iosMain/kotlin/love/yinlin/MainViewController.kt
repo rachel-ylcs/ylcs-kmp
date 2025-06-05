@@ -45,7 +45,3 @@ fun MainViewController(): UIViewController {
         controller = this
     }
 }
-
-fun onOpenURL(url: NSURL) {
-    DeepLinkHandler.onOpenUri(url.toUri())
-}
