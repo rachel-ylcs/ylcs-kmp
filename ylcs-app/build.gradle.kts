@@ -215,7 +215,6 @@ kotlin {
                 implementation(libs.media3.player)
 
                 implementation(libs.mmkv.android)
-                //implementation(libs.pag.android)
                 implementation(libs.scan.android)
                 implementation(libs.scan.camera.android)
 
