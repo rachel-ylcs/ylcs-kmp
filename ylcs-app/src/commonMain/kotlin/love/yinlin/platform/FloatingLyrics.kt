@@ -72,7 +72,4 @@ abstract class FloatingLyrics {
     abstract val isAttached: Boolean
 
     abstract fun updateLyrics(lyrics: String?)
-
-    @Composable
-    abstract fun Content()
 }

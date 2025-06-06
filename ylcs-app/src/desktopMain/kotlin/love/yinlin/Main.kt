@@ -22,6 +22,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
 import love.yinlin.platform.ActualAppContext
+import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
@@ -165,7 +166,7 @@ fun main() {
             }
         }
 
-        app.musicFactory.floatingLyrics?.let {
+        (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
             if (it.isAttached && app.config.enabledFloatingLyrics) it.Content()
         }
     }

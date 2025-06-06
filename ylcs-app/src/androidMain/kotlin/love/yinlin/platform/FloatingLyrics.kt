@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
@@ -33,7 +34,10 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     private val view = ComposeView(activity).apply {
         setViewTreeLifecycleOwner(activity)
         setViewTreeSavedStateRegistryOwner(activity)
-        setContent { ContentWrapper() }
+        setViewTreeViewModelStoreOwner(activity)
+        setContent {
+            ContentWrapper()
+        }
     }
 
     private var currentLyrics: String? by mutableStateOf(null)
@@ -99,30 +103,31 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     }
 
     @Composable
-    override fun Content() {
-        val config = app.config.floatingLyricsAndroidConfig
+    fun BoxWithConstraintsScope.Content() {
         currentLyrics?.let { lyrics ->
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier.padding(
-                        start = this.maxWidth * config.left.coerceIn(0f, 1f),
-                        end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
-                        top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
-                    ).fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = lyrics,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
-                        ),
-                        color = Colors.from(config.textColor),
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
-                    )
-                }
+            val config = app.config.floatingLyricsAndroidConfig
+
+            Box(
+                modifier = Modifier.padding(
+                    start = this.maxWidth * config.left.coerceIn(0f, 1f),
+                    end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
+                    top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
+                ).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = lyrics,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                    ),
+                    color = Colors.from(config.textColor),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.wrapContentSize(unbounded = true)
+                        .background(color = Colors.from(config.backgroundColor))
+                        .padding(ThemeValue.Padding.Value)
+                )
             }
         }
     }

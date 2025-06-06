@@ -105,7 +105,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
     }
 
     @Composable
-    override fun Content() {
+    fun Content() {
         val config = app.config.floatingLyricsIOSConfig
         currentLyrics?.let { lyrics ->
             Box(
