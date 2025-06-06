@@ -16,7 +16,7 @@ import love.yinlin.values
 fun Routing.songAPI(implMap: ImplMap){
     api(API.User.Song.GetSongs) { (sid, num) ->
         val songs = DB.throwQuerySQL("""
-			SELECT sid, version, name, singer, lyricist, composer, album, bgd, video
+			SELECT sid, id, version, name, singer, lyricist, composer, album, bgd, video
 			FROM song
             where sid > ?
 			ORDER BY sid ASC
@@ -25,36 +25,36 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(songs.to())
     }
 
+    api(API.User.Song.SearchSong) { id ->
+        val song = DB.querySQLSingle("""
+            SELECT sid, id, version, name, singer, lyricist, composer, album, bgd, video
+			FROM song
+            where id = ?
+        """, id)
+        if (song == null) "此歌曲未收录".failedData else Data.Success(song.to())
+    }
+
     api(API.User.Song.GetSongComments) { (sid, cid, num) ->
+        VN.throwId(sid)
         val songComment = DB.throwQuerySQL("""
-            WITH base AS (
-                SELECT
-                    COALESCE(
-                    (
-                        SELECT sc2.ts
-                        FROM song_comment AS sc2
-                        WHERE sc2.sid = ?  AND sc2.cid = ? ),
-                        NOW()
-                    ) AS base_ts)
-                SELECT sc.cid, sc.sid, sc.uid, DATE_FORMAT(sc.ts, '%Y-%m-%d %H:%i:%s') AS ts, sc.content, u.name
-                FROM song_comment AS sc
-                JOIN `user` AS u
-                    ON sc.uid = u.uid
-                CROSS JOIN base
-                WHERE sc.sid = ? AND (sc.ts < base.base_ts  OR (sc.ts = base.base_ts AND sc.cid < ?)   
-            )
-            ORDER BY sc.ts DESC, sc.cid DESC
-            LIMIT ?;
-            """, sid, cid, sid, cid, num.coercePageNum)
+            SELECT cid, user.uid, ts, content, name, label, coin
+            FROM song_comment
+            LEFT JOIN user
+            ON song_comment.uid = user.uid
+            WHERE sid = ? AND isDeleted = 0 AND cid > ?
+            ORDER BY cid ASC
+            LIMIT ?
+        """, sid, cid, num.coercePageNum)
         Data.Success(songComment.to())
     }
 
-    api(API.User.Song.SendSongComment){ (token,sid,content)->
+    api(API.User.Song.SendSongComment) { (token, sid, content)->
         VN.throwId(sid)
+        VN.throwEmpty(content)
         val uid = AN.throwExpireToken(token)
         val cid = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO song_comment(sid, uid, content) ${values(3)}
-        """, sid,uid,content).toInt()
+        """, sid, uid, content)
         Data.Success(cid,"评论发送成功")
     }
 
@@ -62,17 +62,13 @@ fun Routing.songAPI(implMap: ImplMap){
         VN.throwId( cid)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，超管
-        if (DB.querySQLSingle("""SELECT 1 FROM song_comment WHERE cid =?""",cid)==null) return@api "未找到该评论或评论已删除".failedData
-        else if (DB.querySQLSingle(
-                """
-            SELECT 1 FROM song_comment WHERE uid = ? AND cid = ?
-			UNION
-			SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, cid, uid
-            ) == null
-        ) return@api "无权限".failedData
+        if (DB.querySQLSingle("""
+            SELECT 1 FROM song_comment WHERE uid = ? AND cid = ? AND isDeleted = 0
+            UNION
+            SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
+        """, uid, cid, uid) == null) return@api "无权限".failedData
         // 逻辑删除
-        DB.throwExecuteSQL("DELETE FROM song_comment WHERE cid = ?", cid)
+        DB.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
         "删除成功".successData
     }
 }

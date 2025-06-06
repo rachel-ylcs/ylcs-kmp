@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Song(
     val sid: Int, // [歌曲编号]
-    val version: Double, // [版本]
+    val id: String,
+    val version: String, // [版本]
     val name: String, // [曲名]
     val singer: String, //[歌手名]
     val lyricist: String, // [词作]

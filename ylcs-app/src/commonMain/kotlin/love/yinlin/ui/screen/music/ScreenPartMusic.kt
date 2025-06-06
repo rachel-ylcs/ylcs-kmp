@@ -38,12 +38,15 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -113,6 +116,21 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	private var sleepJob: Job? by mutableStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
+
+	private fun openMusicComment() {
+		factory.currentMusic?.let { musicInfo ->
+			launch {
+				val result = ClientAPI.request(
+					route = API.User.Song.SearchSong,
+					data = musicInfo.id
+				)
+				when (result) {
+					is Data.Success -> navigate(ScreenSongDetails.Args(song = result.data))
+					is Data.Error -> slot.tip.error(result.message)
+				}
+			}
+		}
+	}
 
 	@Composable
 	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
@@ -499,18 +517,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				ClickIcon(
 					icon = ExtraIcons.ShowLyrics,
 					color = Colors.White,
-					onClick = {
-
-					}
+					onClick = {}
 				)
 			}
 			EqualItem {
 				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
 					color = Colors.White,
-					onClick = {
-
-					}
+					onClick = { openMusicComment() }
 				)
 			}
 		}

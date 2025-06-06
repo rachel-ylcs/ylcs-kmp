@@ -41,6 +41,53 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import kotlin.math.max
 
 @Composable
+internal fun UserBar(
+	avatar: String,
+	name: String,
+	time: String,
+	label: String,
+	level: Int,
+	onAvatarClick: () -> Unit
+) {
+	Row(
+		modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+	) {
+		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
+			WebImage(
+				uri = avatar,
+				key = DateEx.TodayString,
+				contentScale = ContentScale.Crop,
+				circle = true,
+				onClick = onAvatarClick,
+				modifier = Modifier.matchParentSize()
+			)
+		}
+		Column(
+			modifier = Modifier.weight(1f),
+			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+		) {
+			Text(
+				text = name,
+				style = MaterialTheme.typography.labelMedium,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Text(
+				text = time,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+				style = MaterialTheme.typography.bodySmall,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
+		UserLabel(label = label, level = level)
+	}
+}
+
+@Composable
 internal fun BoxText(
 	text: String,
 	color: Color

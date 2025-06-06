@@ -44,7 +44,6 @@ import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
-import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
@@ -56,53 +55,6 @@ import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
-
-@Composable
-private fun UserBar(
-	avatar: String,
-	name: String,
-	time: String,
-	label: String,
-	level: Int,
-	onAvatarClick: () -> Unit
-) {
-	Row(
-		modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-	) {
-		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
-			WebImage(
-				uri = avatar,
-				key = DateEx.TodayString,
-				contentScale = ContentScale.Crop,
-				circle = true,
-				onClick = onAvatarClick,
-				modifier = Modifier.matchParentSize()
-			)
-		}
-		Column(
-			modifier = Modifier.weight(1f),
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-		) {
-			Text(
-				text = name,
-				style = MaterialTheme.typography.labelMedium,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth()
-			)
-			Text(
-				text = time,
-				color = MaterialTheme.colorScheme.onSurfaceVariant,
-				style = MaterialTheme.typography.bodySmall,
-				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.fillMaxWidth()
-			)
-		}
-		UserLabel(label = label, level = level)
-	}
-}
 
 @Composable
 private fun CoinLayout(
@@ -199,13 +151,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	private var details: TopicDetails? by mutableStateOf(null)
 	private var topic: Topic by mutableStateOf(args.currentTopic)
 
-	private val commentPage = object : PaginationArgs<Comment, Int, Int, Boolean>(0, true) {
+	private val pageComments = object : PaginationArgs<Comment, Int, Int, Boolean>(0, true) {
 		override fun distinctValue(item: Comment): Int = item.cid
 		override fun offset(item: Comment): Int = item.cid
 		override fun arg1(item: Comment): Boolean = item.isTop
 	}
 
-	private val commentState = LazyListState()
+	private val listState = LazyListState()
 
 	private var currentSendComment: Comment? by mutableStateOf(null)
 
@@ -215,9 +167,9 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 		@Composable
 		override fun AtLayout(modifier: Modifier) {
-			val userList = remember(details, commentPage.items) {
+			val userList = remember(details, pageComments.items) {
 				val userSet = mutableSetOf(AtInfo(topic.uid, topic.name))
-				commentPage.items.fastForEach { userSet.add(AtInfo(it.uid, it.name)) }
+				pageComments.items.fastForEach { userSet.add(AtInfo(it.uid, it.name)) }
 				userSet -= AtInfo(app.config.userProfile?.uid ?: 0, "")
 				userSet.toList()
 			}
@@ -259,10 +211,10 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			data = API.User.Topic.GetTopicComments.Request(
 				tid = topic.tid,
 				rawSection = topic.rawSection,
-				num = commentPage.pageNum
+				num = pageComments.pageNum
 			)
 		)
-		if (result is Data.Success) commentPage.newData(result.data)
+		if (result is Data.Success) pageComments.newData(result.data)
 	}
 
 	private suspend fun requestMoreComments() {
@@ -271,11 +223,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			data = API.User.Topic.GetTopicComments.Request(
 				tid = topic.tid,
 				rawSection = topic.rawSection,
-				cid = commentPage.offset,
-				isTop = commentPage.arg1
+				cid = pageComments.offset,
+				isTop = pageComments.arg1
 			)
 		)
-		if (result is Data.Success) commentPage.moreData(result.data)
+		if (result is Data.Success) pageComments.moreData(result.data)
 	}
 
 	private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
@@ -391,8 +343,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	}
 
 	private suspend fun onSendComment(content: String): Boolean {
-		val user = app.config.userProfile
-		if (user != null) {
+		app.config.userProfile?.let { user ->
 			// 回复主题
 			val target = currentSendComment
 			if (target == null) {
@@ -410,7 +361,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 						discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 							it.copy(commentNum = it.commentNum + 1)
 						}
-						commentPage.items += Comment(
+						pageComments.items += Comment(
 							cid = result.data,
 							uid = user.uid,
 							ts = DateEx.CurrentString,
@@ -421,7 +372,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 							label = user.label,
 							coin = user.coin
 						)
-						commentState.animateScrollToItem(commentPage.items.size - 1)
+						listState.animateScrollToItem(pageComments.items.size - 1)
 						return true
 					}
 					is Data.Error -> slot.tip.error(result.message)
@@ -440,7 +391,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				)
 				when (result) {
 					is Data.Success -> {
-						commentPage.items.findAssign(predicate = { it.cid == target.cid }) {
+						pageComments.items.findAssign(predicate = { it.cid == target.cid }) {
 							it.copy(subCommentNum = it.subCommentNum + 1)
 						}
 						currentSendComment = null
@@ -450,7 +401,6 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				}
 			}
 		}
-		else slot.tip.error("请先登录")
 		return false
 	}
 
@@ -467,11 +417,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		)
 		when (result) {
 			is Data.Success -> {
-				commentPage.items.findAssign(predicate = { it.cid == cid }) {
+				pageComments.items.findAssign(predicate = { it.cid == cid }) {
 					it.copy(isTop = isTop)
 				}
-				commentPage.items.sort()
-				commentState.scrollToItem(commentPage.items.indexOfFirst { it.cid == cid })
+				pageComments.items.sort()
+				listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
 			}
 			is Data.Error -> slot.tip.error(result.message)
 		}
@@ -493,7 +443,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 						it.copy(commentNum = it.commentNum - 1)
 					}
-					commentPage.items.removeAll { it.cid == cid }
+					pageComments.items.removeAll { it.cid == cid }
 				}
 				is Data.Error -> slot.tip.error(result.message)
 			}
@@ -745,13 +695,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	@Composable
 	private fun Portrait(details: TopicDetails) {
 		PaginationColumn(
-			items = commentPage.items,
+			items = pageComments.items,
 			key = { it.cid },
-			state = commentState,
+			state = listState,
 			canRefresh = false,
-			canLoading = commentPage.canLoading,
+			canLoading = pageComments.canLoading,
 			onLoading = { requestMoreComments() },
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
 			header = {
 				Surface(
 					modifier = Modifier.fillMaxWidth(),
@@ -777,7 +727,10 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	private fun Landscape(details: TopicDetails) {
 		Row(modifier = Modifier.fillMaxSize()) {
 			Surface(
-				modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
+				modifier = Modifier
+					.padding(LocalImmersivePadding.current.withoutEnd)
+					.width(ThemeValue.Size.PanelWidth)
+					.fillMaxHeight()
 					.verticalScroll(rememberScrollState()),
 				tonalElevation = ThemeValue.Shadow.Tonal
 			) {
@@ -788,14 +741,18 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			}
 			VerticalDivider()
 			PaginationColumn(
-				items = commentPage.items,
+				items = pageComments.items,
 				key = { it.cid },
-				state = commentState,
+				state = listState,
 				canRefresh = false,
-				canLoading = commentPage.canLoading,
+				canLoading = pageComments.canLoading,
 				onLoading = { requestMoreComments() },
 				itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
-				modifier = Modifier.weight(1f).fillMaxHeight().padding(ThemeValue.Padding.Value)
+				modifier = Modifier
+					.padding(LocalImmersivePadding.current.withoutStart)
+					.weight(1f)
+					.fillMaxHeight()
+					.padding(ThemeValue.Padding.Value)
 			) {
 				CommentBar(
 					comment = it,
@@ -805,12 +762,12 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 		}
 	}
 
+	override val title: String = "主题"
+
 	override suspend fun initialize() {
 		requestTopic()
 		requestNewComments()
 	}
-
-	override val title: String = "主题"
 
 	override fun onBack() {
 		if (subCommentSheet.isOpen) subCommentSheet.close()
@@ -903,7 +860,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					modifier = Modifier.fillMaxWidth(),
 					onDelete = {
 						page.items -= subComment
-						commentPage.items.findAssign(predicate = { it.cid == args.cid }) {
+						pageComments.items.findAssign(predicate = { it.cid == args.cid }) {
 							it.copy(subCommentNum = it.subCommentNum - 1)
 						}
 						// 楼中楼最后一条回复删除后隐藏楼中楼

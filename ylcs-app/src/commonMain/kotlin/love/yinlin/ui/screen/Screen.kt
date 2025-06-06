@@ -2,6 +2,7 @@ package love.yinlin.ui.screen
 
 import love.yinlin.data.common.Picture
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.ui.screen.common.*
 import love.yinlin.ui.screen.msg.weibo.*
@@ -49,9 +50,6 @@ fun ScreenRouteScope.screens() {
 	// 设置
     screen(::ScreenSettings)
 
-	// 微博
-
-
 	// 听歌
     screen(::ScreenMusicLibrary)
     screen(::ScreenPlaylistLibrary)
@@ -59,6 +57,8 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenMusicDetails)
 
     screen(::ScreenMusicModFactory)
+    screen(::ScreenSongDetails, type<Song>())
+
     screen(::ScreenImportMusic)
     screen(::ScreenCreateMusic)
     screen(::ScreenPlatformMusic, type<PlatformMusicType>())

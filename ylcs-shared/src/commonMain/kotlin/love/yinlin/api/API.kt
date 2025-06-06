@@ -305,19 +305,21 @@ object API : APINode(null, "") {
 				data class Request(val sid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
+			object SearchSong : APIPost<String, love.yinlin.data.rachel.song.Song>(this, "searchSong")
+
 			object GetSongComments : APIPost<GetSongComments.Request, List<SongComment>>(this, "getSongComments") {
 				@Serializable
-				data class Request(val sid: Int, val cid: Int = Int.MAX_VALUE, val num : Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val sid: Int, val cid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object SendSongComment : APIPost<SendSongComment.Request, Int>(this, "sendSongComment") {
+			object SendSongComment : APIPost<SendSongComment.Request, Long>(this, "sendSongComment") {
 				@Serializable
 				data class Request(val token: String, val sid: Int, val content: String)
 			}
 
 			object DeleteSongComment : APIPostRequest<DeleteSongComment.Request>(this, "deleteSongComment") {
 				@Serializable
-				data class Request(val token: String, val cid: Int)
+				data class Request(val token: String, val cid: Long)
 			}
 		}
 	}
