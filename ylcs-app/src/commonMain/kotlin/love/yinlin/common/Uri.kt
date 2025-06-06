@@ -250,7 +250,7 @@ object UriGenerator {
                 scheme = Scheme.Https,
                 host = "qm.qq.com",
                 path = "/cgi-bin/qm/qr",
-                query = "_wv=1027&k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R&group_code=828049503"
+                query = "_wv=1027&k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R&group_code=$id"
             )
         }
     )

@@ -22,13 +22,16 @@ import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.common.UriGenerator
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
+import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.input.RachelText
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.SubScreen
@@ -285,10 +288,12 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     @Composable
     private fun Landscape(song: Song) {
         Row(modifier = Modifier.fillMaxSize()) {
+            val immersivePadding = LocalImmersivePadding.current
+
             SongLayout(
                 song = song,
                 modifier = Modifier
-                    .padding(LocalImmersivePadding.current.withoutEnd)
+                    .padding(immersivePadding.withoutEnd)
                     .width(ThemeValue.Size.PanelWidth)
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
@@ -303,7 +308,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 onLoading = { requestMoreComments() },
                 itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
                 modifier = Modifier
-                    .padding(LocalImmersivePadding.current.withoutStart)
+                    .padding(immersivePadding.withoutStart)
                     .weight(1f)
                     .fillMaxHeight()
                     .padding(ThemeValue.Padding.Value)
@@ -320,6 +325,23 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
 
     override suspend fun initialize() {
         requestNewComments()
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        Action(Icons.Outlined.Download) {
+            val group = when (args.song.album) {
+                "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> "1048965901"
+                "单曲集" -> "836289670"
+                "影视剧OST" -> "971218639"
+                "游戏OST" -> "942459444"
+                else -> null
+            }
+            launch {
+                if (group == null) slot.tip.warning("未找到此歌曲的下载源")
+                else if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group))) slot.tip.warning("未安装QQ")
+            }
+        }
     }
 
     @Composable
