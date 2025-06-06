@@ -692,7 +692,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				) {
 					SecondaryButton(
 						text = "银临茶舍官网",
-						icon = ExtraIcons.Github,
+						icon = Icons.Outlined.Home,
 						onClick = {
 							launch {
 								OS.Net.openUrl(getString(Res.string.app_website))
