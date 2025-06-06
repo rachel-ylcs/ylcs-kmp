@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world
+package love.yinlin.ui.screen.msg.activity
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

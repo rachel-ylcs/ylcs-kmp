@@ -16,18 +16,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.WeiboAPI
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -37,7 +32,6 @@ import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.text.RichText
 
 @Stable
@@ -54,29 +48,6 @@ interface WeiboProcessor {
 }
 
 val LocalWeiboProcessor = localComposition<WeiboProcessor>()
-
-@Stable
-class WeiboGridData {
-	var state by mutableStateOf(BoxState.EMPTY)
-	var items by mutableStateOf(emptyList<Weibo>())
-	val listState = LazyStaggeredGridState()
-
-	suspend fun requestWeibo(users: List<String>) {
-		if (state != BoxState.LOADING) {
-			state = BoxState.LOADING
-			state = if (users.isEmpty()) BoxState.EMPTY
-			else {
-				val newItems = mutableMapOf<String, Weibo>()
-				for (id in users) {
-					val result = WeiboAPI.getUserWeibo(id)
-					if (result is Data.Success) newItems += result.data.associateBy { it.id }
-				}
-				items = newItems.map { it.value }.sortedDescending()
-				if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
-			}
-		}
-	}
-}
 
 @Composable
 private fun WeiboIconValue(

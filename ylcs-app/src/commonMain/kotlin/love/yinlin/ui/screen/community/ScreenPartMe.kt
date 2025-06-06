@@ -31,7 +31,6 @@ import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import love.yinlin.AppModel
-import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -60,7 +59,7 @@ import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenTest
 import love.yinlin.ui.screen.settings.ScreenSettings
-import love.yinlin.ui.screen.world.ScreenActivityLink
+import love.yinlin.ui.screen.msg.activity.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.concurrent.atomics.AtomicBoolean

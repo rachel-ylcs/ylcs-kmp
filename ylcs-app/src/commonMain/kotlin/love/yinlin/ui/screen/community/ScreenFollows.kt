@@ -21,6 +21,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
@@ -236,7 +237,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
 
     @Composable
     override fun SubContent(device: Device) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = ThemeValue.Shadow.Surface

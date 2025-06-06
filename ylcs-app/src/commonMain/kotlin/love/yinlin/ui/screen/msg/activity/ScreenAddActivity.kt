@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world
+package love.yinlin.ui.screen.msg.activity
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
@@ -52,7 +52,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 		when (result) {
 			is Data.Success -> {
 				val (aid, serverPic, serverPics) = result.data
-				worldPart.activities.add(0, activity.copy(
+				msgPart.activities.add(0, activity.copy(
 					aid = aid,
 					pic = serverPic,
 					pics = serverPics
@@ -77,15 +77,15 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	override fun SubContent(device: Device) {
-		ActivityInfoLayout(
-			cropDialog = cropDialog,
-			input = input,
-			onPicAdd = { input.pic = it.toString() },
-			onPicDelete = { input.pic = null },
-			onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
-			onPicsDelete = { input.pics.removeAt(it) },
-			onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
-		)
+        ActivityInfoLayout(
+            cropDialog = cropDialog,
+            input = input,
+            onPicAdd = { input.pic = it.toString() },
+            onPicDelete = { input.pic = null },
+            onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
+            onPicsDelete = { input.pics.removeAt(it) },
+            onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
+        )
 	}
 
 	private val cropDialog = FloatingDialogCrop()

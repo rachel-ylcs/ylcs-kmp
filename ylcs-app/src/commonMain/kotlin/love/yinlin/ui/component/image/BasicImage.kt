@@ -7,11 +7,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -226,6 +228,34 @@ fun ClickIcon(
 		.clip(MaterialTheme.shapes.extraSmall)
 		.clickable(onClick = onClick)
 )
+
+@Composable
+fun IconText(
+	icon: ImageVector,
+	text: String,
+	size: Dp = ThemeValue.Size.ExtraIcon,
+	shape: Shape = MaterialTheme.shapes.large,
+	onClick: () -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.clip(shape)
+			.clickable(onClick = onClick)
+			.padding(ThemeValue.Padding.EqualValue),
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+	) {
+		Image(
+			painter = rememberVectorPainter(icon),
+			contentDescription = null,
+			modifier = Modifier.size(size)
+		)
+		Text(
+			text = text,
+			style = MaterialTheme.typography.labelMedium
+		)
+	}
+}
 
 @Composable
 fun MiniImage(

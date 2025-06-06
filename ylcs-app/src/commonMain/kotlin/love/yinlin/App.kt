@@ -76,12 +76,12 @@ class AppModel(
 ) : ViewModel() {
 	val deeplink = DeepLink(this)
 
-	val worldPart = ScreenPartWorld(this)
 	val msgPart = ScreenPartMsg(this)
+	val worldPart = ScreenPartWorld(this)
 	val musicPart = ScreenPartMusic(this)
 	val discoveryPart = ScreenPartDiscovery(this)
 	val mePart = ScreenPartMe(this)
-	val parts = arrayOf(worldPart, msgPart, musicPart, discoveryPart, mePart)
+	val parts = arrayOf(msgPart, worldPart, musicPart, discoveryPart, mePart)
 
 	val slot = SubScreenSlot(viewModelScope)
 

@@ -633,6 +633,557 @@ object ExtraIcons {
         }.build()
     }
 
+    val Weibo: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "Weibo",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Colors.from(0xFFE71F19)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(851.4f, 590.2f)
+            curveToRelative(-22.2f, -66.2f, -90.4f, -90.4f, -105.9f, -91.9f)
+            curveToRelative(-15.5f, -1.4f, -29.6f, -9.9f, -19.3f, -27.5f)
+            curveToRelative(10.3f, -17.6f, 29.3f, -68.7f, -7.2f, -104.7f)
+            curveToRelative(-36.6f, -36.1f, -116.5f, -22.5f, -173.1f, 0.9f)
+            curveToRelative(-56.4f, 23.3f, -53.4f, 7.1f, -51.7f, -8.9f)
+            curveToRelative(1.9f, -16.8f, 32.4f, -111.0f, -60.8f, -122.4f)
+            curveTo(311.4f, 220.9f, 154.9f, 370.8f, 99.6f, 457.1f)
+            curveTo(16.0f, 587.6f, 29.2f, 675.9f, 29.2f, 675.9f)
+            horizontalLineToRelative(0.6f)
+            curveToRelative(10.0f, 121.8f, 190.8f, 218.9f, 412.3f, 218.9f)
+            curveToRelative(190.5f, 0.0f, 351.0f, -71.9f, 398.4f, -169.5f)
+            curveToRelative(0.0f, 0.0f, 0.1f, -0.4f, 0.6f, -1.2f)
+            curveToRelative(4.9f, -10.5f, 8.7f, -21.2f, 11.0f, -32.3f)
+            curveToRelative(6.7f, -26.2f, 11.8f, -64.2f, -0.7f, -101.7f)
+            close()
+            moveTo(414.7f, 841.5f)
+            curveToRelative(-157.7f, 0.0f, -285.7f, -84.1f, -285.7f, -187.8f)
+            curveToRelative(0.0f, -103.7f, 127.8f, -187.8f, 285.7f, -187.8f)
+            curveToRelative(157.7f, 0.0f, 285.7f, 84.1f, 285.7f, 187.8f)
+            curveToRelative(0.0f, 103.8f, -128.0f, 187.8f, -285.7f, 187.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFF5AA15)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(803.1f, 425.3f)
+            curveToRelative(2.9f, 1.3f, 5.9f, 1.9f, 9.0f, 1.9f)
+            curveToRelative(9.0f, 0.0f, 17.7f, -5.3f, 21.3f, -14.1f)
+            curveToRelative(5.9f, -14.0f, 9.0f, -28.8f, 9.0f, -44.2f)
+            curveToRelative(0.0f, -62.5f, -51.2f, -113.3f, -114.2f, -113.3f)
+            curveToRelative(-15.4f, 0.0f, -30.3f, 3.0f, -44.4f, 8.9f)
+            curveToRelative(-11.8f, 4.9f, -17.3f, 18.4f, -12.3f, 30.2f)
+            curveToRelative(4.9f, 11.7f, 18.6f, 17.1f, 30.5f, 12.2f)
+            curveToRelative(8.4f, -3.5f, 17.3f, -5.3f, 26.4f, -5.3f)
+            curveToRelative(37.4f, 0.0f, 67.8f, 30.2f, 67.8f, 67.2f)
+            curveToRelative(0.0f, 9.1f, -1.7f, 17.9f, -5.4f, 26.2f)
+            arcToRelative(22.8f, 22.8f, 0.0f, false, false, 12.3f, 30.2f)
+            lineToRelative(0.0f, 0.0f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFF5AA15)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(726.9f, 114.2f)
+            curveToRelative(-26.0f, 0.0f, -51.7f, 3.7f, -76.3f, 10.9f)
+            curveToRelative(-18.4f, 5.5f, -28.9f, 24.6f, -23.5f, 42.9f)
+            curveToRelative(5.5f, 18.3f, 24.8f, 28.7f, 43.2f, 23.3f)
+            arcToRelative(201.9f, 201.9f, 0.0f, false, true, 56.6f, -8.1f)
+            curveToRelative(109.3f, 0.0f, 198.2f, 88.3f, 198.2f, 196.7f)
+            curveToRelative(0.0f, 19.4f, -2.9f, 38.7f, -8.4f, 57.2f)
+            curveToRelative(-5.5f, 18.3f, 4.8f, 37.6f, 23.2f, 43.1f)
+            curveToRelative(3.3f, 1.0f, 6.8f, 1.4f, 10.2f, 1.4f)
+            curveToRelative(14.9f, 0.0f, 28.7f, -9.6f, 33.4f, -24.5f)
+            curveToRelative(7.5f, -24.9f, 11.5f, -50.8f, 11.5f, -77.2f)
+            curveToRelative(-0.1f, -146.6f, -120.3f, -265.8f, -268.0f, -265.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF040000)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(388.3f, 534.5f)
+            curveToRelative(-84.2f, 0.0f, -152.3f, 59.2f, -152.3f, 132.3f)
+            curveToRelative(0.0f, 73.1f, 68.2f, 132.3f, 152.3f, 132.3f)
+            curveToRelative(84.1f, 0.0f, 152.3f, -59.2f, 152.3f, -132.3f)
+            curveToRelative(0.0f, -73.2f, -68.2f, -132.3f, -152.3f, -132.3f)
+            close()
+            moveTo(338.5f, 752.8f)
+            curveToRelative(-29.5f, 0.0f, -53.4f, -23.8f, -53.4f, -53.0f)
+            curveToRelative(0.0f, -29.2f, 23.9f, -53.0f, 53.4f, -53.0f)
+            curveToRelative(29.5f, 0.0f, 53.4f, 23.8f, 53.4f, 53.0f)
+            curveToRelative(0.0f, 29.2f, -23.9f, 53.0f, -53.4f, 53.0f)
+            close()
+            moveTo(438.4f, 657.3f)
+            curveToRelative(-6.4f, 11.1f, -19.3f, 15.7f, -28.7f, 10.2f)
+            curveToRelative(-9.4f, -5.3f, -11.8f, -18.7f, -5.4f, -29.8f)
+            curveToRelative(6.4f, -11.1f, 19.3f, -15.7f, 28.7f, -10.2f)
+            curveToRelative(9.4f, 5.5f, 11.8f, 18.9f, 5.4f, 29.8f)
+            close()
+        }.build()
+    }
+
+    val Chaohua: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "Chaohua",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Colors.from(0xFF1296db)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(275.0f, 170.5f)
+            arcTo(32.0f, 32.0f, 0.0f, false, true, 298.7f, 160.0f)
+            horizontalLineToRelative(426.7f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, 23.7f, 10.5f)
+            lineToRelative(213.3f, 234.7f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -1.6f, 44.8f)
+            lineToRelative(-426.7f, 405.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -44.1f, -46.4f)
+            lineToRelative(404.0f, -383.7f)
+            lineToRelative(-182.7f, -201.0f)
+            lineTo(312.8f, 224.0f)
+            lineTo(130.3f, 424.7f)
+            lineTo(384.0f, 660.3f)
+            lineToRelative(64.5f, -59.9f)
+            lineTo(297.4f, 449.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -3.0f, -41.8f)
+            lineToRelative(64.0f, -85.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, 25.6f, -12.8f)
+            horizontalLineToRelative(234.7f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, 25.6f, 12.8f)
+            lineToRelative(64.0f, 85.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -3.8f, 42.7f)
+            lineToRelative(-298.7f, 277.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -43.5f, 0.0f)
+            lineToRelative(-298.7f, -277.3f)
+            arcToRelative(32.0f, 32.0f, 0.0f, false, true, -1.9f, -45.0f)
+            lineToRelative(213.3f, -234.7f)
+            close()
+            moveTo(495.4f, 556.8f)
+            lineToRelative(144.3f, -134.0f)
+            lineToRelative(-37.1f, -49.5f)
+            horizontalLineToRelative(-202.7f)
+            lineTo(362.2f, 423.7f)
+            lineToRelative(133.2f, 133.2f)
+            close()
+        }.build()
+    }
+
+    val Pictures: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "Pictures",
+            defaultWidth = 200.0.dp,
+            defaultHeight = 200.0.dp,
+            viewportWidth = 1024.0f,
+            viewportHeight = 1024.0f
+        ).path(
+            fill = SolidColor(Colors.from(0xFF96F5FF)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(125.2f, 288.0f)
+            curveToRelative(0.8f, 1.4f, 1.5f, 2.8f, 2.3f, 4.1f)
+            lineTo(270.1f, 530.6f)
+            lineToRelative(122.0f, -211.3f)
+            lineToRelative(135.7f, -241.9f)
+            lineToRelative(-5.0f, -5.0f)
+            curveToRelative(-2.9f, -0.1f, -5.8f, -0.1f, -8.7f, -0.1f)
+            curveToRelative(-164.0f, 0.0f, -307.9f, 86.2f, -388.9f, 215.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(270.1f, 547.1f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.2f, -8.0f)
+            lineTo(113.3f, 300.6f)
+            arcToRelative(93.5f, 93.5f, 0.0f, false, true, -1.9f, -3.3f)
+            lineToRelative(-0.7f, -1.3f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 0.4f, -16.8f)
+            curveTo(198.6f, 139.3f, 349.2f, 55.7f, 514.1f, 55.7f)
+            curveToRelative(3.0f, 0.0f, 6.0f, 0.1f, 9.0f, 0.1f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 11.4f, 4.8f)
+            lineToRelative(5.0f, 5.0f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 2.7f, 19.8f)
+            lineTo(406.5f, 327.4f)
+            lineTo(284.4f, 538.8f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.2f, 8.3f)
+            horizontalLineToRelative(-0.1f)
+            close()
+            moveTo(144.5f, 288.4f)
+            lineToRelative(125.4f, 209.5f)
+            lineToRelative(107.9f, -186.9f)
+            lineToRelative(124.6f, -222.1f)
+            curveToRelative(-145.5f, 3.8f, -277.9f, 77.5f, -357.9f, 199.5f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFBFFFCE)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(920.9f, 319.3f)
+            curveToRelative(-72.7f, -139.6f, -215.0f, -237.1f, -381.0f, -246.3f)
+            lineToRelative(-12.1f, 4.4f)
+            lineToRelative(-135.7f, 241.9f)
+            horizontalLineToRelative(528.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(920.9f, 335.8f)
+            lineTo(392.1f, 335.8f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.4f, -24.6f)
+            lineToRelative(135.7f, -241.9f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 8.8f, -7.4f)
+            lineToRelative(12.1f, -4.4f)
+            arcToRelative(16.2f, 16.2f, 0.0f, false, true, 6.6f, -1.0f)
+            curveToRelative(166.4f, 9.3f, 317.6f, 107.0f, 394.7f, 255.2f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.6f, 24.1f)
+            close()
+            moveTo(420.3f, 302.8f)
+            horizontalLineToRelative(472.4f)
+            curveToRelative(-74.4f, -123.3f, -206.1f, -204.0f, -350.3f, -213.1f)
+            lineToRelative(-3.2f, 1.2f)
+            lineToRelative(-118.9f, 212.0f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFFEFF73)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(636.0f, 319.3f)
+            lineToRelative(122.0f, 211.3f)
+            lineToRelative(143.6f, 244.8f)
+            horizontalLineToRelative(4.1f)
+            curveToRelative(44.8f, -70.8f, 70.8f, -154.8f, 70.8f, -244.8f)
+            curveToRelative(0.0f, -76.5f, -18.8f, -148.6f, -51.9f, -212.1f)
+            lineToRelative(-3.7f, 0.8f)
+            horizontalLineToRelative(-284.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(905.7f, 791.9f)
+            horizontalLineToRelative(-4.1f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.2f, -8.2f)
+            lineToRelative(-143.6f, -244.8f)
+            lineToRelative(-122.0f, -211.4f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 14.3f, -24.8f)
+            horizontalLineToRelative(283.1f)
+            lineToRelative(2.0f, -0.4f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 18.1f, 8.5f)
+            curveToRelative(35.2f, 67.3f, 53.8f, 143.3f, 53.8f, 219.7f)
+            curveToRelative(0.0f, 90.1f, -25.4f, 177.8f, -73.4f, 253.6f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.0f, 7.7f)
+            close()
+            moveTo(664.6f, 335.8f)
+            lineToRelative(107.7f, 186.5f)
+            lineToRelative(131.4f, 224.1f)
+            curveToRelative(36.9f, -65.7f, 56.3f, -139.9f, 56.3f, -215.8f)
+            curveToRelative(0.0f, -67.5f, -15.6f, -134.6f, -45.2f, -194.8f)
+            horizontalLineToRelative(-250.2f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFFFCC5E)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(901.6f, 775.4f)
+            lineToRelative(-143.6f, -244.8f)
+            lineToRelative(-122.0f, 211.3f)
+            lineToRelative(-147.6f, 246.1f)
+            curveToRelative(9.8f, 0.6f, 19.8f, 1.0f, 29.8f, 1.0f)
+            curveToRelative(160.8f, 0.0f, 302.3f, -82.9f, 384.1f, -208.2f)
+            lineToRelative(-0.7f, -5.3f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(518.2f, 1005.4f)
+            curveToRelative(-9.9f, 0.0f, -20.2f, -0.3f, -30.8f, -1.0f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -13.1f, -25.0f)
+            lineToRelative(147.6f, -246.1f)
+            lineToRelative(121.8f, -211.0f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 28.5f, -0.1f)
+            lineToRelative(143.6f, 244.8f)
+            curveToRelative(1.1f, 1.9f, 1.8f, 4.0f, 2.1f, 6.2f)
+            lineToRelative(0.7f, 5.3f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -2.5f, 11.2f)
+            curveTo(828.0f, 924.8f, 679.2f, 1005.4f, 518.2f, 1005.4f)
+            close()
+            moveTo(517.0f, 972.4f)
+            horizontalLineToRelative(1.2f)
+            curveToRelative(147.2f, 0.0f, 283.4f, -72.4f, 365.9f, -194.2f)
+            lineToRelative(-126.0f, -214.8f)
+            lineToRelative(-107.8f, 186.7f)
+            lineToRelative(-133.3f, 222.3f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFFF9EAF)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(636.0f, 741.9f)
+            horizontalLineTo(111.4f)
+            curveToRelative(72.1f, 138.5f, 212.8f, 235.5f, 377.0f, 246.1f)
+            lineToRelative(147.6f, -246.1f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(488.4f, 1004.4f)
+            curveToRelative(-0.4f, 0.0f, -0.7f, -0.0f, -1.1f, -0.0f)
+            curveToRelative(-164.6f, -10.6f, -314.3f, -108.2f, -390.6f, -254.9f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 14.6f, -24.1f)
+            horizontalLineToRelative(524.6f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 14.2f, 25.0f)
+            lineToRelative(-147.6f, 246.1f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.2f, 8.0f)
+            close()
+            moveTo(139.6f, 758.4f)
+            curveToRelative(72.6f, 120.2f, 199.9f, 200.1f, 339.9f, 212.3f)
+            lineToRelative(127.4f, -212.3f)
+            lineTo(139.6f, 758.4f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFFEABDFF)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(127.5f, 292.2f)
+            horizontalLineToRelative(-4.9f)
+            curveTo(80.2f, 361.6f, 55.7f, 443.3f, 55.7f, 530.6f)
+            curveToRelative(0.0f, 76.2f, 18.6f, 148.0f, 51.5f, 211.3f)
+            horizontalLineToRelative(284.8f)
+            lineTo(127.5f, 292.2f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(392.1f, 758.4f)
+            lineTo(107.3f, 758.4f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.6f, -8.9f)
+            curveTo(57.7f, 682.4f, 39.2f, 606.7f, 39.2f, 530.6f)
+            curveToRelative(0.0f, -87.4f, 23.9f, -172.8f, 69.2f, -247.0f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 14.1f, -7.9f)
+            horizontalLineToRelative(4.9f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, 14.2f, 8.1f)
+            lineToRelative(264.6f, 449.7f)
+            arcToRelative(16.5f, 16.5f, 0.0f, false, true, -14.2f, 24.9f)
+            close()
+            moveTo(117.4f, 725.3f)
+            horizontalLineToRelative(245.8f)
+            lineTo(125.2f, 320.8f)
+            curveTo(90.5f, 385.0f, 72.3f, 457.0f, 72.3f, 530.6f)
+            curveToRelative(0.0f, 68.5f, 15.2f, 133.9f, 45.2f, 194.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(767.7f, 161.5f)
+            curveTo(867.2f, 240.5f, 931.1f, 362.6f, 931.1f, 499.6f)
+            curveToRelative(0.0f, 238.3f, -193.2f, 431.5f, -431.5f, 431.5f)
+            curveToRelative(-216.2f, 0.0f, -395.2f, -159.0f, -426.6f, -366.4f)
+            curveTo(86.4f, 801.2f, 282.4f, 988.9f, 522.3f, 988.9f)
+            curveToRelative(248.6f, 0.0f, 450.1f, -201.5f, 450.1f, -450.1f)
+            curveToRelative(0.0f, -158.1f, -81.5f, -297.1f, -204.7f, -377.3f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(115.1f, 300.4f)
+            lineTo(307.6f, 693.0f)
+            horizontalLineTo(99.4f)
+            lineToRelative(7.9f, 48.9f)
+            horizontalLineToRelative(284.8f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(453.6f, 928.6f)
+            lineToRelative(159.5f, -186.8f)
+            lineToRelative(-90.3f, 188.6f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(662.7f, 332.4f)
+            lineToRelative(237.9f, 326.9f)
+            lineToRelative(-23.1f, 48.7f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(418.1f, 272.9f)
+            horizontalLineToRelative(448.7f)
+            lineToRelative(25.0f, 46.4f)
+            horizontalLineTo(392.1f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(244.3f, 483.8f)
+            lineToRelative(236.1f, -410.3f)
+            lineToRelative(42.3f, -1.1f)
+            lineToRelative(-258.8f, 465.2f)
+            close()
+        }.path(
+            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            stroke = null,
+            fillAlpha = 0.15f,
+            strokeAlpha = 0.15f,
+            strokeLineWidth = 0.0f,
+            strokeLineCap = StrokeCap.Butt,
+            strokeLineJoin = StrokeJoin.Miter,
+            strokeLineMiter = 4.0f,
+            pathFillType = PathFillType.NonZero
+        ) {
+            moveTo(739.7f, 562.4f)
+            lineToRelative(96.3f, 207.5f)
+            lineToRelative(23.5f, -32.1f)
+            lineToRelative(-101.4f, -207.3f)
+            close()
+        }.build()
+    }
+
     val OrderMode: ImageVector by lazy {
         ImageVector.Builder(
             name = "OrderMode",

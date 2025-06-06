@@ -48,8 +48,8 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 		launch { snapshotFlow(state).collectLatest(action) }
 	}
 
-	val worldPart = model.worldPart
 	val msgPart = model.msgPart
+	val worldPart = model.worldPart
 	val musicPart = model.musicPart
 	val discoveryPart = model.discoveryPart
 	val mePart = model.mePart

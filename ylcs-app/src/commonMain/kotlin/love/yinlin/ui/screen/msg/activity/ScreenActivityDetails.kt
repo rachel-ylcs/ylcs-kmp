@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world
+package love.yinlin.ui.screen.msg.activity
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -93,7 +93,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 	data class Args(val aid: Int)
 
 	private val activity: Activity? by derivedStateOf {
-		worldPart.activities.find { it.aid == args.aid }
+		msgPart.activities.find { it.aid == args.aid }
 	}
 
 	private fun onPicClick(pics: List<Picture>, index: Int) {
@@ -109,7 +109,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 			)
 		)
 		if (result is Data.Success) {
-			worldPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
+			msgPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
 			pop()
 		}
 		else if (result is Data.Error) slot.tip.error(result.message)

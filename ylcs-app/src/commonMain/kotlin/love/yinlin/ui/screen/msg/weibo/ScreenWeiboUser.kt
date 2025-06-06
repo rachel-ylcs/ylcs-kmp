@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,6 +27,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
+import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
@@ -154,7 +156,9 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	@Serializable
 	data class Args(val id: String)
 
-	private val grid = WeiboGridData()
+	private var state by mutableStateOf(BoxState.EMPTY)
+	private var items by mutableStateOf(emptyList<Weibo>())
+	private val listState = LazyStaggeredGridState()
 	private var user: WeiboUser? by mutableStateOf(null)
 	private var albums: List<WeiboAlbum>? by mutableStateOf(null)
 
@@ -173,8 +177,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	@Composable
 	private fun Portrait(
 		user: WeiboUser,
-		albums: List<WeiboAlbum>?,
-		grid: WeiboGridData
+		albums: List<WeiboAlbum>?
 	) {
 		LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			item(key = ItemKey("UserInfoCard")) {
@@ -215,7 +218,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 				)
 			}
 			items(
-				items = grid.items,
+				items = items,
 				key = { it.id }
 			) { weibo ->
 				WeiboCard(
@@ -229,8 +232,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	@Composable
 	private fun Landscape(
 		user: WeiboUser,
-		albums: List<WeiboAlbum>?,
-		grid: WeiboGridData
+		albums: List<WeiboAlbum>?
 	) {
 		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			Surface(
@@ -282,13 +284,13 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 				shadowElevation = ThemeValue.Shadow.Surface
 			) {
 				StatefulBox(
-					state = grid.state,
+					state = state,
 					modifier = Modifier.fillMaxSize()
 				) {
 					WeiboGrid(
-						state = rememberLazyStaggeredGridState(),
+						state = listState,
 						modifier = Modifier.fillMaxSize(),
-						items = grid.items
+						items = items
 					)
 				}
 			}
@@ -299,8 +301,15 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		launch {
 			val data = WeiboAPI.getWeiboUser(args.id)
 			user = if (data is Data.Success) data.data else null
-			user?.let {
-				grid.requestWeibo(listOf(it.info.id))
+			user?.info?.id?.let { id ->
+				if (state != BoxState.LOADING) {
+					state = BoxState.LOADING
+					val newItems = mutableMapOf<String, Weibo>()
+					val result = WeiboAPI.getUserWeibo(id)
+					if (result is Data.Success) newItems += result.data.associateBy { it.id }
+					items = newItems.map { it.value }.sortedDescending()
+					state = if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
+				}
 			}
 		}
 		launch {
@@ -316,8 +325,8 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			user?.let {
 				when (device.type) {
-					Device.Type.PORTRAIT -> Portrait(user = it, albums = albums, grid = grid)
-					Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(user = it, albums = albums, grid = grid)
+					Device.Type.PORTRAIT -> Portrait(user = it, albums = albums)
+					Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(user = it, albums = albums)
 				}
 			} ?: LoadingBox()
 		}

@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world
+package love.yinlin.ui.screen.msg.activity
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
@@ -29,7 +29,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 	@Serializable
 	data class Args(val aid: Int)
 
-	private val activities = worldPart.activities
+	private val activities = msgPart.activities
 	private val input = ActivityInputState(activities.find { it.aid == args.aid })
 
 	private suspend fun modifyActivity() {
@@ -206,15 +206,15 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 
 	@Composable
 	override fun SubContent(device: Device) {
-		ActivityInfoLayout(
-			cropDialog = cropDialog,
-			input = input,
-			onPicAdd = { launch { modifyPicture(it) } },
-			onPicDelete = { launch { deletePicture() } },
-			onPicsAdd = { launch { addPictures(it) } },
-			onPicsDelete = { launch { deletePictures(it) } },
-			onPicsClick = { _, index -> launch { modifyPictures(index) } }
-		)
+        ActivityInfoLayout(
+            cropDialog = cropDialog,
+            input = input,
+            onPicAdd = { launch { modifyPicture(it) } },
+            onPicDelete = { launch { deletePicture() } },
+            onPicsAdd = { launch { addPictures(it) } },
+            onPicsDelete = { launch { deletePictures(it) } },
+            onPicsClick = { _, index -> launch { modifyPictures(index) } }
+        )
 	}
 
 	private val cropDialog = FloatingDialogCrop()
