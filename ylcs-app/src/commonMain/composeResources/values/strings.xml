@@ -3,6 +3,8 @@
 
     <string name="app_name">银临茶舍</string>
 
+    <string name="app_website">https://yinlin.love</string>
+
     <string name="app_repository">https://github.com/rachel-ylcs/ylcs-kmp</string>
 
     <string name="app_description">集资讯、听歌、美图、论坛、社交于一体的小银子聚集地</string>

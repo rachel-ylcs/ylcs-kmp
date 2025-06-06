@@ -1,31 +1,17 @@
 package love.yinlin.ui.component.input
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
@@ -36,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberFalse
+import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 
 @Composable
@@ -226,6 +213,81 @@ fun LoadingButton(
 			color = LocalContentColor.current
 		)
 	}
+}
+
+@Composable
+private fun ContainerButton(
+	text: String,
+	icon: ImageVector?,
+	contentColor: Color,
+	backgroundColor: Color,
+	onClick: () -> Unit
+) {
+	Row(
+		modifier = Modifier.clip(MaterialTheme.shapes.large)
+			.background(color = backgroundColor)
+			.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		icon?.let {
+			MiniIcon(
+				icon = it,
+				color = contentColor
+			)
+		}
+		Text(
+			text = text,
+			color = contentColor,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis
+		)
+	}
+}
+
+@Composable
+fun PrimaryButton(
+	text: String,
+	icon: ImageVector? = null,
+	onClick: () -> Unit
+) {
+	ContainerButton(
+		text = text,
+		icon = icon,
+		contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+		onClick = onClick
+	)
+}
+
+@Composable
+fun SecondaryButton(
+	text: String,
+	icon: ImageVector? = null,
+	onClick: () -> Unit
+) {
+	ContainerButton(
+		text = text,
+		icon = icon,
+		contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+		onClick = onClick
+	)
+}
+
+@Composable
+fun TertiaryButton(
+	text: String,
+	icon: ImageVector? = null,
+	onClick: () -> Unit
+) {
+	ContainerButton(
+		text = text,
+		icon = icon,
+		contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+		onClick = onClick
+	)
 }
 
 @Composable

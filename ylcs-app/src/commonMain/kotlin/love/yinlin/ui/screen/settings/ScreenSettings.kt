@@ -43,7 +43,9 @@ import love.yinlin.platform.*
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.*
 import love.yinlin.ui.component.input.LoadingRachelButton
+import love.yinlin.ui.component.input.SecondaryButton
 import love.yinlin.ui.component.input.SingleSelector
+import love.yinlin.ui.component.input.TertiaryButton
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -544,7 +546,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	@Composable
 	private fun Landscape(userProfile: UserProfile?) {
 		LazyVerticalStaggeredGrid(
-			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+			columns = StaggeredGridCells.Adaptive(ThemeValue.Size.PanelWidth),
 			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
 		) {
 			item(key = ItemKey("AccountSettings")) {
@@ -684,25 +686,27 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					MiniIcon(icon = Icons.Outlined.Dns)
 				}
 				Row(
-					modifier = Modifier.clip(MaterialTheme.shapes.large)
-						.background(MaterialTheme.colorScheme.tertiaryContainer)
-						.clickable {
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceEvenly,
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					SecondaryButton(
+						text = "银临茶舍官网",
+						icon = ExtraIcons.Github,
+						onClick = {
+							launch {
+								OS.Net.openUrl(getString(Res.string.app_website))
+							}
+						}
+					)
+					TertiaryButton(
+						text = "Github开源",
+						icon = ExtraIcons.Github,
+						onClick = {
 							launch {
 								OS.Net.openUrl(getString(Res.string.app_repository))
 							}
-						}.padding(ThemeValue.Padding.Value),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					MiniIcon(
-						icon = ExtraIcons.Github,
-						color = MaterialTheme.colorScheme.onTertiaryContainer
-					)
-					Text(
-						text = "Github ylcs-kmp",
-						color = MaterialTheme.colorScheme.onTertiaryContainer,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						}
 					)
 				}
 				Space()
