@@ -2,9 +2,11 @@ package love.yinlin.data.rachel.profile
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.api.ServerRes
 import love.yinlin.data.rachel.follows.FollowStatus
+import love.yinlin.extension.makeObject
 
 @Stable
 @Serializable
@@ -21,7 +23,7 @@ data class UserProfile(
 	// signin: Binary [签到记录]
 	val follows: Int = 0, // [关注数]
 	val followers: Int = 0, // [粉丝数]
-	val mailNotificationCount: Int = 0, // [未读邮件数]
+	val notification: UserNotification = UserNotification(), // [消息提醒]
 ) {
 	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
 

@@ -176,7 +176,13 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			shape = shape,
 			title = "个人空间"
 		) {
-			Item("签到", Icons.Filled.EventAvailable) {
+			val notification = app.config.userProfile?.notification
+
+			Item(
+				text = "签到",
+				icon = Icons.Filled.EventAvailable,
+				label = if (notification?.isSignin == false) 1 else 0
+			) {
 				app.config.userProfile?.let {
 					signinSheet.open(it)
 				} ?: slot.tip.warning("请先登录")
@@ -189,7 +195,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			Item(
 				text = "邮箱",
 				icon = Icons.Filled.Mail,
-				label = app.config.userProfile?.mailNotificationCount ?: 0
+				label = notification?.mailCount ?: 0
 			) {
 				app.config.userProfile?.let {
 					navigate<ScreenMail>()
@@ -446,7 +452,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 					todayIndex = index
 					signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
 				}
-				if (!todaySignin) app.config.userProfile = args.copy(coin = args.coin + 1)
+				if (!todaySignin) app.config.userProfile = args.copy(
+					coin = args.coin + 1,
+					notification = args.notification.copy(isSignin = true)
+				)
 			}
 		}
 

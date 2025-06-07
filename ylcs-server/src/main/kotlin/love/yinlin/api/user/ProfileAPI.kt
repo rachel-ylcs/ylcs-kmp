@@ -1,6 +1,8 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
@@ -13,28 +15,54 @@ import love.yinlin.currentTS
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.data.rachel.profile.UserNotification
+import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.JsonConverter
+import love.yinlin.extension.Object
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> R): R {
+	val currentDate = LocalDate.now()
+	val firstDayOfYear = LocalDate.of(currentDate.year, 1, 1)
+	val dayIndex = ChronoUnit.DAYS.between(firstDayOfYear, currentDate).toInt()
+	val byteIndex = dayIndex / 8
+	val bitIndex = dayIndex % 8
+	val byteValue = this[byteIndex].toInt()
+	val isSignin = ((byteValue shr bitIndex) and 1) == 1
+	return block(isSignin, byteValue, byteIndex, bitIndex)
+}
+
 fun Routing.profileAPI(implMap: ImplMap) {
 	api(API.User.Profile.GetProfile) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
             SELECT
-				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.follows, u1.followers, u2.name AS inviterName,
-				(SELECT COUNT(*) FROM mail WHERE processed = 0 AND uid = ?) AS mailNotificationCount
+				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.signin, u1.follows, u1.followers, u2.name AS inviterName,
+				JSON_OBJECT(
+					'mailCount', (SELECT COUNT(*) FROM mail WHERE processed = 0 AND uid = ?)
+				) AS notification
             FROM user AS u1
             LEFT JOIN user AS u2
             ON u1.inviter = u2.uid
             WHERE u1.uid = ?
         """, uid, uid)
+		// 处理提醒
+		val signin = user["signin"]!!.to(JsonConverter.ByteArray)
+		var profile = user.to<UserProfile>()
+		signin.checkSignin { isSignin, _, _, _ ->
+			profile = profile.copy(
+				notification = profile.notification.copy(
+					isSignin = isSignin
+				)
+			)
+		}
 		// 更新最后上线时间
 		DB.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", currentTS, uid)
-		Data.Success(user.to())
+		Data.Success(profile)
 	}
 
 	api(API.User.Profile.GetPublicProfile) { (token, uid2) ->
@@ -106,19 +134,13 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		val user = DB.throwGetUser(uid, "signin")
 		// 查询是否签到 ... 签到记录46字节(368位)
 		val signin = user["signin"]!!.to(JsonConverter.ByteArray)
-		val currentDate = LocalDate.now()
-		val firstDayOfYear = LocalDate.of(currentDate.year, 1, 1)
-		val dayIndex = ChronoUnit.DAYS.between(firstDayOfYear, currentDate).toInt()
-		val byteIndex = dayIndex / 8
-		val bitIndex = dayIndex % 8
-		var byteValue = signin[byteIndex].toInt()
-		val isSignin = ((byteValue shr bitIndex) and 1) == 1
-		if (!isSignin) {
-			// 更新签到值，银币增加
-			byteValue = byteValue or (1 shl bitIndex)
-			signin[byteIndex] = byteValue.toByte()
-			DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
+		signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
+			if (!isSignin) {
+				// 更新签到值，银币增加
+				signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
+				DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
+			}
+			Data.Success(API.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
 		}
-		Data.Success(API.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
 	}
 }
