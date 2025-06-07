@@ -53,8 +53,12 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(emptyList())
     }
 
-    api(API.User.Game.GetUserGameRecords) { (token, gid, isCompleted, num) ->
+    api(API.User.Game.GetUserGameRecords) { (token, rid, num) ->
         Data.Success(emptyList())
+    }
+
+    api(API.User.Game.GetGameRecordDetails) { (token, rid) ->
+        Data.Error()
     }
 
     api(API.User.Game.StartGame) { (token, gid, answer) ->

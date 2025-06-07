@@ -9,6 +9,7 @@ import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.data.rachel.game.CreateGameObject
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
+import love.yinlin.data.rachel.game.GameRecordDetails
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
@@ -170,7 +171,12 @@ object API : APINode(null, "") {
 
 			object GetUserGameRecords : APIPost<GetUserGameRecords.Request, List<GameRecord>>(this, "getUserGameRecords") {
 				@Serializable
-				data class Request(val token: String, val gid: Int, val isCompleted: Boolean = false, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val token: String, val rid: Long, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object GetGameRecordDetails : APIPost<GetGameRecordDetails.Request, GameRecordDetails>(this, "getGameRecordDetails") {
+				@Serializable
+				data class Request(val token: String, val rid: Long)
 			}
 
 			object StartGame : APIPost<StartGame.Request, JsonElement>(this, "startGame") {
