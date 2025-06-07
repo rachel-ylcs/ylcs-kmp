@@ -190,6 +190,10 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun SubContent(device: Device) {
+        LaunchedEffect(stack.size) {
+            listState.scrollToItem(0)
+        }
+
         StatefulBox(
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
