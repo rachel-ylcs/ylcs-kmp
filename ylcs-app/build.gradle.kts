@@ -142,7 +142,6 @@ kotlin {
                 implementation(libs.runtime.shapes)
                 implementation(libs.runtime.navigation)
                 implementation(libs.runtime.savedstate)
-                implementation(libs.runtime.window)
                 implementation(libs.runtime.viewmodel)
                 implementation(libs.runtime.lifecycle)
 

@@ -59,7 +59,6 @@ kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", ve
 runtime-shapes = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha08" }
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-beta02" }
 runtime-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.3.0" }
-runtime-window = { module = "org.jetbrains.androidx.window:window-core", version = "1.4.0-alpha07" }
 runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
