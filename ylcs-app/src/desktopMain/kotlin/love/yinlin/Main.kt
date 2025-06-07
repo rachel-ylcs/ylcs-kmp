@@ -92,7 +92,7 @@ fun main() {
         )
 
         Window(
-            onCloseRequest = {},
+            onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.img_logo),
             undecorated = true,
