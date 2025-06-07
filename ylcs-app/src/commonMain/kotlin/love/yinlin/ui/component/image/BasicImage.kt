@@ -279,6 +279,7 @@ fun MiniImage(
 fun MiniImage(
 	res: DrawableResource,
 	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier
 ) {
@@ -290,6 +291,7 @@ fun MiniImage(
 			painter = painterResource(res),
 			modifier = Modifier.matchParentSize(),
 			contentScale = contentScale,
+			alignment = alignment,
 			alpha = alpha,
 			contentDescription = null
 		)
@@ -300,6 +302,7 @@ fun MiniImage(
 fun MiniImage(
 	painter: Painter,
 	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier
 ) {
@@ -311,6 +314,7 @@ fun MiniImage(
 			painter = painter,
 			modifier = Modifier.matchParentSize(),
 			contentScale = contentScale,
+			alignment = alignment,
 			alpha = alpha,
 			contentDescription = null
 		)
@@ -321,12 +325,14 @@ fun MiniImage(
 fun ClickImage(
 	res: DrawableResource,
 	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) = MiniImage(
 	res = res,
 	contentScale = contentScale,
+	alignment = alignment,
 	alpha = alpha,
 	modifier = modifier.clickable(onClick = onClick)
 )

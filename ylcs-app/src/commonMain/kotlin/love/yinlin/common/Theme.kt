@@ -338,6 +338,21 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 40.dp
 			Device.Size.LARGE -> 44.dp
 		}
+		val MediumInput: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 44.dp
+			Device.Size.MEDIUM -> 50.dp
+			Device.Size.LARGE -> 56.dp
+		}
+		val LargeInput: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 56.dp
+			Device.Size.MEDIUM -> 64.dp
+			Device.Size.LARGE -> 72.dp
+		}
+		val ExtraInput: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 72.dp
+			Device.Size.MEDIUM -> 80.dp
+			Device.Size.LARGE -> 88.dp
+		}
 		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 40.dp
 			Device.Size.MEDIUM -> 44.dp
@@ -478,6 +493,12 @@ object ThemeValue {
 			Device.Type.PORTRAIT -> PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
 			else -> PaddingValues(top = HorizontalExtraSpace, bottom = HorizontalExtraSpace, end = HorizontalExtraSpace)
 		}
+		val CardSpace: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 32.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 48.dp
+		}
+		val CardValue: PaddingValues @Composable get() = PaddingValues(CardSpace)
 	}
 
 	@Stable
@@ -520,6 +541,11 @@ object ThemeValue {
 			Device.Size.SMALL -> 4.dp
 			Device.Size.MEDIUM -> 4.5.dp
 			Device.Size.LARGE -> 5.dp
+		}
+		val Card: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 15.dp
+			Device.Size.LARGE -> 20.dp
 		}
 		val Tonal: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 1.dp
