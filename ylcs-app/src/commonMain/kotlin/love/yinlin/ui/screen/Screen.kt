@@ -17,6 +17,7 @@ import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
 import love.yinlin.ui.screen.music.loader.ScreenPlatformMusic
 import love.yinlin.ui.screen.settings.*
+import love.yinlin.ui.screen.world.game.*
 
 fun ScreenRouteScope.screens() {
     // 主页
@@ -46,6 +47,22 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenActivityLink)
 
     // 世界
+    screen(::ScreenGame1Hall)
+    screen(::ScreenGame1Creating)
+    screen(::ScreenGame1Playing)
+    screen(::ScreenGame1Ranking)
+    screen(::ScreenGame2Hall)
+    screen(::ScreenGame2Creating)
+    screen(::ScreenGame2Playing)
+    screen(::ScreenGame2Ranking)
+    screen(::ScreenGame3Hall)
+    screen(::ScreenGame3Creating)
+    screen(::ScreenGame3Playing)
+    screen(::ScreenGame3Ranking)
+    screen(::ScreenGame4Hall)
+    screen(::ScreenGame4Creating)
+    screen(::ScreenGame4Playing)
+    screen(::ScreenGame4Ranking)
 
 	// 设置
     screen(::ScreenSettings)

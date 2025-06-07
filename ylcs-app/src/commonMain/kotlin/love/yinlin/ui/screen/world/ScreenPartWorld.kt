@@ -33,60 +33,17 @@ import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.common.*
+import love.yinlin.data.rachel.game.Game
+import love.yinlin.data.rachel.game.GameType
 import love.yinlin.platform.app
-import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.screen.community.BoxText
-import org.jetbrains.compose.resources.DrawableResource
+import love.yinlin.ui.screen.world.game.*
 import kotlin.math.absoluteValue
-
-@Stable
-private enum class GameType(val title: String) {
-	RANK("排位"),
-	SPEED("竞速")
-}
-
-@Stable
-private enum class Game(
-	val title: String,
-	val imgX: DrawableResource,
-	val imgY: DrawableResource,
-	val description: String,
-	val type: GameType
-) {
-	AnswerQuestion(
-		title = "答题",
-		imgX = Res.drawable.game1x,
-		imgY = Res.drawable.game1y,
-		description = "简单易懂的答题, 支持选择、多选、填空类型, 内容自定义",
-		type = GameType.RANK
-	),
-	BlockText(
-		title = "网格填词",
-		imgX = Res.drawable.game2x,
-		imgY = Res.drawable.game2y,
-		description = "在方形网格中填写缺失的字使得横竖都能构成满足条件的诗词或歌词",
-		type = GameType.RANK
-	),
-	FlowersOrder(
-		title = "寻花令",
-		imgX = Res.drawable.game3x,
-		imgY = Res.drawable.game3y,
-		description = "在有限次数内猜测七言诗词中的某一句, 并根据上次内容与位置提示结果来修正最终答案直至完全猜对",
-		type = GameType.RANK
-	),
-	SearchAll(
-		title = "词寻",
-		imgX = Res.drawable.game4x,
-		imgY = Res.drawable.game4y,
-		description = "根据词库提示尽可能用最短的时间将所有满足条件的内容列出",
-		type = GameType.SPEED
-	)
-}
 
 @Composable
 private fun GameCard(
@@ -147,7 +104,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private val pagerState = PagerState { Game.entries.size }
 
 	private fun onGameClick(game: Game) {
-
+		when (game) {
+            Game.AnswerQuestion -> navigate<ScreenGame1Hall>()
+            Game.BlockText -> navigate<ScreenGame2Hall>()
+            Game.FlowersOrder -> navigate<ScreenGame3Hall>()
+            Game.SearchAll -> navigate<ScreenGame4Hall>()
+        }
 	}
 
 	@Composable
@@ -250,19 +212,27 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				horizontalArrangement = Arrangement.SpaceAround,
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				ColorfulIcon(
-					icon = colorfulImageVector(
-						icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-						color = MaterialTheme.colorScheme.onTertiaryContainer,
-						background = MaterialTheme.colorScheme.tertiaryContainer
-					),
-					size = ThemeValue.Size.ExtraIcon,
-					onClick = {
-						pagerState.requestScrollToPage((pagerState.currentPage - 1 + pagerState.pageCount) % pagerState.pageCount)
-					}
-				)
+				val currentPage = pagerState.currentPage
+				val game = Game.entries[currentPage]
 
-				val game = Game.entries[pagerState.currentPage]
+				Box(
+					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
+					contentAlignment = Alignment.Center
+				) {
+					if (currentPage > 0) {
+						ColorfulIcon(
+							icon = colorfulImageVector(
+								icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+								color = MaterialTheme.colorScheme.onTertiaryContainer,
+								background = MaterialTheme.colorScheme.tertiaryContainer
+							),
+							size = ThemeValue.Size.ExtraIcon,
+							onClick = {
+								pagerState.requestScrollToPage(currentPage - 1)
+							}
+						)
+					}
+				}
 
 				GameCard(
 					game = game,
@@ -281,17 +251,24 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					onClick = { onGameClick(game) }
 				)
 
-				ColorfulIcon(
-					icon = colorfulImageVector(
-						icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-						color = MaterialTheme.colorScheme.onTertiaryContainer,
-						background = MaterialTheme.colorScheme.tertiaryContainer
-					),
-					size = ThemeValue.Size.ExtraIcon,
-					onClick = {
-						pagerState.requestScrollToPage((pagerState.currentPage + 1) % pagerState.pageCount)
+				Box(
+					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
+					contentAlignment = Alignment.Center
+				) {
+					if (currentPage < pagerState.pageCount - 1) {
+						ColorfulIcon(
+							icon = colorfulImageVector(
+								icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+								color = MaterialTheme.colorScheme.onTertiaryContainer,
+								background = MaterialTheme.colorScheme.tertiaryContainer
+							),
+							size = ThemeValue.Size.ExtraIcon,
+							onClick = {
+								pagerState.requestScrollToPage(currentPage + 1)
+							}
+						)
 					}
-				)
+				}
 			}
 		}
 	}
