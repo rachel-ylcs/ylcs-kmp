@@ -6,15 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
@@ -29,16 +29,16 @@ private fun <T> TabBar(
 	modifier: Modifier = Modifier,
 	content: @Composable (Boolean, T) -> Unit,
 ) {
-	ScrollableTabRow(
+	PrimaryScrollableTabRow(
 		modifier = modifier,
 		selectedTabIndex = currentPage,
 		edgePadding = ThemeValue.Padding.ZeroSpace,
-		indicator = { tabPositions ->
-			if (currentPage < tabPositions.size) {
-				TabRowDefaults.SecondaryIndicator(
-					modifier = Modifier.tabIndicatorOffset(tabPositions[currentPage]),
-					height = ThemeValue.Size.Little,
-					color = MaterialTheme.colorScheme.primary
+		indicator = {
+			if (currentPage < items.size) {
+				TabRowDefaults.PrimaryIndicator(
+					Modifier.tabIndicatorOffset(currentPage, matchContentSize = false),
+					width = Dp.Unspecified,
+					height = ThemeValue.Size.Little
 				)
 			}
 		},
@@ -85,6 +85,7 @@ fun TabBar(
 		) {
 			MiniIcon(
 				icon = icon,
+				size = ThemeValue.Size.MicroIcon,
 				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
 			)
 			Text(
