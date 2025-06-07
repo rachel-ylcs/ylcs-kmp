@@ -33,7 +33,7 @@ data class UserProfile(
 
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)
 
-	val hasPrivilegeRes: Boolean get() = UserPrivilege.res(privilege)
+	val hasPrivilegeGame: Boolean get() = UserPrivilege.game(privilege)
 
 	val hasPrivilegeTopic: Boolean get() = UserPrivilege.topic(privilege)
 

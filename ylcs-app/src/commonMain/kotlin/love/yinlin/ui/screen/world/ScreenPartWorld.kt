@@ -35,6 +35,8 @@ import love.yinlin.ScreenPart
 import love.yinlin.common.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameType
+import love.yinlin.data.rachel.game.imgX
+import love.yinlin.data.rachel.game.imgY
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.ColorfulIcon

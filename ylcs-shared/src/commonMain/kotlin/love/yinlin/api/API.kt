@@ -1,10 +1,14 @@
 package love.yinlin.api
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
+import love.yinlin.data.rachel.game.CreateGameObject
+import love.yinlin.data.rachel.game.GameDetails
+import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
@@ -143,6 +147,35 @@ object API : APINode(null, "") {
 			object GetBlockedUsers : APIPost<GetBlockedUsers.Request, List<BlockedUserInfo>>(this, "getBlockedUsers") {
 				@Serializable
 				data class Request(val token: String, val fid: Long = 0L, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+		}
+
+		object Game : APINode(this, "game") {
+			object CreateGame : APIPost<CreateGameObject, Int>(this, "createGame")
+
+			object DeleteGame : APIPostRequest<DeleteGame.Request>(this, "DeleteGame") {
+				@Serializable
+				data class Request(val token: String, val gid: Int)
+			}
+
+			object GetGames : APIPost<GetGames.Request, List<GameDetails>>(this, "getGames") {
+				@Serializable
+				data class Request(val type: love.yinlin.data.rachel.game.Game?, val gid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object GetUserGames : APIPost<GetUserGames.Request, List<GameDetails>>(this, "getUserGames") {
+				@Serializable
+				data class Request(val token: String, val gid: Int, val isCompleted: Boolean = false, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object GetUserGameRecords : APIPost<GetUserGameRecords.Request, List<GameRecord>>(this, "getUserGameRecords") {
+				@Serializable
+				data class Request(val token: String, val gid: Int, val isCompleted: Boolean = false, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object StartGame : APIPost<StartGame.Request, JsonElement>(this, "startGame") {
+				@Serializable
+				data class Request(val token: String, val gid: Int, val answer: JsonElement)
 			}
 		}
 

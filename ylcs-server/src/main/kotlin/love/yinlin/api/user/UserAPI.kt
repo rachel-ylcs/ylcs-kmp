@@ -199,4 +199,5 @@ fun Routing.userAPI(implMap: ImplMap) {
 	rewardAPI(implMap)
 	topicAPI(implMap)
 	songAPI(implMap)
+	gameAPI(implMap)
 }
