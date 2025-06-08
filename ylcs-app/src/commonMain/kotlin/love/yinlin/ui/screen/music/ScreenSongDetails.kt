@@ -332,20 +332,15 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     override fun ActionScope.RightActions() {
         Action(Icons.Outlined.Download) {
             val group = when (args.song.album) {
-                "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> "1048965901"
-                "单曲集" -> "836289670"
-                "影视剧OST" -> "971218639"
-                "游戏OST" -> "942459444"
+                "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> "1048965901" to "KtUvt3KL%2FSavxwgbXhU562BiUvZiCLPEX4Vbx4O7vicWQ7wC9Nq9UN4hbMAUKOJ%2F"
+                "单曲集" -> "836289670" to "Aanfl0VufijRqTaoVFOfizQMjJwLZSYSND9jXpXvIsR1p0qa97Lcu8GpOgjaVuDR"
+                "影视剧OST" -> "971218639" to "Q47DA4cNASFrinbcT3%2BMZXU6G%2FS%2Bi03fUy4lz2KDHuhSMX6nLJHYwV1m%2B%2BWWzjvo"
+                "游戏OST" -> "942459444" to "ah3tB5Ef9Ki4cqhTmBDa2MR%2FnvEIvWT4ZBaj%2FuKSHqt6YohsaQ%2Bf1qo%2FoeeIU2qi"
                 else -> null
             }
             launch {
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
-                else OS.ifPlatform(*Platform.Phone, ifTrue = {
-                    if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group))) slot.tip.warning("未安装QQ")
-                }, ifFalse = {
-                    OS.Application.copyText(group)
-                    slot.tip.info("已复制QQ群号到剪贴板")
-                })
+                else if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group.first, group.second))) slot.tip.warning("未安装QQ")
             }
         }
     }

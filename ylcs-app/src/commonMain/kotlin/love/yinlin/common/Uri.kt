@@ -235,18 +235,24 @@ object UriGenerator {
         query = "src_type=internal&version=1&uin=$id&card_type=person&source=qrcode"
     )
 
-    fun qqGroup(id: String): Uri = Uri(
-        scheme = Scheme.QQ,
-        host = "card",
-        path = "/show_pslcard",
-        query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
-    )
-
-    fun qqGroup(k: String, authKey: String) = Uri(
-        scheme = Scheme.Https,
-        host = "qm.qq.com",
-        path = "/cgi-bin/qm/qr",
-        query = "k=$k&authKey=$authKey"
+    fun qqGroup(id: String, authKey: String = ""): Uri = OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = {
+            Uri(
+                scheme = Scheme.QQ,
+                host = "card",
+                path = "/show_pslcard",
+                query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
+            )
+        },
+        ifFalse = {
+            Uri(
+                scheme = Scheme.Https,
+                host = "qm.qq.com",
+                path = "/cgi-bin/qm/qr",
+                query = "_wv=1027&k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=$authKey&group_code=$id"
+            )
+        }
     )
 
     fun taobao(shopId: String): Uri = OS.ifPlatform(
