@@ -28,6 +28,7 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.input.RachelText
@@ -339,7 +340,12 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             }
             launch {
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
-                else if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group))) slot.tip.warning("未安装QQ")
+                else OS.ifPlatform(*Platform.Phone, ifTrue = {
+                    if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group))) slot.tip.warning("未安装QQ")
+                }, ifFalse = {
+                    OS.Application.copyText(group)
+                    slot.tip.info("已复制QQ群号到剪贴板")
+                })
             }
         }
     }

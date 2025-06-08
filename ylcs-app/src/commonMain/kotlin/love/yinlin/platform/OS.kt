@@ -60,6 +60,7 @@ object OS {
 	@Stable
 	object Application {
 		suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
+		fun copyText(text: String): Boolean = osApplicationCopyText(text)
 	}
 
 	@Stable
@@ -101,6 +102,7 @@ internal expect val osPlatform: Platform
 // ------------  Application
 
 internal expect suspend fun osApplicationStartAppIntent(uri: Uri): Boolean
+internal expect fun osApplicationCopyText(text: String): Boolean
 
 // ------------  Net
 

@@ -1,6 +1,9 @@
 @file:JvmName("OSAndroid")
 package love.yinlin.platform
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import com.github.panpf.sketch.SingletonSketch
 import kotlinx.io.files.Path
@@ -14,6 +17,14 @@ actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = try {
 	val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
 	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 	appNative.context.startActivity(intent)
+	true
+}
+catch (_: Throwable) { false }
+
+actual fun osApplicationCopyText(text: String): Boolean = try {
+	val clipboard = appNative.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+	val clip = ClipData.newPlainText("", text)
+	clipboard.setPrimaryClip(clip)
 	true
 }
 catch (_: Throwable) { false }
