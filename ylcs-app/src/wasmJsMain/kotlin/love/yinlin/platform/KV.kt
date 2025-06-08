@@ -2,42 +2,71 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.browser.localStorage
+import kotlinx.datetime.Clock
+import love.yinlin.extension.Array
+import love.yinlin.extension.Int
 import love.yinlin.extension.JsonConverter
+import love.yinlin.extension.String
+import love.yinlin.extension.makeArray
+import love.yinlin.extension.parseJson
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 
 @Stable
 actual class KV {
+	private fun setItem(key: String, value: String, expire: Int) {
+		val time = if (expire == KVExpire.NEVER) expire else Clock.System.now().epochSeconds.toInt() + expire
+		localStorage.setItem(key, makeArray {
+			add(time)
+			add(value)
+		}.toJsonString())
+	}
+
+	fun getItem(key: String): String? = localStorage.getItem(key)?.let { json ->
+		try {
+			val arr = json.parseJson.Array
+			val time = arr[0].Int
+			val value = arr[1].String
+			val current = Clock.System.now().epochSeconds.toInt()
+			if (time == KVExpire.NEVER || current <= time) value
+			else {
+				localStorage.removeItem(key)
+				null
+			}
+		}
+		catch (_: Throwable) { null }
+	}
+
 	actual fun set(key: String, value: Boolean, expire: Int) {
-		localStorage.setItem(key, value.toString())
+		setItem(key, value.toString(), expire)
 	}
 
 	actual fun set(key: String, value: Int, expire: Int) {
-		localStorage.setItem(key, value.toString())
+		setItem(key, value.toString(), expire)
 	}
 
 	actual fun set(key: String, value: Long, expire: Int) {
-		localStorage.setItem(key, value.toString())
+		setItem(key, value.toString(), expire)
 	}
 
 	actual fun set(key: String, value: Float, expire: Int) {
-		localStorage.setItem(key, value.toString())
+		setItem(key, value.toString(), expire)
 	}
 
 	actual fun set(key: String, value: Double, expire: Int) {
-		localStorage.setItem(key, value.toString())
+		setItem(key, value.toString(), expire)
 	}
 
 	actual fun set(key: String, value: String, expire: Int) {
-		localStorage.setItem(key, value)
+		setItem(key, value, expire)
 	}
 
 	actual fun set(key: String, value: ByteArray, expire: Int) {
-		localStorage.setItem(key, value.toJsonString(JsonConverter.ByteArray))
+		setItem(key, value.toJsonString(JsonConverter.ByteArray), expire)
 	}
 
 	actual inline fun <reified T> get(key: String, default: T): T {
-		val value = localStorage.getItem(key)
+		val value = getItem(key)
 		return if (value == null) default else when (default) {
 			is Boolean -> value as T
 			is Int -> value as T
@@ -50,7 +79,7 @@ actual class KV {
 		}
 	}
 
-	actual fun has(key: String): Boolean = localStorage.getItem(key) != null
+	actual fun has(key: String): Boolean = getItem(key) != null
 
 	actual fun remove(key: String) {
 		localStorage.removeItem(key)
