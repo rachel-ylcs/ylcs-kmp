@@ -41,6 +41,18 @@ import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.community.UserBar
 
 @Stable
+private enum class ModQQGroup(
+    val id: String,
+    val k: String,
+    val authKey: String
+) {
+    Album("1048965901", "k6XfoZ7qC9uWUfdKufTSgqQokpsg6m7U", "KtUvt3KL%2FSavxwgbXhU562BiUvZiCLPEX4Vbx4O7vicWQ7wC9Nq9UN4hbMAUKOJ%2F"),
+    Single("836289670", "GMg4nlFsnNslW_ZVZE7I1XcKy9d0_CA6", "Aanfl0VufijRqTaoVFOfizQMjJwLZSYSND9jXpXvIsR1p0qa97Lcu8GpOgjaVuDR"),
+    Video("971218639", "Hiv2kwEpxJeEYddfVC0IzmMonqGxSWev", "Q47DA4cNASFrinbcT3%2BMZXU6G%2FS%2Bi03fUy4lz2KDHuhSMX6nLJHYwV1m%2B%2BWWzjvo"),
+    Game("942459444", "XvTbFryfRqO1h5L9FN9VvxYmmpsEROhr", "ah3tB5Ef9Ki4cqhTmBDa2MR%2FnvEIvWT4ZBaj%2FuKSHqt6YohsaQ%2Bf1qo%2FoeeIU2qi")
+}
+
+@Stable
 class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongDetails.Args>(model) {
     @Stable
     @Serializable
@@ -332,15 +344,19 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     override fun ActionScope.RightActions() {
         Action(Icons.Outlined.Download) {
             val group = when (args.song.album) {
-                "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> "1048965901" to "KtUvt3KL%2FSavxwgbXhU562BiUvZiCLPEX4Vbx4O7vicWQ7wC9Nq9UN4hbMAUKOJ%2F"
-                "单曲集" -> "836289670" to "Aanfl0VufijRqTaoVFOfizQMjJwLZSYSND9jXpXvIsR1p0qa97Lcu8GpOgjaVuDR"
-                "影视剧OST" -> "971218639" to "Q47DA4cNASFrinbcT3%2BMZXU6G%2FS%2Bi03fUy4lz2KDHuhSMX6nLJHYwV1m%2B%2BWWzjvo"
-                "游戏OST" -> "942459444" to "ah3tB5Ef9Ki4cqhTmBDa2MR%2FnvEIvWT4ZBaj%2FuKSHqt6YohsaQ%2Bf1qo%2FoeeIU2qi"
+                "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> ModQQGroup.Album
+                "单曲集" -> ModQQGroup.Single
+                "影视剧OST" -> ModQQGroup.Video
+                "游戏OST" -> ModQQGroup.Game
                 else -> null
             }
             launch {
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
-                else if (!OS.Application.startAppIntent(UriGenerator.qqGroup(group.first, group.second))) slot.tip.warning("未安装QQ")
+                else if (!OS.ifPlatform(*Platform.Phone, ifTrue = {
+                    OS.Application.startAppIntent(UriGenerator.qqGroup(group.id))
+                }, ifFalse = {
+                    OS.Application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey))
+                })) slot.tip.warning("未安装QQ")
             }
         }
     }
