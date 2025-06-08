@@ -6,6 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Stable
 @Serializable
+data class AQInfo(val threshold: Float)
+
+@Stable
+@Serializable
 sealed class AQQuestion {
     companion object {
         const val MAX_OPTION_COUNT = 10
@@ -112,8 +116,4 @@ sealed class AQUserAnswer {
 
 @Stable
 @Serializable
-data class AQResult(
-    val isCompleted: Boolean,
-    val correctCount: Int,
-    val totalCount: Int
-)
+data class AQResult(val correctCount: Int, val totalCount: Int)

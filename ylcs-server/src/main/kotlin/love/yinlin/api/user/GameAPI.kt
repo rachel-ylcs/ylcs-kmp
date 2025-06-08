@@ -12,10 +12,14 @@ import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameDetails
+import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
+import love.yinlin.throwExecuteSQL
+import love.yinlin.throwInsertSQLGeneratedKey
+import love.yinlin.updateSQL
 import love.yinlin.values
 
 private val Game.manager: GameManager get() = when (this) {
@@ -26,19 +30,31 @@ private val Game.manager: GameManager get() = when (this) {
 }
 
 sealed interface GameManager {
-    fun check(info: JsonElement?, question: JsonElement, answer: JsonElement)
-    fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement
-    fun start(uid: Int, details: GameDetails): Data<JsonElement>
+    companion object {
+        const val MAX_REWARD = 30
+        const val MAX_RANK = 3
+        const val MAX_COST_RATIO = MAX_REWARD / MAX_RANK
+
+        fun checkReward(reward: Int, num: Int, cost: Int): Boolean = reward !in 1 .. MAX_REWARD && num !in 1 .. MAX_RANK &&
+                (cost == 0 || cost !in 1 .. (reward / MAX_COST_RATIO).coerceAtLeast(1))
+    }
+
+    fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
+    fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
 
     data object Game1Manager : GameManager {
-        override fun check(info: JsonElement?, question: JsonElement, answer: JsonElement) {
-            val questions = question.to<List<AQQuestion>>()
-            val answers = answer.to<List<AQAnswer>>()
-            require(questions.size == answers.size)
-            for (i in questions.indices) answers[i].matchQuestion(questions[i])
+        const val MIN_THRESHOLD = 0.75f
+
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            val actualInfo = info.to<AQInfo>()
+            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
+            val actualQuestion = question.to<List<AQQuestion>>()
+            val actualAnswer = answer.to<List<AQAnswer>>()
+            require(actualQuestion.size == actualAnswer.size)
+            for (i in actualQuestion.indices) actualAnswer[i].matchQuestion(actualQuestion[i])
         }
 
-        override fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
+        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): AQResult {
             val standardAnswers = standardAnswer.to<List<AQAnswer>>()
             val userAnswers = userAnswer.to<List<AQUserAnswer>>()
             val size = standardAnswers.size
@@ -47,73 +63,113 @@ sealed interface GameManager {
             repeat(size) { i ->
                 if (userAnswers[i].verifyAnswer(standardAnswers[i])) ++correctCount
             }
-            return AQResult(
-                isCompleted = correctCount == size,
-                correctCount = correctCount,
-                totalCount = size
-            ).toJson()
+            return AQResult(correctCount = correctCount, totalCount = size)
         }
 
-        override fun start(uid: Int, details: GameDetails): Data<JsonElement> {
-            return Data.Error()
+        override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
+            // 验证游戏结果
+            val info = details.info.to<AQInfo>()
+            val aqResult = verify(details.answer, userAnswer)
+            // 计算奖励与名次
+            val isCompleted = (aqResult.correctCount.toFloat() / aqResult.totalCount) >= info.threshold
+            val rank = if (isCompleted) details.winners.size + 1 else 0
+            val reward = if (isCompleted) details.reward / details.num else 0
+            val result = GameResult(
+                isCompleted = isCompleted,
+                reward = reward,
+                rank = rank,
+                info = aqResult.toJson()
+            )
+            var data: Data<GameResult> = Data.Success(result)
+            DB.throwTransaction {
+                // 消费银币
+                val cost = details.cost
+                if (cost > 0) {
+                    if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+                        // 增加发起者银币
+                        it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+                    }
+                    else data = "没有足够的银币参与".failedData
+                }
+                // 插入游戏记录
+                it.throwInsertSQLGeneratedKey("""
+                    INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
+                """, details.gid, uid, userAnswer.toJsonString(), result.toJsonString())
+                // 更新游戏排行榜
+                if (isCompleted) {
+                    val isGameCompleted = details.winners.size + 1 >= details.num
+                    it.throwExecuteSQL("""
+                        UPDATE game
+                        SET winner = ? , isCompleted = ?
+                        WHERE gid = ?
+                    """, details.winners.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+                }
+            }
+            return data
         }
     }
 
     data object Game2Manager : GameManager {
-        override fun check(info: JsonElement?, question: JsonElement, answer: JsonElement) {
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
         }
 
-        override fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
+        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
             return JsonNull
         }
 
-        override fun start(uid: Int, details: GameDetails): Data<JsonElement> {
+        override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
             return Data.Error()
         }
     }
 
     data object Game3Manager : GameManager {
-        override fun check(info: JsonElement?, question: JsonElement, answer: JsonElement) {
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
         }
 
-        override fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
+        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
             return JsonNull
         }
 
-        override fun start(uid: Int, details: GameDetails): Data<JsonElement> {
+        override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
             return Data.Error()
         }
     }
 
     data object Game4Manager : GameManager {
-        override fun check(info: JsonElement?, question: JsonElement, answer: JsonElement) {
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
         }
 
-        override fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
+        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
             return JsonNull
         }
 
-        override fun start(uid: Int, details: GameDetails): Data<JsonElement> {
+        override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
             return Data.Error()
         }
     }
 }
 
 fun Routing.gameAPI(implMap: ImplMap) {
-    api(API.User.Game.CreateGame) { (token, title, type, reward, num, info, question, answer) ->
+    api(API.User.Game.CreateGame) { (token, title, type, reward, num, cost, info, question, answer) ->
         val uid = AN.throwExpireToken(token)
         // 检查游戏奖励与名额
         VN.throwEmpty(title)
-        VN.throwIf(reward !in 1 .. 20, num !in 1 .. 3)
+        VN.throwIf(!GameManager.checkReward(reward, num, cost))
         // 检查游戏数据配置
-        try { type.manager.check(info, question, answer) } catch (_: Throwable) { return@api "数据配置非法".failedData }
+        try {
+            type.manager.check(info, question, answer)
+        } catch (_: Throwable) {
+            return@api "数据配置非法".failedData
+        }
         // 新增游戏行
         val gid = DB.throwInsertSQLGeneratedKey("""
-            INSERT INTO game(uid, title, reward, type, num, info, question, answer) ${values(8)}
-        """, uid, title, reward, type, num, info?.toJsonString(), question.toJsonString(), answer.toJsonString()).toInt()
+            INSERT INTO game(uid, title, type, reward, num, cost, info, question, answer) ${values(9)}
+        """, uid, title, type, reward, num, cost,
+            info.toJsonString(), question.toJsonString(), answer.toJsonString()
+        ).toInt()
         Data.Success(gid)
     }
 
@@ -148,6 +204,6 @@ fun Routing.gameAPI(implMap: ImplMap) {
         if (gameDetails.uid == uid) return@api "不能参与自己创建的游戏哦".failedData
         if (gameDetails.isCompleted) return@api "不能参与已经结算的游戏哦".failedData
         if (uid.toString() in gameDetails.winners) return@api "不能参与完成过的游戏哦".failedData
-        gameDetails.type.manager.start(uid, gameDetails)
+        gameDetails.type.manager.start(uid, gameDetails, answer)
     }
 }

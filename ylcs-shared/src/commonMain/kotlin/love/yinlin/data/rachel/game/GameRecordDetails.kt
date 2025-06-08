@@ -12,5 +12,5 @@ data class GameRecordDetails(
     val uid: Int, // [用户 ID]
     val ts: String, // [创建时间]
     val answer: JsonElement, // [游戏答案]
-    val result: JsonElement, // [游戏结果]
+    val result: GameResult, // [游戏结果]
 )

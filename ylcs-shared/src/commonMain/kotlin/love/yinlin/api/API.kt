@@ -10,6 +10,7 @@ import love.yinlin.data.rachel.game.CreateGameObject
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameRecordDetails
+import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
@@ -179,7 +180,7 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val rid: Long)
 			}
 
-			object StartGame : APIPost<StartGame.Request, JsonElement>(this, "startGame") {
+			object StartGame : APIPost<StartGame.Request, GameResult>(this, "startGame") {
 				@Serializable
 				data class Request(val token: String, val gid: Int, val answer: JsonElement)
 			}
