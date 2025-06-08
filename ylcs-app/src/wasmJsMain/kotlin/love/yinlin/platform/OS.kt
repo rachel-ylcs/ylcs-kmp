@@ -11,6 +11,11 @@ actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	return true
 }
 
+actual fun osApplicationCopyText(text: String): Boolean {
+	window.navigator.clipboard.writeText(text)
+	return true
+}
+
 actual fun osNetOpenUrl(url: String) {
 	window.open(url, "_blank")
 }

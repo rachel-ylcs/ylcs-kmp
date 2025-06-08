@@ -6,6 +6,8 @@ import love.yinlin.Local
 import love.yinlin.common.Uri
 import net.harawata.appdirs.AppDirsFactory
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,6 +22,13 @@ actual val osPlatform: Platform = System.getProperty("os.name").let {
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	osNetOpenUrl(uri.toString())
+	return true
+}
+
+actual fun osApplicationCopyText(text: String): Boolean {
+	val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+	val selection = StringSelection(text)
+	clipboard.setContents(selection, null)
 	return true
 }
 

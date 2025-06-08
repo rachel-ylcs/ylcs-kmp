@@ -42,6 +42,7 @@ import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.*
 import love.yinlin.platform.OS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.common.UserLabel
@@ -217,7 +218,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			Item("水群", ExtraIcons.QQ) {
 				launch {
-					if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ")
+					OS.ifPlatform(*Platform.Phone,
+						ifTrue = { if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ") },
+						ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup("0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E", "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R")) }
+					)
 				}
 			}
 			Item("店铺", ExtraIcons.Taobao) {

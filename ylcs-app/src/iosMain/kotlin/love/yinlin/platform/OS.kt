@@ -6,6 +6,7 @@ import love.yinlin.common.Uri
 import love.yinlin.common.toNSUrl
 import platform.Foundation.*
 import platform.UIKit.UIApplication
+import platform.UIKit.UIPasteboard
 
 actual val osPlatform: Platform = Platform.IOS
 
@@ -20,6 +21,11 @@ actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
     }
     catch (_: Throwable) {}
     return false
+}
+
+actual fun osApplicationCopyText(text: String): Boolean {
+    UIPasteboard.generalPasteboard.setString(text)
+    return true
 }
 
 actual fun osNetOpenUrl(url: String) {
