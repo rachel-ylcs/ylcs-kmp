@@ -347,12 +347,15 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     )
 
     override suspend fun onFabClick() {
-        if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        val result = importDialog.openSuspend() ?: return
+        if (result == ImportMusicItem.FromFactory.ordinal) {
+            pop()
+            navigate<ScreenMusicModFactory>()
+        }
+        else if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
         else {
-            val result = importDialog.openSuspend() ?: return
             pop()
             when (result) {
-                ImportMusicItem.FromFactory.ordinal -> navigate<ScreenMusicModFactory>()
                 ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
                 ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
                 ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
