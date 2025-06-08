@@ -15,6 +15,7 @@ data class GameDetails(
     val type: Game, // [游戏类型]
     val reward: Int, // [游戏奖励]
     val num: Int, // [奖励名额]
+    val winners: List<String>, // [游戏赢家]
     val info: JsonElement?, // [游戏信息]
     val question: JsonElement, // [游戏问题]
     val answer: JsonElement, // [游戏答案]

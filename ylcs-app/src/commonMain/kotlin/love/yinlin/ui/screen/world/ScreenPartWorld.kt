@@ -106,13 +106,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private val pagerState = PagerState { Game.entries.size }
 
 	private fun onGameClick(game: Game) {
-		slot.tip.info("小游戏板块即将在下版本开启, 敬请期待!")
-//		when (game) {
-//            Game.AnswerQuestion -> navigate<ScreenGame1Hall>()
-//            Game.BlockText -> navigate<ScreenGame2Hall>()
-//            Game.FlowersOrder -> navigate<ScreenGame3Hall>()
-//            Game.SearchAll -> navigate<ScreenGame4Hall>()
-//        }
+		when (game) {
+            Game.AnswerQuestion -> navigate<ScreenGame1Hall>()
+            Game.BlockText -> navigate<ScreenGame2Hall>()
+            Game.FlowersOrder -> navigate<ScreenGame3Hall>()
+            Game.SearchAll -> navigate<ScreenGame4Hall>()
+        }
 	}
 
 	@Composable
