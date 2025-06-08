@@ -6,7 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Stable
 @Serializable
-data class AQInfo(val threshold: Float)
+data class AQInfo(
+    val threshold: Float, // [成功阈值]
+)
 
 @Stable
 @Serializable

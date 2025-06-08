@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import love.yinlin.DB
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 import love.yinlin.api.failedData
@@ -72,7 +73,7 @@ sealed interface GameManager {
             val aqResult = verify(details.answer, userAnswer)
             // 计算奖励与名次
             val isCompleted = (aqResult.correctCount.toFloat() / aqResult.totalCount) >= info.threshold
-            val rank = if (isCompleted) details.winners.size + 1 else 0
+            val rank = if (isCompleted) details.winner.size + 1 else 0
             val reward = if (isCompleted) details.reward / details.num else 0
             val result = GameResult(
                 isCompleted = isCompleted,
@@ -97,12 +98,12 @@ sealed interface GameManager {
                 """, details.gid, uid, userAnswer.toJsonString(), result.toJsonString())
                 // 更新游戏排行榜
                 if (isCompleted) {
-                    val isGameCompleted = details.winners.size + 1 >= details.num
+                    val isGameCompleted = details.winner.size + 1 >= details.num
                     it.throwExecuteSQL("""
                         UPDATE game
                         SET winner = ? , isCompleted = ?
                         WHERE gid = ?
-                    """, details.winners.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+                    """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
                 }
             }
             return data
@@ -167,43 +168,71 @@ fun Routing.gameAPI(implMap: ImplMap) {
         // 新增游戏行
         val gid = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO game(uid, title, type, reward, num, cost, info, question, answer) ${values(9)}
-        """, uid, title, type, reward, num, cost,
+        """, uid, title, type.ordinal, reward, num, cost,
             info.toJsonString(), question.toJsonString(), answer.toJsonString()
         ).toInt()
         Data.Success(gid)
     }
 
     api(API.User.Game.DeleteGame) { (token, gid) ->
-        "".successData
+        val uid = AN.throwExpireToken(token)
+        VN.throwId(gid)
+        DB.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ? AND uid = ?", gid, uid)
+        "删除成功".successData
     }
 
     api(API.User.Game.GetGames) { (type, gid, num) ->
-        Data.Success(emptyList())
+        val games = DB.throwQuerySQL("""
+            SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.winner, game.info
+            FROM game
+            LEFT JOIN user ON game.uid = user.uid
+            WHERE game.gid < ? AND game.isDeleted = 0 ${if(type != null) "AND game.type = ${type.ordinal}" else ""}
+            ORDER BY game.gid DESC
+            LIMIT ?
+        """, gid, num.coercePageNum)
+        Data.Success(games.to())
     }
 
     api(API.User.Game.GetUserGames) { (token, gid, isCompleted, num) ->
-        Data.Success(emptyList())
+        val uid = AN.throwExpireToken(token)
+        val games = DB.throwQuerySQL("""
+            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+            FROM game
+            WHERE uid = ? AND isDeleted = 0 AND ${
+                if (isCompleted) "isCompleted = 1 AND gid < ?"
+                else "((isCompleted = 0 AND gid < ?) OR isCompleted = 1)"
+            }
+            ORDER BY isCompleted ASC, gid DESC
+            LIMIT ?
+        """, uid, gid, num.coercePageNum)
+        Data.Success(games.to())
     }
 
     api(API.User.Game.GetUserGameRecords) { (token, rid, num) ->
-        Data.Success(emptyList())
-    }
-
-    api(API.User.Game.GetGameRecordDetails) { (token, rid) ->
-        Data.Error()
+        val uid = AN.throwExpireToken(token)
+        val records = DB.throwQuerySQL("""
+            SELECT record.rid, record.gid, record.ts, user.name, game.title, game.type, record.answer, record.result
+            FROM game_record AS record
+            LEFT JOIN game ON record.gid = game.gid
+            LEFT JOIN user ON game.uid = user.uid
+            WHERE record.uid = ? AND record.rid < ? AND game.isDeleted = 0
+            ORDER BY record.rid DESC
+            LIMIT ?
+        """, uid, rid, num.coercePageNum)
+        Data.Success(records.to())
     }
 
     api(API.User.Game.StartGame) { (token, gid, answer) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
         val gameDetails = DB.throwQuerySQLSingle("""
-            SELECT gid, uid, '' AS name, ts, title, reward, type, num, winner, info, question, answer, isCompleted
+            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0
-        """).to<GameDetails>()
+        """, gid).to<GameDetails>()
         if (gameDetails.uid == uid) return@api "不能参与自己创建的游戏哦".failedData
         if (gameDetails.isCompleted) return@api "不能参与已经结算的游戏哦".failedData
-        if (uid.toString() in gameDetails.winners) return@api "不能参与完成过的游戏哦".failedData
+        if (uid.toString() in gameDetails.winner) return@api "不能参与完成过的游戏哦".failedData
         gameDetails.type.manager.start(uid, gameDetails, answer)
     }
 }

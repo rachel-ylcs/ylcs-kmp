@@ -6,11 +6,13 @@ import kotlinx.serialization.json.JsonElement
 
 @Stable
 @Serializable
-data class GameRecordDetails(
+data class UserGameRecord(
     val rid: Long, // [记录 ID]
     val gid: Int, // [游戏 ID]
-    val uid: Int, // [用户 ID]
     val ts: String, // [创建时间]
+    val name: String, // [发布者昵称]
+    val title: String, // [标题]
+    val type: Game, // [游戏类型]
     val answer: JsonElement, // [游戏答案]
     val result: GameResult, // [游戏结果]
 )

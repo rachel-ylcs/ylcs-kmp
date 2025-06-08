@@ -34,6 +34,7 @@ fun Routing.mailAPI(implMap: ImplMap) {
 
 	api(API.User.Mail.ProcessMail) { (token, mid, confirm) ->
 		val uid = AN.throwExpireToken(token)
+		VN.throwId(mid)
 		val mailEntry = DB.throwQuerySQLSingle("""
 			SELECT uid, processed, filter, param1, param2, param3, info
 			FROM mail
@@ -54,6 +55,7 @@ fun Routing.mailAPI(implMap: ImplMap) {
 
 	api(API.User.Mail.DeleteMail) { (token, mid) ->
 		val uid = AN.throwExpireToken(token)
+		VN.throwId(mid)
 		DB.throwExecuteSQL("DELETE FROM mail WHERE mid = ? AND uid = ?", mid, uid)
 		"删除成功".successData
 	}
