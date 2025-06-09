@@ -14,6 +14,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.Int
 import love.yinlin.extension.String
@@ -44,6 +45,7 @@ sealed interface GameManager {
     }
 
     fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
+    fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
     fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
 
     // 上传成绩
@@ -90,7 +92,7 @@ sealed interface GameManager {
             info = info
         ))
         DB.throwTransaction {
-            
+
         }
         return data
     }
@@ -224,6 +226,11 @@ sealed interface GameManager {
             return FOType.encode(MIN_LENGTH, items)
         }
 
+        override fun preflight(uid: Int, details: GameDetails): PreflightResult {
+
+            return super.preflight(uid, details)
+        }
+
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
             val actualInfo = details.info.to<FOInfo>()
             val foResult = verify(details.answer, userAnswer)
@@ -252,6 +259,27 @@ sealed interface GameManager {
             return Data.Error()
         }
     }
+}
+
+private data class PreflightInfo(
+    val uid: Int,
+    val details: GameDetails,
+    val result: PreflightResult
+)
+
+private fun preflightGame(token: String, gid: Int): PreflightInfo {
+    val uid = AN.throwExpireToken(token)
+    VN.throwId(gid)
+    val gameDetails = DB.throwQuerySQLSingle("""
+            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+            FROM game
+            WHERE gid = ? AND isDeleted = 0
+        """, gid).to<GameDetails>()
+    val result = if (gameDetails.uid == uid) PreflightResult("不能参与自己创建的游戏哦")
+        else if (gameDetails.isCompleted) PreflightResult("不能参与已经结算的游戏哦")
+        else if (uid.toString() in gameDetails.winner) PreflightResult("不能参与完成过的游戏哦")
+        else gameDetails.type.manager.preflight(uid, gameDetails)
+    return PreflightInfo(uid, gameDetails, result)
 }
 
 fun Routing.gameAPI(implMap: ImplMap) {
@@ -323,17 +351,12 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(records.to())
     }
 
+    api(API.User.Game.PreflightGame) { (token, gid) ->
+        Data.Success(preflightGame(token, gid).result)
+    }
+
     api(API.User.Game.StartGame) { (token, gid, answer) ->
-        val uid = AN.throwExpireToken(token)
-        VN.throwId(gid)
-        val gameDetails = DB.throwQuerySQLSingle("""
-            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
-            FROM game
-            WHERE gid = ? AND isDeleted = 0
-        """, gid).to<GameDetails>()
-        if (gameDetails.uid == uid) return@api "不能参与自己创建的游戏哦".failedData
-        if (gameDetails.isCompleted) return@api "不能参与已经结算的游戏哦".failedData
-        if (uid.toString() in gameDetails.winner) return@api "不能参与完成过的游戏哦".failedData
-        gameDetails.type.manager.start(uid, gameDetails, answer)
+        val info = preflightGame(token, gid)
+        info.details.type.manager.start(info.uid, info.details, answer)
     }
 }

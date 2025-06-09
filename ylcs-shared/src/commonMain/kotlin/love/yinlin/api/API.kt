@@ -11,6 +11,7 @@ import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.UserGameRecord
 import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
@@ -173,6 +174,11 @@ object API : APINode(null, "") {
 			object GetUserGameRecords : APIPost<GetUserGameRecords.Request, List<UserGameRecord>>(this, "getUserGameRecords") {
 				@Serializable
 				data class Request(val token: String, val rid: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+
+			object PreflightGame : APIPost<PreflightGame.Request, PreflightResult>(this, "preflightGame") {
+				@Serializable
+				data class Request(val token: String, val gid: Int)
 			}
 
 			object StartGame : APIPost<StartGame.Request, GameResult>(this, "startGame") {
