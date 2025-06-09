@@ -118,4 +118,7 @@ sealed class AQUserAnswer {
 
 @Stable
 @Serializable
-data class AQResult(val correctCount: Int, val totalCount: Int)
+data class AQResult(
+    val correctCount: Int,
+    val totalCount: Int
+)

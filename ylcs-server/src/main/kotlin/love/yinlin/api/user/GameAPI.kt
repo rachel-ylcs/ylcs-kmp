@@ -15,6 +15,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.info.*
+import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -45,6 +46,7 @@ sealed interface GameManager {
     fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
     fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
 
+    // 上传成绩
     fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
         var data: Data<GameResult> = Data.Success(GameResult(
             isCompleted = isCompleted,
@@ -79,20 +81,34 @@ sealed interface GameManager {
         return data
     }
 
+    // 可重试上传成绩
+    fun retryUploadResult(uid: Int, details: GameDetails, tryCount: Int, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
+        var data: Data<GameResult> = Data.Success(GameResult(
+            isCompleted = isCompleted,
+            reward = if (isCompleted) details.reward / details.num else 0,
+            rank = if (isCompleted) details.winner.size + 1 else 0,
+            info = info
+        ))
+        DB.throwTransaction {
+            
+        }
+        return data
+    }
+
     // 答题
     data object Game1Manager : GameManager {
-        const val MIN_THRESHOLD = 0.75f
+        const val MIN_THRESHOLD = 0.75f // 最小成功阈值
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val actualInfo = info.to<AQInfo>()
-            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
             val actualQuestion = question.to<List<AQQuestion>>()
             val actualAnswer = answer.to<List<AQAnswer>>()
+            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
             require(actualQuestion.size == actualAnswer.size)
             for (i in actualQuestion.indices) actualAnswer[i].matchQuestion(actualQuestion[i])
         }
 
-        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): AQResult {
+        private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): AQResult {
             val actualStandardAnswer = standardAnswer.to<List<AQAnswer>>()
             val actualUserAnswer = userAnswer.to<List<AQUserAnswer>>()
             val size = actualStandardAnswer.size
@@ -119,10 +135,10 @@ sealed interface GameManager {
 
     // 网格填词
     data object Game2Manager : GameManager {
-        const val CHAR_EMPTY = '$'
-        const val CHAR_BLOCK = '#'
-        const val MIN_BLOCK_SIZE = 7
-        const val MAX_BLOCK_SIZE = 12
+        const val CHAR_EMPTY = '$' // 空字符
+        const val CHAR_BLOCK = '#' // 方格字符
+        const val MIN_BLOCK_SIZE = 7 // 最小网格大小
+        const val MAX_BLOCK_SIZE = 12 // 最大网格大小
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val actualQuestion = question.String
@@ -151,7 +167,7 @@ sealed interface GameManager {
             }
         }
 
-        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): BTResult {
+        private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): BTResult {
             val actualStandardAnswer = standardAnswer.String
             val actualUserAnswer = userAnswer.String
             require(actualStandardAnswer.length == actualUserAnswer.length)
@@ -178,16 +194,47 @@ sealed interface GameManager {
 
     // 寻花令
     data object Game3Manager : GameManager {
-        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+        const val MIN_TRY_COUNT = 3 // 最小尝试次数
+        const val MIN_LENGTH = 10 // 最小长度
+        const val MAX_LENGTH = 14 // 最大长度
 
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            val actualInfo = info.to<FOInfo>()
+            val actualQuestion = question.Int
+            val actualAnswer = answer.String
+            // 尝试次数
+            require(actualInfo.tryCount >= MIN_TRY_COUNT)
+            // 问题长度
+            require(actualQuestion in MIN_LENGTH .. MAX_LENGTH)
+            // 答案长度与问题一致
+            require(actualAnswer.length == actualQuestion)
         }
 
-        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
-            return JsonNull
+        private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): Int {
+            val actualStandardAnswer = standardAnswer.String
+            val actualUserAnswer = userAnswer.String
+            require(actualStandardAnswer.length == actualUserAnswer.length)
+            val items = List(actualStandardAnswer.length) { i ->
+                val ch1 = actualStandardAnswer[i]
+                val ch2 = actualUserAnswer[i]
+                if (ch1 == ch2) FOType.CORRECT
+                else if (actualUserAnswer.contains(ch1)) FOType.INVALID_POS
+                else FOType.INCORRECT
+            }
+            return FOType.encode(MIN_LENGTH, items)
         }
 
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
-            return Data.Error()
+            val actualInfo = details.info.to<FOInfo>()
+            val foResult = verify(details.answer, userAnswer)
+            return retryUploadResult(
+                uid = uid,
+                details = details,
+                tryCount = actualInfo.tryCount,
+                answer = userAnswer,
+                isCompleted = FOType.verify(foResult),
+                info = foResult.toJson()
+            )
         }
     }
 
@@ -197,7 +244,7 @@ sealed interface GameManager {
 
         }
 
-        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
+        private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
             return JsonNull
         }
 

@@ -1,0 +1,43 @@
+package love.yinlin.data.rachel.game.info
+
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
+
+@Stable
+@Serializable
+data class FOInfo(
+    val tryCount: Int, // [尝试次数]
+)
+
+@Stable
+enum class FOType {
+    CORRECT, // 正确
+    INVALID_POS, // 位置错误
+    INCORRECT; // 错误
+
+    companion object {
+        fun encode(offset: Int, items: List<FOType>): Int {
+            var encoded = 0
+            val countOffset = items.size - offset
+            encoded = encoded or (countOffset shl 28)
+            items.forEachIndexed { index, state ->
+                encoded = encoded or (state.ordinal shl (index * 2))
+            }
+            return encoded
+        }
+
+        fun decode(offset: Int, value: Int): List<FOType> {
+            val countOffset = (value ushr 28) and 0x07
+            val count = countOffset + offset
+            return List(count) { index ->
+                when ((value ushr (index * 2)) and 0x03) {
+                    CORRECT.ordinal -> CORRECT
+                    INVALID_POS.ordinal -> INVALID_POS
+                    else -> INCORRECT
+                }
+            }
+        }
+
+        fun verify(value: Int): Boolean = value and 0x0FFFFFFF == 0
+    }
+}
