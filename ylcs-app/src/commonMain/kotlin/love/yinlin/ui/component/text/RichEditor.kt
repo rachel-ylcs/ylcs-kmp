@@ -19,15 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import love.yinlin.common.Device
-import love.yinlin.common.EmojiManager
+import love.yinlin.data.rachel.emoji.Emoji
+import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.ActionScope
-import org.jetbrains.compose.resources.painterResource
 
 @Stable
 private object RichEditorParser {
@@ -117,7 +117,7 @@ open class RichEditorState {
     protected open val useTopic: Boolean get() = true
     protected open val useAt: Boolean get() = false
 
-    private var emojiClassify by mutableIntStateOf(0)
+    private var emojiClassify by mutableStateOf(EmojiType.Static)
 
     val richString: RichString get() = RichEditorParser.parse(inputState.value.text)
     var text: String get() = inputState.value.text
@@ -136,11 +136,16 @@ open class RichEditorState {
     protected open fun EmojiLayout(modifier: Modifier) {
         Column(modifier = modifier) {
             TabBar(
-                currentPage = emojiClassify,
-                onNavigate = { emojiClassify = it },
-                items = remember { EmojiManager.classifyMap.map { it.title } },
+                currentPage = emojiClassify.ordinal,
+                onNavigate = { emojiClassify = EmojiType.fromInt(it) },
+                items = remember { EmojiType.entries.map { it.title } },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            val items = remember(emojiClassify) {
+                (emojiClassify.start .. emojiClassify.end).map { Emoji(it, emojiClassify) }
+            }
+
             LazyVerticalGrid(
                 columns = GridCells.FixedSize(ThemeValue.Size.Icon),
                 contentPadding = ThemeValue.Padding.EqualValue,
@@ -149,11 +154,12 @@ open class RichEditorState {
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 items(
-                    items = EmojiManager.classifyMap[emojiClassify].items,
+                    items = items,
                     key = { it.id }
                 ) { emoji ->
-                    MiniImage(
-                        painter = painterResource(emoji.res),
+                    WebImage(
+                        uri = remember(emoji) { emoji.previewPath },
+                        animated = false,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
                             closeLayout("[em|${emoji.id}]")
                         }

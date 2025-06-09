@@ -23,21 +23,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.panpf.sketch.fetch.newComposeResourceUri
 import io.github.alexzhirkevich.compottie.Compottie
-import io.github.alexzhirkevich.compottie.DotLottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.Url
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
-import love.yinlin.common.EmojiManager
+import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
 import love.yinlin.platform.ImageQuality
-import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
-import org.jetbrains.compose.resources.painterResource
 
 // RichString DSL
 
@@ -65,7 +62,7 @@ internal const val RICH_TYPE_STYLE = "s"
 interface RichDrawable {
 	val width: Float
 	val height: Float
-	@Composable fun draw()
+	@Composable fun Draw()
 }
 
 class RichContext(
@@ -139,16 +136,18 @@ abstract class RichContainer(type: String) : RichObject(type) {
 	fun text(str: String) = makeItem(Text(str))
 
 	@Stable
-	protected class Emoji(private val id: Int) : RichItem, RichDrawable {
-		override val width: Float get() = when (EmojiManager[id]) {
+	protected class Emoji(id: Int) : RichItem, RichDrawable {
+		private val emoji = love.yinlin.data.rachel.emoji.Emoji.fromId(id)
+
+		override val width: Float get() = when (emoji?.type) {
 			null -> 1f
-			is love.yinlin.common.Emoji.Lottie -> 1.25f
+			EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 
-		override val height: Float get() = when (EmojiManager[id]) {
+		override val height: Float get() = when (emoji?.type) {
 			null -> 1f
-			is love.yinlin.common.Emoji.Lottie -> 1.25f
+			EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 
@@ -161,26 +160,18 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		}
 
 		@Composable
-		override fun draw() {
-			when (val emoji = EmojiManager[id]) {
-				null -> Box(modifier = Modifier.fillMaxSize())
-				is love.yinlin.common.Emoji.Static -> {
-					MiniImage(
-						painter = painterResource(emoji.res),
-						modifier = Modifier.fillMaxSize()
-					)
-				}
-				is love.yinlin.common.Emoji.Dynamic -> {
+		override fun Draw() {
+			if (emoji == null) Box(modifier = Modifier.fillMaxSize())
+			else when (emoji.type) {
+                EmojiType.Static, EmojiType.Dynamic -> {
 					WebImage(
-						uri = newComposeResourceUri(emoji.resPath),
-						quality = ImageQuality.Low,
-						placeholder = null,
+						uri = remember(emoji) { emoji.showPath },
 						modifier = Modifier.fillMaxSize()
 					)
 				}
-				is love.yinlin.common.Emoji.Lottie -> {
+                EmojiType.Lottie -> {
 					val composition by rememberLottieComposition(emoji) {
-						LottieCompositionSpec.DotLottie(archive = EmojiManager.lottieMap, emoji.id.toString())
+						LottieCompositionSpec.Url(emoji.showPath)
 					}
 					MiniImage(
 						painter = rememberLottiePainter(
@@ -191,7 +182,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 						modifier = Modifier.fillMaxSize()
 					)
 				}
-			}
+            }
 		}
 	}
 	fun emoji(id: Int) = makeItem(Emoji(id))
@@ -226,7 +217,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
         }
 
 		@Composable
-		override fun draw() {
+		override fun Draw() {
 			Box(modifier = Modifier.fillMaxSize().padding(horizontal = 0.5.dp * width)) {
 				WebImage(
 					uri = uri,
@@ -480,7 +471,7 @@ fun RichText(
 					placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
 				)
 			) {
-				drawable.draw()
+				drawable.Draw()
 			}
 		}
 	}

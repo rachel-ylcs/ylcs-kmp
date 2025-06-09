@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.*
 import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.request.disallowAnimatedImage
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
@@ -348,14 +349,16 @@ private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = reme
 fun rememberWebImageState(
 	quality: ImageQuality,
 	placeholder: DrawableResource? = null,
-	isCrossfade: Boolean = true
+	isCrossfade: Boolean = true,
+	animated: Boolean = true,
 ): AsyncImageState {
 	val context = LocalPlatformContext.current
 	val holder = placeholder?.let { rememberIconPainterStateImage(it) }
-	val options = remember(quality, holder, isCrossfade) {
+	val options = remember(quality, holder, isCrossfade, animated) {
 		ImageOptions.Builder().apply {
 			sizeMultiplier(quality.sizeMultiplier)
 			placeholder(holder)
+			disallowAnimatedImage(!animated)
 			if (isCrossfade) crossfade()
 		}.merge(SingletonSketch.get(context).globalImageOptions).build()
 	}
@@ -373,7 +376,8 @@ fun WebImage(
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	placeholder: DrawableResource? = Res.drawable.placeholder_pic,
-	state: AsyncImageState = rememberWebImageState(quality, placeholder, true),
+	animated: Boolean = true,
+	state: AsyncImageState = rememberWebImageState(quality, placeholder, true, animated),
 	onClick: (() -> Unit)? = null
 ) {
 	AsyncImage(
@@ -397,7 +401,8 @@ fun LocalFileImage(
 	circle: Boolean = false,
 	contentScale: ContentScale = ContentScale.Fit,
 	alpha: Float = 1f,
-	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, null, true),
+	animated: Boolean = true,
+	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, null, true, animated),
 	onClick: (() -> Unit)? = null
 ) {
 	val baseUri = remember(*key) { path().toString() }

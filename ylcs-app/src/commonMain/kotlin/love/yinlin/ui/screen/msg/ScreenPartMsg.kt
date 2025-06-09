@@ -28,11 +28,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.common.Picture
@@ -43,13 +39,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.replaceAll
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
-import love.yinlin.platform.app
-import love.yinlin.platform.safeDownload
+import love.yinlin.platform.*
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
@@ -64,11 +54,7 @@ import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 import love.yinlin.ui.screen.msg.activity.ScreenActivityDetails
 import love.yinlin.ui.screen.msg.activity.ScreenAddActivity
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
-import love.yinlin.ui.screen.msg.weibo.ScreenChaohua
-import love.yinlin.ui.screen.msg.weibo.ScreenWeibo
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboDetails
-import love.yinlin.ui.screen.msg.weibo.ScreenWeiboUser
-import love.yinlin.ui.screen.msg.weibo.WeiboProcessor
+import love.yinlin.ui.screen.msg.weibo.*
 import kotlin.math.abs
 
 @Stable

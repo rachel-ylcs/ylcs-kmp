@@ -57,10 +57,10 @@ private object LibraryLoader {
     }
 }
 
-fun main() {
-    System.setProperty("compose.swing.render.on.graphics", "true")
-    System.setProperty("compose.interop.blending", "true")
+private external fun requestSingleInstance(): Boolean
+private external fun releaseSingleInstance()
 
+fun main() {
     LibraryLoader.run {
         if (!requestSingleInstance()) {
             releaseSingleInstance()
@@ -68,6 +68,9 @@ fun main() {
         }
         Runtime.getRuntime().addShutdownHook(Thread(::releaseSingleInstance))
     }
+
+    System.setProperty("compose.swing.render.on.graphics", "true")
+    System.setProperty("compose.interop.blending", "true")
 
     ActualAppContext().apply {
         app = this
@@ -171,6 +174,3 @@ fun main() {
         }
     }
 }
-
-private external fun requestSingleInstance(): Boolean
-private external fun releaseSingleInstance()

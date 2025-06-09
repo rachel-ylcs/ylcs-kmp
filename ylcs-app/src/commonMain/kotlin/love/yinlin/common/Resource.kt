@@ -14,7 +14,6 @@ object Resource {
 	fun initialize() {
 		Coroutines.startIO {
 			lunar = Res.readBytes("files/lunar.bin")
-			EmojiManager.initialize()
 		}
 	}
 }

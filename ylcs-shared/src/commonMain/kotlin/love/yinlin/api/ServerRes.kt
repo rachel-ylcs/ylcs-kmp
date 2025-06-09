@@ -11,6 +11,11 @@ object ServerRes : ResNode("public") {
         val DefaultWall = ResNode(this, "default_wall.webp")
     }
 
+    object Emoji : ResNode(this, "emoji") {
+        fun webp(id: Int) = ResNode(this, "${id}.webp")
+        fun lottie(id: Int) = ResNode(this, "${id}.json")
+    }
+
     object Song : ResNode(this, "song") {
         fun song(sid: Int) = ResNode(this, "${sid}.webp")
     }

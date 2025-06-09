@@ -157,8 +157,9 @@ kotlin {
                 implementation(libs.sketch.zoom)
 
                 implementation(libs.lottie)
-                implementation(libs.lottie.dot)
+                implementation(libs.lottie.network)
 
+                implementation(libs.tool.compress)
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
