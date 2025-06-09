@@ -15,6 +15,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.info.*
+import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
@@ -22,6 +23,7 @@ import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
 import love.yinlin.updateSQL
 import love.yinlin.values
+import kotlin.math.sqrt
 
 private val Game.manager: GameManager get() = when (this) {
     Game.AnswerQuestion -> GameManager.Game1Manager
@@ -43,6 +45,41 @@ sealed interface GameManager {
     fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
     fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
 
+    fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
+        var data: Data<GameResult> = Data.Success(GameResult(
+            isCompleted = isCompleted,
+            reward = if (isCompleted) details.reward / details.num else 0,
+            rank = if (isCompleted) details.winner.size + 1 else 0,
+            info = info
+        ))
+        DB.throwTransaction {
+            // 消费银币
+            val cost = details.cost
+            if (cost > 0) {
+                if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+                    // 增加发起者银币
+                    it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+                }
+                else data = "没有足够的银币参与".failedData
+            }
+            // 插入游戏记录
+            it.throwInsertSQLGeneratedKey("""
+                    INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
+                """, details.gid, uid, answer.toJsonString(), info.toJsonString())
+            // 更新游戏排行榜
+            if (isCompleted) {
+                val isGameCompleted = details.winner.size + 1 >= details.num
+                it.throwExecuteSQL("""
+                        UPDATE game
+                        SET winner = ? , isCompleted = ?
+                        WHERE gid = ?
+                    """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+            }
+        }
+        return data
+    }
+
+    // 答题
     data object Game1Manager : GameManager {
         const val MIN_THRESHOLD = 0.75f
 
@@ -56,74 +93,90 @@ sealed interface GameManager {
         }
 
         fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): AQResult {
-            val standardAnswers = standardAnswer.to<List<AQAnswer>>()
-            val userAnswers = userAnswer.to<List<AQUserAnswer>>()
-            val size = standardAnswers.size
-            require(size == userAnswers.size)
+            val actualStandardAnswer = standardAnswer.to<List<AQAnswer>>()
+            val actualUserAnswer = userAnswer.to<List<AQUserAnswer>>()
+            val size = actualStandardAnswer.size
+            require(size == actualUserAnswer.size)
             var correctCount = 0
             repeat(size) { i ->
-                if (userAnswers[i].verifyAnswer(standardAnswers[i])) ++correctCount
+                if (actualUserAnswer[i].verifyAnswer(actualStandardAnswer[i])) ++correctCount
             }
             return AQResult(correctCount = correctCount, totalCount = size)
         }
 
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
-            // 验证游戏结果
             val info = details.info.to<AQInfo>()
             val aqResult = verify(details.answer, userAnswer)
-            // 计算奖励与名次
-            val isCompleted = (aqResult.correctCount.toFloat() / aqResult.totalCount) >= info.threshold
-            val rank = if (isCompleted) details.winner.size + 1 else 0
-            val reward = if (isCompleted) details.reward / details.num else 0
-            val result = GameResult(
-                isCompleted = isCompleted,
-                reward = reward,
-                rank = rank,
+            return uploadResult(
+                uid = uid,
+                details = details,
+                answer = userAnswer,
+                isCompleted = (aqResult.correctCount.toFloat() / aqResult.totalCount) >= info.threshold,
                 info = aqResult.toJson()
             )
-            var data: Data<GameResult> = Data.Success(result)
-            DB.throwTransaction {
-                // 消费银币
-                val cost = details.cost
-                if (cost > 0) {
-                    if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
-                        // 增加发起者银币
-                        it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
-                    }
-                    else data = "没有足够的银币参与".failedData
-                }
-                // 插入游戏记录
-                it.throwInsertSQLGeneratedKey("""
-                    INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
-                """, details.gid, uid, userAnswer.toJsonString(), result.toJsonString())
-                // 更新游戏排行榜
-                if (isCompleted) {
-                    val isGameCompleted = details.winner.size + 1 >= details.num
-                    it.throwExecuteSQL("""
-                        UPDATE game
-                        SET winner = ? , isCompleted = ?
-                        WHERE gid = ?
-                    """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
-                }
-            }
-            return data
         }
     }
 
+    // 网格填词
     data object Game2Manager : GameManager {
-        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+        const val CHAR_EMPTY = '$'
+        const val CHAR_BLOCK = '#'
+        const val MIN_BLOCK_SIZE = 7
+        const val MAX_BLOCK_SIZE = 12
 
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            val actualQuestion = question.String
+            val actualAnswer = answer.String
+            val blockSize = sqrt(actualQuestion.length.toFloat()).toInt()
+            // 网格大小是完全平方数
+            require(blockSize in MIN_BLOCK_SIZE .. MAX_BLOCK_SIZE)
+            require(blockSize * blockSize == actualQuestion.length)
+            // 题目与答案大小相同
+            require(blockSize == actualAnswer.length)
+            // 题目中至少包含一个方格
+            require(actualQuestion.contains(CHAR_BLOCK))
+            // 答案中不能包含方格且至少包含一个非空
+            require(!actualAnswer.contains(CHAR_BLOCK) && !actualAnswer.all { it == CHAR_EMPTY })
+            for (index in actualQuestion.indices) {
+                val q = actualQuestion[index]
+                val a = actualAnswer[index]
+                when (q) {
+                    // 题目空则答案空
+                    CHAR_EMPTY -> require(a == CHAR_EMPTY)
+                    // 题目方格则答案非空
+                    CHAR_BLOCK -> require(a != CHAR_EMPTY)
+                    // 否则题目和答案一致
+                    else -> require(a == q)
+                }
+            }
         }
 
-        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
-            return JsonNull
+        fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): BTResult {
+            val actualStandardAnswer = standardAnswer.String
+            val actualUserAnswer = userAnswer.String
+            require(actualStandardAnswer.length == actualUserAnswer.length)
+            var correctCount = 0
+            for (i in actualStandardAnswer.indices) {
+                val ch1 = actualStandardAnswer[i]
+                val ch2 = actualUserAnswer[i]
+                if (ch1 == ch2) ++correctCount
+            }
+            return BTResult(correctCount = correctCount, totalCount = actualStandardAnswer.length)
         }
 
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
-            return Data.Error()
+            val btResult = verify(details.answer, userAnswer)
+            return uploadResult(
+                uid = uid,
+                details = details,
+                answer = userAnswer,
+                isCompleted = btResult.correctCount == btResult.totalCount,
+                info = btResult.toJson()
+            )
         }
     }
 
+    // 寻花令
     data object Game3Manager : GameManager {
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
@@ -138,6 +191,7 @@ sealed interface GameManager {
         }
     }
 
+    // 词寻
     data object Game4Manager : GameManager {
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
