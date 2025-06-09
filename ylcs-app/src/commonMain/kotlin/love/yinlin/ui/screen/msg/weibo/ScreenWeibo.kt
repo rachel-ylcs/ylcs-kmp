@@ -25,21 +25,26 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 @Stable
 class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
-    private var items by mutableStateOf(emptyList<Weibo>())
+    private var items = mutableStateListOf<Weibo>()
     private val listState = LazyStaggeredGridState()
 
     private suspend fun requestWeibo() {
         if (state != BoxState.LOADING) {
-            state = BoxState.LOADING
             val users = app.config.weiboUsers.map { it.id }
-            state = if (users.isEmpty()) BoxState.EMPTY else {
-                val newItems = mutableMapOf<String, Weibo>()
+            if (users.isEmpty()) state = BoxState.EMPTY
+            else {
+                state = BoxState.LOADING
+                items.clear()
                 for (id in users) {
                     val result = WeiboAPI.getUserWeibo(id)
-                    if (result is Data.Success) newItems += result.data.associateBy { it.id }
+                    if (result is Data.Success) {
+                        items += result.data
+                        items.sortDescending()
+                        if (state == BoxState.LOADING) state = BoxState.CONTENT
+                        listState.scrollToItem(0)
+                    }
                 }
-                items = newItems.map { it.value }.sortedDescending()
-                if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
+                if (state == BoxState.LOADING) state = BoxState.NETWORK_ERROR
             }
         }
     }
