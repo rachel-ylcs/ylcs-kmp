@@ -51,8 +51,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 			val subComments = comment.subComments
 			if (subComments.isNotEmpty()) {
 				Surface(
-					modifier = Modifier.fillMaxWidth()
-						.padding(top = ThemeValue.Padding.VerticalSpace, start = ThemeValue.Padding.HorizontalExtraSpace),
+					modifier = Modifier.fillMaxWidth().padding(
+						top = ThemeValue.Padding.VerticalSpace,
+						start = ThemeValue.Padding.HorizontalExtraSpace * 1.5f
+					),
 					tonalElevation = ThemeValue.Shadow.Tonal
 				) {
 					Column(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
@@ -84,10 +86,11 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 			modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxSize()
-				.padding(ThemeValue.Padding.EqualExtraValue),
+				.padding(horizontal = ThemeValue.Padding.EqualExtraSpace),
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
 			item(key = ItemKey("WeiboLayout")) {
+				Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 				WeiboLayout(weibo = weibo)
 			}
 			comments?.let { weiboComments ->
@@ -110,9 +113,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 			modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxSize()
-				.padding(ThemeValue.Padding.EqualExtraValue)
+				.padding(horizontal = ThemeValue.Padding.EqualExtraSpace)
 		) {
 			Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
+				Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 				WeiboLayout(weibo = weibo)
 			}
 			VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace))
@@ -125,6 +129,9 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 						modifier = Modifier.fillMaxSize(),
 						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 					) {
+						item(key = ItemKey("Space")) {
+							Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+						}
 						items(
 							items = weiboComments,
 							key = { it.id }
