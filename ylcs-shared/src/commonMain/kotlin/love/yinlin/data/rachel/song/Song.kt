@@ -2,6 +2,8 @@ package love.yinlin.data.rachel.song
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import love.yinlin.Local
+import love.yinlin.api.ServerRes
 
 @Stable
 @Serializable
@@ -16,4 +18,6 @@ data class Song(
     val album: String, // [专辑]
     val bgd: Boolean, // [是否有伴奏]
     val video: Boolean, // [是否有MV]
-)
+) {
+    val recordPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Song.song(sid)}" }
+}

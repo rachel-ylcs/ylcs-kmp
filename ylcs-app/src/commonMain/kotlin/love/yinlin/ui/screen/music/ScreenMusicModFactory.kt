@@ -15,13 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
@@ -30,6 +34,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationGrid
@@ -42,15 +47,20 @@ private fun SongCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Column(
+    Row(
         modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-            verticalAlignment = Alignment.CenterVertically
+        WebImage(
+            uri = remember(song) { song.recordPath },
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(ThemeValue.Size.Image).clip(MaterialTheme.shapes.large)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
             Text(
                 text = song.name,
@@ -59,50 +69,50 @@ private fun SongCard(
                 textAlign = TextAlign.Start,
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
-                modifier = Modifier.weight(3f)
+                modifier = Modifier.fillMaxWidth()
             )
-            Text(
-                text = song.id,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End,
-                maxLines = 1,
-                overflow = TextOverflow.MiddleEllipsis,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = song.version,
-                color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                maxLines = 1,
-                overflow = TextOverflow.MiddleEllipsis
-            )
-            if (song.bgd) {
-                MiniIcon(
-                    icon = Icons.Outlined.GifBox,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = song.version,
                     color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                    size = ThemeValue.Size.MicroIcon
+                    maxLines = 1,
+                    overflow = TextOverflow.MiddleEllipsis
                 )
-            }
-            if (song.video) {
-                MiniIcon(
-                    icon = Icons.Outlined.MusicVideo,
-                    color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                    size = ThemeValue.Size.MicroIcon
-                )
+                if (song.bgd) {
+                    MiniIcon(
+                        icon = Icons.Outlined.GifBox,
+                        color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        size = ThemeValue.Size.MicroIcon
+                    )
+                }
+                if (song.video) {
+                    MiniIcon(
+                        icon = Icons.Outlined.MusicVideo,
+                        color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        size = ThemeValue.Size.MicroIcon
+                    )
+                }
             }
         }
+        Text(
+            text = song.id,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            overflow = TextOverflow.MiddleEllipsis,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.align(alignment = Alignment.Top)
+        )
     }
 }
 
 @Stable
 class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
-    private val pageSongs = object : Pagination<Song, Int, Int>(0) {
+    private val pageSongs = object : Pagination<Song, Int, Int>(0, APIConfig.MAX_PAGE_NUM) {
         override fun distinctValue(item: Song): Int = item.sid
         override fun offset(item: Song): Int = item.sid
     }

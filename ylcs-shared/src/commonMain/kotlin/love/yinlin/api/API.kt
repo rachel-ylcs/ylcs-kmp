@@ -337,7 +337,7 @@ object API : APINode(null, "") {
 		object Song: APINode(this, "song") {
 			object GetSongs : APIPost<GetSongs.Request, List<love.yinlin.data.rachel.song.Song>>(this, "getSongs") {
 				@Serializable
-				data class Request(val sid: Int = 0, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val sid: Int = 0, val num: Int = APIConfig.MAX_PAGE_NUM)
 			}
 
 			object SearchSong : APIPost<String, love.yinlin.data.rachel.song.Song>(this, "searchSong")

@@ -12,8 +12,11 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -31,6 +34,7 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
@@ -156,24 +160,40 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {
-                RachelText(
-                    text = song.name,
-                    style = MaterialTheme.typography.labelLarge,
-                    icon = Icons.Outlined.MusicNote,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                RachelText(
-                    text = "编号: ${song.sid}",
-                    icon = Icons.Outlined.Loyalty
-                )
-                RachelText(
-                    text = "ID: ${song.id}",
-                    icon = Icons.Outlined.Badge
-                )
-                RachelText(
-                    text = "版本: ${song.version}",
-                    icon = ExtraIcons.Artist
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.weight(5f),
+                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    ) {
+                        RachelText(
+                            text = song.name,
+                            style = MaterialTheme.typography.labelLarge,
+                            icon = Icons.Outlined.MusicNote,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        RachelText(
+                            text = "编号: ${song.sid}",
+                            icon = Icons.Outlined.Loyalty
+                        )
+                        RachelText(
+                            text = "ID: ${song.id}",
+                            icon = Icons.Outlined.Badge
+                        )
+                        RachelText(
+                            text = "版本: ${song.version}",
+                            icon = ExtraIcons.Artist
+                        )
+                    }
+                    WebImage(
+                        uri = remember(song) { song.recordPath },
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
+                    )
+                }
                 RachelText(
                     text = "演唱: ${song.singer}",
                     icon = ExtraIcons.Artist
