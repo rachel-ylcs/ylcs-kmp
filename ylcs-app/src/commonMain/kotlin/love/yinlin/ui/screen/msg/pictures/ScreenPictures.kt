@@ -2,22 +2,25 @@ package love.yinlin.ui.screen.msg.pictures
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMap
@@ -26,7 +29,6 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
-import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
@@ -75,85 +77,12 @@ private sealed class PhotoItem(val name: String) {
     }
 }
 
-@Composable
-private fun PhotoFile(
-    item: PhotoItem.File,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Surface(
-        modifier = modifier,
-        shadowElevation = ThemeValue.Shadow.Surface
-    ) {
-        WebImage(
-            uri = item.thumb,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-            onClick = onClick
-        )
-    }
-}
-
-@Composable
-private fun PhotoFolderText(
-    text: String,
-    color: Color = Colors.Unspecified,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = text,
-        color = color,
-        textAlign = TextAlign.Center,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun PhotoFolder(
-    item: PhotoItem.Folder,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
-
-    Surface(
-        modifier = modifier,
-        shadowElevation = ThemeValue.Shadow.Surface
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (isAlbum) {
-                WebImage(
-                    uri = (item.items.first() as PhotoItem.File).thumb,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                )
-            }
-            else {
-                MiniImage(
-                    res = Res.drawable.img_photo_album,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                )
-            }
-            PhotoFolderText(
-                text = item.name,
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
-            )
-        }
-    }
-}
-
 @Stable
 class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     private var photos by mutableStateOf(PhotoItem.Home)
     private var stack = mutableStateListOf(photos)
     private var state by mutableStateOf(BoxState.EMPTY)
-    private val listState = LazyGridState()
+    private val listState = LazyListState()
     private val current by derivedStateOf { stack.last() }
 
     private suspend fun loadPhotos() {
@@ -180,7 +109,10 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "美图"
 
     override fun onBack() {
-        if (stack.size > 1) stack.removeLastOrNull()
+        if (stack.size > 1) {
+            stack.removeLastOrNull()
+            listState.requestScrollToItem(0)
+        }
         else pop()
     }
 
@@ -188,12 +120,70 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         loadPhotos()
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun PhotoList(
+        folder: PhotoItem.Folder,
+        modifier: Modifier = Modifier,
+        onAlbumClick: (PhotoItem.Folder, Int) -> Unit,
+        onEnterFolder: (PhotoItem.Folder) -> Unit,
+    ) {
+        LazyColumn(
+            state = listState,
+            contentPadding = ThemeValue.Padding.EqualValue,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+            modifier = modifier
+        ) {
+            items(
+                items = folder.items,
+                key = { it.name }
+            ) { item ->
+                if (item is PhotoItem.Folder) {
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+
+                    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
+                    if (isAlbum) {
+                        HorizontalMultiBrowseCarousel(
+                            state = rememberCarouselState { item.items.size },
+                            preferredItemWidth = ThemeValue.Size.CellWidth,
+                            itemSpacing = ThemeValue.Padding.HorizontalSpace,
+                            modifier = Modifier.fillMaxWidth().clipToBounds()
+                        ) { index ->
+                            WebImage(
+                                uri = (item.items[index] as PhotoItem.File).thumb,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                                    .aspectRatio(0.66667f)
+                                    .maskClip(MaterialTheme.shapes.large),
+                                onClick = { onAlbumClick(item, index) }
+                            )
+                        }
+                    }
+                    else {
+                        MiniImage(
+                            res = Res.drawable.img_photo_album,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                                .aspectRatio(0.66667f)
+                                .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.large)
+                                .clip(MaterialTheme.shapes.large)
+                                .clickable { onEnterFolder(item) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     @Composable
     override fun SubContent(device: Device) {
-        LaunchedEffect(stack.size) {
-            listState.scrollToItem(0)
-        }
-
         StatefulBox(
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
@@ -209,41 +199,25 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             stack.removeRange(it + 1, stack.size)
+                            listState.requestScrollToItem(0)
                         }
                     )
                 }
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
-                    state = listState,
-                    contentPadding = ThemeValue.Padding.EqualValue,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    modifier = Modifier.fillMaxWidth().weight(1f)
-                ) {
-                    itemsIndexed(
-                        items = current.items,
-                        key = { _, item -> item.name }
-                    ) { index, item ->
-                        when (item) {
-                            is PhotoItem.File -> PhotoFile(
-                                item = item,
-                                modifier = Modifier.fillMaxWidth().aspectRatio(0.66667f),
-                                onClick = {
-                                    val pics = current.items.fastMap {
-                                        val file = it as PhotoItem.File
-                                        Picture(file.thumb, file.source)
-                                    }
-                                    navigate(ScreenImagePreview.Args(pics, index))
-                                }
-                            )
-                            is PhotoItem.Folder -> PhotoFolder(
-                                item = item,
-                                modifier = Modifier.fillMaxWidth().aspectRatio(0.66667f),
-                                onClick = { stack += item }
-                            )
+                PhotoList(
+                    folder = current,
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    onAlbumClick = { folder, index ->
+                        val pics = folder.items.fastMap {
+                            val file = it as PhotoItem.File
+                            Picture(file.thumb, file.source)
                         }
+                        navigate(ScreenImagePreview.Args(pics, index))
+                    },
+                    onEnterFolder = {
+                        stack += it
+                        listState.requestScrollToItem(0)
                     }
-                }
+                )
             }
         }
     }
