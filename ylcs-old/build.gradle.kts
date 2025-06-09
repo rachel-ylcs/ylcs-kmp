@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.yinlin.rachel"
-    compileSdk = 35
+    compileSdk = rootProject.extra["androidBuildSDK"] as Int
 
     defaultConfig {
         applicationId = "com.yinlin.rachel"
-        minSdk = 29
-        targetSdk = 35
+        minSdk = rootProject.extra["androidMinSDK"] as Int
+        targetSdk = rootProject.extra["androidBuildSDK"] as Int
         versionCode = 250
         versionName = "2.5.0"
 

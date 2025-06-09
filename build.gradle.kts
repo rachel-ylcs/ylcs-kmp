@@ -44,7 +44,7 @@ val r8OptimizeFilename by extra("proguard-android-optimize.txt")
 // Android
 val androidDir by extra(dirSrc.dir("androidMain"))
 val androidMinSDK by extra(29)
-val androidBuildSDK by extra(35)
+val androidBuildSDK by extra(36)
 val androidNDKABI by extra(arrayOf("arm64-v8a"))
 val androidKeyFile by extra(dirConfig.file("androidKey.jks"))
 val androidKeyName by extra("rachel")
