@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
@@ -31,16 +32,14 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
+import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.common.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameType
-import love.yinlin.data.rachel.game.imgX
-import love.yinlin.data.rachel.game.imgY
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickImage
 import love.yinlin.ui.component.image.ColorfulIcon
-import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.screen.community.BoxText
@@ -50,7 +49,7 @@ import kotlin.math.absoluteValue
 @Composable
 private fun GameCard(
 	game: Game,
-	isPortrait: Boolean,
+	isLandscape: Boolean,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
@@ -59,13 +58,12 @@ private fun GameCard(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 	) {
-		ClickImage(
-			res = if (isPortrait) game.imgY else game.imgX,
+		WebImage(
+			uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
+			key = Local.VERSION,
 			contentScale = ContentScale.Crop,
-			modifier = Modifier
-				.fillMaxWidth(fraction = 0.75f)
-				.aspectRatio(1f)
-				.clip(CircleShape),
+			circle = true,
+			modifier = Modifier.fillMaxWidth(fraction = 0.75f).aspectRatio(1f),
 			onClick = onClick
 		)
 		Row(
@@ -117,7 +115,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	private fun GameBackground(
 		modifier: Modifier = Modifier,
-		isPortrait: Boolean,
+		isLandscape: Boolean,
 	) {
 		Crossfade(
 			targetState = pagerState.currentPage,
@@ -129,8 +127,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			val pageOffset = pagerState.currentPageOffsetFraction
 			val game = Game.entries[currentPage]
 
-			MiniImage(
-				res = if (isPortrait) game.imgY else game.imgX,
+			WebImage(
+				uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
+				key = Local.VERSION,
 				contentScale = ContentScale.Crop,
 				alignment = Alignment.TopCenter,
 				modifier = Modifier
@@ -161,7 +160,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 			GameBackground(
 				modifier = Modifier.fillMaxSize(),
-				isPortrait = true
+				isLandscape = false
 			)
 
 			val padding = (maxWidth - ThemeValue.Size.CardWidth) / 2
@@ -182,7 +181,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 				GameCard(
 					game = game,
-					isPortrait = true,
+					isLandscape = false,
 					modifier = Modifier
 						.padding(bottom = lerp(40.dp, 0.dp, pageOffset.absoluteValue.coerceIn(0f, 1f)))
 						.fillMaxWidth()
@@ -206,7 +205,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		) {
 			GameBackground(
 				modifier = Modifier.fillMaxSize(),
-				isPortrait = false
+				isLandscape = true
 			)
 
 			Row(
@@ -238,7 +237,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 				GameCard(
 					game = game,
-					isPortrait = false,
+					isLandscape = true,
 					modifier = Modifier
 						.width(ThemeValue.Size.CardWidth)
 						.aspectRatio(0.66667f)

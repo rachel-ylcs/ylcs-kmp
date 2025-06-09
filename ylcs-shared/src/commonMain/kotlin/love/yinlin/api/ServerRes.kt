@@ -16,6 +16,12 @@ object ServerRes : ResNode("public") {
         fun lottie(id: Int) = ResNode(this, "${id}.json")
     }
 
+    object Game : ResNode(this, "game") {
+        fun x(id: Int) = ResNode(this, "game${id}x.webp")
+        fun y(id: Int) = ResNode(this, "game${id}y.webp")
+        fun xy(id: Int, isX: Boolean) = if (isX) x(id) else y(id)
+    }
+
     object Song : ResNode(this, "song") {
         fun song(sid: Int) = ResNode(this, "${sid}.webp")
     }

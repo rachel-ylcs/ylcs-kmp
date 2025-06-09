@@ -8,6 +8,8 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import love.yinlin.Local
+import love.yinlin.api.ServerRes
 
 @Stable
 @Serializable(Game.Serializer::class)
@@ -36,6 +38,10 @@ enum class Game(
         description = "根据词库提示尽可能用最短的时间将所有满足条件的内容列出",
         type = GameType.SPEED
     );
+
+    val xPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Game.x(this.ordinal + 1)}" }
+    val yPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Game.y(this.ordinal + 1)}" }
+    fun xyPath(isX: Boolean): String = "${Local.ClientUrl}/${ServerRes.Game.xy(this.ordinal + 1, isX)}"
 
     object Serializer : KSerializer<Game> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Game", PrimitiveKind.INT)
