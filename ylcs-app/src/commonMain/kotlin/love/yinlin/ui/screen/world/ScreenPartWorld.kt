@@ -80,7 +80,8 @@ private fun GameCard(
 				text = game.type.title,
 				color = when (game.type) {
                     GameType.RANK -> MaterialTheme.colorScheme.primary
-                    GameType.SPEED -> MaterialTheme.colorScheme.secondary
+					GameType.EXPLORATION -> MaterialTheme.colorScheme.secondary
+                    GameType.SPEED -> MaterialTheme.colorScheme.tertiary
                 }
 			)
 		}

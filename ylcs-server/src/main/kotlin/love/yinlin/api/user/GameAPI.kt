@@ -17,6 +17,7 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.Int
+import love.yinlin.extension.Long
 import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -45,60 +46,129 @@ sealed interface GameManager {
     }
 
     fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
-    fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
+    fun preflight(uid: Int, details: GameDetails): PreflightResult
     fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
+    fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult>
 
-    // 上传成绩
-    fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
-        var data: Data<GameResult> = Data.Success(GameResult(
-            isCompleted = isCompleted,
-            reward = if (isCompleted) details.reward / details.num else 0,
-            rank = if (isCompleted) details.winner.size + 1 else 0,
-            info = info
-        ))
-        DB.throwTransaction {
-            // 消费银币
-            val cost = details.cost
-            if (cost > 0) {
-                if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
-                    // 增加发起者银币
-                    it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+    // 排位
+    abstract class RankGameManager : GameManager {
+        override fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
+
+        override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
+            return DB.throwTransaction {
+                // 消费银币
+                val cost = details.cost
+                if (cost > 0) {
+                    if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+                        // 增加发起者银币
+                        it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+                    }
+                    else return@throwTransaction "没有足够的银币参与".failedData
                 }
-                else data = "没有足够的银币参与".failedData
-            }
-            // 插入游戏记录
-            it.throwInsertSQLGeneratedKey("""
+                // 插入游戏记录
+                it.throwInsertSQLGeneratedKey("""
                     INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
                 """, details.gid, uid, answer.toJsonString(), info.toJsonString())
-            // 更新游戏排行榜
-            if (isCompleted) {
-                val isGameCompleted = details.winner.size + 1 >= details.num
-                it.throwExecuteSQL("""
+                // 更新游戏排行榜
+                if (isCompleted) {
+                    val isGameCompleted = details.winner.size + 1 >= details.num
+                    it.throwExecuteSQL("""
                         UPDATE game
                         SET winner = ? , isCompleted = ?
                         WHERE gid = ?
                     """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+                }
+                Data.Success(GameResult(
+                    isCompleted = isCompleted,
+                    reward = if (isCompleted) details.reward / details.num else 0,
+                    rank = if (isCompleted) details.winner.size + 1 else 0,
+                    info = info
+                ))
             }
         }
-        return data
     }
 
-    // 可重试上传成绩
-    fun retryUploadResult(uid: Int, details: GameDetails, tryCount: Int, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
-        var data: Data<GameResult> = Data.Success(GameResult(
-            isCompleted = isCompleted,
-            reward = if (isCompleted) details.reward / details.num else 0,
-            rank = if (isCompleted) details.winner.size + 1 else 0,
-            info = info
-        ))
-        DB.throwTransaction {
+    // 探索
+    abstract class ExplorationGameManager : GameManager {
+        open val minTryCount: Int = 3 // 最小尝试次数
+        open val maxTryCount: Int = 10 // 最大尝试次数
 
+        abstract fun fetchTryCount(info: JsonElement): Int
+
+        override fun preflight(uid: Int, details: GameDetails): PreflightResult {
+            // 检查尝试记录
+            val oldRecord = DB.querySQLSingle("""
+                SELECT rid, answer, result
+                FROM game_record
+                WHERE uid = ? AND gid = ?
+            """, uid, details.gid)
+            val oldAnswer = oldRecord?.get("answer")?.to<List<JsonElement>>() ?: emptyList()
+            return if (oldAnswer.size >= fetchTryCount(details.info)) PreflightResult("尝试次数达到上限") else PreflightResult()
         }
-        return data
+
+        override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
+            return DB.throwTransaction {
+                // 检查尝试记录
+                val oldRecord = DB.querySQLSingle("""
+                    SELECT rid, answer, result
+                    FROM game_record
+                    WHERE uid = ? AND gid = ?
+                """, uid, details.gid)
+                val rid = oldRecord?.get("rid")?.Long
+                val oldAnswer = oldRecord?.get("answer")?.to<MutableList<JsonElement>>() ?: mutableListOf()
+                val oldResult = oldRecord?.get("result")?.to<MutableList<JsonElement>>() ?: mutableListOf()
+                if (oldAnswer.size >= fetchTryCount(details.info)) return@throwTransaction "尝试次数达到上限".failedData
+                // 消费银币
+                val cost = details.cost
+                // 只有第一次尝试消耗银币
+                if (cost > 0 && rid == null) {
+                    if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+                        // 增加发起者银币
+                        it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+                    }
+                    else return@throwTransaction "没有足够的银币参与".failedData
+                }
+                // 插入游戏记录
+                oldAnswer += answer
+                oldResult += info
+                if (rid == null) {
+                    it.throwInsertSQLGeneratedKey("""
+                        INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
+                    """, details.gid, uid, oldAnswer.toJsonString(), oldResult.toJsonString())
+                }
+                else {
+                    it.throwExecuteSQL("""
+                        UPDATE game_record
+                        SET answer = ? , result = ? , ts = CURRENT_TIMESTAMP
+                        WHERE rid = ?
+                    """, oldAnswer.toJsonString(), oldResult.toJsonString(), rid)
+                }
+                // 更新游戏排行榜
+                if (isCompleted) {
+                    val isGameCompleted = details.winner.size + 1 >= details.num
+                    it.throwExecuteSQL("""
+                        UPDATE game
+                        SET winner = ? , isCompleted = ?
+                        WHERE gid = ?
+                    """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+                }
+                Data.Success(GameResult(
+                    isCompleted = isCompleted,
+                    reward = if (isCompleted) details.reward / details.num else 0,
+                    rank = if (isCompleted) details.winner.size + 1 else 0,
+                    info = info
+                ))
+            }
+        }
+    }
+
+    // 竞速
+    abstract class SpeedGameManager : RankGameManager() {
+
     }
 
     // 答题
-    data object Game1Manager : GameManager {
+    data object Game1Manager : RankGameManager() {
         const val MIN_THRESHOLD = 0.75f // 最小成功阈值
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
@@ -136,7 +206,7 @@ sealed interface GameManager {
     }
 
     // 网格填词
-    data object Game2Manager : GameManager {
+    data object Game2Manager : RankGameManager() {
         const val CHAR_EMPTY = '$' // 空字符
         const val CHAR_BLOCK = '#' // 方格字符
         const val MIN_BLOCK_SIZE = 7 // 最小网格大小
@@ -195,17 +265,18 @@ sealed interface GameManager {
     }
 
     // 寻花令
-    data object Game3Manager : GameManager {
-        const val MIN_TRY_COUNT = 3 // 最小尝试次数
+    data object Game3Manager : ExplorationGameManager() {
         const val MIN_LENGTH = 10 // 最小长度
         const val MAX_LENGTH = 14 // 最大长度
+
+        override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val actualInfo = info.to<FOInfo>()
             val actualQuestion = question.Int
             val actualAnswer = answer.String
             // 尝试次数
-            require(actualInfo.tryCount >= MIN_TRY_COUNT)
+            require(actualInfo.tryCount in minTryCount .. maxTryCount)
             // 问题长度
             require(actualQuestion in MIN_LENGTH .. MAX_LENGTH)
             // 答案长度与问题一致
@@ -226,18 +297,11 @@ sealed interface GameManager {
             return FOType.encode(MIN_LENGTH, items)
         }
 
-        override fun preflight(uid: Int, details: GameDetails): PreflightResult {
-
-            return super.preflight(uid, details)
-        }
-
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
-            val actualInfo = details.info.to<FOInfo>()
             val foResult = verify(details.answer, userAnswer)
-            return retryUploadResult(
+            return uploadResult(
                 uid = uid,
                 details = details,
-                tryCount = actualInfo.tryCount,
                 answer = userAnswer,
                 isCompleted = FOType.verify(foResult),
                 info = foResult.toJson()
@@ -246,7 +310,7 @@ sealed interface GameManager {
     }
 
     // 词寻
-    data object Game4Manager : GameManager {
+    data object Game4Manager : SpeedGameManager() {
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
 
         }
@@ -271,10 +335,10 @@ private fun preflightGame(token: String, gid: Int): PreflightInfo {
     val uid = AN.throwExpireToken(token)
     VN.throwId(gid)
     val gameDetails = DB.throwQuerySQLSingle("""
-            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
-            FROM game
-            WHERE gid = ? AND isDeleted = 0
-        """, gid).to<GameDetails>()
+        SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+        FROM game
+        WHERE gid = ? AND isDeleted = 0
+    """, gid).to<GameDetails>()
     val result = if (gameDetails.uid == uid) PreflightResult("不能参与自己创建的游戏哦")
         else if (gameDetails.isCompleted) PreflightResult("不能参与已经结算的游戏哦")
         else if (uid.toString() in gameDetails.winner) PreflightResult("不能参与完成过的游戏哦")
