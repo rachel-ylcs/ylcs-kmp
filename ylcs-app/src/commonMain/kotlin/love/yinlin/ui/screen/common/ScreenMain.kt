@@ -147,6 +147,7 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 			parts.getOrNull(it)?.let { part ->
 				Box(modifier = Modifier.fillMaxSize()) {
 					part.Content()
+					
 					part.fabIcon?.let { icon ->
 						FABLayout(
 							icon = icon,

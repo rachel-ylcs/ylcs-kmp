@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.app
@@ -78,7 +79,10 @@ fun FABLayout(
     menus: Array<FABAction>
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().zIndex(Floating.Z_INDEX_FAB),
+        modifier = Modifier
+            .padding(LocalImmersivePadding.current)
+            .fillMaxSize()
+            .zIndex(Floating.Z_INDEX_FAB),
         contentAlignment = Alignment.BottomEnd
     ) {
         if (menus.isEmpty()) {

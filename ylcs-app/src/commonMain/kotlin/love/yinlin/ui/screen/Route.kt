@@ -77,17 +77,17 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 			Content()
 		}
 
-		fabIcon?.let {
-			FABLayout(
-				icon = it,
-				canExpand = fabCanExpand,
-				onClick = ::onFabClick,
-				menus = fabMenus
-			)
-		}
-
 		val immersivePadding = rememberImmersivePadding()
 		CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+			fabIcon?.let {
+				FABLayout(
+					icon = it,
+					canExpand = fabCanExpand,
+					onClick = ::onFabClick,
+					menus = fabMenus
+				)
+			}
+
 			Floating()
 
 			with(slot) {
