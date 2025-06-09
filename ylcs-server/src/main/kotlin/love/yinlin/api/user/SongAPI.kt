@@ -18,20 +18,30 @@ fun Routing.songAPI(implMap: ImplMap){
         val songs = DB.throwQuerySQL("""
 			SELECT sid, id, version, name, singer, lyricist, composer, album, bgd, video
 			FROM song
-            where sid > ?
+            WHERE sid > ?
 			ORDER BY sid ASC
 			LIMIT ?
 		""", sid, num.coercePageNum)
         Data.Success(songs.to())
     }
 
-    api(API.User.Song.SearchSong) { id ->
+    api(API.User.Song.GetSong) { id ->
         val song = DB.querySQLSingle("""
             SELECT sid, id, version, name, singer, lyricist, composer, album, bgd, video
 			FROM song
-            where id = ?
+            WHERE id = ?
         """, id)
         if (song == null) "此歌曲未收录".failedData else Data.Success(song.to())
+    }
+
+    api(API.User.Song.SearchSongs) { key ->
+        val songs = DB.throwQuerySQL("""
+			SELECT sid, id, version, name, singer, lyricist, composer, album, bgd, video
+			FROM song
+            WHERE name LIKE ?
+			ORDER BY sid ASC
+		""", "%${key}%")
+        Data.Success(songs.to())
     }
 
     api(API.User.Song.GetSongComments) { (sid, cid, num) ->

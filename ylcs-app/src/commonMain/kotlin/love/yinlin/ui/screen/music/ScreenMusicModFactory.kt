@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.GifBox
 import androidx.compose.material.icons.outlined.MusicVideo
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,10 +36,12 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.FloatingDialogInput
 
 @Composable
 private fun SongCard(
@@ -125,7 +128,10 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
             data = API.User.Song.GetSongs.Request(num = pageSongs.pageNum)
         )
         when (result) {
-            is Data.Success -> pageSongs.newData(result.data)
+            is Data.Success -> {
+                pageSongs.newData(result.data)
+                gridState.scrollToItem(0)
+            }
             is Data.Error -> slot.tip.error(result.message)
         }
     }
@@ -141,10 +147,33 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
         if (result is Data.Success) pageSongs.moreData(result.data)
     }
 
+    private suspend fun searchNewData(key: String) {
+        val result = ClientAPI.request(
+            route = API.User.Song.SearchSongs,
+            data = key
+        )
+        when (result) {
+            is Data.Success -> {
+                pageSongs.newData(result.data)
+                pageSongs.canLoading = false
+                gridState.scrollToItem(0)
+            }
+            is Data.Error -> slot.tip.error(result.message)
+        }
+    }
+
     override val title: String = "MOD工坊"
 
     override suspend fun initialize() {
         requestNewData()
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        ActionSuspend(Icons.Outlined.Search) {
+            val result = searchDialog.openSuspend()
+            if (result != null) searchNewData(result)
+        }
     }
 
     @Composable
@@ -183,5 +212,12 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewData() }
         else gridState.animateScrollToItem(0)
+    }
+
+    private val searchDialog = FloatingDialogInput(hint = "歌曲名", maxLength = 32)
+
+    @Composable
+    override fun Floating() {
+        searchDialog.Land()
     }
 }

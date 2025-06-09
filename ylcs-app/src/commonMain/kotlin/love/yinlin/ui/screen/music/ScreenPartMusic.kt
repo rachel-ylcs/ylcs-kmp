@@ -121,7 +121,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		factory.currentMusic?.let { musicInfo ->
 			launch {
 				val result = ClientAPI.request(
-					route = API.User.Song.SearchSong,
+					route = API.User.Song.GetSong,
 					data = musicInfo.id
 				)
 				when (result) {

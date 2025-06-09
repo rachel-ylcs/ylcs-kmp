@@ -136,7 +136,10 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> pageFollows.newData(result.data)
+                    is Data.Success -> {
+                        pageFollows.newData(result.data)
+                        gridState.scrollToItem(0)
+                    }
                     is Data.Error -> slot.tip.error(result.message)
                 }
             }
@@ -149,7 +152,10 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> pageFollowers.newData(result.data)
+                    is Data.Success -> {
+                        pageFollowers.newData(result.data)
+                        gridState.scrollToItem(0)
+                    }
                     is Data.Error -> slot.tip.error(result.message)
                 }
             }
@@ -162,12 +168,14 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> pageBlockUsers.newData(result.data)
+                    is Data.Success -> {
+                        pageBlockUsers.newData(result.data)
+                        gridState.scrollToItem(0)
+                    }
                     is Data.Error -> slot.tip.error(result.message)
                 }
             }
         }
-        gridState.scrollToItem(0)
     }
 
     private suspend fun requestMoreData() {
