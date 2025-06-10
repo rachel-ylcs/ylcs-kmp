@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
@@ -132,7 +129,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
             navigate(ScreenCreateGame.Args(args.type))
         },
         FABAction(ExtraIcons.RewardCup) {
-
+            navigate(ScreenGameRanking.Args(args.type))
         },
         FABAction(Icons.Outlined.Refresh) {
             launch { requestNewGames() }

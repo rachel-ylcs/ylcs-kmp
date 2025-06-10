@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -275,5 +277,13 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			Device.Type.PORTRAIT -> Portrait()
 			Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape()
 		}
+	}
+
+	override val fabCanExpand: Boolean = false
+
+	override val fabIcon: ImageVector = Icons.Outlined.History
+
+	override suspend fun onFabClick() {
+
 	}
 }
