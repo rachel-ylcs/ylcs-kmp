@@ -205,7 +205,10 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace)
 			) {
-				MailItem(mail = it)
+				MailItem(
+					mail = it,
+					modifier = Modifier.fillMaxWidth()
+				)
 			}
 		}
 	}

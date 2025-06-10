@@ -36,7 +36,6 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.screen.FABAction
 
@@ -77,8 +76,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 
     private suspend fun requestNewData() {
         state = BoxState.LOADING
-        val section = currentSection
-        val result = when (section) {
+        val result = when (val section = currentSection) {
             DiscoveryItem.LatestTopic.id -> ClientAPI.request(
                 route = API.User.Topic.GetLatestTopics,
                 data = API.User.Topic.GetLatestTopics.Request(
@@ -113,8 +111,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     }
 
     private suspend fun requestMoreData() {
-        val section = currentSection
-        val result = when (section) {
+        val result = when (val section = currentSection) {
             DiscoveryItem.LatestTopic.id -> ClientAPI.request(
                 route = API.User.Topic.GetLatestTopics,
                 data = API.User.Topic.GetLatestTopics.Request(

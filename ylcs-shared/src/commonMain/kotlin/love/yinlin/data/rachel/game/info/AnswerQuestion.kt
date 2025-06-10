@@ -3,6 +3,20 @@ package love.yinlin.data.rachel.game.info
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.yinlin.data.rachel.game.RankConfig
+
+@Stable
+@Suppress("MayBeConstant")
+data object AQConfig : RankConfig() {
+    val minThreshold: Float = 0.75f // 最小成功阈值
+    val maxThreshold: Float = 1f // 最大成功阈值
+    val minQuestionCount: Int = 3 // 最小题数
+    val maxQuestionCount: Int = 30 // 最大题数
+    val minOptionCount: Int = 2 // 最小选项数
+    val maxOptionCount: Int = 8 // 最大选项数
+    val minAnswerCount: Int = 1 // 最小答案数
+    val maxAnswerCount: Int = 10 // 最大答案数
+}
 
 @Stable
 @Serializable
@@ -13,23 +27,19 @@ data class AQInfo(
 @Stable
 @Serializable
 sealed class AQQuestion {
-    companion object {
-        const val MAX_OPTION_COUNT = 10
-    }
-
     abstract val title: String
 
     // 单选
     @Stable
     @Serializable
     @SerialName("Choice")
-    data class Choice(override val title: String, val options: List<String>) : AQQuestion()
+    data class Choice(override val title: String, val options: List<String> = emptyList()) : AQQuestion()
 
     // 多选
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(override val title: String, val options: List<String>) : AQQuestion()
+    data class MultiChoice(override val title: String, val options: List<String> = emptyList()) : AQQuestion()
 
     // 填空
     @Stable
@@ -41,17 +51,17 @@ sealed class AQQuestion {
 @Stable
 @Serializable
 sealed class AQAnswer {
-    abstract fun matchQuestion(question: AQQuestion)
+    abstract fun matchQuestion(config: AQConfig, question: AQQuestion)
 
     // 单选
     @Stable
     @Serializable
     @SerialName("Choice")
-    data class Choice(val value: Int) : AQAnswer() {
-        override fun matchQuestion(question: AQQuestion) {
+    data class Choice(val value: Int = -1) : AQAnswer() {
+        override fun matchQuestion(config: AQConfig, question: AQQuestion) {
             require(question is AQQuestion.Choice)
             require(question.title.isNotBlank())
-            require(question.options.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
+            require(question.options.size in config.minOptionCount .. config.maxOptionCount)
             require(value in 0 ..< question.options.size)
         }
     }
@@ -60,11 +70,12 @@ sealed class AQAnswer {
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(val value: List<Int>) : AQAnswer() {
-        override fun matchQuestion(question: AQQuestion) {
+    data class MultiChoice(val value: List<Int> = emptyList()) : AQAnswer() {
+        override fun matchQuestion(config: AQConfig, question: AQQuestion) {
             require(question is AQQuestion.MultiChoice)
             require(question.title.isNotBlank())
-            require(question.options.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
+            require(question.options.size in config.minOptionCount .. config.maxOptionCount)
+            require(value.size > 1)
             require(value.all { it in 0 ..< question.options.size })
             require(value.size == value.toSet().size)
         }
@@ -74,10 +85,10 @@ sealed class AQAnswer {
     @Stable
     @Serializable
     @SerialName("Blank")
-    data class Blank(val value: List<String>) : AQAnswer() {
-        override fun matchQuestion(question: AQQuestion) {
+    data class Blank(val value: List<String> = emptyList()) : AQAnswer() {
+        override fun matchQuestion(config: AQConfig, question: AQQuestion) {
             require(question is AQQuestion.Blank)
-            require(value.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
+            require(value.size in config.minAnswerCount .. config.maxAnswerCount)
             require(value.size == value.toSet().size)
             require(value.all { it.isNotBlank() })
         }

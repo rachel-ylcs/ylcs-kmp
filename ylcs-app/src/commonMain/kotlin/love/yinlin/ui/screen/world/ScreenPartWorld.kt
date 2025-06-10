@@ -43,7 +43,6 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.screen.community.BoxText
-import love.yinlin.ui.screen.world.game.*
 import kotlin.math.absoluteValue
 
 @Composable
@@ -103,15 +102,6 @@ private fun GameCard(
 @Stable
 class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private val pagerState = PagerState { Game.entries.size }
-
-	private fun onGameClick(game: Game) {
-		when (game) {
-            Game.AnswerQuestion -> navigate<ScreenGame1Hall>()
-            Game.BlockText -> navigate<ScreenGame2Hall>()
-            Game.FlowersOrder -> navigate<ScreenGame3Hall>()
-            Game.SearchAll -> navigate<ScreenGame4Hall>()
-        }
-	}
 
 	@Composable
 	private fun GameBackground(
@@ -192,7 +182,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.condition(offset == 0) { border(width = ThemeValue.Border.Large, color = MaterialTheme.colorScheme.primary, shape = CircleShape) }
 						.background(MaterialTheme.colorScheme.background)
 						.padding(ThemeValue.Padding.CardValue),
-					onClick = { onGameClick(game) }
+					onClick = {
+						navigate(ScreenGameHall.Args(game))
+					}
 				)
 			}
 		}
@@ -250,7 +242,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						)
 						.background(MaterialTheme.colorScheme.surface)
 						.padding(ThemeValue.Padding.CardValue),
-					onClick = { onGameClick(game) }
+					onClick = {
+						navigate(ScreenGameHall.Args(game))
+					}
 				)
 
 				Box(

@@ -2,6 +2,14 @@ package love.yinlin.data.rachel.game.info
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import love.yinlin.data.rachel.game.ExplorationConfig
+
+@Stable
+@Suppress("MayBeConstant")
+data object FOConfig : ExplorationConfig() {
+    val minLength: Int = 10 // 最小长度
+    val maxLength: Int = 14 // 最大长度
+}
 
 @Stable
 @Serializable

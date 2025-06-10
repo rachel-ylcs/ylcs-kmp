@@ -6,7 +6,6 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
-import love.yinlin.data.rachel.game.CreateGameObject
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.UserGameRecord
@@ -153,7 +152,11 @@ object API : APINode(null, "") {
 		}
 
 		object Game : APINode(this, "game") {
-			object CreateGame : APIPost<CreateGameObject, Int>(this, "createGame")
+			object CreateGame : APIPost<CreateGame.Request, Int>(this, "createGame") {
+				@Serializable
+				data class Request(val token: String, val title: String, val type: love.yinlin.data.rachel.game.Game, val reward: Int,
+					val num: Int, val cost: Int, val info: JsonElement, val question: JsonElement, val answer: JsonElement)
+			}
 
 			object DeleteGame : APIPostRequest<DeleteGame.Request>(this, "DeleteGame") {
 				@Serializable
@@ -162,7 +165,7 @@ object API : APINode(null, "") {
 
 			object GetGames : APIPost<GetGames.Request, List<GamePublicDetails>>(this, "getGames") {
 				@Serializable
-				data class Request(val type: love.yinlin.data.rachel.game.Game?, val gid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val type: love.yinlin.data.rachel.game.Game, val gid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
 			object GetUserGames : APIPost<GetUserGames.Request, List<GameDetails>>(this, "getUserGames") {

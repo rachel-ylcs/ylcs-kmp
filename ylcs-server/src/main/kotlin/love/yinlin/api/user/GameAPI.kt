@@ -10,10 +10,14 @@ import love.yinlin.api.api
 import love.yinlin.api.failedData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
+import love.yinlin.data.rachel.game.ExplorationConfig
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.data.rachel.game.RankConfig
+import love.yinlin.data.rachel.game.SpeedConfig
 import love.yinlin.data.rachel.game.SpeedGameAnswer
 import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.Array
@@ -38,15 +42,7 @@ private val Game.manager: GameManager get() = when (this) {
 }
 
 sealed interface GameManager {
-    companion object {
-        const val MAX_REWARD = 30
-        const val MAX_RANK = 3
-        const val MAX_COST_RATIO = MAX_REWARD / MAX_RANK
-
-        fun checkReward(reward: Int, num: Int, cost: Int): Boolean = reward !in 1 .. MAX_REWARD && num !in 1 .. MAX_RANK &&
-                (cost == 0 || cost !in 1 .. (reward / MAX_COST_RATIO).coerceAtLeast(1))
-    }
-
+    val config: GameConfig get() = GameConfig
     fun check(info: JsonElement, question: JsonElement, answer: JsonElement)
     fun preflight(uid: Int, details: GameDetails): PreflightResult
     fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult>
@@ -54,6 +50,8 @@ sealed interface GameManager {
 
     // 排位
     abstract class RankGameManager : GameManager {
+        override val config: RankConfig = RankConfig
+
         override fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
 
         override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
@@ -92,14 +90,13 @@ sealed interface GameManager {
 
     // 探索
     abstract class ExplorationGameManager : GameManager {
-        open val minTryCount: Int = 3 // 最小尝试次数
-        open val maxTryCount: Int = 10 // 最大尝试次数
+        override val config: ExplorationConfig = ExplorationConfig
 
         abstract fun fetchTryCount(info: JsonElement): Int
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val tryCount = fetchTryCount(info)
-            require(tryCount in minTryCount .. maxTryCount)
+            require(tryCount in config.minTryCount .. config.maxTryCount)
         }
 
         override fun preflight(uid: Int, details: GameDetails): PreflightResult {
@@ -171,14 +168,13 @@ sealed interface GameManager {
 
     // 竞速
     abstract class SpeedGameManager : GameManager {
-        open val minTimeLimit: Int = 10 // 最短时间限制
-        open val maxTimeLimit: Int = 3600 // 最长时间限制
+        override val config: SpeedConfig = SpeedConfig
 
         abstract fun fetchTimeLimit(info: JsonElement): Int
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val timeLimit = fetchTimeLimit(info)
-            require(timeLimit in minTimeLimit .. maxTimeLimit)
+            require(timeLimit in config.minTimeLimit .. config.maxTimeLimit)
         }
 
         override fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
@@ -239,15 +235,16 @@ sealed interface GameManager {
 
     // 答题
     data object Game1Manager : RankGameManager() {
-        const val MIN_THRESHOLD = 0.75f // 最小成功阈值
+        override val config: AQConfig = AQConfig
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val actualInfo = info.to<AQInfo>()
             val actualQuestion = question.to<List<AQQuestion>>()
             val actualAnswer = answer.to<List<AQAnswer>>()
-            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
+            require(actualInfo.threshold in config.minThreshold .. config.maxThreshold)
+            require(actualQuestion.size in config.minQuestionCount .. config.maxQuestionCount)
             require(actualQuestion.size == actualAnswer.size)
-            for (i in actualQuestion.indices) actualAnswer[i].matchQuestion(actualQuestion[i])
+            for (i in actualQuestion.indices) actualAnswer[i].matchQuestion(config, actualQuestion[i])
         }
 
         private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): AQResult {
@@ -277,32 +274,29 @@ sealed interface GameManager {
 
     // 网格填词
     data object Game2Manager : RankGameManager() {
-        const val CHAR_EMPTY = '$' // 空字符
-        const val CHAR_BLOCK = '#' // 方格字符
-        const val MIN_BLOCK_SIZE = 7 // 最小网格大小
-        const val MAX_BLOCK_SIZE = 12 // 最大网格大小
+        override val config: BTConfig = BTConfig
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             val actualQuestion = question.String
             val actualAnswer = answer.String
             val blockSize = sqrt(actualQuestion.length.toFloat()).toInt()
             // 网格大小是完全平方数
-            require(blockSize in MIN_BLOCK_SIZE .. MAX_BLOCK_SIZE)
+            require(blockSize in config.minBlockSize .. config.maxBlockSize)
             require(blockSize * blockSize == actualQuestion.length)
             // 题目与答案大小相同
             require(blockSize == actualAnswer.length)
             // 题目中至少包含一个方格
-            require(actualQuestion.contains(CHAR_BLOCK))
+            require(actualQuestion.contains(BTConfig.CHAR_BLOCK))
             // 答案中不能包含方格且至少包含一个非空
-            require(!actualAnswer.contains(CHAR_BLOCK) && !actualAnswer.all { it == CHAR_EMPTY })
+            require(!actualAnswer.contains(BTConfig.CHAR_BLOCK) && !actualAnswer.all { it == BTConfig.CHAR_EMPTY })
             for (index in actualQuestion.indices) {
                 val q = actualQuestion[index]
                 val a = actualAnswer[index]
                 when (q) {
                     // 题目空则答案空
-                    CHAR_EMPTY -> require(a == CHAR_EMPTY)
+                    BTConfig.CHAR_EMPTY -> require(a == BTConfig.CHAR_EMPTY)
                     // 题目方格则答案非空
-                    CHAR_BLOCK -> require(a != CHAR_EMPTY)
+                    BTConfig.CHAR_BLOCK -> require(a != BTConfig.CHAR_EMPTY)
                     // 否则题目和答案一致
                     else -> require(a == q)
                 }
@@ -336,8 +330,7 @@ sealed interface GameManager {
 
     // 寻花令
     data object Game3Manager : ExplorationGameManager() {
-        const val MIN_LENGTH = 10 // 最小长度
-        const val MAX_LENGTH = 14 // 最大长度
+        override val config: FOConfig = FOConfig
 
         override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount
 
@@ -346,7 +339,7 @@ sealed interface GameManager {
             val actualQuestion = question.Int
             val actualAnswer = answer.String
             // 问题长度
-            require(actualQuestion in MIN_LENGTH .. MAX_LENGTH)
+            require(actualQuestion in config.minLength .. config.maxLength)
             // 答案长度与问题一致
             require(actualAnswer.length == actualQuestion)
             // 无空白字符
@@ -364,7 +357,7 @@ sealed interface GameManager {
                 else if (actualUserAnswer.contains(ch1)) FOType.INVALID_POS
                 else FOType.INCORRECT
             }
-            return FOType.encode(MIN_LENGTH, items)
+            return FOType.encode(config.minLength, items)
         }
 
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
@@ -381,7 +374,7 @@ sealed interface GameManager {
 
     // 词寻
     data object Game4Manager : SpeedGameManager() {
-        const val MIN_THRESHOLD = 0.5f // 最小成功阈值
+        override val config: SAConfig = SAConfig
 
         override fun fetchTimeLimit(info: JsonElement): Int = info.to<SAInfo>().timeLimit
 
@@ -390,7 +383,7 @@ sealed interface GameManager {
             val actualInfo = info.to<SAInfo>()
             val actualAnswer = answer.to<List<String>>()
             // 阈值限制
-            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
+            require(actualInfo.threshold in config.minThreshold .. config.maxThreshold)
             // 答案非空白
             require(actualAnswer.all { it.isNotBlank() })
             // 答案无重复
@@ -466,20 +459,25 @@ fun Routing.gameAPI(implMap: ImplMap) {
         val uid = AN.throwExpireToken(token)
         // 检查游戏奖励与名额
         VN.throwEmpty(title)
-        VN.throwIf(!GameManager.checkReward(reward, num, cost))
+        VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
         try {
             type.manager.check(info, question, answer)
         } catch (_: Throwable) {
             return@api "数据配置非法".failedData
         }
+        val actualCoin = (reward * 1.2f).toInt()
         // 新增游戏行
-        val gid = DB.throwInsertSQLGeneratedKey("""
-            INSERT INTO game(uid, title, type, reward, num, cost, info, question, answer) ${values(9)}
-        """, uid, title, type.ordinal, reward, num, cost,
-            info.toJsonString(), question.toJsonString(), answer.toJsonString()
-        ).toInt()
-        Data.Success(gid)
+        DB.throwTransaction {
+            if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", actualCoin, uid, actualCoin)) {
+                val gid = DB.throwInsertSQLGeneratedKey("""
+                    INSERT INTO game(uid, title, type, reward, num, cost, info, question, answer) ${values(9)}
+                """, uid, title, type.ordinal, reward, num, cost,
+                    info.toJsonString(), question.toJsonString(), answer.toJsonString()).toInt()
+                Data.Success(gid)
+            }
+            else "银币不足".failedData
+        }
     }
 
     api(API.User.Game.DeleteGame) { (token, gid) ->
@@ -494,10 +492,10 @@ fun Routing.gameAPI(implMap: ImplMap) {
             SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.winner, game.info
             FROM game
             LEFT JOIN user ON game.uid = user.uid
-            WHERE game.gid < ? AND game.isDeleted = 0 ${if(type != null) "AND game.type = ${type.ordinal}" else ""}
+            WHERE game.gid < ? AND game.type = ? AND game.isDeleted = 0
             ORDER BY game.gid DESC
             LIMIT ?
-        """, gid, num.coercePageNum)
+        """, gid, type.ordinal, num.coercePageNum)
         Data.Success(games.to())
     }
 
