@@ -16,9 +16,11 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.SpeedGameAnswer
 import love.yinlin.data.rachel.game.info.*
+import love.yinlin.extension.Array
 import love.yinlin.extension.Int
 import love.yinlin.extension.Long
 import love.yinlin.extension.String
+import love.yinlin.extension.makeArray
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
@@ -107,8 +109,8 @@ sealed interface GameManager {
                 FROM game_record
                 WHERE uid = ? AND gid = ?
             """, uid, details.gid)
-            val oldAnswer = oldRecord?.get("answer")?.to<List<JsonElement>>() ?: emptyList()
-            return if (oldAnswer.size >= fetchTryCount(details.info)) PreflightResult("尝试次数达到上限") else PreflightResult()
+            val oldAnswer = oldRecord?.get("answer")?.Array ?: makeArray { }
+            return if (oldAnswer.size >= fetchTryCount(details.info)) PreflightResult("尝试次数达到上限") else PreflightResult(oldAnswer)
         }
 
         override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
