@@ -14,17 +14,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.renderComposeScene
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import cocoapods.YLCSCore.*
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.autoreleasepool
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.toNSData
+import org.jetbrains.skia.impl.use
 import platform.darwin.NSObject
 import platform.Foundation.*
 import platform.CoreGraphics.*
@@ -32,9 +35,19 @@ import platform.UIKit.*
 import platform.AVFoundation.*
 import platform.AVKit.*
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Stable
 class ActualFloatingLyrics(private val controller: UIViewController) : FloatingLyrics() {
+
+    private val composeScene by lazy {
+        ImageComposeScene(
+            width = CGRectGetWidth(pipView.frame).toInt(),
+            height = CGRectGetHeight(pipView.frame).toInt(),
+            content = {
+                ContentWrapper()
+            }
+        )
+    }
 
     private var pipView = PIPView(CGRectMake(0.0, 0.0, 600.0, 150.0))
 
@@ -78,17 +91,16 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
     override fun updateLyrics(lyrics: String?) {
         (pipView.layer as? AVSampleBufferDisplayLayer)?.flush()
         currentLyrics = lyrics
-        val imageData = renderComposeScene(
-            CGRectGetWidth(pipView.frame).toInt(),
-            CGRectGetHeight(pipView.frame).toInt(),
-            content = {
-                ContentWrapper()
+        composeScene.render().use { image ->
+            image.encodeToData()?.use { imageData ->
+                autoreleasepool {
+                    val nsData = imageData.bytes.toNSData()
+                    val uiImage = UIImage.imageWithData(nsData)
+                    val buffer = uiImage?.asSampleBuffer()
+                    (pipView.layer as? AVSampleBufferDisplayLayer)?.enqueueSampleBuffer(buffer)
+                }
             }
-        ).encodeToData()
-        val nsData = imageData?.bytes?.toNSData()
-        val uiImage = nsData?.let { UIImage.imageWithData(it) }
-        val buffer = uiImage?.asSampleBuffer()
-        (pipView.layer as? AVSampleBufferDisplayLayer)?.enqueueSampleBuffer(buffer)
+        }
     }
 
     @Composable

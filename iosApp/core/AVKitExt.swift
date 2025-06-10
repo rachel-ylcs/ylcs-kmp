@@ -82,7 +82,7 @@ extension UIImage {
 
   @objc
   open func asSampleBuffer() -> CMSampleBuffer? {
-      return createSampleBufferFrom(pixelBuffer: self.asBuffer()!)
+    return createSampleBufferFrom(pixelBuffer: self.asBuffer()!)
   }
 }
 

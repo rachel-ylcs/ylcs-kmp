@@ -46,26 +46,26 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
 
     internal val protocol: WKNavigationDelegateProtocol = object : NSObject(), WKNavigationDelegateProtocol {
         @ObjCSignatureOverride
-        override fun webView(webview: WKWebView, didStartProvisionalNavigation: WKNavigation?) {
-            webview.URL?.absoluteString?.let { mUrl = it }
+        override fun webView(webView: WKWebView, didStartProvisionalNavigation: WKNavigation?) {
+            webView.URL?.absoluteString?.let { mUrl = it }
             mLoadingState = WebPageLoadingState.Loading(0f)
-            webview.title?.let { mTitle = it }
+            webView.title?.let { mTitle = it }
         }
 
         @ObjCSignatureOverride
-        override fun webView(webview: WKWebView, didFinishNavigation: WKNavigation?) {
-            webview.URL?.absoluteString?.let { mUrl = it }
+        override fun webView(webView: WKWebView, didFinishNavigation: WKNavigation?) {
+            webView.URL?.absoluteString?.let { mUrl = it }
             mLoadingState = WebPageLoadingState.Finished
-            webview.title?.let { mTitle = it }
+            webView.title?.let { mTitle = it }
         }
 
         @ObjCSignatureOverride
-        override fun webView(webview: WKWebView, didCommitNavigation: WKNavigation?) {
-            mLoadingState = WebPageLoadingState.Loading(webview.estimatedProgress.toFloat())
+        override fun webView(webView: WKWebView, didCommitNavigation: WKNavigation?) {
+            mLoadingState = WebPageLoadingState.Loading(webView.estimatedProgress.toFloat())
         }
 
         @ObjCSignatureOverride
-        override fun webView(webview: WKWebView, didFailNavigation: WKNavigation?, withError: NSError) {
+        override fun webView(webView: WKWebView, didFailNavigation: WKNavigation?, withError: NSError) {
             mError = WebPageError(withError.code, withError.description.toString())
         }
     }
