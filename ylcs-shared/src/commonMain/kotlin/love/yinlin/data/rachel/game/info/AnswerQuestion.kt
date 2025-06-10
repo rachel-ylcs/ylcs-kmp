@@ -50,7 +50,7 @@ sealed class AQAnswer {
     data class Choice(val value: Int) : AQAnswer() {
         override fun matchQuestion(question: AQQuestion) {
             require(question is AQQuestion.Choice)
-            require(question.title.isNotEmpty())
+            require(question.title.isNotBlank())
             require(question.options.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
             require(value in 0 ..< question.options.size)
         }
@@ -63,7 +63,7 @@ sealed class AQAnswer {
     data class MultiChoice(val value: List<Int>) : AQAnswer() {
         override fun matchQuestion(question: AQQuestion) {
             require(question is AQQuestion.MultiChoice)
-            require(question.title.isNotEmpty())
+            require(question.title.isNotBlank())
             require(question.options.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
             require(value.all { it in 0 ..< question.options.size })
             require(value.size == value.toSet().size)
@@ -79,7 +79,7 @@ sealed class AQAnswer {
             require(question is AQQuestion.Blank)
             require(value.size in 1 ..AQQuestion.MAX_OPTION_COUNT)
             require(value.size == value.toSet().size)
-            require(value.all { it.isNotEmpty() })
+            require(value.all { it.isNotBlank() })
         }
     }
 }

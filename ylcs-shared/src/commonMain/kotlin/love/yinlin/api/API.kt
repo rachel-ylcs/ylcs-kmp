@@ -20,7 +20,6 @@ import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
 
-
 object API : APINode(null, "") {
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {

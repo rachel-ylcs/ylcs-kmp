@@ -2,7 +2,6 @@ package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig.coercePageNum
@@ -15,6 +14,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.data.rachel.game.SpeedGameAnswer
 import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.Int
 import love.yinlin.extension.Long
@@ -78,7 +78,7 @@ sealed interface GameManager {
                         WHERE gid = ?
                     """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
                 }
-                Data.Success(GameResult(
+                Data.Success(GameResult.Settlement(
                     isCompleted = isCompleted,
                     reward = if (isCompleted) details.reward / details.num else 0,
                     rank = if (isCompleted) details.winner.size + 1 else 0,
@@ -94,6 +94,11 @@ sealed interface GameManager {
         open val maxTryCount: Int = 10 // 最大尝试次数
 
         abstract fun fetchTryCount(info: JsonElement): Int
+
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            val tryCount = fetchTryCount(info)
+            require(tryCount in minTryCount .. maxTryCount)
+        }
 
         override fun preflight(uid: Int, details: GameDetails): PreflightResult {
             // 检查尝试记录
@@ -152,7 +157,7 @@ sealed interface GameManager {
                         WHERE gid = ?
                     """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
                 }
-                Data.Success(GameResult(
+                Data.Success(GameResult.Settlement(
                     isCompleted = isCompleted,
                     reward = if (isCompleted) details.reward / details.num else 0,
                     rank = if (isCompleted) details.winner.size + 1 else 0,
@@ -163,8 +168,71 @@ sealed interface GameManager {
     }
 
     // 竞速
-    abstract class SpeedGameManager : RankGameManager() {
+    abstract class SpeedGameManager : GameManager {
+        open val minTimeLimit: Int = 10 // 最短时间限制
+        open val maxTimeLimit: Int = 3600 // 最长时间限制
 
+        abstract fun fetchTimeLimit(info: JsonElement): Int
+
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            val timeLimit = fetchTimeLimit(info)
+            require(timeLimit in minTimeLimit .. maxTimeLimit)
+        }
+
+        override fun preflight(uid: Int, details: GameDetails): PreflightResult = PreflightResult()
+
+        protected fun time(uid: Int, details: GameDetails, answer: JsonElement): Data<SpeedGameAnswer> {
+            val speedGameAnswer = answer.to<SpeedGameAnswer>()
+            if (speedGameAnswer.start) { // 计时开始
+                val currentTime = System.currentTimeMillis() // 修正时间
+                return DB.throwTransaction {
+                    // 消费银币
+                    val cost = details.cost
+                    if (cost > 0) {
+                        if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+                            // 增加发起者银币
+                            it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
+                        }
+                        else return@throwTransaction "没有足够的银币参与".failedData
+                    }
+                    // 生成初始记录
+                    val rid = it.throwInsertSQLGeneratedKey("""
+                        INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
+                    """, details.gid, uid, speedGameAnswer.copy(ts = currentTime).toJsonString(), Unit.toJsonString())
+                    Data.Success(speedGameAnswer.copy(rid = rid, ts = currentTime))
+                }
+            }
+            else return Data.Success(speedGameAnswer) // 计时结束
+        }
+
+        override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
+            val speedGameAnswer = answer.to<SpeedGameAnswer>()
+            require(!speedGameAnswer.start)
+            VN.throwId(speedGameAnswer.rid)
+            return DB.throwTransaction {
+                // 更新游戏记录
+                it.throwExecuteSQL("""
+                    UPDATE game_record
+                    SET answer = ? , result = ? , ts = CURRENT_TIMESTAMP
+                    WHERE uid = ? AND gid = ? AND rid = ?
+                """, speedGameAnswer.toJsonString(), info.toJsonString(), uid, details.gid, speedGameAnswer.rid)
+                // 更新游戏排行榜
+                if (isCompleted) {
+                    val isGameCompleted = details.winner.size + 1 >= details.num
+                    it.throwExecuteSQL("""
+                        UPDATE game
+                        SET winner = ? , isCompleted = ?
+                        WHERE gid = ?
+                    """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+                }
+                Data.Success(GameResult.Settlement(
+                    isCompleted = isCompleted,
+                    reward = if (isCompleted) details.reward / details.num else 0,
+                    rank = if (isCompleted) details.winner.size + 1 else 0,
+                    info = info
+                ))
+            }
+        }
     }
 
     // 答题
@@ -272,15 +340,15 @@ sealed interface GameManager {
         override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount
 
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
-            val actualInfo = info.to<FOInfo>()
+            super.check(info, question, answer)
             val actualQuestion = question.Int
             val actualAnswer = answer.String
-            // 尝试次数
-            require(actualInfo.tryCount in minTryCount .. maxTryCount)
             // 问题长度
             require(actualQuestion in MIN_LENGTH .. MAX_LENGTH)
             // 答案长度与问题一致
             require(actualAnswer.length == actualQuestion)
+            // 无空白字符
+            require(actualAnswer.all { !it.isWhitespace() })
         }
 
         private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): Int {
@@ -311,16 +379,61 @@ sealed interface GameManager {
 
     // 词寻
     data object Game4Manager : SpeedGameManager() {
-        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+        const val MIN_THRESHOLD = 0.5f // 最小成功阈值
 
+        override fun fetchTimeLimit(info: JsonElement): Int = info.to<SAInfo>().timeLimit
+
+        override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
+            super.check(info, question, answer)
+            val actualInfo = info.to<SAInfo>()
+            val actualAnswer = answer.to<List<String>>()
+            // 阈值限制
+            require(actualInfo.threshold in MIN_THRESHOLD .. 1f)
+            // 答案非空白
+            require(actualAnswer.all { it.isNotBlank() })
+            // 答案无重复
+            require(actualAnswer.size == actualAnswer.toSet().size)
         }
 
-        private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): JsonElement {
-            return JsonNull
+        private fun verify(standardAnswer: JsonElement, speedGameAnswer: SpeedGameAnswer): SAResult {
+            val actualStandardAnswer = standardAnswer.to<List<String>>().toHashSet()
+            val actualUserAnswer = speedGameAnswer.answer.to<List<String>>().toHashSet()
+            var correctCount = 0
+            for (answer in actualUserAnswer) {
+                if (answer in actualStandardAnswer) ++correctCount
+            }
+            val duration = System.currentTimeMillis() - speedGameAnswer.ts
+            return SAResult(
+                correctCount = correctCount,
+                totalCount = actualStandardAnswer.size,
+                duration = (duration / 1000L).toInt()
+            )
         }
 
         override fun start(uid: Int, details: GameDetails, userAnswer: JsonElement): Data<GameResult> {
-            return Data.Error()
+            return when (val result = time(uid, details, userAnswer)) {
+                is Data.Success -> {
+                    val speedGameAnswer = result.data
+                    if (speedGameAnswer.start) { // 计时开始
+                        return Data.Success(GameResult.Time(
+                            rid = speedGameAnswer.rid,
+                            ts = speedGameAnswer.ts
+                        ))
+                    }
+                    else { // 计时结束
+                        val info = details.info.to<SAInfo>()
+                        val saResult = verify(details.answer, speedGameAnswer)
+                        return uploadResult(
+                            uid = uid,
+                            details = details,
+                            answer = userAnswer,
+                            isCompleted = (saResult.correctCount.toFloat() / saResult.totalCount) >= info.threshold,
+                            info = saResult.toJson()
+                        )
+                    }
+                }
+                is Data.Error -> result
+            }
         }
     }
 }
