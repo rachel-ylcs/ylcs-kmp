@@ -393,6 +393,11 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 10.dp
 			Device.Size.LARGE -> 12.dp
 		}
+		val dotHeight: Dp @Composable get() = when (LocalDevice.current.size) {
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 12.dp
+			Device.Size.LARGE -> 14.dp
+		}
 		val RefreshHeaderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 70.dp
 			Device.Size.MEDIUM -> 75.dp

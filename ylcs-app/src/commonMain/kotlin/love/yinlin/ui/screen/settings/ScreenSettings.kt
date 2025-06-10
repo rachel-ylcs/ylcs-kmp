@@ -17,8 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,69 +56,6 @@ import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.community.ScreenUserCard
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-
-@Stable
-private data class Contributor(
-	val name: String,
-	val uid: Int
-)
-
-@Stable
-private data class ContributorGroup(
-	val title: String,
-	val icon: ImageVector,
-	val color: Color,
-	val names: List<Contributor>
-)
-
-@Composable
-private fun ContributorList(
-	contributors: Array<ContributorGroup>,
-	modifier: Modifier = Modifier,
-	onClick: (Contributor) -> Unit
-) {
-	Column(modifier = modifier) {
-		for (contributorGroup in contributors) {
-			Row(modifier = Modifier.fillMaxWidth()) {
-				Row(
-					modifier = Modifier.weight(1f)
-						.background(contributorGroup.color.copy(alpha = 0.7f))
-						.padding(ThemeValue.Padding.Value),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.CenterHorizontally),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					MiniIcon(
-						icon = contributorGroup.icon,
-						size = ThemeValue.Size.MicroIcon
-					)
-					Text(
-						text = contributorGroup.title,
-						style = MaterialTheme.typography.labelMedium,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Clip
-					)
-				}
-				Column(modifier = Modifier.padding(vertical = ThemeValue.Border.Small / 2).weight(2f).border(
-					width = ThemeValue.Border.Small,
-					color = contributorGroup.color.copy(0.7f)
-				)) {
-					for (contributor in contributorGroup.names) {
-						Text(
-							text = contributor.name,
-							textAlign = TextAlign.Center,
-							modifier = Modifier.fillMaxWidth()
-								.clickable { onClick(contributor) }
-								.padding(ThemeValue.Padding.ExtraValue),
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis
-						)
-					}
-				}
-			}
-		}
-	}
-}
 
 @Stable
 class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
@@ -293,8 +228,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	private suspend fun checkUpdate() {
-		val result = ClientAPI.request<ServerStatus>(route = ServerRes.Server)
-		when (result) {
+        when (val result = ClientAPI.request<ServerStatus>(route = ServerRes.Server)) {
 			is Data.Success -> {
 				val data = result.data
 				if (data.targetVersion > Local.VERSION) slot.tip.warning("新版本${data.targetVersion}可用")
@@ -715,47 +649,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					style = MaterialTheme.typography.labelLarge,
 				)
 				ContributorList(
-					contributors = remember { arrayOf(
-						ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf(
-							Contributor("方旖旎", 7),
-							Contributor("木棠", 1563),
-							Contributor("竹香满亭", 11),
-							Contributor("尘落", 89)
-						)),
-						ContributorGroup("运营", Icons.Outlined.Store, Colors.Steel4, listOf(
-							Contributor("思懿", 6),
-							Contributor("清逸", 74),
-							Contributor("青栀", 87)
-						)),
-						ContributorGroup("宣发", Icons.Outlined.Campaign, Colors.Red4, listOf(
-							Contributor("姜辞", 5),
-							Contributor("晨晨", 15)
-						)),
-						ContributorGroup("经办", Icons.Outlined.LocalFireDepartment, Colors.Orange4, listOf(
-							Contributor("寒山", 1),
-							Contributor("南溟", 3),
-							Contributor("韩非", 12),
-							Contributor("泸沽寻临", 8),
-							Contributor("名字不太喵", 18),
-							Contributor("圈圈临", 2)
-						)),
-						ContributorGroup("数据", Icons.Outlined.Token, Colors.Purple4, listOf(
-							Contributor("鲤鱼焙梨", 13),
-							Contributor("海屿悼词", 9),
-							Contributor("冰临", 17),
-							Contributor("银小临", 16)
-						)),
-						ContributorGroup("开发", Icons.Outlined.Code, Colors.Green4, listOf(
-							Contributor("焦骨", 10),
-							Contributor("青尘", 1524),
-							Contributor("yingfeng", 14),
-							Contributor("桃花坞里桃花庵", 20),
-							Contributor("双花", 429),
-							Contributor("苏晚卿", 359)
-						)),
-					) },
+					contributors = About.contributors,
 					modifier = Modifier.fillMaxWidth(),
 					onClick = { navigate(ScreenUserCard.Args(it.uid)) }
+				)
+				UpdateInfoLayout(
+					updateInfo = About.updateInfo,
+					modifier = Modifier.fillMaxWidth()
 				)
 			}
 		}
