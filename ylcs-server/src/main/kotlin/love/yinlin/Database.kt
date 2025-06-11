@@ -66,7 +66,7 @@ object SQLConverter {
 	}
 
 	fun convertTime(ts: String): Long = try {
-		LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.UTC).toEpochMilli()
+		LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli()
 	} catch (_: Throwable) { 0L }
 }
 

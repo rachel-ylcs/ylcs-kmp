@@ -83,6 +83,7 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
             is Data.Success -> {
                 preflightResult = result.data
                 status = Status.Playing
+                state.reset()
             }
             is Data.Error -> slot.tip.error(result.message)
         }
@@ -156,7 +157,24 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
                         }
                     }
                     Status.Playing -> {
-                        preflightResult?.let { result -> state.Content(result) }
+                        preflightResult?.let { result ->
+                            Surface(
+                                modifier = Modifier
+                                    .padding(ThemeValue.Padding.EqualExtraValue)
+                                    .fillMaxWidth(),
+                                shape = MaterialTheme.shapes.extraLarge,
+                                shadowElevation = ThemeValue.Shadow.Surface
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(ThemeValue.Padding.EqualExtraValue)
+                                        .verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                                ) {
+                                    with(state) { Content(result) }
+                                }
+                            }
+                        }
                     }
                     Status.Settling -> {
                         gameResult?.let { result ->
@@ -190,6 +208,7 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
                                             Text(
                                                 text = if (result.isCompleted) "成功" else "失败",
                                                 style = MaterialTheme.typography.displayMedium,
+                                                color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis
                                             )

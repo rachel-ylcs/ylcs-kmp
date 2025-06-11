@@ -35,8 +35,8 @@ abstract class ExplorationConfig : GameConfig() {
 
 @Stable
 abstract class SpeedConfig : GameConfig() {
-    open val minTimeLimit: Int = 10 // 最短时间限制
-    open val maxTimeLimit: Int = 3600 // 最长时间限制
+    open val minTimeLimit: Int = 30 // 最短时间限制
+    open val maxTimeLimit: Int = 3630 // 最长时间限制
 
     companion object : SpeedConfig()
 }

@@ -11,6 +11,7 @@ import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.logger
 
 // 词寻
 data object Game4Manager : SpeedGameManager() {
@@ -54,6 +55,7 @@ data object Game4Manager : SpeedGameManager() {
         val startTime = SQLConverter.convertTime(record.ts)
         val endTime = System.currentTimeMillis()
         val duration = ((endTime - startTime) / 1000).toInt()
+        logger.warn("${record.ts}, $startTime, $endTime, $duration")
         val saResult = verifyAnswer(details.answer, userAnswer, duration)
         val isCompleted = (saResult.correctCount.toFloat() / saResult.totalCount) >= info.threshold && duration <= info.timeLimit
         return GameResult(

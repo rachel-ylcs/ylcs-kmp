@@ -52,8 +52,10 @@ interface PlayGameState {
 
     val submitAnswer: JsonElement
 
+    fun reset()
+
     @Composable
-    fun Content(preflightResult: PreflightResult)
+    fun ColumnScope.Content(preflightResult: PreflightResult)
 
     @Composable
     fun ColumnScope.Settlement(gameResult: GameResult)

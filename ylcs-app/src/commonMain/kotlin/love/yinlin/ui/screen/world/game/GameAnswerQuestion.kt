@@ -454,8 +454,12 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val submitAnswer: JsonElement = JsonNull
 
+    override fun reset() {
+
+    }
+
     @Composable
-    override fun Content(preflightResult: PreflightResult) {
+    override fun ColumnScope.Content(preflightResult: PreflightResult) {
 
     }
 

@@ -10,10 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Flaky
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GamePublicDetails
@@ -21,6 +23,8 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.SAConfig
 import love.yinlin.data.rachel.game.info.SAInfo
+import love.yinlin.data.rachel.game.info.SAResult
+import love.yinlin.extension.Int
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -115,19 +119,93 @@ class SearchAllCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
 @Stable
 class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
+    @Stable
+    private data class Preflight(val info: SAInfo, val question: Int)
+
     override val config = SAConfig
 
-    override val canSubmit: Boolean = false
+    private var preflight: Preflight? by mutableStateOf(null)
+    private var result: SAResult? by mutableStateOf(null)
 
-    override val submitAnswer: JsonElement = JsonNull
+    private val inputState = TextInputState()
+    private val items = mutableStateSetOf<String>()
+
+    override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..(preflight?.question ?: SAConfig.maxCount) }
+
+    override val submitAnswer: JsonElement get() = items.toSet().toJson()
+
+    private fun addOption() {
+        val text = inputState.text
+        if (text.length in SAConfig.minLength ..SAConfig.maxLength) {
+            items.add(text)
+            inputState.text = ""
+        }
+    }
+
+    override fun reset() {
+        inputState.text = ""
+        items.clear()
+        preflight = null
+        result = null
+    }
 
     @Composable
-    override fun Content(preflightResult: PreflightResult) {
+    override fun ColumnScope.Content(preflightResult: PreflightResult) {
+        LaunchedEffect(preflightResult) {
+            try {
+                preflight = Preflight(
+                    info = preflightResult.info.to<SAInfo>(),
+                    question = preflightResult.question.Int,
+                )
+            } catch (_: Throwable) { }
+        }
 
+        preflight?.let { (_, question) ->
+            TextInput(
+                state = inputState,
+                hint = "答案 ${items.size} / $question",
+                maxLength = SAConfig.maxLength,
+                clearButton = false,
+                onImeClick = { addOption() },
+                modifier = Modifier.fillMaxWidth()
+            )
+            FlowRow(modifier = Modifier.fillMaxWidth()) {
+                for (item in items) {
+                    BoxText(
+                        text = item,
+                        color = MaterialTheme.colorScheme.primary,
+                        onClick = { items.remove(item) }
+                    )
+                }
+            }
+        }
     }
 
     @Composable
     override fun ColumnScope.Settlement(gameResult: GameResult) {
+        LaunchedEffect(gameResult) {
+            try {
+                result = gameResult.info.to()
+            } catch (_: Throwable) { }
+        }
 
+        result?.let { (correctCount, totalCount, duration) ->
+            Text(
+                text = "结算: $correctCount / $totalCount",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = "用时: ${(duration.toLong() * 1000).timeString}",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
