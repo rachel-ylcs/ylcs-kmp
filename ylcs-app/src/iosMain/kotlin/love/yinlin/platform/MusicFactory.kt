@@ -5,17 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import cocoapods.MobileVLCKit.*
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
+import kotlinx.coroutines.delay
 import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
 import platform.darwin.*
-import platform.Foundation.NSKeyValueObservingProtocol
 import platform.Foundation.*
-import platform.AVFoundation.*
-import platform.CoreMedia.*
 import platform.AVFAudio.*
 import platform.MediaPlayer.*
 import platform.UIKit.*
@@ -24,13 +23,12 @@ import platform.UIKit.*
 class ActualMusicFactory : MusicFactory() {
     private var interruptionObserver: NSObjectProtocol? = null
 
-    private var avPlayer: AVPlayer? = null
+    private var mediaPlayer: VLCMediaPlayer? = null
+    private var playerDelegate: VLCMediaPlayerDelegateProtocol? = null
+    private var shuffleList = listOf<Int>()
     private var currentIndex = -1
-    private lateinit var playerObserver: NSObject
-    private var timeObserver: Any? = null
-    private var endTimeObserver: NSObjectProtocol? = null
 
-    override val isInit: Boolean get() = avPlayer != null
+    override val isInit: Boolean get() = mediaPlayer != null
     override var error: Throwable? by mutableStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
@@ -78,117 +76,103 @@ class ActualMusicFactory : MusicFactory() {
             }
         }
 
-        playerObserver = object : NSObject(), NSKeyValueObservingProtocol {
-            override fun observeValueForKeyPath(
-                keyPath: String?,
-                ofObject: Any?,
-                change: Map<Any?, *>?,
-                context: COpaquePointer?
-            ) {
-                val newValue = change!![NSKeyValueChangeNewKey]
-                when (keyPath) {
-                    "timeControlStatus" -> isPlaying = newValue == AVPlayerTimeControlStatusPlaying
-                    "currentItem" -> {
-                        if (newValue == null) currentDuration = 0L
+        playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
+            override fun mediaPlayerStateChanged(aNotification: NSNotification) {
+                mediaPlayer?.let { player ->
+                    if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
+                        Coroutines.startMain {
+                            when (playMode) {
+                                MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
+                                else -> gotoNext()
+                            }
+                        }
+                    } else {
+                        isPlaying = player.playing
+                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateOpening) {
+                            currentMusic = musicList[shuffleList[currentIndex]]
+                            onMusicChanged(currentMusic)
+                        }
+                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStatePlaying) {
+                            currentDuration = player.media?.length?.intValue?.toLong() ?: 0
+                        }
                         updatePlayingMetadata()
                     }
-                    "status" -> if (newValue == AVPlayerItemStatusReadyToPlay)
-                        avPlayer?.currentItem?.let {
-                            currentDuration = CMTimeGetSeconds(it.duration).toLong() * 1000
-                            updatePlayingInfo()
-                        }
-                    else -> println("Unknown observed $keyPath:$newValue")
+                }
+            }
+
+            override fun mediaPlayerTimeChanged(aNotification: NSNotification) {
+                mediaPlayer?.let { player ->
+                    currentPosition = player.time.intValue.toLong()
+                    updatePlayingInfo()
                 }
             }
         }
 
-        avPlayer = AVPlayer()
-        avPlayer?.addObserver(playerObserver, "timeControlStatus", NSKeyValueObservingOptionNew, null)
-        avPlayer?.addObserver(playerObserver, "currentItem", NSKeyValueObservingOptionNew, null)
-
-        timeObserver = avPlayer?.addPeriodicTimeObserverForInterval(
-            CMTimeMake(1, 2), // 0.5秒
-            dispatch_get_main_queue()
-        ) { time ->
-            if (isPlaying) {
-                currentPosition = (CMTimeGetSeconds(time) * 1000).toLong()
-                updatePlayingInfo()
-            }
-        }
+        mediaPlayer = VLCMediaPlayer()
+        mediaPlayer!!.delegate = playerDelegate
     }
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
+        if (musicList.isNotEmpty() && currentIndex > -1) {
+            shufflePlayList()
+        }
+        onPlayModeChanged(musicPlayMode)
     }
 
     override suspend fun play(): Unit = Coroutines.main {
-        avPlayer?.play()
+        mediaPlayer?.play()
     }
 
     override suspend fun pause(): Unit = Coroutines.main {
-        avPlayer?.pause()
+        mediaPlayer?.pause()
     }
 
     override suspend fun stop(): Unit = Coroutines.main {
-        avPlayer?.pause()
-        avPlayer?.seekToTime(CMTimeMake(0, 1))
-        setPlayerItem(null)
-        currentPosition = 0L
         musicList = emptyList()
         currentPlaylist = null
         currentMusic = null
         currentIndex = -1
-        updatePlayingMetadata()
+        shuffleList = listOf()
+        mediaPlayer?.stop()
+        mediaPlayer?.media = null
+        currentPosition = 0L
+        currentDuration = 0L
+        onPlayerStop()
     }
 
     override suspend fun gotoPrevious() {
-        if (musicList.isEmpty()) return
-
-        val newIndex = when {
-            currentIndex <= 0 -> musicList.size - 1
-            else -> currentIndex - 1
+        if (musicList.isNotEmpty() && currentIndex == 0) {
+            shufflePlayList()
         }
-        gotoIndex(newIndex)
+        setCurrentPlaying((currentIndex + shuffleList.size - 1) % shuffleList.size, true)
     }
 
     override suspend fun gotoNext() {
-        if (musicList.isEmpty()) return
-
-        val newIndex = when (playMode) {
-            MusicPlayMode.RANDOM -> (0 until musicList.size).random()
-            else -> (currentIndex + 1) % musicList.size
+        if (musicList.isNotEmpty() && currentIndex == shuffleList.size - 1) {
+            shufflePlayList()
         }
-        gotoIndex(newIndex)
+        setCurrentPlaying((currentIndex + 1) % shuffleList.size, true)
     }
 
     override suspend fun gotoIndex(index: Int) {
-        if (index < 0 || index >= musicList.size) return
-
-        setCurrentPlaying(index, true)
-        currentPosition = 0L
+        if (index in 0 ..< shuffleList.size) {
+            setCurrentPlaying(shuffleList.indexOf(index), true)
+        }
     }
 
     override suspend fun seekTo(position: Long): Unit = Coroutines.main {
-        val time = CMTimeMakeWithSeconds(position / 1000.0, 1000)
-        val tolerance = CMTimeMake(0, 1)
-        avPlayer?.seekToTime(time, tolerance, tolerance) { finished ->
-            if (finished) {
-                avPlayer?.currentTime()?.let { actualTime ->
-                    currentPosition = (CMTimeGetSeconds(actualTime) * 1000).toLong()
-                }
-            }
-        }
+        mediaPlayer?.time = VLCTime.timeWithInt(position.toInt())
     }
 
-    override suspend fun prepareMedias(
-        medias: List<MusicInfo>, startIndex: Int?, playing: Boolean
-    ) {
+    override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean) {
         musicList = medias
 
         if (medias.isNotEmpty()) {
-            setCurrentPlaying(startIndex?.coerceIn(0, musicList.size - 1) ?: 0, true)
+            val index = startIndex?.coerceIn(0, musicList.size - 1) ?: 0
+            shufflePlayList(index)
+            setCurrentPlaying(currentIndex, playing)
         }
-        currentPosition = 0L
     }
 
     override suspend fun addMedias(medias: List<MusicInfo>) {
@@ -197,83 +181,76 @@ class ActualMusicFactory : MusicFactory() {
         val oldSize = musicList.size
         musicList = musicList + medias
 
-        if (oldSize == 0 && musicList.isNotEmpty()) {
-            setCurrentPlaying(0, false)
+        if (oldSize == 0) {
+            shufflePlayList()
+            if (musicList.isNotEmpty()) {
+                setCurrentPlaying(currentIndex, false)
+            }
+        } else {
+            shuffleList += (oldSize until musicList.size).toList().let {
+                if (playMode == MusicPlayMode.RANDOM) it.shuffled() else it
+            }
         }
     }
 
     override suspend fun removeMedia(index: Int) {
-        if (index < 0 || index >= musicList.size) return
+        if (index !in 0 ..< musicList.size) return
 
         Coroutines.main {
-            val wasCurrent = index == currentIndex
+            val shuffleIndex = shuffleList.indexOf(index)
+            val wasCurrent = shuffleIndex == currentIndex
             musicList = musicList.filterIndexed { id, _ -> id != index }
 
             when {
                 musicList.isEmpty() -> {
-                    currentIndex = -1
-                    currentMusic = null
-                    setPlayerItem(null)
+                    stop()
+                    return@main
                 }
                 wasCurrent -> {
-                    setCurrentPlaying(currentIndex.coerceAtMost(musicList.size - 1), isPlaying)
+                    if (currentIndex >= musicList.size) {
+                        currentIndex = 0
+                    }
                 }
-                index < currentIndex -> {
+                shuffleIndex < currentIndex -> {
                     currentIndex--
                 }
             }
+
+            val newShuffleList = shuffleList.toMutableList()
+            newShuffleList.removeAt(shuffleIndex)
+            for ((i, item) in newShuffleList.withIndex()) {
+                if (item > index) newShuffleList[i] -= 1
+            }
+            shuffleList = newShuffleList
+
+            if (wasCurrent) {
+                setCurrentPlaying(currentIndex, isPlaying)
+            }
         }
+    }
+
+    private fun shufflePlayList(musicIndex: Int = shuffleList.getOrNull(currentIndex) ?: 0) {
+        shuffleList = if (playMode == MusicPlayMode.RANDOM) {
+            listOf(musicIndex) + (0 until musicList.size).filter { it != musicIndex }.shuffled()
+        } else {
+            List(musicList.size) { it }
+        }
+        currentIndex = shuffleList.indexOf(musicIndex)
     }
 
     private suspend fun setCurrentPlaying(index: Int, play: Boolean) = Coroutines.main {
         currentIndex = index
-        currentMusic = musicList[index]
-        setPlayerItem(currentMusic)
+        val musicInfo = musicList[shuffleList[index]]
+        val url = NSURL.fileURLWithPath(musicInfo.audioPath.toString())
+        val media = VLCMedia.mediaWithURL(url)
+        mediaPlayer?.media = media
 
         if (play) {
-            avPlayer?.play()
-        }
-    }
-
-    private fun setPlayerItem(musicInfo: MusicInfo?) {
-        avPlayer?.currentItem?.removeObserver(playerObserver, "status")
-        val playerItem = musicInfo?.let {
-            val url = NSURL.fileURLWithPath(it.audioPath.toString())
-            val asset = AVURLAsset.URLAssetWithURL(url, mapOf(
-                // https://stackoverflow.com/questions/9290972
-                "AVURLAssetOutOfBandMIMETypeKey" to "audio/flac",
-                AVURLAssetPreferPreciseDurationAndTimingKey to true
-            ))
-            AVPlayerItem.playerItemWithAsset(asset).let {
-                it.addObserver(playerObserver, "status", NSKeyValueObservingOptionNew, null)
-                it
-            }
-        }
-        avPlayer?.replaceCurrentItemWithPlayerItem(playerItem)
-        setupEndTimeObserver()
-    }
-
-    private fun setupEndTimeObserver() {
-        endTimeObserver?.let {
-            NSNotificationCenter.defaultCenter.removeObserver(it)
-            endTimeObserver = null
-        }
-
-        avPlayer?.currentItem?.let {
-            endTimeObserver = NSNotificationCenter.defaultCenter.addObserverForName(
-                AVPlayerItemDidPlayToEndTimeNotification, it, null) { _ ->
-                Coroutines.startMain {
-                    when (playMode) {
-                        MusicPlayMode.LOOP -> {
-                            avPlayer?.seekToTime(CMTimeMake(0, 1))
-                            avPlayer?.play()
-                        }
-                        else -> {
-                            gotoNext()
-                        }
-                    }
-                }
-            }
+            mediaPlayer?.play()
+        } else {
+            mediaPlayer?.play() // 没找到预加载的方法, 先这样吧
+            delay(100)
+            mediaPlayer?.pause()
         }
     }
 
@@ -285,7 +262,7 @@ class ActualMusicFactory : MusicFactory() {
             AudioSessionInterruption.Ended -> {
                 val shouldPlay = arg as Boolean
                 if (isReady && shouldPlay) {
-                    avPlayer?.play()
+                    mediaPlayer?.play()
                 }
             }
             AudioSessionInterruption.Failed -> {}
@@ -358,7 +335,7 @@ class ActualMusicFactory : MusicFactory() {
         val nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo?.toMutableMap() ?: mutableMapOf()
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = currentDuration / 1000.0f
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentPosition / 1000.0f
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = avPlayer?.rate
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = mediaPlayer?.rate
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 }

@@ -82,6 +82,10 @@ kotlin {
             version = "2.2.2"
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
+        pod("MobileVLCKit") {
+            version = "3.6.1b1"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
         pod("SGQRCode") {
             version = "4.1.0"
             extraOpts += listOf("-compiler-option", "-fmodules")

@@ -8,7 +8,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import kotlinx.cinterop.COpaquePointer
+import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
@@ -17,98 +17,55 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI
 import love.yinlin.ui.component.image.ClickIcon
-import platform.AVFoundation.*
 import platform.CoreGraphics.CGRectMake
-import platform.CoreMedia.*
-import platform.Foundation.*
+import platform.Foundation.NSNotification
+import platform.Foundation.NSURL
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
 import platform.darwin.NSObject
-import platform.darwin.dispatch_get_main_queue
-
-val AVPlayer.isPlaying: Boolean
-    get() = timeControlStatus == AVPlayerTimeControlStatusPlaying
 
 @ExperimentalForeignApi
-private class VideoPlayerView(var player: AVPlayer?) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+private class VideoPlayerView(var player: VLCMediaPlayer?) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     var isPlaying by mutableStateOf(false)
     var position by mutableLongStateOf(0L)
     var duration by mutableLongStateOf(0L)
 
-    private val playerLayer: AVPlayerLayer
-    private val playerObserver: NSObject
-    private var timeObserver: Any? = null
+    private val playerDelegate: VLCMediaPlayerDelegateProtocol
 
     init {
         backgroundColor = UIColor.blackColor
-        playerLayer = AVPlayerLayer()
-        playerLayer.player = player
-        layer.addSublayer(playerLayer)
-        playerObserver = object : NSObject(), NSKeyValueObservingProtocol {
-            override fun observeValueForKeyPath(
-                keyPath: String?,
-                ofObject: Any?,
-                change: Map<Any?, *>?,
-                context: COpaquePointer?
-            ) {
-                val newValue = change!![NSKeyValueChangeNewKey]
-                when (keyPath) {
-                    "timeControlStatus" -> isPlaying = newValue == AVPlayerTimeControlStatusPlaying
-                    "status" -> if (newValue == AVPlayerItemStatusReadyToPlay)
-                        player?.currentItem?.let {
-                            duration = CMTimeGetSeconds(it.duration).toLong() * 1000
-                        }
-                    else -> println("Unknown observed $keyPath:$newValue")
+        player?.drawable = this
+        playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
+            override fun mediaPlayerStateChanged(aNotification: NSNotification) = withPlayer { player ->
+                if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
+                    Coroutines.startMain {
+                        player.media = player.media?.url?.let { VLCMedia.mediaWithURL(it) }
+                        player.play()
+                    }
+                } else {
+                    isPlaying = player.playing
+                    if (player.state == VLCMediaPlayerState.VLCMediaPlayerStatePlaying) {
+                        duration = player.media?.length?.intValue?.toLong() ?: 0L
+                    }
                 }
             }
+
+            override fun mediaPlayerTimeChanged(aNotification: NSNotification) = withPlayer { player ->
+                position = player.time.intValue.toLong()
+            }
         }
-        player?.addObserver(playerObserver, "timeControlStatus", NSKeyValueObservingOptionNew, null)
-        player?.currentItem?.addObserver(playerObserver, "status", NSKeyValueObservingOptionNew, null)
-        addTimeObserver()
+        player?.delegate = playerDelegate
     }
 
     fun release() {
-        player?.pause()
-        removeTimeObserver()
-        player?.removeObserver(playerObserver, "timeControlStatus")
-        player?.currentItem?.removeObserver(playerObserver, "status")
+        player?.stop()
+        player?.delegate = null
+        player?.drawable = null
         player = null
     }
 
-    fun seek(pos: Long) {
-        val time = CMTimeMakeWithSeconds(pos / 1000.0, 1000)
-        val tolerance = CMTimeMake(0, 1)
-        removeTimeObserver()
-        position = pos
-        player?.seekToTime(time, tolerance, tolerance) { finished ->
-            if (finished) {
-                player?.currentTime()?.let { actualTime ->
-                    position = (CMTimeGetSeconds(actualTime) * 1000).toLong()
-                }
-                addTimeObserver()
-            }
-        }
-    }
-
-    private fun addTimeObserver() {
-        timeObserver = player?.addPeriodicTimeObserverForInterval(
-            CMTimeMake(1, 2), // 0.5秒
-            dispatch_get_main_queue()
-        ) { time ->
-            position = (CMTimeGetSeconds(time) * 1000).toLong()
-        }
-    }
-
-    private fun removeTimeObserver() {
-        timeObserver?.let {
-            player?.removeTimeObserver(it)
-            timeObserver = null
-        }
-    }
-
-    override fun layoutSubviews() {
-        super.layoutSubviews()
-        playerLayer.frame = bounds
+    inline fun withPlayer(block: (player: VLCMediaPlayer) -> Unit) {
+        player?.let(block)
     }
 }
 
@@ -153,18 +110,15 @@ actual fun VideoPlayer(
             view = state,
             modifier = Modifier.fillMaxSize().zIndex(2f),
             factory = {
-                var player: AVPlayer
-                if (url.startsWith("http")) {
-                    val videoURL = NSURL.URLWithString(url)!!
-                    player = AVPlayer(videoURL)
-                } else {
-                    val fileUrl = NSURL.fileURLWithPath(url)
-                    val asset = AVURLAsset.URLAssetWithURL(fileUrl, mapOf(
-                        "AVURLAssetOutOfBandMIMETypeKey" to "video/mp4",
-                    ))
-                    val playerItem = AVPlayerItem.playerItemWithAsset(asset)
-                    player = AVPlayer(playerItem)
-                }
+                val player = VLCMediaPlayer()
+                val media = VLCMedia(url.let {
+                    if (url.startsWith("http")) {
+                        NSURL.URLWithString(it)!!
+                    } else {
+                        NSURL.fileURLWithPath(it)
+                    }
+                })
+                player.media = media
                 player.play()
                 VideoPlayerView(player)
             },
@@ -178,14 +132,16 @@ actual fun VideoPlayer(
                 modifier = Modifier.fillMaxSize().zIndex(3f),
                 isPlaying = it.isPlaying,
                 onPlayClick = {
-                    it.player?.let { player ->
-                        if (player.isPlaying) player.pause()
+                    it.withPlayer { player ->
+                        if (player.isPlaying()) player.pause()
                         else player.play()
                     }
                 },
                 position = it.position,
                 duration = it.duration,
-                onProgressClick = { position -> it.seek(position) },
+                onProgressClick = { position ->
+                    it.withPlayer { player -> player.time = VLCTime.timeWithInt(position.toInt()) }
+                },
                 topBar = {
                     ClickIcon(
                         icon = Icons.AutoMirrored.Outlined.ArrowBack,
