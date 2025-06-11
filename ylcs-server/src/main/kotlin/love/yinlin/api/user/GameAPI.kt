@@ -381,11 +381,16 @@ sealed interface GameManager {
         override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
             super.check(info, question, answer)
             val actualInfo = info.to<SAInfo>()
+            val actualQuestion = question.Int
             val actualAnswer = answer.to<List<String>>()
             // 阈值限制
             require(actualInfo.threshold in config.minThreshold .. config.maxThreshold)
-            // 答案非空白
-            require(actualAnswer.all { it.isNotBlank() })
+            // 答案数量限制
+            require(actualAnswer.size in config.minCount .. config.maxCount)
+            // 答案长度与问题一致
+            require(actualAnswer.size == actualQuestion)
+            // 备选答案长度限制
+            require(actualAnswer.all { it.length in config.minLength .. config.maxLength })
             // 答案无重复
             require(actualAnswer.size == actualAnswer.toSet().size)
         }

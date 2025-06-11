@@ -25,7 +25,9 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
     }
 
     override val submitInfo: JsonElement = Unit.toJson()
+
     override val submitQuestion: JsonElement get() = JsonPrimitive(content.text.length)
+
     override val submitAnswer: JsonElement get() = JsonPrimitive(content.text)
 
     @Composable

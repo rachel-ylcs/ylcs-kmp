@@ -1,5 +1,7 @@
 package love.yinlin.ui.component.text
 
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
@@ -9,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -66,6 +69,8 @@ fun TextInput(
 	maxLines: Int = 1,
 	minLines: Int = maxLines,
 	clearButton: Boolean = true,
+	imeAction: ImeAction = ImeAction.Done,
+	onImeClick: (KeyboardActionScope.() -> Unit)? = null,
 	modifier: Modifier = Modifier
 ) {
 	OutlinedTextField(
@@ -94,7 +99,17 @@ fun TextInput(
 		} else null,
 		readOnly = readOnly,
 		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
-		keyboardOptions = remember(inputType) { inputType.toKeyboardOptions },
+		keyboardOptions = remember(inputType, imeAction) { inputType.toKeyboardOptions.copy(imeAction = imeAction) },
+		keyboardActions = remember(imeAction) {
+			KeyboardActions(
+				onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,
+				onGo = if (imeAction == ImeAction.Go && onImeClick != null) onImeClick else null,
+				onNext = if (imeAction == ImeAction.Next && onImeClick != null) onImeClick else null,
+				onPrevious = if (imeAction == ImeAction.Previous && onImeClick != null) onImeClick else null,
+				onSearch = if (imeAction == ImeAction.Search && onImeClick != null) onImeClick else null,
+				onSend = if (imeAction == ImeAction.Send && onImeClick != null) onImeClick else null,
+			)
+		},
 		singleLine = maxLines.coerceAtLeast(1) == 1,
 		minLines = minLines.coerceAtLeast(1),
 		maxLines = maxLines.coerceAtLeast(1),

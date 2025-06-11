@@ -38,6 +38,7 @@ import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.ui.component.node.condition
 import kotlin.math.max
 
 @Composable
@@ -90,11 +91,13 @@ internal fun UserBar(
 @Composable
 internal fun BoxText(
 	text: String,
-	color: Color
+	color: Color,
+	onClick: (() -> Unit)? = null
 ) {
 	Box(
 		modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace / 2)
-			.border(ThemeValue.Border.Small, color = color),
+			.border(ThemeValue.Border.Small, color = color)
+			.condition(onClick != null) { clickable { onClick?.invoke() } },
 		contentAlignment = Alignment.Center
 	) {
 		Text(
