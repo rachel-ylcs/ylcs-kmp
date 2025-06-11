@@ -21,6 +21,7 @@ import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.screen.SubScreenSlot
 
@@ -55,6 +56,14 @@ object GameStateManager {
         Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
         Game.SearchAll -> SearchAllCreateGameState(slot)
     }
+}
+
+@Composable
+fun ColumnScope.GameCardInfo(game: GamePublicDetails) = when (game.type) {
+    Game.AnswerQuestion -> AnswerQuestionCardInfo(game)
+    Game.BlockText -> BlockTextCardInfo(game)
+    Game.FlowersOrder -> FlowersOrderCardInfo(game)
+    Game.SearchAll -> SearchAllCardInfo(game)
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()

@@ -9,12 +9,18 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.container.BlockCharacter
 import love.yinlin.ui.component.container.CharacterBlock
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
+
+@Composable
+fun ColumnScope.BlockTextCardInfo(game: GamePublicDetails) {
+
+}
 
 @Stable
 class BlockTextCreateGameState(val slot: SubScreenSlot) : CreateGameState {

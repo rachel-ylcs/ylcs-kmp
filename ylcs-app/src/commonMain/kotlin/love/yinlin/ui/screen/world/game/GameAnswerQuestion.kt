@@ -20,12 +20,15 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.info.AQAnswer
 import love.yinlin.data.rachel.game.info.AQConfig
 import love.yinlin.data.rachel.game.info.AQInfo
 import love.yinlin.data.rachel.game.info.AQQuestion
+import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.SimpleEmptyBox
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
@@ -50,6 +53,19 @@ private sealed interface QuestionItem {
     @Stable
     data class Blank(val question: AQQuestion.Blank, val answer: AQAnswer.Blank) : QuestionItem {
         override val name: String = "填空"
+    }
+}
+
+@Composable
+fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetails) {
+    val info = remember(game) {
+        try { game.info.to<AQInfo>() } catch (_: Throwable) { null }
+    }
+    if (info != null) {
+        RachelText(
+            text = remember(info) { "准确率: ${(info.threshold * 100).toInt()}%" },
+            icon = Icons.Outlined.Flaky
+        )
     }
 }
 
@@ -218,7 +234,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         val scope = rememberCoroutineScope()
 
         GameSlider(
-            title = "成功阈值",
+            title = "准确率",
             progress = threshold,
             minValue = AQConfig.minThreshold,
             maxValue = AQConfig.maxThreshold,

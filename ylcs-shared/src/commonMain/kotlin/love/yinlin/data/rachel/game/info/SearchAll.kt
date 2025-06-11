@@ -7,8 +7,8 @@ import love.yinlin.data.rachel.game.SpeedConfig
 @Stable
 @Suppress("MayBeConstant")
 data object SAConfig : SpeedConfig() {
-    val minThreshold: Float = 0.5f // 最小成功阈值
-    val maxThreshold: Float = 1f // 最大成功阈值
+    val minThreshold: Float = 0.5f // 最小成功准确率
+    val maxThreshold: Float = 1f // 最大成功准确率
     val minCount: Int = 3 // 最小数量
     val maxCount: Int = 100 // 最大数量
     val minLength: Int = 1 // 最小长度
@@ -18,7 +18,7 @@ data object SAConfig : SpeedConfig() {
 @Stable
 @Serializable
 data class SAInfo(
-    val threshold: Float, // [成功阈值]
+    val threshold: Float, // [准确率]
     val timeLimit: Int, // [时间限制]
 )
 

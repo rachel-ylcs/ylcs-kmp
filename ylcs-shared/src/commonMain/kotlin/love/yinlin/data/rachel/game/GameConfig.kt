@@ -9,7 +9,7 @@ abstract class GameConfig {
     open val minReward: Int = 1 // 最小奖励
     open val maxReward: Int = 30 // 最大奖励
     open val minRank: Int = 1 // 最小名额
-    open val maxRank: Int = 3 // 最大名额
+    open val maxRank: Int = 5 // 最大名额
 
     val maxCostRatio: Int get() = maxReward / maxRank
 

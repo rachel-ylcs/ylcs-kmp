@@ -1,17 +1,35 @@
 package love.yinlin.ui.screen.world.game
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.info.FOConfig
 import love.yinlin.data.rachel.game.info.FOInfo
+import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
+
+@Composable
+fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetails) {
+    val info = remember(game) {
+        try { game.info.to<FOInfo>() } catch (_: Throwable) { null }
+    }
+    if (info != null) {
+        RachelText(
+            text = "重试次数: ${info.tryCount}",
+            icon = Icons.Outlined.RestartAlt
+        )
+    }
+}
 
 @Stable
 class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
