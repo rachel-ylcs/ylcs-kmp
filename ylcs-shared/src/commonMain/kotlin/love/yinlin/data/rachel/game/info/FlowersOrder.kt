@@ -7,7 +7,7 @@ import love.yinlin.data.rachel.game.ExplorationConfig
 @Stable
 @Suppress("MayBeConstant")
 data object FOConfig : ExplorationConfig() {
-    val minLength: Int = 10 // 最小长度
+    val minLength: Int = 6 // 最小长度
     val maxLength: Int = 14 // 最大长度
 }
 

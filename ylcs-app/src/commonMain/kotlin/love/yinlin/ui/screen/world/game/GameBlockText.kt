@@ -34,7 +34,7 @@ class BlockTextCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         anyHide && !anyBlock
     }
 
-    override val submitInfo: JsonElement get() = Unit.toJson()
+    override val submitInfo: JsonElement = Unit.toJson()
 
     override val submitQuestion: JsonElement get() = JsonPrimitive(buildString(gridSize * gridSize) {
         data.take(gridSize * gridSize).fastForEach {

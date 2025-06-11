@@ -342,8 +342,8 @@ sealed interface GameManager {
             require(actualQuestion in config.minLength .. config.maxLength)
             // 答案长度与问题一致
             require(actualAnswer.length == actualQuestion)
-            // 无空白字符
-            require(actualAnswer.all { !it.isWhitespace() })
+            // 无ASCII字符
+            require(actualAnswer.all { it.code !in 0 .. 127 })
         }
 
         private fun verify(standardAnswer: JsonElement, userAnswer: JsonElement): Int {
