@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen
 
+import kotlinx.serialization.json.JsonElement
 import love.yinlin.data.common.Picture
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.data.rachel.game.Game
@@ -46,7 +47,7 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenGameHall, type<Game>())
     screen(::ScreenGameRanking, type<Game>())
     screen(::ScreenCreateGame, type<Game>())
-    screen(::ScreenPlayGame, type<Game>())
+    screen(::ScreenPlayGame, type<Game, JsonElement>())
 
 	// 设置
     screen(::ScreenSettings)

@@ -1,14 +1,7 @@
 package love.yinlin.ui.screen.world
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.material.icons.Icons
@@ -16,13 +9,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -198,7 +185,16 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                 GameItem(
                     game = it,
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = {}
+                    onClick = {
+                        val profile = app.config.userProfile
+                        if (profile != null) {
+                            if (profile.name == it.name) slot.tip.warning("不能参与自己创建的游戏哦")
+                            else if (profile.name in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
+                            else if (profile.coin < it.cost) slot.tip.warning("银币不足入场")
+                            else navigate(ScreenPlayGame.Args(it.type, it.gid))
+                        }
+                        else slot.tip.warning("请先登录")
+                    }
                 )
             }
         }

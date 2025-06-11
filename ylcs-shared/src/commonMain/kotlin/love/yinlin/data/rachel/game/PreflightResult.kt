@@ -8,10 +8,8 @@ import love.yinlin.extension.toJson
 @Stable
 @Serializable
 data class PreflightResult(
-    val ok: Boolean, // [预检结果]
-    val msg: String, // [预检文本]
-    val info: JsonElement, // [预检信息]
-) {
-    constructor(info: JsonElement = Unit.toJson()) : this(ok = true, msg = "", info = info)
-    constructor(msg: String) : this(ok = false, msg = msg, info = Unit.toJson())
-}
+    val rid: Long,
+    val info: JsonElement = Unit.toJson(),
+    val question: JsonElement = Unit.toJson(),
+    val answer: JsonElement = Unit.toJson()
+)

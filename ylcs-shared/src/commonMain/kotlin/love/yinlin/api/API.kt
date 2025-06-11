@@ -183,9 +183,9 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val gid: Int)
 			}
 
-			object StartGame : APIPost<StartGame.Request, GameResult>(this, "startGame") {
+			object VerifyGame : APIPost<VerifyGame.Request, GameResult>(this, "verifyGame") {
 				@Serializable
-				data class Request(val token: String, val gid: Int, val answer: JsonElement)
+				data class Request(val token: String, val gid: Int, val rid: Long, val answer: JsonElement)
 			}
 		}
 

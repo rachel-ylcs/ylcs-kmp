@@ -24,6 +24,7 @@ import love.yinlin.common.Uri
 import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.extension.getNavType
 import love.yinlin.ui.component.screen.*
+import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -108,35 +109,38 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 data class ScreenRouteScope(
 	val builder: NavGraphBuilder,
 	val model: AppModel
-)
+) {
+	@JvmName("type1")
+	inline fun <reified T> type() = mapOf(typeOf<T>() to getNavType<T>())
+	@JvmName("type2")
+	inline fun <reified T1, reified T2> type() = mapOf(typeOf<T1>() to getNavType<T1>(), typeOf<T2>() to getNavType<T2>())
+
+	inline fun <reified S : Screen<Unit>> screen(crossinline factory: (AppModel) -> S) {
+		val appModel = this.model
+		this.builder.composable(route = route<S>()) {
+			val screen = viewModel {
+				factory(appModel).also {
+					it.launch { it.initialize() }
+				}
+			}
+			screen.UI()
+		}
+	}
+
+	inline fun <reified A : Any> screen(
+		crossinline factory: (AppModel, A) -> Screen<A>,
+		typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
+	) {
+		val appModel = this.model
+		this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
+			val screen = viewModel {
+				factory(appModel, backStackEntry.toRoute<A>()).also {
+					it.launch { it.initialize() }
+				}
+			}
+			screen.UI()
+		}
+	}
+}
 
 inline fun <reified S : Screen<Unit>> route(): String = "rachel.${S::class.qualifiedName!!}"
-
-inline fun <reified S : Screen<Unit>> ScreenRouteScope.screen(crossinline factory: (AppModel) -> S) {
-	val appModel = this.model
-	this.builder.composable(route = route<S>()) {
-		val screen = viewModel {
-			factory(appModel).also {
-				it.launch { it.initialize() }
-			}
-		}
-		screen.UI()
-	}
-}
-
-inline fun <reified A : Any> ScreenRouteScope.screen(
-	crossinline factory: (AppModel, A) -> Screen<A>,
-	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
-) {
-	val appModel = this.model
-	this.builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
-		val screen = viewModel {
-			factory(appModel, backStackEntry.toRoute<A>()).also {
-				it.launch { it.initialize() }
-			}
-		}
-		screen.UI()
-	}
-}
-
-inline fun <reified T> ScreenRouteScope.type() = mapOf(typeOf<T>() to getNavType<T>())

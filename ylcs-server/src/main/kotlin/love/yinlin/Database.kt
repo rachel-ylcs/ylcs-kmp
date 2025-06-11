@@ -18,6 +18,7 @@ import java.sql.Statement
 import java.sql.Time
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 object Database {
@@ -63,6 +64,10 @@ object SQLConverter {
 			else -> "$type ${value::class.qualifiedName} $value".json
 		}
 	}
+
+	fun convertTime(ts: String): Long = try {
+		LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.UTC).toEpochMilli()
+	} catch (_: Throwable) { 0L }
 }
 
 fun Connection.throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
