@@ -31,8 +31,11 @@ abstract class ExplorationGameManager : GameManager() {
 
     override fun preflight(uid: Int, details: GameDetails): Data<PreflightResult> {
         // 检查重试记录
-        val oldRecord = DB.querySQLSingle("SELECT rid, answer FROM game_record WHERE uid = ? AND gid = ?", uid, details.gid)
+        val oldRecord = DB.querySQLSingle("""
+            SELECT rid, answer, result FROM game_record WHERE uid = ? AND gid = ?
+        """, uid, details.gid)
         val oldAnswer = oldRecord?.get("answer").ArrayEmpty
+        val oldResult = oldRecord?.get("result").ArrayEmpty
         if (oldAnswer.size >= fetchTryCount(details.info)) return "重试次数达到上限".failedData
         return DB.throwTransaction {
             val rid = if (oldRecord == null) {
@@ -43,7 +46,7 @@ abstract class ExplorationGameManager : GameManager() {
                     INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
                 """, details.gid, uid, "[]", "[]")
             } else oldRecord["rid"].Long
-            Data.Success(PreflightResult(rid = rid, answer = oldAnswer))
+            Data.Success(PreflightResult(rid = rid, answer = oldAnswer, result = oldResult))
         }
     }
 

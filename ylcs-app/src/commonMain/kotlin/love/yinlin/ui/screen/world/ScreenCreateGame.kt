@@ -27,8 +27,8 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.world.game.GameSlider
-import love.yinlin.ui.screen.world.game.GameStateManager
 import love.yinlin.ui.screen.world.game.cast
+import love.yinlin.ui.screen.world.game.createGameState
 
 @Stable
 class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreateGame.Args>(model) {
@@ -38,7 +38,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
 
     override val title: String = "${args.type.title} - 新游戏"
 
-    private val state = GameStateManager.createGame(args.type, slot)
+    private val state = createGameState(args.type, slot)
     private val config = state.config
 
     private val titleState = TextInputState()
@@ -59,9 +59,6 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
             if (profile != null) {
                 val reward = reward.cast(config.minReward, config.maxReward)
                 val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
-                println(state.submitInfo)
-                println(state.submitQuestion)
-                println(state.submitAnswer)
                 if (profile.coin >= actionCoin) {
                     val result = ClientAPI.request(
                         route = API.User.Game.CreateGame,

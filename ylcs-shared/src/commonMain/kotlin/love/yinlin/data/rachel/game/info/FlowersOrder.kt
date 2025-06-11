@@ -7,7 +7,7 @@ import love.yinlin.data.rachel.game.ExplorationConfig
 @Stable
 @Suppress("MayBeConstant")
 data object FOConfig : ExplorationConfig() {
-    val minLength: Int = 6 // 最小长度
+    val minLength: Int = 10 // 最小长度
     val maxLength: Int = 14 // 最大长度
 }
 
@@ -24,9 +24,9 @@ enum class FOType {
     INCORRECT; // 错误
 
     companion object {
-        fun encode(offset: Int, items: List<FOType>): Int {
+        fun encode(items: List<FOType>): Int {
             var encoded = 0
-            val countOffset = items.size - offset
+            val countOffset = items.size - 10
             encoded = encoded or (countOffset shl 28)
             items.forEachIndexed { index, state ->
                 encoded = encoded or (state.ordinal shl (index * 2))
@@ -34,9 +34,9 @@ enum class FOType {
             return encoded
         }
 
-        fun decode(offset: Int, value: Int): List<FOType> {
+        fun decode(value: Int): List<FOType> {
             val countOffset = (value ushr 28) and 0x07
-            val count = countOffset + offset
+            val count = countOffset + 10
             return List(count) { index ->
                 when ((value ushr (index * 2)) and 0x03) {
                     CORRECT.ordinal -> CORRECT

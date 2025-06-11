@@ -107,12 +107,12 @@ fun Routing.gameAPI(implMap: ImplMap) {
     api(API.User.Game.VerifyGame) { (token, gid, rid, answer) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid, rid)
-        val record = DB.throwQuerySQL("""
+        val record = DB.throwQuerySQLSingle("""
             SELECT rid, gid, uid, ts, answer, result
             FROM game_record
             WHERE rid = ? AND gid = ? AND uid = ?
         """, rid, gid, uid).to<GameRecord>()
-        val details = DB.throwQuerySQL("""
+        val details = DB.throwQuerySQLSingle("""
             SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0

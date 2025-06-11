@@ -22,6 +22,8 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.ui.component.input.BeautifulSlider
 import love.yinlin.ui.screen.SubScreenSlot
 
@@ -43,19 +45,35 @@ interface CreateGameState {
 }
 
 @Stable
-interface PlayGameState
+interface PlayGameState {
+    val config: GameConfig
+
+    val canSubmit: Boolean
+
+    val submitAnswer: JsonElement
+
+    @Composable
+    fun Content(preflightResult: PreflightResult)
+
+    @Composable
+    fun ColumnScope.Settlement(gameResult: GameResult)
+}
 
 @Stable
 interface GameRankingState
 
-@Stable
-object GameStateManager {
-    fun createGame(type: Game, slot: SubScreenSlot): CreateGameState = when (type) {
-        Game.AnswerQuestion -> AnswerQuestionCreateGameState(slot)
-        Game.BlockText -> BlockTextCreateGameState(slot)
-        Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
-        Game.SearchAll -> SearchAllCreateGameState(slot)
-    }
+fun createGameState(type: Game, slot: SubScreenSlot): CreateGameState = when (type) {
+    Game.AnswerQuestion -> AnswerQuestionCreateGameState(slot)
+    Game.BlockText -> BlockTextCreateGameState(slot)
+    Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
+    Game.SearchAll -> SearchAllCreateGameState(slot)
+}
+
+fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) {
+    Game.AnswerQuestion -> AnswerQuestionPlayGameState(slot)
+    Game.BlockText -> BlockTextPlayGameState(slot)
+    Game.FlowersOrder -> FlowersOrderPlayGameState(slot)
+    Game.SearchAll -> SearchAllPlayGameState(slot)
 }
 
 @Composable

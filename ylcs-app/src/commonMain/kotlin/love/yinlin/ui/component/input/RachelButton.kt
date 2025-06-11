@@ -179,44 +179,7 @@ fun LoadingRachelButton(
 }
 
 @Composable
-fun LoadingButton(
-	text: String,
-	icon: ImageVector? = null,
-	enabled: Boolean = true,
-	modifier: Modifier = Modifier,
-	onClick: suspend CoroutineScope.() -> Unit
-) {
-	val scope = rememberCoroutineScope()
-	var isLoading by rememberFalse()
-
-	Button(
-		modifier = modifier,
-		enabled = enabled && !isLoading,
-		colors = ButtonColors(
-			containerColor = MaterialTheme.colorScheme.primaryContainer,
-			contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-			disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
-			disabledContentColor = MaterialTheme.colorScheme.onSurface
-		),
-		onClick = {
-			scope.launch {
-				isLoading = true
-				onClick()
-				isLoading = false
-			}
-		}
-	) {
-		LoadingButtonContent(
-			isLoading = isLoading,
-			text = text,
-			icon = icon,
-			color = LocalContentColor.current
-		)
-	}
-}
-
-@Composable
-private fun ContainerButton(
+private fun ButtonBase(
 	text: String,
 	icon: ImageVector?,
 	contentColor: Color,
@@ -251,7 +214,7 @@ fun PrimaryButton(
 	icon: ImageVector? = null,
 	onClick: () -> Unit
 ) {
-	ContainerButton(
+	ButtonBase(
 		text = text,
 		icon = icon,
 		contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -266,7 +229,7 @@ fun SecondaryButton(
 	icon: ImageVector? = null,
 	onClick: () -> Unit
 ) {
-	ContainerButton(
+	ButtonBase(
 		text = text,
 		icon = icon,
 		contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -281,7 +244,7 @@ fun TertiaryButton(
 	icon: ImageVector? = null,
 	onClick: () -> Unit
 ) {
-	ContainerButton(
+	ButtonBase(
 		text = text,
 		icon = icon,
 		contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -324,4 +287,100 @@ fun RachelRadioButton(
 			color = LocalContentColor.current
 		)
 	}
+}
+
+@Composable
+private fun LoadingButton(
+	text: String,
+	icon: ImageVector? = null,
+	enabled: Boolean = true,
+	contentColor: Color,
+	backgroundColor: Color,
+	modifier: Modifier = Modifier,
+	onClick: suspend CoroutineScope.() -> Unit
+) {
+	val scope = rememberCoroutineScope()
+	var isLoading by rememberFalse()
+
+	Button(
+		modifier = modifier,
+		enabled = enabled && !isLoading,
+		colors = ButtonColors(
+			containerColor = backgroundColor,
+			contentColor = contentColor,
+			disabledContainerColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
+			disabledContentColor = MaterialTheme.colorScheme.onSurface
+		),
+		onClick = {
+			scope.launch {
+				isLoading = true
+				onClick()
+				isLoading = false
+			}
+		}
+	) {
+		LoadingButtonContent(
+			isLoading = isLoading,
+			text = text,
+			icon = icon,
+			color = contentColor
+		)
+	}
+}
+
+@Composable
+fun PrimaryLoadingButton(
+	text: String,
+	icon: ImageVector? = null,
+	enabled: Boolean = true,
+	modifier: Modifier = Modifier,
+	onClick: suspend CoroutineScope.() -> Unit
+) {
+	LoadingButton(
+		text = text,
+		icon = icon,
+		enabled = enabled,
+		contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+		modifier = modifier,
+		onClick = onClick
+	)
+}
+
+@Composable
+fun SecondaryLoadingButton(
+	text: String,
+	icon: ImageVector? = null,
+	enabled: Boolean = true,
+	modifier: Modifier = Modifier,
+	onClick: suspend CoroutineScope.() -> Unit
+) {
+	LoadingButton(
+		text = text,
+		icon = icon,
+		enabled = enabled,
+		contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+		modifier = modifier,
+		onClick = onClick
+	)
+}
+
+@Composable
+fun TertiaryLoadingButton(
+	text: String,
+	icon: ImageVector? = null,
+	enabled: Boolean = true,
+	modifier: Modifier = Modifier,
+	onClick: suspend CoroutineScope.() -> Unit
+) {
+	LoadingButton(
+		text = text,
+		icon = icon,
+		enabled = enabled,
+		contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+		backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+		modifier = modifier,
+		onClick = onClick
+	)
 }

@@ -25,7 +25,6 @@ import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.LoadingButton
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
@@ -34,6 +33,7 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.input.PrimaryLoadingButton
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
@@ -193,7 +193,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					}
 				)
 			}
-			LoadingButton(
+			PrimaryLoadingButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "登录",
 				enabled = canLogin,
@@ -270,7 +270,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					loginPwd.text = ""
 				}
 			)
-			LoadingButton(
+			PrimaryLoadingButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "注册",
 				enabled = canRegister,
@@ -308,7 +308,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					loginPwd.text = ""
 				}
 			)
-			LoadingButton(
+			PrimaryLoadingButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "提交申请",
 				enabled = canForgotPassword,

@@ -13,9 +13,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.SAConfig
 import love.yinlin.data.rachel.game.info.SAInfo
 import love.yinlin.extension.timeString
@@ -107,5 +110,24 @@ class SearchAllCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                 )
             }
         }
+    }
+}
+
+@Stable
+class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
+    override val config = SAConfig
+
+    override val canSubmit: Boolean = false
+
+    override val submitAnswer: JsonElement = JsonNull
+
+    @Composable
+    override fun Content(preflightResult: PreflightResult) {
+
+    }
+
+    @Composable
+    override fun ColumnScope.Settlement(gameResult: GameResult) {
+
     }
 }

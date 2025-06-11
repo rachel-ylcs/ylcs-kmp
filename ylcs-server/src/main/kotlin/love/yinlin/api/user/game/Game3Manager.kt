@@ -38,10 +38,10 @@ data object Game3Manager : ExplorationGameManager() {
             val ch1 = actualStandardAnswer[i]
             val ch2 = actualUserAnswer[i]
             if (ch1 == ch2) FOType.CORRECT
-            else if (actualUserAnswer.contains(ch1)) FOType.INVALID_POS
+            else if (ch2 in actualStandardAnswer) FOType.INVALID_POS
             else FOType.INCORRECT
         }
-        return FOType.encode(config.minLength, items)
+        return FOType.encode(items)
     }
 
     override fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {

@@ -11,5 +11,6 @@ data class PreflightResult(
     val rid: Long,
     val info: JsonElement = Unit.toJson(),
     val question: JsonElement = Unit.toJson(),
-    val answer: JsonElement = Unit.toJson()
+    val answer: JsonElement = Unit.toJson(),
+    val result: JsonElement = Unit.toJson()
 )

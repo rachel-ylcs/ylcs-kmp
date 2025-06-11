@@ -23,7 +23,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.LoadingButton
+import love.yinlin.ui.component.input.PrimaryLoadingButton
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
@@ -171,7 +171,7 @@ fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 				)
 			}
 			if (retry != null) {
-				LoadingButton(
+				PrimaryLoadingButton(
 					text = stringResource(Res.string.network_error_retry_string),
 					onClick = { retry() }
 				)

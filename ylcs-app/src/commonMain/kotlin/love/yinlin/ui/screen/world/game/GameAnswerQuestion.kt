@@ -19,8 +19,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.AQAnswer
 import love.yinlin.data.rachel.game.info.AQConfig
 import love.yinlin.data.rachel.game.info.AQInfo
@@ -440,5 +443,24 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         titleInputDialog.Land()
         optionInputDialog.Land()
         answerInputDialog.Land()
+    }
+}
+
+@Stable
+class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
+    override val config = AQConfig
+
+    override val canSubmit: Boolean = false
+
+    override val submitAnswer: JsonElement = JsonNull
+
+    @Composable
+    override fun Content(preflightResult: PreflightResult) {
+
+    }
+
+    @Composable
+    override fun ColumnScope.Settlement(gameResult: GameResult) {
+
     }
 }
