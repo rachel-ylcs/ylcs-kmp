@@ -100,20 +100,20 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
 
     override fun init(preflightResult: PreflightResult) {
-        try {
+        preflight = try {
             inputState.text = ""
-            preflight = Preflight(
+            Preflight(
                 length = preflightResult.question.Int,
                 answer = preflightResult.answer.to<List<String>>(),
                 result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
             )
-        } catch (_: Throwable) { }
+        } catch (_: Throwable) { null }
     }
 
     override fun settle(gameResult: GameResult) {
-        try {
-            result = gameResult.info.Int
-        } catch (_: Throwable) {}
+        result = try {
+            gameResult.info.Int
+        } catch (_: Throwable) { null }
     }
 
     @Composable

@@ -100,7 +100,7 @@ fun TextInput(
 		readOnly = readOnly,
 		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
 		keyboardOptions = remember(inputType, imeAction) { inputType.toKeyboardOptions.copy(imeAction = imeAction) },
-		keyboardActions = remember(imeAction) {
+		keyboardActions = remember(imeAction, onImeClick) {
 			KeyboardActions(
 				onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,
 				onGo = if (imeAction == ImeAction.Go && onImeClick != null) onImeClick else null,

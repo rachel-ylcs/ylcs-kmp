@@ -126,11 +126,10 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     override fun init(preflightResult: PreflightResult) {
-        try {
+        preflight = try {
             val text = preflightResult.question.String
             val gridSize = sqrt(text.length.toFloat()).toInt()
             require(gridSize * gridSize == text.length && gridSize in BTConfig.minBlockSize .. BTConfig.maxBlockSize)
-            preflight = Preflight(gridSize = gridSize)
             data.fill(BlockCharacter.Empty)
             text.forEachIndexed { index, ch ->
                 data[index] = when (ch) {
@@ -139,13 +138,14 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                     else -> BlockCharacter(ch, false)
                 }
             }
-        } catch (_: Throwable) {}
+            Preflight(gridSize = gridSize)
+        } catch (_: Throwable) { null }
     }
 
     override fun settle(gameResult: GameResult) {
-        try {
-            result = gameResult.info.to()
-        } catch (_: Throwable) { }
+        result = try {
+            gameResult.info.to()
+        } catch (_: Throwable) { null }
     }
 
     @Composable

@@ -143,20 +143,20 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     override fun init(preflightResult: PreflightResult) {
-        try {
+        preflight = try {
             inputState.text = ""
             items.clear()
-            preflight = Preflight(
+            Preflight(
                 info = preflightResult.info.to<SAInfo>(),
                 count = preflightResult.question.Int,
             )
-        } catch (_: Throwable) { }
+        } catch (_: Throwable) { null }
     }
 
     override fun settle(gameResult: GameResult) {
-        try {
-            result = gameResult.info.to()
-        } catch (_: Throwable) { }
+        result = try {
+            gameResult.info.to()
+        } catch (_: Throwable) { null }
     }
 
     @Composable

@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.GamePublicDetails
 import love.yinlin.data.rachel.game.GameResult
@@ -29,12 +28,16 @@ import love.yinlin.data.rachel.game.info.AQConfig
 import love.yinlin.data.rachel.game.info.AQInfo
 import love.yinlin.data.rachel.game.info.AQQuestion
 import love.yinlin.data.rachel.game.info.AQResult
+import love.yinlin.data.rachel.game.info.AQUserAnswer
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.SimpleEmptyBox
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
 
 @Stable
@@ -48,15 +51,15 @@ private sealed interface QuestionItem {
 
     @Stable
     data class Choice(val question: AQQuestion.Choice, val answer: AQAnswer.Choice) : QuestionItem {
-        override val name: String = "单选"
+        override val name: String = question.name
     }
     @Stable
     data class MultiChoice(val question: AQQuestion.MultiChoice, val answer: AQAnswer.MultiChoice) : QuestionItem {
-        override val name: String = "多选"
+        override val name: String = question.name
     }
     @Stable
     data class Blank(val question: AQQuestion.Blank, val answer: AQAnswer.Blank) : QuestionItem {
-        override val name: String = "填空"
+        override val name: String = question.name
     }
 }
 
@@ -210,7 +213,8 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
             is QuestionItem.MultiChoice -> item.question.options
             is QuestionItem.Blank -> item.answer.value
         }.toMutableList()
-        titleInputDialog.openSuspend(initText = options[index])?.let { text ->
+        val dialog = if (item is QuestionItem.Blank) answerInputDialog else optionInputDialog
+        dialog.openSuspend(initText = options[index])?.let { text ->
             options[index] = text
             questions[currentIndex] = when (item) {
                 is QuestionItem.Choice -> item.copy(question = item.question.copy(options = options))
@@ -298,6 +302,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                     scope.launch { modifyTitle(item) }
                                 }
                             )
+                            Space()
                             question.options.fastForEachIndexed { index, option ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -333,6 +338,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                     scope.launch { modifyTitle(item) }
                                 }
                             )
+                            Space()
                             question.options.fastForEachIndexed { index, option ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -368,6 +374,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                     scope.launch { modifyTitle(item) }
                                 }
                             )
+                            Space()
                             answer.value.fastForEachIndexed { index, option ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -450,30 +457,186 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 @Stable
 class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Stable
-    private data class Preflight(val info: AQInfo, val question: List<AQQuestion>)
+    private data class Preflight(val info: AQInfo, val questions: List<AQQuestion>)
 
     override val config = AQConfig
 
     private var preflight: Preflight? by mutableStateOf(null)
     private var result: AQResult? by mutableStateOf(null)
 
-    override val canSubmit: Boolean = false
+    private val answers = mutableStateListOf<AQUserAnswer>()
+    private var currentIndex by mutableIntStateOf(0)
 
-    override val submitAnswer: JsonElement = JsonNull
+    override val canSubmit: Boolean by derivedStateOf { answers.all { answer ->
+        when (answer) {
+            is AQUserAnswer.Choice -> answer.value != -1
+            is AQUserAnswer.MultiChoice -> answer.value.size > 1
+            is AQUserAnswer.Blank -> answer.value.isNotEmpty()
+        }
+    } }
+
+    override val submitAnswer: JsonElement get() = answers.toList().toJson()
 
     override fun init(preflightResult: PreflightResult) {
-
+        preflight = try {
+            val questions = preflightResult.question.to<List<AQQuestion>>()
+            require(questions.size in AQConfig.minQuestionCount .. AQConfig.maxQuestionCount)
+            answers.clear()
+            for (question in questions) {
+                answers += when (question) {
+                    is AQQuestion.Choice -> AQUserAnswer.Choice()
+                    is AQQuestion.MultiChoice -> AQUserAnswer.MultiChoice()
+                    is AQQuestion.Blank -> AQUserAnswer.Blank()
+                }
+            }
+            currentIndex = 0
+            Preflight(
+                info = preflightResult.info.to(),
+                questions = questions
+            )
+        } catch (_: Throwable) { null }
     }
 
     override fun settle(gameResult: GameResult) {
-        try {
-            result = gameResult.info.to()
-        } catch (_: Throwable) { }
+        result = try {
+            gameResult.info.to()
+        } catch (_: Throwable) { null }
     }
 
     @Composable
     override fun ColumnScope.Content() {
+        preflight?.let { (_, questions) ->
+            Column(
+                modifier = Modifier.fillMaxWidth()
+                    .height(ThemeValue.Size.CardWidth)
+                    .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.primary)
+                    .padding(ThemeValue.Padding.EqualValue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            ) {
+                val question = questions.getOrNull(currentIndex)
+                val answer = answers.getOrNull(currentIndex)
 
+                if (question != null && answer != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ClickIcon(
+                            icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                            onClick = {
+                                if (currentIndex > 0) --currentIndex
+                            }
+                        )
+                        Text(
+                            text = remember(currentIndex) { "${currentIndex + 1} ${question.name}" },
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ClickIcon(
+                            icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                            onClick = {
+                                if (currentIndex < questions.size - 1) ++currentIndex
+                            }
+                        )
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxWidth().weight(1f)
+                            .padding(ThemeValue.Padding.EqualValue)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    ) {
+                        when (question) {
+                            is AQQuestion.Choice -> {
+                                answer as AQUserAnswer.Choice
+                                Text(text = question.title)
+                                Space()
+                                question.options.fastForEachIndexed { index, option ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val isSelected = index == answer.value
+
+                                        ClickIcon(
+                                            icon = if (isSelected) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            onClick = {
+                                                answers[currentIndex] = answer.copy(value = if (answer.value == index) -1 else index)
+                                            }
+                                        )
+                                        Text(
+                                            text = option,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                }
+                            }
+                            is AQQuestion.MultiChoice -> {
+                                answer as AQUserAnswer.MultiChoice
+                                Text(text = question.title)
+                                Space()
+                                question.options.fastForEachIndexed { index, option ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        val isSelected = index in answer.value
+
+                                        ClickIcon(
+                                            icon = if (isSelected) Icons.Outlined.CheckBox else Icons.Outlined.CheckBoxOutlineBlank,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            onClick = {
+                                                val newAnswers = answer.value.toMutableList()
+                                                if (index in newAnswers) newAnswers.remove(index)
+                                                else newAnswers.add(index)
+                                                answers[currentIndex] = answer.copy(value = newAnswers)
+                                            }
+                                        )
+                                        Text(
+                                            text = option,
+                                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                }
+                            }
+                            is AQQuestion.Blank -> {
+                                answer as AQUserAnswer.Blank
+                                Text(text = question.title)
+                                Space()
+                                Text(
+                                    text = answer.value,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Space()
+                                val inputState = remember(currentIndex) { TextInputState() }
+                                TextInput(
+                                    state = inputState,
+                                    hint = "输入答案(回车保存)",
+                                    clearButton = false,
+                                    onImeClick = {
+                                        answers[currentIndex] = answer.copy(value = inputState.text)
+                                        inputState.text = ""
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
+                else {
+                    Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                        SimpleEmptyBox()
+                    }
+                }
+            }
+        }
     }
 
     @Composable

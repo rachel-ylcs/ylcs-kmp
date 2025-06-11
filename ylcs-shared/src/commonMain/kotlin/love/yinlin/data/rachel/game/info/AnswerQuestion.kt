@@ -29,23 +29,31 @@ data class AQInfo(
 sealed class AQQuestion {
     abstract val title: String
 
+    abstract val name: String
+
     // 单选
     @Stable
     @Serializable
     @SerialName("Choice")
-    data class Choice(override val title: String, val options: List<String> = emptyList()) : AQQuestion()
+    data class Choice(override val title: String, val options: List<String> = emptyList()) : AQQuestion() {
+        override val name: String = "单选"
+    }
 
     // 多选
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(override val title: String, val options: List<String> = emptyList()) : AQQuestion()
+    data class MultiChoice(override val title: String, val options: List<String> = emptyList()) : AQQuestion() {
+        override val name: String = "多选"
+    }
 
     // 填空
     @Stable
     @Serializable
     @SerialName("Blank")
-    data class Blank(override val title: String) : AQQuestion()
+    data class Blank(override val title: String) : AQQuestion() {
+        override val name: String = "填空"
+    }
 }
 
 @Stable
@@ -104,7 +112,7 @@ sealed class AQUserAnswer {
     @Stable
     @Serializable
     @SerialName("Choice")
-    data class Choice(val value: Int) : AQUserAnswer() {
+    data class Choice(val value: Int = -1) : AQUserAnswer() {
         override fun verifyAnswer(answer: AQAnswer): Boolean = answer is AQAnswer.Choice && value == answer.value
     }
 
@@ -112,7 +120,7 @@ sealed class AQUserAnswer {
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(val value: List<Int>) : AQUserAnswer() {
+    data class MultiChoice(val value: List<Int> = emptyList()) : AQUserAnswer() {
         override fun verifyAnswer(answer: AQAnswer): Boolean = answer is AQAnswer.MultiChoice &&
                 value.size == answer.value.size &&
                 answer.value.groupingBy { it }.eachCount() == value.groupingBy { it }.eachCount()
@@ -122,7 +130,7 @@ sealed class AQUserAnswer {
     @Stable
     @Serializable
     @SerialName("Blank")
-    data class Blank(val value: String) : AQUserAnswer() {
+    data class Blank(val value: String = "") : AQUserAnswer() {
         override fun verifyAnswer(answer: AQAnswer): Boolean = answer is AQAnswer.Blank && value in answer.value
     }
 }
