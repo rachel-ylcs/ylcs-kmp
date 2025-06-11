@@ -241,4 +241,9 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
             }
         }
     }
+
+    @Composable
+    override fun Floating() {
+        state.Floating()
+    }
 }

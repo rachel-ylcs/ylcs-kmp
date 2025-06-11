@@ -86,7 +86,7 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 @Stable
 class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Stable
-    private data class Preflight(val question: Int, val answer: List<String>, val result: List<Int>)
+    private data class Preflight(val length: Int, val answer: List<String>, val result: List<Int>)
 
     override val config = FOConfig
 
@@ -95,7 +95,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     private val inputState = TextInputState()
 
-    override val canSubmit: Boolean by derivedStateOf { inputState.text.length == preflight?.question }
+    override val canSubmit: Boolean by derivedStateOf { inputState.text.length == preflight?.length }
 
     override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
 
@@ -135,7 +135,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         LaunchedEffect(preflightResult) {
             try {
                 preflight = Preflight(
-                    question = preflightResult.question.Int,
+                    length = preflightResult.question.Int,
                     answer = preflightResult.answer.to<List<String>>(),
                     result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
                 )

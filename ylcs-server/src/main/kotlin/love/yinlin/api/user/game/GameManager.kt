@@ -52,7 +52,7 @@ sealed class GameManager {
                 UPDATE game
                 SET winner = ? , isCompleted = ?
                 WHERE gid = ?
-            """, details.winner.plus(uid.toString()).toJsonString(), isGameCompleted, details.gid)
+            """, details.winner.plus(uid).toJsonString(), isGameCompleted, details.gid)
         }
     }
 

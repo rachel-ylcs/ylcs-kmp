@@ -151,7 +151,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                 GameCardInfo(game = game)
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     game.winner.fastForEach { winner ->
-                        BoxText(text = winner, color = MaterialTheme.colorScheme.primary)
+                        BoxText(text = winner.toString(), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -189,7 +189,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                         val profile = app.config.userProfile
                         if (profile != null) {
                             if (profile.name == it.name) slot.tip.warning("不能参与自己创建的游戏哦")
-                            else if (profile.name in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
+                            else if (profile.uid in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
                             else if (profile.coin < it.cost) slot.tip.warning("银币不足入场")
                             else navigate(ScreenPlayGame.Args(it.type, it.gid))
                         }

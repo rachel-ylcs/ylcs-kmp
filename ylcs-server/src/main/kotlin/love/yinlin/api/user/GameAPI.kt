@@ -100,7 +100,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         """, gid).to<GameDetails>()
         if (details.uid == uid) "不能参与自己创建的游戏哦".failedData
             else if (details.isCompleted) "不能参与已经结算的游戏哦".failedData
-            else if (uid.toString() in details.winner) "不能参与完成过的游戏哦".failedData
+            else if (uid in details.winner) "不能参与完成过的游戏哦".failedData
             else details.type.manager.preflight(uid, details).map { it.copy(info = details.info, question = details.question) }
     }
 

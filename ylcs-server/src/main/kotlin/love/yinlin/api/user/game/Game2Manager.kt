@@ -46,10 +46,14 @@ data object Game2Manager : RankGameManager() {
         val actualUserAnswer = userAnswer.String
         require(actualStandardAnswer.length == actualUserAnswer.length)
         var correctCount = 0
+        var totalCount = 0
         for (i in actualStandardAnswer.indices) {
             val ch1 = actualStandardAnswer[i]
             val ch2 = actualUserAnswer[i]
-            if (ch1 == ch2) ++correctCount
+            if (ch2 != BTConfig.CHAR_EMPTY) {
+                ++totalCount
+                if (ch1 == ch2) ++correctCount
+            }
         }
         return BTResult(correctCount = correctCount, totalCount = actualStandardAnswer.length)
     }

@@ -15,6 +15,6 @@ data class GamePublicDetails(
     val reward: Int, // [游戏奖励]
     val num: Int, // [奖励名额]
     val cost: Int, // [参赛消耗]
-    val winner: List<String>, // [游戏赢家]
+    val winner: List<Int>, // [游戏赢家]
     val info: JsonElement, // [游戏信息]
 )

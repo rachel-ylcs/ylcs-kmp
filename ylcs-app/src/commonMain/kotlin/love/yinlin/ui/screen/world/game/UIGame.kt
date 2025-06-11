@@ -59,6 +59,9 @@ interface PlayGameState {
 
     @Composable
     fun ColumnScope.Settlement(gameResult: GameResult)
+
+    @Composable
+    fun Floating() {}
 }
 
 @Stable

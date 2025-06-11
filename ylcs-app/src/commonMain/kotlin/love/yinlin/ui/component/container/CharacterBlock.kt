@@ -104,9 +104,10 @@ fun CharacterBlock(
                                 hide -> MaterialTheme.colorScheme.secondaryContainer
                                 else -> MaterialTheme.colorScheme.primaryContainer
                             }).clickable {
-                                if (writeMode || (ch != BTConfig.CHAR_EMPTY && ch != BTConfig.CHAR_BLOCK && hide)) {
-                                    openIndex = if (openIndex != -1) -1 else index
-                                }
+                                openIndex = if (writeMode) if (openIndex != -1) -1 else index
+                                    else if (ch != BTConfig.CHAR_EMPTY && ch != BTConfig.CHAR_BLOCK && hide) {
+                                        if (openIndex != -1) -1 else index
+                                    } else -1
                             }.padding(ThemeValue.Padding.LittleSpace * 16f / blockSize),
                         contentAlignment = Alignment.Center
                     ) {

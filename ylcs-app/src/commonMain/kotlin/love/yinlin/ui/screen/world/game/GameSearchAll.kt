@@ -120,7 +120,7 @@ class SearchAllCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 @Stable
 class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Stable
-    private data class Preflight(val info: SAInfo, val question: Int)
+    private data class Preflight(val info: SAInfo, val count: Int)
 
     override val config = SAConfig
 
@@ -130,7 +130,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     private val inputState = TextInputState()
     private val items = mutableStateSetOf<String>()
 
-    override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..(preflight?.question ?: SAConfig.maxCount) }
+    override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..(preflight?.count ?: SAConfig.maxCount) }
 
     override val submitAnswer: JsonElement get() = items.toSet().toJson()
 
@@ -155,7 +155,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
             try {
                 preflight = Preflight(
                     info = preflightResult.info.to<SAInfo>(),
-                    question = preflightResult.question.Int,
+                    count = preflightResult.question.Int,
                 )
             } catch (_: Throwable) { }
         }
