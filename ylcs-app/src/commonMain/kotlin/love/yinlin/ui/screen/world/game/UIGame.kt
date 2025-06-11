@@ -21,7 +21,7 @@ import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.ui.component.input.BeautifulSlider
@@ -84,7 +84,7 @@ fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) 
 }
 
 @Composable
-fun ColumnScope.GameCardInfo(game: GamePublicDetails) = when (game.type) {
+fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type) {
     Game.AnswerQuestion -> AnswerQuestionCardInfo(game)
     Game.BlockText -> BlockTextCardInfo(game)
     Game.FlowersOrder -> FlowersOrderCardInfo(game)

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.SAConfig
@@ -35,7 +35,7 @@ import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.BoxText
 
 @Composable
-fun ColumnScope.SearchAllCardInfo(game: GamePublicDetails) {
+fun ColumnScope.SearchAllCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
         try { game.info.to<SAInfo>() } catch (_: Throwable) { null }
     }

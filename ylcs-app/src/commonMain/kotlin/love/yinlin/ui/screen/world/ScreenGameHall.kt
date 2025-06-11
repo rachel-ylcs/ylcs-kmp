@@ -26,7 +26,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText
@@ -47,9 +47,9 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
 
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private var page = object : Pagination<GamePublicDetails, Int, Int>(Int.MAX_VALUE) {
-        override fun distinctValue(item: GamePublicDetails): Int = item.gid
-        override fun offset(item: GamePublicDetails): Int = item.gid
+    private var page = object : Pagination<GamePublicDetailsWithName, Int, Int>(Int.MAX_VALUE) {
+        override fun distinctValue(item: GamePublicDetailsWithName): Int = item.gid
+        override fun offset(item: GamePublicDetailsWithName): Int = item.gid
     }
 
     private val gridState = LazyGridState()
@@ -86,7 +86,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
 
     @Composable
     private fun GameItem(
-        game: GamePublicDetails,
+        game: GamePublicDetailsWithName,
         modifier: Modifier = Modifier,
         onClick: () -> Unit,
     ) {
@@ -149,9 +149,12 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                     modifier = Modifier.fillMaxWidth()
                 )
                 GameCardInfo(game = game)
-                FlowRow(modifier = Modifier.fillMaxWidth()) {
-                    game.winner.fastForEach { winner ->
-                        BoxText(text = winner.toString(), color = MaterialTheme.colorScheme.primary)
+                if (game.winner.isNotEmpty()) {
+                    RachelText(text = "赢家", icon = Icons.Outlined.MilitaryTech)
+                    FlowRow(modifier = Modifier.fillMaxWidth()) {
+                        game.winner.fastForEach { winner ->
+                            BoxText(text = winner.toString(), color = MaterialTheme.colorScheme.primary)
+                        }
                     }
                 }
             }
@@ -189,7 +192,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                         val profile = app.config.userProfile
                         if (profile != null) {
                             if (profile.name == it.name) slot.tip.warning("不能参与自己创建的游戏哦")
-                            else if (profile.uid in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
+                            else if (profile.name in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
                             else if (profile.coin < it.cost) slot.tip.warning("银币不足入场")
                             else navigate(ScreenPlayGame.Args(it.type, it.gid))
                         }

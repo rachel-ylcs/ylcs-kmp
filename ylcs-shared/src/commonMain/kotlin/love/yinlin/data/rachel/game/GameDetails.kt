@@ -9,8 +9,6 @@ import kotlinx.serialization.json.JsonElement
 data class GameDetails(
     val gid: Int, // [游戏 ID]
     val uid: Int, // [创建者 ID]
-    val ts: String, // [创建时间]
-    val title: String, // [标题]
     val type: Game, // [游戏类型]
     val reward: Int, // [游戏奖励]
     val num: Int, // [奖励名额]

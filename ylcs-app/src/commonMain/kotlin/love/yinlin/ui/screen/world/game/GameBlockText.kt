@@ -13,7 +13,7 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.BTConfig
@@ -28,7 +28,7 @@ import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.math.sqrt
 
 @Composable
-fun ColumnScope.BlockTextCardInfo(game: GamePublicDetails) {}
+fun ColumnScope.BlockTextCardInfo(game: GamePublicDetailsWithName) {}
 
 @Stable
 class BlockTextCreateGameState(val slot: SubScreenSlot) : CreateGameState {

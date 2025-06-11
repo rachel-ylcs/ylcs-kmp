@@ -18,7 +18,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
 import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.FOConfig
@@ -34,7 +34,7 @@ import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
 
 @Composable
-fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetails) {
+fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
         try { game.info.to<FOInfo>() } catch (_: Throwable) { null }
     }

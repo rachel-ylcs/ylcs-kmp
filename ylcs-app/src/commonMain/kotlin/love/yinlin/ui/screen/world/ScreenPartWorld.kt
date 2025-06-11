@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Castle
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +46,7 @@ import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
+import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import kotlin.math.absoluteValue
 
@@ -279,14 +282,16 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
-	override val fabCanExpand: Boolean = false
+	override val fabCanExpand: Boolean = true
 
-	override val fabIcon: ImageVector = Icons.Outlined.History
+	override val fabIcon: ImageVector = Icons.Outlined.Add
 
-	override suspend fun onFabClick() {
-		if (app.config.userProfile != null) {
-
+	override val fabMenus: Array<FABAction> = arrayOf(
+		FABAction(Icons.Outlined.History) {
+			navigate<ScreenGameRecordHistory>()
+		},
+		FABAction(Icons.Outlined.Castle) {
+			navigate<ScreenGameHistory>()
 		}
-		else slot.tip.warning("请先登录")
-	}
+	)
 }

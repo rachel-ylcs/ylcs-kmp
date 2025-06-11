@@ -51,7 +51,12 @@ fun Routing.gameAPI(implMap: ImplMap) {
 
     api(API.User.Game.GetGames) { (type, gid, num) ->
         val games = DB.throwQuerySQL("""
-            SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.winner, game.info
+            SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.info,
+                IFNULL((
+                    SELECT JSON_ARRAYAGG(COALESCE(u.name, 'Unknown'))
+                    FROM JSON_TABLE(game.winner, '$[*]' COLUMNS (uid INT PATH '$')) AS jt
+                    LEFT JOIN user AS u ON jt.uid = u.uid
+                ), JSON_ARRAY()) AS winner
             FROM game
             LEFT JOIN user ON game.uid = user.uid
             WHERE game.gid < ? AND game.type = ? AND game.isDeleted = 0
@@ -64,7 +69,12 @@ fun Routing.gameAPI(implMap: ImplMap) {
     api(API.User.Game.GetUserGames) { (token, gid, isCompleted, num) ->
         val uid = AN.throwExpireToken(token)
         val games = DB.throwQuerySQL("""
-            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+            SELECT gid, ts, title, type, reward, num, cost, info, question, answer, isCompleted,
+                IFNULL((
+                    SELECT JSON_ARRAYAGG(COALESCE(u.name, 'Unknown'))
+                    FROM JSON_TABLE(game.winner, '$[*]' COLUMNS (uid INT PATH '$')) AS jt
+                    LEFT JOIN user u ON jt.uid = u.uid
+                ), JSON_ARRAY()) AS winner
             FROM game
             WHERE uid = ? AND isDeleted = 0 AND ${
                 if (isCompleted) "isCompleted = 1 AND gid < ?"
@@ -94,7 +104,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
         val details = DB.throwQuerySQLSingle("""
-            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+            SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0
         """, gid).to<GameDetails>()
@@ -113,7 +123,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
             WHERE rid = ? AND gid = ? AND uid = ?
         """, rid, gid, uid).to<GameRecord>()
         val details = DB.throwQuerySQLSingle("""
-            SELECT gid, uid, ts, title, type, reward, num, cost, winner, info, question, answer, isCompleted
+            SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0
         """, gid).to<GameDetails>()

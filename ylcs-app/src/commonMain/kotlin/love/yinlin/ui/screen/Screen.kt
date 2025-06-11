@@ -48,6 +48,8 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenGameRanking, type<Game>())
     screen(::ScreenCreateGame, type<Game>())
     screen(::ScreenPlayGame, type<Game, JsonElement>())
+    screen(::ScreenGameHistory)
+    screen(::ScreenGameRecordHistory)
 
 	// 设置
     screen(::ScreenSettings)

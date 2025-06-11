@@ -7,8 +7,9 @@ import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.data.rachel.game.GameDetails
-import love.yinlin.data.rachel.game.GamePublicDetails
-import love.yinlin.data.rachel.game.UserGameRecord
+import love.yinlin.data.rachel.game.GameDetailsWithName
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.profile.UserProfile
@@ -163,17 +164,17 @@ object API : APINode(null, "") {
 				data class Request(val token: String, val gid: Int)
 			}
 
-			object GetGames : APIPost<GetGames.Request, List<GamePublicDetails>>(this, "getGames") {
+			object GetGames : APIPost<GetGames.Request, List<GamePublicDetailsWithName>>(this, "getGames") {
 				@Serializable
 				data class Request(val type: love.yinlin.data.rachel.game.Game, val gid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetUserGames : APIPost<GetUserGames.Request, List<GameDetails>>(this, "getUserGames") {
+			object GetUserGames : APIPost<GetUserGames.Request, List<GameDetailsWithName>>(this, "getUserGames") {
 				@Serializable
 				data class Request(val token: String, val gid: Int = Int.MAX_VALUE, val isCompleted: Boolean = false, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 
-			object GetUserGameRecords : APIPost<GetUserGameRecords.Request, List<UserGameRecord>>(this, "getUserGameRecords") {
+			object GetUserGameRecords : APIPost<GetUserGameRecords.Request, List<GameRecordWithName>>(this, "getUserGameRecords") {
 				@Serializable
 				data class Request(val token: String, val rid: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}

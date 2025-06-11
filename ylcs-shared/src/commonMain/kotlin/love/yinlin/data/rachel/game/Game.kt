@@ -30,7 +30,7 @@ enum class Game(
     ),
     FlowersOrder(
         title = "寻花令",
-        description = "在有限次数内猜测七言诗词中的某一句, 并根据上次内容与位置提示结果来修正答案直至完全猜对",
+        description = "在有限次数内猜测诗词中的某一句, 并根据上次内容与位置提示结果来修正答案直至完全猜对",
         type = GameType.EXPLORATION
     ),
     SearchAll(

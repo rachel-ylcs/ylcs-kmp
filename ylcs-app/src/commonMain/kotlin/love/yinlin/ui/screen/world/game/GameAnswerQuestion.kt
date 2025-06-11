@@ -20,7 +20,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.AQAnswer
@@ -64,7 +64,7 @@ private sealed interface QuestionItem {
 }
 
 @Composable
-fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetails) {
+fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
         try { game.info.to<AQInfo>() } catch (_: Throwable) { null }
     }
