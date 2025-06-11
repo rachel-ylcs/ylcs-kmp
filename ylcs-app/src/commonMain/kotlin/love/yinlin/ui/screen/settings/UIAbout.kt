@@ -45,18 +45,12 @@ internal data class ContributorGroup(
 )
 
 @Stable
-internal data class UpdateRecord(
-    val content: String,
-    val color: Color = Color.Unspecified
-)
-
-@Stable
 internal data class UpdateRecordGroup(
     val type: String,
     val icon: ImageVector,
     val color: Color,
     val background: Color,
-    val records: List<UpdateRecord>
+    val records: List<String>
 )
 
 @Stable
@@ -70,6 +64,54 @@ internal data class UpdateInfo(
 )
 
 object About {
+    internal val updateInfo = UpdateInfo(
+        platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
+        title = null,
+        force = true,
+        maintenance = true,
+        date = LocalDate(2025, 6, 11),
+        groups = listOf(
+            UpdateRecordGroup(
+                type = "新功能",
+                icon = Icons.Outlined.RocketLaunch,
+                color = Colors.Steel4,
+                background = Colors.Steel2,
+                records = listOf(
+                    "1. 世界小游戏板块开启(创建新游戏, 游戏大厅, 战绩记录, 排行榜)",
+                    "2. 美图页使用轮播画廊UI",
+                    "3. 长短身份验证启用, 登录状态将从7天维持到30天",
+                    "4. MOD工坊搜索歌曲支持",
+                    "5. 安卓16支持, 你的第一款适配安卓16 App",
+                )
+            ),
+            UpdateRecordGroup(
+                type = "优化",
+                icon = Icons.Outlined.Speed,
+                color = Colors.Pink4,
+                background = Colors.Pink2,
+                records = listOf(
+                    "1. MOD工坊显示歌曲封面预览",
+                    "2. 允许播放器开启状态进入MOD工坊",
+                    "3. 大幅提示微博关注页加载速度",
+                    "4. 云端存储表情包减小包体积大小",
+                    "5. 更新日志页显示在关于页"
+                )
+            ),
+            UpdateRecordGroup(
+                type = "修复",
+                icon = Icons.Outlined.BugReport,
+                color = Colors.Red4,
+                background = Colors.Red2,
+                records = listOf(
+                    "1. 修复桌面端QQ群无法跳转的问题",
+                    "2. 修复桌面端MOD工坊列表无法加载的问题",
+                    "3. 修复FAB按钮在手机端三键导航模式下沉浸失效的问题",
+                    "4. 修复iOS端悬浮歌词内存泄漏的问题"
+                )
+            )
+        )
+    )
+
     internal val contributors = arrayOf(
         ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf(
             Contributor("方旖旎", 7),
@@ -108,46 +150,6 @@ object About {
             Contributor("双花", 429),
             Contributor("苏晚卿", 359)
         )),
-    )
-
-    internal val updateInfo = UpdateInfo(
-        platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
-        title = null,
-        force = true,
-        maintenance = true,
-        date = LocalDate(2025, 6, 10),
-        groups = listOf(
-            UpdateRecordGroup(
-                type = "新功能",
-                icon = Icons.Outlined.RocketLaunch,
-                color = Colors.Steel4,
-                background = Colors.Steel2,
-                records = listOf(
-                    UpdateRecord("1"),
-                    UpdateRecord("2"),
-                )
-            ),
-            UpdateRecordGroup(
-                type = "优化",
-                icon = Icons.Outlined.Speed,
-                color = Colors.Pink4,
-                background = Colors.Pink2,
-                records = listOf(
-                    UpdateRecord("1"),
-                    UpdateRecord("2"),
-                )
-            ),
-            UpdateRecordGroup(
-                type = "修复",
-                icon = Icons.Outlined.BugReport,
-                color = Colors.Red4,
-                background = Colors.Red2,
-                records = listOf(
-                    UpdateRecord("1"),
-                    UpdateRecord("2"),
-                )
-            )
-        )
     )
 }
 
@@ -274,10 +276,7 @@ internal fun UpdateInfoLayout(
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.onSurface)
                                 )
-                                Text(
-                                    text = record.content,
-                                    color = record.color
-                                )
+                                Text(text = record)
                             }
                         }
                     }
