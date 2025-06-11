@@ -82,8 +82,8 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
         when (result) {
             is Data.Success -> {
                 preflightResult = result.data
+                state.init(result.data)
                 status = Status.Playing
-                state.reset()
             }
             is Data.Error -> slot.tip.error(result.message)
         }
@@ -118,8 +118,9 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
                     when (result) {
                         is Data.Success -> {
                             gameResult = result.data
-                            status = Status.Settling
+                            state.settle(result.data)
                             preflightResult = null
+                            status = Status.Settling
                         }
                         is Data.Error -> slot.tip.error(result.message)
                     }
@@ -171,7 +172,7 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
                                         .verticalScroll(rememberScrollState()),
                                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
                                 ) {
-                                    with(state) { Content(result) }
+                                    with(state) { Content() }
                                 }
                             }
                         }
@@ -232,7 +233,7 @@ class ScreenPlayGame(model: AppModel, val args: Args) : SubScreen<ScreenPlayGame
                                         RachelText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
                                     }
                                     Space()
-                                    with(state) { Settlement(result) }
+                                    with(state) { Settlement() }
                                 }
                             }
                         }

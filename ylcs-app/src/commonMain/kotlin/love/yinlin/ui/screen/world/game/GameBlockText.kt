@@ -125,32 +125,31 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         })
     }
 
-    override fun reset() {
-        data.fill(BlockCharacter.Empty)
-        preflight = null
-        result = null
+    override fun init(preflightResult: PreflightResult) {
+        try {
+            val text = preflightResult.question.String
+            val gridSize = sqrt(text.length.toFloat()).toInt()
+            require(gridSize * gridSize == text.length && gridSize in BTConfig.minBlockSize .. BTConfig.maxBlockSize)
+            preflight = Preflight(gridSize = gridSize)
+            data.fill(BlockCharacter.Empty)
+            text.forEachIndexed { index, ch ->
+                data[index] = when (ch) {
+                    BTConfig.CHAR_EMPTY -> BlockCharacter.Empty
+                    BTConfig.CHAR_BLOCK -> BlockCharacter.Blank
+                    else -> BlockCharacter(ch, false)
+                }
+            }
+        } catch (_: Throwable) {}
+    }
+
+    override fun settle(gameResult: GameResult) {
+        try {
+            result = gameResult.info.to()
+        } catch (_: Throwable) { }
     }
 
     @Composable
-    override fun ColumnScope.Content(preflightResult: PreflightResult) {
-        LaunchedEffect(preflightResult) {
-            try {
-                val text = preflightResult.question.String
-                val gridSize = sqrt(text.length.toFloat()).toInt()
-                require(gridSize * gridSize == text.length && gridSize in BTConfig.minBlockSize .. BTConfig.maxBlockSize)
-                preflight = Preflight(gridSize = gridSize)
-                if (data.all { it == BlockCharacter.Empty }) {
-                    text.forEachIndexed { index, ch ->
-                        data[index] = when (ch) {
-                            BTConfig.CHAR_EMPTY -> BlockCharacter.Empty
-                            BTConfig.CHAR_BLOCK -> BlockCharacter.Blank
-                            else -> BlockCharacter(ch, false)
-                        }
-                    }
-                }
-            } catch (_: Throwable) { }
-        }
-
+    override fun ColumnScope.Content() {
         preflight?.let { (gridSize) ->
             CharacterBlock(
                 blockSize = gridSize,
@@ -166,13 +165,7 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     @Composable
-    override fun ColumnScope.Settlement(gameResult: GameResult) {
-        LaunchedEffect(gameResult) {
-            try {
-                result = gameResult.info.to()
-            } catch (_: Throwable) { }
-        }
-
+    override fun ColumnScope.Settlement() {
         result?.let { (correctCount, totalCount) ->
             Text(
                 text = "结算: $correctCount / $totalCount",

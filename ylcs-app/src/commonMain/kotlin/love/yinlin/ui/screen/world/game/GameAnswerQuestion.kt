@@ -28,6 +28,7 @@ import love.yinlin.data.rachel.game.info.AQAnswer
 import love.yinlin.data.rachel.game.info.AQConfig
 import love.yinlin.data.rachel.game.info.AQInfo
 import love.yinlin.data.rachel.game.info.AQQuestion
+import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.image.ClickIcon
@@ -448,23 +449,44 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
 @Stable
 class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
+    @Stable
+    private data class Preflight(val info: AQInfo, val question: List<AQQuestion>)
+
     override val config = AQConfig
+
+    private var preflight: Preflight? by mutableStateOf(null)
+    private var result: AQResult? by mutableStateOf(null)
 
     override val canSubmit: Boolean = false
 
     override val submitAnswer: JsonElement = JsonNull
 
-    override fun reset() {
+    override fun init(preflightResult: PreflightResult) {
+
+    }
+
+    override fun settle(gameResult: GameResult) {
+        try {
+            result = gameResult.info.to()
+        } catch (_: Throwable) { }
+    }
+
+    @Composable
+    override fun ColumnScope.Content() {
 
     }
 
     @Composable
-    override fun ColumnScope.Content(preflightResult: PreflightResult) {
-
-    }
-
-    @Composable
-    override fun ColumnScope.Settlement(gameResult: GameResult) {
-
+    override fun ColumnScope.Settlement() {
+        result?.let { (correctCount, totalCount) ->
+            Text(
+                text = "结算: $correctCount / $totalCount",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

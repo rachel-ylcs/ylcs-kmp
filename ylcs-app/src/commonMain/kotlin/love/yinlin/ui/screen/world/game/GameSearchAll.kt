@@ -142,24 +142,25 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         }
     }
 
-    override fun reset() {
-        inputState.text = ""
-        items.clear()
-        preflight = null
-        result = null
+    override fun init(preflightResult: PreflightResult) {
+        try {
+            inputState.text = ""
+            items.clear()
+            preflight = Preflight(
+                info = preflightResult.info.to<SAInfo>(),
+                count = preflightResult.question.Int,
+            )
+        } catch (_: Throwable) { }
+    }
+
+    override fun settle(gameResult: GameResult) {
+        try {
+            result = gameResult.info.to()
+        } catch (_: Throwable) { }
     }
 
     @Composable
-    override fun ColumnScope.Content(preflightResult: PreflightResult) {
-        LaunchedEffect(preflightResult) {
-            try {
-                preflight = Preflight(
-                    info = preflightResult.info.to<SAInfo>(),
-                    count = preflightResult.question.Int,
-                )
-            } catch (_: Throwable) { }
-        }
-
+    override fun ColumnScope.Content() {
         preflight?.let { (_, question) ->
             TextInput(
                 state = inputState,
@@ -182,13 +183,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     @Composable
-    override fun ColumnScope.Settlement(gameResult: GameResult) {
-        LaunchedEffect(gameResult) {
-            try {
-                result = gameResult.info.to()
-            } catch (_: Throwable) { }
-        }
-
+    override fun ColumnScope.Settlement() {
         result?.let { (correctCount, totalCount, duration) ->
             Text(
                 text = "结算: $correctCount / $totalCount",

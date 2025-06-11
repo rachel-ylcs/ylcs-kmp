@@ -99,10 +99,21 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
 
-    override fun reset() {
-        inputState.text = ""
-        preflight = null
-        result = null
+    override fun init(preflightResult: PreflightResult) {
+        try {
+            inputState.text = ""
+            preflight = Preflight(
+                length = preflightResult.question.Int,
+                answer = preflightResult.answer.to<List<String>>(),
+                result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
+            )
+        } catch (_: Throwable) { }
+    }
+
+    override fun settle(gameResult: GameResult) {
+        try {
+            result = gameResult.info.Int
+        } catch (_: Throwable) {}
     }
 
     @Composable
@@ -131,17 +142,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     @Composable
-    override fun ColumnScope.Content(preflightResult: PreflightResult) {
-        LaunchedEffect(preflightResult) {
-            try {
-                preflight = Preflight(
-                    length = preflightResult.question.Int,
-                    answer = preflightResult.answer.to<List<String>>(),
-                    result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
-                )
-            } catch (_: Throwable) { }
-        }
-
+    override fun ColumnScope.Content() {
         preflight?.let { (question, answer, result) ->
             Text(
                 text = "寻花令长度: $question",
@@ -181,13 +182,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     @Composable
-    override fun ColumnScope.Settlement(gameResult: GameResult) {
-        LaunchedEffect(gameResult) {
-            try {
-                result = gameResult.info.Int
-            } catch (_: Throwable) {}
-        }
-
+    override fun ColumnScope.Settlement() {
         result?.let {
             Text(
                 text = "提示",
