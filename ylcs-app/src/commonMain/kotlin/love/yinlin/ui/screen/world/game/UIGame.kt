@@ -4,19 +4,58 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.rachel.game.Game
+import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.screen.SubScreenSlot
+
+@Stable
+interface CreateGameState {
+    val config: GameConfig
+
+    val canSubmit: Boolean
+
+    val submitInfo: JsonElement
+    val submitQuestion: JsonElement
+    val submitAnswer: JsonElement
+
+    @Composable
+    fun ColumnScope.Content()
+
+    @Composable
+    fun Floating() {}
+}
+
+@Stable
+interface PlayGameState
+
+@Stable
+interface GameRankingState
+
+@Stable
+object GameStateManager {
+    fun createGame(type: Game, slot: SubScreenSlot): CreateGameState = when (type) {
+        Game.AnswerQuestion -> AnswerQuestionCreateGameState(slot)
+        Game.BlockText -> BlockTextCreateGameState(slot)
+        Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
+        Game.SearchAll -> SearchAllCreateGameState(slot)
+    }
+}
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()
 internal fun Float.cast(minValue: Float, maxValue: Float): Float = this * (maxValue - minValue) + minValue

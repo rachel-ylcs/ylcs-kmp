@@ -284,7 +284,7 @@ sealed interface GameManager {
             require(blockSize in config.minBlockSize .. config.maxBlockSize)
             require(blockSize * blockSize == actualQuestion.length)
             // 题目与答案大小相同
-            require(blockSize == actualAnswer.length)
+            require(actualQuestion.length == actualAnswer.length)
             // 题目中至少包含一个方格
             require(actualQuestion.contains(BTConfig.CHAR_BLOCK))
             // 答案中不能包含方格且至少包含一个非空

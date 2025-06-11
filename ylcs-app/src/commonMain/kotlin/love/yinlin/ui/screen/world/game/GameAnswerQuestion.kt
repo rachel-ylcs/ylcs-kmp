@@ -31,56 +31,35 @@ import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
 
 @Stable
+private enum class QuestionType {
+    Choice, MultiChoice, Blank
+}
+
+@Stable
+private sealed interface QuestionItem {
+    val name: String
+
+    @Stable
+    data class Choice(val question: AQQuestion.Choice, val answer: AQAnswer.Choice) : QuestionItem {
+        override val name: String = "单选"
+    }
+    @Stable
+    data class MultiChoice(val question: AQQuestion.MultiChoice, val answer: AQAnswer.MultiChoice) : QuestionItem {
+        override val name: String = "多选"
+    }
+    @Stable
+    data class Blank(val question: AQQuestion.Blank, val answer: AQAnswer.Blank) : QuestionItem {
+        override val name: String = "填空"
+    }
+}
+
+@Stable
 class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
-    @Stable
-    private enum class QuestionType {
-        Choice, MultiChoice, Blank
-    }
-
-    @Stable
-    private sealed interface QuestionItem {
-        val name: String
-
-        @Stable
-        data class Choice(val question: AQQuestion.Choice, val answer: AQAnswer.Choice) : QuestionItem {
-            override val name: String = "单选"
-        }
-        @Stable
-        data class MultiChoice(val question: AQQuestion.MultiChoice, val answer: AQAnswer.MultiChoice) : QuestionItem {
-            override val name: String = "多选"
-        }
-        @Stable
-        data class Blank(val question: AQQuestion.Blank, val answer: AQAnswer.Blank) : QuestionItem {
-            override val name: String = "填空"
-        }
-    }
+    override val config = AQConfig
 
     private var threshold by mutableFloatStateOf(0f)
     private val questions = mutableStateListOf<QuestionItem>()
     private var currentIndex by mutableIntStateOf(-1)
-
-    private val titleInputDialog = FloatingDialogInput(
-        hint = "输入题目",
-        maxLength = 256,
-        maxLines = 5,
-        minLines = 1,
-        clearButton = false
-    )
-
-    private val optionInputDialog = FloatingDialogInput(
-        hint = "输入选项",
-        maxLength = 64,
-        maxLines = 3,
-        minLines = 1,
-        clearButton = false
-    )
-
-    private val answerInputDialog = FloatingDialogInput(
-        hint = "输入备选答案",
-        maxLength = 16
-    )
-
-    override val config = AQConfig
 
     override val canSubmit: Boolean by derivedStateOf {
         questions.size in AQConfig.minQuestionCount .. AQConfig.maxQuestionCount && questions.all { item ->
@@ -418,6 +397,27 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
             }
         }
     }
+
+    private val titleInputDialog = FloatingDialogInput(
+        hint = "输入题目",
+        maxLength = 256,
+        maxLines = 5,
+        minLines = 1,
+        clearButton = false
+    )
+
+    private val optionInputDialog = FloatingDialogInput(
+        hint = "输入选项",
+        maxLength = 64,
+        maxLines = 3,
+        minLines = 1,
+        clearButton = false
+    )
+
+    private val answerInputDialog = FloatingDialogInput(
+        hint = "输入备选答案",
+        maxLength = 16
+    )
 
     @Composable
     override fun Floating() {

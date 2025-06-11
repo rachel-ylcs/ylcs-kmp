@@ -13,13 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
-import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
@@ -53,20 +50,23 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
             icon = Icons.Outlined.Check,
             enabled = canSubmit
         ) {
-            val result = ClientAPI.request(
-                route = API.User.Game.CreateGame,
-                data = API.User.Game.CreateGame.Request(
-                    token = app.config.userToken,
-                    title = titleState.text,
-                    type = args.type,
-                    reward = reward.cast(config.minReward, config.maxReward),
-                    num = num.cast(config.minRank, config.maxRank),
-                    cost = cost.cast(0, maxCost),
-                    info = state.submitInfo,
-                    question = state.submitQuestion,
-                    answer = state.submitAnswer,
-                )
-            )
+            println(state.submitInfo)
+            println(state.submitQuestion)
+            println(state.submitAnswer)
+//            val result = ClientAPI.request(
+//                route = API.User.Game.CreateGame,
+//                data = API.User.Game.CreateGame.Request(
+//                    token = app.config.userToken,
+//                    title = titleState.text,
+//                    type = args.type,
+//                    reward = reward.cast(config.minReward, config.maxReward),
+//                    num = num.cast(config.minRank, config.maxRank),
+//                    cost = cost.cast(0, maxCost),
+//                    info = state.submitInfo,
+//                    question = state.submitQuestion,
+//                    answer = state.submitAnswer,
+//                )
+//            )
         }
     }
 
@@ -89,7 +89,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                 modifier = Modifier.fillMaxWidth()
             )
             GameSlider(
-                title = "奖励银币(↑20%)",
+                title = "奖励银币\n(+20%)",
                 progress = reward,
                 minValue = config.minReward,
                 maxValue = config.maxReward,
@@ -97,7 +97,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                 modifier = Modifier.fillMaxWidth()
             )
             GameSlider(
-                title = "名额",
+                title = "限定名额",
                 progress = num,
                 minValue = config.minRank,
                 maxValue = config.maxRank,
