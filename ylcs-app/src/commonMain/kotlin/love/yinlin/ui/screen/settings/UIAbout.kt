@@ -69,7 +69,7 @@ object About {
         title = null,
         force = true,
         maintenance = true,
-        date = LocalDate(2025, 6, 11),
+        date = LocalDate(2025, 6, 12),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
