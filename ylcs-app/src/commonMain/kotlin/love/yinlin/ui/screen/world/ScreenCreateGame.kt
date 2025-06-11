@@ -13,10 +13,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
@@ -38,7 +43,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
 
     private val titleState = TextInputState()
     private var reward by mutableFloatStateOf(0f)
-    private var num by mutableFloatStateOf(0f)
+    private var num by mutableFloatStateOf(1f)
     private var cost by mutableFloatStateOf(0f)
     private val maxCost by derivedStateOf { reward.cast(config.minReward, config.maxReward) / config.maxCostRatio }
 
@@ -50,23 +55,39 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
             icon = Icons.Outlined.Check,
             enabled = canSubmit
         ) {
-            println(state.submitInfo)
-            println(state.submitQuestion)
-            println(state.submitAnswer)
-//            val result = ClientAPI.request(
-//                route = API.User.Game.CreateGame,
-//                data = API.User.Game.CreateGame.Request(
-//                    token = app.config.userToken,
-//                    title = titleState.text,
-//                    type = args.type,
-//                    reward = reward.cast(config.minReward, config.maxReward),
-//                    num = num.cast(config.minRank, config.maxRank),
-//                    cost = cost.cast(0, maxCost),
-//                    info = state.submitInfo,
-//                    question = state.submitQuestion,
-//                    answer = state.submitAnswer,
-//                )
-//            )
+            val profile = app.config.userProfile
+            if (profile != null) {
+                val reward = reward.cast(config.minReward, config.maxReward)
+                val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
+                println(state.submitInfo)
+                println(state.submitQuestion)
+                println(state.submitAnswer)
+                if (profile.coin >= actionCoin) {
+                    val result = ClientAPI.request(
+                        route = API.User.Game.CreateGame,
+                        data = API.User.Game.CreateGame.Request(
+                            token = app.config.userToken,
+                            title = titleState.text,
+                            type = args.type,
+                            reward = reward,
+                            num = num.cast(config.minRank, config.maxRank),
+                            cost = cost.cast(0, maxCost),
+                            info = state.submitInfo,
+                            question = state.submitQuestion,
+                            answer = state.submitAnswer,
+                        )
+                    )
+                    when (result) {
+                        is Data.Success -> {
+                            worldPart.slot.tip.success(result.message)
+                            app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
+                            pop()
+                        }
+                        is Data.Error -> slot.tip.error(result.message)
+                    }
+                }
+                else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")
+            }
         }
     }
 

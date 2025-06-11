@@ -4,6 +4,8 @@ import androidx.compose.runtime.Stable
 
 @Stable
 abstract class GameConfig {
+    val rewardCostRatio: Float = 1.2f // 佣金比
+
     open val minReward: Int = 1 // 最小奖励
     open val maxReward: Int = 30 // 最大奖励
     open val minRank: Int = 1 // 最小名额

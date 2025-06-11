@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.info.FOConfig
+import love.yinlin.data.rachel.game.info.FOInfo
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -24,7 +25,7 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         text.length in FOConfig.minLength .. FOConfig.maxLength && text.all { it.code !in 0 .. 127 }
     }
 
-    override val submitInfo: JsonElement = Unit.toJson()
+    override val submitInfo: JsonElement get() = FOInfo(tryCount.cast(FOConfig.minTryCount, FOConfig.maxTryCount)).toJson()
 
     override val submitQuestion: JsonElement get() = JsonPrimitive(content.text.length)
 

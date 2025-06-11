@@ -65,6 +65,45 @@ object SQLConverter {
 	}
 }
 
+fun Connection.throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
+	val statement = prepareStatement(sql)
+	args.forEachIndexed { index, arg -> statement.setObject(index + 1, arg) }
+	val resultSet = statement.executeQuery()
+	val metadata = resultSet.metaData
+	val col = metadata.columnCount
+	val colNames = mutableListOf("")
+	val colTypes = mutableListOf("")
+	for (i in 1..col) {
+		colNames += metadata.getColumnLabel(i)
+		colTypes += metadata.getColumnTypeName(i)
+	}
+	return makeArray {
+		while (resultSet.next()) {
+			obj {
+				for (i in 1..col) {
+					val obj = resultSet.getObject(i)
+					colNames[i] with SQLConverter.convert(colTypes[i], obj)
+				}
+			}
+		}
+	}
+}
+
+fun Connection.querySQL(sql: String, vararg args: Any?): JsonArray? = try { throwQuerySQL(sql, *args) } catch (_: Throwable) { null }
+
+fun Connection.throwQuerySQLSingle(sql: String, vararg args: Any?): JsonObject {
+	val result = throwQuerySQL(sql, *args)
+	if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
+	return result[0].Object
+}
+
+fun Connection.querySQLSingle(sql: String, vararg args: Any?): JsonObject? = try {
+	val result = throwQuerySQL(sql, *args)
+	if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
+	result[0].Object
+}
+catch (_: Throwable) { null }
+
 fun Connection.throwExecuteSQL(sql: String, vararg args: Any?) {
 	val statement = this.prepareStatement(sql)
 	args.forEachIndexed { index, arg -> statement.setObject(index + 1, arg) }
@@ -100,49 +139,13 @@ fun Connection.throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long 
 }
 
 object DB {
-	fun throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
-		Database.connection.use {
-			val statement = it.prepareStatement(sql)
-			args.forEachIndexed { index, arg -> statement.setObject(index + 1, arg) }
-			val resultSet = statement.executeQuery()
-			val metadata = resultSet.metaData
-			val col = metadata.columnCount
-			val colNames = mutableListOf("")
-			val colTypes = mutableListOf("")
-			for (i in 1..col) {
-				colNames += metadata.getColumnLabel(i)
-				colTypes += metadata.getColumnTypeName(i)
-			}
-			return makeArray {
-				while (resultSet.next()) {
-					obj {
-						for (i in 1..col) {
-							val obj = resultSet.getObject(i)
-							colNames[i] with SQLConverter.convert(colTypes[i], obj)
-						}
-					}
-				}
-			}
-		}
-	}
+	fun throwQuerySQL(sql: String, vararg args: Any?) = Database.connection.use { it.throwQuerySQL(sql, *args) }
 
-	fun querySQL(sql: String, vararg args: Any?): JsonArray? = try {
-		throwQuerySQL(sql, *args)
-	}
-	catch (_: Throwable) { null }
+	fun querySQL(sql: String, vararg args: Any?) = Database.connection.use { it.querySQL(sql, *args) }
 
-	fun throwQuerySQLSingle(sql: String, vararg args: Any?): JsonObject {
-		val result = throwQuerySQL(sql, *args)
-		if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
-		return result[0].Object
-	}
+	fun throwQuerySQLSingle(sql: String, vararg args: Any?) = Database.connection.use { it.throwQuerySQLSingle(sql, *args) }
 
-	fun querySQLSingle(sql: String, vararg args: Any?): JsonObject? = try {
-		val result = throwQuerySQL(sql, *args)
-		if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
-		result[0].Object
-	}
-	catch (_: Throwable) { null }
+	fun querySQLSingle(sql: String, vararg args: Any?) = Database.connection.use { it.querySQLSingle(sql, *args) }
 
 	fun throwExecuteSQL(sql: String, vararg args: Any?) = Database.connection.use { it.throwExecuteSQL(sql, *args) }
 

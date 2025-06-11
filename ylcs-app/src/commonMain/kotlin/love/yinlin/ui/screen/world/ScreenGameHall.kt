@@ -27,6 +27,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetails
+import love.yinlin.platform.app
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationGrid
@@ -125,8 +126,11 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
 
     override val fabMenus: Array<FABAction> = arrayOf(
         FABAction(Icons.Outlined.Edit) {
-            pop()
-            navigate(ScreenCreateGame.Args(args.type))
+            if (app.config.userProfile != null) {
+                pop()
+                navigate(ScreenCreateGame.Args(args.type))
+            }
+            else slot.tip.warning("请先登录")
         },
         FABAction(ExtraIcons.RewardCup) {
             navigate(ScreenGameRanking.Args(args.type))

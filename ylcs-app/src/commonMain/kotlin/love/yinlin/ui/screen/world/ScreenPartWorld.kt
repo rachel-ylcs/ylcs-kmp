@@ -284,6 +284,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	override val fabIcon: ImageVector = Icons.Outlined.History
 
 	override suspend fun onFabClick() {
+		if (app.config.userProfile != null) {
 
+		}
+		else slot.tip.warning("请先登录")
 	}
 }

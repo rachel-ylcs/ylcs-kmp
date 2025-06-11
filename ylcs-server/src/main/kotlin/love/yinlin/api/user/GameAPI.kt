@@ -111,17 +111,17 @@ sealed interface GameManager {
         }
 
         override fun uploadResult(uid: Int, details: GameDetails, answer: JsonElement, isCompleted: Boolean, info: JsonElement): Data<GameResult> {
-            return DB.throwTransaction {
-                // 检查尝试记录
-                val oldRecord = DB.querySQLSingle("""
-                    SELECT rid, answer, result
-                    FROM game_record
-                    WHERE uid = ? AND gid = ?
-                """, uid, details.gid)
-                val rid = oldRecord?.get("rid")?.Long
-                val oldAnswer = oldRecord?.get("answer")?.to<MutableList<JsonElement>>() ?: mutableListOf()
-                val oldResult = oldRecord?.get("result")?.to<MutableList<JsonElement>>() ?: mutableListOf()
-                if (oldAnswer.size >= fetchTryCount(details.info)) return@throwTransaction "尝试次数达到上限".failedData
+            // 检查尝试记录
+            val oldRecord = DB.querySQLSingle("""
+                SELECT rid, answer, result
+                FROM game_record
+                WHERE uid = ? AND gid = ?
+            """, uid, details.gid)
+            val rid = oldRecord?.get("rid")?.Long
+            val oldAnswer = oldRecord?.get("answer")?.to<MutableList<JsonElement>>() ?: mutableListOf()
+            val oldResult = oldRecord?.get("result")?.to<MutableList<JsonElement>>() ?: mutableListOf()
+            return if (oldAnswer.size >= fetchTryCount(details.info)) "尝试次数达到上限".failedData
+            else DB.throwTransaction {
                 // 消费银币
                 val cost = details.cost
                 // 只有第一次尝试消耗银币
@@ -471,15 +471,15 @@ fun Routing.gameAPI(implMap: ImplMap) {
         } catch (_: Throwable) {
             return@api "数据配置非法".failedData
         }
-        val actualCoin = (reward * 1.2f).toInt()
+        val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
         DB.throwTransaction {
             if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", actualCoin, uid, actualCoin)) {
-                val gid = DB.throwInsertSQLGeneratedKey("""
-                    INSERT INTO game(uid, title, type, reward, num, cost, info, question, answer) ${values(9)}
+                val gid = it.throwInsertSQLGeneratedKey("""
+                    INSERT INTO game(uid, title, type, reward, num, cost, winner, info, question, answer) ${values(10)}
                 """, uid, title, type.ordinal, reward, num, cost,
-                    info.toJsonString(), question.toJsonString(), answer.toJsonString()).toInt()
-                Data.Success(gid)
+                    "[]", info.toJsonString(), question.toJsonString(), answer.toJsonString()).toInt()
+                Data.Success(gid, "创建成功")
             }
             else "银币不足".failedData
         }

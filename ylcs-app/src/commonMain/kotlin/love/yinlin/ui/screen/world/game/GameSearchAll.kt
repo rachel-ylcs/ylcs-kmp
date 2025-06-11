@@ -25,7 +25,7 @@ class SearchAllCreateGameState(val slot: SubScreenSlot) : CreateGameState {
     override val config: GameConfig = SAConfig
 
     private var threshold by mutableFloatStateOf(0f)
-    private var timeLimit by mutableFloatStateOf(0f)
+    private var timeLimit by mutableFloatStateOf(0.05f)
     private val inputState = TextInputState()
     private val items = mutableStateSetOf<String>()
 
