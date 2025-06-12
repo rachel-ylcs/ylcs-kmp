@@ -184,14 +184,10 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
             ) {
                 val (answers, results) = remember(args) {
                     try {
-                        val results = when (val tmp = args.result) {
-                            null -> emptyList()
-                            is JsonArray -> tmp
-                            else -> listOf(tmp)
-                        }.map { it.to<GameResult>() }
-                        val answers = when (results.size) {
-                            0 -> emptyList()
-                            else -> args.answer.Array
+                        val (results, answers) = when (val tmp = args.result) {
+                            null -> emptyList<GameResult>() to emptyList()
+                            is JsonArray -> tmp.map { it.to<GameResult>() } to args.answer.Array
+                            else -> listOf(tmp.to<GameResult>()) to listOf(args.answer!!)
                         }
                         require(answers.size == results.size)
                         answers to results
