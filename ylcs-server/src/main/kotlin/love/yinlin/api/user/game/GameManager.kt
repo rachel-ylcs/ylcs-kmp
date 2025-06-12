@@ -41,6 +41,12 @@ sealed class GameManager {
     // 生成结果
     abstract fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult
 
+    // 更新奖励
+    fun Connection.updateReward(uid: Int, details: GameDetails, result: GameResult) {
+        val perReward = details.reward / details.num
+        if (result.isCompleted && perReward > 0) updateSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", perReward, uid)
+    }
+
     // 更新游戏记录
     abstract fun Connection.updateRecord(record: GameRecord, answer: JsonElement, result: GameResult)
 
@@ -60,7 +66,7 @@ sealed class GameManager {
     fun verify(uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement): Data<GameResult> {
         val result = generateResult(details, record, userAnswer)
         DB.throwTransaction {
-            it.consumeCoin(uid, details)
+            it.updateReward(uid, details, result)
             it.updateRecord(record, userAnswer, result)
             it.updateRank(uid, details, result.isCompleted)
         }
