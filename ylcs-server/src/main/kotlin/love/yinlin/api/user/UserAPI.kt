@@ -117,7 +117,7 @@ object AN {
 		val encryptedBytes = cipher.doFinal(token.bytes)
 		val tokenString = Base64.getEncoder().encodeToString(encryptedBytes)
 		Redis.use {
-			it.setex(token.key, 7 * 24 * 60 * 60, tokenString)
+			it.setex(token.key, 30 * 24 * 60 * 60, tokenString)
 		}
 		return tokenString
 	}

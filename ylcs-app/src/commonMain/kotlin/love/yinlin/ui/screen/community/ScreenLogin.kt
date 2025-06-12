@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastForEach
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -79,6 +80,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		when (result1) {
 			is Data.Success -> {
 				val token = result1.data
+				app.config.userShortToken = Clock.System.now().toEpochMilliseconds()
 				app.config.userToken = token
 				pop()
 			}

@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import love.yinlin.AppModel
@@ -109,6 +110,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
     private val isUpdateToken = AtomicBoolean(false)
 
 	fun cleanUserToken() {
+		app.config.userShortToken = 0L
 		app.config.userToken = ""
 		app.config.userProfile = null
 		app.config.cacheUserAvatar = KVConfig.UPDATE
@@ -118,14 +120,20 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	@OptIn(ExperimentalAtomicApi::class)
 	suspend fun updateUserToken() {
 		val token = app.config.userToken
-		if (token.isNotEmpty() && isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
+		val currentTime = Clock.System.now().toEpochMilliseconds()
+		val duration = currentTime - app.config.userShortToken
+		if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
+			isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
 			val result = ClientAPI.request(
 				route = API.User.Account.UpdateToken,
 				data = token
 			)
 			isUpdateToken.store(false)
 			when (result) {
-				is Data.Success -> app.config.userToken = result.data
+				is Data.Success -> {
+					app.config.userShortToken = currentTime
+					app.config.userToken = result.data
+				}
 				is Data.Error if result.type == Failed.RequestError.Unauthorized -> {
 					cleanUserToken()
 					navigate<ScreenLogin>()

@@ -339,6 +339,8 @@ class KVConfig(private val kv: KV) {
 
 	/* ------------------  社区  ------------------ */
 
+	// 用户短 Token 时间
+	var userShortToken: Long by longState(0L)
 	// 用户 Token
 	var userToken: String by stringState("")
 	// 用户 信息
