@@ -674,10 +674,10 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                         currentIndex = currentIndex,
                         name = question.name,
                         onIncrease = {
-                            if (currentIndex > 0) --currentIndex
+                            if (currentIndex < questions.size - 1) ++currentIndex
                         },
                         onDecrease = {
-                            if (currentIndex < questions.size - 1) ++currentIndex
+                            if (currentIndex > 0) --currentIndex
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
