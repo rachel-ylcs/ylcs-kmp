@@ -148,6 +148,9 @@ fun Routing.gameAPI(implMap: ImplMap) {
             FROM game
             WHERE gid = ? AND isDeleted = 0
         """, gid).to<GameDetails>()
-        details.type.manager.verify(uid, details, record, answer)
+        if (details.uid == uid) "不能参与自己创建的游戏哦".failedData
+        else if (details.isCompleted) "不能参与已经结算的游戏哦".failedData
+        else if (uid in details.winner) "不能参与完成过的游戏哦".failedData
+        else details.type.manager.verify(uid, details, record, answer)
     }
 }
