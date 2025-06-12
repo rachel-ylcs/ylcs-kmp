@@ -10,9 +10,15 @@ import love.yinlin.data.map
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
+import love.yinlin.data.rachel.profile.UserPrivilege
+import love.yinlin.extension.Array
+import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
+import love.yinlin.querySQLSingle
+import love.yinlin.throwExecuteSQL
 import love.yinlin.throwInsertSQLGeneratedKey
+import love.yinlin.throwQuerySQLSingle
 import love.yinlin.updateSQL
 import love.yinlin.values
 
@@ -45,7 +51,20 @@ fun Routing.gameAPI(implMap: ImplMap) {
     api(API.User.Game.DeleteGame) { (token, gid) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
-        DB.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ? AND uid = ?", gid, uid)
+        DB.throwTransaction {
+            val result = it.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ?", gid)
+            val userUid = result["uid"].Int
+            if (userUid != uid) {
+                if (it.querySQLSingle("""
+                    SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
+                """, uid) == null) "无权限".failedData
+            }
+            val reward = result["reward"].Int
+            val useReward = (reward / result["num"].Int) * result["winner"].Array.size
+            val remainReward = reward - useReward
+            it.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ?", gid)
+            if (remainReward in 1 .. reward) it.updateSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", remainReward, uid)
+        }
         "删除成功".successData
     }
 
