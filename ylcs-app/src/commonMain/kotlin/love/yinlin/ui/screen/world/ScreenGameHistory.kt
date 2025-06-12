@@ -124,7 +124,11 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
                 ) {
                     LoadingIcon(
                         icon = Icons.Outlined.Delete,
-                        onClick = { deleteGame(it.gid) },
+                        onClick = {
+                            if (slot.confirm.openSuspend(content = "删除仅返还奖池内剩余银币")) {
+                                deleteGame(it.gid)
+                            }
+                        },
                         modifier = Modifier.align(alignment = Alignment.End)
                     )
                 }
