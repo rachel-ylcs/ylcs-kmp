@@ -57,15 +57,17 @@ fun Routing.gameAPI(implMap: ImplMap) {
             if (userUid != uid) {
                 if (it.querySQLSingle("""
                     SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-                """, uid) == null) "无权限".failedData
+                """, uid) == null) return@throwTransaction "无权限".failedData
             }
             val reward = result["reward"].Int
             val useReward = (reward / result["num"].Int) * result["winner"].Array.size
             val remainReward = reward - useReward
             it.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ?", gid)
-            if (remainReward in 1 .. reward) it.updateSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", remainReward, uid)
+            if (remainReward in 1 .. reward) {
+                it.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", remainReward, userUid)
+            }
+            "删除成功".successData
         }
-        "删除成功".successData
     }
 
     api(API.User.Game.GetGames) { (type, gid, num) ->
