@@ -44,7 +44,9 @@ sealed class GameManager {
     // 更新奖励
     fun Connection.updateReward(uid: Int, details: GameDetails, result: GameResult) {
         val perReward = details.reward / details.num
-        if (result.isCompleted && perReward > 0) updateSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", perReward, uid)
+        if (result.isCompleted && perReward in 1 ..GameConfig.maxReward / details.num) {
+            throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", perReward, uid)
+        }
     }
 
     // 更新游戏记录
