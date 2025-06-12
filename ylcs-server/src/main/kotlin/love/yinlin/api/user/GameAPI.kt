@@ -59,7 +59,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
                 ), JSON_ARRAY()) AS winner
             FROM game
             LEFT JOIN user ON game.uid = user.uid
-            WHERE game.gid < ? AND game.type = ? AND game.isDeleted = 0
+            WHERE game.gid < ? AND game.type = ? AND game.isDeleted = 0 AND game.isCompleted = 0
             ORDER BY game.gid DESC
             LIMIT ?
         """, gid, type.ordinal, num.coercePageNum)
