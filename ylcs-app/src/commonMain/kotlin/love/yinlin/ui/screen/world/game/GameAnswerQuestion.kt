@@ -16,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -29,9 +31,11 @@ import love.yinlin.data.rachel.game.info.AQInfo
 import love.yinlin.data.rachel.game.info.AQQuestion
 import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.data.rachel.game.info.AQUserAnswer
+import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.SimpleEmptyBox
 import love.yinlin.ui.component.layout.Space
@@ -39,6 +43,7 @@ import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
+import kotlin.to
 
 @Stable
 private enum class QuestionType {
@@ -64,6 +69,38 @@ private sealed interface QuestionItem {
 }
 
 @Composable
+private fun TopPager(
+    currentIndex: Int,
+    name: String,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ClickIcon(
+            icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+            onClick = onDecrease
+        )
+        Text(
+            text = remember(currentIndex) { "${currentIndex + 1} $name" },
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        ClickIcon(
+            icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+            onClick = onIncrease
+        )
+    }
+}
+
+@Composable
 fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
         try { game.info.to<AQInfo>() } catch (_: Throwable) { null }
@@ -73,6 +110,136 @@ fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
             text = remember(info) { "准确率: ${(info.threshold * 100).toInt()}%" },
             icon = Icons.Outlined.Flaky
         )
+    }
+}
+
+@Composable
+fun ColumnScope.AnswerQuestionCardQuestionAnswer(game: GameDetailsWithName) {
+    val data = remember(game) {
+        try {
+            val questions = game.question.to<List<AQQuestion>>()
+            val answers = game.answer.to<List<AQAnswer>>()
+            require(questions.size == answers.size && questions.size in AQConfig.minQuestionCount ..AQConfig.maxQuestionCount)
+            questions to answers
+        } catch (_: Throwable) {
+            null
+        }
+    }
+    data?.let { (questions, answers) ->
+        var currentIndex by rememberValueState(0)
+
+        val question = questions[currentIndex]
+        val answer = answers[currentIndex]
+
+        TopPager(
+            currentIndex = currentIndex,
+            name = question.name,
+            onIncrease = {
+                if (currentIndex < questions.size - 1) ++currentIndex
+            },
+            onDecrease = {
+                if (currentIndex > 0) --currentIndex
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(1f)
+                .padding(ThemeValue.Padding.EqualValue)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        ) {
+            when (question) {
+                is AQQuestion.Choice -> {
+                    answer as AQAnswer.Choice
+                    Text(text = question.title)
+                    Space()
+                    question.options.fastForEachIndexed { index, option ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val isSelected = index == answer.value
+
+                            MiniIcon(
+                                icon = if (isSelected) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = option,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+                is AQQuestion.MultiChoice -> {
+                    answer as AQAnswer.MultiChoice
+                    Text(text = question.title)
+                    Space()
+                    question.options.fastForEachIndexed { index, option ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val isSelected = index in answer.value
+
+                            MiniIcon(
+                                icon = if (isSelected) Icons.Outlined.CheckBox else Icons.Outlined.CheckBoxOutlineBlank,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = option,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+                is AQQuestion.Blank -> {
+                    answer as AQAnswer.Blank
+                    Text(text = question.title)
+                    Space()
+                    answer.value.fastForEach { option ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = option,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.AnswerQuestionRecordResult(result: AQResult) {
+    val (correctCount, totalCount) = result
+    Text(
+        text = "正确率: $correctCount / $totalCount",
+        style = MaterialTheme.typography.titleLarge,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun ColumnScope.AnswerQuestionRecordCard(answer: JsonElement, info: JsonElement) {
+    val data = remember(answer, info) {
+        try {
+            answer.to<List<AQUserAnswer>>() to info.to<AQResult>()
+        }
+        catch (_: Throwable) { null }
+    }
+
+    data?.let { (_, actualResult) ->
+        AnswerQuestionRecordResult(actualResult)
     }
 }
 
@@ -260,32 +427,17 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
             val item = questions.getOrNull(currentIndex)
 
             if (item != null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ClickIcon(
-                        icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-                        onClick = {
-                            if (questions.isNotEmpty() && currentIndex > 0) --currentIndex
-                        }
-                    )
-                    Text(
-                        text = remember(currentIndex) { "${currentIndex + 1} ${item.name}" },
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    ClickIcon(
-                        icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                        onClick = {
-                            if (questions.isNotEmpty() && currentIndex < questions.size - 1) ++currentIndex
-                        }
-                    )
-                }
+                TopPager(
+                    currentIndex = currentIndex,
+                    name = item.name,
+                    onIncrease = {
+                        if (questions.isNotEmpty() && currentIndex < questions.size - 1) ++currentIndex
+                    },
+                    onDecrease = {
+                        if (questions.isNotEmpty() && currentIndex > 0) --currentIndex
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Column(
                     modifier = Modifier.fillMaxWidth().weight(1f)
                         .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.secondary)
@@ -518,32 +670,17 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 val answer = answers.getOrNull(currentIndex)
 
                 if (question != null && answer != null) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ClickIcon(
-                            icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
-                            onClick = {
-                                if (currentIndex > 0) --currentIndex
-                            }
-                        )
-                        Text(
-                            text = remember(currentIndex) { "${currentIndex + 1} ${question.name}" },
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
-                        )
-                        ClickIcon(
-                            icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                            onClick = {
-                                if (currentIndex < questions.size - 1) ++currentIndex
-                            }
-                        )
-                    }
+                    TopPager(
+                        currentIndex = currentIndex,
+                        name = question.name,
+                        onIncrease = {
+                            if (currentIndex > 0) --currentIndex
+                        },
+                        onDecrease = {
+                            if (currentIndex < questions.size - 1) ++currentIndex
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Column(
                         modifier = Modifier.fillMaxWidth().weight(1f)
                             .padding(ThemeValue.Padding.EqualValue)
@@ -641,15 +778,6 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     @Composable
     override fun ColumnScope.Settlement() {
-        result?.let { (correctCount, totalCount) ->
-            Text(
-                text = "结算: $correctCount / $totalCount",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        result?.let { AnswerQuestionRecordResult(it) }
     }
 }

@@ -55,7 +55,7 @@ data object Game2Manager : RankGameManager() {
                 if (ch1 == ch2) ++correctCount
             }
         }
-        return BTResult(correctCount = correctCount, totalCount = actualStandardAnswer.length)
+        return BTResult(correctCount = correctCount, totalCount = totalCount)
     }
 
     override fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {

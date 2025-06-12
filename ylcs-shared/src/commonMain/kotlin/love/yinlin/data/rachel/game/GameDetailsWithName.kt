@@ -19,4 +19,17 @@ data class GameDetailsWithName(
     val question: JsonElement, // [游戏问题]
     val answer: JsonElement, // [游戏答案]
     val isCompleted: Boolean, // [是否完成]
-)
+) {
+    fun toPublic(name: String): GamePublicDetailsWithName = GamePublicDetailsWithName(
+        gid = gid,
+        name = name,
+        ts = ts,
+        title = title,
+        type = type,
+        reward = reward,
+        num = num,
+        cost = cost,
+        winner = winner,
+        info = info
+    )
+}

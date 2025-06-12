@@ -11,7 +11,6 @@ import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.logger
 
 // 词寻
 data object Game4Manager : SpeedGameManager() {

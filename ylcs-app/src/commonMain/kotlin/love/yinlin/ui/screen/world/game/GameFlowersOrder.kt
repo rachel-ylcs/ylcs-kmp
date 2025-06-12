@@ -3,10 +3,12 @@ package love.yinlin.ui.screen.world.game
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -18,6 +20,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -25,6 +28,7 @@ import love.yinlin.data.rachel.game.info.FOConfig
 import love.yinlin.data.rachel.game.info.FOInfo
 import love.yinlin.data.rachel.game.info.FOType
 import love.yinlin.extension.Int
+import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.input.RachelText
@@ -32,6 +36,32 @@ import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
+import kotlin.to
+
+@Composable
+private fun FlowersOrderText(
+    text: String,
+    key: Int,
+    style: TextStyle = MaterialTheme.typography.labelLarge,
+    modifier: Modifier = Modifier
+) {
+    val items = remember(key) { FOType.decode(key) }
+    if (text.length == items.size) {
+        Text(
+            text = remember(text, items) { buildAnnotatedString {
+                text.forEachIndexed { index, ch ->
+                    when (items[index]) {
+                        FOType.CORRECT -> withStyle(SpanStyle(color = Colors.Green4)) { append(ch) }
+                        FOType.INVALID_POS -> withStyle(SpanStyle(color = Colors.Yellow4)) { append(ch) }
+                        FOType.INCORRECT -> withStyle(SpanStyle(color = Colors.Red4)) { append(ch) }
+                    }
+                }
+            } },
+            style = style,
+            modifier = modifier
+        )
+    }
+}
 
 @Composable
 fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
@@ -43,6 +73,58 @@ fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
             text = "重试次数: ${info.tryCount}",
             icon = Icons.Outlined.RestartAlt
         )
+    }
+}
+
+@Composable
+fun ColumnScope.FlowersOrderCardQuestionAnswer(game: GameDetailsWithName) {
+    val answer = remember(game) {
+        try {
+            game.answer.String
+        } catch (_: Throwable) {
+            null
+        }
+    }
+    if (answer != null) {
+        Text(
+            text = "答案",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        RachelText(
+            text = answer,
+            icon = Icons.Outlined.Lightbulb,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.FlowersOrderRecordResult(text: String, result: Int) {
+    Text(
+        text = "提示",
+        style = MaterialTheme.typography.titleLarge,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth()
+    )
+    FlowersOrderText(
+        text = text,
+        key = result
+    )
+}
+
+@Composable
+fun ColumnScope.FlowersOrderRecordCard(answer: JsonElement, info: JsonElement) {
+    val data = remember(answer, info) {
+        try {
+            answer.String to info.Int
+        }
+        catch (_: Throwable) { null }
+    }
+
+    data?.let { (actualAnswer, actualResult) ->
+        FlowersOrderRecordResult(actualAnswer, actualResult)
     }
 }
 
@@ -116,30 +198,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         } catch (_: Throwable) { null }
     }
 
-    @Composable
-    private fun FlowersOrderText(
-        text: String,
-        key: Int,
-        style: TextStyle = MaterialTheme.typography.labelLarge,
-        modifier: Modifier = Modifier
-    ) {
-        val items = remember(key) { FOType.decode(key) }
-        if (text.length == items.size) {
-            Text(
-                text = remember(text, items) { buildAnnotatedString {
-                    text.forEachIndexed { index, ch ->
-                        when (items[index]) {
-                            FOType.CORRECT -> withStyle(SpanStyle(color = Colors.Green4)) { append(ch) }
-                            FOType.INVALID_POS -> withStyle(SpanStyle(color = Colors.Yellow4)) { append(ch) }
-                            FOType.INCORRECT -> withStyle(SpanStyle(color = Colors.Red4)) { append(ch) }
-                        }
-                    }
-                } },
-                style = style,
-                modifier = modifier
-            )
-        }
-    }
+
 
     @Composable
     override fun ColumnScope.Content() {
@@ -183,19 +242,6 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     @Composable
     override fun ColumnScope.Settlement() {
-        result?.let {
-            Text(
-                text = "提示",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-            FlowersOrderText(
-                text = inputState.text,
-                key = it
-            )
-        }
+        result?.let { FlowersOrderRecordResult(inputState.text, it) }
     }
 }

@@ -12,12 +12,14 @@ import androidx.compose.material.icons.outlined.Flaky
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -48,6 +50,79 @@ fun ColumnScope.SearchAllCardInfo(game: GamePublicDetailsWithName) {
             text = remember(info) { "时间限制: ${(info.timeLimit * 1000).toLong().timeString}" },
             icon = Icons.Outlined.Alarm
         )
+    }
+}
+
+@Composable
+fun ColumnScope.SearchAllCardQuestionAnswer(game: GameDetailsWithName) {
+    val answer = remember(game) {
+        try {
+            game.answer.to<List<String>>()
+        } catch (_: Throwable) {
+            null
+        }
+    }
+    if (answer != null) {
+        Text(
+            text = "答案",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        FlowRow(modifier = Modifier.fillMaxWidth().aspectRatio(1f).verticalScroll(rememberScrollState())) {
+            for (item in answer) {
+                BoxText(
+                    text = item,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.SearchAllRecordResult(result: SAResult) {
+    val (correctCount, totalCount, duration) = result
+    Text(
+        text = "正确率: $correctCount / $totalCount",
+        style = MaterialTheme.typography.titleLarge,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth()
+    )
+    Text(
+        text = "用时: ${(duration.toLong() * 1000).timeString}",
+        style = MaterialTheme.typography.titleLarge,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun ColumnScope.SearchAllRecordCard(answer: JsonElement, info: JsonElement) {
+    val data = remember(answer, info) {
+        try {
+            answer.to<List<String>>() to info.to<SAResult>()
+        }
+        catch (_: Throwable) { null }
+    }
+
+    data?.let { (actualAnswer, actualResult) ->
+        SearchAllRecordResult(actualResult)
+
+        Text(
+            text = "答案",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        FlowRow(modifier = Modifier.fillMaxWidth().aspectRatio(1f).verticalScroll(rememberScrollState())) {
+            for (item in actualAnswer) {
+                BoxText(
+                    text = item,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
 
@@ -184,23 +259,6 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     @Composable
     override fun ColumnScope.Settlement() {
-        result?.let { (correctCount, totalCount, duration) ->
-            Text(
-                text = "结算: $correctCount / $totalCount",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = "用时: ${(duration.toLong() * 1000).timeString}",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        result?.let { SearchAllRecordResult(it) }
     }
 }

@@ -1,31 +1,50 @@
 package love.yinlin.ui.screen.world.game
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Diamond
+import androidx.compose.material.icons.outlined.FormatListNumbered
+import androidx.compose.material.icons.outlined.MilitaryTech
+import androidx.compose.material.icons.outlined.Paid
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.json.JsonElement
+import love.yinlin.Local
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.screen.SubScreenSlot
+import love.yinlin.ui.screen.community.BoxText
 
 @Stable
 interface CreateGameState {
@@ -91,6 +110,22 @@ fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type)
     Game.SearchAll -> SearchAllCardInfo(game)
 }
 
+@Composable
+fun ColumnScope.GameCardQuestionAnswer(game: GameDetailsWithName) = when (game.type) {
+    Game.AnswerQuestion -> AnswerQuestionCardQuestionAnswer(game)
+    Game.BlockText -> BlockTextCardQuestionAnswer(game)
+    Game.FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
+    Game.SearchAll -> SearchAllCardQuestionAnswer(game)
+}
+
+@Composable
+fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElement) = when (type) {
+    Game.AnswerQuestion -> AnswerQuestionRecordCard(answer, info)
+    Game.BlockText -> BlockTextRecordCard(answer, info)
+    Game.FlowersOrder -> FlowersOrderRecordCard(answer, info)
+    Game.SearchAll -> SearchAllRecordCard(answer, info)
+}
+
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()
 internal fun Float.cast(minValue: Float, maxValue: Float): Float = this * (maxValue - minValue) + minValue
 
@@ -143,6 +178,85 @@ fun <T : Number> GameSlider(
                     Text(text = maxValue.toString())
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun GameItem(
+    game: GamePublicDetailsWithName,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit = {},
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        shadowElevation = ThemeValue.Shadow.Surface,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(ThemeValue.Padding.ExtraValue),
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WebImage(
+                    uri = remember { game.type.yPath },
+                    key = Local.VERSION,
+                    contentScale = ContentScale.Crop,
+                    circle = true,
+                    modifier = Modifier.size(ThemeValue.Size.MediumImage)
+                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                ) {
+                    RachelText(text = game.name, icon = Icons.Outlined.AccountCircle)
+                    RachelText(text = game.ts, icon = Icons.Outlined.Timer)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        RachelText(
+                            text = game.reward.toString(),
+                            icon = Icons.Outlined.Diamond,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        RachelText(
+                            text = game.num.toString(),
+                            icon = Icons.Outlined.FormatListNumbered,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        RachelText(
+                            text = game.cost.toString(),
+                            icon = Icons.Outlined.Paid,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
+            }
+            Text(
+                text = game.title,
+                modifier = Modifier.fillMaxWidth()
+            )
+            GameCardInfo(game)
+            if (game.winner.isNotEmpty()) {
+                RachelText(text = "赢家", icon = Icons.Outlined.MilitaryTech)
+                FlowRow(modifier = Modifier.fillMaxWidth()) {
+                    game.winner.fastForEach { winner ->
+                        BoxText(text = winner, color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            }
+            content()
         }
     }
 }

@@ -13,6 +13,6 @@ data class GameRecordWithName(
     val name: String, // [发布者昵称]
     val title: String, // [标题]
     val type: Game, // [游戏类型]
-    val answer: JsonElement, // [游戏答案]
-    val result: GameResult, // [游戏结果]
+    val answer: JsonElement?, // [游戏答案]
+    val result: JsonElement?, // [游戏结果]
 )

@@ -4,18 +4,23 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
@@ -48,6 +53,8 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 		override fun offset(item: Mail): Long = item.mid
 		override fun arg1(item: Mail): Boolean = item.processed
 	}
+
+	private val gridState = LazyGridState()
 
 	private suspend fun requestNewMails() {
 		if (state != BoxState.LOADING) {
@@ -211,6 +218,17 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				)
 			}
 		}
+	}
+
+	private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
+
+	override val fabCanExpand: Boolean = false
+
+	override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+
+	override suspend fun onFabClick() {
+		if (isScrollTop) launch { requestNewMails() }
+		else gridState.animateScrollToItem(0)
 	}
 
 	private val mailDetailsSheet = object : FloatingArgsSheet<Mail>() {

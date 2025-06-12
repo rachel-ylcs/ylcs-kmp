@@ -1,23 +1,21 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
@@ -28,16 +26,13 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationGrid
+import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.screen.community.BoxText
-import love.yinlin.ui.screen.world.game.GameCardInfo
+import love.yinlin.ui.screen.world.game.GameItem
 
 @Stable
 class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall.Args>(model) {
@@ -52,7 +47,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
         override fun offset(item: GamePublicDetailsWithName): Int = item.gid
     }
 
-    private val gridState = LazyGridState()
+    private val gridState = LazyStaggeredGridState()
 
     override val title: String = "${args.type.title} - 大厅"
 
@@ -84,83 +79,6 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
         if (result is Data.Success) page.moreData(result.data)
     }
 
-    @Composable
-    private fun GameItem(
-        game: GamePublicDetailsWithName,
-        modifier: Modifier = Modifier,
-        onClick: () -> Unit,
-    ) {
-        Surface(
-            modifier = modifier,
-            shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface,
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-                    .clickable(onClick = onClick)
-                    .padding(ThemeValue.Padding.ExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    WebImage(
-                        uri = remember { args.type.yPath },
-                        key = Local.VERSION,
-                        contentScale = ContentScale.Crop,
-                        circle = true,
-                        modifier = Modifier.size(ThemeValue.Size.MediumImage)
-                    )
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-                    ) {
-                        RachelText(text = game.name, icon = Icons.Outlined.AccountCircle)
-                        RachelText(text = game.ts, icon = Icons.Outlined.Timer)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            RachelText(
-                                text = game.reward.toString(),
-                                icon = Icons.Outlined.Diamond,
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                            RachelText(
-                                text = game.num.toString(),
-                                icon = Icons.Outlined.FormatListNumbered,
-                                color = MaterialTheme.colorScheme.secondary,
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                            RachelText(
-                                text = game.cost.toString(),
-                                icon = Icons.Outlined.Paid,
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                    }
-                }
-                Text(
-                    text = game.title,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                GameCardInfo(game = game)
-                if (game.winner.isNotEmpty()) {
-                    RachelText(text = "赢家", icon = Icons.Outlined.MilitaryTech)
-                    FlowRow(modifier = Modifier.fillMaxWidth()) {
-                        game.winner.fastForEach { winner ->
-                            BoxText(text = winner.toString(), color = MaterialTheme.colorScheme.primary)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override suspend fun initialize() {
         requestNewGames()
     }
@@ -171,10 +89,10 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            PaginationGrid(
+            PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
-                columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
@@ -183,7 +101,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = ThemeValue.Padding.EqualValue,
                 horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace)
+                verticalItemSpacing = ThemeValue.Padding.EqualSpace
             ) {
                 GameItem(
                     game = it,
