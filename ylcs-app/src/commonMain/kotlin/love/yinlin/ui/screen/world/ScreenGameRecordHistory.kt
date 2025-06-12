@@ -191,7 +191,6 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                         }.map { it.to<GameResult>() }
                         val answers = when (results.size) {
                             0 -> emptyList()
-                            1 -> listOf(args.answer!!)
                             else -> args.answer.Array
                         }
                         require(answers.size == results.size)
