@@ -158,6 +158,7 @@ kotlin {
                 implementation(libs.sketch.resources)
                 implementation(libs.sketch.gif)
                 implementation(libs.sketch.webp)
+                implementation(libs.sketch.extensions.compose)
                 implementation(libs.sketch.zoom)
 
                 implementation(libs.lottie)

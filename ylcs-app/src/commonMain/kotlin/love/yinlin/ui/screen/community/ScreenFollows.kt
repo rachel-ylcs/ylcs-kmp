@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
@@ -262,29 +263,33 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
             }
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 if (items.isEmpty()) EmptyBox()
-                else PaginationGrid(
-                    items = items,
-                    key = { it.fid },
-                    columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
-                    state = gridState,
-                    canRefresh = true,
-                    canLoading = page.canLoading,
-                    onRefresh = { requestNewData() },
-                    onLoading = { requestMoreData() },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    FollowItemLayout(
-                        item = it,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            if (tab != FollowTabItem.BLOCK_USERS) navigate(ScreenUserCard.Args(it.uid))
-                            else {
-                                launch {
-                                    if (slot.confirm.openSuspend(content = "取消拉黑")) unBlockUser(it)
+                else {
+                    bindPauseLoadWhenScrolling(gridState)
+
+                    PaginationGrid(
+                        items = items,
+                        key = { it.fid },
+                        columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                        state = gridState,
+                        canRefresh = true,
+                        canLoading = page.canLoading,
+                        onRefresh = { requestNewData() },
+                        onLoading = { requestMoreData() },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        FollowItemLayout(
+                            item = it,
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                if (tab != FollowTabItem.BLOCK_USERS) navigate(ScreenUserCard.Args(it.uid))
+                                else {
+                                    launch {
+                                        if (slot.confirm.openSuspend(content = "取消拉黑")) unBlockUser(it)
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

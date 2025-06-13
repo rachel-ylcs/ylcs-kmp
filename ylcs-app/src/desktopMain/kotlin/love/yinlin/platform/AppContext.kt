@@ -6,6 +6,7 @@ import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
@@ -15,6 +16,9 @@ class ActualAppContext : AppContext() {
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
 		logger(level = Logger.Level.Error)
+		components {
+			addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
+		}
 		downloadCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),

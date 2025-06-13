@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
@@ -264,6 +265,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 state = state,
                 modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)
             ) {
+                bindPauseLoadWhenScrolling(listState)
+
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },

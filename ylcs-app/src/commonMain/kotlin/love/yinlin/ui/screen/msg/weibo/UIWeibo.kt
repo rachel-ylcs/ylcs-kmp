@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
@@ -229,6 +230,7 @@ fun WeiboGrid(
 	items: List<Weibo>,
 	modifier: Modifier = Modifier
 ) {
+	bindPauseLoadWhenScrolling(state)
 	LazyVerticalStaggeredGrid(
 		columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
 		modifier = modifier,

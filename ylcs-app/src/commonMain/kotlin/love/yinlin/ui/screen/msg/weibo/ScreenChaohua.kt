@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
@@ -71,6 +72,7 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
                 state = state,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
+                bindPauseLoadWhenScrolling(listState)
                 PaginationStaggeredGrid(
                     items = items,
                     key = { it.id },

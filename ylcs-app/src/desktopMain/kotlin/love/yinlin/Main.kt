@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.CropSquare
+import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,13 +24,7 @@ import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
-import love.yinlin.platform.ActualAppContext
-import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
-import love.yinlin.platform.app
+import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo

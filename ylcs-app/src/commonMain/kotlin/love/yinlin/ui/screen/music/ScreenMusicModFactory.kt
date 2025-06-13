@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
@@ -180,6 +181,8 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
     override fun SubContent(device: Device) {
         if (pageSongs.items.isEmpty()) EmptyBox()
         else {
+            bindPauseLoadWhenScrolling(gridState)
+
             PaginationGrid(
                 items = pageSongs.items,
                 key = { it.sid },

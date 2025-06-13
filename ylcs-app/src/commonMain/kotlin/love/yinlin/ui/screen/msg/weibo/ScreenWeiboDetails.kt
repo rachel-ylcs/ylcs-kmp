@@ -3,6 +3,7 @@ package love.yinlin.ui.screen.msg.weibo
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -10,6 +11,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
@@ -82,11 +84,15 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun Portrait(weibo: Weibo) {
+		val listState = rememberLazyListState()
+		bindPauseLoadWhenScrolling(listState)
+
 		LazyColumn(
 			modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxSize()
 				.padding(horizontal = ThemeValue.Padding.EqualExtraSpace),
+			state = listState,
 			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 		) {
 			item(key = ItemKey("WeiboLayout")) {
@@ -125,8 +131,12 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 				if (weiboComments == null) LoadingBox()
 				else if (weiboComments.isEmpty()) EmptyBox()
 				else {
+					val listState = rememberLazyListState()
+					bindPauseLoadWhenScrolling(listState)
+
 					LazyColumn(
 						modifier = Modifier.fillMaxSize(),
+						state = listState,
 						verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
 					) {
 						item(key = ItemKey("Space")) {

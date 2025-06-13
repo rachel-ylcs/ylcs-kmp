@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -247,6 +248,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	@Composable
 	private fun Portrait(profile: UserPublicProfile) {
 		if (profile.status.canShowTopics) {
+			bindPauseLoadWhenScrolling(listState)
+
 			PaginationStaggeredGrid(
 				items = page.items,
 				key = { it.tid },
@@ -288,6 +291,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				modifier = Modifier.width(ThemeValue.Size.PanelWidth).padding(ThemeValue.Padding.EqualExtraValue)
 			)
 			if (profile.status.canShowTopics) {
+				bindPauseLoadWhenScrolling(listState)
+
 				PaginationStaggeredGrid(
 					items = page.items,
 					key = { it.tid },

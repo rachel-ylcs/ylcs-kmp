@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
+import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
@@ -694,6 +696,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 	@Composable
 	private fun Portrait(details: TopicDetails) {
+		bindPauseLoadWhenScrolling(listState)
+
 		PaginationColumn(
 			items = pageComments.items,
 			key = { it.cid },
@@ -740,6 +744,9 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				)
 			}
 			VerticalDivider()
+
+			bindPauseLoadWhenScrolling(listState)
+
 			PaginationColumn(
 				items = pageComments.items,
 				key = { it.cid },
@@ -839,9 +846,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
 		@Composable
 		override fun Content(args: Comment) {
+			val state = rememberLazyListState()
+			bindPauseLoadWhenScrolling(state)
+
 			PaginationColumn(
 				items = page.items,
 				key = { it.cid },
+				state = state,
 				canRefresh = false,
 				canLoading = page.canLoading,
 				onLoading = {

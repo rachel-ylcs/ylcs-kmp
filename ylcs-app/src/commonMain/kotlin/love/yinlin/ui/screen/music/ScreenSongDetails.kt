@@ -332,6 +332,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                     .verticalScroll(rememberScrollState())
             )
             VerticalDivider()
+
             PaginationColumn(
                 items = pageComments.items,
                 key = { it.cid },

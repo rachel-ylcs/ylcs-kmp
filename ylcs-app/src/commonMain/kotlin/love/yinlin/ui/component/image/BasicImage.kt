@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.*
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.request.disallowAnimatedImage
+import com.github.panpf.sketch.request.pauseLoadWhenScrolling
 import com.github.panpf.sketch.state.rememberIconPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
@@ -359,6 +360,7 @@ fun rememberWebImageState(
 			sizeMultiplier(quality.sizeMultiplier)
 			placeholder(holder)
 			disallowAnimatedImage(!animated)
+			pauseLoadWhenScrolling(true)
 			if (isCrossfade) crossfade()
 		}.merge(SingletonSketch.get(context).globalImageOptions).build()
 	}
@@ -380,17 +382,19 @@ fun WebImage(
 	state: AsyncImageState = rememberWebImageState(quality, placeholder, true, animated),
 	onClick: (() -> Unit)? = null
 ) {
-	AsyncImage(
-		uri = rememberWebImageKeyUrl(uri, key),
-		contentDescription = null,
-		state = state,
-		alignment = alignment,
-		contentScale = contentScale,
-		filterQuality = quality.filterQuality,
-		alpha = alpha,
-		modifier = modifier.condition(circle) { clip(CircleShape) }
-			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
-	)
+	Box(modifier = modifier) {
+		AsyncImage(
+			uri = rememberWebImageKeyUrl(uri, key),
+			contentDescription = null,
+			state = state,
+			alignment = alignment,
+			contentScale = contentScale,
+			filterQuality = quality.filterQuality,
+			alpha = alpha,
+			modifier = Modifier.matchParentSize().condition(circle) { clip(CircleShape) }
+				.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+		)
+	}
 }
 
 @Composable
@@ -407,17 +411,19 @@ fun LocalFileImage(
 ) {
 	val baseUri = remember(*key) { path().toString() }
 	val baseKey = remember(*key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
-	AsyncImage(
-		uri = rememberWebImageKeyUrl(baseUri, baseKey),
-		contentDescription = null,
-		state = state,
-		alignment = Alignment.Center,
-		contentScale = contentScale,
-		filterQuality = ImageQuality.Full.filterQuality,
-		alpha = alpha,
-		modifier = modifier.condition(circle) { clip(CircleShape) }
-			.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
-	)
+	Box(modifier = modifier) {
+		AsyncImage(
+			uri = rememberWebImageKeyUrl(baseUri, baseKey),
+			contentDescription = null,
+			state = state,
+			alignment = Alignment.Center,
+			contentScale = contentScale,
+			filterQuality = ImageQuality.Full.filterQuality,
+			alpha = alpha,
+			modifier = Modifier.matchParentSize().condition(circle) { clip(CircleShape) }
+				.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+		)
+	}
 }
 
 @Composable
