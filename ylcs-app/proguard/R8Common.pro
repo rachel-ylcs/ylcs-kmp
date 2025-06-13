@@ -112,8 +112,4 @@
 
 -keep class io.ktor.** { *; }
 -keepclassmembers class io.ktor.** { volatile <fields>; }
--dontwarn io.ktor.network.sockets.SocketBase
-
-# ----------------------------------------- Sketch ----------------------------------------------- #
-
--keep class com.github.panpf.sketch.**
+-dontwarn io.ktor.network.sockets.SocketBase # TODO: 将在ktor 3.2.0 版本修复后即可去除

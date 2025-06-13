@@ -15,4 +15,8 @@
 -keep class * implements uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider { *; }
 -keep interface uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider { *; }
 
+# ----------------------------------------- Sketch ----------------------------------------------- #
+
+-keep class com.github.panpf.sketch.**
+
 # ----------------------------------------- App ----------------------------------------------- #
