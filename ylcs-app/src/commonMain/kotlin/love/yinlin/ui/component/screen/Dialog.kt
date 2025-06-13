@@ -292,6 +292,9 @@ open class FloatingDialogInput(
 				maxLines = maxLines,
 				minLines = minLines,
 				clearButton = clearButton,
+				onImeClick = {
+					if (textInputState.ok) continuation?.resume(textInputState.text)
+				},
 				modifier = Modifier.fillMaxWidth()
 			)
 		}

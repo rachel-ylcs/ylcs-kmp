@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastForEach
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
@@ -160,14 +161,18 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = loginId,
 				hint = "昵称",
-				maxLength = UserConstraint.MAX_NAME_LENGTH
+				maxLength = UserConstraint.MAX_NAME_LENGTH,
+				imeAction = ImeAction.Next
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = loginPwd,
 				hint = "密码",
 				inputType = InputType.PASSWORD,
-				maxLength = UserConstraint.MAX_PWD_LENGTH
+				maxLength = UserConstraint.MAX_PWD_LENGTH,
+				onImeClick = {
+					if (canLogin) launch { login() }
+				}
 			)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
@@ -215,21 +220,24 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = registerId,
 				hint = "注册昵称",
-				maxLength = UserConstraint.MAX_NAME_LENGTH
+				maxLength = UserConstraint.MAX_NAME_LENGTH,
+				imeAction = ImeAction.Next
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd,
 				hint = "密码",
 				inputType = InputType.PASSWORD,
-				maxLength = UserConstraint.MAX_PWD_LENGTH
+				maxLength = UserConstraint.MAX_PWD_LENGTH,
+				imeAction = ImeAction.Next
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd2,
 				hint = "确认密码",
 				inputType = InputType.PASSWORD,
-				maxLength = UserConstraint.MAX_PWD_LENGTH
+				maxLength = UserConstraint.MAX_PWD_LENGTH,
+				imeAction = ImeAction.Next
 			)
 
 			Box(modifier = Modifier.fillMaxWidth()) {
@@ -244,7 +252,10 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 							onClick = { inviterMenuExpanded = true }
 						)
 					},
-					maxLength = UserConstraint.MAX_NAME_LENGTH
+					maxLength = UserConstraint.MAX_NAME_LENGTH,
+					onImeClick = {
+						if (canRegister) launch { register() }
+					}
 				)
 				DropdownMenu(
 					expanded = inviterMenuExpanded,
@@ -292,14 +303,18 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = forgotPasswordId,
 				hint = "昵称",
-				maxLength = UserConstraint.MAX_NAME_LENGTH
+				maxLength = UserConstraint.MAX_NAME_LENGTH,
+				imeAction = ImeAction.Next
 			)
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
 				state = forgotPasswordPwd,
 				hint = "新密码",
 				inputType = InputType.PASSWORD,
-				maxLength = UserConstraint.MAX_PWD_LENGTH
+				maxLength = UserConstraint.MAX_PWD_LENGTH,
+				onImeClick = {
+					if (canForgotPassword) launch { forgotPassword() }
+				}
 			)
 			Text(
 				text = "返回登录",

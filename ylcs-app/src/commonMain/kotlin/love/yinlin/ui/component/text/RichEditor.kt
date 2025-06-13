@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import love.yinlin.common.Device
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
@@ -250,6 +252,8 @@ open class RichEditorState {
     private fun InputLayout(
         hint: String?,
         maxLength: Int,
+        imeAction: ImeAction,
+        onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
         TextInput(
@@ -266,6 +270,8 @@ open class RichEditorState {
                 )
             },
             clearButton = false,
+            imeAction = imeAction,
+            onImeClick = onImeClick,
             modifier = modifier.focusRequester(focusRequester)
         )
     }
@@ -301,6 +307,8 @@ open class RichEditorState {
     private fun PortraitPreviewLayout(
         hint: String?,
         maxLength: Int,
+        imeAction: ImeAction,
+        onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
         Column(
@@ -312,6 +320,8 @@ open class RichEditorState {
             InputLayout(
                 hint = hint,
                 maxLength = maxLength,
+                imeAction = imeAction,
+                onImeClick = onImeClick,
                 modifier = Modifier.fillMaxWidth().aspectRatio(2f)
             )
         }
@@ -321,6 +331,8 @@ open class RichEditorState {
     private fun LandscapePreviewLayout(
         hint: String?,
         maxLength: Int,
+        imeAction: ImeAction,
+        onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
         Row(
@@ -331,6 +343,8 @@ open class RichEditorState {
             InputLayout(
                 hint = hint,
                 maxLength = maxLength,
+                imeAction = imeAction,
+                onImeClick = onImeClick,
                 modifier = Modifier.weight(1f).aspectRatio(2f)
             )
             PreviewText(modifier = Modifier.weight(1f).aspectRatio(2f))
@@ -341,12 +355,16 @@ open class RichEditorState {
     private fun PreviewLayout(
         hint: String?,
         maxLength: Int,
+        imeAction: ImeAction,
+        onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
         if (LocalDevice.current.type == Device.Type.PORTRAIT) {
             PortraitPreviewLayout(
                 hint = hint,
                 maxLength = maxLength,
+                imeAction = imeAction,
+                onImeClick = onImeClick,
                 modifier = modifier
             )
         }
@@ -354,6 +372,8 @@ open class RichEditorState {
             LandscapePreviewLayout(
                 hint = hint,
                 maxLength = maxLength,
+                imeAction = imeAction,
+                onImeClick = onImeClick,
                 modifier = modifier
             )
         }
@@ -361,8 +381,10 @@ open class RichEditorState {
 
     @Composable
     fun Content(
-        hint: String? = null,
-        maxLength: Int = 0,
+        hint: String?,
+        maxLength: Int,
+        imeAction: ImeAction,
+        onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
         LaunchedEffect(enablePreview) {
@@ -426,6 +448,8 @@ open class RichEditorState {
                     PreviewLayout(
                         hint = hint,
                         maxLength = maxLength,
+                        imeAction = imeAction,
+                        onImeClick = onImeClick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -434,6 +458,8 @@ open class RichEditorState {
                 InputLayout(
                     hint = hint,
                     maxLength = maxLength,
+                    imeAction = imeAction,
+                    onImeClick = onImeClick,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -446,5 +472,13 @@ fun RichEditor(
     state: RichEditorState,
     hint: String? = null,
     maxLength: Int = 0,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeClick: (KeyboardActionScope.() -> Unit)? = null,
     modifier: Modifier = Modifier
-) = state.Content(hint = hint, maxLength = maxLength, modifier = modifier)
+) = state.Content(
+    hint = hint,
+    maxLength = maxLength,
+    imeAction = imeAction,
+    onImeClick = onImeClick,
+    modifier = modifier
+)

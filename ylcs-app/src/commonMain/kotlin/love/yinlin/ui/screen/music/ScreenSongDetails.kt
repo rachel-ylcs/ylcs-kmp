@@ -269,27 +269,28 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
 
     @Composable
     private fun BottomLayout(modifier: Modifier = Modifier) {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextInput(
-                state = inputState,
-                hint = "评论",
-                maxLength = 256,
-                maxLines = 5,
-                minLines = 1,
-                modifier = Modifier.weight(1f)
-            )
-            LoadingIcon(
-                icon = Icons.AutoMirrored.Filled.Send,
-                enabled = inputState.ok,
-                onClick = {
+        TextInput(
+            state = inputState,
+            hint = "评论",
+            maxLength = 256,
+            maxLines = 5,
+            minLines = 1,
+            trailingIcon = {
+                LoadingIcon(
+                    icon = Icons.AutoMirrored.Filled.Send,
+                    enabled = inputState.ok,
+                    onClick = {
+                        if (onSendComment(inputState.text)) inputState.text = ""
+                    }
+                )
+            },
+            onImeClick = {
+                if (inputState.ok) launch {
                     if (onSendComment(inputState.text)) inputState.text = ""
                 }
-            )
-        }
+            },
+            modifier = modifier
+        )
     }
 
     @Composable

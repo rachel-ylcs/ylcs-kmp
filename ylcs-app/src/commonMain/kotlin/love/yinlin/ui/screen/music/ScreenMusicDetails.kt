@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.writeText
@@ -174,6 +175,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 ) {
                     LoadingRachelButton(
                         text = "修改",
+                        icon = Icons.Outlined.Check,
                         enabled = name.ok && singer.ok && lyricist.ok && composer.ok && album.ok,
                         onClick = {
                             val id = args.id
@@ -207,24 +209,28 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         state = name,
                         hint = "歌曲名",
                         maxLength = 16,
+                        imeAction = ImeAction.Next,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(
                         state = singer,
                         hint = "演唱",
                         maxLength = 16,
+                        imeAction = ImeAction.Next,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(
                         state = lyricist,
                         hint = "作词",
                         maxLength = 16,
+                        imeAction = ImeAction.Next,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(
                         state = composer,
                         hint = "作曲",
                         maxLength = 16,
+                        imeAction = ImeAction.Next,
                         modifier = Modifier.fillMaxWidth()
                     )
                     TextInput(

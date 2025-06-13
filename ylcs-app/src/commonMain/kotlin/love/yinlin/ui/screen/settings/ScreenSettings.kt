@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.buffered
@@ -662,6 +663,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	private val passwordModifySheet = object : FloatingSheet() {
+		private suspend fun submit(oldPwd: String, newPwd1: String, newPwd2: String) {
+			if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
+			else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
+			else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
+			else modifyPassword(oldPwd, newPwd1)
+		}
+
 		@Composable
 		override fun Content() {
 			val oldPassword = rememberTextInputState()
@@ -680,13 +688,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					icon = Icons.Outlined.Check,
 					enabled = canSubmit,
 					onClick = {
-						val oldPwd = oldPassword.text
-						val newPwd1 = newPassword1.text
-						val newPwd2 = newPassword2.text
-						if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
-						else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
-						else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
-						else modifyPassword(oldPwd, newPwd1)
+						submit(oldPassword.text, newPassword1.text, newPassword2.text)
 					}
 				)
 				TextInput(
@@ -694,6 +696,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					hint = "旧密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					imeAction = ImeAction.Next,
 					modifier = Modifier.fillMaxWidth()
 				)
 				TextInput(
@@ -701,6 +704,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					hint = "确认旧密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					imeAction = ImeAction.Next,
 					modifier = Modifier.fillMaxWidth()
 				)
 				TextInput(
@@ -708,6 +712,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					hint = "新密码",
 					inputType = InputType.PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
+					onImeClick = {
+						if (canSubmit) launch {
+							submit(oldPassword.text, newPassword1.text, newPassword2.text)
+						}
+					},
 					modifier = Modifier.fillMaxWidth()
 				)
 			}

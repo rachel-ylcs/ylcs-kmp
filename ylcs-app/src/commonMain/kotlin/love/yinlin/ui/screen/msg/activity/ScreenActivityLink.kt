@@ -24,6 +24,7 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.platform.WebPage
+import love.yinlin.ui.component.platform.WebPageLoadingState
 import love.yinlin.ui.component.platform.WebPageSettings
 import love.yinlin.ui.component.platform.WebPageState
 import love.yinlin.ui.component.screen.CommonSubScreen
@@ -75,6 +76,7 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
                         )
                         RachelButton(
                             text = "提取",
+                            enabled = webPageState.loadingState == WebPageLoadingState.Finished,
                             onClick = {
                                 webPageState.evaluateJavaScript("document.getElementById('openApp').click();")
                             }

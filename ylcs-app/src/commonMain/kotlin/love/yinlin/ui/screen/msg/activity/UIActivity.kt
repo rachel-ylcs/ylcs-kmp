@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -111,6 +112,7 @@ internal fun ActivityInfoLayout(
             state = input.title,
             hint = "活动名称(可空, 2-4字)",
             maxLength = 4,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth()
         )
         DockedDatePicker(
@@ -124,6 +126,7 @@ internal fun ActivityInfoLayout(
             hint = "活动内容",
             maxLength = 512,
             maxLines = 10,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(
@@ -131,18 +134,21 @@ internal fun ActivityInfoLayout(
             hint = "秀动ID(可空)",
             maxLength = 1024,
             maxLines = 5,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(
             state = input.damai,
             hint = "大麦ID(可空)",
             maxLength = 16,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(
             state = input.maoyan,
             hint = "猫眼ID(可空)",
             maxLength = 16,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(

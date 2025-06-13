@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -178,6 +179,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                     maxLines = 2,
                     minLines = 1,
                     clearButton = false,
+                    imeAction = ImeAction.Next,
                     modifier = Modifier.fillMaxWidth()
                 )
                 RichEditor(

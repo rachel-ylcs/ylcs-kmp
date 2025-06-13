@@ -198,8 +198,6 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         } catch (_: Throwable) { null }
     }
 
-
-
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (question, answer, result) ->

@@ -62,13 +62,24 @@ fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState
 fun TextInput(
 	state: TextInputState,
 	hint: String? = null,
-	leadingIcon: @Composable (() -> Unit)? = null,
 	inputType: InputType = InputType.COMMON,
 	readOnly: Boolean = false,
 	maxLength: Int = 0,
 	maxLines: Int = 1,
 	minLines: Int = maxLines,
 	clearButton: Boolean = true,
+	leadingIcon: @Composable (() -> Unit)? = null,
+	trailingIcon: @Composable (() -> Unit)? = if (clearButton) {
+		{
+			ClickIcon(
+				icon = Icons.Outlined.Clear,
+				onClick = {
+					state.text = ""
+					state.overflow = false
+				}
+			)
+		}
+	} else null,
 	imeAction: ImeAction = ImeAction.Done,
 	onImeClick: (KeyboardActionScope.() -> Unit)? = null,
 	modifier: Modifier = Modifier
@@ -86,17 +97,7 @@ fun TextInput(
 			)
 		} },
 		leadingIcon = leadingIcon,
-		trailingIcon = if (clearButton) {
-			{
-				ClickIcon(
-					icon = Icons.Outlined.Clear,
-					onClick = {
-						state.text = ""
-						state.overflow = false
-					}
-				)
-			}
-		} else null,
+		trailingIcon = trailingIcon,
 		readOnly = readOnly,
 		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
 		keyboardOptions = remember(inputType, imeAction) { inputType.toKeyboardOptions.copy(imeAction = imeAction) },

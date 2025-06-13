@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import io.ktor.utils.io.core.writeText
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
@@ -179,42 +180,49 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
                 state = input.id,
                 hint = "唯一ID(仅字母或数字)",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.author,
                 hint = "作者",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.name,
                 hint = "歌名",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.singer,
                 hint = "演唱",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.lyricist,
                 hint = "作词",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.composer,
                 hint = "作曲",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
                 state = input.album,
                 hint = "专辑",
                 maxLength = 32,
+                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
