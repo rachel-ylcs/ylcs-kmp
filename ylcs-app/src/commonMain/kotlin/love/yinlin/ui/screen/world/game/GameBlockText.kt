@@ -34,6 +34,7 @@ import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
+import love.yinlin.extension.rememberState
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -42,6 +43,7 @@ import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.jvm.JvmInline
+import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.to
 
@@ -83,14 +85,26 @@ private value class BlockCharacter(val value: Int) {
     }
 }
 
+@Stable
+private enum class CharacterBlockInputMode {
+    DISABLED, HORIZONTAL, VERTICAL;
+
+    val next: CharacterBlockInputMode get() = when (this) {
+        DISABLED -> HORIZONTAL
+        HORIZONTAL -> VERTICAL
+        VERTICAL -> DISABLED
+    }
+}
+
 @Composable
 private fun CharacterBlock(
     blockSize: Int,
     data: List<BlockCharacter>,
     enabled: Boolean = true,
     writeMode: Boolean,
-    onCharacterSelected: suspend (Int, Char?) -> Char?,
-    onCharacterChanged: (Int, BlockCharacter) -> Unit,
+    onCharacterSelected: suspend (Char?) -> Char? = { null },
+    onStringSelected: suspend () -> String? = { null },
+    onCharacterChanged: (Int, BlockCharacter) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -98,10 +112,11 @@ private fun CharacterBlock(
         contentAlignment = Alignment.Center
     ) {
         var openIndex by rememberValueState(-1)
+        var inputMode by rememberState { CharacterBlockInputMode.DISABLED }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(blockSize),
-            modifier = Modifier.fillMaxSize().zIndex(1f).drawGrid(
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f).zIndex(1f).drawGrid(
                 blockSize = blockSize,
                 color = MaterialTheme.colorScheme.tertiary
             ),
@@ -153,19 +168,37 @@ private fun CharacterBlock(
                     horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val textChanged: suspend (Boolean, Int, Char) -> Unit = remember(onCharacterSelected, onCharacterChanged) {
+                    val textChanged: suspend (Boolean, Int, Char) -> Unit =
+                        remember(inputMode, onCharacterSelected, onStringSelected, onCharacterChanged) {
                         { hide, index, ch ->
-                            val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
-                            onCharacterSelected(index, oldCharacter)?.let { newCharacter ->
-                                if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
-                                    onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                            if (inputMode == CharacterBlockInputMode.DISABLED) {
+                                val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
+                                onCharacterSelected(oldCharacter)?.let { newCharacter ->
+                                    if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
+                                        onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                                    }
+                                }
+                            }
+                            else {
+                                onStringSelected()?.let { newString ->
+                                    // 确定当前索引的位置
+                                    val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
+                                    repeat(min(blockSize - startIndex, newString.length)) {
+                                        val actualIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index + it else index + it * blockSize
+                                        data[actualIndex].decode { currentCharacter, currentHide ->
+                                            // 防止将不可重写的格子重写
+                                            if (writeMode || (currentCharacter != BTConfig.CHAR_EMPTY && currentCharacter != BTConfig.CHAR_BLOCK && currentHide)) {
+                                                onCharacterChanged(actualIndex, BlockCharacter(newString[it], hide))
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
                     LoadingIcon(
-                        icon = Icons.Outlined.TextFormat,
+                        icon = Icons.Outlined.VisibilityOff,
                         size = ThemeValue.Size.MediumIcon,
                         onClick = {
                             textChanged(true, openIndex, data[openIndex].ch)
@@ -174,7 +207,7 @@ private fun CharacterBlock(
                     )
                     if (writeMode) {
                         LoadingIcon(
-                            icon = Icons.Outlined.Spellcheck,
+                            icon = Icons.Outlined.Visibility,
                             size = ThemeValue.Size.MediumIcon,
                             onClick = {
                                 textChanged(false, openIndex, data[openIndex].ch)
@@ -191,9 +224,13 @@ private fun CharacterBlock(
                         }
                     )
                     ClickIcon(
-                        icon = Icons.Outlined.Close,
-                        size = ThemeValue.Size.MediumIcon,
-                        onClick = { openIndex = -1 }
+                        icon = when (inputMode) {
+                            CharacterBlockInputMode.DISABLED -> Icons.Outlined.MobiledataOff
+                            CharacterBlockInputMode.HORIZONTAL -> Icons.Outlined.SwapHoriz
+                            CharacterBlockInputMode.VERTICAL -> Icons.Outlined.SwapVert
+                        },
+                        color = if (inputMode == CharacterBlockInputMode.DISABLED) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
+                        onClick = { inputMode = inputMode.next }
                     )
                 }
             }
@@ -235,9 +272,7 @@ fun ColumnScope.BlockTextCardQuestionAnswer(game: GameDetailsWithName) {
             data = data,
             enabled = false,
             writeMode = false,
-            onCharacterSelected = { _, _ -> null },
-            onCharacterChanged = { _, _ -> },
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -281,9 +316,7 @@ fun ColumnScope.BlockTextRecordCard(answer: JsonElement, info: JsonElement) {
             data = data,
             enabled = false,
             writeMode = false,
-            onCharacterSelected = { _, _ -> null },
-            onCharacterChanged = { _, _ -> },
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -334,11 +367,10 @@ class BlockTextCreateGameState(val slot: SubScreenSlot) : CreateGameState {
             blockSize = gridSize,
             data = data,
             writeMode = true,
-            onCharacterSelected = { _, ch ->
-                characterInputDialog.openSuspend(ch?.toString() ?: "")?.firstOrNull()
-            },
+            onCharacterSelected = { characterInputDialog.openSuspend(it?.toString() ?: "")?.firstOrNull() },
+            onStringSelected = { stringInputDialog.openSuspend() },
             onCharacterChanged = { index, ch -> data[index] = ch },
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 
@@ -348,9 +380,16 @@ class BlockTextCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         clearButton = false
     )
 
+    private val stringInputDialog = FloatingDialogInput(
+        hint = "输入多个文字",
+        maxLength = BTConfig.maxBlockSize,
+        clearButton = false
+    )
+
     @Composable
     override fun Floating() {
         characterInputDialog.Land()
+        stringInputDialog.Land()
     }
 }
 
@@ -413,11 +452,10 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 blockSize = gridSize,
                 data = data,
                 writeMode = false,
-                onCharacterSelected = { _, ch ->
-                    characterInputDialog.openSuspend(ch?.toString() ?: "")?.firstOrNull()
-                },
+                onCharacterSelected = { characterInputDialog.openSuspend(it?.toString() ?: "")?.firstOrNull() },
+                onStringSelected = { stringInputDialog.openSuspend() },
                 onCharacterChanged = { index, ch -> data[index] = ch },
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -433,8 +471,15 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         clearButton = false
     )
 
+    private val stringInputDialog = FloatingDialogInput(
+        hint = "输入多个文字",
+        maxLength = BTConfig.maxBlockSize,
+        clearButton = false
+    )
+
     @Composable
     override fun Floating() {
         characterInputDialog.Land()
+        stringInputDialog.Land()
     }
 }
