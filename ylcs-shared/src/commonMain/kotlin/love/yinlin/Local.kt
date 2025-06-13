@@ -4,27 +4,22 @@ package love.yinlin
 object Local {
 	const val APP_NAME: String = "ylcs"
 	const val NAME: String = "银临茶舍"
-	const val VERSION: Int = 310
-	const val VERSION_NAME: String = "3.1.0"
+	const val VERSION: Int = 311
+	const val VERSION_NAME: String = "3.1.1"
 
 	// 客户端配置
 	object Client {
 		const val DEVELOPMENT: Boolean = false
 	}
 
-	// 服务器配置
-	object Server {
-
-	}
-
-
 	// ***********  不可修改处  ***********
 
 	const val MAIN_HOST: String = "yinlin.love"
-	private const val LOCAL_HOST: String = "localhost"
-	private const val TEST_PORT: Int = 1211
+	const val LOCAL_HOST: String = "localhost"
 
-	val ServerHost: String = LOCAL_HOST
-	val ClientHost: String = if (Client.DEVELOPMENT) LOCAL_HOST else MAIN_HOST
-	val ClientUrl: String = if (Client.DEVELOPMENT) "http://$ClientHost:$TEST_PORT" else "https://api.$ClientHost"
+	@Suppress("HttpUrlsUsage")
+	val ClientUrl: String = run {
+		val clientHost = if (Client.DEVELOPMENT) LOCAL_HOST else MAIN_HOST
+		if (Client.DEVELOPMENT) "http://$clientHost:1211" else "https://api.$clientHost"
+	}
 }

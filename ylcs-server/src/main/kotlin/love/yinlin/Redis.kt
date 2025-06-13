@@ -15,7 +15,7 @@ object Redis {
 		maxIdle = 20
 		minIdle = 5
 		setMaxWait(Duration.ofMillis(3000))
-	}, Local.ServerHost, Config.Redis.PORT, 3000, Config.Redis.PASSWORD)
+	}, Local.LOCAL_HOST, Config.Redis.PORT, 3000, Config.Redis.PASSWORD)
 
 	inline fun <R> use(block: (Jedis) -> R): R = RedisConnection(dataSource.resource).use { block(it.jedis) }
 
