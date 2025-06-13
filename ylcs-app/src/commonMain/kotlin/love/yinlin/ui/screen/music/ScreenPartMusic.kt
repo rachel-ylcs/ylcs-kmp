@@ -804,49 +804,45 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
 
-			LazyColumn(
-				modifier = Modifier.fillMaxWidth(),
-				state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
-			) {
-				item(key = ItemKey("Header")) {
-					Row(
-						modifier = Modifier.fillMaxWidth().padding(
-							start = ThemeValue.Padding.HorizontalExtraSpace,
-							end = ThemeValue.Padding.HorizontalExtraSpace,
-							top = ThemeValue.Padding.VerticalExtraSpace
-						),
-						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Text(
-							text = factory.currentPlaylist?.name ?: "",
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary,
-							modifier = Modifier.weight(1f)
-						)
-						ClickIcon(
-							icon = Icons.Outlined.StopCircle,
-							onClick = {
-								close()
-								launch { factory.stop() }
-							}
-						)
-					}
-					HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue))
-				}
-				itemsIndexed(
-					items = factory.musicList,
-					key = { _, musicInfo -> musicInfo.id }
-				) { index, musicInfo ->
-					PlayingMusicStatusCard(
-						musicInfo = musicInfo,
-						isCurrent = index == currentIndex,
+			Column(modifier = Modifier.fillMaxWidth()) {
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(
+						text = factory.currentPlaylist?.name ?: "",
+						style = MaterialTheme.typography.titleLarge,
+						color = MaterialTheme.colorScheme.primary,
+						modifier = Modifier.weight(1f)
+					)
+					ClickIcon(
+						icon = Icons.Outlined.StopCircle,
 						onClick = {
 							close()
-							launch { factory.gotoIndex(index) }
-						},
-						modifier = Modifier.fillMaxWidth()
+							launch { factory.stop() }
+						}
 					)
+				}
+				HorizontalDivider()
+				LazyColumn(
+					modifier = Modifier.fillMaxWidth(),
+					state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
+				) {
+					itemsIndexed(
+						items = factory.musicList,
+						key = { _, musicInfo -> musicInfo.id }
+					) { index, musicInfo ->
+						PlayingMusicStatusCard(
+							musicInfo = musicInfo,
+							isCurrent = index == currentIndex,
+							onClick = {
+								close()
+								launch { factory.gotoIndex(index) }
+							},
+							modifier = Modifier.fillMaxWidth()
+						)
+					}
 				}
 			}
 		}
