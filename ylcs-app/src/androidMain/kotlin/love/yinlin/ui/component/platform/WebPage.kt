@@ -1,6 +1,7 @@
 package love.yinlin.ui.component.platform
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -120,6 +121,7 @@ actual fun WebPage(
 		modifier = modifier,
 		factory = { context ->
 			val webview = WebView(context)
+			webview.setBackgroundColor(Color.TRANSPARENT)
 			webview.settings.apply {
 				javaScriptEnabled = state.settings.enableJavaScript
 				javaScriptCanOpenWindowsAutomatically = state.settings.enableJavaScriptOpenWindow
