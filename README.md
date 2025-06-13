@@ -1,6 +1,6 @@
 <div align="center">
     <h1>银临茶舍跨平台 App</h1>
-    <p>集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503</p>
+    <p></p>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android"/>
         <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
@@ -15,6 +15,10 @@
         <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg"/>
     </div>
 </div>
+
+> [!IMPORTANT]
+>
+>  集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503
 
 ## 跨平台特性
 
@@ -328,3 +332,12 @@ music 模块是应用 MOD 存储协议及序列化与反序列化的核心实现
 MOD 管理器是方便桌面客户端创建, 解析, 预览 MOD 的简易工具
 
 ![MOD管理器](docs/pics/mod_manager.png)
+
+
+## 贡献者
+
+[![Contributors](https://contrib.rocks/image?repo=rachel-ylcs/ylcs-kmp)](https://github.com/OpenListTeam/OpenList/graphs/contributors)
+
+## 许可
+
+`银临茶舍KMP` 是在 MIT 许可下许可的开源软件。
