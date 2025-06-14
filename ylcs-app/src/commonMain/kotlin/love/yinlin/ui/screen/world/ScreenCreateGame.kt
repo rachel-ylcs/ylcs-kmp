@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.world
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -51,6 +49,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     private val titleState = TextInputState()
     private var reward by mutableFloatStateOf(0f)
     private var num by mutableFloatStateOf(1f)
+    private val maxNum by derivedStateOf { (reward.cast(config.minReward, config.maxReward) - 1) / config.maxCostRatio + 1 }
     private var cost by mutableFloatStateOf(0f)
     private val maxCost by derivedStateOf { reward.cast(config.minReward, config.maxReward) / config.maxCostRatio }
 
@@ -74,7 +73,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                             title = titleState.text,
                             type = args.type,
                             reward = reward,
-                            num = num.cast(config.minRank, config.maxRank),
+                            num = num.cast(config.minRank, maxNum),
                             cost = cost.cast(0, maxCost),
                             info = state.submitInfo,
                             question = state.submitQuestion,
@@ -118,7 +117,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
             title = "限定名额",
             progress = num,
             minValue = config.minRank,
-            maxValue = config.maxRank,
+            maxValue = maxNum,
             onProgressChange = { num = it },
             modifier = Modifier.fillMaxWidth()
         )
