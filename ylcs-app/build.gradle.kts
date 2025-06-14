@@ -116,6 +116,11 @@ kotlin {
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     port = rootProject.extra["webServerPort"] as Int
                     client?.overlay = false
+                    proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
+                        context = mutableListOf("/public", "/user", "/test"),
+                        target = "https://api.yinlin.love",
+                        secure = false
+                    ))
                 }
             }
         }

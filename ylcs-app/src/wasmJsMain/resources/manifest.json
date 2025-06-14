@@ -1,0 +1,50 @@
+{
+  "name": "银临茶舍",
+  "start_url": "/",
+  "categories": ["music"],
+  "description": "集资讯、听歌、美图、论坛、社交于一体的小银子聚集地。",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "128x128"
+    },
+    {
+      "src": "icon.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ],
+  "display": "standalone",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "background_color": "#ffffff",
+  "theme_color": "#2471a3",
+  "protocol_handlers": [
+    {
+      "protocol": "web+rachel",
+      "url": "/?deeplink=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/octet-stream": [".rachel"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "mods",
+          "accept": [".rachel"]
+        }
+      ]
+    }
+  }
+}
