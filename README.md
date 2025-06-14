@@ -336,7 +336,7 @@ MOD 管理器是方便桌面客户端创建, 解析, 预览 MOD 的简易工具
 
 ## 贡献者
 
-[![Contributors](https://contrib.rocks/image?repo=rachel-ylcs/ylcs-kmp)](https://github.com/OpenListTeam/OpenList/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=rachel-ylcs/ylcs-kmp)](https://github.com/rachel-ylcs/ylcs-kmp/graphs/contributors)
 
 ## 许可
 
