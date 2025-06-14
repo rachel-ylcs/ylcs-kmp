@@ -115,7 +115,7 @@ private data class AtInfo(val uid: Int, val name: String) {
 	override fun equals(other: Any?): Boolean = other is AtInfo && other.uid == uid
 	override fun hashCode(): Int = uid
 
-	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 }
 
 @Composable

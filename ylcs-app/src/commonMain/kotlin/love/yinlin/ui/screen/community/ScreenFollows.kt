@@ -55,7 +55,7 @@ enum class FollowTabItem(val title: String) {
 @Stable
 @Serializable
 private data class FollowItem(val fid: Long, val uid: Int, val name: String) {
-    val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 }
 
 @Composable

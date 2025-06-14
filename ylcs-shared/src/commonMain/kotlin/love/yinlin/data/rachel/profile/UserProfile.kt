@@ -25,9 +25,9 @@ data class UserProfile(
 	val followers: Int = 0, // [粉丝数]
 	val notification: UserNotification = UserNotification(), // [消息提醒]
 ) {
-	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 
-	val wallPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).wall}" }
+	val wallPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).wall}" }
 
 	val level: Int by lazy { UserLevel.level(coin) }
 

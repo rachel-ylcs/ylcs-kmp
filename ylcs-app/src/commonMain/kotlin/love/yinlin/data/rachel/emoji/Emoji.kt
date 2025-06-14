@@ -9,9 +9,9 @@ data class Emoji(
     val id: Int,
     val type: EmojiType
 ) {
-    private val webpPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Emoji.webp(id)}" }
+    private val webpPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Emoji.webp(id)}" }
 
-    private val lottiePath: String by lazy { "${Local.ClientUrl}/${ServerRes.Emoji.lottie(id)}" }
+    private val lottiePath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Emoji.lottie(id)}" }
 
     val previewPath: String by lazy { webpPath }
 

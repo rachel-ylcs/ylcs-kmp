@@ -59,7 +59,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
 		data: Request
 	): Data<Response> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${Local.ClientUrl}$route${buildGetParameters(data.toJson().Object)}")
+		client.prepareGet(urlString = "${Local.API_BASE_URL}$route${buildGetParameters(data.toJson().Object)}")
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -68,7 +68,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
 		data: Request
 	) : Data<Response.Default> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${Local.ClientUrl}$route${buildGetParameters(data.toJson().Object)}")
+		client.prepareGet(urlString = "${Local.API_BASE_URL}$route${buildGetParameters(data.toJson().Object)}")
 			.execute { processResponse(it) }
 	}
 
@@ -76,7 +76,7 @@ object ClientAPI {
 	suspend inline fun <reified Response : Any> request(
 		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>
 	): Data<Response> = app.client.safeCallData { client ->
-		client.prepareGet(urlString = "${Local.ClientUrl}$route")
+		client.prepareGet(urlString = "${Local.API_BASE_URL}$route")
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -85,7 +85,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
 		data: Request
 	): Data<Response> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(data) }
+		client.preparePost(urlString = "${Local.API_BASE_URL}$route") { setBody(data) }
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -94,7 +94,7 @@ object ClientAPI {
 		route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
 		data: Request
 	): Data<Response.Default> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(data) }
+		client.preparePost(urlString = "${Local.API_BASE_URL}$route") { setBody(data) }
 			.execute { processResponse(it) }
 	}
 
@@ -102,7 +102,7 @@ object ClientAPI {
 	suspend inline fun <reified Response : Any> request(
 		route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>
 	): Data<Response> = app.client.safeCallData { client ->
-		client.preparePost(urlString = "${Local.ClientUrl}$route") { setBody(Request.Default) }
+		client.preparePost(urlString = "${Local.API_BASE_URL}$route") { setBody(Request.Default) }
 			.execute { processResponse<Response>(it) }
 	}
 
@@ -195,7 +195,7 @@ object ClientAPI {
 				buildFormFiles(fileScope, this, files)
 				if (data != null) append(key = "#data#", value = data.toJsonString())
 			}
-			client.preparePost(urlString = "${Local.ClientUrl}$route") {
+			client.preparePost(urlString = "${Local.API_BASE_URL}$route") {
 				setBody(MultiPartFormDataContent(formParts))
 			}.execute { responseBuilder(it) }
 		}
@@ -223,6 +223,6 @@ object ClientAPI {
 
 	@JvmName("requestServerResource")
 	suspend inline fun <reified Response : Any> request(route: ResNode): Data<Response> = app.client.safeCall { client ->
-		client.prepareGet(urlString = "${Local.ClientUrl}/$route").execute { it.body() }
+		client.prepareGet(urlString = "${Local.API_BASE_URL}/$route").execute { it.body() }
 	}
 }

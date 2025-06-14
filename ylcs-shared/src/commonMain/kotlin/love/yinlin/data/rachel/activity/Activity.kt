@@ -32,7 +32,7 @@ data class Activity(
 		}
 	}
 
-	val picPath: String? by lazy { pic?.let { "${Local.ClientUrl}/${ServerRes.Activity.activity(it)}" } }
+	val picPath: String? by lazy { pic?.let { "${Local.API_BASE_URL}/${ServerRes.Activity.activity(it)}" } }
 
-	fun picPath(key: String): String = "${Local.ClientUrl}/${ServerRes.Activity.activity(key)}"
+	fun picPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes.Activity.activity(key)}"
 }

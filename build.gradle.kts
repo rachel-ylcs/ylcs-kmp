@@ -11,6 +11,16 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
 }
 
+// Env
+enum class Environment { Dev, Prod }
+val environment by extra(Environment.Prod)
+val mainHost by extra("yinlin.love")
+val apiHost by extra("api.$mainHost")
+val apiBaseUrl by extra(when (environment) {
+    Environment.Dev -> "http://localhost:1211"
+    Environment.Prod -> "https://$apiHost"
+})
+
 // Dir
 val dirProject: Directory = layout.projectDirectory
 val dirConfig by extra(dirProject.dir("config"))
@@ -21,13 +31,12 @@ val dirSrc by extra(dirApp.dir("src"))
 val dirBuild by extra(dirApp.dir("build"))
 val dirIOSApp by extra(dirProject.dir("iosApp"))
 val dirNative by extra(dirProject.dir("native"))
-val dirOutput by extra(dirProject.dir("outputs"))
-
-// Native
 val nativeLibsDir by extra(dirNative.dir("libs"))
+val dirOutput by extra(dirProject.dir("outputs"))
 
 // App
 val appName by extra("ylcs")
+val appDisplayName by extra("银临茶舍")
 val appVersion by extra(311)
 val appVersionName by extra("3.1.1")
 val appPackageName by extra("love.yinlin")
@@ -66,6 +75,7 @@ val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/
 // Web
 val webDir by extra(dirSrc.dir("wasmJsMain"))
 val webServerPort by extra(8000)
+val webUseProxy by extra(environment == Environment.Dev) // 调试Web端时需要开启, 防止本地调试时出现跨域问题
 val webOriginOutputPath by extra("${dirBuild}/dist/wasmJs/productionExecutable")
 val webOutputDir by extra(dirOutput.dir("web"))
 

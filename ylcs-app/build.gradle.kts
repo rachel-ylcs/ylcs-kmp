@@ -108,6 +108,7 @@ kotlin {
             sourceMap = false
         }
         browser {
+            val webUseProxy: Boolean by rootProject.extra
             commonWebpackConfig {
                 outputFileName = "${rootProject.extra["appProjectName"]}.js"
                 cssSupport {
@@ -116,11 +117,13 @@ kotlin {
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     port = rootProject.extra["webServerPort"] as Int
                     client?.overlay = false
-                    proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
-                        context = mutableListOf("/public", "/user", "/test"),
-                        target = "https://api.yinlin.love",
-                        secure = false
-                    ))
+                    if (webUseProxy) {
+                        proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
+                            context = mutableListOf("/public", "/user", "/test"),
+                            target = rootProject.extra["apiBaseUrl"] as String,
+                            secure = false
+                        ))
+                    }
                 }
             }
         }

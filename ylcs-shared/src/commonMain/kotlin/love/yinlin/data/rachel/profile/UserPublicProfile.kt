@@ -20,7 +20,7 @@ data class UserPublicProfile(
 ) {
 	val level: Int by lazy { UserLevel.level(coin) }
 
-	val avatarPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).avatar}" }
+	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 
-	val wallPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Users.User(uid).wall}" }
+	val wallPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).wall}" }
 }

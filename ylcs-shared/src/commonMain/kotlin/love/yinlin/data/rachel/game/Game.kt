@@ -39,9 +39,9 @@ enum class Game(
         type = GameType.SPEED
     );
 
-    val xPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Game.x(this.ordinal + 1)}" }
-    val yPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Game.y(this.ordinal + 1)}" }
-    fun xyPath(isX: Boolean): String = "${Local.ClientUrl}/${ServerRes.Game.xy(this.ordinal + 1, isX)}"
+    val xPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.x(this.ordinal + 1)}" }
+    val yPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.y(this.ordinal + 1)}" }
+    fun xyPath(isX: Boolean): String = "${Local.API_BASE_URL}/${ServerRes.Game.xy(this.ordinal + 1, isX)}"
 
     object Serializer : KSerializer<Game> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Game", PrimitiveKind.INT)

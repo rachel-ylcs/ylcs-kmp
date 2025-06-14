@@ -16,6 +16,8 @@ actual fun osApplicationCopyText(text: String): Boolean {
 	return true
 }
 
+fun osApplicationIsStandalone() = window.matchMedia("(display-mode: standalone)").matches
+
 actual fun osNetOpenUrl(url: String) {
 	window.open(url, "_blank")
 }

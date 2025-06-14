@@ -19,5 +19,5 @@ data class Song(
     val bgd: Boolean, // [是否有伴奏]
     val video: Boolean, // [是否有MV]
 ) {
-    val recordPath: String by lazy { "${Local.ClientUrl}/${ServerRes.Song.song(sid)}" }
+    val recordPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Song.song(sid)}" }
 }
