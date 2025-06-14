@@ -198,7 +198,7 @@ fun GameItem(
             modifier = Modifier.fillMaxWidth()
                 .clickable(onClick = onClick)
                 .padding(ThemeValue.Padding.ExtraValue),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -98,7 +98,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                 modifier = Modifier.fillMaxWidth()
                     .clickable(onClick = onClick)
                     .padding(ThemeValue.Padding.EqualExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

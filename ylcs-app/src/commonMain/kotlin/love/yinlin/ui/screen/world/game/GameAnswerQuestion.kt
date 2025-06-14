@@ -233,13 +233,28 @@ private fun ColumnScope.AnswerQuestionRecordResult(result: AQResult) {
 fun ColumnScope.AnswerQuestionRecordCard(answer: JsonElement, info: JsonElement) {
     val data = remember(answer, info) {
         try {
-            answer.to<List<AQUserAnswer>>() to info.to<AQResult>()
+            val answers = answer.to<List<AQUserAnswer>>()
+            buildString {
+                answers.fastForEachIndexed { index, item ->
+                    append("[${index + 1}] ")
+                    appendLine(when (item) {
+                        is AQUserAnswer.Choice -> if (item.value == -1) "未填" else ('A' + item.value)
+                        is AQUserAnswer.MultiChoice -> if (item.value.isEmpty()) "未填" else item.value.joinToString("") { ('A' + it).toString() }
+                        is AQUserAnswer.Blank -> item.value
+                    })
+                }
+            } to info.to<AQResult>()
         }
         catch (_: Throwable) { null }
     }
 
-    data?.let { (_, actualResult) ->
+    data?.let { (totalAnswer, actualResult) ->
         AnswerQuestionRecordResult(actualResult)
+
+        Text(
+            text = totalAnswer,
+            modifier = Modifier.fillMaxWidth().align(Alignment.Start)
+        )
     }
 }
 
