@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -168,7 +169,30 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 @Stable
 class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Stable
-    private data class Preflight(val length: Int, val answer: List<String>, val result: List<Int>)
+    private data class Preflight(
+        val length: Int,
+        val answer: List<String>,
+        val result: List<Int>,
+        val oldCharacters: AnnotatedString
+    )
+
+    companion object {
+        private val DICTIONARY = """
+不人月天江春无山花风夜日一
+来云水上长见有生城飞处流尽
+下百时声中万落君秋相此色心
+去闻酒行空欲寒千三黄青衣归
+年家朝东阳草看五是客前入马
+雪雨金重西海明愁知成为门红
+得如多在似谁目烟满树情开头
+可南高将出今鸟间道还泪柳望
+孤半光转笑楼未我思大古十问
+里身五深死歌梦意怜向别关莫
+绿百犹照河汉平尘子地四乡两
+与难舟独林曲新恨回北须路皆
+登清杨更故影当应已少对宫好
+""".trimIndent()
+    }
 
     override val config = FOConfig
 
@@ -184,10 +208,79 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     override fun init(preflightResult: PreflightResult) {
         preflight = try {
             inputState.text = ""
+            val answer = preflightResult.answer.to<List<String>>()
+            val result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
+            require(answer.size == result.size)
             Preflight(
                 length = preflightResult.question.Int,
-                answer = preflightResult.answer.to<List<String>>(),
-                result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
+                answer = answer,
+                result = result,
+                oldCharacters = buildAnnotatedString {
+                    val correctSet = mutableSetOf<Char>()
+                    val incorrectSet = mutableSetOf<Char>()
+                    for (i in answer.indices.reversed()) {
+                        val v = FOType.decode(result[i])
+                        answer[i].forEachIndexed { index, ch ->
+                            if (v[index] == FOType.INCORRECT) incorrectSet.add(ch)
+                            else correctSet.add(ch)
+                        }
+                    }
+                    val normal = StringBuilder()
+                    val correct = StringBuilder()
+                    val incorrect = StringBuilder()
+                    var charState = 0
+                    for (ch in DICTIONARY) {
+                        when (ch) {
+                            in correctSet -> {
+                                when (charState) {
+                                    0 -> {
+                                        append(normal)
+                                        normal.clear()
+                                    }
+                                    2 -> {
+                                        withStyle(SpanStyle(color = Colors.Red4)) { append(incorrect) }
+                                        incorrect.clear()
+                                    }
+                                }
+                                charState = 1
+                                correct.append(ch)
+                            }
+                            in incorrectSet -> {
+                                when (charState) {
+                                    0 -> {
+                                        append(normal)
+                                        normal.clear()
+                                    }
+                                    1 -> {
+                                        withStyle(SpanStyle(color = Colors.Green4)) { append(correct) }
+                                        correct.clear()
+                                    }
+                                }
+                                charState = 2
+                                incorrect.append(ch)
+                            }
+                            else -> {
+                                when (charState) {
+                                    1 -> {
+                                        withStyle(SpanStyle(color = Colors.Green4)) { append(correct) }
+                                        correct.clear()
+                                    }
+                                    2 -> {
+                                        withStyle(SpanStyle(color = Colors.Red4)) { append(incorrect) }
+                                        incorrect.clear()
+                                    }
+                                }
+                                charState = 0
+                                normal.append(ch)
+                            }
+                        }
+                    }
+                    when (charState) {
+                        0 -> append(normal)
+                        1 -> withStyle(SpanStyle(color = Colors.Green4)) { append(correct) }
+                        2 -> withStyle(SpanStyle(color = Colors.Red4)) { append(incorrect) }
+                    }
+                }
             )
         } catch (_: Throwable) { null }
     }
@@ -200,7 +293,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     @Composable
     override fun ColumnScope.Content() {
-        preflight?.let { (question, answer, result) ->
+        preflight?.let { (question, answer, result, oldCharacters) ->
             Text(
                 text = "寻花令长度: $question",
                 style = MaterialTheme.typography.titleLarge,
@@ -234,6 +327,22 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                     )
                 }
             }
+            Space()
+
+            Text(
+                text = "常用字表",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Space()
+            Text(
+                text = oldCharacters,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
             Space()
         }
     }
