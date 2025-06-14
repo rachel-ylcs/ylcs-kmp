@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,9 +42,11 @@ import love.yinlin.resources.img_photo_album
 import love.yinlin.ui.component.container.Breadcrumb
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
@@ -106,18 +109,33 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
-    override val title: String = "美图"
-
-    override fun onBack() {
-        if (stack.size > 1) {
-            stack.removeLastOrNull()
-            listState.requestScrollToItem(0)
+    private fun searchFolderItem(virtualStack: MutableList<PhotoItem.Folder>, index: Int, folder: PhotoItem.Folder, key: String): Int? {
+        if (folder.name.contains(key, true)) return index
+        else {
+            for ((i, item) in folder.items.withIndex()) {
+                if (item is PhotoItem.Folder) {
+                    virtualStack.add(item)
+                    val fetchIndex = searchFolderItem(virtualStack, i, item, key)
+                    if (fetchIndex != null) return fetchIndex
+                    virtualStack.removeLast()
+                }
+                else return null
+            }
+            return null
         }
-        else pop()
     }
 
-    override suspend fun initialize() {
-        loadPhotos()
+    private suspend fun searchFolder(key: String) {
+        val virtualStack = mutableListOf(photos)
+        val result = Coroutines.cpu { searchFolderItem(virtualStack, 0, photos, key) }
+        if (result != null) {
+            stack.clear()
+            val isAlbum = virtualStack.last().items.all { it is PhotoItem.File }
+            if (isAlbum) virtualStack.removeLast()
+            for (step in virtualStack) stack += step
+            if (isAlbum) listState.animateScrollToItem(result)
+        }
+        else slot.tip.warning("未找到相关图集")
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -182,6 +200,28 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
+    override val title: String = "美图"
+
+    override fun onBack() {
+        if (stack.size > 1) {
+            stack.removeLastOrNull()
+            listState.requestScrollToItem(0)
+        }
+        else pop()
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        ActionSuspend(Icons.Outlined.Search) {
+            val result = searchDialog.openSuspend()
+            if (result != null) searchFolder(result)
+        }
+    }
+
+    override suspend fun initialize() {
+        loadPhotos()
+    }
+
     @Composable
     override fun SubContent(device: Device) {
         StatefulBox(
@@ -231,5 +271,15 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     override suspend fun onFabClick() {
         if (isScrollTop) launch { loadPhotos() }
         else listState.animateScrollToItem(0)
+    }
+
+    private val searchDialog = FloatingDialogInput(
+        hint = "分类名",
+        maxLength = 32
+    )
+
+    @Composable
+    override fun Floating() {
+        searchDialog.Land()
     }
 }
