@@ -1,10 +1,16 @@
 package love.yinlin.ui.screen.world
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -16,6 +22,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
@@ -89,48 +96,86 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     }
 
     @Composable
-    override fun SubContent(device: Device) {
+    private fun ColumnScope.ArgsLayout() {
+        TextInput(
+            state = titleState,
+            hint = "标题",
+            maxLines = 3,
+            minLines = 1,
+            maxLength = 128,
+            clearButton = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+        GameSlider(
+            title = "奖励银币\n(+20%)",
+            progress = reward,
+            minValue = config.minReward,
+            maxValue = config.maxReward,
+            onProgressChange = { reward = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+        GameSlider(
+            title = "限定名额",
+            progress = num,
+            minValue = config.minRank,
+            maxValue = config.maxRank,
+            onProgressChange = { num = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+        GameSlider(
+            title = "入场银币",
+            progress = cost,
+            minValue = 0,
+            maxValue = maxCost,
+            onProgressChange = { cost = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+
+    @Composable
+    private fun Portrait() {
         Column(
             modifier = Modifier.padding(LocalImmersivePadding.current)
                 .fillMaxSize()
                 .padding(ThemeValue.Padding.EqualValue)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
         ) {
-            TextInput(
-                state = titleState,
-                hint = "标题",
-                maxLines = 3,
-                minLines = 1,
-                maxLength = 128,
-                clearButton = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-            GameSlider(
-                title = "奖励银币\n(+20%)",
-                progress = reward,
-                minValue = config.minReward,
-                maxValue = config.maxReward,
-                onProgressChange = { reward = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-            GameSlider(
-                title = "限定名额",
-                progress = num,
-                minValue = config.minRank,
-                maxValue = config.maxRank,
-                onProgressChange = { num = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-            GameSlider(
-                title = "入场银币",
-                progress = cost,
-                minValue = 0,
-                maxValue = maxCost,
-                onProgressChange = { cost = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-            with(state) { Content() }
+            ArgsLayout()
+            with(state) { this@Column.Content() }
+        }
+    }
+
+    @Composable
+    private fun Landscape() {
+        Row(
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+        ) {
+            Column(
+                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
+                    .padding(ThemeValue.Padding.EqualValue)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            ) {
+                ArgsLayout()
+            }
+            Column(
+                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
+                    .padding(ThemeValue.Padding.EqualValue)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            ) {
+                with(state) { this@Column.Content() }
+            }
+        }
+    }
+
+    @Composable
+    override fun SubContent(device: Device) {
+        when (LocalDevice.current.type) {
+            Device.Type.PORTRAIT -> Portrait()
+            Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }
     }
 

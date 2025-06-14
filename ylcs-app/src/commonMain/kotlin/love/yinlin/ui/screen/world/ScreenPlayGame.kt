@@ -3,10 +3,13 @@ package love.yinlin.ui.screen.world
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -131,114 +134,172 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
+    private fun GameLayout(
+        details: GamePublicDetailsWithName,
+        modifier: Modifier = Modifier,
+    ) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.TopCenter
+        ) {
+            when (status) {
+                Status.Preparing -> {
+                    SecondaryLoadingButton(
+                        text = "开始",
+                        modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace),
+                        onClick = { preflight() }
+                    )
+                }
+                Status.Playing -> {
+                    preflightResult?.let {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            shadowElevation = ThemeValue.Shadow.Surface
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(ThemeValue.Padding.EqualExtraValue)
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                            ) {
+                                with(state) { Content() }
+                            }
+                        }
+                    }
+                }
+                Status.Settling -> {
+                    gameResult?.let { result ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            shadowElevation = ThemeValue.Shadow.Surface
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(ThemeValue.Padding.EqualExtraValue)
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    MiniIcon(
+                                        res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
+                                        size = ThemeValue.Size.LargeImage
+                                    )
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
+                                    ) {
+                                        Text(
+                                            text = if (result.isCompleted) "成功" else "失败",
+                                            style = MaterialTheme.typography.displayMedium,
+                                            color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        SecondaryButton(
+                                            text = "返回",
+                                            onClick = {
+                                                preflightResult = null
+                                                gameResult = null
+                                                status = Status.Preparing
+                                            }
+                                        )
+                                    }
+                                }
+                                Space()
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
+                                    RachelText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
+                                }
+                                Space()
+                                with(state) { Settlement() }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Portrait(details: GamePublicDetailsWithName) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        ) {
+            GameItem(
+                game = details,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {}
+            )
+            GameLayout(
+                details = details,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    @Composable
+    private fun Landscape(details: GamePublicDetailsWithName) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+        ) {
+            Column(
+                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
+                    .padding(ThemeValue.Padding.EqualExtraValue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            ) {
+                GameItem(
+                    game = details,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {}
+                )
+            }
+            Column(
+                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
+                    .padding(ThemeValue.Padding.EqualExtraValue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            ) {
+                GameLayout(
+                    details = details,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+
+    @Composable
     override fun SubContent(device: Device) {
         game?.let { details ->
             Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-                val isLandscape = LocalDevice.current.type != Device.Type.PORTRAIT
+                val deviceType = LocalDevice.current.type
 
                 WebImage(
-                    uri = remember(isLandscape) { game.type.xyPath(isLandscape) },
+                    uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT) },
                     key = Local.VERSION,
                     contentScale = ContentScale.Crop,
                     alpha = 0.75f,
                     modifier = Modifier.fillMaxSize().zIndex(1f)
                 )
 
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue).zIndex(2f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-                ) {
-                    GameItem(
-                        game = details,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {}
-                    )
-                    when (status) {
-                        Status.Preparing -> {
-                            SecondaryLoadingButton(
-                                text = "开始",
-                                modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace),
-                                onClick = { preflight() }
-                            )
-                        }
-                        Status.Playing -> {
-                            preflightResult?.let {
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.extraLarge,
-                                    shadowElevation = ThemeValue.Shadow.Surface
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .padding(ThemeValue.Padding.EqualExtraValue)
-                                            .verticalScroll(rememberScrollState()),
-                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-                                    ) {
-                                        with(state) { Content() }
-                                    }
-                                }
-                            }
-                        }
-                        Status.Settling -> {
-                            gameResult?.let { result ->
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.extraLarge,
-                                    shadowElevation = ThemeValue.Shadow.Surface
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth()
-                                            .padding(ThemeValue.Padding.EqualExtraValue)
-                                            .verticalScroll(rememberScrollState()),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            MiniIcon(
-                                                res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
-                                                size = ThemeValue.Size.LargeImage
-                                            )
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
-                                            ) {
-                                                Text(
-                                                    text = if (result.isCompleted) "成功" else "失败",
-                                                    style = MaterialTheme.typography.displayMedium,
-                                                    color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
-                                                SecondaryButton(
-                                                    text = "返回",
-                                                    onClick = {
-                                                        preflightResult = null
-                                                        gameResult = null
-                                                        status = Status.Preparing
-                                                    }
-                                                )
-                                            }
-                                        }
-                                        Space()
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                        ) {
-                                            RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
-                                            RachelText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
-                                        }
-                                        Space()
-                                        with(state) { Settlement() }
-                                    }
-                                }
-                            }
-                        }
+                Box(modifier = Modifier.fillMaxSize().zIndex(2f)) {
+                    when (deviceType) {
+                        Device.Type.PORTRAIT -> Portrait(details)
+                        Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape(details)
                     }
                 }
             }
