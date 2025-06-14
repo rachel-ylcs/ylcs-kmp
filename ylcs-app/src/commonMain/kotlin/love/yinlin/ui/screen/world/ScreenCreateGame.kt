@@ -49,9 +49,12 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     private val titleState = TextInputState()
     private var reward by mutableFloatStateOf(0f)
     private var num by mutableFloatStateOf(1f)
-    private val maxNum by derivedStateOf { (reward.cast(config.minReward, config.maxReward) - 1) / config.maxCostRatio + 1 }
     private var cost by mutableFloatStateOf(0f)
     private val maxCost by derivedStateOf { reward.cast(config.minReward, config.maxReward) / config.maxCostRatio }
+    private val maxNum by derivedStateOf {
+        val actualCost = cost.cast(0, maxCost)
+        if (actualCost == 0) config.maxRank else (reward.cast(config.minReward, config.maxReward) / actualCost / 3).coerceAtMost(config.maxRank)
+    }
 
     private val canSubmit by derivedStateOf { titleState.ok && state.canSubmit }
 

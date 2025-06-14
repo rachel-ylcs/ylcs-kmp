@@ -13,9 +13,11 @@ abstract class GameConfig {
 
     val maxCostRatio: Int get() = maxReward / maxRank
 
-    fun checkReward(reward: Int, num: Int, cost: Int): Boolean = reward in minReward .. maxReward &&
-            num in minRank .. ((reward - 1) / maxCostRatio + 1) &&
-            (cost in 0 .. (reward / maxCostRatio).coerceAtLeast(1))
+    fun checkReward(reward: Int, num: Int, cost: Int): Boolean =
+        reward in minReward .. maxReward &&
+                num in minRank .. maxRank &&
+                (cost in 0 .. (reward / maxCostRatio).coerceAtLeast(1)) &&
+                num * cost <= reward / 3
 
     companion object : GameConfig()
 }
