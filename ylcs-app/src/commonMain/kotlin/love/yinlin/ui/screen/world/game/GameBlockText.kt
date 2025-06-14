@@ -126,8 +126,8 @@ private fun CharacterBlock(
                 data[index].decode { ch, hide ->
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .widthIn(max = ThemeValue.Size.PanelWidth)
+                            .fillMaxWidth()
                             .aspectRatio(1f)
                             .background(when {
                                 ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK -> Colors.Transparent

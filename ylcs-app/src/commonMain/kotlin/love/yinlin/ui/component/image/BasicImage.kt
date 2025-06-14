@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun MiniIcon(
-	icon: ImageVector? = null,
+	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	size: Dp = ThemeValue.Size.Icon,
 	modifier: Modifier = Modifier
@@ -52,14 +52,12 @@ fun MiniIcon(
 		modifier = modifier,
 		contentAlignment = Alignment.Center
 	) {
-		if (icon != null) {
-			Icon(
-				modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
-				imageVector = icon,
-				contentDescription = null,
-				tint = color,
-			)
-		}
+		Icon(
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			imageVector = icon,
+			contentDescription = null,
+			tint = color,
+		)
 	}
 }
 

@@ -29,6 +29,7 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
@@ -132,7 +133,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun SubContent(device: Device) {
         game?.let { details ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
                 val isLandscape = LocalDevice.current.type != Device.Type.PORTRAIT
 
                 WebImage(

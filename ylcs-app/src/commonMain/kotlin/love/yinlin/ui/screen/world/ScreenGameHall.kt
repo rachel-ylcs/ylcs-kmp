@@ -53,7 +53,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
 
     private val gridState = LazyStaggeredGridState()
 
-    override val title: String = "${args.type.title} - 大厅"
+    override val title: String = args.type.title
 
     private suspend fun requestNewGames() {
         if (state != BoxState.LOADING) {

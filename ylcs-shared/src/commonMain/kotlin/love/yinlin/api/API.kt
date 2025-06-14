@@ -9,6 +9,7 @@ import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -178,6 +179,8 @@ object API : APINode(null, "") {
 				@Serializable
 				data class Request(val token: String, val rid: Long = Long.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
+
+			object GetGameRank : APIPost<love.yinlin.data.rachel.game.Game, List<GameRank>>(this, "getGameRank")
 
 			object PreflightGame : APIPost<PreflightGame.Request, PreflightResult>(this, "preflightGame") {
 				@Serializable

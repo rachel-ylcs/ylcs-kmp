@@ -121,6 +121,16 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(records.to())
     }
 
+    api(API.User.Game.GetGameRank) { game ->
+        val ranks = DB.throwQuerySQL("""
+            SELECT uid, name, cnt
+            FROM game_rank
+            WHERE type = ?
+            ORDER BY r ASC
+        """, game.ordinal)
+        Data.Success(ranks.to())
+    }
+
     api(API.User.Game.PreflightGame) { (token, gid) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
