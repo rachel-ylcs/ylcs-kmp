@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -284,6 +286,12 @@ open class FloatingDialogInput(
 	@Composable
 	override fun Wrapper(block: @Composable () -> Unit) {
 		super.Wrapper {
+			val focusRequester = remember { FocusRequester() }
+
+			LaunchedEffect(Unit) {
+				focusRequester.requestFocus()
+			}
+
 			TextInput(
 				state = textInputState,
 				hint = hint,
@@ -295,7 +303,7 @@ open class FloatingDialogInput(
 				onImeClick = {
 					if (textInputState.ok) continuation?.resume(textInputState.text)
 				},
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
 			)
 		}
 	}
