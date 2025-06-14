@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMap
@@ -157,15 +158,6 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                 key = { it.name }
             ) { item ->
                 if (item is PhotoItem.Folder) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
-
                     val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
                     if (isAlbum) {
                         HorizontalMultiBrowseCarousel(
@@ -195,6 +187,16 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                                 .clickable { onEnterFolder(item) },
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                    )
                 }
             }
         }
