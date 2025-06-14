@@ -137,7 +137,7 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     override val canSubmit: Boolean by derivedStateOf {
         val text = content.text
-        text.length in FOConfig.minLength .. FOConfig.maxLength && text.all { it.code !in 0 .. 127 }
+        text.length in FOConfig.minLength .. FOConfig.maxLength && text.all { FOType.check(it) }
     }
 
     override val submitInfo: JsonElement get() = FOInfo(tryCount.cast(FOConfig.minTryCount, FOConfig.maxTryCount)).toJson()

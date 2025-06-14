@@ -27,7 +27,8 @@ data object Game3Manager : ExplorationGameManager() {
         // 答案长度与问题一致
         require(actualAnswer.length == actualQuestion)
         // 无ASCII字符
-        require(actualAnswer.all { it.code !in 0 .. 127 })
+        val symbol = setOf('，', '。', '：', '！', '？')
+        require(actualAnswer.all { FOType.check(it) })
     }
 
     private fun verifyAnswer(standardAnswer: JsonElement, userAnswer: JsonElement): Int {

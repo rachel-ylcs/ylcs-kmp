@@ -26,6 +26,10 @@ enum class FOType {
     INCORRECT; // 错误
 
     companion object {
+        private val symbol = setOf('，', '。', '：', '！', '？')
+
+        fun check(ch: Char): Boolean = ch.code !in 0 .. 127 && ch !in symbol
+
         fun encode(items: List<FOType>): Int {
             var encoded = 0
             val countOffset = items.size - 10
