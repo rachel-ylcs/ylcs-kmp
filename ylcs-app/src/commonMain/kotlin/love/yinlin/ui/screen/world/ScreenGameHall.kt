@@ -132,7 +132,10 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                             if (profile.name == it.name) slot.tip.warning("不能参与自己创建的游戏哦")
                             else if (profile.name in it.winner) slot.tip.warning("不能参与完成过的游戏哦")
                             else if (profile.coin < it.cost) slot.tip.warning("银币不足入场")
-                            else navigate(ScreenPlayGame.Args(it.type, it.gid))
+                            else {
+                                worldPart.currentGame = it
+                                navigate<ScreenPlayGame>()
+                            }
                         }
                         else slot.tip.warning("请先登录")
                     }

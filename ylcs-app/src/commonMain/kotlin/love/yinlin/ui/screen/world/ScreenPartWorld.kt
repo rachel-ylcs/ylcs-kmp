@@ -40,6 +40,7 @@ import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.common.*
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ColorfulIcon
@@ -86,6 +87,7 @@ private fun GameCard(
                     GameType.RANK -> MaterialTheme.colorScheme.primary
 					GameType.EXPLORATION -> MaterialTheme.colorScheme.secondary
                     GameType.SPEED -> MaterialTheme.colorScheme.tertiary
+					GameType.SINGLE -> MaterialTheme.colorScheme.onSurface
                 }
 			)
 		}
@@ -107,6 +109,8 @@ private fun GameCard(
 @Stable
 class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private val pagerState = PagerState { Game.entries.size }
+
+	var currentGame: GamePublicDetailsWithName? = null
 
 	@Composable
 	private fun GameBackground(
