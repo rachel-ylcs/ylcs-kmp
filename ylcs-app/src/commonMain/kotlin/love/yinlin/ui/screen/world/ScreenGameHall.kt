@@ -9,9 +9,11 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
@@ -25,7 +27,9 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
+import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
@@ -79,6 +83,20 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
         if (result is Data.Success) page.moreData(result.data)
     }
 
+    private suspend fun deleteGame(gid: Int) {
+        val result = ClientAPI.request(
+            route = API.User.Game.DeleteGame,
+            data = API.User.Game.DeleteGame.Request(
+                token = app.config.userToken,
+                gid = gid
+            )
+        )
+        when (result) {
+            is Data.Success -> page.items.removeAll { it.gid == gid }
+            is Data.Error -> slot.tip.error(result.message)
+        }
+    }
+
     override suspend fun initialize() {
         requestNewGames()
     }
@@ -89,6 +107,8 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
+            val canDelete by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
+
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
@@ -116,7 +136,19 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                         }
                         else slot.tip.warning("请先登录")
                     }
-                )
+                ) {
+                    if (canDelete) {
+                        LoadingIcon(
+                            icon = Icons.Outlined.Delete,
+                            onClick = {
+                                if (slot.confirm.openSuspend(content = "删除仅返还奖池内剩余银币")) {
+                                    deleteGame(it.gid)
+                                }
+                            },
+                            modifier = Modifier.align(alignment = Alignment.End)
+                        )
+                    }
+                }
             }
         }
     }
