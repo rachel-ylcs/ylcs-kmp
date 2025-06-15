@@ -12,14 +12,6 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 
-actual val osPlatform: Platform = System.getProperty("os.name").let {
-	when {
-		it.startsWith("Windows") -> Platform.Windows
-		it.startsWith("Mac") -> Platform.MacOS
-		else -> Platform.Linux
-	}
-}
-
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	osNetOpenUrl(uri.toString())
 	return true

@@ -43,7 +43,7 @@ private object LibraryLoader {
         System.loadLibrary("ylcs_native")
         // VLC
         val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
-            when (OS.platform) {
+            when (platform) {
                 Platform.Windows -> it.resolve("vlc")
                 Platform.Linux -> it.resolve("bin/vlc")
                 Platform.MacOS -> it.resolve("MacOS/vlc")

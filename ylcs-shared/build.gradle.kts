@@ -124,6 +124,8 @@ afterEvaluate {
         outputs.file(constantsFile)
         val content = """
             package love.yinlin
+            import love.yinlin.platform.Platform
+            import love.yinlin.platform.platform
             
             // 由构建脚本自动生成，请勿手动修改
             object Local {
@@ -138,15 +140,13 @@ afterEvaluate {
                 const val MAIN_HOST: String = "${rootProject.extra["mainHost"]}"
                 @Suppress("HttpUrlsUsage")
                 val API_BASE_URL: String = run {
-                    if (isWeb && ${rootProject.extra["webUseProxy"]}) {
+                    if (platform == Platform.WebWasm && ${rootProject.extra["webUseProxy"]}) {
                         "http://${'$'}LOCAL_HOST:${rootProject.extra["webServerPort"]}"
                     } else {
                         "${rootProject.extra["apiBaseUrl"]}"
                     }
                 }
             }
-            
-            expect val isWeb: Boolean
         """.trimIndent()
 
         outputs.upToDateWhen {

@@ -20,7 +20,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
 
-val UnsupportedPlatformText = "不支持的平台 ${OS.platform}"
+val UnsupportedPlatformText = "不支持的平台 $platform"
 
 open class UnsupportedPlatformException : Exception(UnsupportedPlatformText)
 
@@ -43,8 +43,6 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 
 @Stable
 object OS {
-	val platform: Platform = osPlatform // 平台
-
 	fun platform(vararg filter: Platform): Boolean = filter.contains(platform)
 
 	fun notPlatform(vararg filter: Platform): Boolean = !filter.contains(platform)
@@ -94,10 +92,6 @@ object OS {
 		} catch (_: Throwable) { null }
 	}
 }
-
-// ------------  OS
-
-internal expect val osPlatform: Platform
 
 // ------------  Application
 

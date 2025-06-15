@@ -4,8 +4,6 @@ import kotlinx.browser.window
 import kotlinx.io.files.Path
 import love.yinlin.common.Uri
 
-actual val osPlatform: Platform = Platform.WebWasm
-
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	osNetOpenUrl(uri.toString())
 	return true

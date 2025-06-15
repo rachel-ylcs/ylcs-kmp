@@ -28,3 +28,5 @@ enum class Platform {
 		}
 	}
 }
+
+expect val platform: Platform

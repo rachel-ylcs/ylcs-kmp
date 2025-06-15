@@ -11,8 +11,6 @@ import androidx.core.net.toUri
 import love.yinlin.common.Uri
 import love.yinlin.common.toAndroidUri
 
-actual val osPlatform: Platform = Platform.Android
-
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = try {
 	val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
 	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

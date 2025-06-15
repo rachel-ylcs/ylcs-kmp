@@ -25,8 +25,8 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.rememberFalse
-import love.yinlin.platform.OS
 import love.yinlin.platform.app
+import love.yinlin.platform.platform
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
@@ -75,7 +75,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			data = API.User.Account.Login.Request(
 				name = id,
 				pwd = pwd,
-				platform = OS.platform
+				platform = platform
 			)
 		)
 		when (result1) {

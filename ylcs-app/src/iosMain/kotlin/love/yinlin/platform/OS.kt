@@ -8,8 +8,6 @@ import platform.Foundation.*
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 
-actual val osPlatform: Platform = Platform.IOS
-
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
     try {
         val application = UIApplication.sharedApplication
