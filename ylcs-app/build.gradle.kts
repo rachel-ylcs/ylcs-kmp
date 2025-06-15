@@ -79,7 +79,7 @@ kotlin {
             source = path(project.file("../iosApp/core"))
         }
         pod("MMKV") {
-            version = "2.2.2"
+            version = libs.versions.mmkv.get()
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
         pod("MobileVLCKit") {
