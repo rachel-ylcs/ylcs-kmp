@@ -91,8 +91,6 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private var session: DefaultClientWebSocketSession? = null
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
-    override val title: String = Game.GuessLyrics.title
-
     private suspend inline fun send(data: LyricsSockets.CM) {
         session?.sendSerialized(data)
     }
@@ -100,19 +98,23 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private suspend fun dispatchMessage(msg: LyricsSockets.SM) {
         when (msg) {
             is LyricsSockets.SM.Error -> slot.tip.warning(msg.message)
-            is LyricsSockets.SM.GameStart -> {
-
-            }
+            is LyricsSockets.SM.PlayerList -> players.replaceAll(msg.players)
             is LyricsSockets.SM.InviteReceived -> {
-
+                val accept = slot.confirm.openSuspend(content = "是否接受${msg.player.name}的对战邀请")
+                send(LyricsSockets.CM.InviteResponse(msg.player.uid, accept))
             }
             is LyricsSockets.SM.InviteResult -> {
+                if (!msg.accepted) slot.tip.warning("${msg.player.name}拒绝了你的对战邀请")
+            }
+            is LyricsSockets.SM.GamePrepare -> {
+
+            }
+            is LyricsSockets.SM.GameStart -> {
 
             }
             is LyricsSockets.SM.OtherAnswerUpdated -> {
 
             }
-            is LyricsSockets.SM.PlayerList -> players.replaceAll(msg.players)
             is LyricsSockets.SM.SendResult -> {
 
             }
@@ -172,6 +174,14 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             shadowElevation = ThemeValue.Shadow.Surface
         ) {
 
+        }
+    }
+
+    override val title: String = Game.GuessLyrics.title
+
+    override fun onBack() {
+        launch {
+            if (slot.confirm.openSuspend(content = "退出游戏大厅")) pop()
         }
     }
 

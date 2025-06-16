@@ -29,7 +29,7 @@ object LyricsSocketsManager {
 
     private class Room(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo) {
         private val lyrics = library.indices.shuffled().take(LyricsSockets.QUESTION_COUNT).map { library[it] }
-        val createTime = System.currentTimeMillis()
+        var createTime = System.currentTimeMillis()
         var submitTime1: Long? = null
         var submitTime2: Long? = null
         val questions: List<String> get() = lyrics.map { it.q }
@@ -51,17 +51,28 @@ object LyricsSocketsManager {
 
     private val availablePlayers: List<LyricsSockets.PlayerInfo> get() = players.values.filter { it.room == null }.map { it.info }
 
-    private suspend fun onInviteTimer(uid: Int, targetUid: Int) {
+    private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME)
         // 超时自动拒绝
-        val target = players[targetUid]
+        val target = players[targetInfo.uid]
         val user = players[uid]
         if ((target == null || target.room == null) && user != null) {
-            user.session.send(LyricsSockets.SM.InviteResult(false))
+            user.session.send(LyricsSockets.SM.InviteResult(false, targetInfo))
         }
     }
 
+    private suspend fun prepareGame(room: Room) {
+        // 启动准备计时
+        delay(LyricsSockets.PREPARE_TIME)
+        val player1 = players[room.info1.uid]
+        val player2 = players[room.info2.uid]
+        player1?.session?.send(LyricsSockets.SM.GameStart(room.questions))
+        player2?.session?.send(LyricsSockets.SM.GameStart(room.questions))
+        onPlayingTimer(room.info1.uid, room.info2.uid)
+    }
+
     private suspend fun onPlayingTimer(uid1: Int, uid2: Int) {
+        // 启动游戏计时
         delay(LyricsSockets.PLAYING_TIME)
         // 强制结算
         val room = players[uid1]?.room ?: players[uid2]?.room
@@ -135,7 +146,7 @@ object LyricsSocketsManager {
                             else -> {
                                 target.session.send(LyricsSockets.SM.InviteReceived(currentPlayer.info))
                                 // 启动邀请验证
-                                scope.launch { onInviteTimer(currentPlayer.uid, target.uid) }
+                                scope.launch { onInviteTimer(currentPlayer.uid, target.info) }
                             }
                         }
                     }
@@ -147,17 +158,17 @@ object LyricsSocketsManager {
                             currentPlayer.room != null -> session.send(LyricsSockets.SM.Error("你已在游戏中"))
                             inviter.room != null -> session.send(LyricsSockets.SM.Error("对方已在游戏中"))
                             else -> {
+                                val info = currentPlayer.info
+                                val inviterInfo = inviter.info
                                 if (msg.accept) {
-                                    val room = Room(inviter.info, currentPlayer.info)
-                                    val questions = room.questions
+                                    val room = Room(inviterInfo, info)
                                     inviter.room = room
                                     currentPlayer.room = room
-                                    inviter.session.send(LyricsSockets.SM.GameStart(inviter.info, currentPlayer.info, room.createTime, questions))
-                                    session.send(LyricsSockets.SM.GameStart(currentPlayer.info, inviter.info, room.createTime, questions))
-                                    // 启动游戏计时
-                                    scope.launch { onPlayingTimer(inviter.uid, currentPlayer.uid) }
+                                    inviter.session.send(LyricsSockets.SM.GamePrepare(inviterInfo, info))
+                                    session.send(LyricsSockets.SM.GamePrepare(info, inviterInfo))
+                                    scope.launch { prepareGame(room) }
                                 }
-                                else inviter.session.send(LyricsSockets.SM.InviteResult(false))
+                                else inviter.session.send(LyricsSockets.SM.InviteResult(false, info))
                             }
                         }
                     }

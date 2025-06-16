@@ -10,6 +10,7 @@ import love.yinlin.api.Sockets
 object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
     const val QUESTION_COUNT = 10
     const val INVITE_TIME = 15 * 1000L
+    const val PREPARE_TIME = 15 * 1000L
     const val PLAYING_TIME = 5 * 60 * 1000L
 
     @Stable
@@ -57,10 +58,13 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
         data class InviteReceived(val player: PlayerInfo) : SM
         @Serializable
         @SerialName("InviteResult")
-        data class InviteResult(val accepted: Boolean) : SM
+        data class InviteResult(val accepted: Boolean, val player: PlayerInfo) : SM
+        @Serializable
+        @SerialName("GamePrepare")
+        data class GamePrepare(val player1: PlayerInfo, val player2: PlayerInfo) : SM
         @Serializable
         @SerialName("GameStart")
-        data class GameStart(val player1: PlayerInfo, val player2: PlayerInfo, val startTime: Long, val questions: List<String>) : SM
+        data class GameStart(val questions: List<String>) : SM
         @Serializable
         @SerialName("OtherAnswerUpdated")
         data class OtherAnswerUpdated(val count: Int) : SM
