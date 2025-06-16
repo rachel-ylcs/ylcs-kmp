@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.Local
 import love.yinlin.common.ThemeValue
@@ -37,7 +38,6 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.ui.component.image.WebImage
@@ -71,7 +71,7 @@ interface PlayGameState {
 
     val submitAnswer: JsonElement
 
-    fun init(preflightResult: PreflightResult)
+    fun init(scope: CoroutineScope, preflightResult: PreflightResult)
 
     fun settle(gameResult: GameResult)
 

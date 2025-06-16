@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
@@ -422,7 +423,7 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         })
     }
 
-    override fun init(preflightResult: PreflightResult) {
+    override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = try {
             val text = preflightResult.question.String
             val gridSize = sqrt(text.length.toFloat()).toInt()

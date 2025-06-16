@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -16,8 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -204,6 +209,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     private val inputState = TextInputState()
     private val items = mutableStateSetOf<String>()
+    private var time by mutableLongStateOf(0L)
 
     override val canSubmit: Boolean by derivedStateOf { items.size in SAConfig.minCount ..(preflight?.count ?: SAConfig.maxCount) }
 
@@ -217,15 +223,26 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         }
     }
 
-    override fun init(preflightResult: PreflightResult) {
+    override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = try {
             inputState.text = ""
             items.clear()
+            val info = preflightResult.info.to<SAInfo>()
+            require(info.timeLimit in SAConfig.minTimeLimit .. SAConfig.maxTimeLimit)
+            time = info.timeLimit * 1000L
             Preflight(
-                info = preflightResult.info.to<SAInfo>(),
+                info = info,
                 count = preflightResult.question.Int,
             )
         } catch (_: Throwable) { null }
+        if (preflight != null) scope.launch {
+            while (true) {
+                if (time > 1000L) time -= 1000L
+                else if (time > 0L) time = 0L
+                else break
+                delay(1000L)
+            }
+        }
     }
 
     override fun settle(gameResult: GameResult) {
@@ -237,6 +254,12 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (_, question) ->
+            Text(
+                text = remember(time) { time.timeString },
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.VerticalSpace)
+            )
             TextInput(
                 state = inputState,
                 hint = "答案 ${items.size} / $question",

@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.common.ThemeValue
@@ -644,7 +645,7 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val submitAnswer: JsonElement get() = answers.toList().toJson()
 
-    override fun init(preflightResult: PreflightResult) {
+    override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = try {
             val questions = preflightResult.question.to<List<AQQuestion>>()
             require(questions.size in AQConfig.minQuestionCount .. AQConfig.maxQuestionCount)

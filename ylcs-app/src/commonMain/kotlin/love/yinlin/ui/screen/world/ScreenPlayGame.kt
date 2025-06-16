@@ -3,7 +3,6 @@ package love.yinlin.ui.screen.world
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
@@ -38,7 +38,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
-import love.yinlin.data.rachel.game.GameType
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
@@ -86,7 +85,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
         when (result) {
             is Data.Success -> {
                 preflightResult = result.data
-                state.init(result.data)
+                state.init(viewModelScope, result.data)
                 status = Status.Playing
             }
             is Data.Error -> slot.tip.error(result.message)

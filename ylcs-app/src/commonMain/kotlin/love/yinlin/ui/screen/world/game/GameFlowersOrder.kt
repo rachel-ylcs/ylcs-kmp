@@ -17,6 +17,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
@@ -205,7 +206,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
 
-    override fun init(preflightResult: PreflightResult) {
+    override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = try {
             inputState.text = ""
             val answer = preflightResult.answer.to<List<String>>()
