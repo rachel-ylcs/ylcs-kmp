@@ -24,4 +24,9 @@ actual object NetClient {
 		useJson()
 		useFileTimeout()
 	} }
+
+	@Stable
+	actual val sockets: HttpClient by lazy { HttpClient(Js) {
+		useWebSockets()
+	} }
 }

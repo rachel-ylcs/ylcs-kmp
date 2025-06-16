@@ -200,4 +200,6 @@ fun Routing.userAPI(implMap: ImplMap) {
 	topicAPI(implMap)
 	songAPI(implMap)
 	gameAPI(implMap)
+
+	socketsAPI(implMap)
 }

@@ -64,6 +64,7 @@ runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 sketch = { module = "io.github.panpf.sketch4:sketch-compose", version.ref = "sketch" }
@@ -118,6 +119,7 @@ ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.18" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.3.0" }

@@ -6,9 +6,11 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
 import kotlinx.io.Sink
@@ -23,6 +25,8 @@ expect object NetClient {
 	val common: HttpClient
 	@Stable
 	val file: HttpClient
+	@Stable
+	val sockets: HttpClient
 }
 
 fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useJson() {
@@ -32,6 +36,12 @@ fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useJson() {
 
 	install(ContentNegotiation) {
 		json(Json)
+	}
+}
+
+fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useWebSockets() {
+	install(WebSockets) {
+		contentConverter = KotlinxWebsocketSerializationConverter(Json)
 	}
 }
 

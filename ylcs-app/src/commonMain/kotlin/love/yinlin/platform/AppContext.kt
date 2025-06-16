@@ -22,6 +22,7 @@ abstract class AppContext {
 	// HttpClient
 	val client: HttpClient by lazy { NetClient.common }
 	val fileClient: HttpClient by lazy { NetClient.file }
+	val socketsClient: HttpClient by lazy { NetClient.sockets }
 
 	// 初始化部分
 

@@ -159,6 +159,7 @@ kotlin {
 
                 implementation(libs.ktor.client)
                 implementation(libs.ktor.client.negotiation)
+                implementation(libs.ktor.client.websockets)
                 implementation(libs.ktor.json)
 
                 implementation(libs.sketch)
