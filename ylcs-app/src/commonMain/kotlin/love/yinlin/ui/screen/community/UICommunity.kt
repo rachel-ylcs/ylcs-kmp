@@ -57,7 +57,7 @@ internal fun UserBar(
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			WebImage(
 				uri = avatar,
-				key = DateEx.TodayString,
+				key = remember { DateEx.TodayString },
 				contentScale = ContentScale.Crop,
 				circle = true,
 				onClick = onAvatarClick,
@@ -145,7 +145,7 @@ internal fun UserProfileInfo(
 			Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 				WebImage(
 					uri = profile.avatarPath,
-					key = if (owner) app.config.cacheUserAvatar else DateEx.TodayString,
+					key = if (owner) app.config.cacheUserAvatar else remember { DateEx.TodayString },
 					contentScale = ContentScale.Crop,
 					circle = true,
 					modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
@@ -191,7 +191,7 @@ internal fun UserProfileCard(
 		Column(modifier = Modifier.fillMaxWidth()) {
 			WebImage(
 				uri = profile.wallPath,
-				key = if (owner) app.config.cacheUserWall else DateEx.TodayString,
+				key = if (owner) app.config.cacheUserWall else remember { DateEx.TodayString },
 				modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 			)
 			Column(

@@ -71,7 +71,7 @@ private fun FollowItemLayout(
     ) {
         WebImage(
             uri = item.avatarPath,
-            key = DateEx.TodayString,
+            key = remember { DateEx.TodayString },
             contentScale = ContentScale.Crop,
             circle = true,
             modifier = Modifier.size(ThemeValue.Size.MicroImage)

@@ -63,8 +63,6 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     private val game: GamePublicDetailsWithName? = worldPart.currentGame
 
-    override val title: String = game?.type?.title ?: "未知游戏"
-
     private var status by mutableStateOf(Status.Preparing)
 
     private val state = playGameState(game?.type ?: Game.AnswerQuestion, slot)
@@ -92,51 +90,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
-    override fun onBack() {
-        if (status == Status.Playing) {
-            launch {
-                if (slot.confirm.openSuspend(content = "中途退出将以失败结算")) pop()
-            }
-        }
-        else pop()
-    }
-
     @Composable
-    override fun ActionScope.RightActions() {
-        if (game != null && status == Status.Playing) {
-            ActionSuspend(
-                icon = Icons.Outlined.Check,
-                enabled = canSubmit
-            ) {
-                preflightResult?.let { preflight ->
-                    val result = ClientAPI.request(
-                        route = API.User.Game.VerifyGame,
-                        data = API.User.Game.VerifyGame.Request(
-                            token = app.config.userToken,
-                            gid = game.gid,
-                            rid = preflight.rid,
-                            answer = state.submitAnswer
-                        )
-                    )
-                    when (result) {
-                        is Data.Success -> {
-                            gameResult = result.data
-                            state.settle(result.data)
-                            preflightResult = null
-                            status = Status.Settling
-                        }
-                        is Data.Error -> slot.tip.error(result.message)
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun GameLayout(
-        details: GamePublicDetailsWithName,
-        modifier: Modifier = Modifier,
-    ) {
+    private fun GameLayout(modifier: Modifier = Modifier) {
         Box(
             modifier = modifier,
             contentAlignment = Alignment.TopCenter
@@ -242,10 +197,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {}
             )
-            GameLayout(
-                details = details,
-                modifier = Modifier.fillMaxWidth()
-            )
+            GameLayout(modifier = Modifier.fillMaxWidth())
         }
     }
 
@@ -273,10 +225,49 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
             ) {
-                GameLayout(
-                    details = details,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                GameLayout(modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+
+    override val title: String = game?.type?.title ?: "未知游戏"
+
+    override fun onBack() {
+        if (status == Status.Playing) {
+            launch {
+                if (slot.confirm.openSuspend(content = "中途退出将以失败结算")) pop()
+            }
+        }
+        else pop()
+    }
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        if (game != null && status == Status.Playing) {
+            ActionSuspend(
+                icon = Icons.Outlined.Check,
+                enabled = canSubmit
+            ) {
+                preflightResult?.let { preflight ->
+                    val result = ClientAPI.request(
+                        route = API.User.Game.VerifyGame,
+                        data = API.User.Game.VerifyGame.Request(
+                            token = app.config.userToken,
+                            gid = game.gid,
+                            rid = preflight.rid,
+                            answer = state.submitAnswer
+                        )
+                    )
+                    when (result) {
+                        is Data.Success -> {
+                            gameResult = result.data
+                            state.settle(result.data)
+                            preflightResult = null
+                            status = Status.Settling
+                        }
+                        is Data.Error -> slot.tip.error(result.message)
+                    }
+                }
             }
         }
     }

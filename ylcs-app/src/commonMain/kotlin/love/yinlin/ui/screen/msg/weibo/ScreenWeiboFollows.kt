@@ -17,6 +17,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,14 +58,18 @@ private fun WeiboUserItem(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 	) {
-		if (user.avatar.isEmpty()) LoadingCircle(size = ThemeValue.Size.MicroImage)
-		else WebImage(
-			uri = user.avatar,
-			key = DateEx.TodayString,
-			contentScale = ContentScale.Crop,
-			circle = true,
-			modifier = Modifier.size(ThemeValue.Size.MicroImage)
-		)
+		if (user.avatar.isEmpty()) {
+			LoadingCircle(size = ThemeValue.Size.MicroImage)
+		}
+		else {
+			WebImage(
+				uri = user.avatar,
+				key = remember { DateEx.TodayString },
+				contentScale = ContentScale.Crop,
+				circle = true,
+				modifier = Modifier.size(ThemeValue.Size.MicroImage)
+			)
+		}
 		Text(
 			text = user.name,
 			overflow = TextOverflow.Ellipsis,

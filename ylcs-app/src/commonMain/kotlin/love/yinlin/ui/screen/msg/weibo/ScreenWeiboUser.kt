@@ -51,7 +51,7 @@ private fun UserInfoCard(
 		OffsetLayout(y = -ThemeValue.Size.MediumImage / 3) {
 			WebImage(
 				uri = user.info.avatar,
-				key = DateEx.TodayString,
+				key = remember { DateEx.TodayString },
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.size(ThemeValue.Size.MediumImage)
@@ -242,7 +242,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 				Column(modifier = Modifier.fillMaxSize()) {
 					WebImage(
 						uri = user.background,
-						key = DateEx.TodayString,
+						key = remember { DateEx.TodayString },
 						modifier = Modifier.fillMaxWidth().aspectRatio(2f),
 						contentScale = ContentScale.Crop,
 						alpha = 0.8f

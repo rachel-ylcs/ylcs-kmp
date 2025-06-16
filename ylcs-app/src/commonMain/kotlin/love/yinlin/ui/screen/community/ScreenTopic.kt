@@ -131,7 +131,7 @@ private fun AtUserItem(
 	) {
 		WebImage(
 			uri = info.avatarPath,
-			key = DateEx.TodayString,
+			key = remember { DateEx.TodayString },
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = Modifier.size(ThemeValue.Size.MicroImage)

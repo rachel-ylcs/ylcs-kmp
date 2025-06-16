@@ -85,14 +85,12 @@ interface PlayGameState {
     fun Floating() {}
 }
 
-@Stable
-interface GameRankingState
-
 fun createGameState(type: Game, slot: SubScreenSlot): CreateGameState = when (type) {
     Game.AnswerQuestion -> AnswerQuestionCreateGameState(slot)
     Game.BlockText -> BlockTextCreateGameState(slot)
     Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
     Game.SearchAll -> SearchAllCreateGameState(slot)
+    else -> error("Unknown type $type")
 }
 
 fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) {
@@ -100,6 +98,7 @@ fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) 
     Game.BlockText -> BlockTextPlayGameState(slot)
     Game.FlowersOrder -> FlowersOrderPlayGameState(slot)
     Game.SearchAll -> SearchAllPlayGameState(slot)
+    else -> error("Unknown type $type")
 }
 
 @Composable
@@ -108,6 +107,7 @@ fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type)
     Game.BlockText -> BlockTextCardInfo(game)
     Game.FlowersOrder -> FlowersOrderCardInfo(game)
     Game.SearchAll -> SearchAllCardInfo(game)
+    else -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -116,6 +116,7 @@ fun ColumnScope.GameCardQuestionAnswer(game: GameDetailsWithName) = when (game.t
     Game.BlockText -> BlockTextCardQuestionAnswer(game)
     Game.FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
     Game.SearchAll -> SearchAllCardQuestionAnswer(game)
+    else -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -124,6 +125,7 @@ fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElemen
     Game.BlockText -> BlockTextRecordCard(answer, info)
     Game.FlowersOrder -> FlowersOrderRecordCard(answer, info)
     Game.SearchAll -> SearchAllRecordCard(answer, info)
+    else -> error("Unknown type $type")
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()

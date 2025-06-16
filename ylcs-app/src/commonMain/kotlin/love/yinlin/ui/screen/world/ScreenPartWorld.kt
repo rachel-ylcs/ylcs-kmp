@@ -49,6 +49,7 @@ import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
+import love.yinlin.ui.screen.world.online.ScreenGuessLyrics
 import kotlin.math.absoluteValue
 
 @Composable
@@ -87,7 +88,7 @@ private fun GameCard(
                     GameType.RANK -> MaterialTheme.colorScheme.primary
 					GameType.EXPLORATION -> MaterialTheme.colorScheme.secondary
                     GameType.SPEED -> MaterialTheme.colorScheme.tertiary
-					GameType.SINGLE -> MaterialTheme.colorScheme.onSurface
+					else -> MaterialTheme.colorScheme.onSurface
                 }
 			)
 		}
@@ -111,6 +112,17 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private val pagerState = PagerState { Game.entries.size }
 
 	var currentGame: GamePublicDetailsWithName? = null
+
+	private fun onGameClick(game: Game) {
+		when (game) {
+			Game.GuessLyrics -> {
+				val profile = app.config.userProfile
+				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
+				else slot.tip.warning("请先登录")
+			}
+			else -> navigate(ScreenGameHall.Args(game))
+		}
+	}
 
 	@Composable
 	private fun GameBackground(
@@ -191,9 +203,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.condition(offset == 0) { border(width = ThemeValue.Border.Large, color = MaterialTheme.colorScheme.primary, shape = CircleShape) }
 						.background(MaterialTheme.colorScheme.background)
 						.padding(ThemeValue.Padding.CardValue),
-					onClick = {
-						navigate(ScreenGameHall.Args(game))
-					}
+					onClick = { onGameClick(game) }
 				)
 			}
 		}
@@ -251,9 +261,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						)
 						.background(MaterialTheme.colorScheme.surface)
 						.padding(ThemeValue.Padding.CardValue),
-					onClick = {
-						navigate(ScreenGameHall.Args(game))
-					}
+					onClick = { onGameClick(game) }
 				)
 
 				Box(

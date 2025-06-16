@@ -192,7 +192,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                     Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
                         WebImage(
                             uri = topic.avatarPath,
-                            key = DateEx.TodayString,
+                            key = remember { DateEx.TodayString },
                             contentScale = ContentScale.Crop,
                             circle = true,
                             modifier = Modifier.matchParentSize(),

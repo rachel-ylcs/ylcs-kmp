@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen
 
-import kotlinx.serialization.json.JsonElement
 import love.yinlin.data.common.Picture
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.data.rachel.game.Game
@@ -15,6 +14,7 @@ import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.music.loader.*
 import love.yinlin.ui.screen.settings.*
 import love.yinlin.ui.screen.world.*
+import love.yinlin.ui.screen.world.online.ScreenGuessLyrics
 
 fun ScreenRouteScope.screens() {
     // 主页
@@ -50,6 +50,8 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenPlayGame)
     screen(::ScreenGameHistory)
     screen(::ScreenGameRecordHistory)
+
+    screen(::ScreenGuessLyrics)
 
 	// 设置
     screen(::ScreenSettings)

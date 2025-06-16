@@ -119,6 +119,7 @@ object LyricsSocketsManager {
                             val player = Player(uid, name, session)
                             currentPlayer = player
                             players[uid] = player
+                            logger.warn("加入 $uid $name lists=${players.values.joinToString(",")}")
                             session.send(LyricsSockets.SM.PlayerList(availablePlayers))
                         }
                         else session.close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "连接已存在"))
@@ -185,6 +186,7 @@ object LyricsSocketsManager {
         }
         finally {
             currentPlayer?.let { player ->
+                logger.warn("移除 ${player.uid} ${player.name}")
                 players.remove(player.uid)
                 player.room?.let { room -> submitAnswers(room, player.uid) }
             }

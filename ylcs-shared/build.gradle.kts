@@ -120,7 +120,7 @@ android {
 
 afterEvaluate {
     val generateConstants by tasks.registering {
-        val constantsFile = file("build/generated/kotlin/love/yinlin/Constants.kt")
+        val constantsFile = file("build/generated/kotlin/love/yinlin/Local.kt")
         outputs.file(constantsFile)
         val content = """
             package love.yinlin
@@ -138,6 +138,7 @@ afterEvaluate {
                 
                 const val LOCAL_HOST: String = "localhost"
                 const val MAIN_HOST: String = "${rootProject.extra["mainHost"]}"
+                const val API_HOST: String = "api.${rootProject.extra["mainHost"]}"
                 @Suppress("HttpUrlsUsage")
                 val API_BASE_URL: String = run {
                     if (platform == Platform.WebWasm && ${rootProject.extra["webUseProxy"]}) {

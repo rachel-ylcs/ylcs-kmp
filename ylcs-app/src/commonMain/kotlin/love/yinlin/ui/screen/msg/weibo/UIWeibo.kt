@@ -111,7 +111,7 @@ fun WeiboUserBar(
 		Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
 			WebImage(
 				uri = info.avatar,
-				key = DateEx.TodayString,
+				key = remember { DateEx.TodayString },
 				contentScale = ContentScale.Crop,
 				circle = true,
 				modifier = Modifier.matchParentSize(),
