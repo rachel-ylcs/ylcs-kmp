@@ -11,6 +11,10 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
 }
 
+// Task
+val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
+println("currentTaskName = $taskName")
+
 // Env
 enum class Environment { Dev, Prod }
 val environment by extra(Environment.Prod)
@@ -75,7 +79,7 @@ val desktopOriginOutputPath by extra("${dirBuild}/compose/binaries/main-release/
 // Web
 val webDir by extra(dirSrc.dir("wasmJsMain"))
 val webServerPort by extra(8000)
-val webUseProxy by extra(true) // 调试Web端时需要开启, 防止本地调试时出现跨域问题
+val webUseProxy by extra("webRun" in taskName) // 调试Web端时需要开启, 防止本地调试时出现跨域问题
 val webOriginOutputPath by extra("${dirBuild}/dist/wasmJs/productionExecutable")
 val webOutputDir by extra(dirOutput.dir("web"))
 
