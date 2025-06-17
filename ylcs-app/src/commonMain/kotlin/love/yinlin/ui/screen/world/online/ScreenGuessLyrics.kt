@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -417,6 +419,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         var index: Int by rememberValueState(0)
 
         val inputState = remember(index) { TextInputState() }
+        val focusRequester = remember { FocusRequester() }
 
         Row(
             modifier = modifier,
@@ -427,6 +430,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                 onClick = {
                     if (index > 0) --index
+                    focusRequester.requestFocus()
                 }
             )
             Text(
@@ -441,6 +445,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                 onClick = {
                     if (index < status.questions.size - 1) ++index
+                    focusRequester.requestFocus()
                 }
             )
         }
@@ -470,7 +475,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
         )
     }
 
