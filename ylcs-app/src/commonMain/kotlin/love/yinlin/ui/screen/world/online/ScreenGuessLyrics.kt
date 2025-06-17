@@ -654,8 +654,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 }
             }
             catch (e: Throwable) {
-                e.printStackTrace()
-                slot.tip.error("无法连接到服务器")
+                slot.tip.error("断开连接 ${e.message}")
             } finally {
                 session?.close()
                 session = null
