@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +19,6 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
@@ -34,7 +31,6 @@ import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.world.game.GameItem
 
@@ -156,27 +152,12 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
         }
     }
 
-    override val fabCanExpand: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
+    private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
-
-    override val fabMenus: Array<FABAction> = arrayOf(
-        FABAction(Icons.Outlined.Edit) {
-            if (app.config.userProfile != null) {
-                pop()
-                navigate(ScreenCreateGame.Args(args.type))
-            }
-            else slot.tip.warning("请先登录")
-        },
-        FABAction(ExtraIcons.RewardCup) {
-            navigate(ScreenGameRanking.Args(args.type))
-        },
-        FABAction(Icons.Outlined.Refresh) {
-            launch { requestNewGames() }
-        }
-    )
+    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
-        gridState.animateScrollToItem(0)
+        if (isScrollTop) launch { requestNewGames() }
+        else gridState.animateScrollToItem(0)
     }
 }

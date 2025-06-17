@@ -1,18 +1,7 @@
 package love.yinlin.ui.screen.world.online
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -21,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.Reply
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -31,37 +21,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.sendSerialized
-import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.websocket.Frame
-import io.ktor.websocket.close
-import io.ktor.websocket.readText
+import io.ktor.client.plugins.websocket.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.common.Device
+import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.parseJsonValue
-import love.yinlin.extension.rememberValueState
-import love.yinlin.extension.replaceAll
-import love.yinlin.extension.timeString
+import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.LoadingRachelButton
 import love.yinlin.ui.component.input.PrimaryLoadingButton
 import love.yinlin.ui.component.input.SecondaryLoadingButton
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.SplitLayout
@@ -75,7 +59,7 @@ private fun UserItem(
     info: LyricsSockets.PlayerInfo,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    content: (@Composable () -> Unit)? = null
+    content: (@Composable ColumnScope.() -> Unit)? = null
 ) {
     Box(modifier = modifier) {
         Column(
@@ -98,8 +82,56 @@ private fun UserItem(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-            content?.invoke()
+            content?.invoke(this)
         }
+    }
+}
+
+@Composable
+private fun GameResultUserItem(
+    result: LyricsSockets.GameResult,
+    modifier: Modifier = Modifier,
+    isWinner: Boolean
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+    ) {
+        WebImage(
+            uri = result.player.avatarPath,
+            key = remember { DateEx.TodayString },
+            circle = true,
+            modifier = Modifier.size(ThemeValue.Size.MediumImage)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isWinner) {
+                MiniImage(
+                    icon = ExtraIcons.Rank1,
+                    size = ThemeValue.Size.MicroIcon
+                )
+            }
+            Text(
+                text = result.player.name,
+                style = MaterialTheme.typography.labelLarge,
+                color = if (isWinner) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Text(
+            text = "正确率: ${result.count} / ${LyricsSockets.QUESTION_COUNT}",
+            color = if (isWinner) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = remember(result) { "时间: ${result.duration.timeString}" },
+            color = if (isWinner) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -177,7 +209,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun handlePreparing(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo) {
         currentStatus = Status.Preparing(info1, info2, LyricsSockets.PREPARE_TIME)
         launch {
-            for (i in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
+            for (i in 0 ..< (LyricsSockets.PREPARE_TIME / 1000L).toInt()) {
                 delay(1000L)
                 (currentStatus as? Status.Preparing)?.let { status ->
                     val time = status.time - 1000L
@@ -191,7 +223,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun handlePlaying(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo, questions: List<String>) {
         currentStatus = Status.Playing(info1, info2, LyricsSockets.PLAYING_TIME, questions, questions.map { null }, 0, 0)
         launch {
-            for (i in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
+            for (i in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
                 delay(1000L)
                 (currentStatus as? Status.Playing)?.let { status ->
                     val time = status.time - 1000L
@@ -266,7 +298,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.CellWidth))
+            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
             Space(ThemeValue.Padding.VerticalExtraSpace)
             Text(
                 text = "等待对方回应",
@@ -299,7 +331,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.CellWidth))
+            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
             Space(ThemeValue.Padding.VerticalExtraSpace)
             Text(
                 text = "是否接受对战",
@@ -351,7 +383,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         ) {
             SplitLayout(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace,
+                horizontalArrangement = ThemeValue.Padding.HorizontalSpace,
                 verticalAlignment = Alignment.CenterVertically,
                 left = {
                     UserItem(info = status.info1, modifier = Modifier.width(ThemeValue.Size.LargeImage))
@@ -387,6 +419,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         var index: Int by rememberValueState(0)
 
         val inputState = remember(index) { TextInputState() }
+        val focusRequester = remember { FocusRequester() }
 
         Row(
             modifier = modifier,
@@ -397,6 +430,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
                 onClick = {
                     if (index > 0) --index
+                    focusRequester.requestFocus()
                 }
             )
             Text(
@@ -411,6 +445,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
                 onClick = {
                     if (index < status.questions.size - 1) ++index
+                    focusRequester.requestFocus()
                 }
             )
         }
@@ -440,7 +475,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
         )
     }
 
@@ -474,7 +509,10 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                             info = status.info1,
                             modifier = Modifier.width(ThemeValue.Size.LargeImage)
                         ) {
-                            Text(text = status.count1.toString())
+                            Text(
+                                text = "${status.count1} / ${LyricsSockets.QUESTION_COUNT}",
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
                         }
                     }
                     Column(
@@ -505,7 +543,10 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                             info = status.info2,
                             modifier = Modifier.width(ThemeValue.Size.LargeImage)
                         ) {
-                            Text(text = status.count2.toString())
+                            Text(
+                                text = "${status.count2} / ${LyricsSockets.QUESTION_COUNT}",
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
                         }
                     }
                 }
@@ -528,7 +569,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.CellWidth))
+            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
             Space(ThemeValue.Padding.VerticalExtraSpace)
             Text(
                 text = "等待对方完成...",
@@ -553,14 +594,40 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             shadowElevation = ThemeValue.Shadow.Surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(ThemeValue.Padding.EqualExtraValue)
-                    .verticalScroll(rememberScrollState()),
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
             ) {
-                Text(text = status.result1.toString())
-                Text(text = status.result2.toString())
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val win = remember(status) {
+                        if (status.result1.count > status.result2.count) true
+                        else if (status.result1.count == status.result2.count) status.result1.duration <= status.result2.duration
+                        else false
+                    }
+
+                    GameResultUserItem(
+                        result = status.result1,
+                        modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                        isWinner = win
+                    )
+                    GameResultUserItem(
+                        result = status.result2,
+                        modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                        isWinner = !win
+                    )
+                }
+                PrimaryLoadingButton(
+                    text = "返回大厅",
+                    icon = Icons.AutoMirrored.Outlined.Reply,
+                    onClick = {
+                        currentStatus = Status.Hall
+                        send(LyricsSockets.CM.GetPlayers)
+                    }
+                )
             }
         }
     }
@@ -578,7 +645,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             try {
                 val newSession = app.socketsClient.webSocketSession(host = Local.API_HOST, path = LyricsSockets.path)
                 session = newSession
-                send(LyricsSockets.CM.Login(LyricsSockets.PlayerInfo(args.uid, args.name)))
+                send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
                 newSession.incoming.consumeAsFlow().collect { frame ->
                     if (frame is Frame.Text) {
                         val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()

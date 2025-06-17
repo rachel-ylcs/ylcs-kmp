@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Castle
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,6 +44,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
 import love.yinlin.platform.app
+import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.colorfulImageVector
@@ -57,7 +59,8 @@ private fun GameCard(
 	game: Game,
 	isLandscape: Boolean,
 	modifier: Modifier = Modifier,
-	onClick: () -> Unit
+	onClick: () -> Unit,
+	content: @Composable () -> Unit
 ) {
 	Column(
 		modifier = modifier,
@@ -86,12 +89,12 @@ private fun GameCard(
 				text = game.type.title,
 				color = when (game.type) {
                     GameType.RANK -> MaterialTheme.colorScheme.primary
-					GameType.EXPLORATION -> MaterialTheme.colorScheme.secondary
-                    GameType.SPEED -> MaterialTheme.colorScheme.tertiary
-					else -> MaterialTheme.colorScheme.onSurface
+					GameType.EXPLORATION, GameType.SINGLE -> MaterialTheme.colorScheme.secondary
+                    GameType.SPEED, GameType.BATTLE -> MaterialTheme.colorScheme.tertiary
                 }
 			)
 		}
+		content()
 		Text(
 			text = game.description,
 			color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -168,6 +171,32 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	}
 
 	@Composable
+	private fun ButtonLayout(game: Game, modifier: Modifier = Modifier) {
+		Row(
+			modifier = modifier,
+			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			when (game) {
+				Game.GuessLyrics -> {}
+				else -> {
+					ClickIcon(
+						icon = Icons.Outlined.Edit,
+						onClick = {
+							if (app.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
+							else slot.tip.warning("请先登录")
+						}
+					)
+				}
+			}
+			ClickIcon(
+				icon = ExtraIcons.RewardCup,
+				onClick = { navigate(ScreenGameRanking.Args(game)) }
+			)
+		}
+	}
+
+	@Composable
 	private fun Portrait() {
 		BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 			GameBackground(
@@ -204,7 +233,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.background(MaterialTheme.colorScheme.background)
 						.padding(ThemeValue.Padding.CardValue),
 					onClick = { onGameClick(game) }
-				)
+				) {
+					ButtonLayout(game = game, modifier = Modifier.fillMaxWidth())
+				}
 			}
 		}
 	}
@@ -254,6 +285,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.width(ThemeValue.Size.CardWidth)
 						.aspectRatio(0.66667f)
 						.clip(CircleShape)
+						.border(width = ThemeValue.Border.Large, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
 						.shadow(
 							elevation = ThemeValue.Shadow.Card,
 							shape = CircleShape,
@@ -262,7 +294,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.background(MaterialTheme.colorScheme.surface)
 						.padding(ThemeValue.Padding.CardValue),
 					onClick = { onGameClick(game) }
-				)
+				) {
+					ButtonLayout(game = game, modifier = Modifier.fillMaxWidth())
+				}
 
 				Box(
 					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
