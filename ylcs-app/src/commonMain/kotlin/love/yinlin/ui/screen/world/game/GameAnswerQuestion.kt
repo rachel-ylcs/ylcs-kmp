@@ -773,9 +773,12 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                     state = inputState,
                                     hint = "输入答案(回车保存)",
                                     clearButton = false,
+                                    maxLength = 64,
                                     onImeClick = {
-                                        answers[currentIndex] = answer.copy(value = inputState.text)
-                                        inputState.text = ""
+                                        if (inputState.ok) {
+                                            answers[currentIndex] = answer.copy(value = inputState.text)
+                                            inputState.text = ""
+                                        }
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 )
