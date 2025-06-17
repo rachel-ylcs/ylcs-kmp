@@ -82,7 +82,10 @@ object LyricsSocketsManager {
         // 启动准备计时
         delay(LyricsSockets.PREPARE_TIME)
         // 更新创建时间
-        room.createTime = System.currentTimeMillis()
+        val newCreateTime = System.currentTimeMillis()
+        room.submitTime1?.let { room.submitTime1 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
+        room.submitTime2?.let { room.submitTime2 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
+        room.createTime = newCreateTime
         val player1 = players[room.info1.uid]
         val player2 = players[room.info2.uid]
         if (player1?.room?.roomId == room.roomId) player1.session.send(LyricsSockets.SM.GameStart(room.questions))
@@ -121,8 +124,8 @@ object LyricsSocketsManager {
         val answers2 = room.answers2
         // 计算时长
         val lastSubmitTime = System.currentTimeMillis()
-        val duration1 = (room.submitTime1 ?: lastSubmitTime) - room.createTime
-        val duration2 = (room.submitTime2 ?: lastSubmitTime) - room.createTime
+        val duration1 = ((room.submitTime1 ?: lastSubmitTime) - room.createTime).coerceIn(0L, LyricsSockets.PLAYING_TIME)
+        val duration2 = ((room.submitTime2 ?: lastSubmitTime) - room.createTime).coerceIn(0L, LyricsSockets.PLAYING_TIME)
         // 计算正确数
         var count1 = 0
         var count2 = 0
@@ -209,9 +212,9 @@ object LyricsSocketsManager {
                                         val room = Room(inviterInfo, info)
                                         inviter.room = room
                                         currentPlayer.room = room
+                                        scope.launch { prepareGame(room) }
                                         inviter.session.send(LyricsSockets.SM.GamePrepare(inviterInfo, info))
                                         session.send(LyricsSockets.SM.GamePrepare(info, inviterInfo))
-                                        scope.launch { prepareGame(room) }
                                     }
                                     else inviter.session.send(LyricsSockets.SM.RefuseInvitation(info))
                                 }
@@ -250,8 +253,8 @@ object LyricsSocketsManager {
         }
         finally {
             currentPlayer?.let { player ->
-                players.remove(player.uid)
                 player.room?.let { room -> submitAnswers(room, player.uid) }
+                players.remove(player.uid)
             }
             session.close(CloseReason(CloseReason.Codes.NORMAL, "连接关闭"))
         }
