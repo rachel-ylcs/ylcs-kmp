@@ -23,11 +23,15 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
     @Serializable
     data class GameResult(val player: PlayerInfo, val count: Int, val duration: Long)
 
+    @Stable
+    @Serializable
+    data class StorageResult(val count: Int, val duration: Long)
+
     @Serializable
     sealed interface CM {
         @Serializable
         @SerialName("Login")
-        data class Login(val info: PlayerInfo) : CM
+        data class Login(val token: String, val info: PlayerInfo) : CM
         @Serializable
         @SerialName("GetPlayers")
         data object GetPlayers : CM
