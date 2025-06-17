@@ -57,8 +57,8 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
         @SerialName("InviteReceived")
         data class InviteReceived(val player: PlayerInfo) : SM
         @Serializable
-        @SerialName("InviteResult")
-        data class InviteResult(val accepted: Boolean, val player: PlayerInfo) : SM
+        @SerialName("RefuseInvitation")
+        data class RefuseInvitation(val player: PlayerInfo) : SM
         @Serializable
         @SerialName("GamePrepare")
         data class GamePrepare(val player1: PlayerInfo, val player2: PlayerInfo) : SM
@@ -66,8 +66,8 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
         @SerialName("GameStart")
         data class GameStart(val questions: List<String>) : SM
         @Serializable
-        @SerialName("OtherAnswerUpdated")
-        data class OtherAnswerUpdated(val count: Int) : SM
+        @SerialName("AnswerUpdated")
+        data class AnswerUpdated(val count1: Int, val count2: Int) : SM
         @Serializable
         @SerialName("SendResult")
         data class SendResult(val result1: GameResult, val result2: GameResult) : SM

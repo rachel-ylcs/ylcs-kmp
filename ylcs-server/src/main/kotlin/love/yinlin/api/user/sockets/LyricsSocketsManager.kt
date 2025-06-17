@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.logger
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 private suspend inline fun WebSocketServerSession.send(data: LyricsSockets.SM) = this.sendSerialized(data)
@@ -21,7 +22,7 @@ object LyricsSocketsManager {
     private data class Player(
         val uid: Int,
         val name: String,
-        val session: DefaultWebSocketServerSession,
+        var session: DefaultWebSocketServerSession,
         var room: Room? = null
     ) {
         val info: LyricsSockets.PlayerInfo get() = LyricsSockets.PlayerInfo(uid, name)
@@ -29,7 +30,8 @@ object LyricsSocketsManager {
 
     private class Room(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo) {
         private val lyrics = library.indices.shuffled().take(LyricsSockets.QUESTION_COUNT).map { library[it] }
-        var createTime = System.currentTimeMillis()
+        val roomId: String = UUID.randomUUID().toString()
+        var createTime: Long = System.currentTimeMillis()
         var submitTime1: Long? = null
         var submitTime2: Long? = null
         val questions: List<String> get() = lyrics.map { it.q }
@@ -54,43 +56,48 @@ object LyricsSocketsManager {
     private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME)
         // 超时自动拒绝
+        logger.warn("onInviteTimer: 超时 $targetInfo")
         val target = players[targetInfo.uid]
-        val user = players[uid]
-        if ((target == null || target.room == null) && user != null) {
-            user.session.send(LyricsSockets.SM.InviteResult(false, targetInfo))
+        if (target == null || target.room == null) {
+            players[uid]?.session?.send(LyricsSockets.SM.RefuseInvitation(targetInfo))
         }
     }
 
     private suspend fun prepareGame(room: Room) {
         // 启动准备计时
         delay(LyricsSockets.PREPARE_TIME)
+        logger.info("prepareGame: 准备结束 ${room.info1} ${room.info2}")
         val player1 = players[room.info1.uid]
         val player2 = players[room.info2.uid]
-        player1?.session?.send(LyricsSockets.SM.GameStart(room.questions))
-        player2?.session?.send(LyricsSockets.SM.GameStart(room.questions))
-        onPlayingTimer(room.info1.uid, room.info2.uid)
+        if (player1?.room?.roomId == room.roomId) player1.session.send(LyricsSockets.SM.GameStart(room.questions))
+        if (player2?.room?.roomId == room.roomId) player2.session.send(LyricsSockets.SM.GameStart(room.questions))
+        onPlayingTimer(room)
     }
 
-    private suspend fun onPlayingTimer(uid1: Int, uid2: Int) {
+    private suspend fun onPlayingTimer(room: Room) {
         // 启动游戏计时
         delay(LyricsSockets.PLAYING_TIME)
         // 强制结算
-        val room = players[uid1]?.room ?: players[uid2]?.room
-        if (room != null) {
-            submitAnswers(room, room.info1.uid)
-            submitAnswers(room, room.info2.uid)
+        logger.info("onPlayingTimer: 强制结算 ${room.info1} ${room.info2}")
+        players[room.info1.uid]?.room?.let { room1 ->
+            if (room.roomId == room1.roomId) submitAnswers(room, room.info1.uid)
+        }
+        players[room.info2.uid]?.room?.let { room2 ->
+            if (room.roomId == room2.roomId) submitAnswers(room, room.info2.uid)
         }
     }
 
     private suspend fun submitAnswers(room: Room, uid: Int) {
-        if (room.info1.uid == uid) {
-            if (room.submitTime1 != null) room.submitTime1 = System.currentTimeMillis()
+        if (room.info1.uid == uid && room.submitTime1 == null) {
+            room.submitTime1 = System.currentTimeMillis()
+            logger.warn("submitAnswers: ${room.info1}")
+            if (room.submitTime2 != null) endGame(room)
         }
-        else if (room.info2.uid == uid) {
-            if (room.submitTime2 != null) room.submitTime2 = System.currentTimeMillis()
+        else if (room.info2.uid == uid && room.submitTime2 == null) {
+            room.submitTime2 = System.currentTimeMillis()
+            logger.warn("submitAnswers: ${room.info2}")
+            if (room.submitTime1 != null) endGame(room)
         }
-
-        if (room.submitTime1 != null && room.submitTime2 != null) endGame(room)
     }
 
     private suspend fun endGame(room: Room) {
@@ -99,6 +106,7 @@ object LyricsSocketsManager {
         val standardAnswers = room.answers
         val answers1 = room.answers1
         val answers2 = room.answers2
+        // 计算正确数
         var count1 = 0
         var count2 = 0
         for (index in standardAnswers.indices) {
@@ -106,15 +114,22 @@ object LyricsSocketsManager {
             if (answers1[index] == answer) ++count1
             if (answers2[index] == answer) ++count2
         }
-        logger.warn("count1=$count1, count2=$count2, answers1=$answers1, answers2=$answers2, standardAnswers=$standardAnswers")
-        // 仍然在线的玩家发送结果
+        logger.warn("endGame: count1=$count1, count2=$count2, answers1=$answers1, answers2=$answers2, standardAnswers=$standardAnswers")
+        // 生成结果
         val lastSubmitTime = System.currentTimeMillis()
         val response = LyricsSockets.SM.SendResult(
             result1 = LyricsSockets.GameResult(room.info1, count1, (room.submitTime1 ?: lastSubmitTime) - room.createTime),
             result2 = LyricsSockets.GameResult(room.info2, count2, (room.submitTime2 ?: lastSubmitTime) - room.createTime)
         )
-        player1?.session?.send(response)
-        player2?.session?.send(response)
+        // 仍然在线的玩家发送结果
+        if (player1?.room?.roomId == room.roomId) {
+            player1.session.send(response)
+            player1.room = null
+        }
+        if (player2?.room?.roomId == room.roomId) {
+            player2.session.send(response)
+            player2.room = null
+        }
     }
 
     suspend fun dispatchMessage(session: DefaultWebSocketServerSession) {
@@ -130,10 +145,14 @@ object LyricsSocketsManager {
                             val player = Player(uid, name, session)
                             currentPlayer = player
                             players[uid] = player
-                            logger.warn("加入 $uid $name lists=${players.values.joinToString(",")}")
+                            logger.warn("Login: $uid $name lists=${players.values.joinToString(",")}")
                             session.send(LyricsSockets.SM.PlayerList(availablePlayers))
                         }
-                        else session.close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "连接已存在"))
+                        else {
+                            logger.warn("Login: 重复连接服务器")
+                            session.send(LyricsSockets.SM.Error("重复连接服务器"))
+                            session.close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "重复连接服务器"))
+                        }
                     }
                     LyricsSockets.CM.GetPlayers if currentPlayer != null -> session.send(LyricsSockets.SM.PlayerList(availablePlayers))
                     is LyricsSockets.CM.InvitePlayer if currentPlayer != null -> {
@@ -144,6 +163,7 @@ object LyricsSocketsManager {
                             currentPlayer.room != null -> session.send(LyricsSockets.SM.Error("你已在游戏中"))
                             target.room != null -> session.send(LyricsSockets.SM.Error("对方已在游戏中"))
                             else -> {
+                                logger.warn("InvitePlayer: ${currentPlayer.info}")
                                 target.session.send(LyricsSockets.SM.InviteReceived(currentPlayer.info))
                                 // 启动邀请验证
                                 scope.launch { onInviteTimer(currentPlayer.uid, target.info) }
@@ -160,6 +180,7 @@ object LyricsSocketsManager {
                             else -> {
                                 val info = currentPlayer.info
                                 val inviterInfo = inviter.info
+                                logger.warn("InviteResponse: $inviterInfo $info")
                                 if (msg.accept) {
                                     val room = Room(inviterInfo, info)
                                     inviter.room = room
@@ -168,22 +189,30 @@ object LyricsSocketsManager {
                                     session.send(LyricsSockets.SM.GamePrepare(info, inviterInfo))
                                     scope.launch { prepareGame(room) }
                                 }
-                                else inviter.session.send(LyricsSockets.SM.InviteResult(false, info))
+                                else inviter.session.send(LyricsSockets.SM.RefuseInvitation(info))
                             }
                         }
                     }
                     is LyricsSockets.CM.SaveAnswer if currentPlayer != null -> {
                         currentPlayer.room?.let { room ->
-                            val (answers, isFirst) = when (currentPlayer.uid) {
-                                room.info1.uid -> room.answers1 to true
-                                room.info2.uid -> room.answers2 to false
-                                else -> null to false
+                            val triple = when (currentPlayer.uid) {
+                                room.info1.uid -> Triple(room.answers1, room.info2.uid, room.answers2)
+                                room.info2.uid -> Triple(room.answers2, room.info1.uid, room.answers1)
+                                else -> null
                             }
-                            if (answers != null && msg.index in 0 ..< LyricsSockets.QUESTION_COUNT) {
-                                answers[msg.index] = msg.answer
-                                // 通知对手自身进度
-                                val player = players[if (isFirst) room.info2.uid else room.info1.uid]
-                                player?.session?.send(LyricsSockets.SM.OtherAnswerUpdated(answers.count { it != null }))
+                            logger.warn("SaveAnswer: $triple $msg")
+                            triple?.let { (answers, otherUid, otherAnswers) ->
+                                if (msg.index in 0 ..< LyricsSockets.QUESTION_COUNT) {
+                                    answers[msg.index] = msg.answer
+                                    // 通知进度
+                                    val count = answers.count { it != null }
+                                    val otherCount = otherAnswers.count { it != null }
+                                    session.send(LyricsSockets.SM.AnswerUpdated(count, otherCount))
+                                    val otherPlayer = players[otherUid]
+                                    if (otherPlayer?.room?.roomId == room.roomId) {
+                                        otherPlayer.session.send(LyricsSockets.SM.AnswerUpdated(otherCount, count))
+                                    }
+                                }
                             }
                         }
                     }
@@ -197,7 +226,7 @@ object LyricsSocketsManager {
         }
         finally {
             currentPlayer?.let { player ->
-                logger.warn("移除 ${player.uid} ${player.name}")
+                logger.warn("finally 移除 ${player.uid} ${player.name}")
                 players.remove(player.uid)
                 player.room?.let { room -> submitAnswers(room, player.uid) }
             }
