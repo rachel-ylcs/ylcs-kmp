@@ -67,9 +67,9 @@ object About {
     internal val updateInfo = UpdateInfo(
         platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
         title = null,
-        force = true,
-        maintenance = true,
-        date = LocalDate(2025, 6, 12),
+        force = false,
+        maintenance = false,
+        date = LocalDate(2025, 6, 17),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
@@ -77,11 +77,9 @@ object About {
                 color = Colors.Steel4,
                 background = Colors.Steel2,
                 records = listOf(
-                    "1. 世界小游戏板块开启(创建新游戏, 游戏大厅, 战绩记录, 排行榜)",
-                    "2. 美图页使用轮播画廊UI",
-                    "3. 长短身份验证启用, 登录状态将从7天维持到30天",
-                    "4. MOD工坊搜索歌曲支持",
-                    "5. 安卓16支持, 你的第一款适配安卓16 App",
+                    "1. 美图支持搜索关键字",
+                    "2. 1v1在线联机对战默写歌词小游戏(测试中...)",
+                    "3. 世界页小游戏板块增加排行榜"
                 )
             ),
             UpdateRecordGroup(
@@ -90,11 +88,14 @@ object About {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. MOD工坊显示歌曲封面预览",
-                    "2. 允许播放器开启状态进入MOD工坊",
-                    "3. 大幅提升微博关注页加载速度",
-                    "4. 云端存储表情包减小包体积大小",
-                    "5. 更新日志页显示在关于页"
+                    "1. 管理员可以删除游戏, 删除游戏时二次确认",
+                    "2. 所有输入框弹出时自动获取焦点, 电脑端支持回车确认",
+                    "3. 优化全平台列表滚动性能",
+                    "4. [小游戏] 横屏适配, 奖励机制调整, 游戏结算提醒",
+                    "   [答题] 战绩页显示自己的答案",
+                    "   [网格填词] 支持横竖批量填写",
+                    "   [寻花令] 禁止标点符号, 支持常用字表",
+                    "   [词寻] 增加倒计时提示"
                 )
             ),
             UpdateRecordGroup(
@@ -103,12 +104,9 @@ object About {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复桌面端QQ群无法跳转的问题",
-                    "2. 修复桌面端MOD工坊列表无法加载的问题",
-                    "3. 修复FAB按钮在手机端三键导航模式下沉浸失效的问题",
-                    "4. 修复iOS端悬浮歌词内存泄漏的问题",
-                    "5. 修复iOS端拖动音乐播放进度条时进度不对的问题",
-                    "6. 修复iOS端播放MV黑屏的问题"
+                    "1. 修复Android端WebView在深色模式下仍然保持白色背景",
+                    "2. 修复当前播放列表标题与停止键被滚动遮挡",
+                    "3. 修复小游戏下一题按钮位置不正确"
                 )
             )
         )
