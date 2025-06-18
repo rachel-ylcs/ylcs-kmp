@@ -16,6 +16,7 @@ dependencyResolutionManagement {
         maven("https://maven.aliyun.com/repository/google")
         google()
         maven("https://jitpack.io")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
     }
 
     versionCatalogs {
