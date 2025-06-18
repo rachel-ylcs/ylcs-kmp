@@ -46,6 +46,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.common.ScreenImagePreview
@@ -195,7 +196,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                        modifier = Modifier.condition(isAlbum, ifTrue = { fillMaxWidth() }, ifFalse = { width(ThemeValue.Size.CellWidth) })
                     )
                 }
             }
