@@ -20,6 +20,7 @@ import love.yinlin.values
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.coroutineContext
+import kotlin.random.Random
 
 private suspend inline fun WebSocketServerSession.send(data: LyricsSockets.SM) = this.sendSerialized(data)
 
@@ -38,7 +39,15 @@ object LyricsSocketsManager {
     }
 
     private class Room(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo) {
-        private val lyrics = library.indices.shuffled().take(LyricsSockets.QUESTION_COUNT).map { library[it] }
+        private val lyrics = run {
+            val set = mutableSetOf<Int>()
+            val random = Random(System.currentTimeMillis())
+            for (i in library.size - LyricsSockets.QUESTION_COUNT until library.size) {
+                val randomIndex = random.nextInt(i + 1)
+                if (!set.add(randomIndex)) set.add(i)
+            }
+            set.map { library[it] }
+        }
         val roomId: String = UUID.randomUUID().toString()
         var createTime: Long = System.currentTimeMillis()
         var submitTime1: Long? = null
