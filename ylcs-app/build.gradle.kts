@@ -173,6 +173,11 @@ kotlin {
                 implementation(libs.lottie)
                 implementation(libs.lottie.network)
 
+                implementation(libs.kubriko.engine)
+                implementation(libs.kubriko.plugin.physics)
+                implementation(libs.kubriko.plugin.sprites)
+                implementation(libs.kubriko.plugin.pointer)
+
                 implementation(libs.tool.compress)
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
