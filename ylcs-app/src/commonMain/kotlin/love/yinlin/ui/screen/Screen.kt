@@ -10,6 +10,7 @@ import love.yinlin.ui.screen.msg.weibo.*
 import love.yinlin.ui.screen.music.*
 import love.yinlin.ui.screen.community.*
 import love.yinlin.ui.screen.msg.activity.*
+import love.yinlin.ui.screen.msg.douyin.ScreenDouyin
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.music.loader.*
 import love.yinlin.ui.screen.settings.*
@@ -26,7 +27,9 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenImagePreview, type<List<Picture>>())
     screen(::ScreenVideo)
 
-    // 微博
+    // 资讯
+    screen(::ScreenPictures)
+
     screen(::ScreenWeibo)
     screen(::ScreenChaohua)
     screen(::ScreenWeiboDetails)
@@ -34,8 +37,7 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenWeiboFollows)
     screen(::ScreenWeiboAlbum)
 
-    // 美图
-    screen(::ScreenPictures)
+    screen(::ScreenDouyin)
 
     // 活动
     screen(::ScreenActivityDetails)

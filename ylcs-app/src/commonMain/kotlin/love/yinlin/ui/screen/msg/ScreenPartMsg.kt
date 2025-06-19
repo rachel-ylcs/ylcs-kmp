@@ -53,6 +53,7 @@ import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 import love.yinlin.ui.screen.msg.activity.ScreenActivityDetails
 import love.yinlin.ui.screen.msg.activity.ScreenAddActivity
+import love.yinlin.ui.screen.msg.douyin.ScreenDouyin
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.msg.weibo.*
 import kotlin.math.abs
@@ -200,6 +201,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				IconText(
+					icon = ExtraIcons.Pictures,
+					text = "美图",
+					onClick = { navigate<ScreenPictures>() }
+				)
+				IconText(
 					icon = ExtraIcons.Weibo,
 					text = "微博",
 					onClick = { navigate<ScreenWeibo>() }
@@ -211,8 +217,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				)
 				IconText(
 					icon = ExtraIcons.Pictures,
-					text = "美图",
-					onClick = { navigate<ScreenPictures>() }
+					text = "抖音",
+					onClick = { navigate<ScreenDouyin>() }
 				)
 			}
 		}
