@@ -1,22 +1,17 @@
 package love.yinlin.ui.component.platform
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import love.yinlin.platform.appNative
 import love.yinlin.ui.CustomUI
+
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
@@ -152,4 +147,66 @@ actual fun WebPage(
 			onRelease()
 		}
 	)
+}
+
+@Stable
+actual abstract class HeadlessBrowser actual constructor() {
+	@SuppressLint("SetJavaScriptEnabled")
+    private val webview = WebView(appNative.context).apply {
+		settings.apply {
+			javaScriptEnabled = true
+			domStorageEnabled = true
+			allowFileAccess = true
+			allowContentAccess = true
+			blockNetworkImage = false
+			blockNetworkLoads = false
+			loadsImagesAutomatically = true
+			useWideViewPort = true
+			builtInZoomControls = true
+			displayZoomControls = false
+			mediaPlaybackRequiresUserGesture = false
+			userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
+			setSupportMultipleWindows(true)
+			setSupportZoom(true)
+			setGeolocationEnabled(true)
+		}
+		webViewClient = object : WebViewClient() {
+			override fun onPageFinished(view: WebView?, url: String?) {
+				view?.evaluateJavascript("""
+(function() {
+	var originalOpen = XMLHttpRequest.prototype.open;
+	XMLHttpRequest.prototype.open = function(method, url) {
+		this._url = url;
+		originalOpen.apply(this, arguments);
+	};
+	var originalSend = XMLHttpRequest.prototype.send;
+	XMLHttpRequest.prototype.send = function(body) {
+		var self = this;
+		this.addEventListener('readystatechange', function() {
+			if (self.readyState === 4 && self.status === 200) {
+				try {
+					RequestInterceptor.onJsonResponse(self._url, self.responseText);
+				} catch(e) { }
+			}
+		});
+		originalSend.apply(this, arguments);
+	};
+})();
+""", null)
+			}
+		}
+		webChromeClient = object : WebChromeClient() {}
+		addJavascriptInterface(object {
+			@JavascriptInterface
+			fun onJsonResponse(url: String?, json: String?) {
+				if (url != null && json != null) onRequest(url, json)
+			}
+		}, "RequestInterceptor")
+	}
+
+	actual fun load(url: String) = webview.loadUrl(url)
+
+	actual fun destroy() = webview.destroy()
+
+	actual abstract fun onRequest(url: String, response: String)
 }

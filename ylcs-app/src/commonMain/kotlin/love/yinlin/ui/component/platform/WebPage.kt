@@ -50,3 +50,9 @@ expect fun WebPage(
 	state: WebPageState,
 	modifier: Modifier = Modifier
 )
+
+expect abstract class HeadlessBrowser() {
+	fun load(url: String)
+	fun destroy()
+	abstract fun onRequest(url: String, response: String)
+}

@@ -27,3 +27,12 @@ actual fun WebPage(
 ) {
 	UnsupportedComponent(modifier = modifier)
 }
+
+@Stable
+actual abstract class HeadlessBrowser actual constructor() {
+	actual fun load(url: String) {}
+
+	actual fun destroy() {}
+
+	actual abstract fun onRequest(url: String, response: String)
+}
