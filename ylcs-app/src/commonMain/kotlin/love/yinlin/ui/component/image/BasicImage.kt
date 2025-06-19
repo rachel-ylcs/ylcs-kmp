@@ -12,21 +12,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.*
+import com.github.panpf.sketch.ability.progressIndicator
+import com.github.panpf.sketch.painter.internal.AbsProgressPainter
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.request.disallowAnimatedImage
 import com.github.panpf.sketch.request.pauseLoadWhenScrolling
-import com.github.panpf.sketch.state.rememberIconPainterStateImage
+import com.github.panpf.sketch.state.ColorPainterStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
+import io.github.alexzhirkevich.qrose.toImageBitmap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
@@ -36,6 +47,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberFalse
 import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.ImageQuality
+import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.placeholder_pic
 import org.jetbrains.compose.resources.DrawableResource
@@ -347,22 +359,82 @@ private fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = reme
 @Composable
 fun rememberWebImageState(
 	quality: ImageQuality,
-	placeholder: DrawableResource? = null,
+	background: Color? = MaterialTheme.colorScheme.scrim,
 	isCrossfade: Boolean = true,
 	animated: Boolean = true,
 ): AsyncImageState {
 	val context = LocalPlatformContext.current
-	val holder = placeholder?.let { rememberIconPainterStateImage(it) }
-	val options = remember(quality, holder, isCrossfade, animated) {
+	val options = remember(quality, background, isCrossfade, animated) {
 		ImageOptions.Builder().apply {
 			sizeMultiplier(quality.sizeMultiplier)
-			placeholder(holder)
 			disallowAnimatedImage(!animated)
 			pauseLoadWhenScrolling(true)
+			background?.let { placeholder(ColorPainterStateImage(it)) }
 			if (isCrossfade) crossfade()
 		}.merge(SingletonSketch.get(context).globalImageOptions).build()
 	}
 	return rememberAsyncImageState(options)
+}
+
+@Stable
+private class WebImageIndicator(
+	density: Density,
+	private val indicatorSize: Dp,
+	private val indicatorColor: Color,
+	private val indicatorImage: ImageBitmap
+) : AbsProgressPainter(
+	hiddenWhenIndeterminate = false,
+	hiddenWhenCompleted = true,
+	stepAnimationDuration = app.config.animationSpeed
+) {
+	override val intrinsicSize: Size = with(density) { Size(indicatorSize.toPx(), indicatorSize.toPx()) }
+
+	override fun DrawScope.drawProgress(drawProgress: Float) {
+		val widthRadius = size.width / 2f
+		val heightRadius = size.height / 2f
+		val radius = widthRadius.coerceAtMost(heightRadius)
+		val cx = 0 + widthRadius
+		val cy = 0 + heightRadius
+		val center = Offset(widthRadius, heightRadius)
+		val ringWidth = (indicatorSize * 0.1f).toPx()
+		drawImage(
+			image = indicatorImage,
+			topLeft = Offset(x = intrinsicSize.width / 4, y = intrinsicSize.height / 4)
+		)
+		drawCircle(
+			color = indicatorColor.copy(alpha = 0.25f),
+			radius = radius,
+			center = center,
+			style = Stroke(ringWidth)
+		)
+		val sweepAngle = drawProgress * 360f
+		drawArc(
+			color = indicatorColor,
+			startAngle = 270f,
+			sweepAngle = sweepAngle,
+			useCenter = false,
+			topLeft = Offset(cx - radius, cy - radius),
+			size = Size(radius * 2f, radius * 2f),
+			style = Stroke(ringWidth, cap = StrokeCap.Round),
+		)
+	}
+}
+
+@Composable
+private fun rememberWebImageIndicator(): WebImageIndicator {
+	val density = LocalDensity.current
+	val size = ThemeValue.Size.MediumInput
+	val color = MaterialTheme.colorScheme.primaryContainer
+	val imagePainter = painterResource(Res.drawable.placeholder_pic)
+	val image = remember(imagePainter) {
+		with(density) {
+			val imageSize = (size / 2).roundToPx()
+			imagePainter.toImageBitmap(imageSize, imageSize)
+		}
+	}
+	return remember(density, size, color, image) {
+		WebImageIndicator(density, size, color, image)
+	}
 }
 
 @Composable
@@ -375,12 +447,13 @@ fun WebImage(
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
-	placeholder: DrawableResource? = Res.drawable.placeholder_pic,
 	animated: Boolean = true,
-	state: AsyncImageState = rememberWebImageState(quality, placeholder, true, animated),
+	state: AsyncImageState = rememberWebImageState(quality, animated = animated),
 	onClick: (() -> Unit)? = null
 ) {
 	Box(modifier = modifier) {
+		val progressIndicator = rememberWebImageIndicator()
+
 		AsyncImage(
 			uri = rememberWebImageKeyUrl(uri, key),
 			contentDescription = null,
@@ -391,6 +464,7 @@ fun WebImage(
 			alpha = alpha,
 			modifier = Modifier.matchParentSize().condition(circle) { clip(CircleShape) }
 				.condition(onClick != null) { clickable(onClick = onClick ?: {}) }
+				.progressIndicator(state, progressIndicator)
 		)
 	}
 }
@@ -404,7 +478,7 @@ fun LocalFileImage(
 	contentScale: ContentScale = ContentScale.Fit,
 	alpha: Float = 1f,
 	animated: Boolean = true,
-	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, null, true, animated),
+	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
 	onClick: (() -> Unit)? = null
 ) {
 	val baseUri = remember(*key) { path().toString() }
@@ -434,19 +508,22 @@ fun ZoomWebImage(
 	contentScale: ContentScale = ContentScale.Fit,
 	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
-	placeholder: DrawableResource = Res.drawable.placeholder_pic,
-	state: AsyncImageState = rememberWebImageState(quality, placeholder, false)
+	state: AsyncImageState = rememberWebImageState(quality, isCrossfade = false)
 ) {
-	SketchZoomAsyncImage(
-		uri = rememberWebImageKeyUrl(uri, key),
-		contentDescription = null,
-		state = state,
-		zoomState = zoomState,
-		alignment = alignment,
-		contentScale = contentScale,
-		filterQuality = quality.filterQuality,
-		alpha = alpha,
-		scrollBar = null,
-		modifier = modifier
-	)
+	Box(modifier = modifier) {
+		val progressIndicator = rememberWebImageIndicator()
+
+		SketchZoomAsyncImage(
+			uri = rememberWebImageKeyUrl(uri, key),
+			contentDescription = null,
+			state = state,
+			zoomState = zoomState,
+			alignment = alignment,
+			contentScale = contentScale,
+			filterQuality = quality.filterQuality,
+			alpha = alpha,
+			scrollBar = null,
+			modifier = Modifier.matchParentSize().progressIndicator(state, progressIndicator)
+		)
+	}
 }
