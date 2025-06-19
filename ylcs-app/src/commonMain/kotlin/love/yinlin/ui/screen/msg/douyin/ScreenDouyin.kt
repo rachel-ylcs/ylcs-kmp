@@ -24,8 +24,11 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
+import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.Picker
+import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.BoxState
@@ -33,6 +36,7 @@ import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.platform.HeadlessBrowser
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenVideo
 
 @Stable
@@ -131,6 +135,26 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                         modifier = Modifier.weight(1f)
                     )
                 }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    ClickIcon(
+                        icon = Icons.Outlined.Download,
+                        onClick = {
+                            val url = item.resource.video
+                            val filename = url.filenameOrRandom(".mp4")
+                            launch {
+                                Coroutines.io {
+                                    Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                        val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+                                        Picker.cleanSave(origin, result)
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -179,5 +203,12 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
 
     override suspend fun onFabClick() {
         gridState.animateScrollToItem(0)
+    }
+
+    private val downloadVideoDialog = FloatingDownloadDialog()
+
+    @Composable
+    override fun Floating() {
+        downloadVideoDialog.Land()
     }
 }

@@ -27,15 +27,24 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
+import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.filenameOrRandom
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.OS
+import love.yinlin.platform.Picker
+import love.yinlin.platform.Platform
+import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.platform.app
+import love.yinlin.platform.safeDownload
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Composable
 private fun UserInfoCard(
@@ -174,6 +183,53 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		navigate(ScreenWeiboAlbum.Args(album.containerId, album.title))
 	}
 
+	private fun onPicturesDownload(pics: List<Picture>) {
+		OS.ifPlatform(
+			*Platform.Phone,
+			ifTrue = {
+				launch {
+					slot.loading.openSuspend()
+					Coroutines.io {
+						for (pic in pics) {
+							val url = pic.source
+							val filename = url.filenameOrRandom(".webp")
+							Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+								val result = sink.use {
+									val result = app.fileClient.safeDownload(
+										url = url,
+										sink = it,
+										isCancel = { false },
+										onGetSize = {},
+										onTick = { _, _ -> }
+									)
+									if (result) Picker.actualSave(filename, origin, sink)
+									result
+								}
+								Picker.cleanSave(origin, result)
+							}
+						}
+					}
+					slot.loading.close()
+				}
+			},
+			ifFalse = {
+				slot.tip.warning(UnsupportedPlatformText)
+			}
+		)
+	}
+
+	private fun onVideoDownload(url: String) {
+		val filename = url.filenameOrRandom(".mp4")
+		launch {
+			Coroutines.io {
+				Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+					val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+					Picker.cleanSave(origin, result)
+				}
+			}
+		}
+	}
+
 	@Composable
 	private fun Portrait(
 		user: WeiboUser,
@@ -223,7 +279,9 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 			) { weibo ->
 				WeiboCard(
 					weibo = weibo,
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+					onPicturesDownload = ::onPicturesDownload,
+					onVideoDownload = ::onVideoDownload
 				)
 			}
 		}
@@ -290,7 +348,9 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 					WeiboGrid(
 						state = listState,
 						modifier = Modifier.fillMaxSize(),
-						items = items
+						items = items,
+						onPicturesDownload = ::onPicturesDownload,
+						onVideoDownload = ::onVideoDownload
 					)
 				}
 			}
@@ -330,5 +390,12 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 				}
 			} ?: LoadingBox()
 		}
+	}
+
+	private val downloadVideoDialog = FloatingDownloadDialog()
+
+	@Composable
+	override fun Floating() {
+		downloadVideoDialog.Land()
 	}
 }

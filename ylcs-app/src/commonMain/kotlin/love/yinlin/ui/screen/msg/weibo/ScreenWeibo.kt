@@ -16,17 +16,25 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.extension.filenameOrRandom
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.OS
+import love.yinlin.platform.Picker
+import love.yinlin.platform.Platform
+import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.platform.app
+import love.yinlin.platform.safeDownload
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items = mutableStateListOf<Weibo>()
-    private val listState = LazyStaggeredGridState()
+    private val gridState = LazyStaggeredGridState()
 
     private suspend fun requestWeibo() {
         if (state != BoxState.LOADING) {
@@ -41,7 +49,7 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
                         items += result.data
                         items.sortDescending()
                         if (state == BoxState.LOADING) state = BoxState.CONTENT
-                        listState.scrollToItem(0)
+                        gridState.scrollToItem(0)
                     }
                 }
                 if (state == BoxState.LOADING) state = BoxState.NETWORK_ERROR
@@ -70,20 +78,72 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
                 WeiboGrid(
-                    state = listState,
+                    state = gridState,
                     items = items,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    onPicturesDownload = { pics ->
+                        OS.ifPlatform(
+                            *Platform.Phone,
+                            ifTrue = {
+                                launch {
+                                    slot.loading.openSuspend()
+                                    Coroutines.io {
+                                        for (pic in pics) {
+                                            val url = pic.source
+                                            val filename = url.filenameOrRandom(".webp")
+                                            Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+                                                val result = sink.use {
+                                                    val result = app.fileClient.safeDownload(
+                                                        url = url,
+                                                        sink = it,
+                                                        isCancel = { false },
+                                                        onGetSize = {},
+                                                        onTick = { _, _ -> }
+                                                    )
+                                                    if (result) Picker.actualSave(filename, origin, sink)
+                                                    result
+                                                }
+                                                Picker.cleanSave(origin, result)
+                                            }
+                                        }
+                                    }
+                                    slot.loading.close()
+                                }
+                            },
+                            ifFalse = {
+                                slot.tip.warning(UnsupportedPlatformText)
+                            }
+                        )
+                    },
+                    onVideoDownload = { url ->
+                        val filename = url.filenameOrRandom(".mp4")
+                        launch {
+                            Coroutines.io {
+                                Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                    val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+                                    Picker.cleanSave(origin, result)
+                                }
+                            }
+                        }
+                    }
                 )
             }
         }
     }
 
-    private val isScrollTop: Boolean by derivedStateOf { listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0 }
+    private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestWeibo() }
-        else listState.animateScrollToItem(0)
+        else gridState.animateScrollToItem(0)
+    }
+
+    private val downloadVideoDialog = FloatingDownloadDialog()
+
+    @Composable
+    override fun Floating() {
+        downloadVideoDialog.Land()
     }
 }

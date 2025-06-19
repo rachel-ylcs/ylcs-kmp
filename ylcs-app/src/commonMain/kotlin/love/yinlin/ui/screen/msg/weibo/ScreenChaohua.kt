@@ -20,10 +20,19 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.extension.filenameOrRandom
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.OS
+import love.yinlin.platform.Picker
+import love.yinlin.platform.Platform
+import love.yinlin.platform.UnsupportedPlatformText
+import love.yinlin.platform.app
+import love.yinlin.platform.safeDownload
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
@@ -89,7 +98,52 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
                 ) { weibo ->
                     WeiboCard(
                         weibo = weibo,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        onPicturesDownload = { pics ->
+                            OS.ifPlatform(
+                                *Platform.Phone,
+                                ifTrue = {
+                                    launch {
+                                        slot.loading.openSuspend()
+                                        Coroutines.io {
+                                            for (pic in pics) {
+                                                val url = pic.source
+                                                val filename = url.filenameOrRandom(".webp")
+                                                Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+                                                    val result = sink.use {
+                                                        val result = app.fileClient.safeDownload(
+                                                            url = url,
+                                                            sink = it,
+                                                            isCancel = { false },
+                                                            onGetSize = {},
+                                                            onTick = { _, _ -> }
+                                                        )
+                                                        if (result) Picker.actualSave(filename, origin, sink)
+                                                        result
+                                                    }
+                                                    Picker.cleanSave(origin, result)
+                                                }
+                                            }
+                                        }
+                                        slot.loading.close()
+                                    }
+                                },
+                                ifFalse = {
+                                    slot.tip.warning(UnsupportedPlatformText)
+                                }
+                            )
+                        },
+                        onVideoDownload = { url ->
+                            val filename = url.filenameOrRandom(".mp4")
+                            launch {
+                                Coroutines.io {
+                                    Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                        val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+                                        Picker.cleanSave(origin, result)
+                                    }
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -103,5 +157,12 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewData() }
         else gridState.animateScrollToItem(0)
+    }
+
+    private val downloadVideoDialog = FloatingDownloadDialog()
+
+    @Composable
+    override fun Floating() {
+        downloadVideoDialog.Land()
     }
 }
