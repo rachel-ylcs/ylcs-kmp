@@ -81,7 +81,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                 Text(
                     text = item.title,
                     color = if (item.isTop) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    maxLines = 2,
+                    maxLines = 5,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
                 )

@@ -216,7 +216,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					onClick = { navigate<ScreenChaohua>() }
 				)
 				IconText(
-					icon = ExtraIcons.Pictures,
+					icon = ExtraIcons.Douyin,
 					text = "抖音",
 					onClick = { navigate<ScreenDouyin>() }
 				)
