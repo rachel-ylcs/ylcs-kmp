@@ -31,15 +31,9 @@
 -dontwarn java.lang.management.ManagementFactory
 -dontwarn java.lang.management.RuntimeMXBean
 
-# ---------------------------------------- KLuban --------------------------------------------- #
-
--dontwarn com.bumptech.glide.Glide
--dontwarn com.bumptech.glide.load.engine.bitmap_recycle.ArrayPool
-
 # ---------------------------------------- libpag --------------------------------------------- #
 
 -keep class org.libpag.**{*;}
 -keep class androidx.exifinterface.**{ *; }
 
 # ----------------------------------------- App ----------------------------------------------- #
-
