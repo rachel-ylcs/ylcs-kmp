@@ -29,7 +29,7 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableStateOf(emptyList<Weibo>())
-    private val listState = LazyStaggeredGridState()
+    private val gridState = LazyStaggeredGridState()
     private var sinceId: Long = 0L
     private var canLoading by mutableStateOf(false)
 
@@ -72,12 +72,12 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
                 state = state,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
-                bindPauseLoadWhenScrolling(listState)
+                bindPauseLoadWhenScrolling(gridState)
                 PaginationStaggeredGrid(
                     items = items,
                     key = { it.id },
                     columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
-                    state = listState,
+                    state = gridState,
                     canRefresh = true,
                     canLoading = canLoading,
                     onRefresh = { requestNewData() },
@@ -96,12 +96,12 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
         }
     }
 
-    private val isScrollTop: Boolean by derivedStateOf { listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0 }
+    private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewData() }
-        else listState.animateScrollToItem(0)
+        else gridState.animateScrollToItem(0)
     }
 }

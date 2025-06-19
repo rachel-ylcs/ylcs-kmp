@@ -185,7 +185,9 @@ actual abstract class HeadlessBrowser actual constructor() {
 		this.addEventListener('readystatechange', function() {
 			if (self.readyState === 4 && self.status === 200) {
 				try {
-					RequestInterceptor.onJsonResponse(self._url, self.responseText);
+					if (RequestInterceptor.onUrlDetected(self._url)) {
+						RequestInterceptor.onRequestDetected(self._url, self.responseText);
+					}
 				} catch(e) { }
 			}
 		});
@@ -198,15 +200,27 @@ actual abstract class HeadlessBrowser actual constructor() {
 		webChromeClient = object : WebChromeClient() {}
 		addJavascriptInterface(object {
 			@JavascriptInterface
-			fun onJsonResponse(url: String?, json: String?) {
-				if (url != null && json != null) onRequest(url, json)
+			fun onUrlDetected(url: String?): Boolean = url?.let { onUrlIntercepted(it) } ?: false
+
+			@JavascriptInterface
+			fun onRequestDetected(url: String?, json: String?) {
+				if (url != null && json != null) onRequestIntercepted(url, json)
 			}
 		}, "RequestInterceptor")
 	}
 
+	private var isDestroy: Boolean = false
+
 	actual fun load(url: String) = webview.loadUrl(url)
 
-	actual fun destroy() = webview.destroy()
+	actual fun destroy() {
+		if (!isDestroy) {
+			isDestroy = true
+			webview.destroy()
+		}
+	}
 
-	actual abstract fun onRequest(url: String, response: String)
+	actual abstract fun onUrlIntercepted(url: String): Boolean
+
+	actual abstract fun onRequestIntercepted(url: String, response: String)
 }

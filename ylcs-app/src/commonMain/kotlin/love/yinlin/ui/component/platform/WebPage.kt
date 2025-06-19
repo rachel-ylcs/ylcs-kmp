@@ -54,5 +54,6 @@ expect fun WebPage(
 expect abstract class HeadlessBrowser() {
 	fun load(url: String)
 	fun destroy()
-	abstract fun onRequest(url: String, response: String)
+	abstract fun onUrlIntercepted(url: String): Boolean
+	abstract fun onRequestIntercepted(url: String, response: String)
 }

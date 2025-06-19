@@ -34,7 +34,9 @@ actual abstract class HeadlessBrowser actual constructor() {
 
 	actual fun destroy() {}
 
-	actual abstract fun onRequest(url: String, response: String)
+	actual abstract fun onUrlIntercepted(url: String): Boolean
+
+	actual abstract fun onRequestIntercepted(url: String, response: String)
 }
 
 //@Stable
