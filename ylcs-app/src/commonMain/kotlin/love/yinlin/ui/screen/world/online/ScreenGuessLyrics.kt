@@ -154,7 +154,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         @Stable
         data class Preparing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long) : Status
         @Stable
-        data class Playing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long, val questions: List<String>, val answers: List<String?>, val count1: Int, val count2: Int) : Status
+        data class Playing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long, val questions: List<Pair<String, Int>>, val answers: List<String?>, val count1: Int, val count2: Int) : Status
         @Stable
         data class Waiting(val info: LyricsSockets.PlayerInfo) : Status
         @Stable
@@ -247,7 +247,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         }
     }
 
-    private fun handlePlaying(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo, questions: List<String>) {
+    private fun handlePlaying(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo, questions: List<Pair<String, Int>>) {
         currentStatus = Status.Playing(info1, info2, LyricsSockets.PLAYING_TIME, questions, questions.map { null }, 0, 0)
         launch {
             for (i in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
@@ -477,18 +477,19 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             )
         }
 
+        val (question, answerLength) = status.questions[index]
         Text(
-            text = status.questions[index],
+            text = remember(question) { "上句: $question" },
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = status.answers[index] ?: "",
+            text = remember(index) { "下句: ${status.answers[index] ?: ""}" },
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(
             state = inputState,
-            hint = "输入歌词下句(回车保存)",
+            hint = "[下句${answerLength}字](回车保存)",
             clearButton = false,
             maxLength = 16,
             onImeClick = {
