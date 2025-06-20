@@ -162,8 +162,32 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     private var currentStatus: Status by mutableStateOf(Status.Hall)
-    private var session: DefaultClientWebSocketSession? = null
+    private var session: DefaultClientWebSocketSession? by mutableStateOf(null)
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
+
+    private suspend fun sessionLoop() {
+        try {
+            session?.close()
+            val newSession = app.socketsClient.webSocketSession {
+                method = HttpMethod.Get
+                url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
+            }
+            session = newSession
+            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
+            newSession.incoming.consumeAsFlow().collect { frame ->
+                if (frame is Frame.Text) {
+                    val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
+                    if (msg != null) dispatchMessage(msg)
+                }
+            }
+        }
+        catch (e: Throwable) {
+            slot.tip.error("断开连接 ${e.message}")
+        } finally {
+            session?.close()
+            session = null
+        }
+    }
 
     private suspend inline fun send(data: LyricsSockets.CM) {
         session?.sendSerialized(data) ?: slot.tip.error("无法连接到服务器")
@@ -644,28 +668,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     override suspend fun initialize() {
-        launch {
-            try {
-                val newSession = app.socketsClient.webSocketSession {
-                    method = HttpMethod.Get
-                    url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
-                }
-                session = newSession
-                send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
-                newSession.incoming.consumeAsFlow().collect { frame ->
-                    if (frame is Frame.Text) {
-                        val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
-                        if (msg != null) dispatchMessage(msg)
-                    }
-                }
-            }
-            catch (e: Throwable) {
-                slot.tip.error("断开连接 ${e.message}")
-            } finally {
-                session?.close()
-                session = null
-            }
-        }
+        launch { sessionLoop() }
     }
 
     @Composable
@@ -686,9 +689,21 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         }
     }
 
-    override val fabIcon: ImageVector? by derivedStateOf { if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null }
+    override val fabIcon: ImageVector? by derivedStateOf {
+        if (session != null) {
+            if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null
+        }
+        else ExtraIcons.Disconnect
+    }
 
     override suspend fun onFabClick() {
-        if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
+        if (session != null) {
+            if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
+        }
+        else launch {
+            players.clear()
+            currentStatus = Status.Hall
+            sessionLoop()
+        }
     }
 }
