@@ -557,8 +557,12 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                             text = "提交",
                             icon = Icons.Outlined.Check,
                             onClick = {
-                                send(LyricsSockets.CM.Submit)
-                                currentStatus = Status.Waiting(status.info2)
+                                val blankCount = status.answers.count { it == null }
+                                val submit = if (blankCount > 0) slot.confirm.openSuspend(content = "还有${blankCount}题未填写, 是否提交?") else true
+                                if (submit) {
+                                    send(LyricsSockets.CM.Submit)
+                                    currentStatus = Status.Waiting(status.info2)
+                                }
                             }
                         )
                     }
