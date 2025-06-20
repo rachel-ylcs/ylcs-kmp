@@ -27,6 +27,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.url
+import io.ktor.http.HttpMethod
+import io.ktor.http.URLProtocol
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -643,7 +646,10 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     override suspend fun initialize() {
         launch {
             try {
-                val newSession = app.socketsClient.webSocketSession(host = Local.API_HOST, path = LyricsSockets.path)
+                val newSession = app.socketsClient.webSocketSession {
+                    method = HttpMethod.Get
+                    url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
+                }
                 session = newSession
                 send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
                 newSession.incoming.consumeAsFlow().collect { frame ->
