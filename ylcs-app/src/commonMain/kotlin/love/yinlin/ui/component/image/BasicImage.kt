@@ -83,7 +83,7 @@ data class ColorfulImageVector(
 @Composable
 fun colorfulImageVector(
 	icon: ImageVector,
-	color: Color = MaterialTheme.colorScheme.onSurface,
+	color: Color = Colors.Ghost,
 	background: Color = Colors.Transparent
 ) = ColorfulImageVector(icon, color, background)
 
@@ -91,6 +91,7 @@ fun colorfulImageVector(
 fun ColorfulIcon(
 	icon: ColorfulImageVector,
 	size: Dp = ThemeValue.Size.Icon,
+    gap: Float = 1.5f,
 	onClick: (() -> Unit)? = null
 ) {
 	Box(
@@ -101,10 +102,10 @@ fun ColorfulIcon(
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * 1.5f).size(size),
+			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * gap).size(size),
 			imageVector = icon.icon,
 			contentDescription = null,
-			tint = Colors.Ghost,
+			tint = icon.color,
 		)
 	}
 }

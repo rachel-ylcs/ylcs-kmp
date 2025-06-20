@@ -1,9 +1,13 @@
 package love.yinlin.common
 
 import love.yinlin.AppModel
+import love.yinlin.api.API
+import love.yinlin.api.ClientAPI
+import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.community.ScreenUserCard
+import love.yinlin.ui.screen.music.ScreenSongDetails
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
 import love.yinlin.ui.screen.music.loader.ScreenPlatformMusic
 
@@ -39,6 +43,17 @@ class DeepLink(private val model: AppModel) {
             "/openProfile" -> {
                 uri.params["uid"]?.toIntOrNull()?.let { uid ->
                     model.navigate(ScreenUserCard.Args(uid))
+                }
+            }
+            "/openSong" -> {
+                uri.params["id"]?.let { id ->
+                    model.launch {
+                        val result = ClientAPI.request(
+                            route = API.User.Song.GetSong,
+                            data = id
+                        )
+                        if (result is Data.Success) model.navigate(ScreenSongDetails.Args(result.data))
+                    }
                 }
             }
         }
