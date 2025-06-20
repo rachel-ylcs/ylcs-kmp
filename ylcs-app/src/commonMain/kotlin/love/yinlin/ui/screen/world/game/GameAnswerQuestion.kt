@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
@@ -719,7 +721,8 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                             icon = if (isSelected) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
                                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             onClick = {
-                                                answers[currentIndex] = answer.copy(value = if (answer.value == index) -1 else index)
+                                                answers[currentIndex] = answer.copy(value = if (isSelected) -1 else index)
+                                                if (!isSelected && currentIndex < questions.size - 1) ++currentIndex
                                             }
                                         )
                                         Text(
@@ -769,6 +772,10 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                 )
                                 Space()
                                 val inputState = remember(currentIndex) { TextInputState() }
+                                val focusRequester = remember { FocusRequester() }
+                                LaunchedEffect(currentIndex) {
+                                    focusRequester.requestFocus()
+                                }
                                 TextInput(
                                     state = inputState,
                                     hint = "输入答案(回车保存)",
@@ -778,9 +785,10 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                         if (inputState.ok) {
                                             answers[currentIndex] = answer.copy(value = inputState.text)
                                             inputState.text = ""
+                                            if (currentIndex < questions.size - 1) ++currentIndex
                                         }
                                     },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
                                 )
                             }
                         }
