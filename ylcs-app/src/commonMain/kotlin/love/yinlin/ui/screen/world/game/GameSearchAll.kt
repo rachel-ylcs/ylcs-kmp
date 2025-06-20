@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
@@ -254,6 +256,12 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (_, question) ->
+            val focusRequester = remember { FocusRequester() }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
             Text(
                 text = remember(time) { time.timeString },
                 style = MaterialTheme.typography.labelLarge,
@@ -266,7 +274,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 maxLength = SAConfig.maxLength,
                 clearButton = false,
                 onImeClick = { addOption() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
             FlowRow(modifier = Modifier.fillMaxWidth()) {
                 for (item in items) {

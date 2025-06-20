@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -295,6 +297,12 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (question, answer, result, oldCharacters) ->
+            val focusRequester = remember { FocusRequester() }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
             Text(
                 text = "寻花令长度: $question",
                 style = MaterialTheme.typography.titleLarge,
@@ -309,7 +317,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 hint = "答案",
                 maxLength = question,
                 clearButton = false,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
             Text(
                 text = "历史记录",
