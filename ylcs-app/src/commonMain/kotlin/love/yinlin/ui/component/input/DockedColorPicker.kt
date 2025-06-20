@@ -151,7 +151,7 @@ fun DockedColorPicker(
             }
         }
         Space(size = ThemeValue.Padding.VerticalExtraSpace)
-        BeautifulSlider(
+        ProgressSlider(
             value = pickerColor.alpha,
             modifier = Modifier.fillMaxWidth(),
             onValueChange = {

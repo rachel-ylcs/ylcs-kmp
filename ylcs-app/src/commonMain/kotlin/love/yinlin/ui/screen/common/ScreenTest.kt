@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.common
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.ui.component.screen.CommonSubScreen

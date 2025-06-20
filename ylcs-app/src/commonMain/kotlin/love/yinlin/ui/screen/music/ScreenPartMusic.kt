@@ -56,7 +56,7 @@ import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
@@ -387,7 +387,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		chorus: List<Long>?,
 		modifier: Modifier = Modifier
 	) {
-		BeautifulSlider(
+		ProgressSlider(
 			value = if (duration == 0L) 0f else currentTime / duration.toFloat(),
 			height = ThemeValue.Size.ProgressHeight,
 			showThumb = false,

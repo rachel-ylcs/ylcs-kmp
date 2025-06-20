@@ -17,7 +17,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
@@ -67,7 +67,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             }
 
             RowLayout("字体大小") {
-                BeautifulSlider(
+                ProgressSlider(
                     value = desktopConfig.textSizeProgress,
                     onValueChange = { desktopConfig = desktopConfig.copyTextSize(it) },
                     onValueChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },

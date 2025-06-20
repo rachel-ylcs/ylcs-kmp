@@ -109,7 +109,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
             modifier = Modifier.fillMaxWidth()
         )
         GameSlider(
-            title = "奖励银币\n(+20%)",
+            title = "奖励银币(手续+20%)",
             progress = reward,
             minValue = config.minReward,
             maxValue = config.maxReward,
