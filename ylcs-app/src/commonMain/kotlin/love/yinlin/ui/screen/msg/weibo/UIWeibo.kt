@@ -43,9 +43,7 @@ interface WeiboProcessor {
 	fun onWeiboTopicClick(arg: String)
 	fun onWeiboAtClick(arg: String)
 	fun onWeiboPicClick(pics: List<Picture>, current: Int)
-	fun onWeiboPicsDownload(pics: List<Picture>)
 	fun onWeiboVideoClick(pic: Picture)
-	fun onWeiboVideoDownload(url: String)
 }
 
 val LocalWeiboProcessor = localComposition<WeiboProcessor>()
@@ -155,7 +153,11 @@ fun WeiboUserBar(
 }
 
 @Composable
-fun WeiboLayout(weibo: Weibo) {
+fun WeiboLayout(
+	weibo: Weibo,
+	onPicturesDownload: ((List<Picture>) -> Unit)?,
+	onVideoDownload: ((String) -> Unit)?
+) {
 	val processor = LocalWeiboProcessor.current
 	WeiboUserBar(
 		info = weibo.info,
@@ -180,20 +182,26 @@ fun WeiboLayout(weibo: Weibo) {
 			onVideoClick = { processor.onWeiboVideoClick(it) }
 		)
 		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.End,
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			val video = remember(weibo) { weibo.pictures.find { it.isVideo }?.video }
-			if (video != null) ClickIcon(
-				icon = Icons.Outlined.Download,
-				onClick = { processor.onWeiboVideoDownload(video) }
-			)
-			else ClickIcon(
-				icon = Icons.Outlined.Download,
-				onClick = { processor.onWeiboPicsDownload(weibo.pictures) }
-			)
+		if (onVideoDownload != null && onPicturesDownload != null) {
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.End,
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				val video = remember(weibo) { weibo.pictures.find { it.isVideo }?.video }
+				if (video != null) {
+					ClickIcon(
+						icon = Icons.Outlined.Download,
+						onClick = { onVideoDownload(video) }
+					)
+				}
+				else {
+					ClickIcon(
+						icon = Icons.Outlined.Download,
+						onClick = { onPicturesDownload(weibo.pictures) }
+					)
+				}
+			}
 		}
 		Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
 	}
@@ -208,7 +216,9 @@ fun WeiboLayout(weibo: Weibo) {
 @Composable
 fun WeiboCard(
 	weibo: Weibo,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onPicturesDownload: ((List<Picture>) -> Unit)?,
+	onVideoDownload: ((String) -> Unit)?
 ) {
 	val processor = LocalWeiboProcessor.current
 	Surface(
@@ -219,7 +229,11 @@ fun WeiboCard(
 		Column(modifier = Modifier.fillMaxWidth().clickable {
 			processor.onWeiboClick(weibo)
 		}.padding(ThemeValue.Padding.EqualValue)) {
-			WeiboLayout(weibo = weibo)
+			WeiboLayout(
+				weibo = weibo,
+				onPicturesDownload = onPicturesDownload,
+				onVideoDownload = onVideoDownload
+			)
 		}
 	}
 }
@@ -228,7 +242,9 @@ fun WeiboCard(
 fun WeiboGrid(
 	state: LazyStaggeredGridState,
 	items: List<Weibo>,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onPicturesDownload: ((List<Picture>) -> Unit)?,
+	onVideoDownload: ((String) -> Unit)?
 ) {
 	bindPauseLoadWhenScrolling(state)
 	LazyVerticalStaggeredGrid(
@@ -245,7 +261,9 @@ fun WeiboGrid(
 		) { weibo ->
 			WeiboCard(
 				weibo = weibo,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
+				onPicturesDownload = onPicturesDownload,
+				onVideoDownload = onVideoDownload
 			)
 		}
 	}

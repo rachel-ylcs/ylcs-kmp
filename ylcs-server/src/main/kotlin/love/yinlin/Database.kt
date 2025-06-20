@@ -7,6 +7,8 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.extension.Object
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.json
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJson
@@ -51,23 +53,20 @@ object SQLConverter {
 			"BINARY", "BLOB", "LONGBLOB", "MEDIUMBLOB", "TINYBLOB", "VARBINARY" -> (value as ByteArray).json
 			"BIT" -> (value as Boolean).json
 			"CHAR", "TEXT", "VARCHAR", "TINYTEXT", "LONGTEXT" -> (value as String).json
-			"DATE" -> try { (value as Date).toLocalDate().format(dateFormatter).json }
-			catch (_: Throwable) { JsonNull }
-			"DATETIME" -> try { (value as LocalDateTime).format(dateTimeFormatter).json } catch (_: Throwable) { JsonNull }
+			"DATE" -> catchingDefault(JsonNull) { (value as Date).toLocalDate().format(dateFormatter).json }
+			"DATETIME" -> catchingDefault(JsonNull) { (value as LocalDateTime).format(dateTimeFormatter).json }
 			"DECIMAL" -> (value as BigDecimal).json
 			"DOUBLE" -> (value as Double).json
 			"FLOAT" -> (value as Float).json
 			"INT", "TINYINT", "MEDIUMINT", "SMALLINT" -> (value as Int).json
 			"JSON" -> (value as String).parseJson
-			"TIME" -> try { (value as Time).toLocalTime().format(timeFormatter).json } catch (_: Throwable) { JsonNull }
-			"TIMESTAMP" -> try { (value as Timestamp).toLocalDateTime().format(dateTimeFormatter).json } catch (_: Throwable) { JsonNull }
+			"TIME" -> catchingDefault(JsonNull) { (value as Time).toLocalTime().format(timeFormatter).json }
+			"TIMESTAMP" -> catchingDefault(JsonNull) { (value as Timestamp).toLocalDateTime().format(dateTimeFormatter).json }
 			else -> "$type ${value::class.qualifiedName} $value".json
 		}
 	}
 
-	fun convertTime(ts: String): Long = try {
-		LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli()
-	} catch (_: Throwable) { 0L }
+	fun convertTime(ts: String): Long = catchingDefault(0L) { LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli() }
 }
 
 fun Connection.throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
@@ -94,7 +93,7 @@ fun Connection.throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
 	}
 }
 
-fun Connection.querySQL(sql: String, vararg args: Any?): JsonArray? = try { throwQuerySQL(sql, *args) } catch (_: Throwable) { null }
+fun Connection.querySQL(sql: String, vararg args: Any?): JsonArray? = catchingNull { throwQuerySQL(sql, *args) }
 
 fun Connection.throwQuerySQLSingle(sql: String, vararg args: Any?): JsonObject {
 	val result = throwQuerySQL(sql, *args)
@@ -102,12 +101,11 @@ fun Connection.throwQuerySQLSingle(sql: String, vararg args: Any?): JsonObject {
 	return result[0].Object
 }
 
-fun Connection.querySQLSingle(sql: String, vararg args: Any?): JsonObject? = try {
+fun Connection.querySQLSingle(sql: String, vararg args: Any?): JsonObject? = catchingNull {
 	val result = throwQuerySQL(sql, *args)
 	if (result.size != 1) throw Throwable("NotSingle ${args.joinToString()}")
 	result[0].Object
 }
-catch (_: Throwable) { null }
 
 fun Connection.throwExecuteSQL(sql: String, vararg args: Any?) {
 	val statement = this.prepareStatement(sql)

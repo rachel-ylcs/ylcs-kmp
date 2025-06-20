@@ -9,6 +9,8 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.MusicResourceType
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 
 @Stable
@@ -23,12 +25,11 @@ abstract class MusicFactory {
     private fun initLibrary() = Coroutines.startIO {
         val musicPath = OS.Storage.musicPath
         SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
-            try {
+            catching {
                 val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
                 val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
                 musicLibrary[info.id] = info
             }
-            catch (_: Throwable) { }
         }
     }
 
@@ -93,12 +94,9 @@ abstract class MusicFactory {
         for (id in ids) {
             val modification = musicLibrary[id]?.modification ?: 0
             val info = Coroutines.io {
-                try {
+                catchingNull {
                     val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
                     SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
-                }
-                catch (_: Throwable) {
-                    null
                 }
             }
             if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)

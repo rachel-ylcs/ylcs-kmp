@@ -29,6 +29,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.extension.Array
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.to
 import love.yinlin.platform.app
@@ -181,7 +182,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {
                 val (answers, results) = remember(args) {
-                    try {
+                    catchingDefault({ makeArray { } to emptyList() }) {
                         val (results, answers) = when (val tmp = args.result) {
                             null -> emptyList<GameResult>() to emptyList()
                             is JsonArray -> tmp.map { it.to<GameResult>() } to args.answer.Array
@@ -189,9 +190,6 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                         }
                         require(answers.size == results.size)
                         answers to results
-                    }
-                    catch (_: Throwable) {
-                        makeArray { } to emptyList()
                     }
                 }
 

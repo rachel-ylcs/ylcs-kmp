@@ -27,6 +27,7 @@ import love.yinlin.extension.Object
 import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
 import love.yinlin.extension.arr
+import love.yinlin.extension.catching
 import love.yinlin.extension.obj
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
@@ -367,7 +368,7 @@ object WeiboAPI {
 		val cards = data.arr("cards")
 		val items = mutableListOf<Weibo>()
 		for (item in cards) {
-			try {
+			catching {
 				val card = item.Object
 				val cardType = card["card_type"].Int
 				if (cardType == 11) {
@@ -375,7 +376,6 @@ object WeiboAPI {
 				}
 				else if (cardType == 9) items += getWeibo(card)
 			}
-			catch (_: Throwable) { }
 		}
 		items to newSinceId
 	}

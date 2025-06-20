@@ -10,7 +10,6 @@ import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.api.common.commonAPI
-import love.yinlin.api.user.socketsAPI
 import love.yinlin.api.test.testAPI
 import love.yinlin.api.user.userAPI
 import love.yinlin.copy

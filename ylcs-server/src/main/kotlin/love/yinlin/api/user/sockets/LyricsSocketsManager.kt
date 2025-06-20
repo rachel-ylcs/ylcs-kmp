@@ -20,6 +20,7 @@ import love.yinlin.values
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.coroutineContext
+import kotlin.random.Random
 
 private suspend inline fun WebSocketServerSession.send(data: LyricsSockets.SM) = this.sendSerialized(data)
 
@@ -38,13 +39,21 @@ object LyricsSocketsManager {
     }
 
     private class Room(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo) {
-        private val lyrics = library.indices.shuffled().take(LyricsSockets.QUESTION_COUNT).map { library[it] }
+        private val lyrics = run {
+            val set = mutableSetOf<Int>()
+            val random = Random(System.currentTimeMillis())
+            for (i in library.size - LyricsSockets.QUESTION_COUNT until library.size) {
+                val randomIndex = random.nextInt(i + 1)
+                if (!set.add(randomIndex)) set.add(i)
+            }
+            set.map { library[it] }
+        }
         val roomId: String = UUID.randomUUID().toString()
         var createTime: Long = System.currentTimeMillis()
         var submitTime1: Long? = null
         var submitTime2: Long? = null
-        val questions: List<String> get() = lyrics.map { it.q }
-        val answers: List<String> get() = lyrics.map { it.a }
+        val questions: List<Pair<String, Int>> = lyrics.map { it.q to it.a.length }
+        val answers: List<String> = lyrics.map { it.a }
         val answers1: MutableList<String?> = MutableList(LyricsSockets.QUESTION_COUNT) { null }
         val answers2: MutableList<String?> = MutableList(LyricsSockets.QUESTION_COUNT) { null }
     }
@@ -88,8 +97,9 @@ object LyricsSocketsManager {
         room.createTime = newCreateTime
         val player1 = players[room.info1.uid]
         val player2 = players[room.info2.uid]
-        if (player1?.room?.roomId == room.roomId) player1.session.send(LyricsSockets.SM.GameStart(room.questions))
-        if (player2?.room?.roomId == room.roomId) player2.session.send(LyricsSockets.SM.GameStart(room.questions))
+        val questions = LyricsSockets.SM.GameStart(room.questions)
+        if (player1?.room?.roomId == room.roomId) player1.session.send(questions)
+        if (player2?.room?.roomId == room.roomId) player2.session.send(questions)
         onPlayingTimer(room)
     }
 

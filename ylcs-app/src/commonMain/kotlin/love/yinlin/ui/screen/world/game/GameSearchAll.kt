@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +34,7 @@ import love.yinlin.data.rachel.game.info.SAConfig
 import love.yinlin.data.rachel.game.info.SAInfo
 import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -44,7 +47,7 @@ import love.yinlin.ui.screen.community.BoxText
 @Composable
 fun ColumnScope.SearchAllCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
-        try { game.info.to<SAInfo>() } catch (_: Throwable) { null }
+        catchingNull { game.info.to<SAInfo>() }
     }
     if (info != null) {
         RachelText(
@@ -61,11 +64,7 @@ fun ColumnScope.SearchAllCardInfo(game: GamePublicDetailsWithName) {
 @Composable
 fun ColumnScope.SearchAllCardQuestionAnswer(game: GameDetailsWithName) {
     val answer = remember(game) {
-        try {
-            game.answer.to<List<String>>()
-        } catch (_: Throwable) {
-            null
-        }
+        catchingNull { game.answer.to<List<String>>() }
     }
     if (answer != null) {
         Text(
@@ -107,10 +106,7 @@ private fun ColumnScope.SearchAllRecordResult(result: SAResult) {
 @Composable
 fun ColumnScope.SearchAllRecordCard(answer: JsonElement, info: JsonElement) {
     val data = remember(answer, info) {
-        try {
-            answer.to<List<String>>() to info.to<SAResult>()
-        }
-        catch (_: Throwable) { null }
+        catchingNull { answer.to<List<String>>() to info.to<SAResult>() }
     }
 
     data?.let { (actualAnswer, actualResult) ->
@@ -224,7 +220,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
-        preflight = try {
+        preflight = catchingNull {
             inputState.text = ""
             items.clear()
             val info = preflightResult.info.to<SAInfo>()
@@ -234,7 +230,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 info = info,
                 count = preflightResult.question.Int,
             )
-        } catch (_: Throwable) { null }
+        }
         if (preflight != null) scope.launch {
             while (true) {
                 if (time > 1000L) time -= 1000L
@@ -246,14 +242,18 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     override fun settle(gameResult: GameResult) {
-        result = try {
-            gameResult.info.to()
-        } catch (_: Throwable) { null }
+        result = catchingNull { gameResult.info.to() }
     }
 
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (_, question) ->
+            val focusRequester = remember { FocusRequester() }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
             Text(
                 text = remember(time) { time.timeString },
                 style = MaterialTheme.typography.labelLarge,
@@ -266,7 +266,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 maxLength = SAConfig.maxLength,
                 clearButton = false,
                 onImeClick = { addOption() },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
             FlowRow(modifier = Modifier.fillMaxWidth()) {
                 for (item in items) {

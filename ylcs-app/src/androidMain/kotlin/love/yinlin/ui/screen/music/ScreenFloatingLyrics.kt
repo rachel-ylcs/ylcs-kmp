@@ -24,7 +24,7 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
@@ -99,7 +99,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         }
 
         RowLayout("左侧偏移") {
-            BeautifulSlider(
+            ProgressSlider(
                 value = androidConfig.leftProgress,
                 onValueChange = { androidConfig = androidConfig.copyLeft(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
@@ -108,7 +108,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         }
 
         RowLayout("右侧偏移") {
-            BeautifulSlider(
+            ProgressSlider(
                 value = androidConfig.rightProgress,
                 onValueChange = { androidConfig = androidConfig.copyRight(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
@@ -117,7 +117,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         }
 
         RowLayout("顶部偏移") {
-            BeautifulSlider(
+            ProgressSlider(
                 value = androidConfig.topProgress,
                 onValueChange = { androidConfig = androidConfig.copyTop(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
@@ -126,7 +126,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         }
 
         RowLayout("字体大小") {
-            BeautifulSlider(
+            ProgressSlider(
                 value = androidConfig.textSizeProgress,
                 onValueChange = { androidConfig = androidConfig.copyTextSize(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },

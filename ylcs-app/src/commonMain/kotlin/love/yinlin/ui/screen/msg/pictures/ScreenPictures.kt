@@ -37,6 +37,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_photo_album
@@ -46,6 +47,7 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.common.ScreenImagePreview
@@ -93,13 +95,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
             val result = ClientAPI.request<JsonObject>(route = ServerRes.Photo)
-            val data = Coroutines.cpu {
-                try {
-                    PhotoItem.parseJson("相册", (result as Data.Success).data)
-                } catch (_: Throwable) {
-                    null
-                }
-            }
+            val data = Coroutines.cpu { catchingNull { PhotoItem.parseJson("相册", (result as Data.Success).data) } }
             if (data != null) {
                 photos = data
                 stack.clear()
@@ -195,7 +191,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                        modifier = Modifier.condition(isAlbum, ifTrue = { fillMaxWidth() }, ifFalse = { width(ThemeValue.Size.CellWidth) })
                     )
                 }
             }

@@ -4,6 +4,7 @@ package love.yinlin.platform
 import kotlinx.io.files.Path
 import love.yinlin.Local
 import love.yinlin.common.Uri
+import love.yinlin.extension.catching
 import net.harawata.appdirs.AppDirsFactory
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -24,14 +25,11 @@ actual fun osApplicationCopyText(text: String): Boolean {
 	return true
 }
 
-actual fun osNetOpenUrl(url: String) {
-	try {
-		val desktop = Desktop.getDesktop()
-		if (desktop.isSupported(Desktop.Action.BROWSE)) {
-			desktop.browse(URI(url))
-		}
+actual fun osNetOpenUrl(url: String) = catching {
+	val desktop = Desktop.getDesktop()
+	if (desktop.isSupported(Desktop.Action.BROWSE)) {
+		desktop.browse(URI(url))
 	}
-	catch (_: Exception) { }
 }
 
 val osAppPath: Path get() {

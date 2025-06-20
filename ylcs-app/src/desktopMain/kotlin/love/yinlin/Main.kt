@@ -9,11 +9,12 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CropSquare
+import androidx.compose.material.icons.outlined.MobiledataOff
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.VerticalAlignTop
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,7 @@ import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
+import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -91,6 +93,8 @@ fun main() {
             height = 700.dp
         )
 
+        var alwaysOnTop by rememberFalse()
+
         Window(
             onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
@@ -98,6 +102,7 @@ fun main() {
             undecorated = true,
             resizable = true,
             transparent = true,
+            alwaysOnTop = alwaysOnTop,
             state = state,
         ) {
             // MinimumSize
@@ -140,6 +145,12 @@ fun main() {
                                         }
                                     }
                                 }
+                            }
+                            Action(
+                                icon = if (alwaysOnTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            ) {
+                                alwaysOnTop = !alwaysOnTop
                             }
                             Action(
                                 icon = Icons.Outlined.Remove,

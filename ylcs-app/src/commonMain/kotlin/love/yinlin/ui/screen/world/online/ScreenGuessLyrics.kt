@@ -27,6 +27,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.url
+import io.ktor.http.HttpMethod
+import io.ktor.http.URLProtocol
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -151,7 +154,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         @Stable
         data class Preparing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long) : Status
         @Stable
-        data class Playing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long, val questions: List<String>, val answers: List<String?>, val count1: Int, val count2: Int) : Status
+        data class Playing(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo, val time: Long, val questions: List<Pair<String, Int>>, val answers: List<String?>, val count1: Int, val count2: Int) : Status
         @Stable
         data class Waiting(val info: LyricsSockets.PlayerInfo) : Status
         @Stable
@@ -159,8 +162,32 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     private var currentStatus: Status by mutableStateOf(Status.Hall)
-    private var session: DefaultClientWebSocketSession? = null
+    private var session: DefaultClientWebSocketSession? by mutableStateOf(null)
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
+
+    private suspend fun sessionLoop() {
+        try {
+            session?.close()
+            val newSession = app.socketsClient.webSocketSession {
+                method = HttpMethod.Get
+                url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
+            }
+            session = newSession
+            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
+            newSession.incoming.consumeAsFlow().collect { frame ->
+                if (frame is Frame.Text) {
+                    val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
+                    if (msg != null) dispatchMessage(msg)
+                }
+            }
+        }
+        catch (e: Throwable) {
+            slot.tip.error("断开连接 ${e.message}")
+        } finally {
+            session?.close()
+            session = null
+        }
+    }
 
     private suspend inline fun send(data: LyricsSockets.CM) {
         session?.sendSerialized(data) ?: slot.tip.error("无法连接到服务器")
@@ -220,7 +247,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         }
     }
 
-    private fun handlePlaying(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo, questions: List<String>) {
+    private fun handlePlaying(info1: LyricsSockets.PlayerInfo, info2: LyricsSockets.PlayerInfo, questions: List<Pair<String, Int>>) {
         currentStatus = Status.Playing(info1, info2, LyricsSockets.PLAYING_TIME, questions, questions.map { null }, 0, 0)
         launch {
             for (i in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
@@ -450,18 +477,19 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             )
         }
 
+        val (question, answerLength) = status.questions[index]
         Text(
-            text = status.questions[index],
+            text = remember(question) { "上句: $question" },
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = status.answers[index] ?: "",
+            text = remember(index) { "下句: ${status.answers[index] ?: ""}" },
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.fillMaxWidth()
         )
         TextInput(
             state = inputState,
-            hint = "输入歌词下句(回车保存)",
+            hint = "[下句${answerLength}字](回车保存)",
             clearButton = false,
             maxLength = 16,
             onImeClick = {
@@ -530,8 +558,12 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                             text = "提交",
                             icon = Icons.Outlined.Check,
                             onClick = {
-                                send(LyricsSockets.CM.Submit)
-                                currentStatus = Status.Waiting(status.info2)
+                                val blankCount = status.answers.count { it == null }
+                                val submit = if (blankCount > 0) slot.confirm.openSuspend(content = "还有${blankCount}题未填写, 是否提交?") else true
+                                if (submit) {
+                                    send(LyricsSockets.CM.Submit)
+                                    currentStatus = Status.Waiting(status.info2)
+                                }
                             }
                         )
                     }
@@ -641,25 +673,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     override suspend fun initialize() {
-        launch {
-            try {
-                val newSession = app.socketsClient.webSocketSession(host = Local.API_HOST, path = LyricsSockets.path)
-                session = newSession
-                send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
-                newSession.incoming.consumeAsFlow().collect { frame ->
-                    if (frame is Frame.Text) {
-                        val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
-                        if (msg != null) dispatchMessage(msg)
-                    }
-                }
-            }
-            catch (e: Throwable) {
-                slot.tip.error("断开连接 ${e.message}")
-            } finally {
-                session?.close()
-                session = null
-            }
-        }
+        launch { sessionLoop() }
     }
 
     @Composable
@@ -680,9 +694,21 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         }
     }
 
-    override val fabIcon: ImageVector? by derivedStateOf { if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null }
+    override val fabIcon: ImageVector? by derivedStateOf {
+        if (session != null) {
+            if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null
+        }
+        else ExtraIcons.Disconnect
+    }
 
     override suspend fun onFabClick() {
-        if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
+        if (session != null) {
+            if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
+        }
+        else launch {
+            players.clear()
+            currentStatus = Status.Hall
+            sessionLoop()
+        }
     }
 }

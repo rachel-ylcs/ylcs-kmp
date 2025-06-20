@@ -35,6 +35,7 @@ import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
@@ -245,7 +246,7 @@ fun ColumnScope.BlockTextCardInfo(game: GamePublicDetailsWithName) {}
 @Composable
 fun ColumnScope.BlockTextCardQuestionAnswer(game: GameDetailsWithName) {
     val answer = remember(game) {
-        try {
+        catchingNull {
             val question = game.question.String
             val answer = game.answer.String
             val gridSize = sqrt(answer.length.toFloat()).toInt()
@@ -259,8 +260,6 @@ fun ColumnScope.BlockTextCardQuestionAnswer(game: GameDetailsWithName) {
                     else -> BlockCharacter(ch2, false)
                 }
             }
-        } catch (_: Throwable) {
-            null
         }
     }
     answer?.let { (blockSize, data) ->
@@ -294,7 +293,7 @@ private fun ColumnScope.BlockTextRecordResult(result: BTResult) {
 @Composable
 fun ColumnScope.BlockTextRecordCard(answer: JsonElement, info: JsonElement) {
     val data = remember(answer, info) {
-        try {
+        catchingNull {
             val answerString = answer.String
             val gridSize = sqrt(answerString.length.toFloat()).toInt()
             require(gridSize * gridSize == answerString.length && gridSize in BTConfig.minBlockSize .. BTConfig.maxBlockSize)
@@ -307,7 +306,6 @@ fun ColumnScope.BlockTextRecordCard(answer: JsonElement, info: JsonElement) {
             val actualResult = info.to<BTResult>()
             Triple(gridSize, data, actualResult)
         }
-        catch (_: Throwable) { null }
     }
 
     data?.let { (blockSize, data, actualResult) ->
@@ -424,7 +422,7 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     }
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
-        preflight = try {
+        preflight = catchingNull {
             val text = preflightResult.question.String
             val gridSize = sqrt(text.length.toFloat()).toInt()
             require(gridSize * gridSize == text.length && gridSize in BTConfig.minBlockSize .. BTConfig.maxBlockSize)
@@ -437,13 +435,11 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 }
             }
             Preflight(gridSize = gridSize)
-        } catch (_: Throwable) { null }
+        }
     }
 
     override fun settle(gameResult: GameResult) {
-        result = try {
-            gameResult.info.to()
-        } catch (_: Throwable) { null }
+        result = catchingNull { gameResult.info.to() }
     }
 
     @Composable

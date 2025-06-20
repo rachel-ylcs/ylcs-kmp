@@ -56,7 +56,7 @@ import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
@@ -387,7 +387,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		chorus: List<Long>?,
 		modifier: Modifier = Modifier
 	) {
-		BeautifulSlider(
+		ProgressSlider(
 			value = if (duration == 0L) 0f else currentTime / duration.toFloat(),
 			height = ThemeValue.Size.ProgressHeight,
 			showThumb = false,
@@ -758,17 +758,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		monitor(state = { factory.currentMusic }) { musicInfo ->
 			lyrics.reset()
 
-			if (musicInfo != null) {
-				try {
-					Coroutines.io {
-						SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-							lyrics.parseLrcString(source.readText())
-						}
-						hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
-						hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
+			if (musicInfo != null) catching {
+				Coroutines.io {
+					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
+						lyrics.parseLrcString(source.readText())
 					}
+					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
+					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
 				}
-				catch (_: Throwable) { }
 			}
 			else {
 				hasAnimation = false

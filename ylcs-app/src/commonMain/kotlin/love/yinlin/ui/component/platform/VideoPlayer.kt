@@ -22,7 +22,7 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.extension.timeString
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.layout.Space
 
 @Composable
@@ -106,7 +106,7 @@ fun VideoPlayerControls(
                 leftAction()
                 Space()
             }
-            BeautifulSlider(
+            ProgressSlider(
                 value = if (duration == 0L) 0f else position / duration.toFloat(),
                 onValueChangeFinished = { onProgressClick((it * duration).toLong()) },
                 modifier = Modifier.weight(1f)

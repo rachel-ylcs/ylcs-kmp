@@ -47,12 +47,12 @@ import love.yinlin.ui.component.image.IconText
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitLayout
-import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 import love.yinlin.ui.screen.msg.activity.ScreenActivityDetails
 import love.yinlin.ui.screen.msg.activity.ScreenAddActivity
+import love.yinlin.ui.screen.msg.douyin.ScreenDouyin
 import love.yinlin.ui.screen.msg.pictures.ScreenPictures
 import love.yinlin.ui.screen.msg.weibo.*
 import kotlin.math.abs
@@ -82,55 +82,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			navigate(ScreenImagePreview.Args(pics, current))
 		}
 
-		override fun onWeiboPicsDownload(pics: List<Picture>) {
-			OS.ifPlatform(
-				*Platform.Phone,
-				ifTrue = {
-					launch {
-						slot.loading.openSuspend()
-						Coroutines.io {
-							for (pic in pics) {
-								val url = pic.source
-								val filename = url.substringAfterLast('/').substringBefore('?')
-								Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
-									val result = sink.use {
-										val result = app.fileClient.safeDownload(
-											url = url,
-											sink = it,
-											isCancel = { false },
-											onGetSize = {},
-											onTick = { _, _ -> }
-										)
-										if (result) Picker.actualSave(filename, origin, sink)
-										result
-									}
-									Picker.cleanSave(origin, result)
-								}
-							}
-						}
-						slot.loading.close()
-					}
-				},
-				ifFalse = {
-					slot.tip.warning(UnsupportedPlatformText)
-				}
-			)
-		}
-
 		override fun onWeiboVideoClick(pic: Picture) {
 			navigate(ScreenVideo.Args(pic.video))
-		}
-
-		override fun onWeiboVideoDownload(url: String) {
-			val filename = url.substringAfterLast('/').substringBefore('?')
-			launch {
-				Coroutines.io {
-					Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-						val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-						Picker.cleanSave(origin, result)
-					}
-				}
-			}
 		}
 	}
 
@@ -200,6 +153,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				IconText(
+					icon = ExtraIcons.Pictures,
+					text = "美图",
+					onClick = { navigate<ScreenPictures>() }
+				)
+				IconText(
 					icon = ExtraIcons.Weibo,
 					text = "微博",
 					onClick = { navigate<ScreenWeibo>() }
@@ -210,9 +168,9 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					onClick = { navigate<ScreenChaohua>() }
 				)
 				IconText(
-					icon = ExtraIcons.Pictures,
-					text = "美图",
-					onClick = { navigate<ScreenPictures>() }
+					icon = ExtraIcons.Douyin,
+					text = "抖音",
+					onClick = { navigate<ScreenDouyin>() }
 				)
 			}
 		}
@@ -415,12 +373,5 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			Device.Type.PORTRAIT -> Portrait()
 			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
 		}
-	}
-
-	private val downloadVideoDialog = FloatingDownloadDialog()
-
-	@Composable
-	override fun Floating() {
-		downloadVideoDialog.Land()
 	}
 }

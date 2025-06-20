@@ -413,16 +413,13 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 			}
 		}
 
-		fun parse(data: String): RichString = try {
+		fun parse(data: String): RichString = catchingDefault({ RichString() }) {
 			buildRichString {
 				if (data.startsWith('{') && data.endsWith('}')) {
 					parseElement(data.parseJson, this)
 				}
 				else text(data)
 			}
-		}
-		catch (_: Throwable) {
-			RichString()
 		}
 	}
 }

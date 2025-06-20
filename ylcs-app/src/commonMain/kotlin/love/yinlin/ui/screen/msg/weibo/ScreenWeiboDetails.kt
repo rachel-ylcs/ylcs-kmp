@@ -97,7 +97,11 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 		) {
 			item(key = ItemKey("WeiboLayout")) {
 				Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
-				WeiboLayout(weibo = weibo)
+				WeiboLayout(
+					weibo = weibo,
+					onPicturesDownload = null,
+					onVideoDownload = null
+				)
 			}
 			comments?.let { weiboComments ->
 				item(key = ItemKey("HorizontalDivider")) {
@@ -123,7 +127,11 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 		) {
 			Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
 				Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
-				WeiboLayout(weibo = weibo)
+				WeiboLayout(
+					weibo = weibo,
+					onPicturesDownload = null,
+					onVideoDownload = null
+				)
 			}
 			VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace))
 			Box(modifier = Modifier.weight(1f).fillMaxHeight()) {

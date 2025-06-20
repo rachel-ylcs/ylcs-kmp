@@ -41,7 +41,8 @@ import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.BeautifulSlider
+import love.yinlin.ui.component.input.CylinderSlider
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.BoxText
@@ -140,46 +141,42 @@ fun <T : Number> GameSlider(
     onProgressChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
+    CylinderSlider(
+        value = progress,
+        onValueChanged = onProgressChange,
+        modifier = modifier
+    ) { percent ->
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
         Row(
-            modifier = Modifier.fillMaxWidth()
-                .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.primary)
-                .padding(ThemeValue.Padding.EqualExtraValue),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = title)
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BeautifulSlider(
-                    value = progress,
-                    onValueChangeFinished = onProgressChange,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                ) {
-                    Text(text = minValue.toString())
-                    Text(
-                        text = remember(progress, minValue, maxValue) {
-                            when (minValue) {
-                                is Int if maxValue is Int -> progress.cast(minValue, maxValue).toString()
-                                is Float if maxValue is Float -> progress.cast(minValue, maxValue).toString()
-                                else -> "error"
-                            }
-                        },
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(text = maxValue.toString())
-                }
-            }
+            Text(
+                text = remember(percent, minValue, maxValue) {
+                    "当前: ${when (minValue) {
+                        is Int if maxValue is Int -> percent.cast(minValue, maxValue)
+                        is Float if maxValue is Float -> percent.cast(minValue, maxValue)
+                        else -> "N/A"
+                    }}"
+                },
+                textAlign = TextAlign.Start,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = remember(percent, minValue, maxValue) { "范围: $minValue ~ $maxValue" },
+                textAlign = TextAlign.End,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }

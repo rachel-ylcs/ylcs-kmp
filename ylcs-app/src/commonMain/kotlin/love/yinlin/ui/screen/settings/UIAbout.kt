@@ -67,9 +67,9 @@ object About {
     internal val updateInfo = UpdateInfo(
         platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
         title = null,
-        force = false,
-        maintenance = false,
-        date = LocalDate(2025, 6, 17),
+        force = true,
+        maintenance = true,
+        date = LocalDate(2025, 6, 21),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
@@ -77,9 +77,10 @@ object About {
                 color = Colors.Steel4,
                 background = Colors.Steel2,
                 records = listOf(
-                    "1. 美图支持搜索关键字",
-                    "2. 1v1在线联机对战默写歌词小游戏(测试中...)",
-                    "3. 世界页小游戏板块增加排行榜"
+                    "1. 资讯接入银临抖音板块与视频下载",
+                    "2. 经验系统上线(等级相关, 经验与银币独立计算)",
+                    "3. 小游戏新增[你画我猜]",
+                    "4. 桌面端支持窗口置顶",
                 )
             ),
             UpdateRecordGroup(
@@ -88,14 +89,13 @@ object About {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 管理员可以删除游戏, 删除游戏时二次确认",
-                    "2. 所有输入框弹出时自动获取焦点, 电脑端支持回车确认",
-                    "3. 优化全平台列表滚动性能",
-                    "4. [小游戏] 横屏适配, 奖励机制调整, 游戏结算提醒",
-                    "   [答题] 战绩页显示自己的答案",
-                    "   [网格填词] 支持横竖批量填写",
-                    "   [寻花令] 禁止标点符号, 支持常用字表",
-                    "   [词寻] 增加倒计时提示"
+                    "1. 所有图片加载将显示进度圈和状态遮罩",
+                    "2. 更新字体以支持更多字符",
+                    "3. 重构滑块条UI",
+                    "4. 小游戏优化",
+                    "   [答题] 选择题或填空题完成后自动跳转下一题",
+                    "   [寻花令] 输入框自动获取焦点",
+                    "   [歌词对战] 断线后可重新回到大厅, 如有未做的题提交前提示, 显示答案的字数要求",
                 )
             ),
             UpdateRecordGroup(
@@ -104,9 +104,9 @@ object About {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复Android端WebView在深色模式下仍然保持白色背景",
-                    "2. 修复当前播放列表标题与停止键被滚动遮挡",
-                    "3. 修复小游戏下一题按钮位置不正确"
+                    "1. 修复网页端无法进入在线歌词对战",
+                    "2. 修复美图页过长标题被遮挡",
+                    "3. 修复微博超话页下载视频或图片不显示进度框"
                 )
             )
         )

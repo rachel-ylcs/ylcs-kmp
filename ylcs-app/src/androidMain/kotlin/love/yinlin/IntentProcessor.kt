@@ -6,6 +6,7 @@ import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.Scheme
 import love.yinlin.common.Uri
 import love.yinlin.common.toUri
+import love.yinlin.extension.catching
 
 object IntentProcessor {
     private object ActionView {
@@ -52,14 +53,10 @@ object IntentProcessor {
         }
     }
 
-    fun process(intent: Intent) {
-        try {
-            when (intent.action) {
-                Intent.ACTION_VIEW -> ActionView.process(intent.data!!)
-                Intent.ACTION_SEND -> ActionSend.process(intent)
-            }
-        } catch (e: Throwable) {
-            e.printStackTrace()
+    fun process(intent: Intent) = catching {
+        when (intent.action) {
+            Intent.ACTION_VIEW -> ActionView.process(intent.data!!)
+            Intent.ACTION_SEND -> ActionSend.process(intent)
         }
     }
 }

@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -31,6 +33,7 @@ import love.yinlin.data.rachel.game.info.FOInfo
 import love.yinlin.data.rachel.game.info.FOType
 import love.yinlin.extension.Int
 import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.input.RachelText
@@ -68,7 +71,7 @@ private fun FlowersOrderText(
 @Composable
 fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
-        try { game.info.to<FOInfo>() } catch (_: Throwable) { null }
+        catchingNull { game.info.to<FOInfo>() }
     }
     if (info != null) {
         RachelText(
@@ -81,11 +84,7 @@ fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
 @Composable
 fun ColumnScope.FlowersOrderCardQuestionAnswer(game: GameDetailsWithName) {
     val answer = remember(game) {
-        try {
-            game.answer.String
-        } catch (_: Throwable) {
-            null
-        }
+        catchingNull { game.answer.String }
     }
     if (answer != null) {
         Text(
@@ -119,10 +118,7 @@ private fun ColumnScope.FlowersOrderRecordResult(text: String, result: Int) {
 @Composable
 fun ColumnScope.FlowersOrderRecordCard(answer: JsonElement, info: JsonElement) {
     val data = remember(answer, info) {
-        try {
-            answer.String to info.Int
-        }
-        catch (_: Throwable) { null }
+        catchingNull { answer.String to info.Int }
     }
 
     data?.let { (actualAnswer, actualResult) ->
@@ -207,7 +203,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
-        preflight = try {
+        preflight = catchingNull {
             inputState.text = ""
             val answer = preflightResult.answer.to<List<String>>()
             val result = preflightResult.result.to<List<GameResult>>().map { it.info.Int }
@@ -283,18 +279,22 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                     }
                 }
             )
-        } catch (_: Throwable) { null }
+        }
     }
 
     override fun settle(gameResult: GameResult) {
-        result = try {
-            gameResult.info.Int
-        } catch (_: Throwable) { null }
+        result = catchingNull { gameResult.info.Int }
     }
 
     @Composable
     override fun ColumnScope.Content() {
         preflight?.let { (question, answer, result, oldCharacters) ->
+            val focusRequester = remember { FocusRequester() }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
             Text(
                 text = "寻花令长度: $question",
                 style = MaterialTheme.typography.titleLarge,
@@ -309,7 +309,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 hint = "答案",
                 maxLength = question,
                 clearButton = false,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
             Text(
                 text = "历史记录",

@@ -1,13 +1,16 @@
 package love.yinlin.ui.screen.music
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -16,11 +19,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
+import io.github.alexzhirkevich.qrose.options.QrBallShape
+import io.github.alexzhirkevich.qrose.options.QrBrush
+import io.github.alexzhirkevich.qrose.options.QrFrameShape
+import io.github.alexzhirkevich.qrose.options.QrPixelShape
+import io.github.alexzhirkevich.qrose.options.brush
+import io.github.alexzhirkevich.qrose.options.circle
+import io.github.alexzhirkevich.qrose.options.roundCorners
+import io.github.alexzhirkevich.qrose.options.solid
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
@@ -30,15 +48,20 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
+import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
+import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationColumn
+import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -364,6 +387,9 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
 
     @Composable
     override fun ActionScope.RightActions() {
+        Action(Icons.Outlined.Share) {
+            shareSheet.open()
+        }
         Action(Icons.Outlined.Download) {
             val group = when (args.song.album) {
                 "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> ModQQGroup.Album
@@ -399,5 +425,102 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(song = args.song)
             Device.Type.LANDSCAPE -> Landscape(song = args.song)
         }
+    }
+
+    private val shareSheet = object : FloatingSheet() {
+        override val maxHeightRatio: Float = 1f
+        override val initFullScreen: Boolean = true
+
+        @Composable
+        override fun Content() {
+            val gradientColors = remember {
+                listOf(Colors.Steel3, Colors.Steel4, Colors.Steel5, Colors.Steel6, Colors.Steel7, Colors.Steel8)
+            }
+
+            Box(modifier = Modifier.padding(
+                horizontal = ThemeValue.Padding.HorizontalExtraSpace * 2,
+                vertical = ThemeValue.Padding.VerticalExtraSpace * 2
+            ).fillMaxSize().shadow(
+                elevation = ThemeValue.Shadow.Surface * 2,
+                shape = MaterialTheme.shapes.extraLarge,
+                ambientColor = Colors.Steel5,
+                spotColor = Colors.Steel6
+            ).background(
+                brush = Brush.linearGradient(colors = gradientColors),
+                shape = MaterialTheme.shapes.extraLarge
+            )) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace, Alignment.Bottom)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f).padding(ThemeValue.Padding.ExtraValue),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        ColorfulIcon(
+                            icon = colorfulImageVector(
+                                icon = Icons.AutoMirrored.Outlined.Send,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                background = MaterialTheme.colorScheme.secondaryContainer
+                            ),
+                            gap = 2f,
+                            onClick = {
+
+                            }
+                        )
+                    }
+                    Text(
+                        text = args.song.name,
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Colors.Ghost,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                    )
+                    Text(
+                        text = args.song.singer,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Colors.Ghost,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        WebImage(
+                            uri = args.song.recordPath,
+                            key = Local.VERSION,
+                            quality = ImageQuality.Full,
+                            modifier = Modifier.fillMaxWidth(fraction = 0.65f)
+                                .aspectRatio(1f)
+                                .clip(MaterialTheme.shapes.extraLarge.copy(topStart = CornerSize(0), bottomEnd = CornerSize(0)))
+                        )
+                        Box(modifier = Modifier.background(Colors.Ghost).weight(1f).aspectRatio(1f)) {
+                            MiniImage(
+                                painter = rememberQrCodePainter(data = "rachel://yinlin.love/openSong?id=${args.song.id}") {
+                                    shapes {
+                                        ball = QrBallShape.circle()
+                                        frame = QrFrameShape.roundCorners(0.25f)
+                                    }
+                                    colors {
+                                        dark = QrBrush.solid(Colors.Dark)
+                                        frame = QrBrush.solid(Colors.Dark)
+                                    }
+                                },
+                                modifier = Modifier.padding(ThemeValue.Padding.EqualExtraSpace)
+                                    .fillMaxSize().clip(MaterialTheme.shapes.small)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    override fun Floating() {
+        shareSheet.Land()
     }
 }

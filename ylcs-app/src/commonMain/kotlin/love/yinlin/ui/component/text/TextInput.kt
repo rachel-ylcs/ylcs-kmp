@@ -23,17 +23,7 @@ import love.yinlin.ui.component.image.ClickIcon
 @Serializable
 enum class InputType {
 	COMMON,
-	PASSWORD;
-
-	internal val toVisualTransformation: VisualTransformation get() = when (this) {
-		COMMON -> VisualTransformation.None
-		PASSWORD -> PasswordVisualTransformation()
-	}
-
-	internal val toKeyboardOptions: KeyboardOptions get() = when (this) {
-		COMMON -> KeyboardOptions.Default
-		PASSWORD -> KeyboardOptions(keyboardType = KeyboardType.Password)
-	}
+	PASSWORD
 }
 
 @Stable
@@ -99,8 +89,22 @@ fun TextInput(
 		leadingIcon = leadingIcon,
 		trailingIcon = trailingIcon,
 		readOnly = readOnly,
-		visualTransformation = remember(inputType) { inputType.toVisualTransformation },
-		keyboardOptions = remember(inputType, imeAction) { inputType.toKeyboardOptions.copy(imeAction = imeAction) },
+		visualTransformation = remember(inputType) {
+			when (inputType) {
+				InputType.COMMON -> VisualTransformation.None
+				InputType.PASSWORD -> PasswordVisualTransformation()
+			}
+		},
+		keyboardOptions = remember(inputType, imeAction) {
+			KeyboardOptions(
+				keyboardType = when (inputType) {
+					InputType.COMMON -> KeyboardType.Text
+					InputType.PASSWORD -> KeyboardType.Password
+				},
+				autoCorrectEnabled = false,
+				imeAction = imeAction
+			)
+		},
 		keyboardActions = remember(imeAction, onImeClick) {
 			KeyboardActions(
 				onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,

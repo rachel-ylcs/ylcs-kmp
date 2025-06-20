@@ -36,6 +36,8 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.rememberFalse
@@ -72,12 +74,11 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         suspend fun ScreenMusicDetails.invoke(item: ResourceItem) {
             if (!enabled) return
             if (!slot.confirm.openSuspend(content = "删除资源")) return
-            try {
+            catching {
                 val resourceFile = Path(OS.Storage.musicPath, args.id, item.resource.toString())
                 Coroutines.io { SystemFileSystem.delete(resourceFile) }
                 resources.removeAll { it == item }
             }
-            catch (_: Throwable) {}
         }
 
         @Stable
@@ -98,7 +99,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             val id = args.id
             val musicPath = musicInfo?.path
             if (!enabled || musicPath == null) return
-            try {
+            catching {
                 Coroutines.io {
                     openSource()?.use { source ->
                         val resourceFile = Path(OS.Storage.musicPath, id, item.resource.toString())
@@ -119,7 +120,6 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     }
                 }
             }
-            catch (_: Throwable) { }
         }
 
         @Stable
@@ -189,7 +189,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                                     modification = it.modification + 1
                                 )
                             }?.let { newInfo ->
-                                try {
+                                catching {
                                     val configPath = newInfo.configPath
                                     Coroutines.io {
                                         SystemFileSystem.sink(configPath).buffered().use { sink ->
@@ -200,7 +200,6 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                                         makeResourceItem(it.resource, SystemFileSystem.metadataOrNull(configPath)!!.size.toInt())
                                     }
                                 }
-                                catch (_: Throwable) {}
                             }
                             modifySheet.close()
                         }
@@ -297,17 +296,16 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         }
 
         private suspend fun loadLyrics(info: MusicInfo): String = Coroutines.io {
-            try {
+            catchingDefault("") {
                 val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
                     it.readText()
                 }
                 LyricsLrc.Parser(lyrics).plainText
             }
-            catch (_: Throwable) { "" }
         }
 
         private suspend fun loadResources(info: MusicInfo): List<ResourceItem> = Coroutines.io {
-            try {
+            catchingDefault({ emptyList() }) {
                 SystemFileSystem.list(info.path).map { path ->
                     makeResourceItem(
                         resource = MusicResource.fromString(path.name)!!,
@@ -315,7 +313,6 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     )
                 }
             }
-            catch (_: Throwable) { emptyList() }
         }
     }
 

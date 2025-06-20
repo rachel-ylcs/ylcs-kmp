@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
@@ -32,6 +34,7 @@ import love.yinlin.data.rachel.game.info.AQInfo
 import love.yinlin.data.rachel.game.info.AQQuestion
 import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.data.rachel.game.info.AQUserAnswer
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -104,7 +107,7 @@ private fun TopPager(
 @Composable
 fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
     val info = remember(game) {
-        try { game.info.to<AQInfo>() } catch (_: Throwable) { null }
+        catchingNull { game.info.to<AQInfo>() }
     }
     if (info != null) {
         RachelText(
@@ -117,13 +120,11 @@ fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
 @Composable
 fun ColumnScope.AnswerQuestionCardQuestionAnswer(game: GameDetailsWithName) {
     val data = remember(game) {
-        try {
+        catchingNull {
             val questions = game.question.to<List<AQQuestion>>()
             val answers = game.answer.to<List<AQAnswer>>()
             require(questions.size == answers.size && questions.size in AQConfig.minQuestionCount ..AQConfig.maxQuestionCount)
             questions to answers
-        } catch (_: Throwable) {
-            null
         }
     }
     data?.let { (questions, answers) ->
@@ -233,7 +234,7 @@ private fun ColumnScope.AnswerQuestionRecordResult(result: AQResult) {
 @Composable
 fun ColumnScope.AnswerQuestionRecordCard(answer: JsonElement, info: JsonElement) {
     val data = remember(answer, info) {
-        try {
+        catchingNull {
             val answers = answer.to<List<AQUserAnswer>>()
             buildString {
                 answers.fastForEachIndexed { index, item ->
@@ -246,7 +247,6 @@ fun ColumnScope.AnswerQuestionRecordCard(answer: JsonElement, info: JsonElement)
                 }
             } to info.to<AQResult>()
         }
-        catch (_: Throwable) { null }
     }
 
     data?.let { (totalAnswer, actualResult) ->
@@ -646,7 +646,7 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     override val submitAnswer: JsonElement get() = answers.toList().toJson()
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
-        preflight = try {
+        preflight = catchingNull {
             val questions = preflightResult.question.to<List<AQQuestion>>()
             require(questions.size in AQConfig.minQuestionCount .. AQConfig.maxQuestionCount)
             answers.clear()
@@ -662,13 +662,11 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 info = preflightResult.info.to(),
                 questions = questions
             )
-        } catch (_: Throwable) { null }
+        }
     }
 
     override fun settle(gameResult: GameResult) {
-        result = try {
-            gameResult.info.to()
-        } catch (_: Throwable) { null }
+        result = catchingNull { gameResult.info.to() }
     }
 
     @Composable
@@ -719,7 +717,8 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                             icon = if (isSelected) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
                                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             onClick = {
-                                                answers[currentIndex] = answer.copy(value = if (answer.value == index) -1 else index)
+                                                answers[currentIndex] = answer.copy(value = if (isSelected) -1 else index)
+                                                if (!isSelected && currentIndex < questions.size - 1) ++currentIndex
                                             }
                                         )
                                         Text(
@@ -769,6 +768,10 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                 )
                                 Space()
                                 val inputState = remember(currentIndex) { TextInputState() }
+                                val focusRequester = remember { FocusRequester() }
+                                LaunchedEffect(currentIndex) {
+                                    focusRequester.requestFocus()
+                                }
                                 TextInput(
                                     state = inputState,
                                     hint = "输入答案(回车保存)",
@@ -778,9 +781,10 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                         if (inputState.ok) {
                                             answers[currentIndex] = answer.copy(value = inputState.text)
                                             inputState.text = ""
+                                            if (currentIndex < questions.size - 1) ++currentIndex
                                         }
                                     },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
                                 )
                             }
                         }

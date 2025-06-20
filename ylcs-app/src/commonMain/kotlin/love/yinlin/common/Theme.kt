@@ -353,6 +353,11 @@ object ThemeValue {
 			Device.Size.MEDIUM -> 80.dp
 			Device.Size.LARGE -> 88.dp
 		}
+        val SliderWidth: Dp @Composable get() = when (LocalDevice.current.size) {
+            Device.Size.SMALL -> 90.dp
+            Device.Size.MEDIUM -> 96.dp
+            Device.Size.LARGE -> 102.dp
+        }
 		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
 			Device.Size.SMALL -> 40.dp
 			Device.Size.MEDIUM -> 44.dp

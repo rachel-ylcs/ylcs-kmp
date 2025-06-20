@@ -2,6 +2,7 @@ package love.yinlin
 
 import love.yinlin.api.APIFile
 import love.yinlin.api.ResNode
+import love.yinlin.extension.catchingDefault
 import java.io.File
 import java.net.JarURLConnection
 import java.nio.charset.StandardCharsets
@@ -49,7 +50,7 @@ fun ResNode.mkdir() = File(this.path).mkdirs()
 fun ResNode.copy(other: ResNode) = File(this.path).copyTo(File(other.path), true)
 fun APIFile.copy(other: ResNode) = File(this).copyTo(File(other.path), true)
 
-val String.md5: String get() = try {
+val String.md5: String get() = catchingDefault("") {
 	val md = MessageDigest.getInstance("MD5")
 	md.update(this.toByteArray(StandardCharsets.UTF_8))
 	val hexString = StringBuilder()
@@ -60,7 +61,6 @@ val String.md5: String get() = try {
 	}
 	hexString.toString()
 }
-catch (_: Exception) { "" }
 
 val currentTS: Timestamp get() = Timestamp(System.currentTimeMillis())
 

@@ -50,3 +50,10 @@ expect fun WebPage(
 	state: WebPageState,
 	modifier: Modifier = Modifier
 )
+
+expect abstract class HeadlessBrowser() {
+	fun load(url: String)
+	fun destroy()
+	abstract fun onUrlIntercepted(url: String): Boolean
+	abstract fun onRequestIntercepted(url: String, response: String)
+}

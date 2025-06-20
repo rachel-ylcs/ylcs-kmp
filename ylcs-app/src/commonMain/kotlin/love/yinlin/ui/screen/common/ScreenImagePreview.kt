@@ -24,6 +24,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
+import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.Picker
@@ -51,7 +52,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	private fun downloadPicture() {
 		val preview = previews[current]
 		val url = if (preview.isSource) preview.pic.source else preview.pic.image
-		val filename = url.substringAfterLast('/').substringBefore('?')
+		val filename = url.filenameOrRandom(".webp")
 		launch {
 			Coroutines.io {
 				Picker.prepareSavePicture(filename)?.let { (origin, sink) ->

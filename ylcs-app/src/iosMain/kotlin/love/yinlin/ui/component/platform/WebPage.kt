@@ -110,3 +110,14 @@ actual fun WebPage(
         }
     )
 }
+
+@Stable
+actual abstract class HeadlessBrowser actual constructor() {
+    actual fun load(url: String) {}
+
+    actual fun destroy() {}
+
+    actual abstract fun onUrlIntercepted(url: String): Boolean
+
+    actual abstract fun onRequestIntercepted(url: String, response: String)
+}
