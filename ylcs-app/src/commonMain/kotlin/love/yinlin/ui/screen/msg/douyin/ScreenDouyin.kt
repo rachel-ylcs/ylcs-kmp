@@ -26,6 +26,8 @@ import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
+import love.yinlin.extension.rememberIntState
+import love.yinlin.extension.rememberValueState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.ClickIcon
@@ -72,13 +74,17 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
             shape = MaterialTheme.shapes.large,
             shadowElevation = ThemeValue.Shadow.Surface
         ) {
+            var videoIndex by rememberIntState(item) { item.videoUrl.lastIndex }
+
             Column(
                 modifier = Modifier.fillMaxWidth().clickable {
-                    navigate(ScreenVideo.Args(url = item.resource.video))
+                    item.videoUrl.getOrNull(videoIndex)?.let { url ->
+                        navigate(ScreenVideo.Args(url = url))
+                    }
                 }
             ) {
                 WebImage(
-                    uri = item.resource.image,
+                    uri = item.picUrl,
                     modifier = Modifier.fillMaxWidth().aspectRatio(0.75f),
                     contentScale = ContentScale.Crop
                 )
@@ -137,18 +143,27 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text(
+                        text = "切换视频源[${videoIndex + 1}]",
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.weight(1f).clickable {
+                            videoIndex = (videoIndex + 1) % item.videoUrl.size
+                        }.padding(ThemeValue.Padding.LittleValue)
+                    )
                     ClickIcon(
                         icon = Icons.Outlined.Download,
                         onClick = {
-                            val url = item.resource.video
-                            val filename = url.filenameOrRandom(".mp4")
-                            launch {
-                                Coroutines.io {
-                                    Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-                                        val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-                                        Picker.cleanSave(origin, result)
+                            item.videoUrl.getOrNull(videoIndex)?.let { url ->
+                                val filename = url.filenameOrRandom(".mp4")
+                                launch {
+                                    Coroutines.io {
+                                        Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                            val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
+                                            Picker.cleanSave(origin, result)
+                                        }
                                     }
                                 }
                             }

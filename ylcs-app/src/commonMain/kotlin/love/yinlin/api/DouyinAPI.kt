@@ -2,7 +2,6 @@ package love.yinlin.api
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.data.common.Picture
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.IntNull
@@ -21,15 +20,13 @@ object DouyinAPI {
         val picUrl = cover.last().String
         val playAddr = video.obj("play_addr").arr("url_list")
         val statistics = json.obj("statistics")
+        require(playAddr.isNotEmpty())
         return DouyinVideo(
             id = json["aweme_id"].String,
             title = json["desc"].String,
             createTime = DateEx.Formatter.standardDateTime.format(time)!!,
-            resource = Picture(
-                image = picUrl,
-                source = picUrl,
-                video = playAddr.last().String
-            ),
+            picUrl = picUrl,
+            videoUrl = playAddr.map { it.String },
             likeNum = statistics["digg_count"].IntNull ?: 0,
             commentNum = statistics["comment_count"].IntNull ?: 0,
             collectNum = statistics["collect_count"].IntNull ?: 0,
