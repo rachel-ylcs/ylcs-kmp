@@ -4,6 +4,7 @@ package love.yinlin.platform
 import androidx.compose.runtime.*
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.catching
 import love.yinlin.extension.replaceAll
 import love.yinlin.ui.screen.music.audioPath
 import uk.co.caprica.vlcj.media.Media
@@ -18,18 +19,13 @@ class ActualMusicFactory : MusicFactory() {
     private var controller: AudioPlayerComponent? by mutableStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
-    override suspend fun init() {
-        try {
-            val component = AudioPlayerComponent()
-            component.mediaPlayer().events().apply {
-                addMediaEventListener(eventListener)
-                addMediaPlayerEventListener(playerListener)
-            }
-            controller = component
+    override suspend fun init() = catching {
+        val component = AudioPlayerComponent()
+        component.mediaPlayer().events().apply {
+            addMediaEventListener(eventListener)
+            addMediaPlayerEventListener(playerListener)
         }
-        catch (e: Throwable) {
-            e.printStackTrace()
-        }
+        controller = component
     }
 
     override var error: Throwable? by mutableStateOf(null)

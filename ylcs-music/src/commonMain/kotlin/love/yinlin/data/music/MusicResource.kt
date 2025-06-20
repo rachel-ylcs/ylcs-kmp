@@ -2,6 +2,7 @@ package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import love.yinlin.extension.catchingNull
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -29,10 +30,9 @@ data class MusicResource(
             return id != null && id >= 0 && name.length in 1 .. 32
         }
 
-        fun fromString(text: String): MusicResource? = try {
+        fun fromString(text: String): MusicResource? = catchingNull {
             val list = text.split("-")
             MusicResource(list[0].toInt(), list[1])
         }
-        catch (_: Throwable) { null }
     }
 }

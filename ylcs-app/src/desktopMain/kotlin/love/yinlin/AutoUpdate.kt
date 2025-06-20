@@ -1,5 +1,6 @@
 package love.yinlin
 
+import love.yinlin.extension.catching
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import java.io.File
@@ -57,21 +58,18 @@ object AutoUpdate {
         ).inheritIO().start()
     }
 
-    fun start(filename: String) {
-        try {
-            val currentDir = Paths.get(System.getProperty("compose.application.resources.dir"))
-                                    .parent.parent.toAbsolutePath()
+    fun start(filename: String) = catching {
+        val currentDir = Paths.get(System.getProperty("compose.application.resources.dir"))
+            .parent.parent.toAbsolutePath()
 
-            // 1. 解压更新包到当前目录
-            val zipPath = File(filename)
-            val newName = System.currentTimeMillis().toString()
-            val unzipPath = currentDir.resolve(newName)
-            unzipPackage(unzipPath, zipPath)
-            // 2. 启动脚本
-            startScript(currentDir, newName)
-            // 3. 结束自身进程
-            exitProcess(0)
-        }
-        catch (_: Throwable) { }
+        // 1. 解压更新包到当前目录
+        val zipPath = File(filename)
+        val newName = System.currentTimeMillis().toString()
+        val unzipPath = currentDir.resolve(newName)
+        unzipPackage(unzipPath, zipPath)
+        // 2. 启动脚本
+        startScript(currentDir, newName)
+        // 3. 结束自身进程
+        exitProcess(0)
     }
 }

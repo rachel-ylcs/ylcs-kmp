@@ -17,6 +17,7 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.catchingNull
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
 
@@ -76,20 +77,19 @@ object OS {
 		val cacheSize get() = osStorageCacheSize
 		fun clearCache() = osStorageClearCache()
 
-		suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = try {
+		suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
 			val path = Path(cachePath, DateEx.CurrentLong.toString())
-			if (SystemFileSystem.sink(path).buffered().use {
-				Coroutines.io { block(it) }
-			}) path else null
-		} catch (_: Throwable) { null }
+			require(SystemFileSystem.sink(path).buffered().use { Coroutines.io { block(it) } })
+			path
+		}
 
-		suspend fun createTempFolder(): Path? = try {
+		suspend fun createTempFolder(): Path? = catchingNull {
 			Coroutines.io {
 				val path = Path(cachePath, DateEx.CurrentLong.toString())
 				SystemFileSystem.createDirectories(path)
 				path
 			}
-		} catch (_: Throwable) { null }
+		}
 	}
 }
 

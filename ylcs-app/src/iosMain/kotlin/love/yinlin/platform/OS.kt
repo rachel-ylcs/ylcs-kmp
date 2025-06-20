@@ -4,21 +4,17 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
 import love.yinlin.common.Uri
 import love.yinlin.common.toNSUrl
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingDefault
 import platform.Foundation.*
 import platform.UIKit.UIApplication
 import platform.UIKit.UIPasteboard
 
-actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
-    try {
-        val application = UIApplication.sharedApplication
-        val url = uri.toNSUrl()
-        if (application.canOpenURL(url)) {
-            application.openURL(url)
-            return true
-        }
-    }
-    catch (_: Throwable) {}
-    return false
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = catchingDefault(false) {
+    val application = UIApplication.sharedApplication
+    val url = uri.toNSUrl()
+    require(application.canOpenURL(url))
+    application.openURL(url)
 }
 
 actual fun osApplicationCopyText(text: String): Boolean {
@@ -26,13 +22,10 @@ actual fun osApplicationCopyText(text: String): Boolean {
     return true
 }
 
-actual fun osNetOpenUrl(url: String) {
-    try {
-        NSURL.URLWithString(url)?.let {
-            UIApplication.sharedApplication.openURL(it)
-        }
+actual fun osNetOpenUrl(url: String) = catching {
+    NSURL.URLWithString(url)?.let {
+        UIApplication.sharedApplication.openURL(it)
     }
-    catch (_: Throwable) {}
 }
 
 fun osStorageSearchPath(directory: NSSearchPathDirectory): Path {

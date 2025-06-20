@@ -21,7 +21,7 @@ object DateEx {
 	@JvmInline
 	value class Formatter<T> private constructor(private val factory: DateTimeFormat<T>) {
 		fun parse(input: CharSequence): T? = factory.parseOrNull(input)
-		fun format(value: T): String? = try { factory.format(value) } catch (_: Throwable) { null }
+		fun format(value: T): String? = catchingNull { factory.format(value) }
 
 		companion object {
 			val weiboDateTime = Formatter(DateTimeComponents.Format {
@@ -77,10 +77,10 @@ object DateEx {
 	val TodayString: String get() = Formatter.standardDate.format(Today)!!
 }
 
-val Instant.toLocalDateTime: LocalDateTime? get() = try { this.toLocalDateTime(TimeZone.currentSystemDefault()) } catch (_: Throwable) { null }
+val Instant.toLocalDateTime: LocalDateTime? get() = catchingNull { this.toLocalDateTime(TimeZone.currentSystemDefault()) }
 val Long.toLocalDateTime: LocalDateTime? get() = Instant.fromEpochMilliseconds(this).toLocalDateTime
 val Long.toLocalDate: LocalDate? get() = this.toLocalDateTime?.date
-val Long.toLocalTime: LocalTime? get() = try { LocalTime.fromMillisecondOfDay(this.toInt()) } catch (_: Throwable) { null }
+val Long.toLocalTime: LocalTime? get() = catchingNull { LocalTime.fromMillisecondOfDay(this.toInt()) }
 val LocalDateTime.toLong: Long get() = this.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 val LocalDate.toLong: Long get() = this.toLocalDateTime.toLong
 val LocalDate.toLocalDateTime: LocalDateTime get() = LocalDateTime(this, LocalTime(8, 0, 0))

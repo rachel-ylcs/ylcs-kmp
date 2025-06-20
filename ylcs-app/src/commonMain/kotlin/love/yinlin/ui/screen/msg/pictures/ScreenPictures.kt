@@ -37,6 +37,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_photo_album
@@ -94,13 +95,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
             val result = ClientAPI.request<JsonObject>(route = ServerRes.Photo)
-            val data = Coroutines.cpu {
-                try {
-                    PhotoItem.parseJson("相册", (result as Data.Success).data)
-                } catch (_: Throwable) {
-                    null
-                }
-            }
+            val data = Coroutines.cpu { catchingNull { PhotoItem.parseJson("相册", (result as Data.Success).data) } }
             if (data != null) {
                 photos = data
                 stack.clear()

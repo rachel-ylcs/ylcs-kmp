@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.catching
 import love.yinlin.extension.timeString
 import love.yinlin.ui.component.layout.fadingEdges
 import kotlin.math.abs
@@ -113,7 +114,7 @@ class LyricsLrc : LyricsEngine {
             for (item in items) {
                 val line = item.trim()
                 if (line.isEmpty()) continue
-                try {
+                catching {
                     val result = pattern.find(line)!!.groups
                     val minutes = result[1]!!.value.toLong()
                     val seconds = result[2]!!.value.toLong()
@@ -124,7 +125,6 @@ class LyricsLrc : LyricsEngine {
                     val text = result[4]!!.value.trim()
                     if (text.isNotEmpty()) newLines += LrcLine(position, text)
                 }
-                catch (_: Throwable) { }
             }
             lines = newLines.fastFilter { it.position > 100L }.fastDistinctBy { it.position }.sorted().ifEmpty { null }
         }

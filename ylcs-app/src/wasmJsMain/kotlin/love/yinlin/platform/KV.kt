@@ -7,6 +7,7 @@ import love.yinlin.extension.Array
 import love.yinlin.extension.Int
 import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJson
 import love.yinlin.extension.parseJsonValue
@@ -22,20 +23,17 @@ actual class KV {
 		}.toJsonString())
 	}
 
-	fun getItem(key: String): String? = localStorage.getItem(key)?.let { json ->
-		try {
-			val arr = json.parseJson.Array
-			val time = arr[0].Int
-			val value = arr[1].String
-			val current = Clock.System.now().epochSeconds.toInt()
-			if (time == KVExpire.NEVER || current <= time) value
-			else {
-				localStorage.removeItem(key)
-				null
-			}
+	fun getItem(key: String): String? = localStorage.getItem(key)?.let { catchingNull {
+		val arr = it.parseJson.Array
+		val time = arr[0].Int
+		val value = arr[1].String
+		val current = Clock.System.now().epochSeconds.toInt()
+		if (time == KVExpire.NEVER || current <= time) value
+		else {
+			localStorage.removeItem(key)
+			null
 		}
-		catch (_: Throwable) { null }
-	}
+	} }
 
 	actual fun set(key: String, value: Boolean, expire: Int) {
 		setItem(key, value.toString(), expire)

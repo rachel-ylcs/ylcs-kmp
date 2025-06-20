@@ -30,6 +30,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.catchingNull
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -67,7 +68,7 @@ abstract class FloatingDialog<R>() : Floating<Unit>() {
 		super.close()
 	}
 
-	protected suspend fun awaitResult(): R? = try {
+	protected suspend fun awaitResult(): R? = catchingNull {
 		val result = suspendCancellableCoroutine { cont ->
 			cont.invokeOnCancellation {
 				continuation = null
@@ -83,7 +84,6 @@ abstract class FloatingDialog<R>() : Floating<Unit>() {
 		}
 		result
 	}
-	catch (_: CancellationException) { null }
 
 	@Composable
 	override fun Wrapper(block: @Composable (() -> Unit)) {

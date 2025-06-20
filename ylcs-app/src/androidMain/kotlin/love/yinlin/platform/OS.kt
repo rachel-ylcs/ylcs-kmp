@@ -10,31 +10,28 @@ import kotlinx.io.files.Path
 import androidx.core.net.toUri
 import love.yinlin.common.Uri
 import love.yinlin.common.toAndroidUri
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingDefault
 
-actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = try {
+actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = catchingDefault(false) {
 	val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
 	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 	appNative.context.startActivity(intent)
 	true
 }
-catch (_: Throwable) { false }
 
-actual fun osApplicationCopyText(text: String): Boolean = try {
+actual fun osApplicationCopyText(text: String): Boolean = catchingDefault(false) {
 	val clipboard = appNative.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 	val clip = ClipData.newPlainText("", text)
 	clipboard.setPrimaryClip(clip)
 	true
 }
-catch (_: Throwable) { false }
 
-actual fun osNetOpenUrl(url: String) {
-	try {
-		val uri = url.toUri()
-		val intent = Intent(Intent.ACTION_VIEW, uri)
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-		appNative.context.startActivity(intent)
-	}
-	catch (_: Exception) { }
+actual fun osNetOpenUrl(url: String) = catching {
+	val uri = url.toUri()
+	val intent = Intent(Intent.ACTION_VIEW, uri)
+	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+	appNative.context.startActivity(intent)
 }
 
 actual val osStorageDataPath: Path get() = Path(appNative.context.filesDir.absolutePath)

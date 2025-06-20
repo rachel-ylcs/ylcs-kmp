@@ -24,6 +24,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
 import love.yinlin.extension.rememberIntState
@@ -50,13 +51,10 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
 
         override fun onRequestIntercepted(url: String, response: String) {
             launch {
-                state = try {
+                state = catchingDefault(BoxState.NETWORK_ERROR) {
                     val json = response.parseJson
                     items = Coroutines.cpu { DouyinAPI.getDouyinVideos(json.Object) }
                     if (items.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
-                }
-                catch (_: Throwable) {
-                    BoxState.NETWORK_ERROR
                 }
                 destroy()
             }

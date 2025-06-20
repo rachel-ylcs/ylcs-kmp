@@ -758,17 +758,14 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		monitor(state = { factory.currentMusic }) { musicInfo ->
 			lyrics.reset()
 
-			if (musicInfo != null) {
-				try {
-					Coroutines.io {
-						SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-							lyrics.parseLrcString(source.readText())
-						}
-						hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
-						hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
+			if (musicInfo != null) catching {
+				Coroutines.io {
+					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
+						lyrics.parseLrcString(source.readText())
 					}
+					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
+					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
 				}
-				catch (_: Throwable) { }
 			}
 			else {
 				hasAnimation = false

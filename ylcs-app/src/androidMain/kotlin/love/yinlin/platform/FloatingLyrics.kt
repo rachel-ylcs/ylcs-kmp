@@ -27,6 +27,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.catching
 import java.util.UUID
 
 @Stable
@@ -46,18 +47,15 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
 
     override val isAttached: Boolean get() = view.isAttachedToWindow
 
-    fun applyPermission(onResult: (Boolean) -> Unit) {
-        try {
-            activity.activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) {
-                onResult(canAttached)
-            }.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-                setData(Uri.fromParts(Scheme.Package.toString(), activity.packageName, null))
-            })
-        }
-        catch (_: Throwable) {}
+    fun applyPermission(onResult: (Boolean) -> Unit) = catching {
+        activity.activityResultRegistry.register(
+            key = UUID.randomUUID().toString(),
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) {
+            onResult(canAttached)
+        }.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+            setData(Uri.fromParts(Scheme.Package.toString(), activity.packageName, null))
+        })
     }
 
     fun attach() {
