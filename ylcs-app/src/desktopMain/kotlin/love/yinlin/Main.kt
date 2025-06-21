@@ -26,6 +26,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.rememberFalse
+import love.yinlin.extension.rememberTrue
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -85,6 +86,7 @@ fun main() {
     application(exitProcessOnExit = true) {
         val scope = rememberCoroutineScope()
 
+        // 主窗口
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,
@@ -92,13 +94,14 @@ fun main() {
             width = 1200.dp,
             height = 700.dp
         )
-
+        var visible by rememberTrue()
         var alwaysOnTop by rememberFalse()
 
         Window(
             onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.img_logo),
+            visible = visible,
             undecorated = true,
             resizable = true,
             transparent = true,
@@ -156,7 +159,7 @@ fun main() {
                                 icon = Icons.Outlined.Remove,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
-                                state.isMinimized = true
+                                visible = false
                             }
                             Action(
                                 icon = Icons.Outlined.CropSquare,
@@ -177,6 +180,18 @@ fun main() {
             }
         }
 
+        // 托盘
+        if (!visible) {
+            val trayState = rememberTrayState()
+
+            Tray(
+                icon = painterResource(Res.drawable.img_logo),
+                state = trayState,
+                onAction = { visible = true }
+            )
+        }
+
+        // 悬浮歌词
         (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
             if (it.isAttached && app.config.enabledFloatingLyrics) it.Content()
         }
