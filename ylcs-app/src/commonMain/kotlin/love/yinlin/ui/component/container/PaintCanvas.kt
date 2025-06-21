@@ -14,22 +14,80 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
+import kotlinx.io.Buffer
+import kotlinx.io.UnsafeIoApi
+import kotlinx.io.readByteArray
+import kotlinx.io.unsafe.UnsafeBufferOperations
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import love.yinlin.common.Colors
 import love.yinlin.extension.rememberState
+import kotlin.io.encoding.Base64
 
 @Stable
-@Serializable
+@Serializable(PaintPath.Serializer::class)
+@SerialName("PP")
 data class PaintPath(
-    val paths: List<Long>,
-    val width: Float,
-    val color: ULong
-)
+    @SerialName("p") val paths: List<Long>,
+    @SerialName("w") val width: Float,
+    @SerialName("c") val color: Int
+) {
+    object Serializer : KSerializer<PaintPath> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("PP") {
+            element<String>("p")
+            element<Float>("w")
+            element<Int>("c")
+        }
+
+        override fun serialize(encoder: Encoder, value: PaintPath) {
+            encoder.beginStructure(descriptor).run {
+                val buffer = Buffer()
+                value.paths.fastForEach { buffer.writeLong(it) }
+                encodeStringElement(descriptor, 0, Base64.encode(buffer.readByteArray()))
+                encodeFloatElement(descriptor, 1, value.width)
+                encodeIntElement(descriptor, 2, value.color)
+                endStructure(descriptor)
+            }
+        }
+
+        @OptIn(UnsafeIoApi::class)
+        override fun deserialize(decoder: Decoder): PaintPath = decoder.beginStructure(descriptor).run {
+            val paths = mutableListOf<Long>()
+            var width = 1f
+            var color = Colors.Black.toArgb()
+            val buffer = Buffer()
+            while (true) {
+                when (val index = decodeElementIndex(descriptor)) {
+                    0 -> {
+                        val base64Str = decodeStringElement(descriptor, 0)
+                        val bytes = Base64.decode(base64Str)
+                        UnsafeBufferOperations.moveToTail(buffer, bytes)
+                        repeat(bytes.size / 8) { paths += buffer.readLong() }
+                    }
+                    1 -> width = decodeFloatElement(descriptor, 1)
+                    2 -> color = decodeIntElement(descriptor, 2)
+                    CompositeDecoder.DECODE_DONE -> break
+                    else -> error("unexpected index: $index")
+                }
+            }
+            endStructure(descriptor)
+            PaintPath(paths, width, color)
+        }
+    }
+}
 
 private fun DrawScope.drawPaintPath(paths: List<Long>, width: Float, color: Color) {
     val path = Path().apply {
@@ -57,6 +115,7 @@ fun PaintCanvas(
     color: Color,
     width: Float,
     onPathAdded: (PaintPath) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -65,23 +124,31 @@ fun PaintCanvas(
 
         Canvas(modifier = Modifier.matchParentSize()
             .background(Colors.White)
-            .pointerInput(color, width, onPathAdded) {
-                detectDragGestures(
+            .pointerInput(enabled, color, width, onPathAdded) {
+                if (enabled) detectDragGestures(
                     onDragStart = { currentPath += packFloats(it.x, it.y) },
                     onDragEnd = {
-                        if (currentPath.isNotEmpty()) {
-                            onPathAdded(PaintPath(currentPath.toList(), width, color.value))
-                            currentPath.clear()
+                        val distinctPath = when (currentPath.size) {
+                            in 0 .. 1 -> null
+                            2 -> listOf(currentPath[0], currentPath[1])
+                            else -> {
+                                val last = currentPath.last()
+                                var index = currentPath.size - 2
+                                while (index >= 0 && currentPath[index] == last) index--
+                                currentPath.take(index + 2)
+                            }
                         }
+                        distinctPath?.let { onPathAdded(PaintPath(it, width, color.toArgb())) }
+                        currentPath.clear()
                     },
                     onDrag = { v, _ -> currentOffset = v.position }
                 )
-            }.pointerInput(color, width, onPathAdded) {
-                detectTapGestures {
+            }.pointerInput(enabled, color, width, onPathAdded) {
+                if (enabled) detectTapGestures {
                     onPathAdded(PaintPath(listOf(
                         packFloats(it.x, it.y),
                         packFloats(it.x, it.y)
-                    ), width, color.value))
+                    ), width, color.toArgb()))
                 }
             }
         ) {
