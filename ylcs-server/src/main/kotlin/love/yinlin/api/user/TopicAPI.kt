@@ -140,7 +140,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 	api(API.User.Topic.GetTopicDetails) { tid ->
 		VN.throwId(tid)
 		val topics = DB.throwQuerySQLSingle("""
-			SELECT tid, user.uid, ts, title, content, pics, isTop, coinNum, commentNum, section, rawSection, name, label, coin
+			SELECT tid, user.uid, ts, title, content, pics, isTop, coinNum, commentNum, section, rawSection, name, label, exp
 			FROM topic
 			LEFT JOIN user
 			ON topic.uid = user.uid
@@ -252,7 +252,11 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			// 投币者减少银币
 			it.throwExecuteSQL("""
                 UPDATE user SET coin = coin - ? , exp = exp + ? WHERE uid = ? AND coin >= ?
-            """, value, value, srcUid, value)
+            """, value, when (value) {
+                UserConstraint.MIN_COIN_REWARD -> 2
+                UserConstraint.MIN_COIN_REWARD - 1 -> 1
+                else -> 0
+            }, srcUid, value)
 			// 被投币者增加银币和经验
 			if (value == UserConstraint.MIN_COIN_REWARD)
 				it.throwExecuteSQL("UPDATE user SET exp = exp + 1 , coin = coin + 1 WHERE uid = ?", uid)
