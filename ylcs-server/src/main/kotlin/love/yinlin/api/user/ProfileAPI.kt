@@ -41,7 +41,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
             SELECT
-				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.coin, u1.signin, u1.follows, u1.followers, u2.name AS inviterName,
+				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.signin, u1.follows, u1.followers, u2.name AS inviterName,
 				JSON_OBJECT(
 					'mailCount', (SELECT COUNT(*) FROM mail WHERE processed = 0 AND uid = ?)
 				) AS notification
@@ -69,7 +69,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		VN.throwId(uid2)
 		val uid1 = token?.let { AN.throwExpireToken(it) }
 		val user = DB.throwQuerySQLSingle("""
-			SELECT uid, name, signature, label, coin, follows, followers FROM user WHERE uid = ?
+			SELECT uid, name, signature, label, exp, follows, followers FROM user WHERE uid = ?
 		""", uid2)
 		val status = if (uid1 == null) FollowStatus.UNAUTHORIZE
 			else if (uid1 == uid2) FollowStatus.SELF

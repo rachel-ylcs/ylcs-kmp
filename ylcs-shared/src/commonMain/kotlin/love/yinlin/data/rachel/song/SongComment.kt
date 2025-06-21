@@ -15,9 +15,9 @@ data class SongComment(
     val content: String, // [评论内容]
     val name: String, // [用户昵称]
     val label: String, // [用户标签]
-    val coin: Int // [用户银币]
+    val exp: Int // [用户经验]
 ) {
-    val level: Int by lazy { UserLevel.level(coin) }
+    val level: Int by lazy { UserLevel.level(exp) }
 
     val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 }

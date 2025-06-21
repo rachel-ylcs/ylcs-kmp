@@ -153,7 +153,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(tid)
 		val tableName = VN.throwSection(rawSection)
 		val comments = DB.throwQuerySQL("""
-			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, coin
+			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, exp
             FROM $tableName
             LEFT JOIN user
             ON $tableName.uid = user.uid
@@ -171,7 +171,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(pid)
 		val tableName = VN.throwSection(rawSection)
 		val subComments = DB.throwQuerySQL("""
-			SELECT cid, user.uid, ts, content, name, label, coin
+			SELECT cid, user.uid, ts, content, name, label, exp
 			FROM $tableName
 			LEFT JOIN user
 			ON $tableName.uid = user.uid

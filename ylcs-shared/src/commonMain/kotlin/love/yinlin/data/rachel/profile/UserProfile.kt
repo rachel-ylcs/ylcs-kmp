@@ -2,11 +2,9 @@ package love.yinlin.data.rachel.profile
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.api.ServerRes
 import love.yinlin.data.rachel.follows.FollowStatus
-import love.yinlin.extension.makeObject
 
 @Stable
 @Serializable
@@ -18,7 +16,8 @@ data class UserProfile(
 	val privilege: Int, // [权限]
 	val signature: String, // [个性签名]
 	val label: String, // [标签]
-	val coin: Int, // [银币]
+    val exp: Int = 0, // [经验]
+	val coin: Int = 0, // [银币]
 	// playlist: JsonObject [云歌单]
 	// signin: Binary [签到记录]
 	val follows: Int = 0, // [关注数]
@@ -29,9 +28,9 @@ data class UserProfile(
 
 	val wallPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).wall}" }
 
-	val level: Int by lazy { UserLevel.level(coin) }
+	val level: Int by lazy { UserLevel.level(exp) }
 
-	val publicProfile: UserPublicProfile get() = UserPublicProfile(uid, name, signature, label, coin, follows, followers, FollowStatus.SELF)
+	val publicProfile: UserPublicProfile get() = UserPublicProfile(uid, name, signature, label, exp, follows, followers, FollowStatus.SELF)
 
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)
 

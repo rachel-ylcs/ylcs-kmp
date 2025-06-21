@@ -372,7 +372,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 							subCommentNum = 0,
 							name = user.name,
 							label = user.label,
-							coin = user.coin
+							exp = user.exp
 						)
 						listState.animateScrollToItem(pageComments.items.size - 1)
 						return true

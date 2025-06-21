@@ -25,8 +25,8 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
@@ -36,7 +36,6 @@ import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.node.condition
 import kotlin.math.max
@@ -175,8 +174,7 @@ internal fun UserProfileInfo(
 
 @Composable
 internal fun UserProfileCard(
-	profile: UserPublicProfile,
-	owner: Boolean,
+	profile: UserProfile,
 	shape: Shape = RectangleShape,
 	modifier: Modifier = Modifier,
 	onLevelClick: () -> Unit = {},
@@ -191,7 +189,7 @@ internal fun UserProfileCard(
 		Column(modifier = Modifier.fillMaxWidth()) {
 			WebImage(
 				uri = profile.wallPath,
-				key = if (owner) app.config.cacheUserWall else remember { DateEx.TodayString },
+				key = app.config.cacheUserWall,
 				modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
 			)
 			Column(
@@ -199,8 +197,8 @@ internal fun UserProfileCard(
 				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
 			) {
 				UserProfileInfo(
-					profile = profile,
-					owner = owner,
+					profile = remember(profile) { profile.publicProfile },
+					owner = true,
 					modifier = Modifier.fillMaxWidth(),
 					onLevelClick = onLevelClick,
 					content = content
@@ -224,10 +222,15 @@ internal fun UserProfileCard(
 						title = "等级",
 						modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
 					)
-					PortraitValue(
-						value = profile.coin.toString(),
-						title = "银币"
-					)
+                    PortraitValue(
+                        value = profile.exp.toString(),
+                        title = "经验",
+                        modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
+                    )
+                    PortraitValue(
+                        value = profile.coin.toString(),
+                        title = "银币"
+                    )
 					PortraitValue(
 						value = profile.follows.toString(),
 						title = "关注",
@@ -242,6 +245,66 @@ internal fun UserProfileCard(
 			}
 		}
 	}
+}
+
+@Composable
+internal fun UserPublicProfileCard(
+    profile: UserPublicProfile,
+    shape: Shape = RectangleShape,
+    modifier: Modifier = Modifier,
+    content: @Composable (RowScope.(() -> Unit) -> Unit) = {}
+) {
+    Surface(
+        modifier = modifier,
+        shape = shape,
+        shadowElevation = ThemeValue.Shadow.Surface
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            WebImage(
+                uri = profile.wallPath,
+                key = remember { DateEx.TodayString },
+                modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
+            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
+            ) {
+                UserProfileInfo(
+                    profile = profile,
+                    owner = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    content = content
+                )
+                SelectionContainer {
+                    Text(
+                        text = profile.signature,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    PortraitValue(
+                        value = profile.level.toString(),
+                        title = "等级"
+                    )
+                    PortraitValue(
+                        value = profile.follows.toString(),
+                        title = "关注"
+                    )
+                    PortraitValue(
+                        value = profile.followers.toString(),
+                        title = "粉丝"
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Stable

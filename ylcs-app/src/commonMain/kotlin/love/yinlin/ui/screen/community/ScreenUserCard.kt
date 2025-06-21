@@ -213,9 +213,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 		shape: Shape = RectangleShape,
 		modifier: Modifier = Modifier
 	) {
-		UserProfileCard(
+		UserPublicProfileCard(
 			profile = profile,
-			owner = false,
 			shape = shape,
 			modifier = modifier
 		) {

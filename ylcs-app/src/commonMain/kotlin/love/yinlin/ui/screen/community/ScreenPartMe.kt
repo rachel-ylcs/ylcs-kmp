@@ -301,8 +301,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			UserProfileCard(
 				modifier = Modifier.fillMaxWidth(),
-				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true,
+				profile = userProfile,
 				onLevelClick = { levelSheet.open(userProfile) },
 				onFollowClick = { navigate(ScreenFollows.Args(it)) }
 			)
@@ -320,8 +319,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private fun Landscape(userProfile: UserProfile) {
 		Row(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
 			UserProfileCard(
-				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true,
+				profile = userProfile,
 				shape = MaterialTheme.shapes.large,
 				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
 				onLevelClick = { levelSheet.open(userProfile) },
