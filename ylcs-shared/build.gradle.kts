@@ -40,6 +40,7 @@ kotlin {
                 implementation(libs.compose.runtime)
 
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.json)
             }
         }

@@ -13,7 +13,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 词寻
-data object Game4Manager : SpeedGameManager() {
+data object SearchAllManager : SpeedGameManager() {
     override val config: SAConfig = SAConfig
 
     override fun fetchTimeLimit(info: JsonElement): Int = info.to<SAInfo>().timeLimit
