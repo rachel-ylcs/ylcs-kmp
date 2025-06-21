@@ -1,9 +1,7 @@
 package love.yinlin.ui.screen.world.game
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
@@ -12,12 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Diamond
-import androidx.compose.material.icons.outlined.FormatListNumbered
-import androidx.compose.material.icons.outlined.MilitaryTech
-import androidx.compose.material.icons.outlined.Paid
-import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,7 +35,6 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.CylinderSlider
-import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.BoxText
@@ -91,7 +83,8 @@ fun createGameState(type: Game, slot: SubScreenSlot): CreateGameState = when (ty
     Game.BlockText -> BlockTextCreateGameState(slot)
     Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
     Game.SearchAll -> SearchAllCreateGameState(slot)
-    else -> error("Unknown type $type")
+    Game.Pictionary -> PictionaryCreateGameState(slot)
+    Game.GuessLyrics -> error("Unknown type $type")
 }
 
 fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) {
@@ -99,7 +92,8 @@ fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) 
     Game.BlockText -> BlockTextPlayGameState(slot)
     Game.FlowersOrder -> FlowersOrderPlayGameState(slot)
     Game.SearchAll -> SearchAllPlayGameState(slot)
-    else -> error("Unknown type $type")
+    Game.Pictionary -> PictionaryPlayGameState(slot)
+    Game.GuessLyrics -> error("Unknown type $type")
 }
 
 @Composable
@@ -108,7 +102,8 @@ fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type)
     Game.BlockText -> BlockTextCardInfo(game)
     Game.FlowersOrder -> FlowersOrderCardInfo(game)
     Game.SearchAll -> SearchAllCardInfo(game)
-    else -> error("Unknown type ${game.type}")
+    Game.Pictionary -> PictionaryCardInfo(game)
+    Game.GuessLyrics -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -117,7 +112,8 @@ fun ColumnScope.GameCardQuestionAnswer(game: GameDetailsWithName) = when (game.t
     Game.BlockText -> BlockTextCardQuestionAnswer(game)
     Game.FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
     Game.SearchAll -> SearchAllCardQuestionAnswer(game)
-    else -> error("Unknown type ${game.type}")
+    Game.Pictionary -> PictionaryQuestionAnswer(game)
+    Game.GuessLyrics -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -126,7 +122,8 @@ fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElemen
     Game.BlockText -> BlockTextRecordCard(answer, info)
     Game.FlowersOrder -> FlowersOrderRecordCard(answer, info)
     Game.SearchAll -> SearchAllRecordCard(answer, info)
-    else -> error("Unknown type $type")
+    Game.Pictionary -> PictionaryRecordCard(answer, info)
+    Game.GuessLyrics -> error("Unknown type $type")
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()

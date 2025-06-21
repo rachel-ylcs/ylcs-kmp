@@ -10,11 +10,12 @@ import love.yinlin.updateSQL
 import java.sql.Connection
 
 internal val Game.manager: GameManager get() = when (this) {
-    Game.AnswerQuestion -> Game1Manager
-    Game.BlockText -> Game2Manager
-    Game.FlowersOrder -> Game3Manager
-    Game.SearchAll -> Game4Manager
-    else -> error("Unknown game: $this")
+    Game.AnswerQuestion -> AnswerQuestionManager
+    Game.BlockText -> BlockTextManager
+    Game.FlowersOrder -> FlowersOrderManager
+    Game.SearchAll -> SearchAllManager
+    Game.Pictionary -> PictionaryManager
+    Game.GuessLyrics -> error("Unknown game: $this")
 }
 
 sealed class GameManager {
@@ -27,7 +28,7 @@ sealed class GameManager {
     fun Connection.consumeCoin(uid: Int, details: GameDetails): Boolean {
         val cost = details.cost
         if (cost > 0) {
-            if (updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
+            if (updateSQL("UPDATE user SET coin = coin - ?, exp = exp + 1 WHERE uid = ? AND coin >= ?", cost, uid, cost)) {
                 // 增加发起者银币
                 throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", cost, details.uid)
             }
@@ -55,13 +56,15 @@ sealed class GameManager {
 
     // 更新游戏排行榜
     fun Connection.updateRank(uid: Int, details: GameDetails, isCompleted: Boolean) {
-        if (isCompleted) {
-            val isGameCompleted = details.winner.size + 1 >= details.num
+        if (isCompleted && details.winner.size < details.num) {
+            val newWinner = details.winner.plus(uid)
+            val isGameCompleted = newWinner.size >= details.num
             throwExecuteSQL("""
                 UPDATE game
                 SET winner = ? , isCompleted = ?
                 WHERE gid = ?
-            """, details.winner.plus(uid).toJsonString(), isGameCompleted, details.gid)
+            """, newWinner.toJsonString(), isGameCompleted, details.gid)
+            if (isGameCompleted) throwExecuteSQL("UPDATE user SET exp = exp + ? WHERE uid = ?", details.reward / 2, details.uid)
         }
     }
 

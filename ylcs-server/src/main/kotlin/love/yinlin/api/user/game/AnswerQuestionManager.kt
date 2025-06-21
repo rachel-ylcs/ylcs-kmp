@@ -14,7 +14,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 答题
-data object Game1Manager : RankGameManager() {
+data object AnswerQuestionManager : RankGameManager() {
     override val config: AQConfig = AQConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {

@@ -175,7 +175,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             super.onTimelineChanged(timeline, reason)
-            withPlayer { player ->
+            withPlayer {
                 when (reason) {
                     Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED if timeline !is Timeline.RemotableTimeline -> {
                         // timeline可能是 Timeline.RemotableTimeline 或 PlaylistTimeline

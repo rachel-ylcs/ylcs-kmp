@@ -47,7 +47,7 @@ fun Routing.songAPI(implMap: ImplMap){
     api(API.User.Song.GetSongComments) { (sid, cid, num) ->
         VN.throwId(sid)
         val songComment = DB.throwQuerySQL("""
-            SELECT cid, user.uid, ts, content, name, label, coin
+            SELECT cid, user.uid, ts, content, name, label, exp
             FROM song_comment
             LEFT JOIN user
             ON song_comment.uid = user.uid

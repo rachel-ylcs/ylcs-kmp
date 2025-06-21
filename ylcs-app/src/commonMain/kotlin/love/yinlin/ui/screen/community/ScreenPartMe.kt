@@ -89,7 +89,7 @@ private fun LevelItem(
 					if (item.second != Int.MAX_VALUE) "${item.first} ~ ${item.second}"
 					else "> ${item.first}"
 				},
-				icon = Icons.Outlined.Paid
+				icon = Icons.Outlined.Explicit
 			)
 		}
 		Box(
@@ -301,8 +301,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 		) {
 			UserProfileCard(
 				modifier = Modifier.fillMaxWidth(),
-				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true,
+				profile = userProfile,
 				onLevelClick = { levelSheet.open(userProfile) },
 				onFollowClick = { navigate(ScreenFollows.Args(it)) }
 			)
@@ -320,8 +319,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	private fun Landscape(userProfile: UserProfile) {
 		Row(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
 			UserProfileCard(
-				profile = remember(userProfile) { userProfile.publicProfile },
-				owner = true,
+				profile = userProfile,
 				shape = MaterialTheme.shapes.large,
 				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
 				onLevelClick = { levelSheet.open(userProfile) },
@@ -466,6 +464,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				}
 				if (!todaySignin) app.config.userProfile = args.copy(
 					coin = args.coin + 1,
+                    exp = args.exp + 1,
 					notification = args.notification.copy(isSignin = true)
 				)
 			}
@@ -525,7 +524,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 						}
 					}
 				}
-				Text(text = if (todaySignin) "今日已签到" else "签到成功! 银币+1")
+				Text(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
 			}
 		}
 	}
@@ -550,8 +549,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 								modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
 							)
 							PortraitValue(
-								value = args.coin.toString(),
-								title = "银币"
+								value = args.exp.toString(),
+								title = "经验"
 							)
 						}
 					}

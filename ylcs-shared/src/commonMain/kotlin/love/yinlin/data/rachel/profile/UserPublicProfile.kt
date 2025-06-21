@@ -13,12 +13,12 @@ data class UserPublicProfile(
 	val name: String,
 	val signature: String,
 	val label: String,
-	val coin: Int,
+    val exp: Int,
 	val follows: Int,
 	val followers: Int,
 	val status: FollowStatus,
 ) {
-	val level: Int by lazy { UserLevel.level(coin) }
+	val level: Int by lazy { UserLevel.level(exp) }
 
 	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
 

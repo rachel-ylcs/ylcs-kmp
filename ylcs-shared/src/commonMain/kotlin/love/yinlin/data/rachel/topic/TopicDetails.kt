@@ -12,7 +12,7 @@ data class TopicDetails (
 	val pics: List<String>,
 	val section: Int,
 	val label: String,
-	val coin: Int
+	val exp: Int
 ) {
-	val level: Int by lazy { UserLevel.level(coin) }
+	val level: Int by lazy { UserLevel.level(exp) }
 }

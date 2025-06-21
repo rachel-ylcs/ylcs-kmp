@@ -153,7 +153,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(tid)
 		val tableName = VN.throwSection(rawSection)
 		val comments = DB.throwQuerySQL("""
-			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, coin
+			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, exp
             FROM $tableName
             LEFT JOIN user
             ON $tableName.uid = user.uid
@@ -171,7 +171,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(pid)
 		val tableName = VN.throwSection(rawSection)
 		val subComments = DB.throwQuerySQL("""
-			SELECT cid, user.uid, ts, content, name, label, coin
+			SELECT cid, user.uid, ts, content, name, label, exp
 			FROM $tableName
 			LEFT JOIN user
 			ON $tableName.uid = user.uid
@@ -251,11 +251,11 @@ fun Routing.topicAPI(implMap: ImplMap) {
             """, value, tid, uid)
 			// 投币者减少银币
 			it.throwExecuteSQL("""
-                UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?
-            """, value, srcUid, value)
-			// 被投币者增加银币
+                UPDATE user SET coin = coin - ? , exp = exp + ? WHERE uid = ? AND coin >= ?
+            """, value, value, srcUid, value)
+			// 被投币者增加银币和经验
 			if (value == UserConstraint.MIN_COIN_REWARD)
-				it.throwExecuteSQL("UPDATE user SET coin = coin + 1 WHERE uid = ?", uid)
+				it.throwExecuteSQL("UPDATE user SET exp = exp + 1 , coin = coin + 1 WHERE uid = ?", uid)
 		}
 		"投币成功".successData
 	}

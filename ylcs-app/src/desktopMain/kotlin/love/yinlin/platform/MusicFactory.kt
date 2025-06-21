@@ -62,8 +62,10 @@ class ActualMusicFactory : MusicFactory() {
     private val playerListener = object : MediaPlayerEventAdapter() {
         override fun mediaChanged(mediaPlayer: MediaPlayer?, media: MediaRef?) {
             val musicInfo = musicList[currentIndex]
-            currentMusic = musicInfo
-            onMusicChanged(musicInfo)
+            if (musicInfo.id != currentMusic?.id) {
+                currentMusic = musicInfo
+                onMusicChanged(musicInfo)
+            }
         }
         override fun playing(mediaPlayer: MediaPlayer?) { isPlaying = true }
         override fun paused(mediaPlayer: MediaPlayer?) { isPlaying = false }
@@ -179,7 +181,7 @@ class ActualMusicFactory : MusicFactory() {
         }
     }
 
-    override suspend fun addMedias(medias: List<MusicInfo>) = withReadyPlayer { player ->
+    override suspend fun addMedias(medias: List<MusicInfo>) = withReadyPlayer {
         musicList.addAll(medias)
 
         /*

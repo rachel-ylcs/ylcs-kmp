@@ -11,7 +11,7 @@ import love.yinlin.extension.toJson
 import kotlin.math.sqrt
 
 // 网格填词
-data object Game2Manager : RankGameManager() {
+data object BlockTextManager : RankGameManager() {
     override val config: BTConfig = BTConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {

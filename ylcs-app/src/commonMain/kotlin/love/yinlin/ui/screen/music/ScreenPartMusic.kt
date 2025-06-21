@@ -252,7 +252,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				musicInfo?.let {
 					MusicRecord(
 						musicInfo = it,
-						modifier = Modifier.fillMaxSize(fraction = 0.75f).zIndex(2f)
+						modifier = Modifier.fillMaxSize(fraction = 0.75f)
+                            .clickable { navigate(ScreenMusicDetails.Args(it.id)) }
+                            .zIndex(2f)
 					)
 				}
 			}

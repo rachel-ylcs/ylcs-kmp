@@ -138,8 +138,8 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         ts = DateEx.CurrentString,
                         content = content,
                         name = user.name,
-                        coin = user.coin,
-                        label = user.label
+                        label = user.label,
+                        exp = user.exp
                     )
                     listState.animateScrollToItem(pageComments.items.size - 1)
                     return true

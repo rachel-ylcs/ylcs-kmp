@@ -13,7 +13,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 // 寻花令
-data object Game3Manager : ExplorationGameManager() {
+data object FlowersOrderManager : ExplorationGameManager() {
     override val config: FOConfig = FOConfig
 
     override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount
