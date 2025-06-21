@@ -127,6 +127,7 @@ abstract class MusicFactory {
 
     // 回调
     protected fun onMusicChanged(musicInfo: MusicInfo?) {
+        println(musicInfo)
         val lastPlaylist = currentPlaylist?.name ?: ""
         app.config.lastPlaylist = lastPlaylist
         if (lastPlaylist.isNotEmpty()) musicInfo?.let { app.config.lastMusic = it.id }

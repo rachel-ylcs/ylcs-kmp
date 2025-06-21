@@ -185,7 +185,10 @@ class LyricsLrc : LyricsEngine {
         onLyricsClick: (Long) -> Unit
     ) {
         LaunchedEffect(currentIndex) {
-            if (!isDragging) if (currentIndex >= 3) listState.animateScrollToItem(currentIndex - 3)
+            if (!isDragging) {
+                if (currentIndex >= 3) listState.animateScrollToItem(currentIndex - 3)
+                else listState.animateScrollToItem(0)
+            }
         }
 
         LaunchedEffect(listState.interactionSource) {
