@@ -138,7 +138,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 			if (!isSignin) {
 				// 更新签到值，银币增加
 				signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
-				DB.throwExecuteSQL("UPDATE user SET signin = ? , coin = coin + 1 WHERE uid = ?", signin, uid)
+				DB.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
 			}
 			Data.Success(API.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
 		}

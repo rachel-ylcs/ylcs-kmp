@@ -251,11 +251,11 @@ fun Routing.topicAPI(implMap: ImplMap) {
             """, value, tid, uid)
 			// 投币者减少银币
 			it.throwExecuteSQL("""
-                UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?
-            """, value, srcUid, value)
-			// 被投币者增加银币
+                UPDATE user SET coin = coin - ? , exp = exp + ? WHERE uid = ? AND coin >= ?
+            """, value, value, srcUid, value)
+			// 被投币者增加银币和经验
 			if (value == UserConstraint.MIN_COIN_REWARD)
-				it.throwExecuteSQL("UPDATE user SET coin = coin + 1 WHERE uid = ?", uid)
+				it.throwExecuteSQL("UPDATE user SET exp = exp + 1 , coin = coin + 1 WHERE uid = ?", uid)
 		}
 		"投币成功".successData
 	}
