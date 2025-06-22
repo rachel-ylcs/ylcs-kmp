@@ -8,7 +8,7 @@ import love.yinlin.data.rachel.game.RankConfig
 @Stable
 @Suppress("MayBeConstant")
 data object AQConfig : RankConfig() {
-    val minThreshold: Float = 0.75f // 最小成功准确率
+    val minThreshold: Float = 0.6f // 最小成功准确率
     val maxThreshold: Float = 1f // 最大成功准确率
     val minQuestionCount: Int = 3 // 最小题数
     val maxQuestionCount: Int = 30 // 最大题数
