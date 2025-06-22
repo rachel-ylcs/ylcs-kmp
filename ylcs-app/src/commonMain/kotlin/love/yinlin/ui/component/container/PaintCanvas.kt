@@ -75,11 +75,11 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
 }
 
 @Composable
-private fun PaintCanvasLeftTool(
+private fun PaintCanvasTool1(
     state: PaintCanvasState,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Row(modifier = modifier) {
         PaintCanvasState.colors.forEach { color ->
             ClickIcon(
                 icon = Icons.Outlined.Brush,
@@ -94,11 +94,11 @@ private fun PaintCanvasLeftTool(
 }
 
 @Composable
-private fun PaintCanvasRightTool(
+private fun PaintCanvasTool2(
     state: PaintCanvasState,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Row(modifier = modifier) {
         val canRemove by rememberDerivedState { state.paths.isNotEmpty() }
         ClickIcon(
             icon = Icons.AutoMirrored.Outlined.Undo,
@@ -183,10 +183,16 @@ fun PaintCanvas(
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
-        Row(modifier = Modifier.height(PaintCanvasState.defaultHeight)) {
-            if (enabled) PaintCanvasLeftTool(state = state, modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState()))
-            PaintCanvasView(state = state, enabled = enabled, modifier = Modifier.width(PaintCanvasState.defaultWidth).fillMaxHeight())
-            if (enabled) PaintCanvasRightTool(state = state, modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState()))
+        Column(modifier = Modifier.width(PaintCanvasState.defaultWidth)) {
+            if (enabled) {
+                PaintCanvasTool1(state = state, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()))
+                PaintCanvasTool2(state = state, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()))
+            }
+            PaintCanvasView(
+                state = state,
+                enabled = enabled,
+                modifier = Modifier.fillMaxWidth().height(PaintCanvasState.defaultHeight)
+            )
         }
     }
 }
