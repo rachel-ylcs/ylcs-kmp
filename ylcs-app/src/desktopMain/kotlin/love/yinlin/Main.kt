@@ -181,15 +181,20 @@ fun main() {
         }
 
         // 托盘
-        if (!visible) {
-            val trayState = rememberTrayState()
-
-            Tray(
-                icon = painterResource(Res.drawable.img_logo),
-                state = trayState,
-                onAction = { visible = true }
-            )
+        val trayState = rememberTrayState()
+        val notification = rememberNotification(
+            title = stringResource(Res.string.app_name),
+            message = "已隐藏到任务栏托盘中",
+            type = Notification.Type.Info
+        )
+        LaunchedEffect(visible) {
+            if (!visible) trayState.sendNotification(notification)
         }
+        Tray(
+            icon = painterResource(Res.drawable.img_logo),
+            state = trayState,
+            onAction = { visible = true }
+        )
 
         // 悬浮歌词
         (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
