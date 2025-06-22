@@ -36,10 +36,10 @@ fun ColumnScope.PictionaryCardInfo(game: GamePublicDetailsWithName) {}
 
 @Composable
 fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
-    val answer = remember(game) {
-        catchingNull { game.answer.String }
+    val data = remember(game) {
+        catchingNull { game.question.to<Pair<List<PaintPath>, Int>>() to game.answer.String }
     }
-    if (answer != null) {
+    data?.let { (question, answer) ->
         Text(
             text = "答案",
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -48,6 +48,11 @@ fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
             text = answer,
             icon = Icons.Outlined.Lightbulb,
             color = MaterialTheme.colorScheme.primary
+        )
+        PaintCanvas(
+            state = remember(question) { PaintCanvasState(question.first) },
+            enabled = false,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
 }
