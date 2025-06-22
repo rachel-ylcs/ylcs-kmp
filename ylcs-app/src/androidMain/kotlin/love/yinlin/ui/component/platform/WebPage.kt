@@ -3,6 +3,8 @@ package love.yinlin.ui.component.platform
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.*
@@ -153,24 +155,38 @@ actual fun WebPage(
 actual abstract class HeadlessBrowser actual constructor() {
 	@SuppressLint("SetJavaScriptEnabled")
     private val webview = WebView(appNative.context).apply {
+        visibility = View.GONE
+        layoutParams = ViewGroup.LayoutParams(1, 1)
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 		settings.apply {
 			javaScriptEnabled = true
-			domStorageEnabled = true
-			allowFileAccess = true
-			allowContentAccess = true
-			blockNetworkImage = false
+            javaScriptCanOpenWindowsAutomatically = false
+            cacheMode = WebSettings.LOAD_NO_CACHE
+			domStorageEnabled = false
+			allowFileAccess = false
+			allowContentAccess = false
+			blockNetworkImage = true
 			blockNetworkLoads = false
-			loadsImagesAutomatically = true
-			useWideViewPort = true
-			builtInZoomControls = true
+			loadsImagesAutomatically = false
+			useWideViewPort = false
+			builtInZoomControls = false
 			displayZoomControls = false
-			mediaPlaybackRequiresUserGesture = false
+			mediaPlaybackRequiresUserGesture = true
+            safeBrowsingEnabled = false
 			userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
-			setSupportMultipleWindows(true)
-			setSupportZoom(true)
+			setSupportMultipleWindows(false)
+			setSupportZoom(false)
 			setGeolocationEnabled(true)
+            setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_WAIVED, true)
 		}
 		webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
+                val url = request?.url.toString()
+                return if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".webp")) {
+                    WebResourceResponse(null, null, null)
+                } else super.shouldInterceptRequest(view, request)
+            }
+
 			override fun onPageFinished(view: WebView?, url: String?) {
 				view?.evaluateJavascript("""
 (function() {
@@ -204,7 +220,9 @@ actual abstract class HeadlessBrowser actual constructor() {
 
 			@JavascriptInterface
 			fun onRequestDetected(url: String?, json: String?) {
-				if (url != null && json != null) onRequestIntercepted(url, json)
+				if (url != null && json != null) {
+                    if (onRequestIntercepted(url, json)) stopLoading()
+                }
 			}
 		}, "RequestInterceptor")
 	}
@@ -222,5 +240,5 @@ actual abstract class HeadlessBrowser actual constructor() {
 
 	actual abstract fun onUrlIntercepted(url: String): Boolean
 
-	actual abstract fun onRequestIntercepted(url: String, response: String)
+	actual abstract fun onRequestIntercepted(url: String, response: String): Boolean
 }

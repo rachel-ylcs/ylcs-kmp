@@ -49,7 +49,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
     private val browser = object : HeadlessBrowser() {
         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")
 
-        override fun onRequestIntercepted(url: String, response: String) {
+        override fun onRequestIntercepted(url: String, response: String): Boolean {
             launch {
                 state = catchingDefault(BoxState.NETWORK_ERROR) {
                     val json = response.parseJson
@@ -58,6 +58,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                 }
                 destroy()
             }
+            return onUrlIntercepted(url)
         }
     }
 
