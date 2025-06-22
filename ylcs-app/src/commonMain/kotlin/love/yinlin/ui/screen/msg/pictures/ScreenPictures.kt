@@ -7,14 +7,19 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.EmojiObjects
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -210,6 +215,13 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
+        ActionSuspend(Icons.Outlined.EmojiObjects) {
+            slot.info.openSuspend(
+                title = "图集分享",
+                content = "欢迎大家分享相机线下拍摄的超清原图给其他小银子, 有贡献图集意愿的小银子可联系我们收录, 我们也会为您赠予银币奖励!"
+            )
+        }
+
         ActionSuspend(Icons.Outlined.Search) {
             val result = searchDialog.openSuspend()
             if (result != null) searchFolder(result)

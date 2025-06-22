@@ -35,7 +35,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -53,7 +53,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
             onClick = onClick
         )
 	}
