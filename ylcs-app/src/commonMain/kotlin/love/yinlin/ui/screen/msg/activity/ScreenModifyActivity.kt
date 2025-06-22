@@ -198,6 +198,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 	override fun ActionScope.RightActions() {
 		ActionSuspend(
 			icon = Icons.Outlined.Check,
+            tip = "提交",
 			enabled = input.canSubmit
 		) {
 			modifyActivity()

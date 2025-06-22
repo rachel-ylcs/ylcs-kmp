@@ -69,6 +69,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 	override fun ActionScope.RightActions() {
 		ActionSuspend(
 			icon = Icons.Outlined.Check,
+            tip = "提交",
 			enabled = input.canSubmit
 		) {
 			addActivity()

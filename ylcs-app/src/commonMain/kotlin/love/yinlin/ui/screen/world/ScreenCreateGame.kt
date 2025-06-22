@@ -41,8 +41,6 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     @Serializable
     data class Args(val type: Game)
 
-    override val title: String = "${args.type.title} - 新游戏"
-
     private val state = createGameState(args.type, slot)
     private val config = state.config
 
@@ -57,45 +55,6 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     }
 
     private val canSubmit by derivedStateOf { titleState.ok && state.canSubmit }
-
-    @Composable
-    override fun ActionScope.RightActions() {
-        ActionSuspend(
-            icon = Icons.Outlined.Check,
-            enabled = canSubmit
-        ) {
-            val profile = app.config.userProfile
-            if (profile != null) {
-                val reward = reward.cast(config.minReward, config.maxReward)
-                val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
-                if (profile.coin >= actionCoin) {
-                    val result = ClientAPI.request(
-                        route = API.User.Game.CreateGame,
-                        data = API.User.Game.CreateGame.Request(
-                            token = app.config.userToken,
-                            title = titleState.text,
-                            type = args.type,
-                            reward = reward,
-                            num = num.cast(config.minRank, maxNum),
-                            cost = cost.cast(0, maxCost),
-                            info = state.submitInfo,
-                            question = state.submitQuestion,
-                            answer = state.submitAnswer,
-                        )
-                    )
-                    when (result) {
-                        is Data.Success -> {
-                            worldPart.slot.tip.success(result.message)
-                            app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
-                            pop()
-                        }
-                        is Data.Error -> slot.tip.error(result.message)
-                    }
-                }
-                else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")
-            }
-        }
-    }
 
     @Composable
     private fun ColumnScope.ArgsLayout() {
@@ -169,6 +128,48 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                 verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {
                 with(state) { this@Column.Content() }
+            }
+        }
+    }
+
+    override val title: String = "${args.type.title} - 新游戏"
+
+    @Composable
+    override fun ActionScope.RightActions() {
+        ActionSuspend(
+            icon = Icons.Outlined.Check,
+            tip = "提交",
+            enabled = canSubmit
+        ) {
+            val profile = app.config.userProfile
+            if (profile != null) {
+                val reward = reward.cast(config.minReward, config.maxReward)
+                val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
+                if (profile.coin >= actionCoin) {
+                    val result = ClientAPI.request(
+                        route = API.User.Game.CreateGame,
+                        data = API.User.Game.CreateGame.Request(
+                            token = app.config.userToken,
+                            title = titleState.text,
+                            type = args.type,
+                            reward = reward,
+                            num = num.cast(config.minRank, maxNum),
+                            cost = cost.cast(0, maxCost),
+                            info = state.submitInfo,
+                            question = state.submitQuestion,
+                            answer = state.submitAnswer,
+                        )
+                    )
+                    when (result) {
+                        is Data.Success -> {
+                            worldPart.slot.tip.success(result.message)
+                            app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
+                            pop()
+                        }
+                        is Data.Error -> slot.tip.error(result.message)
+                    }
+                }
+                else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")
             }
         }
     }

@@ -171,7 +171,7 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        ActionSuspend(Icons.Outlined.Search) {
+        ActionSuspend(Icons.Outlined.Search, "搜索") {
             val result = searchDialog.openSuspend()
             if (result != null) searchNewData(result)
         }

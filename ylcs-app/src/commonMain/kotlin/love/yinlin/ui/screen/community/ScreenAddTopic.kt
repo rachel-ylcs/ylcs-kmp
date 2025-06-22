@@ -134,7 +134,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.LeftActions() {
-        Action(Icons.Outlined.Close) {
+        Action(Icons.Outlined.Close, "发表") {
             app.config.editedTopic = null
             pop()
         }
@@ -144,6 +144,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
     override fun ActionScope.RightActions() {
         ActionSuspend(
             icon = Icons.Outlined.Check,
+            tip = "放弃更改",
             enabled = input.canSubmit
         ) {
             val profile = app.config.userProfile

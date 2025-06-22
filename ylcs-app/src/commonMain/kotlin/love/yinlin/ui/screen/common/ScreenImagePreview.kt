@@ -160,7 +160,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 
 	@Composable
 	override fun ActionScope.RightActions() {
-		Action(Icons.Filled.Download) {
+		Action(Icons.Filled.Download, "下载") {
 			downloadPicture()
 		}
 	}

@@ -126,11 +126,11 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	override fun ActionScope.RightActions() {
-		ActionSuspend(Icons.Outlined.Search) {
+		ActionSuspend(Icons.Outlined.Search, "搜索") {
 			onSearchWeiboUser()
 		}
 		if (isLocal) {
-			Action(Icons.Outlined.SwapVert) {
+			Action(Icons.Outlined.SwapVert, "备份") {
 				importSheet.open()
 			}
 		}

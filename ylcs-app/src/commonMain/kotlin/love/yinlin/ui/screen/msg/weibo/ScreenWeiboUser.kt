@@ -85,6 +85,7 @@ private fun UserInfoCard(
 				)
 				ClickIcon(
 					icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    tip = if (isFollowed) "取消关注" else "关注",
 					color = MaterialTheme.colorScheme.primary,
 					onClick = { onFollowClick(!isFollowed) }
 				)

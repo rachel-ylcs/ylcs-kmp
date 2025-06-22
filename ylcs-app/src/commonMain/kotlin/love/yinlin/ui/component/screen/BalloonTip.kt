@@ -11,6 +11,7 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import love.yinlin.common.ThemeValue
+import love.yinlin.platform.app
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +35,7 @@ fun BallonTip(
             }
         },
         state = rememberTooltipState(),
+        enableUserInput = app.config.enabledTip,
         content = content
     )
 }
@@ -72,6 +74,7 @@ fun BallonTip(
             )
         },
         state = rememberTooltipState(),
+        enableUserInput = app.config.enabledTip,
         content = content
     )
 }

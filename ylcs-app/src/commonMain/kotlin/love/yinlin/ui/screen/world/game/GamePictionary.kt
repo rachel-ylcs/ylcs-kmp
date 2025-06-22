@@ -95,7 +95,7 @@ class PictionaryCreateGameState(val slot: SubScreenSlot) : CreateGameState {
     override fun ColumnScope.Content() {
         TextInput(
             state = inputState,
-            hint = "答案(长度${PConfig.minAnswerLength}-${PConfig.maxAnswerLength})",
+            hint = "答案(长度${PConfig.minAnswerLength}~${PConfig.maxAnswerLength})",
             maxLength = PConfig.maxAnswerLength,
             modifier = Modifier.fillMaxWidth()
         )

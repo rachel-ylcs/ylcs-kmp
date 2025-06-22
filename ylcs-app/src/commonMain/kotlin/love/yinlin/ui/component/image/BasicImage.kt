@@ -50,6 +50,7 @@ import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.placeholder_pic
+import love.yinlin.ui.component.screen.BallonTip
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -134,6 +135,20 @@ fun ClickIcon(
 )
 
 @Composable
+fun ClickIcon(
+    icon: ImageVector,
+    tip: String,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    size: Dp = ThemeValue.Size.Icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickIcon(icon, color, size, indication, enabled, modifier, onClick) }
+}
+
+@Composable
 fun LoadingCircle(
 	modifier: Modifier = Modifier,
 	size: Dp = ThemeValue.Size.Icon,
@@ -211,6 +226,19 @@ fun LoadingIcon(
 }
 
 @Composable
+fun LoadingIcon(
+    icon: ImageVector,
+    tip: String,
+    size: Dp = ThemeValue.Size.Icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: suspend CoroutineScope.() -> Unit
+) {
+    BallonTip(text = tip) { LoadingIcon(icon, size, color, enabled, modifier, onClick) }
+}
+
+@Composable
 fun MiniIcon(
 	res: DrawableResource,
 	size: Dp = ThemeValue.Size.Icon,
@@ -241,6 +269,17 @@ fun ClickIcon(
 		.clip(MaterialTheme.shapes.extraSmall)
 		.clickable(onClick = onClick)
 )
+
+@Composable
+fun ClickIcon(
+    res: DrawableResource,
+    tip: String,
+    size: Dp = ThemeValue.Size.Icon,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickIcon(res, size, modifier, onClick) }
+}
 
 @Composable
 fun IconText(

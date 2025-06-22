@@ -280,8 +280,9 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun ActionScope.LeftActions() {
         if (isManaging) {
-            Action(Icons.Outlined.SelectAll) {
-                if (library.fastAll { it.selected }) exitManagement()
+            val isSelectAll = library.fastAll { it.selected }
+            Action(Icons.Outlined.SelectAll, if (isSelectAll) "取消全选" else "全选") {
+                if (isSelectAll) exitManagement()
                 else selectAll()
             }
         }
@@ -291,12 +292,12 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override fun ActionScope.RightActions() {
         if (!isManaging) {
             if (isSearching) {
-                Action(Icons.Outlined.Home) {
+                Action(Icons.Outlined.Home, "返回曲库") {
                     closeSearch()
                 }
             }
             else {
-                ActionSuspend(Icons.Outlined.Search) {
+                ActionSuspend(Icons.Outlined.Search, "搜索") {
                     openSearch()
                 }
             }
@@ -335,13 +336,13 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
     override val fabIcon: ImageVector by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.Token }
 
     override val fabMenus: Array<FABAction> = arrayOf(
-        FABAction(Icons.AutoMirrored.Outlined.PlaylistAdd) {
+        FABAction(Icons.AutoMirrored.Outlined.PlaylistAdd, "添加到歌单") {
             launch { onMusicAdd() }
         },
-        FABAction(Icons.Outlined.Delete) {
+        FABAction(Icons.Outlined.Delete, "删除") {
             launch { onMusicDelete() }
         },
-        FABAction(Icons.Outlined.Archive) {
+        FABAction(Icons.Outlined.Archive, "导出MOD") {
             launch { onMusicPackage() }
         }
     )

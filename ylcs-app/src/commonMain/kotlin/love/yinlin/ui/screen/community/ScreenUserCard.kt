@@ -225,11 +225,14 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				val status = profile.status
 				when (val isFollowed = status.isFollowed) {
 					null -> {}
-					else -> LoadingIcon(
-						icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-						color = MaterialTheme.colorScheme.primary,
-						onClick = { if (isFollowed) unfollowUser(profile) else followUser(profile) }
-					)
+					else -> {
+                        LoadingIcon(
+                            icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            tip = if (isFollowed) "取消关注" else "关注",
+                            color = MaterialTheme.colorScheme.primary,
+                            onClick = { if (isFollowed) unfollowUser(profile) else followUser(profile) }
+                        )
+                    }
 				}
 				if (status.canBlock) {
 					LoadingIcon(

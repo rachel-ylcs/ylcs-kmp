@@ -398,13 +398,22 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			ItemSwitch(
 				title = "音频焦点",
 				icon = colorfulImageVector(icon = Icons.Outlined.MusicNote, background = MaterialTheme.colorScheme.primaryContainer),
-				hasDivider = false,
 				checked = app.config.audioFocus,
 				onCheckedChange = {
 					app.config.audioFocus = it
 					slot.tip.success("重启APP后生效")
 				}
 			)
+
+            ItemSwitch(
+                title = "悬浮提示",
+                icon = colorfulImageVector(icon = Icons.Outlined.Lightbulb, background = MaterialTheme.colorScheme.primaryContainer),
+                hasDivider = false,
+                checked = app.config.enabledTip,
+                onCheckedChange = {
+                    app.config.enabledTip = it
+                }
+            )
 		}
 	}
 

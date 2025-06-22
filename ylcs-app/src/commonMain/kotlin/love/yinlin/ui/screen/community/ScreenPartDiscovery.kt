@@ -296,10 +296,10 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
 
     override val fabMenus: Array<FABAction> = arrayOf(
-        FABAction(Icons.Outlined.Edit) {
+        FABAction(Icons.Outlined.Edit, "发表主题") {
             navigate<ScreenAddTopic>()
         },
-        FABAction(Icons.Outlined.Refresh) {
+        FABAction(Icons.Outlined.Refresh, "刷新") {
             launch { requestNewData() }
         }
     )

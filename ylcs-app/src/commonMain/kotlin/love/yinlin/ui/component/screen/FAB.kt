@@ -30,6 +30,7 @@ import love.yinlin.ui.component.node.condition
 @Stable
 data class FABAction(
     val icon: ImageVector,
+    val tip: String? = null,
     val onClick: () -> Unit = {}
 )
 
@@ -50,6 +51,29 @@ private fun FABIcon(
             icon = icon,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
+    }
+}
+
+@Composable
+private fun FABIcon(
+    icon: ImageVector,
+    tip: String,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) {
+        Box(
+            modifier = Modifier
+                .size(ThemeValue.Size.FAB)
+                .clip(CircleShape)
+                .clickable(onClick = onClick)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            MiniIcon(
+                icon = icon,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
     }
 }
 
@@ -128,7 +152,12 @@ fun FABLayout(
                             exit = fadeOut(tween(duration)) +
                                     slideOutHorizontally(tween(durationMillis = duration))
                         ) {
-                            FABIcon(icon = action.icon) {
+                            action.tip?.let { tip ->
+                                FABIcon(icon = action.icon, tip = tip) {
+                                    expanded = false
+                                    action.onClick()
+                                }
+                            } ?: FABIcon(icon = action.icon) {
                                 expanded = false
                                 action.onClick()
                             }

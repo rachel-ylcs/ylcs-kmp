@@ -160,6 +160,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
     override fun ActionScope.RightActions() {
         ActionSuspend(
             icon = Icons.Outlined.Check,
+            tip = "创建",
             enabled = input.canSubmit
         ) {
             submit()

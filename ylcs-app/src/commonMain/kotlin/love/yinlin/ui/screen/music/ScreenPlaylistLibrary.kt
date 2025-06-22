@@ -306,7 +306,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun ActionScope.LeftActions() {
         if (currentPage != -1) {
-            ActionSuspend(Icons.Outlined.PlayArrow) {
+            ActionSuspend(Icons.Outlined.PlayArrow, "播放") {
                 playPlaylist()
             }
         }
@@ -314,10 +314,10 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        Action(Icons.Outlined.CloudUpload) {
+        Action(Icons.Outlined.CloudUpload, "云备份") {
             cloudBackupSheet.open()
         }
-        ActionSuspend(Icons.Outlined.Add) {
+        ActionSuspend(Icons.Outlined.Add, "创建歌单") {
             addPlaylist()
         }
     }

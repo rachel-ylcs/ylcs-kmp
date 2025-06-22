@@ -139,6 +139,7 @@ fun main() {
                         ) {
                             Action(
                                 icon = Icons.Outlined.RocketLaunch,
+                                tip = "加载更新包",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 scope.launch {
@@ -151,24 +152,28 @@ fun main() {
                             }
                             Action(
                                 icon = if (alwaysOnTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
+                                tip = "窗口置顶",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 alwaysOnTop = !alwaysOnTop
                             }
                             Action(
                                 icon = Icons.Outlined.Remove,
+                                tip = "最小化到托盘",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 visible = false
                             }
                             Action(
                                 icon = Icons.Outlined.CropSquare,
+                                tip = "最大化",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 state.placement = if (state.placement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
                             }
                             Action(
                                 icon = Icons.Outlined.Close,
+                                tip = "关闭",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
                                 exitApplication()
@@ -188,7 +193,7 @@ fun main() {
             type = Notification.Type.Info
         )
         LaunchedEffect(visible) {
-            if (!visible) trayState.sendNotification(notification)
+            if (!visible && app.config.enabledTip) trayState.sendNotification(notification)
         }
         Tray(
             icon = painterResource(Res.drawable.img_logo),

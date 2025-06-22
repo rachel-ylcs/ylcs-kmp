@@ -237,7 +237,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
 
     @Composable
     override fun ActionScope.RightActions() {
-        ActionSuspend(Icons.Outlined.Refresh) { requestNewData() }
+        ActionSuspend(Icons.Outlined.Refresh, "刷新") { requestNewData() }
     }
 
     override suspend fun initialize() {
