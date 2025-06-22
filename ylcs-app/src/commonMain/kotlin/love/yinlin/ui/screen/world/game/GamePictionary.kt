@@ -20,6 +20,7 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.PConfig
 import love.yinlin.data.rachel.game.info.PaintPath
+import love.yinlin.data.rachel.game.info.PictionaryQuestion
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
@@ -37,7 +38,7 @@ fun ColumnScope.PictionaryCardInfo(game: GamePublicDetailsWithName) {}
 @Composable
 fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
     val data = remember(game) {
-        catchingNull { game.question.to<Pair<List<PaintPath>, Int>>() to game.answer.String }
+        catchingNull { game.question.to<PictionaryQuestion>() to game.answer.String }
     }
     data?.let { (question, answer) ->
         Text(
@@ -50,7 +51,7 @@ fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
             color = MaterialTheme.colorScheme.primary
         )
         PaintCanvas(
-            state = remember(question) { PaintCanvasState(question.first) },
+            state = remember(question) { PaintCanvasState(question.paths) },
             enabled = false,
             modifier = Modifier.fillMaxWidth()
         )
@@ -87,7 +88,7 @@ class PictionaryCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     override val submitInfo: JsonElement = Unit.toJson()
 
-    override val submitQuestion: JsonElement get() = (paintState.paths.toList() to inputState.text.length).toJson()
+    override val submitQuestion: JsonElement get() = PictionaryQuestion(paintState.paths.toList(), inputState.text.length).toJson()
 
     override val submitAnswer: JsonElement get() = inputState.text.toJson()
 
@@ -95,7 +96,7 @@ class PictionaryCreateGameState(val slot: SubScreenSlot) : CreateGameState {
     override fun ColumnScope.Content() {
         TextInput(
             state = inputState,
-            hint = "答案(长度${PConfig.minAnswerLength} - ${PConfig.maxAnswerLength})",
+            hint = "答案(长度${PConfig.minAnswerLength}-${PConfig.maxAnswerLength})",
             maxLength = PConfig.maxAnswerLength,
             modifier = Modifier.fillMaxWidth()
         )
@@ -109,7 +110,7 @@ class PictionaryCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 @Stable
 class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
     @Stable
-    private data class Preflight(val paths: List<PaintPath>, val count: Int)
+    private data class Preflight(val question: PictionaryQuestion)
 
     override val config: PConfig = PConfig
 
@@ -124,10 +125,10 @@ class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = catchingNull {
-            val (paths, length) = preflightResult.question.to<Pair<List<PaintPath>, Int>>()
-            require(length in PConfig.minAnswerLength ..PConfig.maxAnswerLength)
-            require(paths.isNotEmpty())
-            Preflight(paths = paths, count = length)
+            val question = preflightResult.question.to<PictionaryQuestion>()
+            require(question.count in PConfig.minAnswerLength ..PConfig.maxAnswerLength)
+            require(question.paths.isNotEmpty())
+            Preflight(question = question)
         }
     }
 
@@ -137,7 +138,7 @@ class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     @Composable
     override fun ColumnScope.Content() {
-        preflight?.let { (paths, count) ->
+        preflight?.let { (question) ->
             val focusRequester = remember { FocusRequester() }
 
             LaunchedEffect(Unit) {
@@ -146,13 +147,13 @@ class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
             TextInput(
                 state = inputState,
-                hint = "答案(字数:$count)",
+                hint = "答案(字数:${question.count})",
                 maxLength = PConfig.maxAnswerLength,
                 clearButton = false,
                 modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
             PaintCanvas(
-                state = remember(paths) { PaintCanvasState(paths) },
+                state = remember(question) { PaintCanvasState(question.paths) },
                 enabled = false,
                 modifier = Modifier.fillMaxWidth()
             )

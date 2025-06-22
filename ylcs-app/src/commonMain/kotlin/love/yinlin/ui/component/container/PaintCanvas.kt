@@ -56,14 +56,18 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
     companion object {
         val defaultColor = Colors.Black
         val defaultBackground = Colors.White
-        val colors = arrayOf(
-            Colors.Black, Colors.White, Colors.Gray4, Colors.Red4,
-            Colors.Orange4, Colors.Yellow4, Colors.Green4, Colors.Cyan4,
-            Colors.Blue4, Colors.Purple4, Colors.Steel4, Colors.Pink4
+        val colors1 = arrayOf(
+            Colors.Black, Colors.White, Colors.Gray4, Colors.Steel4,
+            Colors.Pink4
+        )
+        val colors2 = arrayOf(
+            Colors.Red4, Colors.Orange4, Colors.Yellow4, Colors.Green4,
+            Colors.Cyan4, Colors.Blue4, Colors.Purple4
         )
         val widths = arrayOf(
-            1f to Icons.Outlined._1k, 2f to Icons.Outlined._2k, 3f to Icons.Outlined._3k,
-            4f to Icons.Outlined._4k, 5f to Icons.Outlined._5k, 6f to Icons.Outlined._6k,
+            1f to Icons.Outlined._1k, 3f to Icons.Outlined._2k, 5f to Icons.Outlined._3k,
+            7f to Icons.Outlined._4k, 9f to Icons.Outlined._5k, 11f to Icons.Outlined._6k,
+            13f to Icons.Outlined._7k,
         )
     }
 
@@ -73,51 +77,13 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
 }
 
 @Composable
-private fun PaintCanvasTool1(
-    state: PaintCanvasState,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier) {
-        PaintCanvasState.colors.forEach { color ->
-            ClickIcon(
-                icon = Icons.Outlined.Brush,
-                color = color,
-                onClick = { state.color = color },
-                modifier = Modifier.condition(state.color == color) {
-                    border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun PaintCanvasTool2(
-    state: PaintCanvasState,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier) {
-        val canRemove by rememberDerivedState { state.paths.isNotEmpty() }
-        ClickIcon(
-            icon = Icons.AutoMirrored.Outlined.Undo,
-            enabled = canRemove,
-            onClick = { state.paths.removeLastOrNull() }
-        )
-        ClickIcon(
-            icon = Icons.Outlined.Delete,
-            enabled = canRemove,
-            onClick = { state.paths.clear() }
-        )
-        PaintCanvasState.widths.forEach { (width, icon) ->
-            ClickIcon(
-                icon = icon,
-                onClick = { state.width = width },
-                modifier = Modifier.condition(state.width == width) {
-                    border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
-                }
-            )
-        }
-    }
+private inline fun PaintCanvasTool(content: @Composable RowScope.() -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(ThemeValue.Padding.Value)
+            .horizontalScroll(rememberScrollState()),
+        content = content
+    )
 }
 
 @Composable
@@ -187,18 +153,52 @@ fun PaintCanvas(
     Surface(modifier = modifier) {
         Column(modifier = Modifier.fillMaxWidth().border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)) {
             if (enabled) {
-                PaintCanvasTool1(
-                    state = state,
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(ThemeValue.Padding.Value)
-                        .horizontalScroll(rememberScrollState())
-                )
-                PaintCanvasTool2(
-                    state = state,
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(ThemeValue.Padding.Value)
-                        .horizontalScroll(rememberScrollState())
-                )
+                PaintCanvasTool {
+                    val canRemove by rememberDerivedState { state.paths.isNotEmpty() }
+                    ClickIcon(
+                        icon = Icons.AutoMirrored.Outlined.Undo,
+                        enabled = canRemove,
+                        onClick = { state.paths.removeLastOrNull() }
+                    )
+                    ClickIcon(
+                        icon = Icons.Outlined.Delete,
+                        enabled = canRemove,
+                        onClick = { state.paths.clear() }
+                    )
+                    PaintCanvasState.colors1.forEach { color ->
+                        ClickIcon(
+                            icon = Icons.Outlined.Brush,
+                            color = color,
+                            onClick = { state.color = color },
+                            modifier = Modifier.condition(state.color == color) {
+                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                            }
+                        )
+                    }
+                }
+                PaintCanvasTool {
+                    PaintCanvasState.colors2.forEach { color ->
+                        ClickIcon(
+                            icon = Icons.Outlined.Brush,
+                            color = color,
+                            onClick = { state.color = color },
+                            modifier = Modifier.condition(state.color == color) {
+                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                            }
+                        )
+                    }
+                }
+                PaintCanvasTool {
+                    PaintCanvasState.widths.forEach { (width, icon) ->
+                        ClickIcon(
+                            icon = icon,
+                            onClick = { state.width = width },
+                            modifier = Modifier.condition(state.width == width) {
+                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                            }
+                        )
+                    }
+                }
             }
             PaintCanvasView(
                 state = state,
