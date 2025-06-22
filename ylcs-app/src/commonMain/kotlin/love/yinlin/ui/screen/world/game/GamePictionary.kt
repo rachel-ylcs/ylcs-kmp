@@ -52,7 +52,7 @@ fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
         PaintCanvas(
             state = remember(question) { PaintCanvasState(question.first) },
             enabled = false,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -101,7 +101,7 @@ class PictionaryCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         )
         PaintCanvas(
             state = paintState,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -154,7 +154,7 @@ class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
             PaintCanvas(
                 state = remember(paths) { PaintCanvasState(paths) },
                 enabled = false,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

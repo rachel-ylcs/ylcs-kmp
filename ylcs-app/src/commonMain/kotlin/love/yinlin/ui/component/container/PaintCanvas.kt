@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
@@ -31,31 +31,29 @@ import love.yinlin.extension.rememberState
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.node.condition
 
-private fun DrawScope.drawPaintPath(paths: List<Long>, width: Float, color: Color) {
+private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {
         paths.firstOrNull()?.let { first ->
             var x = unpackFloat1(first)
             var y = unpackFloat2(first)
-            moveTo(x, y)
+            moveTo(x * ratio, y * ratio)
             for (i in 1 ..< paths.size - 1) {
                 x = unpackFloat1(paths[i])
                 y = unpackFloat2(paths[i])
-                lineTo(x, y)
+                lineTo(x * ratio, y * ratio)
             }
         }
     }
     drawPath(
         path = path,
         color = color,
-        style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        style = Stroke(width = width * ratio, cap = StrokeCap.Round, join = StrokeJoin.Round)
     )
 }
 
 @Stable
 class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
     companion object {
-        val defaultWidth = 300.dp
-        val defaultHeight = 450.dp
         val defaultColor = Colors.Black
         val defaultBackground = Colors.White
         val colors = arrayOf(
@@ -128,48 +126,52 @@ private fun PaintCanvasView(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val currentPath = remember { mutableStateListOf<Long>() }
-    var currentOffset: Offset? by rememberState { null }
+    BoxWithConstraints(modifier = modifier) {
+        val currentPath = remember { mutableStateListOf<Long>() }
+        var currentOffset: Offset? by rememberState { null }
 
-    Canvas(modifier = modifier
-        .clipToBounds()
-        .background(PaintCanvasState.defaultBackground)
-        .pointerInput(enabled, state) {
-            if (enabled) detectDragGestures(
-                onDragStart = { currentPath += packFloats(it.x, it.y) },
-                onDragEnd = {
-                    val distinctPath = when (currentPath.size) {
-                        in 0 .. 1 -> null
-                        2 -> listOf(currentPath[0], currentPath[1])
-                        else -> {
-                            val last = currentPath.last()
-                            var index = currentPath.size - 2
-                            while (index >= 0 && currentPath[index] == last) index--
-                            currentPath.take(index + 2)
+        val density = LocalDensity.current.density
+        val ratio = remember(maxWidth, density) { maxWidth.value / 360 * density }
+
+        Canvas(modifier = Modifier.fillMaxSize().clipToBounds()
+            .background(PaintCanvasState.defaultBackground)
+            .pointerInput(maxWidth, ratio, enabled, state) {
+                if (enabled) detectDragGestures(
+                    onDragStart = { currentPath += packFloats(it.x / ratio, it.y / ratio) },
+                    onDragEnd = {
+                        val distinctPath = when (currentPath.size) {
+                            in 0 .. 1 -> null
+                            2 -> listOf(currentPath[0], currentPath[1])
+                            else -> {
+                                val last = currentPath.last()
+                                var index = currentPath.size - 2
+                                while (index >= 0 && currentPath[index] == last) index--
+                                currentPath.take(index + 2)
+                            }
                         }
-                    }
-                    distinctPath?.let { state.paths += PaintPath(it, state.width, state.color.toArgb()) }
-                    currentPath.clear()
-                },
-                onDrag = { v, _ -> currentOffset = v.position }
-            )
-        }.pointerInput(enabled, state) {
-            if (enabled) detectTapGestures {
-                state.paths += PaintPath(listOf(
-                    packFloats(it.x, it.y),
-                    packFloats(it.x, it.y)
-                ), state.width, state.color.toArgb())
+                        distinctPath?.let { state.paths += PaintPath(it, state.width, state.color.toArgb()) }
+                        currentPath.clear()
+                    },
+                    onDrag = { v, _ -> currentOffset = v.position }
+                )
+            }.pointerInput(maxWidth, ratio, enabled, state) {
+                if (enabled) detectTapGestures {
+                    state.paths += PaintPath(listOf(
+                        packFloats(it.x / ratio, it.y / ratio),
+                        packFloats(it.x / ratio, it.y / ratio)
+                    ), state.width, state.color.toArgb())
+                }
             }
-        }
-    ) {
-        state.paths.fastForEach { (paths, width, color) ->
-            drawPaintPath(paths, width, Color(color))
-        }
-        if (enabled) {
-            currentOffset?.let { offset ->
-                if (currentPath.isNotEmpty()) {
-                    currentPath += packFloats(offset.x, offset.y)
-                    drawPaintPath(currentPath, state.width, state.color)
+        ) {
+            state.paths.fastForEach { (paths, width, color) ->
+                drawPaintPath(paths, ratio, width, Color(color))
+            }
+            if (enabled) {
+                currentOffset?.let { offset ->
+                    if (currentPath.isNotEmpty()) {
+                        currentPath += packFloats(offset.x / ratio, offset.y / ratio)
+                        drawPaintPath(currentPath, ratio, state.width, state.color)
+                    }
                 }
             }
         }
@@ -183,15 +185,25 @@ fun PaintCanvas(
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
-        Column(modifier = Modifier.width(PaintCanvasState.defaultWidth)) {
+        Column(modifier = Modifier.fillMaxWidth().border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)) {
             if (enabled) {
-                PaintCanvasTool1(state = state, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()))
-                PaintCanvasTool2(state = state, modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()))
+                PaintCanvasTool1(
+                    state = state,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(ThemeValue.Padding.Value)
+                        .horizontalScroll(rememberScrollState())
+                )
+                PaintCanvasTool2(
+                    state = state,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(ThemeValue.Padding.Value)
+                        .horizontalScroll(rememberScrollState())
+                )
             }
             PaintCanvasView(
                 state = state,
                 enabled = enabled,
-                modifier = Modifier.fillMaxWidth().height(PaintCanvasState.defaultHeight)
+                modifier = Modifier.fillMaxWidth().aspectRatio(0.666667f)
             )
         }
     }
