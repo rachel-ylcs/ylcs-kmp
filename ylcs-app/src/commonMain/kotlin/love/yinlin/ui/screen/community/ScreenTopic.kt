@@ -665,17 +665,19 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				left = {
 					Action(
 						icon = Icons.Filled.Home,
+                        tip = "回复楼主",
 						enabled = currentSendComment != null
 					) {
 						currentSendComment = null
 					}
 				},
 				right = {
-					Action(Icons.Filled.Paid) {
+					Action(Icons.Filled.Paid, "投币") {
 						sendCoinSheet.open()
 					}
 					ActionSuspend(
 						icon = Icons.AutoMirrored.Filled.Send,
+                        tip = "发送",
 						enabled = sendCommentState.ok
 					) {
 						if (onSendComment(sendCommentState.richString.toString())) {
@@ -788,17 +790,20 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(topic.uid) == true }
 			val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
 			if (canUpdateTopicTop) {
-				ActionSuspend(if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop) {
+				ActionSuspend(
+                    icon = if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
+                    tip = if (topic.isTop) "取消置顶" else "置顶"
+                ) {
 					onChangeTopicIsTop(!topic.isTop)
 				}
 			}
 			if (canMoveTopic) {
-				ActionSuspend(Icons.Outlined.MoveUp) {
+				ActionSuspend(Icons.Outlined.MoveUp, "移动") {
 					onMoveTopic()
 				}
 			}
 			if (canDeleteTopic) {
-				ActionSuspend(Icons.Outlined.Delete) {
+				ActionSuspend(Icons.Outlined.Delete, "删除") {
 					onDeleteTopic()
 				}
 			}

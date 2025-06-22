@@ -5,7 +5,7 @@ import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.info.PConfig
-import love.yinlin.data.rachel.game.info.PaintPath
+import love.yinlin.data.rachel.game.info.PictionaryQuestion
 import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -15,7 +15,7 @@ data object PictionaryManager : RankGameManager() {
     override val config: PConfig = PConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
-        val (actualQuestion, length) = question.to<Pair<List<PaintPath>, Int>>()
+        val (actualQuestion, length) = question.to<PictionaryQuestion>()
         val actualAnswer = answer.String
         require(actualQuestion.isNotEmpty())
         require(length == actualAnswer.length)

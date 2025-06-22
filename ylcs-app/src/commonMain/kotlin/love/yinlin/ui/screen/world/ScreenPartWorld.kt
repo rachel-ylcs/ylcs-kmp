@@ -51,7 +51,7 @@ import love.yinlin.ui.component.image.colorfulImageVector
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
-import love.yinlin.ui.screen.world.online.ScreenGuessLyrics
+import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
 import kotlin.math.absoluteValue
 
 @Composable
@@ -118,12 +118,15 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 	private fun onGameClick(game: Game) {
 		when (game) {
+            Game.AnswerQuestion, Game.BlockText,
+            Game.FlowersOrder, Game.SearchAll,
+            Game.Pictionary -> navigate(ScreenGameHall.Args(game))
 			Game.GuessLyrics -> {
 				val profile = app.config.userProfile
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
-			else -> navigate(ScreenGameHall.Args(game))
+            Game.Rhyme -> slot.tip.warning("请从MOD歌曲中进入")
 		}
 	}
 
@@ -178,20 +181,31 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			when (game) {
-				Game.GuessLyrics -> {}
-				else -> {
-					ClickIcon(
-						icon = Icons.Outlined.Edit,
-						onClick = {
-							if (app.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
-							else slot.tip.warning("请先登录")
-						}
-					)
-				}
+                Game.AnswerQuestion, Game.BlockText,
+                Game.FlowersOrder, Game.SearchAll,
+                Game.Pictionary -> {
+                    ClickIcon(
+                        icon = Icons.Outlined.Edit,
+                        tip = "创建",
+                        onClick = {
+                            if (app.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
+                            else slot.tip.warning("请先登录")
+                        }
+                    )
+                }
+				Game.GuessLyrics, Game.Rhyme -> {}
 			}
 			ClickIcon(
 				icon = ExtraIcons.RewardCup,
-				onClick = { navigate(ScreenGameRanking.Args(game)) }
+                tip = "排行榜",
+				onClick = {
+                    when (game) {
+                        Game.AnswerQuestion, Game.BlockText,
+                        Game.FlowersOrder, Game.SearchAll,
+                        Game.Pictionary, Game.GuessLyrics,
+                        Game.Rhyme -> navigate(ScreenGameRanking.Args(game))
+                    }
+                }
 			)
 		}
 	}
@@ -333,10 +347,10 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	override val fabIcon: ImageVector = Icons.Outlined.Add
 
 	override val fabMenus: Array<FABAction> = arrayOf(
-		FABAction(Icons.Outlined.History) {
+		FABAction(Icons.Outlined.History, "我的战绩") {
 			navigate<ScreenGameRecordHistory>()
 		},
-		FABAction(Icons.Outlined.Castle) {
+		FABAction(Icons.Outlined.Castle, "我的游戏") {
 			navigate<ScreenGameHistory>()
 		}
 	)

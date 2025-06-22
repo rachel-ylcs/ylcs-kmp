@@ -139,6 +139,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                     if (canDelete) {
                         LoadingIcon(
                             icon = Icons.Outlined.Delete,
+                            tip = "删除",
                             onClick = {
                                 if (slot.confirm.openSuspend(content = "删除仅返还奖池内剩余银币")) {
                                     deleteGame(it.gid)

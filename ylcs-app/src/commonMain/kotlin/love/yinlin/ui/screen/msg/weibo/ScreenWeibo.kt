@@ -61,7 +61,7 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        Action(Icons.Outlined.AccountCircle) {
+        Action(Icons.Outlined.AccountCircle, "关注列表") {
             navigate<ScreenWeiboFollows>()
         }
     }

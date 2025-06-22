@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.ui.component.screen.BallonTip
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {
@@ -35,10 +36,21 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
             onClick = onClick
         )
 	}
+
+    @Composable
+    fun Action(
+        icon: ImageVector,
+        tip: String,
+        color: Color = MaterialTheme.colorScheme.onSurface,
+        enabled: Boolean = true,
+        onClick: () -> Unit
+    ) {
+        BallonTip(text = tip) { Action(icon, color, enabled, onClick) }
+    }
 
 	@Composable
 	fun ActionSuspend(
@@ -53,10 +65,21 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
             onClick = onClick
         )
 	}
+
+    @Composable
+    fun ActionSuspend(
+        icon: ImageVector,
+        tip: String,
+        color: Color = MaterialTheme.colorScheme.onSurface,
+        enabled: Boolean = true,
+        onClick: suspend CoroutineScope.() -> Unit
+    ) {
+        BallonTip(text = tip) { ActionSuspend(icon, color, enabled, onClick) }
+    }
 
 	@Composable
 	inline fun Actions(block: @Composable ActionScope.() -> Unit) = block()

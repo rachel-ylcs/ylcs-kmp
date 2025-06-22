@@ -166,6 +166,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			left = {
 				Action(
 					icon = Icons.Outlined.LibraryMusic,
+                    tip = "曲库",
 					color = Colors.White
 				) {
 					if (app.musicFactory.isInit) navigate<ScreenMusicLibrary>()
@@ -173,6 +174,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 				Action(
 					icon = Icons.AutoMirrored.Outlined.QueueMusic,
+                    tip = "歌单",
 					color = Colors.White
 				) {
 					if (app.musicFactory.isInit) navigate<ScreenPlaylistLibrary>()
@@ -180,6 +182,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				}
 				Action(
 					icon = Icons.Outlined.Lyrics,
+                    tip = "歌词",
 					color = Colors.White
 				) {
 					if (app.musicFactory.isInit) navigate<ScreenFloatingLyrics>()
@@ -189,6 +192,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			right = {
 				Action(
 					icon = Icons.Outlined.AlarmOn,
+                    tip = "睡眠模式",
 					color = Colors.White
 				) {
 					sleepModeSheet.open()
@@ -442,6 +446,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
                         MusicPlayMode.LOOP -> ExtraIcons.LoopMode
                         MusicPlayMode.RANDOM -> ExtraIcons.ShuffleMode
                     },
+                    tip = "播放模式",
 					color = Colors.White,
 					onClick = {
 						launch { factory.switchPlayMode() }
@@ -481,6 +486,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.Playlist,
+                    tip = "播放列表",
 					color = Colors.White,
 					onClick = {
 						if (factory.isReady) currentPlaylistSheet.open()
@@ -496,6 +502,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = Icons.Outlined.GifBox,
+                    tip = "动画",
 					color = if (isAnimationBackground) MaterialTheme.colorScheme.primary else Colors.White,
 					enabled = hasAnimation,
 					onClick = { isAnimationBackground = !isAnimationBackground }
@@ -504,6 +511,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = Icons.Outlined.MusicVideo,
+                    tip = "视频",
 					color = Colors.White,
 					enabled = hasVideo,
 					onClick = {
@@ -517,6 +525,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = ExtraIcons.ShowLyrics,
+                    tip = "歌词",
 					color = Colors.White,
 					onClick = {}
 				)
@@ -524,6 +533,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
+                    tip = "评论",
 					color = Colors.White,
 					onClick = { openMusicComment() }
 				)
@@ -816,6 +826,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					)
 					ClickIcon(
 						icon = Icons.Outlined.StopCircle,
+                        tip = "停止",
 						onClick = {
 							close()
 							launch { factory.stop() }

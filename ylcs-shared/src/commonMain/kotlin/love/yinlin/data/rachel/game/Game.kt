@@ -47,6 +47,11 @@ enum class Game(
         title = "你画我猜",
         description = "猜猜我是谁",
         type = GameType.RANK
+    ),
+    Rhyme(
+        title = "琴韵",
+        description = "演离合相遇悲喜为谁",
+        type = GameType.SINGLE
     );
 
     val xPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.x(this.ordinal + 1)}" }
@@ -65,6 +70,7 @@ enum class Game(
             SearchAll.ordinal -> SearchAll
             GuessLyrics.ordinal -> GuessLyrics
             Pictionary.ordinal -> Pictionary
+            Rhyme.ordinal -> Rhyme
             else -> error("Unexpected Game: $game")
         }
     }

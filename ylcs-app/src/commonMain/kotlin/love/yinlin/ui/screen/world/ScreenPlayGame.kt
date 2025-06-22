@@ -246,6 +246,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
         if (game != null && status == Status.Playing) {
             ActionSuspend(
                 icon = Icons.Outlined.Check,
+                tip = "提交",
                 enabled = canSubmit
             ) {
                 preflightResult?.let { preflight ->

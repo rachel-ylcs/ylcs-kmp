@@ -20,15 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.QrBallShape
 import io.github.alexzhirkevich.qrose.options.QrBrush
 import io.github.alexzhirkevich.qrose.options.QrFrameShape
-import io.github.alexzhirkevich.qrose.options.QrPixelShape
-import io.github.alexzhirkevich.qrose.options.brush
 import io.github.alexzhirkevich.qrose.options.circle
 import io.github.alexzhirkevich.qrose.options.roundCorners
 import io.github.alexzhirkevich.qrose.options.solid
@@ -387,10 +384,10 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
 
     @Composable
     override fun ActionScope.RightActions() {
-        Action(Icons.Outlined.Share) {
+        Action(Icons.Outlined.Share, "分享") {
             shareSheet.open()
         }
-        Action(Icons.Outlined.Download) {
+        Action(Icons.Outlined.Download, "下载") {
             val group = when (args.song.album) {
                 "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> ModQQGroup.Album
                 "单曲集" -> ModQQGroup.Single

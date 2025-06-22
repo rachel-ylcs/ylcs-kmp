@@ -279,7 +279,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
     @Composable
     override fun ActionScope.LeftActions() {
         if (linkState.text.isNotEmpty() || items.isNotEmpty()) {
-            Action(Icons.Outlined.Refresh) {
+            Action(Icons.Outlined.Refresh, "刷新") {
                 linkState.text = ""
                 items = emptyList()
             }
@@ -290,17 +290,18 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
     override fun ActionScope.RightActions() {
         ActionSuspend(
             icon = Icons.Outlined.Preview,
+            tip = "预览",
             enabled = linkState.text.isNotEmpty()
         ) {
             val parser = PlatformMusicParser.build(platformType)
-            val result = parser.parseLink(linkState.text)
-            when (result) {
+            when (val result = parser.parseLink(linkState.text)) {
                 is Data.Success -> items = result.data
                 is Data.Error -> slot.tip.warning("解析失败")
             }
         }
         ActionSuspend(
             icon = Icons.Outlined.Download,
+            tip = "下载",
             enabled = items.isNotEmpty()
         ) {
             downloadMusic()

@@ -39,7 +39,7 @@ fun DockedDatePicker(
 		val end = today.plus(6, DateTimeUnit.MONTH)
 		object : SelectableDates {
 			override fun isSelectableDate(utcTimeMillis: Long): Boolean = utcTimeMillis.toLocalDate?.let {
-				it >= start && it <= end
+                it in start .. end
 			} ?: false
 			override fun isSelectableYear(year: Int): Boolean = year >= start.year && year <= end.year
 		}

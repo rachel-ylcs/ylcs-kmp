@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.ui.component.platform.VideoPlayer
-import love.yinlin.ui.component.screen.FloatingDialogProgress
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
@@ -26,12 +25,5 @@ class ScreenVideo(model: AppModel, val args: Args) : SubScreen<ScreenVideo.Args>
             modifier = Modifier.fillMaxSize(),
             onBack = { onBack() }
         )
-    }
-
-    private val downloadDialog = FloatingDialogProgress()
-
-    @Composable
-    override fun Floating() {
-        downloadDialog.Land()
     }
 }

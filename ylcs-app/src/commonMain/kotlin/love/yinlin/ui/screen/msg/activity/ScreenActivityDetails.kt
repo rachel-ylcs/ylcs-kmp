@@ -147,6 +147,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.showstart?.let { showstart ->
 					ClickIcon(
 						res = Res.drawable.img_showstart,
+                        tip = "打开秀动",
 						size = ThemeValue.Size.MediumIcon,
 						onClick = {
 							launch {
@@ -160,6 +161,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.damai?.let { damai ->
 					ClickIcon(
 						res = Res.drawable.img_damai,
+                        tip = "打开大麦",
 						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
@@ -167,6 +169,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.maoyan?.let { maoyan ->
 					ClickIcon(
 						res = Res.drawable.img_maoyan,
+                        tip = "打开猫眼",
 						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink("https://show.maoyan.com/qqw#/detail/${maoyan}") }
 					)
@@ -174,6 +177,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				activity.link?.let { link ->
 					ClickIcon(
 						icon = Icons.Outlined.Link,
+                        tip = "打开链接",
 						size = ThemeValue.Size.MediumIcon,
 						onClick = { openLink(link) }
 					)
@@ -239,10 +243,10 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 	override fun ActionScope.RightActions() {
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 		if (hasPrivilegeVIPCalendar) {
-			Action(Icons.Outlined.Edit) {
+			Action(Icons.Outlined.Edit, "编辑") {
 				navigate(ScreenModifyActivity.Args(args.aid))
 			}
-			ActionSuspend(Icons.Outlined.Delete) {
+			ActionSuspend(Icons.Outlined.Delete, "删除") {
 				if (slot.confirm.openSuspend(content = "删除活动")) {
 					deleteActivity()
 				}

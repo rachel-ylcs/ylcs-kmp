@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world.online
+package love.yinlin.ui.screen.world.battle
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -455,6 +455,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         ) {
             ClickIcon(
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                tip = "上一题",
                 onClick = {
                     if (index > 0) --index
                     focusRequester.requestFocus()
@@ -470,6 +471,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             )
             ClickIcon(
                 icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                tip = "下一题",
                 onClick = {
                     if (index < status.questions.size - 1) ++index
                     focusRequester.requestFocus()

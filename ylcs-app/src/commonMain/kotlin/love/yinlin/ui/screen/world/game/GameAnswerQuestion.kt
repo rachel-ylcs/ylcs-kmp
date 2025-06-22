@@ -87,6 +87,7 @@ private fun TopPager(
     ) {
         ClickIcon(
             icon = Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+            tip = "上一题",
             onClick = onDecrease
         )
         Text(
@@ -99,6 +100,7 @@ private fun TopPager(
         )
         ClickIcon(
             icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+            tip = "下一题",
             onClick = onIncrease
         )
     }
@@ -480,6 +482,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
                                     ClickIcon(
                                         icon = Icons.Outlined.Delete,
+                                        tip = "删除",
                                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                         onClick = { deleteOption(item, index) }
                                     )
@@ -516,6 +519,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
                                     ClickIcon(
                                         icon = Icons.Outlined.Delete,
+                                        tip = "删除",
                                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                         onClick = { deleteOption(item, index) }
                                     )
@@ -550,6 +554,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                 ) {
                                     ClickIcon(
                                         icon = Icons.Outlined.Delete,
+                                        tip = "删除",
                                         onClick = { deleteOption(item, index) }
                                     )
                                     Text(
@@ -580,15 +585,15 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.CenterStart
                     ) {
-                        ClickIcon(Icons.Outlined.Add) {
+                        ClickIcon(Icons.Outlined.Add, "添加选项") {
                             addOption(item)
                         }
                     }
                 }
-                ClickIcon(Icons.Outlined.RadioButtonChecked) { addQuestion(QuestionType.Choice) }
-                ClickIcon(Icons.Outlined.CheckBox) { addQuestion(QuestionType.MultiChoice) }
-                ClickIcon(Icons.Outlined.Translate) { addQuestion(QuestionType.Blank) }
-                ClickIcon(Icons.Outlined.Delete) { deleteQuestion() }
+                ClickIcon(Icons.Outlined.RadioButtonChecked, "单选题") { addQuestion(QuestionType.Choice) }
+                ClickIcon(Icons.Outlined.CheckBox, "多选题") { addQuestion(QuestionType.MultiChoice) }
+                ClickIcon(Icons.Outlined.Translate, "填空题") { addQuestion(QuestionType.Blank) }
+                ClickIcon(Icons.Outlined.Delete, "删除") { deleteQuestion() }
             }
         }
     }

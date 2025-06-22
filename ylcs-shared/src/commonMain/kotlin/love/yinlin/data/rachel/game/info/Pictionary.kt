@@ -75,3 +75,10 @@ data object PConfig : RankConfig() {
     val minAnswerLength: Int = 1 // 最小答案长度
     val maxAnswerLength: Int = 12 // 最大答案长度
 }
+
+@Stable
+@Serializable
+data class PictionaryQuestion(
+    val paths: List<PaintPath>,
+    val count: Int
+)

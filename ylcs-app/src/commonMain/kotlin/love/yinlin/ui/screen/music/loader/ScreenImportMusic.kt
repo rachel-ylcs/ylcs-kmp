@@ -212,6 +212,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
         if (step is Step.Prepare) {
             Action(
                 icon = Icons.Outlined.Refresh,
+                tip = "重置",
                 onClick = { reset() }
             )
         }
@@ -223,16 +224,19 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             is Step.Initial -> {
                 ActionSuspend(
                     icon = Icons.Outlined.Add,
+                    tip = "添加",
                     onClick = { loadModFile() }
                 )
             }
             is Step.Prepare -> {
                 Action(
                     icon = Icons.Outlined.Preview,
+                    tip = "预览",
                     onClick = { launch { previewMod(currentStep.path) } }
                 )
                 Action(
                     icon = Icons.Outlined.Check,
+                    tip = "导入",
                     onClick = { launch { processMod(currentStep.path) } }
                 )
             }
@@ -240,10 +244,12 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 if (currentStep.preview != null) {
                     Action(
                         icon = Icons.Outlined.Refresh,
+                        tip = "刷新",
                         onClick = { reset() }
                     )
                     Action(
                         icon = Icons.Outlined.Check,
+                        tip = "导入",
                         onClick = { launch { processMod(currentStep.path) } }
                     )
                 }

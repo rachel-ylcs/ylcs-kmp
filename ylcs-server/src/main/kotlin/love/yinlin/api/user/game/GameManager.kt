@@ -15,7 +15,7 @@ internal val Game.manager: GameManager get() = when (this) {
     Game.FlowersOrder -> FlowersOrderManager
     Game.SearchAll -> SearchAllManager
     Game.Pictionary -> PictionaryManager
-    Game.GuessLyrics -> error("Unknown game: $this")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown game: $this")
 }
 
 sealed class GameManager {

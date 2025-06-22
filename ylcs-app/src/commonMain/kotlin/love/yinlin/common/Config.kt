@@ -309,6 +309,8 @@ class KVConfig(private val kv: KV) {
 	var animationSpeed: Int by intState(400)
 	// 字体大小
 	var fontScale: Float by floatState(1f, "20250518")
+    // 悬浮提示
+    var enabledTip: Boolean by booleanState(true)
 
 	/* ------------------  微博  ------------------ */
 

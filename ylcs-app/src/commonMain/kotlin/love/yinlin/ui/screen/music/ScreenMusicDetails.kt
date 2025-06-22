@@ -482,6 +482,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     if (item.onDelete.enabled) {
                         LoadingIcon(
                             icon = Icons.Outlined.Delete,
+                            tip = "删除",
                             color = Colors.White,
                             onClick = {
                                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
@@ -492,6 +493,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     if (item.onReplace.enabled) {
                         LoadingIcon(
                             icon = Icons.Outlined.FindReplace,
+                            tip = "替换",
                             color = Colors.White,
                             onClick = {
                                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
@@ -502,6 +504,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     if (item.onModify.enabled) {
                         LoadingIcon(
                             icon = Icons.Outlined.Edit,
+                            tip = "编辑",
                             color = Colors.White,
                             onClick = {
                                 if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
@@ -537,6 +540,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     )
                     ClickIcon(
                         icon = Icons.Outlined.Add,
+                        tip = "导入",
                         onClick = { }
                     )
                 }

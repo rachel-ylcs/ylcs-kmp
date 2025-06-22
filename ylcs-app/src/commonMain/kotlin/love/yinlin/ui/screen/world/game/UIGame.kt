@@ -84,7 +84,7 @@ fun createGameState(type: Game, slot: SubScreenSlot): CreateGameState = when (ty
     Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
     Game.SearchAll -> SearchAllCreateGameState(slot)
     Game.Pictionary -> PictionaryCreateGameState(slot)
-    Game.GuessLyrics -> error("Unknown type $type")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
 }
 
 fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) {
@@ -93,7 +93,7 @@ fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) 
     Game.FlowersOrder -> FlowersOrderPlayGameState(slot)
     Game.SearchAll -> SearchAllPlayGameState(slot)
     Game.Pictionary -> PictionaryPlayGameState(slot)
-    Game.GuessLyrics -> error("Unknown type $type")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
 }
 
 @Composable
@@ -103,7 +103,7 @@ fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type)
     Game.FlowersOrder -> FlowersOrderCardInfo(game)
     Game.SearchAll -> SearchAllCardInfo(game)
     Game.Pictionary -> PictionaryCardInfo(game)
-    Game.GuessLyrics -> error("Unknown type ${game.type}")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -113,7 +113,7 @@ fun ColumnScope.GameCardQuestionAnswer(game: GameDetailsWithName) = when (game.t
     Game.FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
     Game.SearchAll -> SearchAllCardQuestionAnswer(game)
     Game.Pictionary -> PictionaryQuestionAnswer(game)
-    Game.GuessLyrics -> error("Unknown type ${game.type}")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown type ${game.type}")
 }
 
 @Composable
@@ -123,7 +123,7 @@ fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElemen
     Game.FlowersOrder -> FlowersOrderRecordCard(answer, info)
     Game.SearchAll -> SearchAllRecordCard(answer, info)
     Game.Pictionary -> PictionaryRecordCard(answer, info)
-    Game.GuessLyrics -> error("Unknown type $type")
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()

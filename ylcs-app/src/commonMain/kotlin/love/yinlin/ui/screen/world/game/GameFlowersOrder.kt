@@ -156,7 +156,7 @@ class FlowersOrderCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         )
         TextInput(
             state = content,
-            hint = "内容(长度${FOConfig.minLength} - ${FOConfig.maxLength})",
+            hint = "内容(长度${FOConfig.minLength}~${FOConfig.maxLength})",
             maxLength = FOConfig.maxLength,
             modifier = Modifier.fillMaxWidth()
         )

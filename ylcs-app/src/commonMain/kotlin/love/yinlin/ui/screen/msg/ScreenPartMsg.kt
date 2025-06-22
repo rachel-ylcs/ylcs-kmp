@@ -262,6 +262,18 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 	}
 
+    @Composable
+    private fun ActionScope.ToolBarLayout() {
+        if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+            Action(Icons.Outlined.Add, "添加") {
+                navigate<ScreenAddActivity>()
+            }
+        }
+        ActionSuspend(Icons.Outlined.Refresh, "刷新") {
+            requestActivity()
+        }
+    }
+
 	@Composable
 	private fun Portrait() {
 		LazyColumn(
@@ -280,14 +292,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 			}
 			item(key = ItemKey("Calendar")) {
 				CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
-					if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-						Action(Icons.Outlined.Add) {
-							navigate<ScreenAddActivity>()
-						}
-					}
-					ActionSuspend(Icons.Outlined.Refresh) {
-						requestActivity()
-					}
+					ToolBarLayout()
 				}
 			}
 			items(
@@ -321,14 +326,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 					horizontalArrangement = Arrangement.End,
 				) {
 					ActionScope.Right.Actions {
-						if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-							Action(Icons.Outlined.Add) {
-								navigate<ScreenAddActivity>()
-							}
-						}
-						ActionSuspend(Icons.Outlined.Refresh) {
-							requestActivity()
-						}
+						ToolBarLayout()
 					}
 				}
 			}
