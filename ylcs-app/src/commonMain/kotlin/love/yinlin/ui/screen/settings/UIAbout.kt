@@ -66,10 +66,10 @@ internal data class UpdateInfo(
 object About {
     internal val updateInfo = UpdateInfo(
         platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
-        title = null,
-        force = true,
-        maintenance = true,
-        date = LocalDate(2025, 6, 21),
+        title = "测试标题",
+        force = false,
+        maintenance = false,
+        date = LocalDate(2025, 6, 22),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
@@ -85,8 +85,9 @@ object About {
   [银币获取] 途径保持不变
   [经验获取] 签到+1, 投币+N, 主题被三连+1, 游戏结算+N/2, 参与游戏+1, 福利/奖励等
                     """.trimIndent(),
-                    "3. 小游戏新增[你画我猜]",
-                    "4. 桌面端支持窗口置顶, 系统托盘图标",
+                    "3. 所有点击图标均添加悬浮气泡文字提示, 可在设置中关闭",
+                    "4. 小游戏新增[你画我猜]",
+                    "5. 桌面端支持窗口置顶, 系统托盘图标",
                 )
             ),
             UpdateRecordGroup(
@@ -101,7 +102,7 @@ object About {
                     "4. 点击歌曲封面跳转到详情页",
                     """
 5. 小游戏优化
-  [答题] 选择题或填空题完成后自动跳转下一题
+  [答题] 选择题或填空题完成后自动跳转下一题, 正确率最小限制调整为0.6
   [寻花令] 输入框自动获取焦点
   [歌词对战] 断线后可重新回到大厅, 如有未做的题提交前提示, 显示答案的字数要求
                     """.trimIndent(),
