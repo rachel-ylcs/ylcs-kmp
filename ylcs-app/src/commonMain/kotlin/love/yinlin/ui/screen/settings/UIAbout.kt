@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.LocalDate
 import love.yinlin.Local
 import love.yinlin.common.Colors
+import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.MiniIcon
@@ -66,7 +67,7 @@ internal data class UpdateInfo(
 object About {
     internal val updateInfo = UpdateInfo(
         platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
-        title = "测试标题",
+        title = "银临茶舍将于此稳定版本起停止更新一段时间, 直到新概念音游开发完成后更新",
         force = false,
         maintenance = false,
         date = LocalDate(2025, 6, 22),
@@ -254,6 +255,7 @@ internal fun UpdateInfoLayout(
         updateInfo.title?.let { title ->
             Text(
                 text = title,
+                color = ThemeColor.warning,
                 modifier = Modifier.fillMaxWidth()
             )
         }
