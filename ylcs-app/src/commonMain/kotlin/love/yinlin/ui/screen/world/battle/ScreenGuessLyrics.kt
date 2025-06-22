@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.world.online
+package love.yinlin.ui.screen.world.battle
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

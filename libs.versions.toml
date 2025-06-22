@@ -79,12 +79,6 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 lottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "lottie" }
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
-kubriko-engine = { module = "io.github.pandulapeter.kubriko:engine", version.ref = "kubriko" }
-kubriko-plugin-collision = { module = "io.github.pandulapeter.kubriko:plugin-collision", version.ref = "kubriko" }
-kubriko-plugin-physics = { module = "io.github.pandulapeter.kubriko:plugin-physics", version.ref = "kubriko" }
-kubriko-plugin-sprites = { module = "io.github.pandulapeter.kubriko:plugin-sprites", version.ref = "kubriko" }
-kubriko-plugin-pointer = { module = "io.github.pandulapeter.kubriko:plugin-pointer-input", version.ref = "kubriko" }
-
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.4" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.4" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }
