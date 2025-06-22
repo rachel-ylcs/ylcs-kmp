@@ -41,8 +41,8 @@ val dirOutput by extra(dirProject.dir("outputs"))
 // App
 val appName by extra("ylcs")
 val appDisplayName by extra("银临茶舍")
-val appVersion by extra(312)
-val appVersionName by extra("3.1.2")
+val appVersion by extra(313)
+val appVersionName by extra("3.1.3")
 val appPackageName by extra("love.yinlin")
 val appMainClass by extra("${appPackageName}.MainKt")
 
