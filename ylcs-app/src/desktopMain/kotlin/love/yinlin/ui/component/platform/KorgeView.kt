@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import korlibs.korge.GLCanvasWithKorge
 import korlibs.korge.Korge
-import korlibs.korge.glCanvas
 import korlibs.render.GameWindowCreationConfig
 import love.yinlin.ui.component.CustomUI
 
