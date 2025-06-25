@@ -42,9 +42,9 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     private var sinceId: Long = 0L
     private var canLoading by mutableStateOf(false)
 
-    private suspend fun requestNewData() {
+    private suspend fun requestNewData(loading: Boolean) {
         if (state != BoxState.LOADING) {
-            state = BoxState.LOADING
+            if (loading) state = BoxState.LOADING
             canLoading = false
             val result = WeiboAPI.extractChaohua(0L)
             state = if (result is Data.Success) {
@@ -71,7 +71,7 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "超话"
 
     override suspend fun initialize() {
-        requestNewData()
+        requestNewData(true)
     }
 
     @Composable
@@ -89,7 +89,7 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
                     state = gridState,
                     canRefresh = true,
                     canLoading = canLoading,
-                    onRefresh = { requestNewData() },
+                    onRefresh = { requestNewData(false) },
                     onLoading = { requestMoreData() },
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = ThemeValue.Padding.EqualValue,
@@ -155,7 +155,7 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
-        if (isScrollTop) launch { requestNewData() }
+        if (isScrollTop) launch { requestNewData(true) }
         else gridState.animateScrollToItem(0)
     }
 

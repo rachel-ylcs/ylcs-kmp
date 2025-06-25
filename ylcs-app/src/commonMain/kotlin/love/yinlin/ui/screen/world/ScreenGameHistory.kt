@@ -46,9 +46,9 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
 
     private val gridState = LazyStaggeredGridState()
 
-    private suspend fun requestNewGames() {
+    private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
-            state = BoxState.LOADING
+            if (loading) state = BoxState.LOADING
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGames,
                 data = API.User.Game.GetUserGames.Request(
@@ -92,7 +92,7 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "我的游戏"
 
     override suspend fun initialize() {
-        requestNewGames()
+        requestNewGames(true)
     }
 
     @Composable
@@ -110,7 +110,7 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
-                onRefresh = { requestNewGames() },
+                onRefresh = { requestNewGames(false) },
                 onLoading = { requestMoreGames() },
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = ThemeValue.Padding.EqualValue,
@@ -142,7 +142,7 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
-        if (isScrollTop) launch { requestNewGames() }
+        if (isScrollTop) launch { requestNewGames(true) }
         else gridState.animateScrollToItem(0)
     }
 

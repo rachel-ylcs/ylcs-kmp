@@ -64,7 +64,7 @@ private enum class DiscoveryItem(
 class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private val listState = LazyStaggeredGridState()
+    private val gridState = LazyStaggeredGridState()
 
     private var currentPage by mutableIntStateOf(0)
     val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
@@ -75,40 +75,42 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
         override fun arg1(item: Topic): Double = item.score
     }
 
-    private suspend fun requestNewData() {
-        state = BoxState.LOADING
-        val result = when (val section = currentSection) {
-            DiscoveryItem.LatestTopic.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestTopics,
-                data = API.User.Topic.GetLatestTopics.Request(
-                    num = page.pageNum
+    private suspend fun requestNewData(loading: Boolean) {
+        if (state != BoxState.LOADING) {
+            if (loading) state = BoxState.LOADING
+            val result = when (val section = currentSection) {
+                DiscoveryItem.LatestTopic.id -> ClientAPI.request(
+                    route = API.User.Topic.GetLatestTopics,
+                    data = API.User.Topic.GetLatestTopics.Request(
+                        num = page.pageNum
+                    )
                 )
-            )
-            DiscoveryItem.LatestComment.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestTopicsByComment,
-                data = API.User.Topic.GetLatestTopicsByComment.Request(
-                    num = page.pageNum
+                DiscoveryItem.LatestComment.id -> ClientAPI.request(
+                    route = API.User.Topic.GetLatestTopicsByComment,
+                    data = API.User.Topic.GetLatestTopicsByComment.Request(
+                        num = page.pageNum
+                    )
                 )
-            )
-            DiscoveryItem.Hot.id -> ClientAPI.request(
-                route = API.User.Topic.GetHotTopics,
-                data = API.User.Topic.GetHotTopics.Request(
-                    num = page.pageNum
+                DiscoveryItem.Hot.id -> ClientAPI.request(
+                    route = API.User.Topic.GetHotTopics,
+                    data = API.User.Topic.GetHotTopics.Request(
+                        num = page.pageNum
+                    )
                 )
-            )
-            else -> ClientAPI.request(
-                route = API.User.Topic.GetSectionTopics,
-                data = API.User.Topic.GetSectionTopics.Request(
-                    section = section,
-                    num = page.pageNum
+                else -> ClientAPI.request(
+                    route = API.User.Topic.GetSectionTopics,
+                    data = API.User.Topic.GetSectionTopics.Request(
+                        section = section,
+                        num = page.pageNum
+                    )
                 )
-            )
+            }
+            if (result is Data.Success) {
+                state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+                gridState.scrollToItem(0)
+            }
+            else state = BoxState.NETWORK_ERROR
         }
-        if (result is Data.Success) {
-            state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            listState.scrollToItem(0)
-        }
-        else state = BoxState.NETWORK_ERROR
     }
 
     private suspend fun requestMoreData() {
@@ -238,7 +240,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     }
 
     override suspend fun initialize() {
-        requestNewData()
+        requestNewData(true)
     }
 
     @Composable
@@ -254,7 +256,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                     currentPage = currentPage,
                     onNavigate = {
                         currentPage = it
-                        launch { requestNewData() }
+                        launch { requestNewData(true) }
                     },
                     items = DiscoveryItem.items,
                     modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom)
@@ -265,16 +267,15 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 state = state,
                 modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)
             ) {
-                bindPauseLoadWhenScrolling(listState)
-
+                bindPauseLoadWhenScrolling(gridState)
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },
                     columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
-                    state = listState,
+                    state = gridState,
                     canRefresh = true,
                     canLoading = page.canLoading,
-                    onRefresh = { requestNewData() },
+                    onRefresh = { requestNewData(false) },
                     onLoading = { requestMoreData() },
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = ThemeValue.Padding.EqualValue,
@@ -291,7 +292,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
         }
     }
 
-    override val fabCanExpand: Boolean get() = listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
+    override val fabCanExpand: Boolean get() = gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0
 
     override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
 
@@ -300,11 +301,11 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
             navigate<ScreenAddTopic>()
         },
         FABAction(Icons.Outlined.Refresh, "刷新") {
-            launch { requestNewData() }
+            launch { requestNewData(true) }
         }
     )
 
     override suspend fun onFabClick() {
-        listState.animateScrollToItem(0)
+        gridState.animateScrollToItem(0)
     }
 }
