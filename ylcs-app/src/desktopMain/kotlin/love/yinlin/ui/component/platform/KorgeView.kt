@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import korlibs.korge.GLCanvasWithKorge
 import korlibs.korge.Korge
 import korlibs.render.GameWindowCreationConfig
+import korlibs.render.awt.GLCanvas
 import love.yinlin.ui.component.CustomUI
 
 @Stable
@@ -14,7 +15,7 @@ actual class KorgeState actual constructor(
     val config: GameWindowCreationConfig,
     val korge: Korge
 ) {
-    val glView = mutableStateOf<GLCanvasWithKorge?>(null)
+    val glView = mutableStateOf<GLCanvas?>(null)
 }
 
 @Composable
@@ -25,7 +26,7 @@ actual fun KorgeView(
     CustomUI(
         view = state.glView,
         factory = {
-            GLCanvasWithKorge(state.korge, state.korge.main)
+            GLCanvasWithKorge(state.korge) { }
         },
         release = { _, onRelease ->
             state.glView.value?.close()

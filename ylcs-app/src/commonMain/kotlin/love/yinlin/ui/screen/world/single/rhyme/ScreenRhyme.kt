@@ -3,7 +3,6 @@ package love.yinlin.ui.screen.world.single.rhyme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import korlibs.image.color.RGBA
 import korlibs.korge.Korge
@@ -20,16 +19,15 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     override val title: String = Game.Rhyme.title
 
+    private val state = KorgeState(GameWindowCreationConfig(), Korge(
+        main = {
+            views.clearColor = RGBA(255, 0, 0)
+            solidRect(100, 100, RGBA(0x46, 0x82, 0xb4))
+        }
+    ))
+
     @Composable
     override fun SubContent(device: Device) {
-        val state = remember {
-            KorgeState(GameWindowCreationConfig(), Korge(
-                main = {
-                    views.clearColor = RGBA(255, 0, 0)
-                    solidRect(100, 100, RGBA(0x46, 0x82, 0xb4))
-                }
-            ))
-        }
         KorgeView(state, Modifier.fillMaxSize())
     }
 }
