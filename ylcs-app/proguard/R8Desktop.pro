@@ -19,4 +19,10 @@
 
 -keep class com.github.panpf.sketch.**
 
+# ----------------------------------------- Korge ----------------------------------------------- #
+
+#-dontwarn korlibs.**
+#-dontwarn net.bytebuddy.**
+#-dontwarn kotlinx.coroutines.debug.**
+
 # ----------------------------------------- App ----------------------------------------------- #

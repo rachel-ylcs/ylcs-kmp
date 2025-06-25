@@ -7,7 +7,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.compose.runtime.*
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
@@ -21,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import love.yinlin.R
+import love.yinlin.common.LocalFileProvider
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -247,14 +247,12 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                 .setAlbumArtist(this.singer)
                 .setComposer(this.composer)
                 .setWriter(this.lyricist)
-                .setArtworkUri(FileProvider.getUriForFile(
-                    context,
-                    context.getString(R.string.music_file_provider),
-                        File(this.recordPath.toString())
-                ))
-                .build()
-        )
-        .build()
+                .setArtworkUri(LocalFileProvider.uri(
+                    context = context,
+                    authority = context.getString(R.string.music_file_provider),
+                    file = File(this.recordPath.toString())
+                )).build()
+        ).build()
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         send(

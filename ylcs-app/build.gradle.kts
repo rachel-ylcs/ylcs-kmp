@@ -173,6 +173,8 @@ kotlin {
                 implementation(libs.lottie)
                 implementation(libs.lottie.network)
 
+                implementation(libs.korge)
+
                 implementation(libs.tool.html)
                 implementation(libs.tool.blur)
                 implementation(libs.tool.reorder)
