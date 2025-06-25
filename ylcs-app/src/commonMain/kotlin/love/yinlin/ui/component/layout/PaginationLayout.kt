@@ -219,7 +219,7 @@ private fun SwipePaginationLayout(
 		headerHeight.toPx() to footerHeight.toPx()
 	}
 	val connection = remember(
-		canRefresh, canLoading, stickinessLevel, state, headerHeightPx, footerHeightPx
+		canRefresh, canLoading, onRefresh, onLoading, stickinessLevel, state, headerHeightPx, footerHeightPx
 	) { object : NestedScrollConnection {
 		private fun scroll(canConsumed: Float): Offset = if (canConsumed.absoluteValue > 0.5f) {
 			scope.launch {
