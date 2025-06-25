@@ -11,6 +11,7 @@ import korlibs.math.geom.ScaleMode
 import korlibs.math.geom.Size2D
 import love.yinlin.AppModel
 import love.yinlin.activity.KorgeActivity
+import love.yinlin.data.rachel.game.Game
 
 @Stable
 actual abstract class KorgeGame actual constructor(
@@ -22,6 +23,7 @@ actual abstract class KorgeGame actual constructor(
     actual abstract val mainScene: Scene
 
     actual val korge: Korge = Korge(
+        title = Game.Rhyme.title,
         windowSize = Size2D(1280, 720),
         virtualSize = Size2D(1280, 720),
         displayMode = KorgeDisplayMode(ScaleMode.SHOW_ALL, Anchor2D.CENTER, false),
