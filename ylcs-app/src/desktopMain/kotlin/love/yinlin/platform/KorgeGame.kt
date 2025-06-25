@@ -26,6 +26,7 @@ actual abstract class KorgeGame actual constructor(
         gameWindow = CreateDefaultGameWindow(GameWindowCreationConfig(
             resizable = false
         )).apply {
+            alwaysOnTop = true
             exitProcessOnClose = false
         },
         title = Game.Rhyme.title,
