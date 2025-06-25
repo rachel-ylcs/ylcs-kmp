@@ -55,9 +55,9 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 
 	private val gridState = LazyGridState()
 
-	private suspend fun requestNewMails() {
+	private suspend fun requestNewMails(loading: Boolean) {
 		if (state != BoxState.LOADING) {
-			state = BoxState.LOADING
+			if (loading) state = BoxState.LOADING
 			val result = ClientAPI.request(
 				route = API.User.Mail.GetMails,
 				data = API.User.Mail.GetMails.Request(
@@ -187,7 +187,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	override suspend fun initialize() {
-		requestNewMails()
+		requestNewMails(true)
 	}
 
 	override val title: String = "邮箱"
@@ -204,7 +204,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
 				canRefresh = true,
 				canLoading = page.canLoading,
-				onRefresh = { requestNewMails() },
+				onRefresh = { requestNewMails(false) },
 				onLoading = { requestMoreMails() },
 				modifier = Modifier.fillMaxSize(),
 				contentPadding = ThemeValue.Padding.EqualValue,
@@ -224,7 +224,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
 	override suspend fun onFabClick() {
-		if (isScrollTop) launch { requestNewMails() }
+		if (isScrollTop) launch { requestNewMails(true) }
 		else gridState.animateScrollToItem(0)
 	}
 

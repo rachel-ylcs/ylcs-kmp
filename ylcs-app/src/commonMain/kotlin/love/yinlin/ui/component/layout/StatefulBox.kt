@@ -189,6 +189,7 @@ fun StatefulBox(
 ) {
 	Crossfade(
 		targetState = state,
+        animationSpec = tween(durationMillis = app.config.animationSpeed, easing = FastOutSlowInEasing),
 		modifier = modifier,
 	) {
 		when (it) {

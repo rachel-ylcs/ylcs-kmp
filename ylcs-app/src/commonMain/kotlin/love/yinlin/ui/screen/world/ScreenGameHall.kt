@@ -51,9 +51,9 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
 
     override val title: String = args.type.title
 
-    private suspend fun requestNewGames() {
+    private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
-            state = BoxState.LOADING
+            if (loading) state = BoxState.LOADING
             val result = ClientAPI.request(
                 route = API.User.Game.GetGames,
                 data = API.User.Game.GetGames.Request(
@@ -94,7 +94,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
     }
 
     override suspend fun initialize() {
-        requestNewGames()
+        requestNewGames(true)
     }
 
     @Composable
@@ -112,7 +112,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
-                onRefresh = { requestNewGames() },
+                onRefresh = { requestNewGames(false) },
                 onLoading = { requestMoreGames() },
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = ThemeValue.Padding.EqualValue,
@@ -158,7 +158,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
-        if (isScrollTop) launch { requestNewGames() }
+        if (isScrollTop) launch { requestNewGames(true) }
         else gridState.animateScrollToItem(0)
     }
 }

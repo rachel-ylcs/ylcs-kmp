@@ -24,7 +24,6 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.common.toUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.rememberFalse
-import love.yinlin.extension.rememberTrue
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
@@ -70,7 +69,7 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
-    ActualAppContext().apply {
+    val appContext = ActualAppContext().apply {
         app = this
         initialize()
     }
@@ -92,14 +91,13 @@ fun main() {
             width = 1200.dp,
             height = 700.dp
         )
-        var visible by rememberTrue()
         var alwaysOnTop by rememberFalse()
 
         Window(
             onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.img_logo),
-            visible = visible,
+            visible = appContext.windowVisible,
             undecorated = true,
             resizable = true,
             transparent = true,
@@ -160,7 +158,7 @@ fun main() {
                                 tip = "最小化到托盘",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
-                                visible = false
+                                appContext.windowVisible = false
                             }
                             Action(
                                 icon = Icons.Outlined.CropSquare,
@@ -190,18 +188,18 @@ fun main() {
             message = "已隐藏到任务栏托盘中",
             type = Notification.Type.Info
         )
-        LaunchedEffect(visible) {
-            if (!visible && app.config.enabledTip) trayState.sendNotification(notification)
+        LaunchedEffect(appContext.windowVisible) {
+            if (!appContext.windowVisible && appContext.config.enabledTip) trayState.sendNotification(notification)
         }
         Tray(
             icon = painterResource(Res.drawable.img_logo),
             state = trayState,
-            onAction = { visible = true }
+            onAction = { appContext.windowVisible = true }
         )
 
         // 悬浮歌词
-        (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
-            if (it.isAttached && app.config.enabledFloatingLyrics) it.Content()
+        (appContext.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
+            if (it.isAttached && appContext.config.enabledFloatingLyrics) it.Content()
         }
     }
 }

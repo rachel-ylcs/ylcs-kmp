@@ -16,7 +16,6 @@ import love.yinlin.ui.screen.music.loader.*
 import love.yinlin.ui.screen.settings.*
 import love.yinlin.ui.screen.world.*
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
-import love.yinlin.ui.screen.world.single.rhyme.ScreenRhyme
 
 fun ScreenRouteScope.screens() {
     // 主页
@@ -55,8 +54,6 @@ fun ScreenRouteScope.screens() {
     screen(::ScreenGameRecordHistory)
 
     screen(::ScreenGuessLyrics)
-
-    screen(::ScreenRhyme)
 
 	// 设置
     screen(::ScreenSettings)
