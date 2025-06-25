@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
+        appNative.activity = this
         appNative.activityResultRegistry = activityResultRegistry
 
         ActualFloatingLyrics(this).also {

@@ -1,6 +1,9 @@
 @file:JvmName("AppContextDesktop")
 package love.yinlin.platform
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -12,6 +15,8 @@ import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
 class ActualAppContext : AppContext() {
+    var windowVisible by mutableStateOf(true)
+
 	override val kv: KV = KV()
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {

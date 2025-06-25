@@ -52,7 +52,7 @@ import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
-import love.yinlin.ui.screen.world.single.rhyme.ScreenRhyme
+import love.yinlin.ui.screen.world.single.RhymeGame
 import kotlin.math.absoluteValue
 
 @Composable
@@ -127,7 +127,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
-            Game.Rhyme -> navigate<ScreenRhyme>()
+            Game.Rhyme -> launch { RhymeGame(model, app).launch() }
 		}
 	}
 
@@ -196,18 +196,20 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
                 }
 				Game.GuessLyrics, Game.Rhyme -> {}
 			}
-			ClickIcon(
-				icon = ExtraIcons.RewardCup,
-                tip = "排行榜",
-				onClick = {
-                    when (game) {
-                        Game.AnswerQuestion, Game.BlockText,
-                        Game.FlowersOrder, Game.SearchAll,
-                        Game.Pictionary, Game.GuessLyrics,
-                        Game.Rhyme -> navigate(ScreenGameRanking.Args(game))
-                    }
+            when (game) {
+                Game.AnswerQuestion, Game.BlockText,
+                Game.FlowersOrder, Game.SearchAll,
+                Game.Pictionary, Game.GuessLyrics -> {
+                    ClickIcon(
+                        icon = ExtraIcons.RewardCup,
+                        tip = "排行榜",
+                        onClick = {
+                            navigate(ScreenGameRanking.Args(game))
+                        }
+                    )
                 }
-			)
+                Game.Rhyme -> {}
+            }
 		}
 	}
 

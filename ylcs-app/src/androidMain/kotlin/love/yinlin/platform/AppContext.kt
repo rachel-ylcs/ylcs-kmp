@@ -1,6 +1,7 @@
 @file:JvmName("AppContextAndroid")
 package love.yinlin.platform
 
+import android.app.Activity
 import android.content.Context
 import androidx.activity.result.ActivityResultRegistry
 import com.github.panpf.sketch.Sketch
@@ -14,6 +15,7 @@ import okio.Path.Companion.toPath
 class ActualAppContext(val context: Context) : AppContext() {
 	override val kv: KV = KV(context)
 
+    var activity: Activity? = null
 	var activityResultRegistry: ActivityResultRegistry? = null
 
 	override fun initializeSketch(): Sketch = Sketch.Builder(context).apply {
