@@ -22,6 +22,9 @@ class RhymeGame(appModel: AppModel, appContext: AppContext) : KorgeGame(appModel
             uiButton(label = "Reset").position(stage!!.width - 200, 200).onClickSuspend {
                 sceneContainer.changeTo { SceneStart() }
             }
+            uiButton(label = "End").position(stage!!.width - 200, 400).onClickSuspend {
+                this@SceneStart.gameWindow.close()
+            }
         }
     }
 

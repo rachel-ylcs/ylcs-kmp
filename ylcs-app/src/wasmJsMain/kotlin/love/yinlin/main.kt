@@ -12,7 +12,6 @@ fun main() {
         app = this
         initialize()
     }
-
     ComposeViewport(document.body!!) {
         AppWrapper {
             App()
