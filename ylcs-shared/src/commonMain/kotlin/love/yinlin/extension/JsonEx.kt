@@ -85,7 +85,6 @@ fun <T> String?.parseJsonValue(deserializer: DeserializationStrategy<T>): T? = i
 // JsonConverter
 
 object JsonConverter {
-	@OptIn(ExperimentalStdlibApi::class)
 	val ByteArray = object : KSerializer<ByteArray> {
 		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ByteArray", PrimitiveKind.STRING)
 		override fun serialize(encoder: Encoder, value: ByteArray) = encoder.encodeString(value.toHexString(HexFormat.UpperCase))

@@ -221,16 +221,16 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		}
 		val intervalString = remember(interval) { when {
 			interval == null -> ""
-			interval == 0 -> "进行中"
-			interval > 0 -> ">> ${interval}天"
-			interval < 0 -> "<< ${abs(interval)}天"
+			interval == 0L -> "进行中"
+			interval > 0L -> ">> ${interval}天"
+			interval < 0L -> "<< ${abs(interval)}天"
 			else -> ""
 		} }
 		val intervalColor = when {
 			interval == null -> MaterialTheme.colorScheme.onSurface
-			interval == 0 -> MaterialTheme.colorScheme.primary
-			interval > 0 -> MaterialTheme.colorScheme.secondary
-			interval < 0 -> MaterialTheme.colorScheme.tertiary
+			interval == 0L -> MaterialTheme.colorScheme.primary
+			interval > 0L -> MaterialTheme.colorScheme.secondary
+			interval < 0L -> MaterialTheme.colorScheme.tertiary
 			else -> MaterialTheme.colorScheme.onSurface
 		}
 

@@ -52,9 +52,9 @@ compose-material3-icons = { module = "org.jetbrains.compose.material:material-ic
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.6.2" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.0" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
-kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.1" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
 
 runtime-shapes = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha08" }
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-beta03" }
@@ -81,7 +81,7 @@ lottie-network = { module = "io.github.alexzhirkevich:compottie-network", versio
 korge = { module = "com.soywiz.korge:korge", version = "6.0.0" }
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.4" }
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.4" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.5" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 

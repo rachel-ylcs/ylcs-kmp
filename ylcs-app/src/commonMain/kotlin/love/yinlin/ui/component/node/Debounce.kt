@@ -2,15 +2,16 @@ package love.yinlin.ui.component.node
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import love.yinlin.extension.DateEx
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Composable
-fun Debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
-    var lastTime = remember { Instant.fromEpochMilliseconds(0L) }
+fun debounce(delay: Duration = Duration.ZERO, onClick: () -> Unit): () -> Unit {
+    var lastTime = remember { DateEx.Zero }
     return {
-        val currentTime = Clock.System.now()
+        val currentTime = DateEx.CurrentInstant
         val diff = currentTime - lastTime
         if (diff >= delay) {
             lastTime = currentTime

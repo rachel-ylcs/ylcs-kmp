@@ -53,8 +53,8 @@ private val solarTermTable = arrayOf(
 
 private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
 	val solarYear = this.year
-	val solarMonth = this.monthNumber
-	val solarDay = this.dayOfMonth
+	val solarMonth = this.month.number
+	val solarDay = this.day
 	val index = ((solarYear - 2000) * 12 * 31 + (solarMonth - 1) * 31 + (solarDay - 1)) * 2
 	val byte0 = table[index].toInt() and 0xFF
 	val byte1 = table[index + 1].toInt() and 0xFF
@@ -80,10 +80,10 @@ class CalendarState : PagerState(currentPage = 5) { override val pageCount: Int 
 
 private fun indexShadowDate(index: Int): LocalDate {
 	val today = DateEx.Today
-	val value = index - 5 + today.monthNumber
-	return if (value <= 0) LocalDate(year = today.year - 1, monthNumber = value + 12, dayOfMonth = 1)
-	else if (value > 12) LocalDate(year = today.year + 1, monthNumber = value - 12, dayOfMonth = 1)
-	else LocalDate(year = today.year, monthNumber = value, dayOfMonth = 1)
+	val value = index - 5 + today.month.number
+	return if (value <= 0) LocalDate(year = today.year - 1, month = value + 12, day = 1)
+	else if (value > 12) LocalDate(year = today.year + 1, month = value - 12, day = 1)
+	else LocalDate(year = today.year, month = value, day = 1)
 }
 
 @Composable
@@ -100,7 +100,7 @@ private fun CalendarHeader(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			text = remember(currentDate) { "${currentDate.year}年${currentDate.monthNumber}月" },
+			text = remember(currentDate) { "${currentDate.year}年${currentDate.month.number}月" },
 			style = MaterialTheme.typography.titleLarge,
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
@@ -146,7 +146,7 @@ private fun CalendarDayGrid(
 		val endDay = remember(currentDate, startDay) {
 			val tmp = currentDate.plus(1, DateTimeUnit.MONTH)
 			val endOfMonth = LocalDate(tmp.year, tmp.month, 1).minus(1, DateTimeUnit.DAY)
-			startDay + endOfMonth.dayOfMonth - 1
+			startDay + endOfMonth.day - 1
 		}
 		val startDate = remember(currentDate, startDay) { currentDate.minus(startDay, DateTimeUnit.DAY) }
 		val today = remember(currentDate) { DateEx.Today }
@@ -179,7 +179,7 @@ private fun CalendarDayGrid(
 							}
 							Column(horizontalAlignment = Alignment.CenterHorizontally) {
 								Text(
-									text = date.dayOfMonth.toString(),
+									text = date.day.toString(),
 									color = color,
 									style = MaterialTheme.typography.labelLarge,
 									textAlign = TextAlign.Center,
