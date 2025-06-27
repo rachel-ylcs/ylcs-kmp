@@ -2,8 +2,8 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.browser.localStorage
-import kotlinx.datetime.Clock
 import love.yinlin.extension.Array
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
 import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.String
@@ -16,7 +16,7 @@ import love.yinlin.extension.toJsonString
 @Stable
 actual class KV {
 	private fun setItem(key: String, value: String, expire: Int) {
-		val time = if (expire == KVExpire.NEVER) expire else Clock.System.now().epochSeconds.toInt() + expire
+		val time = if (expire == KVExpire.NEVER) expire else (DateEx.CurrentLong / 1000L).toInt() + expire
 		localStorage.setItem(key, makeArray {
 			add(time)
 			add(value)
@@ -27,7 +27,7 @@ actual class KV {
 		val arr = it.parseJson.Array
 		val time = arr[0].Int
 		val value = arr[1].String
-		val current = Clock.System.now().epochSeconds.toInt()
+		val current = (DateEx.CurrentLong / 1000L).toInt()
 		if (time == KVExpire.NEVER || current <= time) value
 		else {
 			localStorage.removeItem(key)
