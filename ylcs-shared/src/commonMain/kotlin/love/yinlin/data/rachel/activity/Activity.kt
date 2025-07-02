@@ -22,13 +22,13 @@ data class Activity(
 ) : Comparable<Activity> {
 	override fun compareTo(other: Activity): Int {
 		val today = DateEx.Today.toEpochDays()
-		val day1 = (this.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Int.MAX_VALUE) - today
-		val day2 = (other.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Int.MAX_VALUE) - today
-		return if (day1 < 0) {
-			if (day2 < 0) day2 - day1 else 1
+		val day1 = (this.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Long.MAX_VALUE) - today
+		val day2 = (other.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Long.MAX_VALUE) - today
+		return if (day1 < 0L) {
+			if (day2 < 0L) (day2 - day1).toInt() else 1
 		}
 		else {
-			if (day2 < 0) -1 else day1 - day2
+			if (day2 < 0L) -1 else (day1 - day2).toInt()
 		}
 	}
 

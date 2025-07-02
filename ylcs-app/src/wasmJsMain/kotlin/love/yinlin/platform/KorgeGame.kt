@@ -1,6 +1,7 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
+import korlibs.io.async.launchImmediately
 import korlibs.korge.Korge
 import korlibs.korge.KorgeDisplayMode
 import korlibs.korge.scene.Scene
@@ -8,9 +9,43 @@ import korlibs.korge.scene.sceneContainer
 import korlibs.math.geom.Anchor2D
 import korlibs.math.geom.ScaleMode
 import korlibs.math.geom.Size2D
-import korlibs.render.CreateDefaultGameWindow
+import korlibs.render.BrowserCanvasJsGameWindow
+import korlibs.render.GameWindow
+import kotlinx.browser.document
+import kotlinx.browser.window
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancelAndJoin
 import love.yinlin.AppModel
 import love.yinlin.data.rachel.game.Game
+import org.w3c.dom.HTMLCanvasElement
+
+private class ActualWasmGameWindow(canvas: HTMLCanvasElement) : BrowserCanvasJsGameWindow(canvas) {
+    private var fakeLoopJob: Job? = null
+    private var fakeJsFrame: (Double) -> Unit
+
+    init {
+        fakeJsFrame = { _: Double ->
+            window.requestAnimationFrame(fakeJsFrame)
+            frame()
+        }
+    }
+
+    // 手动模拟Canvas绘制第一帧
+    override suspend fun loop(entry: suspend GameWindow.() -> Unit) {
+        fakeLoopJob = launchImmediately(getCoroutineDispatcherWithCurrentContext()) {
+            entry()
+        }
+        fakeJsFrame(0.0)
+    }
+    // 取消引擎关闭窗口, 而是还原compose的Canvas
+    override fun close(exitCode: Int) {
+        MainScope().launchImmediately {
+            fakeLoopJob?.cancelAndJoin()
+        }
+        fakeLoopJob = null
+    }
+}
 
 @Stable
 actual abstract class KorgeGame actual constructor(
@@ -21,7 +56,12 @@ actual abstract class KorgeGame actual constructor(
 
     actual abstract val mainScene: Scene
 
+    private val canvas = (document.createElement("canvas") as HTMLCanvasElement).apply {
+        setAttribute("z-index", "1")
+    }
+
     protected actual val korge: Korge = Korge(
+        gameWindow = ActualWasmGameWindow(canvas),
         title = Game.Rhyme.title,
         windowSize = Size2D(1280, 720),
         virtualSize = Size2D(1280, 720),
@@ -32,6 +72,10 @@ actual abstract class KorgeGame actual constructor(
     )
 
     actual suspend fun launch() {
-        korge.start()
+        document.body?.let { body ->
+            body.appendChild(canvas)
+            korge.start()
+            body.removeChild(canvas)
+        }
     }
 }

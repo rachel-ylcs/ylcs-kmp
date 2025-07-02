@@ -8,6 +8,7 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 
+// MMKV 过期时间单位是秒
 object KVExpire {
 	const val NEVER = 0
 	const val MINUTE = 60

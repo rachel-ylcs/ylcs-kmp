@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastForEach
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -24,6 +23,7 @@ import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.app
 import love.yinlin.platform.platform
@@ -81,7 +81,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		when (result1) {
 			is Data.Success -> {
 				val token = result1.data
-				app.config.userShortToken = Clock.System.now().toEpochMilliseconds()
+				app.config.userShortToken = DateEx.CurrentLong
 				app.config.userToken = token
 				pop()
 			}

@@ -28,9 +28,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
@@ -120,7 +120,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	@OptIn(ExperimentalAtomicApi::class)
 	suspend fun updateUserToken() {
 		val token = app.config.userToken
-		val currentTime = Clock.System.now().toEpochMilliseconds()
+		val currentTime = DateEx.CurrentLong
 		val duration = currentTime - app.config.userShortToken
 		if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
 			isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
@@ -513,7 +513,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
 										)
 										Text(
-											text = "${date.monthNumber}月${date.dayOfMonth}日",
+											text = "${date.month.number}月${date.day}日",
 											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
 											maxLines = 1,
 											overflow = TextOverflow.Ellipsis

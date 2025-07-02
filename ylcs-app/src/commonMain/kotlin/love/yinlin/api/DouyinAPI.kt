@@ -1,20 +1,14 @@
 package love.yinlin.api
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.douyin.DouyinVideo
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.IntNull
-import love.yinlin.extension.Long
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
-import love.yinlin.extension.arr
-import love.yinlin.extension.obj
-import love.yinlin.extension.toLocalDateTime
+import love.yinlin.extension.*
+import kotlin.time.ExperimentalTime
 
 object DouyinAPI {
+    @OptIn(ExperimentalTime::class)
     private fun getDouyinVideo(json: JsonObject): DouyinVideo {
-        val time = Instant.fromEpochSeconds(json["create_time"].Long).toLocalDateTime!!
+        val time = (json["create_time"].Long * 1000).toLocalDateTime!!
         val video = json.obj("video")
         val cover = video.obj("cover").arr("url_list")
         val picUrl = cover.last().String

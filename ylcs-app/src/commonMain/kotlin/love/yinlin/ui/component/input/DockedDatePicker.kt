@@ -13,12 +13,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.*
 import love.yinlin.ui.component.image.ClickIcon
@@ -56,9 +53,7 @@ fun DockedDatePicker(
 
 	LaunchedEffect(datePickerState.selectedDateMillis) {
 		isShow = false
-		onDateSelected(datePickerState.selectedDateMillis?.let {
-			Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault()).date
-		})
+		onDateSelected(datePickerState.selectedDateMillis?.toLocalDate)
 	}
 
 	Column(
