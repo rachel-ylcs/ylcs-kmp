@@ -18,7 +18,7 @@ lottie = "2.0.0-rc04"
 
 # Android
 cmp-android = "1.8.1"
-media3 = "1.8.0-alpha01"
+media3 = "1.8.0-beta01"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
