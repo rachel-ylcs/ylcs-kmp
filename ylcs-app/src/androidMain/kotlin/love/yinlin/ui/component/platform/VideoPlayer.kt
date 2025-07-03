@@ -1,8 +1,6 @@
 @file:JvmName("AndroidVideoPlayer")
 package love.yinlin.ui.component.platform
 
-import android.content.pm.ActivityInfo
-import androidx.activity.compose.LocalActivity
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +11,7 @@ import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.zIndex
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -93,11 +92,12 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val activity = LocalActivity.current!!
+    val context = LocalContext.current
     val state by rememberState { VideoPlayerState() }
+    val orientationController = rememberOrientationController()
 
     DisposableEffect(Unit) {
-        state.controller = FfmpegRenderersFactory.build(activity, app.config.audioFocus).apply {
+        state.controller = FfmpegRenderersFactory.build(context, app.config.audioFocus).apply {
             repeatMode = Player.REPEAT_MODE_ONE
             addListener(state.listener)
             setMediaItem(MediaItem.fromUri(url))
@@ -105,7 +105,6 @@ actual fun VideoPlayer(
             play()
         }
         onDispose {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             synchronized(state.updateProgressJobLock) {
                 state.updateProgressJob?.cancel()
             }
@@ -153,10 +152,7 @@ actual fun VideoPlayer(
                     ClickIcon(
                         icon = Icons.Outlined.Fullscreen,
                         color = Colors.White,
-                        onClick = {
-                            activity.requestedOrientation = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-                                ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                        }
+                        onClick = { orientationController.rotate() }
                     )
                 }
             )
