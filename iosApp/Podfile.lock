@@ -4,7 +4,7 @@ PODS:
   - MMKVCore (2.2.2)
   - MobileVLCKit (3.6.1b1)
   - SGQRCode (4.1.0)
-  - ylcs-app (3.1.0):
+  - ylcs-app (3.2.0):
     - MMKV (= 2.2.2)
     - MobileVLCKit (= 3.6.1b1)
     - SGQRCode (= 4.1.0)
@@ -33,7 +33,7 @@ SPEC CHECKSUMS:
   MMKVCore: a255341a3746955f50da2ad9121b18cb2b346e61
   MobileVLCKit: 2d9c7c373393ae43086aeeff890bf0b1afc15c5c
   SGQRCode: 6ad664d63f38f2842503bc5087812c5a3136d924
-  ylcs-app: 28f24344e1387516dad25a855edb2946d48aa1a9
+  ylcs-app: 1b7228ce0e65ac3269f78ecff0472b442ec04216
   YLCSCore: ca05d5345f1c351ecfec8f32aac8eecb7975e02d
 
 PODFILE CHECKSUM: 0d47abdc2df72fd63ed28a56de89ba9cf72c25a3

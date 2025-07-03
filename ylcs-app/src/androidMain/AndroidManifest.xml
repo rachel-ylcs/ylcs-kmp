@@ -56,15 +56,6 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
-        <activity
-            android:exported="false"
-            android:name=".activity.KorgeActivity"
-            android:launchMode="singleTop"
-            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|layoutDirection|fontScale|colorMode|density|fontWeightAdjustment"
-            android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            tools:ignore="DiscouragedApi" >
-        </activity>
         <service
             android:name=".service.MusicService"
             android:enabled="true"

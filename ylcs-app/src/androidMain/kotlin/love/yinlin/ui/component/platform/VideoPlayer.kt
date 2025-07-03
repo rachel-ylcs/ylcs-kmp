@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -93,6 +94,7 @@ actual fun VideoPlayer(
 ) {
     val context = LocalContext.current
     val state by rememberState { VideoPlayerState() }
+    val orientationController = rememberOrientationController()
 
     DisposableEffect(Unit) {
         state.controller = FfmpegRenderersFactory.build(context, app.config.audioFocus).apply {
@@ -144,6 +146,13 @@ actual fun VideoPlayer(
                         icon = Icons.AutoMirrored.Outlined.ArrowBack,
                         color = Colors.White,
                         onClick = onBack
+                    )
+                },
+                rightAction = {
+                    ClickIcon(
+                        icon = Icons.Outlined.Fullscreen,
+                        color = Colors.White,
+                        onClick = { orientationController.rotate() }
                     )
                 }
             )
