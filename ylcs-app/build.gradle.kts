@@ -135,6 +135,7 @@ kotlin {
             dependencies {
                 implementation(projects.ylcsShared)
                 implementation(projects.ylcsMusic)
+                implementation(projects.ylcsKorge)
 
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.foundation)
@@ -385,63 +386,69 @@ android {
     }
 }
 
-compose.desktop {
-    application {
-        mainClass = rootProject.extra["appMainClass"] as String
+compose {
+    resources {
+        customDirectory("commonMain", provider { (rootProject.extra["commonResourceDir"] as Directory) })
+    }
 
-        // 为调试运行提供工作目录与库目录, 但发布打包时不需要
-        val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
-        if (taskName.contains("desktopRun")) {
-            val desktopCurrentDir: Directory by rootProject.extra
-            desktopCurrentDir.asFile.mkdir()
-            jvmArgs += "-Duser.dir=${desktopCurrentDir}"
-            jvmArgs += "-Djava.library.path=${rootProject.extra["nativeLibsDir"]}"
-        }
+    desktop {
+        application {
+            mainClass = rootProject.extra["appMainClass"] as String
 
-        buildTypes.release.proguard {
-            version = "7.7.0"
-            isEnabled = true
-            optimize = true
-            obfuscate = true
-            configurationFiles.from(
-                rootProject.extra["commonR8File"],
-                rootProject.extra["desktopR8File"]
-            )
-        }
-
-        nativeDistributions {
-            packageName = appName
-            packageVersion = appVersionName
-            description = "银临茶舍KMP跨平台APP"
-            copyright = "© 2024-2025 银临茶舍 版权所有"
-            vendor = "银临茶舍"
-            licenseFile.set(rootProject.file("LICENSE"))
-
-            targetFormats(TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Pkg)
-
-            modules(
-                "java.instrument",
-                "java.net.http",
-                "java.management",
-                "jdk.unsupported",
-            )
-
-            val dirConfig: Directory by rootProject.extra
-
-            windows {
-                console = false
-                exePackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.ico"))
+            // 为调试运行提供工作目录与库目录, 但发布打包时不需要
+            val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
+            if (taskName.contains("desktopRun")) {
+                val desktopCurrentDir: Directory by rootProject.extra
+                desktopCurrentDir.asFile.mkdir()
+                jvmArgs += "-Duser.dir=${desktopCurrentDir}"
+                jvmArgs += "-Djava.library.path=${rootProject.extra["nativeLibsDir"]}"
             }
 
-            linux {
-                debPackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.png"))
+            buildTypes.release.proguard {
+                version = "7.7.0"
+                isEnabled = true
+                optimize = true
+                obfuscate = true
+                configurationFiles.from(
+                    rootProject.extra["commonR8File"],
+                    rootProject.extra["desktopR8File"]
+                )
             }
 
-            macOS {
-                pkgPackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.icns"))
+            nativeDistributions {
+                packageName = appName
+                packageVersion = appVersionName
+                description = "银临茶舍KMP跨平台APP"
+                copyright = "© 2024-2025 银临茶舍 版权所有"
+                vendor = "银临茶舍"
+                licenseFile.set(rootProject.file("LICENSE"))
+
+                targetFormats(TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Pkg)
+
+                modules(
+                    "java.instrument",
+                    "java.net.http",
+                    "java.management",
+                    "jdk.unsupported",
+                )
+
+                val dirConfig: Directory by rootProject.extra
+
+                windows {
+                    console = false
+                    exePackageVersion = appVersionName
+                    iconFile.set(dirConfig.file("icon.ico"))
+                }
+
+                linux {
+                    debPackageVersion = appVersionName
+                    iconFile.set(dirConfig.file("icon.png"))
+                }
+
+                macOS {
+                    pkgPackageVersion = appVersionName
+                    iconFile.set(dirConfig.file("icon.icns"))
+                }
             }
         }
     }

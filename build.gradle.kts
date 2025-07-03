@@ -47,6 +47,8 @@ val appPackageName by extra("love.yinlin")
 val appMainClass by extra("${appPackageName}.MainKt")
 
 // Common
+val commonDir by extra(dirSrc.dir("commonMain"))
+val commonResourceDir by extra(commonDir.dir("resources"))
 val r8Dir by extra(dirApp.dir("proguard"))
 val commonR8File by extra(r8Dir.file("R8Common.pro"))
 

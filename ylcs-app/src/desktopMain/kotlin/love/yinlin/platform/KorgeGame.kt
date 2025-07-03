@@ -91,7 +91,7 @@ actual abstract class KorgeGame actual constructor(
         gameWindow = ActualAwtGameWindow(),
         title = Game.Rhyme.title,
         windowSize = Size2D(1280, 720),
-        virtualSize = Size2D(1280, 720),
+        virtualSize = Size2D(1920, 1080),
         displayMode = KorgeDisplayMode(ScaleMode.SHOW_ALL, Anchor2D.CENTER, false),
         main = {
             sceneContainer().changeTo { mainScene }
