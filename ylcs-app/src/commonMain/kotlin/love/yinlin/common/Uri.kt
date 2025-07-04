@@ -104,7 +104,7 @@ data class Uri(
         private fun parseUri(uri: String): Uri? {
             val schemeEnd = uri.indexOf(':')
             if (schemeEnd == -1) return null
-            val scheme = uri.substring(0, schemeEnd)
+            val scheme = uri.take(schemeEnd)
             if (scheme.isEmpty()) return null
             if (schemeEnd + 2 >= uri.length || uri[schemeEnd + 1] != '/' || uri[schemeEnd + 2] != '/') return null
             val remaining = uri.substring(schemeEnd + 3)
@@ -117,14 +117,14 @@ data class Uri(
                     }
                 }
             }
-            val authorityPart = if (authorityEnd == -1) remaining else remaining.substring(0, authorityEnd)
+            val authorityPart = if (authorityEnd == -1) remaining else remaining.take(authorityEnd)
             var afterAuthority = if (authorityEnd == -1) "" else remaining.substring(authorityEnd)
             var host: String? = null
             var port: Int? = null
             if (authorityPart.isNotEmpty()) {
                 val lastColonIndex = authorityPart.lastIndexOf(':')
                 if (lastColonIndex != -1) {
-                    val hostCandidate = authorityPart.substring(0, lastColonIndex)
+                    val hostCandidate = authorityPart.take(lastColonIndex)
                     if (hostCandidate.isEmpty()) return null
                     val portStr = authorityPart.substring(lastColonIndex + 1)
                     if (portStr.isEmpty()) return null
@@ -139,7 +139,7 @@ data class Uri(
             val queryIndex = afterAuthority.indexOf('?')
             if (queryIndex != -1) {
                 query = afterAuthority.substring(queryIndex + 1)
-                afterAuthority = afterAuthority.substring(0, queryIndex)
+                afterAuthority = afterAuthority.take(queryIndex)
             }
             val path: String? = afterAuthority.ifEmpty { null }
             return Uri(Scheme(scheme.lowercase()), host, port, path, query)
@@ -198,8 +198,7 @@ data class Uri(
                                     builder.append('\ufffd')
                                     return builder.toString()
                                 }
-                                val nextC = str[i++]
-                                val newDigit: Int = when (nextC) {
+                                val newDigit: Int = when (val nextC = str[i++]) {
                                     in '0'..'9' -> nextC.code - '0'.code
                                     in 'a'..'f' -> 10 + nextC.code - 'a'.code
                                     in 'A'..'F' -> 10 + nextC.code - 'A'.code

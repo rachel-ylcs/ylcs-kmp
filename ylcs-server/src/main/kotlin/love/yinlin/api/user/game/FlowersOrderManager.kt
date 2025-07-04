@@ -27,7 +27,6 @@ data object FlowersOrderManager : ExplorationGameManager() {
         // 答案长度与问题一致
         require(actualAnswer.length == actualQuestion)
         // 无ASCII字符
-        val symbol = setOf('，', '。', '：', '！', '？')
         require(actualAnswer.all { FOType.check(it) })
     }
 
