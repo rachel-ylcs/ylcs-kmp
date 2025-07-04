@@ -29,7 +29,7 @@ class ActualAppContext : AppContext() {
 				${DateEx.CurrentString}
 				$source - $lineno - $colno
 				$message
-				$error
+				${error?.toThrowableOrNull()}
 			""".trimIndent()
 			kv.set(CRASH_KEY, errorString)
 			println(errorString)
