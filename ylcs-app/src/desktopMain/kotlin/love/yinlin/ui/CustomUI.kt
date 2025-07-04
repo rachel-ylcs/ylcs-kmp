@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -16,7 +16,7 @@ fun <T : Component> CustomUI(
 	update: ((T) -> Unit)? = null,
 	release: (T, () -> Unit) -> Unit = { _, onRelease -> onRelease() }
 ) {
-	DisposableEffect(Unit) {
+	DisposableEffect(view, release) {
 		onDispose {
 			view.value?.let {
 				release(it) {

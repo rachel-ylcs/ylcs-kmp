@@ -17,7 +17,7 @@ fun <T : View> CustomUI(
 	reset: ((T) -> Unit)? = null,
 	release: (T, () -> Unit) -> Unit = { _, onRelease -> onRelease() }
 ) {
-	DisposableEffect(Unit) {
+	DisposableEffect(view, release) {
 		onDispose {
 			view.value?.let {
 				release(it) {
