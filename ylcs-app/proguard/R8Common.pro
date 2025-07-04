@@ -112,4 +112,3 @@
 
 -keep class io.ktor.** { *; }
 -keepclassmembers class io.ktor.** { volatile <fields>; }
--dontwarn io.ktor.network.sockets.SocketBase # TODO: 将在ktor 3.2.1 版本修复后即可去除
