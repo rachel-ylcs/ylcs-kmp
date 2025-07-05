@@ -29,7 +29,7 @@ class ScreenWebpage(model: AppModel, args: Args) : SubScreen<ScreenWebpage.Args>
 	companion object {
 		inline fun gotoWebPage(arg: String, onNavigate: (Args) -> Unit) {
 			OS.ifPlatform(
-				Platform.WebWasm, *Platform.Desktop,
+				*Platform.Desktop,
 				ifTrue = {
 					OS.Net.openUrl(arg)
 				},

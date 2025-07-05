@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import love.yinlin.platform.appNative
 import love.yinlin.ui.CustomUI
 
-
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	internal val webview = mutableStateOf<WebView?>(null)
@@ -158,11 +157,11 @@ actual abstract class HeadlessBrowser actual constructor() {
         visibility = View.GONE
         layoutParams = ViewGroup.LayoutParams(1, 1)
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-		settings.apply {
+        settings.apply {
 			javaScriptEnabled = true
             javaScriptCanOpenWindowsAutomatically = false
             cacheMode = WebSettings.LOAD_NO_CACHE
-			domStorageEnabled = false
+            domStorageEnabled = false
 			allowFileAccess = false
 			allowContentAccess = false
 			blockNetworkImage = true

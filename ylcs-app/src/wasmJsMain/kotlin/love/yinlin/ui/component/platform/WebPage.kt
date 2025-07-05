@@ -2,14 +2,18 @@ package love.yinlin.ui.component.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.platform.UnsupportedComponent
+import kotlinx.browser.document
+import love.yinlin.ui.CustomUI
+import org.w3c.dom.HTMLIFrameElement
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-	actual var url: String = initUrl
-	actual val loadingState: WebPageLoadingState = WebPageLoadingState.Initializing
+    internal val webview = mutableStateOf<HTMLIFrameElement?>(null)
+    actual var url: String = initUrl
+	actual val loadingState: WebPageLoadingState = WebPageLoadingState.Finished
 	actual val title: String = ""
 	actual val icon: BitmapPainter? = null
 	actual val canGoBack: Boolean = false
@@ -25,7 +29,17 @@ actual fun WebPage(
 	state: WebPageState,
 	modifier: Modifier
 ) {
-	UnsupportedComponent(modifier = modifier)
+    CustomUI(
+        view = state.webview,
+        factory = {
+            (document.createElement("iframe") as HTMLIFrameElement).also { iframe ->
+                iframe.frameBorder = "0"
+                iframe.referrerPolicy = "no-referrer"
+                iframe.src = state.url
+            }
+        },
+        modifier = modifier
+    )
 }
 
 @Stable

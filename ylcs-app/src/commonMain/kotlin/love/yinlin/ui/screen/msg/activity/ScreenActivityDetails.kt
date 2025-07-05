@@ -30,7 +30,6 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.OS
-import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.NineGrid
@@ -40,7 +39,7 @@ import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.resources.*
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.screen.common.ScreenWebpage
+import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 
 @Composable
 private fun ActivityDetailsLayout(
@@ -115,18 +114,6 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 		else if (result is Data.Error) slot.tip.error(result.message)
 	}
 
-	private fun openLink(url: String) {
-		OS.ifPlatform(
-			Platform.WebWasm, *Platform.Desktop,
-			ifTrue = {
-				OS.Net.openUrl(url)
-			},
-			ifFalse = {
-				navigate(ScreenWebpage.Args(url))
-			}
-		)
-	}
-
 	@Composable
 	private fun ActivityPictureLayout(
 		activity: Activity,
@@ -163,7 +150,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 						res = Res.drawable.img_damai,
                         tip = "打开大麦",
 						size = ThemeValue.Size.MediumIcon,
-						onClick = { openLink("https://m.damai.cn/shows/item.html?itemId=${damai}") }
+						onClick = { gotoWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
 				}
 				activity.maoyan?.let { maoyan ->
@@ -171,7 +158,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 						res = Res.drawable.img_maoyan,
                         tip = "打开猫眼",
 						size = ThemeValue.Size.MediumIcon,
-						onClick = { openLink("https://show.maoyan.com/qqw#/detail/${maoyan}") }
+						onClick = { gotoWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}") }
 					)
 				}
 				activity.link?.let { link ->
@@ -179,7 +166,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 						icon = Icons.Outlined.Link,
                         tip = "打开链接",
 						size = ThemeValue.Size.MediumIcon,
-						onClick = { openLink(link) }
+						onClick = { gotoWebPage(link) }
 					)
 				}
 			}
