@@ -20,6 +20,10 @@ lottie = "2.0.0-rc04"
 cmp-android = "1.8.1"
 media3 = "1.8.0-beta01"
 
+# iOS
+vlcKit = "3.6.1b1"
+sgQrcode = "4.1.0"
+
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -34,6 +38,9 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [libraries]
+
+# Gradle
+kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
@@ -105,7 +112,7 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 
-jna = { module = "net.java.dev.jna:jna", version = "5.17.0" }
+jna-core = { module = "net.java.dev.jna:jna", version = "5.17.0" }
 jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.17.0" }
 vlcj = { module = "uk.co.caprica:vlcj", version = "4.11.0" }
 

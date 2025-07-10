@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,24 +7,23 @@ plugins {
 }
 
 kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xexpect-actual-classes")
-    }
+    C.useCompilerFeatures(this)
 
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+        C.jvmTarget(this)
+    }
+
+    iosArm64()
+    if (C.platform == BuildPlatform.Mac) {
+        when (C.architecture) {
+            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
+            BuildArchitecture.X86_64 -> iosX64()
+            else -> {}
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     jvm("desktop") {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+        C.jvmTarget(this)
     }
 
     @OptIn(ExperimentalWasmDsl::class)
@@ -35,94 +33,75 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir("build/generated/kotlin")
-            dependencies {
-                implementation(libs.compose.runtime)
-
-                implementation(libs.kotlinx.datetime)
-                implementation(libs.kotlinx.io)
-                implementation(libs.kotlinx.json)
-            }
+            kotlin.srcDir(C.root.shared.srcGenerated)
+            useLib(
+                // compose
+                libs.compose.runtime,
+                // kotlinx
+                libs.kotlinx.datetime,
+                libs.kotlinx.io,
+                libs.kotlinx.json
+            )
         }
 
         val nonAndroidMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-
-            }
+            useSourceSet(commonMain)
         }
 
         val nonWasmJsMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-
-            }
+            useSourceSet(commonMain)
         }
 
-        androidMain.get().apply {
-            dependsOn(nonWasmJsMain)
-            dependencies {
-
-            }
+        androidMain.configure {
+            useSourceSet(nonWasmJsMain)
         }
 
         val iosMain = iosMain.get().apply {
-            dependsOn(nonAndroidMain)
-            dependsOn(nonWasmJsMain)
-            dependencies {
-
-            }
+            useSourceSet(nonAndroidMain, nonWasmJsMain)
         }
 
-        listOf(
-            iosX64Main,
-            iosArm64Main,
-            iosSimulatorArm64Main
-        ).forEach {
-            it.get().apply {
-                dependsOn(iosMain)
-                dependencies {
-
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
                 }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
             }
         }
 
         val desktopMain by getting {
-            dependsOn(nonAndroidMain)
-            dependsOn(nonWasmJsMain)
-            dependencies {
-
-            }
+            useSourceSet(nonAndroidMain, nonWasmJsMain)
         }
 
-        wasmJsMain.get().apply {
-            dependsOn(nonAndroidMain)
-            dependencies {
-
-            }
+        wasmJsMain.configure {
+            useSourceSet(nonAndroidMain)
         }
     }
 }
 
 android {
-    namespace = "${rootProject.extra["appPackageName"]}.shared"
-    compileSdk = rootProject.extra["androidBuildSDK"] as Int
+    namespace = "${C.app.packageName}.shared"
+    compileSdk = C.android.compileSdk
 
     defaultConfig {
-        minSdk = rootProject.extra["androidMinSDK"] as Int
-        lint.targetSdk = rootProject.extra["androidBuildSDK"] as Int
+        minSdk = C.android.minSdk
+        lint.targetSdk = C.android.targetSdk
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = C.jvm.compatibility
+        targetCompatibility = C.jvm.compatibility
     }
 }
 
 afterEvaluate {
     val generateConstants by tasks.registering {
-        val constantsFile = file("build/generated/kotlin/love/yinlin/Local.kt")
-        outputs.file(constantsFile)
         val content = """
             package love.yinlin
             import love.yinlin.platform.Platform
@@ -130,27 +109,25 @@ afterEvaluate {
             
             // 由构建脚本自动生成，请勿手动修改
             object Local {
-                const val DEVELOPMENT: Boolean = ${rootProject.extra["environment"] == "Dev"}
+                const val DEVELOPMENT: Boolean = ${C.environment == BuildEnvironment.Dev}
                 
-                const val APP_NAME: String = "${rootProject.extra["appName"]}"
-                const val NAME: String = "${rootProject.extra["appDisplayName"]}"
-                const val VERSION: Int = ${rootProject.extra["appVersion"]}
-                const val VERSION_NAME: String = "${rootProject.extra["appVersionName"]}"
+                const val APP_NAME: String = "${C.app.name}"
+                const val NAME: String = "${C.app.displayName}"
+                const val VERSION: Int = ${C.app.version}
+                const val VERSION_NAME: String = "${C.app.versionName}"
                 
-                const val LOCAL_HOST: String = "localhost"
-                const val MAIN_HOST: String = "${rootProject.extra["mainHost"]}"
-                const val API_HOST: String = "api.${rootProject.extra["mainHost"]}"
+                const val MAIN_HOST: String = "${C.host.mainHost}"
+                const val API_HOST: String = "${C.host.apiHost}"
                 @Suppress("HttpUrlsUsage")
                 val API_BASE_URL: String = run {
-                    if (platform == Platform.WebWasm && ${rootProject.extra["webUseProxy"]}) {
-                        "http://${'$'}LOCAL_HOST:${rootProject.extra["webServerPort"]}"
-                    } else {
-                        "${rootProject.extra["apiBaseUrl"]}"
-                    }
+                    if (platform == Platform.WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
                 }
             }
         """.trimIndent()
-
+        val constantsFile = C.root.shared.generatedLocalFile.let {
+            outputs.file(it)
+            it.asFile
+        }
         outputs.upToDateWhen {
             constantsFile.takeIf { it.exists() }?.readText() == content
         }
