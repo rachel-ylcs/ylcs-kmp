@@ -52,6 +52,7 @@ import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
+import love.yinlin.ui.screen.world.single.ScreenRhyme
 import kotlin.math.absoluteValue
 
 @Composable
@@ -126,7 +127,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
-            Game.Rhyme -> launch { }
+            Game.Rhyme -> navigate<ScreenRhyme>()
 		}
 	}
 
