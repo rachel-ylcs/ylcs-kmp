@@ -111,7 +111,10 @@ class Constants(project: Project) {
         when {
             it.lowercase().startsWith("aarch64") -> BuildArchitecture.AARCH64
             it.lowercase().startsWith("arm") -> BuildArchitecture.ARM
+            // Windows x86_64
             it.lowercase().startsWith("amd64") -> BuildArchitecture.X86_64
+            // macOS Intel
+            it.lowercase().startsWith("x86_64") -> BuildArchitecture.X86_64
             else -> error("Unsupported architecture: $it")
         }
     }

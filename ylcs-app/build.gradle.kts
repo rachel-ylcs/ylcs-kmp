@@ -268,18 +268,24 @@ android {
         }
     }
 
-    val localProperties = Properties().also { p ->
-        C.root.localProperties.asFile.inputStream().use { p.load(it) }
-    }
-    val androidKeyName = localProperties.getProperty("androidKeyName")!!
-    val androidKeyPassword = localProperties.getProperty("androidKeyPassword")!!
-    signingConfigs {
-        register(androidKeyName) {
-            keyAlias = androidKeyName
-            keyPassword = androidKeyPassword
-            storeFile = C.root.config.androidKey.asFile
-            storePassword = androidKeyPassword
+    val androidSigningConfig = try {
+        val localProperties = Properties().also { p ->
+            C.root.localProperties.asFile.inputStream().use { p.load(it) }
         }
+        val androidKeyName = localProperties.getProperty("androidKeyName")
+        val androidKeyPassword = localProperties.getProperty("androidKeyPassword")
+        signingConfigs {
+            register(androidKeyName) {
+                keyAlias = androidKeyName
+                keyPassword = androidKeyPassword
+                storeFile = C.root.config.androidKey.asFile
+                storePassword = androidKeyPassword
+            }
+        }
+        signingConfigs.getByName(androidKeyName)
+    } catch (e: Throwable) {
+        println("Can't load android signing config, error: ${e.message}")
+        null
     }
 
     buildTypes {
@@ -287,7 +293,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             isDebuggable = true
-            signingConfig = signingConfigs.getByName(androidKeyName)
+            signingConfig = androidSigningConfig
         }
 
         release {
@@ -298,7 +304,7 @@ android {
                 getDefaultProguardFile(C.proguard.defaultRule),
                 C.root.app.commonR8Rule, C.root.app.androidR8Rule
             )
-            signingConfig = signingConfigs.getByName(androidKeyName)
+            signingConfig = androidSigningConfig
         }
     }
 

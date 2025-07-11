@@ -41,6 +41,7 @@ jobs:
           filters: |
             common: &common
               - 'gradle/**'
+              - 'buildSrc/**'
               - 'ylcs-shared/**'
               - 'gradle.properties'
               - 'settings.gradle.kts'
