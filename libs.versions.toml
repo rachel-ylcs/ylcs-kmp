@@ -80,7 +80,7 @@ sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources"
 sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
-sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0-beta02" }
+sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0-beta03" }
 
 lottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "lottie" }
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
@@ -103,7 +103,7 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.2.0" }
+scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.3.0" }
 scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.3.1" }
 
 # Apple
