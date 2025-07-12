@@ -16,8 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
@@ -36,7 +34,7 @@ fun RachelText(
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Row(
 			modifier = Modifier.height(IntrinsicSize.Min).padding(padding),
@@ -56,7 +54,7 @@ fun RachelText(
 				style = style,
 				color = color,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 		}
 	}
@@ -95,9 +93,9 @@ fun RachelButton(
 				text = text,
 				color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
 				style = MaterialTheme.typography.labelMedium,
-				textAlign = TextAlign.Center,
+				textAlign = Center,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 		}
 	}
@@ -118,7 +116,7 @@ private fun LoadingButtonContent(
 		if (isLoading) {
 			Box(
 				modifier = Modifier.fillMaxHeight().aspectRatio(1f),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				LoadingAnimation(color = color)
 			}
@@ -139,9 +137,9 @@ private fun LoadingButtonContent(
 			text = text,
 			color = if (isLoading) MaterialTheme.colorScheme.onSurfaceVariant else color,
 			style = MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center,
+			textAlign = Center,
 			maxLines = 1,
-			overflow = TextOverflow.Ellipsis
+			overflow = Ellipsis
 		)
 	}
 }
@@ -203,7 +201,7 @@ private fun ButtonBase(
 			text = text,
 			color = contentColor,
 			maxLines = 1,
-			overflow = TextOverflow.Ellipsis
+			overflow = Ellipsis
 		)
 	}
 }

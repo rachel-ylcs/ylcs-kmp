@@ -15,13 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.util.fastAll
-import androidx.compose.ui.util.fastFilter
-import androidx.compose.ui.util.fastForEachIndexed
-import androidx.compose.ui.util.fastMap
-import androidx.compose.ui.util.fastMapNotNull
+import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -33,7 +27,6 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
-import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
@@ -44,13 +37,9 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FABAction
-import love.yinlin.ui.component.screen.FloatingDialogChoice
-import love.yinlin.ui.component.screen.FloatingDialogDynamicChoice
-import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic
 import love.yinlin.ui.screen.music.loader.ScreenPlatformMusic
@@ -105,18 +94,18 @@ private fun MusicCard(
             ) {
                 Text(
                     text = musicInfo.name,
-                    textAlign = TextAlign.Center,
+                    textAlign = Center,
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
+                    overflow = MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = musicInfo.singer,
-                    textAlign = TextAlign.Center,
+                    textAlign = Center,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
+                    overflow = MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -359,9 +348,9 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
             when (result) {
                 ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
                 ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
-                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
-                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
-                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
+                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, QQMusic))
+                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, NetEaseCloud))
+                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, Kugou))
             }
         }
     }

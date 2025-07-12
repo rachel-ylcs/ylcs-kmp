@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
@@ -29,10 +28,8 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
-import love.yinlin.data.rachel.follows.FollowStatus
-import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
@@ -66,7 +63,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				uid = args.uid
 			)
 		)
-		if (result is Data.Success) profile = result.data
+		if (result is Success) profile = result.data
 	}
 
 	private suspend fun requestNewTopics() {
@@ -77,7 +74,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				num = page.pageNum
 			)
 		)
-		if (result is Data.Success) page.newData(result.data)
+		if (result is Success) page.newData(result.data)
 	}
 
 	private suspend fun requestMoreTopics() {
@@ -90,7 +87,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				num = page.pageNum
 			)
 		)
-		if (result is Data.Success) page.moreData(result.data)
+		if (result is Success) page.moreData(result.data)
 	}
 
 	private suspend fun followUser(profile: UserPublicProfile) {
@@ -102,11 +99,11 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		when (result) {
-			is Data.Success -> this.profile = profile.copy(
-				status = FollowStatus.FOLLOW,
+			is Success -> this.profile = profile.copy(
+				status = FOLLOW,
 				followers = profile.followers + 1
 			)
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -119,11 +116,11 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		when (result) {
-			is Data.Success -> this.profile = profile.copy(
-				status = FollowStatus.UNFOLLOW,
+			is Success -> this.profile = profile.copy(
+				status = UNFOLLOW,
 				followers = profile.followers - 1
 			)
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -136,8 +133,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 			)
 		)
 		when (result) {
-			is Data.Success -> this.profile = profile.copy(status = FollowStatus.BLOCK)
-			is Data.Error -> slot.tip.error(result.message)
+			is Success -> this.profile = profile.copy(status = BLOCK)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -179,7 +176,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 				Text(
 					text = topic.title,
 					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
 				)
 				Spacer(Modifier.weight(1f))
@@ -329,8 +326,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
 	override fun SubContent(device: Device) {
 		profile?.let {
 			when (device.type) {
-				Device.Type.PORTRAIT -> Portrait(it)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
+				PORTRAIT -> Portrait(it)
+				LANDSCAPE, SQUARE -> Landscape(it)
 			}
 		} ?: EmptyBox()
 	}

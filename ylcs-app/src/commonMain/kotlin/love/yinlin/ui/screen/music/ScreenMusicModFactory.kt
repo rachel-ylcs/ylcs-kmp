@@ -12,18 +12,12 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -32,7 +26,6 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
@@ -70,9 +63,9 @@ private fun SongCard(
                 text = song.name,
                 style = MaterialTheme.typography.labelMedium,
                 color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Start,
+                textAlign = Start,
                 maxLines = 1,
-                overflow = TextOverflow.MiddleEllipsis,
+                overflow = MiddleEllipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Row(
@@ -84,7 +77,7 @@ private fun SongCard(
                     text = song.version,
                     color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis
+                    overflow = MiddleEllipsis
                 )
                 if (song.bgd) {
                     MiniIcon(
@@ -105,9 +98,9 @@ private fun SongCard(
         Text(
             text = song.id,
             style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
+            textAlign = End,
             maxLines = 1,
-            overflow = TextOverflow.MiddleEllipsis,
+            overflow = MiddleEllipsis,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(alignment = Alignment.Top)
         )
@@ -129,11 +122,11 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
             data = API.User.Song.GetSongs.Request(num = pageSongs.pageNum)
         )
         when (result) {
-            is Data.Success -> {
+            is Success -> {
                 pageSongs.newData(result.data)
                 gridState.scrollToItem(0)
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -145,7 +138,7 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
                 num = pageSongs.pageNum
             )
         )
-        if (result is Data.Success) pageSongs.moreData(result.data)
+        if (result is Success) pageSongs.moreData(result.data)
     }
 
     private suspend fun searchNewData(key: String) {
@@ -154,12 +147,12 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
             data = key
         )
         when (result) {
-            is Data.Success -> {
+            is Success -> {
                 pageSongs.newData(result.data)
                 pageSongs.canLoading = false
                 gridState.scrollToItem(0)
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Failure -> slot.tip.error(result.message)
         }
     }
 

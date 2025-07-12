@@ -7,9 +7,9 @@ import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
 
 private val ImageQuality.samplingMode: SamplingMode get() = when (this) {
-    ImageQuality.Low -> SamplingMode.DEFAULT
-    ImageQuality.Medium -> SamplingMode.LINEAR
-    ImageQuality.High, ImageQuality.Full -> SamplingMode.MITCHELL
+    Low -> DEFAULT
+    Medium -> LINEAR
+    High, Full -> MITCHELL
 }
 
 private fun Bitmap.Companion.create(width: Int, height: Int, colorInfo: ColorInfo): Bitmap = Bitmap().apply {

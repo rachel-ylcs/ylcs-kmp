@@ -3,7 +3,7 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
@@ -27,7 +27,7 @@ abstract class AppContext {
 	// 初始化部分
 
 	private fun initializePath() {
-		OS.ifNotPlatform(Platform.WebWasm) {
+		OS.ifNotPlatform(WebWasm) {
 			SystemFileSystem.createDirectories(OS.Storage.dataPath)
 			SystemFileSystem.createDirectories(OS.Storage.cachePath)
 

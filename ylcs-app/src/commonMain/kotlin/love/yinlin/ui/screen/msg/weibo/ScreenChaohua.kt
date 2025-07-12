@@ -18,16 +18,9 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
-import love.yinlin.platform.app
-import love.yinlin.platform.safeDownload
+import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -36,31 +29,31 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
-    private var state by mutableStateOf(BoxState.EMPTY)
+    private var state: BoxState by mutableStateOf(EMPTY)
     private var items by mutableStateOf(emptyList<Weibo>())
     private val gridState = LazyStaggeredGridState()
     private var sinceId: Long = 0L
     private var canLoading by mutableStateOf(false)
 
     private suspend fun requestNewData(loading: Boolean) {
-        if (state != BoxState.LOADING) {
-            if (loading) state = BoxState.LOADING
+        if (state != LOADING) {
+            if (loading) state = LOADING
             canLoading = false
             val result = WeiboAPI.extractChaohua(0L)
-            state = if (result is Data.Success) {
+            state = if (result is Success) {
                 val (data, newSinceId) = result.data
                 sinceId = newSinceId
                 canLoading = newSinceId != 0L
                 items = data
-                if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+                if (data.isEmpty()) EMPTY else CONTENT
             }
-            else BoxState.NETWORK_ERROR
+            else NETWORK_ERROR
         }
     }
 
     private suspend fun requestMoreData() {
         val result = WeiboAPI.extractChaohua(sinceId)
-        if (result is Data.Success) {
+        if (result is Success) {
             val (data, newSinceId) = result.data
             sinceId = newSinceId
             canLoading = newSinceId != 0L

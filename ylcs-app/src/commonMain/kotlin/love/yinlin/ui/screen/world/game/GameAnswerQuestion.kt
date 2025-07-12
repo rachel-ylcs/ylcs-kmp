@@ -16,8 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.CoroutineScope
@@ -28,12 +26,7 @@ import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
-import love.yinlin.data.rachel.game.info.AQAnswer
-import love.yinlin.data.rachel.game.info.AQConfig
-import love.yinlin.data.rachel.game.info.AQInfo
-import love.yinlin.data.rachel.game.info.AQQuestion
-import love.yinlin.data.rachel.game.info.AQResult
-import love.yinlin.data.rachel.game.info.AQUserAnswer
+import love.yinlin.data.rachel.game.info.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
@@ -47,7 +40,6 @@ import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
-import kotlin.to
 
 @Stable
 private enum class QuestionType {
@@ -93,9 +85,9 @@ private fun TopPager(
         Text(
             text = remember(currentIndex) { "${currentIndex + 1} $name" },
             style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
+            textAlign = Center,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = Ellipsis,
             modifier = Modifier.weight(1f)
         )
         ClickIcon(
@@ -226,9 +218,9 @@ private fun ColumnScope.AnswerQuestionRecordResult(result: AQResult) {
     Text(
         text = "正确率: $correctCount / $totalCount",
         style = MaterialTheme.typography.titleLarge,
-        textAlign = TextAlign.Center,
+        textAlign = Center,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = Ellipsis,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -272,9 +264,9 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
     override val canSubmit: Boolean by derivedStateOf {
         questions.size in AQConfig.minQuestionCount .. AQConfig.maxQuestionCount && questions.all { item ->
             when (item) {
-                is QuestionItem.Choice -> item.question.options.size in AQConfig.minOptionCount .. AQConfig.maxOptionCount && item.answer.value != -1
-                is QuestionItem.MultiChoice -> item.question.options.size in AQConfig.minOptionCount .. AQConfig.maxOptionCount && item.answer.value.size > 1
-                is QuestionItem.Blank -> item.answer.value.size in AQConfig.minAnswerCount .. AQConfig.maxAnswerCount
+                is Choice -> item.question.options.size in AQConfig.minOptionCount .. AQConfig.maxOptionCount && item.answer.value != -1
+                is MultiChoice -> item.question.options.size in AQConfig.minOptionCount .. AQConfig.maxOptionCount && item.answer.value.size > 1
+                is Blank -> item.answer.value.size in AQConfig.minAnswerCount .. AQConfig.maxAnswerCount
             }
         }
     }
@@ -283,17 +275,17 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     override val submitQuestion: JsonElement get() = questions.map {
         when (it) {
-            is QuestionItem.Choice -> it.question
-            is QuestionItem.MultiChoice -> it.question
-            is QuestionItem.Blank -> it.question
+            is Choice -> it.question
+            is MultiChoice -> it.question
+            is Blank -> it.question
         }
     }.toJson()
 
     override val submitAnswer: JsonElement get() = questions.map {
         when (it) {
-            is QuestionItem.Choice -> it.answer
-            is QuestionItem.MultiChoice -> it.answer
-            is QuestionItem.Blank -> it.answer
+            is Choice -> it.answer
+            is MultiChoice -> it.answer
+            is Blank -> it.answer
         }
     }.toJson()
 
@@ -302,9 +294,9 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         else {
             val title = "请输入题目..."
             questions.add(++currentIndex, when (type) {
-                QuestionType.Choice -> QuestionItem.Choice(AQQuestion.Choice(title), AQAnswer.Choice())
-                QuestionType.MultiChoice -> QuestionItem.MultiChoice(AQQuestion.MultiChoice(title), AQAnswer.MultiChoice())
-                QuestionType.Blank -> QuestionItem.Blank(AQQuestion.Blank(title), AQAnswer.Blank())
+                Choice -> QuestionItem.Choice(AQQuestion.Choice(title), AQAnswer.Choice())
+                MultiChoice -> QuestionItem.MultiChoice(AQQuestion.MultiChoice(title), AQAnswer.MultiChoice())
+                Blank -> QuestionItem.Blank(AQQuestion.Blank(title), AQAnswer.Blank())
             })
         }
     }
@@ -318,22 +310,22 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     private suspend fun modifyTitle(item: QuestionItem) {
         val title = when (item) {
-            is QuestionItem.Choice -> item.question.title
-            is QuestionItem.MultiChoice -> item.question.title
-            is QuestionItem.Blank -> item.question.title
+            is Choice -> item.question.title
+            is MultiChoice -> item.question.title
+            is Blank -> item.question.title
         }
         titleInputDialog.openSuspend(initText = title)?.let { text ->
             questions[currentIndex] = when (item) {
-                is QuestionItem.Choice -> item.copy(question = item.question.copy(title = text))
-                is QuestionItem.MultiChoice -> item.copy(question = item.question.copy(title = text))
-                is QuestionItem.Blank -> item.copy(question = item.question.copy(title = text))
+                is Choice -> item.copy(question = item.question.copy(title = text))
+                is MultiChoice -> item.copy(question = item.question.copy(title = text))
+                is Blank -> item.copy(question = item.question.copy(title = text))
             }
         }
     }
 
     private fun addOption(item: QuestionItem) {
         when (item) {
-            is QuestionItem.Choice -> {
+            is Choice -> {
                 val options = item.question.options.toMutableList()
                 if (options.size >= AQConfig.maxOptionCount) slot.tip.warning("选项数量超出上限")
                 else {
@@ -344,7 +336,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                     )
                 }
             }
-            is QuestionItem.MultiChoice -> {
+            is MultiChoice -> {
                 val options = item.question.options.toMutableList()
                 if (options.size >= AQConfig.maxOptionCount) slot.tip.warning("选项数量超出上限")
                 else {
@@ -355,7 +347,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                     )
                 }
             }
-            is QuestionItem.Blank -> {
+            is Blank -> {
                 val answers = item.answer.value.toMutableList()
                 if (answers.size >= AQConfig.maxAnswerCount) slot.tip.warning("备选答案超出上限")
                 else {
@@ -368,7 +360,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     private fun deleteOption(item: QuestionItem, index: Int) {
         when (item) {
-            is QuestionItem.Choice -> {
+            is Choice -> {
                 val options = item.question.options.toMutableList()
                 options.removeAt(index)
                 questions[currentIndex] = item.copy(
@@ -376,7 +368,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                     answer = AQAnswer.Choice()
                 )
             }
-            is QuestionItem.MultiChoice -> {
+            is MultiChoice -> {
                 val options = item.question.options.toMutableList()
                 options.removeAt(index)
                 questions[currentIndex] = item.copy(
@@ -384,7 +376,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                     answer = AQAnswer.MultiChoice()
                 )
             }
-            is QuestionItem.Blank -> {
+            is Blank -> {
                 val answers = item.answer.value.toMutableList()
                 answers.removeAt(index)
                 questions[currentIndex] = item.copy(answer = AQAnswer.Blank(answers))
@@ -394,31 +386,31 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
     private suspend fun modifyOption(item: QuestionItem, index: Int) {
         val options = when (item) {
-            is QuestionItem.Choice -> item.question.options
-            is QuestionItem.MultiChoice -> item.question.options
-            is QuestionItem.Blank -> item.answer.value
+            is Choice -> item.question.options
+            is MultiChoice -> item.question.options
+            is Blank -> item.answer.value
         }.toMutableList()
-        val dialog = if (item is QuestionItem.Blank) answerInputDialog else optionInputDialog
+        val dialog = if (item is Blank) answerInputDialog else optionInputDialog
         dialog.openSuspend(initText = options[index])?.let { text ->
             options[index] = text
             questions[currentIndex] = when (item) {
-                is QuestionItem.Choice -> item.copy(question = item.question.copy(options = options))
-                is QuestionItem.MultiChoice -> item.copy(question = item.question.copy(options = options))
-                is QuestionItem.Blank -> item.copy(answer = AQAnswer.Blank(options))
+                is Choice -> item.copy(question = item.question.copy(options = options))
+                is MultiChoice -> item.copy(question = item.question.copy(options = options))
+                is Blank -> item.copy(answer = AQAnswer.Blank(options))
             }
         }
     }
 
     private fun selectOption(item: QuestionItem, index: Int) {
         questions[currentIndex] = when (item) {
-            is QuestionItem.Choice -> item.copy(answer = AQAnswer.Choice(if (item.answer.value == index) -1 else index))
-            is QuestionItem.MultiChoice -> {
+            is Choice -> item.copy(answer = AQAnswer.Choice(if (item.answer.value == index) -1 else index))
+            is MultiChoice -> {
                 val answers = item.answer.value.toMutableList()
                 if (index in answers) answers.remove(index)
                 else answers.add(index)
                 item.copy(answer = AQAnswer.MultiChoice(answers))
             }
-            is QuestionItem.Blank -> error("")
+            is Blank -> error("")
         }
     }
 
@@ -464,7 +456,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
                 ) {
                     when (item) {
-                        is QuestionItem.Choice -> {
+                        is Choice -> {
                             val (question, answer) = item
                             Text(
                                 text = question.title,
@@ -501,7 +493,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                 }
                             }
                         }
-                        is QuestionItem.MultiChoice -> {
+                        is MultiChoice -> {
                             val (question, answer) = item
                             Text(
                                 text = question.title,
@@ -538,7 +530,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                                 }
                             }
                         }
-                        is QuestionItem.Blank -> {
+                        is Blank -> {
                             val (question, answer) = item
                             Text(
                                 text = question.title,
@@ -590,9 +582,9 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                         }
                     }
                 }
-                ClickIcon(Icons.Outlined.RadioButtonChecked, "单选题") { addQuestion(QuestionType.Choice) }
-                ClickIcon(Icons.Outlined.CheckBox, "多选题") { addQuestion(QuestionType.MultiChoice) }
-                ClickIcon(Icons.Outlined.Translate, "填空题") { addQuestion(QuestionType.Blank) }
+                ClickIcon(Icons.Outlined.RadioButtonChecked, "单选题") { addQuestion(Choice) }
+                ClickIcon(Icons.Outlined.CheckBox, "多选题") { addQuestion(MultiChoice) }
+                ClickIcon(Icons.Outlined.Translate, "填空题") { addQuestion(Blank) }
                 ClickIcon(Icons.Outlined.Delete, "删除") { deleteQuestion() }
             }
         }

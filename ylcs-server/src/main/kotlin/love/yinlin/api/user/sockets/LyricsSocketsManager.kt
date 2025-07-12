@@ -180,7 +180,7 @@ object LyricsSocketsManager {
             for (frame in session.incoming) {
                 if (frame !is Frame.Text) continue
                 when (val msg = frame.readText().parseJsonValue<LyricsSockets.CM>()!!) {
-                    is LyricsSockets.CM.Login -> {
+                    is Login -> {
                         val tokenUid = Coroutines.io { AN.throwExpireToken(msg.token) }
                         val (uid, name) = msg.info
                         require(tokenUid == uid && !players.containsKey(uid))
@@ -189,8 +189,8 @@ object LyricsSocketsManager {
                         players[uid] = player
                         session.send(LyricsSockets.SM.PlayerList(availablePlayers))
                     }
-                    LyricsSockets.CM.GetPlayers if currentPlayer != null -> session.send(LyricsSockets.SM.PlayerList(availablePlayers))
-                    is LyricsSockets.CM.InvitePlayer if currentPlayer != null -> {
+                    GetPlayers if currentPlayer != null -> session.send(LyricsSockets.SM.PlayerList(availablePlayers))
+                    is InvitePlayer if currentPlayer != null -> {
                         val target = players[msg.targetUid]
                         when {
                             target == null -> session.send(LyricsSockets.SM.Error("对方未上线"))
@@ -205,7 +205,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    is LyricsSockets.CM.InviteResponse if currentPlayer != null -> {
+                    is InviteResponse if currentPlayer != null -> {
                         val inviter = players[msg.inviterUid]
                         when {
                             inviter == null -> session.send(LyricsSockets.SM.Error("对方未上线"))
@@ -231,7 +231,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    is LyricsSockets.CM.SaveAnswer if currentPlayer != null -> {
+                    is SaveAnswer if currentPlayer != null -> {
                         currentPlayer.room?.let { room ->
                             val triple = when (currentPlayer.uid) {
                                 room.info1.uid -> Triple(room.answers1, room.info2.uid, room.answers2)
@@ -253,7 +253,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    LyricsSockets.CM.Submit if currentPlayer != null -> currentPlayer.room?.let { submitAnswers(it, currentPlayer.uid) }
+                    Submit if currentPlayer != null -> currentPlayer.room?.let { submitAnswers(it, currentPlayer.uid) }
                     else -> {}
                 }
             }

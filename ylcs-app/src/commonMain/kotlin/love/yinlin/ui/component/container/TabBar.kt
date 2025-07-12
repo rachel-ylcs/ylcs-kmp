@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.common.ThemeValue
@@ -55,7 +54,7 @@ private fun <T> TabBar(
 						if (currentPage == index) onLongClick?.invoke(index)
 					}
 				).padding(ThemeValue.Padding.EqualSpace),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				content(isSelected, item)
 			}
@@ -92,7 +91,7 @@ fun TabBar(
 				text = title,
 				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 				style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-				textAlign = TextAlign.Center
+				textAlign = Center
 			)
 		}
 	}
@@ -117,7 +116,7 @@ fun TabBar(
 			text = title,
 			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-			textAlign = TextAlign.Center
+			textAlign = Center
 		)
 	}
 }

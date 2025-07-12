@@ -33,27 +33,27 @@ import kotlin.math.roundToInt
 @Stable
 abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     override fun alignment(device: Device): Alignment = when (device.type) {
-        Device.Type.PORTRAIT -> Alignment.BottomCenter
-        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
+        PORTRAIT -> BottomCenter
+        LANDSCAPE, SQUARE -> CenterEnd
     }
 
     override fun enter(device: Device): EnterTransition = when (device.type) {
-        Device.Type.PORTRAIT -> slideInVertically(
+        PORTRAIT -> slideInVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
-        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
+        LANDSCAPE, SQUARE -> slideInHorizontally(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
 
     override fun exit(device: Device): ExitTransition = when (device.type) {
-        Device.Type.PORTRAIT -> slideOutVertically(
+        PORTRAIT -> slideOutVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetY = { it }
         )
-        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
+        LANDSCAPE, SQUARE -> slideOutHorizontally(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
@@ -190,8 +190,8 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     @Composable
     final override fun Wrapper(block: @Composable () -> Unit) {
         when (LocalDevice.current.type) {
-            Device.Type.PORTRAIT -> PortraitWrapper(block)
-            Device.Type.LANDSCAPE, Device.Type.SQUARE -> LandscapeWrapper(block)
+            PORTRAIT -> PortraitWrapper(block)
+            LANDSCAPE, SQUARE -> LandscapeWrapper(block)
         }
     }
 

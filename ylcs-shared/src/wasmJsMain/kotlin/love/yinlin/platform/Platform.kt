@@ -1,3 +1,3 @@
 package love.yinlin.platform
 
-actual val platform: Platform = Platform.WebWasm
+actual val platform: Platform = WebWasm

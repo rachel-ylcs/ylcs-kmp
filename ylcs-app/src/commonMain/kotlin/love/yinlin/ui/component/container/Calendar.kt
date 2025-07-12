@@ -8,20 +8,21 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
 import love.yinlin.common.Colors
 import love.yinlin.common.Resource
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.node.condition
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.node.condition
 
 private val lunarFestivalTable = mapOf(
 	101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",
@@ -103,7 +104,7 @@ private fun CalendarHeader(
 			text = remember(currentDate) { "${currentDate.year}年${currentDate.month.number}月" },
 			style = MaterialTheme.typography.titleLarge,
 			maxLines = 1,
-			overflow = TextOverflow.Ellipsis,
+			overflow = Ellipsis,
 			modifier = Modifier.weight(1f)
 		)
 		Row(verticalAlignment = Alignment.CenterVertically) {
@@ -119,9 +120,9 @@ private fun CalendarWeekGrid(modifier: Modifier = Modifier) {
 			Text(
 				text = it.toString(),
 				style = MaterialTheme.typography.labelLarge,
-				textAlign = TextAlign.Center,
+				textAlign = Center,
 				maxLines = 1,
-				overflow = TextOverflow.Clip,
+				overflow = Clip,
 				modifier = Modifier.weight(1f)
 			)
 		}
@@ -169,7 +170,7 @@ private fun CalendarDayGrid(
 
 						Box(modifier = Modifier.weight(1f).aspectRatio(1f)
 							.condition(eventTitle != null) { clickable(onClick = { onEventClick(date) }) },
-							contentAlignment = Alignment.Center
+							contentAlignment = Center
 						) {
 							if (date == today) {
 								Box(modifier = Modifier.matchParentSize().background(
@@ -182,17 +183,17 @@ private fun CalendarDayGrid(
 									text = date.day.toString(),
 									color = color,
 									style = MaterialTheme.typography.labelLarge,
-									textAlign = TextAlign.Center,
+									textAlign = Center,
 									maxLines = 1,
-									overflow = TextOverflow.Clip
+									overflow = Clip
 								)
 								Text(
 									text = text,
 									color = color,
 									style = ThemeStyle.bodyExtraSmall,
-									textAlign = TextAlign.Center,
+									textAlign = Center,
 									maxLines = 1,
-									overflow = TextOverflow.Clip
+									overflow = Clip
 								)
 							}
 						}

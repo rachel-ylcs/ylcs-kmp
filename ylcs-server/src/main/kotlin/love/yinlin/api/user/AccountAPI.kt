@@ -7,7 +7,7 @@ import love.yinlin.api.EmptySuccessData
 import love.yinlin.api.ImplMap
 import love.yinlin.api.ServerRes
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.failedObject
 import love.yinlin.api.successData
 import love.yinlin.api.successObject
@@ -34,8 +34,8 @@ fun Routing.accountAPI(implMap: ImplMap) {
 	api(API.User.Account.Login) { (name, pwd, platform) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
-		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failedData
-		if (user["pwd"].String != pwd.md5) return@api "密码错误".failedData
+		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failureData
+		if (user["pwd"].String != pwd.md5) return@api "密码错误".failureData
 		val uid = user["uid"].Int
 		// 根据 uid, platform, timestamp 生成 token
 		val token = Token(uid, platform)
@@ -65,15 +65,15 @@ fun Routing.accountAPI(implMap: ImplMap) {
             UNION
             SELECT param1 FROM mail WHERE param1 = ? AND filter = '${Mail.Filter.REGISTER}'
         """, name, name) != null)
-			return@api "\"${name}\"已注册或正在注册审批中".failedData
+			return@api "\"${name}\"已注册或正在注册审批中".failureData
 
 		// 检查邀请人是否有审核资格
 		val inviter = DB.querySQLSingle("""
                 SELECT uid, privilege FROM user WHERE (privilege & ${UserPrivilege.VIP_ACCOUNT}) != 0 AND name = ?
             """, inviterName)
-		if (inviter == null) return@api "邀请人\"${inviterName}\"不存在".failedData
+		if (inviter == null) return@api "邀请人\"${inviterName}\"不存在".failureData
 		if (!UserPrivilege.vipAccount(inviter["privilege"].Int))
-			return@api "邀请人\"${inviterName}\"无审核资格".failedData
+			return@api "邀请人\"${inviterName}\"无审核资格".failureData
 
 		// 提交申请
 		DB.throwExecuteSQL("""
@@ -112,20 +112,20 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		VN.throwName(name)
 		VN.throwPassword(pwd)
 
-		val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name) ?: return@api "ID\"${name}\"未注册".failedData
-		val inviterUid = user["inviter"].IntNull ?: return@api "原始ID请联系管理员修改密码".failedData
+		val user = DB.querySQLSingle("SELECT uid, inviter FROM user WHERE name = ?", name) ?: return@api "ID\"${name}\"未注册".failureData
+		val inviterUid = user["inviter"].IntNull ?: return@api "原始ID请联系管理员修改密码".failureData
 
 		// 检查邀请人是否有审核资格
-		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid) ?: return@api "邀请人不存在".failedData
+		val inviter = DB.querySQLSingle("SELECT name, privilege FROM user WHERE uid = ?", inviterUid) ?: return@api "邀请人不存在".failureData
 		val inviterName = inviter["name"].String
 		if (!UserPrivilege.vipAccount(inviter["privilege"].Int))
-			return@api "邀请人\"${inviterName}\"无审核资格".failedData
+			return@api "邀请人\"${inviterName}\"无审核资格".failureData
 		// 查询ID是否注册过或是否正在审批
 		if (DB.querySQLSingle("""
             SELECT uid FROM mail
             WHERE uid = ? AND filter = '${Mail.Filter.FORGOT_PASSWORD}' AND param1 = ? AND processed = 0
         """, inviterUid, name) != null)
-			return@api "已提交过审批，请等待邀请人\"${inviterName}\"审核".failedData
+			return@api "已提交过审批，请等待邀请人\"${inviterName}\"审核".failureData
 		// 提交申请
 		DB.throwExecuteSQL("""
             INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
@@ -151,8 +151,8 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		val user = DB.throwGetUser(uid, "pwd")
 		val oldPwdMd5 = oldPwd.md5
 		val newPwdMd5 = newPwd.md5
-		if (user["pwd"].String != oldPwdMd5) "原密码错误".failedData
-		else if (oldPwdMd5 == newPwdMd5) "原密码与新密码相同".failedData
+		if (user["pwd"].String != oldPwdMd5) "原密码错误".failureData
+		else if (oldPwdMd5 == newPwdMd5) "原密码与新密码相同".failureData
 		else {
 			DB.throwExecuteSQL("UPDATE user SET pwd = ? WHERE uid = ?", newPwdMd5, uid)
 			AN.removeAllTokens(uid)

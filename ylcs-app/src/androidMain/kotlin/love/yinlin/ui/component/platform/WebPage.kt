@@ -22,7 +22,7 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
 	actual var url: String get() = mUrl
 		set(value) { webview.value?.loadUrl(value) }
 
-	internal var mLoadingState: WebPageLoadingState by mutableStateOf(WebPageLoadingState.Initializing)
+	internal var mLoadingState: WebPageLoadingState by mutableStateOf(Initializing)
 	actual val loadingState: WebPageLoadingState get() = mLoadingState
 
 	internal var mTitle: String by mutableStateOf("")
@@ -52,7 +52,7 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
 		override fun onPageFinished(view: WebView?, url: String?) {
 			super.onPageFinished(view, url)
 			url?.let { mUrl = it }
-			mLoadingState = WebPageLoadingState.Finished
+			mLoadingState = Finished
 		}
 
 		override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {

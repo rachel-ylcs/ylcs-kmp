@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLIFrameElement
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
     internal val webview = mutableStateOf<HTMLIFrameElement?>(null)
     actual var url: String = initUrl
-	actual val loadingState: WebPageLoadingState = WebPageLoadingState.Finished
+	actual val loadingState: WebPageLoadingState = Finished
 	actual val title: String = ""
 	actual val icon: BitmapPainter? = null
 	actual val canGoBack: Boolean = false

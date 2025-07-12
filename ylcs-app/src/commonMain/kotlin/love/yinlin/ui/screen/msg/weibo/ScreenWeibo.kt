@@ -14,16 +14,9 @@ import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
-import love.yinlin.platform.app
-import love.yinlin.platform.safeDownload
+import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
@@ -32,27 +25,27 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
-    private var state by mutableStateOf(BoxState.EMPTY)
+    private var state: BoxState by mutableStateOf(EMPTY)
     private var items = mutableStateListOf<Weibo>()
     private val gridState = LazyStaggeredGridState()
 
     private suspend fun requestWeibo() {
-        if (state != BoxState.LOADING) {
+        if (state != LOADING) {
             val users = app.config.weiboUsers.map { it.id }
-            if (users.isEmpty()) state = BoxState.EMPTY
+            if (users.isEmpty()) state = EMPTY
             else {
-                state = BoxState.LOADING
+                state = LOADING
                 items.clear()
                 for (id in users) {
                     val result = WeiboAPI.getUserWeibo(id)
-                    if (result is Data.Success) {
+                    if (result is Success) {
                         items += result.data
                         items.sortDescending()
-                        if (state == BoxState.LOADING) state = BoxState.CONTENT
+                        if (state == LOADING) state = CONTENT
                         gridState.scrollToItem(0)
                     }
                 }
-                if (state == BoxState.LOADING) state = BoxState.NETWORK_ERROR
+                if (state == LOADING) state = NETWORK_ERROR
             }
         }
     }

@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastFilter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -28,8 +27,10 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.*
-import love.yinlin.data.Data
+import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.common.ThemeValue
 import love.yinlin.data.ItemKey
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -39,7 +40,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.replaceAll
-import love.yinlin.platform.*
+import love.yinlin.platform.app
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
@@ -95,7 +96,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 		val result = ClientAPI.request(
 			route = API.User.Activity.GetActivities
 		)
-		if (result is Data.Success) activities.replaceAll(result.data.sorted())
+		if (result is Success) activities.replaceAll(result.data.sorted())
 	}
 
 	private fun showActivityDetails(aid: Int) {
@@ -244,18 +245,18 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 				left = {
 					Text(
 						text = intervalString,
-						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
+						style = if (LocalDevice.current.type == PORTRAIT) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge,
 						color = intervalColor,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						overflow = Ellipsis
 					)
 				},
 				right = {
 					Text(
 						text = remember(activity) { "${activity.title} / ${activity.ts}" },
-						style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
+						style = if (LocalDevice.current.type == PORTRAIT) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						overflow = Ellipsis
 					)
 				}
 			)
@@ -368,8 +369,8 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> Portrait()
-			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+			PORTRAIT -> Portrait()
+			LANDSCAPE, SQUARE -> Landscape()
 		}
 	}
 }

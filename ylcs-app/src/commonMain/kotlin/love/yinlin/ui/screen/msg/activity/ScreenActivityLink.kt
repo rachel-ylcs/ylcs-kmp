@@ -1,12 +1,6 @@
 package love.yinlin.ui.screen.msg.activity
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +18,7 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.platform.WebPage
-import love.yinlin.ui.component.platform.WebPageLoadingState
+import love.yinlin.ui.component.platform.WebPageLoadingState.Finished
 import love.yinlin.ui.component.platform.WebPageSettings
 import love.yinlin.ui.component.platform.WebPageState
 import love.yinlin.ui.component.screen.CommonSubScreen
@@ -41,7 +35,7 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun SubContent(device: Device) {
         OS.ifPlatform(
-            Platform.WebWasm, *Platform.Desktop,
+            WebWasm, *Platform.Desktop,
             ifTrue = {
                 UnsupportedComponent(modifier = Modifier.fillMaxSize())
             },
@@ -76,7 +70,7 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
                         )
                         RachelButton(
                             text = "提取",
-                            enabled = webPageState.loadingState == WebPageLoadingState.Finished,
+                            enabled = webPageState.loadingState is Finished,
                             onClick = {
                                 webPageState.evaluateJavaScript("document.getElementById('openApp').click();")
                             }

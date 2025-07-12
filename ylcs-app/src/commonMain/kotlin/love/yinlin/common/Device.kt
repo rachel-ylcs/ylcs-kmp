@@ -21,27 +21,27 @@ class Device private constructor(
 
     constructor(width: Dp) : this(
         size = when {
-            width <= 420.dp -> Size.SMALL
-            width <= 900.dp -> Size.MEDIUM
-            else -> Size.LARGE
+            width <= 420.dp -> SMALL
+            width <= 900.dp -> MEDIUM
+            else -> LARGE
         },
         type = when {
-            width <= 420.dp -> Type.PORTRAIT
-            width <= 900.dp -> Type.SQUARE
-            else -> Type.LANDSCAPE
+            width <= 420.dp -> PORTRAIT
+            width <= 900.dp -> SQUARE
+            else -> LANDSCAPE
         }
     )
 
     constructor(width: Dp, height: Dp) : this(
         size = when {
-            width <= 420.dp -> Size.SMALL
-            width <= 900.dp -> Size.MEDIUM
-            else -> Size.LARGE
+            width <= 420.dp -> SMALL
+            width <= 900.dp -> MEDIUM
+            else -> LARGE
         },
         type = when {
-            height >= width * 1.3f -> Type.PORTRAIT
-            width >= height * 1.3f -> Type.LANDSCAPE
-            else -> Type.SQUARE
+            height >= width * 1.3f -> PORTRAIT
+            width >= height * 1.3f -> LANDSCAPE
+            else -> SQUARE
         }
     )
 

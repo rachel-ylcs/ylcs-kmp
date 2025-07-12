@@ -1,10 +1,6 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
@@ -21,7 +17,6 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
@@ -36,7 +31,7 @@ import love.yinlin.ui.screen.world.game.GameItem
 
 @Stable
 class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
-    private var state by mutableStateOf(BoxState.EMPTY)
+    private var state: BoxState by mutableStateOf(EMPTY)
 
     private val page = object : PaginationArgs<GameDetailsWithName, Int, Int, Boolean>(Int.MAX_VALUE, false) {
         override fun distinctValue(item: GameDetailsWithName): Int = item.gid
@@ -47,8 +42,8 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
     private val gridState = LazyStaggeredGridState()
 
     private suspend fun requestNewGames(loading: Boolean) {
-        if (state != BoxState.LOADING) {
-            if (loading) state = BoxState.LOADING
+        if (state != LOADING) {
+            if (loading) state = LOADING
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGames,
                 data = API.User.Game.GetUserGames.Request(
@@ -56,9 +51,9 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
                     num = page.pageNum
                 )
             )
-            state = if (result is Data.Success) {
-                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            } else BoxState.NETWORK_ERROR
+            state = if (result is Success) {
+                if (page.newData(result.data)) CONTENT else EMPTY
+            } else NETWORK_ERROR
         }
     }
 
@@ -72,7 +67,7 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
                 num = page.pageNum
             )
         )
-        if (result is Data.Success) page.moreData(result.data)
+        if (result is Success) page.moreData(result.data)
     }
 
     private suspend fun deleteGame(gid: Int) {
@@ -84,8 +79,8 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
             )
         )
         when (result) {
-            is Data.Success -> page.items.removeAll { it.gid == gid }
-            is Data.Error -> slot.tip.error(result.message)
+            is Success -> page.items.removeAll { it.gid == gid }
+            is Failure -> slot.tip.error(result.message)
         }
     }
 

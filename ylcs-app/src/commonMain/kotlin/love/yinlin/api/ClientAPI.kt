@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.data.Data
-import love.yinlin.data.Failed
+import love.yinlin.data.RequestError
 import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.platform.safeCall
@@ -28,9 +28,9 @@ object ClientAPI {
 		val msg = json["msg"].StringNull
 		return when (code) {
 			APICode.SUCCESS -> Data.Success(json["data"]!!.to(), msg)
-			APICode.FAILED -> Data.Error(Failed.RequestError.InvalidArgument, msg)
-			APICode.UNAUTHORIZED -> Data.Error(Failed.RequestError.Unauthorized, msg)
-			else -> Data.Error(Failed.RequestError.ClientError, msg)
+			APICode.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
+			APICode.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
+			else -> Data.Failure(RequestError.ClientError, msg)
 		}
 	}
 
@@ -41,9 +41,9 @@ object ClientAPI {
 		val msg = json["msg"].StringNull
 		return when (code) {
 			APICode.SUCCESS -> Data.Success(Response.Default, msg)
-			APICode.FAILED -> Data.Error(Failed.RequestError.InvalidArgument, msg)
-			APICode.UNAUTHORIZED -> Data.Error(Failed.RequestError.Unauthorized, msg)
-			else -> Data.Error(Failed.RequestError.ClientError, msg)
+			APICode.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
+			APICode.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
+			else -> Data.Failure(RequestError.ClientError, msg)
 		}
 	}
 

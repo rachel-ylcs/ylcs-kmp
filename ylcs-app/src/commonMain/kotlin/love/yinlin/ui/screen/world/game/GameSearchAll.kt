@@ -1,10 +1,6 @@
 package love.yinlin.ui.screen.world.game
 
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -17,27 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GameDetailsWithName
-import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.data.rachel.game.GameResult
-import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.data.rachel.game.*
 import love.yinlin.data.rachel.game.info.SAConfig
 import love.yinlin.data.rachel.game.info.SAInfo
 import love.yinlin.data.rachel.game.info.SAResult
-import love.yinlin.extension.Int
-import love.yinlin.extension.catchingNull
-import love.yinlin.extension.timeString
-import love.yinlin.extension.to
-import love.yinlin.extension.toJson
+import love.yinlin.extension.*
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -88,17 +74,17 @@ private fun ColumnScope.SearchAllRecordResult(result: SAResult) {
     Text(
         text = "正确率: $correctCount / $totalCount",
         style = MaterialTheme.typography.titleLarge,
-        textAlign = TextAlign.Center,
+        textAlign = Center,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = Ellipsis,
         modifier = Modifier.fillMaxWidth()
     )
     Text(
         text = "用时: ${(duration.toLong() * 1000).timeString}",
         style = MaterialTheme.typography.titleLarge,
-        textAlign = TextAlign.Center,
+        textAlign = Center,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = Ellipsis,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -257,7 +243,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
             Text(
                 text = remember(time) { time.timeString },
                 style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
+                textAlign = Center,
                 modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.VerticalSpace)
             )
             TextInput(

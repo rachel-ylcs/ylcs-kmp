@@ -120,7 +120,7 @@ afterEvaluate {
                 const val API_HOST: String = "${C.host.apiHost}"
                 @Suppress("HttpUrlsUsage")
                 val API_BASE_URL: String = run {
-                    if (platform == Platform.WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
+                    if (platform == WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
                 }
             }
         """.trimIndent()

@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
@@ -119,8 +117,8 @@ actual fun VideoPlayer(
                 bitmap,
                 modifier = Modifier.fillMaxSize().background(Color.Black).zIndex(1f),
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
-                alignment = Alignment.Center,
+                contentScale = Fit,
+                alignment = Center,
             )
         }
 

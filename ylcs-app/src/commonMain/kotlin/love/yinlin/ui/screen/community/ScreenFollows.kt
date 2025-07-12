@@ -11,8 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
@@ -24,7 +22,6 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
@@ -32,11 +29,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationGrid
+import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
@@ -72,13 +65,13 @@ private fun FollowItemLayout(
         WebImage(
             uri = item.avatarPath,
             key = remember { DateEx.TodayString },
-            contentScale = ContentScale.Crop,
+            contentScale = Crop,
             circle = true,
             modifier = Modifier.size(ThemeValue.Size.MicroImage)
         )
         Text(
             text = item.name,
-            overflow = TextOverflow.Ellipsis,
+            overflow = Ellipsis,
             modifier = Modifier.weight(1f)
         )
     }
@@ -112,23 +105,23 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
 
     private val items by derivedStateOf {
         when (tab) {
-            FollowTabItem.FOLLOWS -> pageFollows.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.FOLLOWERS -> pageFollowers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.BLOCK_USERS -> pageBlockUsers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            FOLLOWS -> pageFollows.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            FOLLOWERS -> pageFollowers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            BLOCK_USERS -> pageBlockUsers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
         }
     }
 
     private val page by derivedStateOf {
         when (tab) {
-            FollowTabItem.FOLLOWS -> pageFollows
-            FollowTabItem.FOLLOWERS -> pageFollowers
-            FollowTabItem.BLOCK_USERS -> pageBlockUsers
+            FOLLOWS -> pageFollows
+            FOLLOWERS -> pageFollowers
+            BLOCK_USERS -> pageBlockUsers
         }
     }
 
     private suspend fun requestNewData() {
         when (tab) {
-            FollowTabItem.FOLLOWS -> {
+            FOLLOWS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollows,
                     data = API.User.Follows.GetFollows.Request(
@@ -137,14 +130,14 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> {
+                    is Success -> {
                         pageFollows.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Failure -> slot.tip.error(result.message)
                 }
             }
-            FollowTabItem.FOLLOWERS -> {
+            FOLLOWERS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollowers,
                     data = API.User.Follows.GetFollowers.Request(
@@ -153,14 +146,14 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> {
+                    is Success -> {
                         pageFollowers.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Failure -> slot.tip.error(result.message)
                 }
             }
-            FollowTabItem.BLOCK_USERS -> {
+            BLOCK_USERS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetBlockedUsers,
                     data = API.User.Follows.GetBlockedUsers.Request(
@@ -169,11 +162,11 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     )
                 )
                 when (result) {
-                    is Data.Success -> {
+                    is Success -> {
                         pageBlockUsers.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Failure -> slot.tip.error(result.message)
                 }
             }
         }
@@ -181,7 +174,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
 
     private suspend fun requestMoreData() {
         when (tab) {
-            FollowTabItem.FOLLOWS -> {
+            FOLLOWS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollows,
                     data = API.User.Follows.GetFollows.Request(
@@ -191,9 +184,9 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         num = pageFollows.pageNum
                     )
                 )
-                if (result is Data.Success) pageFollows.moreData(result.data)
+                if (result is Success) pageFollows.moreData(result.data)
             }
-            FollowTabItem.FOLLOWERS -> {
+            FOLLOWERS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollowers,
                     data = API.User.Follows.GetFollowers.Request(
@@ -203,9 +196,9 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         num = pageFollowers.pageNum
                     )
                 )
-                if (result is Data.Success) pageFollowers.moreData(result.data)
+                if (result is Success) pageFollowers.moreData(result.data)
             }
-            FollowTabItem.BLOCK_USERS -> {
+            BLOCK_USERS -> {
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetBlockedUsers,
                     data = API.User.Follows.GetBlockedUsers.Request(
@@ -214,7 +207,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         num = pageBlockUsers.pageNum
                     )
                 )
-                if (result is Data.Success) pageBlockUsers.moreData(result.data)
+                if (result is Success) pageBlockUsers.moreData(result.data)
             }
         }
     }
@@ -228,8 +221,8 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
             )
         )
         when (result) {
-            is Data.Success -> pageBlockUsers.items.removeAll { it.fid == item.fid }
-            is Data.Error -> slot.tip.error(result.message)
+            is Success -> pageBlockUsers.items.removeAll { it.fid == item.fid }
+            is Failure -> slot.tip.error(result.message)
         }
     }
 

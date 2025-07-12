@@ -6,6 +6,7 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.asInputStream
 import kotlinx.io.asOutputStream
+import androidx.core.graphics.scale
 
 actual typealias ImageOwner = Bitmap
 
@@ -34,7 +35,7 @@ actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>
 actual data object ImageCompress : ImageOp {
     actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
         val info = ScaleQualityInfo.calculate(owner.width, owner.height)
-        return if (info.scale) Bitmap.createScaledBitmap(owner, info.width, info.height, true) else null
+        return if (info.scale) owner.scale(info.width, info.height) else null
     }
 }
 

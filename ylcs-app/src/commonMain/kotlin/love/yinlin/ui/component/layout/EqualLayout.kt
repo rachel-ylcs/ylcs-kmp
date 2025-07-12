@@ -16,7 +16,7 @@ typealias EqualRowScope = RowScope
 fun EqualRowScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier.weight(1f),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Center,
         content = content
     )
 }
@@ -41,7 +41,7 @@ typealias EqualColumnScope = ColumnScope
 fun EqualColumnScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier.weight(1f),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Center,
         content = content
     )
 }

@@ -122,7 +122,8 @@ class Constants(project: Project) {
     // kotlin 特性
     val features = listOf(
         "-Xexpect-actual-classes",
-        "-Xnested-type-aliases"
+        "-Xnested-type-aliases",
+        "-Xcontext-sensitive-resolution"
     )
 
     // 排除资源

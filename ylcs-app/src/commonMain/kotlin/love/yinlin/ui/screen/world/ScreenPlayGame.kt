@@ -1,14 +1,6 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,20 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
-import love.yinlin.data.rachel.game.Game
+import love.yinlin.common.*
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -63,14 +48,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     private val game: GamePublicDetailsWithName? = worldPart.currentGame
 
-    private var status by mutableStateOf(Status.Preparing)
+    private var status: Status by mutableStateOf(Preparing)
 
-    private val state = playGameState(game?.type ?: Game.AnswerQuestion, slot)
+    private val state = playGameState(game?.type ?: AnswerQuestion, slot)
 
     private var preflightResult: PreflightResult? by mutableStateOf(null)
     private var gameResult: GameResult? by mutableStateOf(null)
 
-    private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
+    private val canSubmit by derivedStateOf { status == Playing && preflightResult != null && state.canSubmit }
 
     private suspend fun preflight() {
         val result = ClientAPI.request(
@@ -81,12 +66,12 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
             )
         )
         when (result) {
-            is Data.Success -> {
+            is Success -> {
                 preflightResult = result.data
                 state.init(viewModelScope, result.data)
-                status = Status.Playing
+                status = Playing
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -97,14 +82,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
             contentAlignment = Alignment.TopCenter
         ) {
             when (status) {
-                Status.Preparing -> {
+                Preparing -> {
                     SecondaryLoadingButton(
                         text = "开始",
                         modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace),
                         onClick = { preflight() }
                     )
                 }
-                Status.Playing -> {
+                Playing -> {
                     preflightResult?.let {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
@@ -122,7 +107,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         }
                     }
                 }
-                Status.Settling -> {
+                Settling -> {
                     gameResult?.let { result ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
@@ -154,14 +139,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                                             style = MaterialTheme.typography.displayMedium,
                                             color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = Ellipsis
                                         )
                                         SecondaryButton(
                                             text = "返回",
                                             onClick = {
                                                 preflightResult = null
                                                 gameResult = null
-                                                status = Status.Preparing
+                                                status = Preparing
                                             }
                                         )
                                     }
@@ -233,7 +218,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     override val title: String = game?.type?.title ?: "未知游戏"
 
     override fun onBack() {
-        if (status == Status.Playing) {
+        if (status == Playing) {
             launch {
                 if (slot.confirm.openSuspend(content = "中途退出将以失败结算")) pop()
             }
@@ -243,7 +228,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (game != null && status == Status.Playing) {
+        if (game != null && status == Playing) {
             ActionSuspend(
                 icon = Icons.Outlined.Check,
                 tip = "提交",
@@ -260,13 +245,13 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         )
                     )
                     when (result) {
-                        is Data.Success -> {
+                        is Success -> {
                             gameResult = result.data
                             state.settle(result.data)
                             preflightResult = null
-                            status = Status.Settling
+                            status = Settling
                         }
-                        is Data.Error -> slot.tip.error(result.message)
+                        is Failure -> slot.tip.error(result.message)
                     }
                 }
             }
@@ -280,7 +265,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 val deviceType = LocalDevice.current.type
 
                 WebImage(
-                    uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT) },
+                    uri = remember(deviceType) { game.type.xyPath(deviceType != PORTRAIT) },
                     key = Local.VERSION,
                     contentScale = ContentScale.Crop,
                     alpha = 0.75f,
@@ -289,8 +274,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
                 Box(modifier = Modifier.fillMaxSize().zIndex(2f)) {
                     when (deviceType) {
-                        Device.Type.PORTRAIT -> Portrait(details)
-                        Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape(details)
+                        PORTRAIT -> Portrait(details)
+                        SQUARE, LANDSCAPE -> Landscape(details)
                     }
                 }
             }

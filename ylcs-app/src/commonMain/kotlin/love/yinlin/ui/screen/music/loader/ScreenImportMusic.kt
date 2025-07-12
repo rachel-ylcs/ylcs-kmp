@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
@@ -29,12 +28,12 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.LoadingAnimation
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult
 import love.yinlin.ui.component.platform.dragAndDrop
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
@@ -65,7 +64,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     private suspend fun loadModFile() {
         OS.ifPlatform(
-            Platform.WebWasm,
+            WebWasm,
             ifTrue = {
                 slot.tip.warning(UnsupportedPlatformText)
             },
@@ -85,11 +84,11 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             }
         }
         catch (e: Throwable) {
-            Data.Error(throwable = e)
+            Data.Failure(throwable = e)
         }
         step = when (data) {
-            is Data.Success -> Step.Preview(path, data.data)
-            is Data.Error -> Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Success -> Step.Preview(path, data.data)
+            is Failure -> Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 
@@ -102,15 +101,15 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             }
         }
         catch (e: Throwable) {
-            Data.Error(throwable = e)
+            Data.Failure(throwable = e)
         }
         when (data) {
-            is Data.Success -> {
+            is Success -> {
                 app.musicFactory.updateMusicLibraryInfo(data.data.medias)
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }
-            is Data.Error -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Failure -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 
@@ -209,7 +208,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     @Composable
     override fun ActionScope.LeftActions() {
-        if (step is Step.Prepare) {
+        if (step is Prepare) {
             Action(
                 icon = Icons.Outlined.Refresh,
                 tip = "重置",
@@ -221,14 +220,14 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     @Composable
     override fun ActionScope.RightActions() {
         when (val currentStep = step) {
-            is Step.Initial -> {
+            is Initial -> {
                 ActionSuspend(
                     icon = Icons.Outlined.Add,
                     tip = "添加",
                     onClick = { loadModFile() }
                 )
             }
-            is Step.Prepare -> {
+            is Prepare -> {
                 Action(
                     icon = Icons.Outlined.Preview,
                     tip = "预览",
@@ -240,7 +239,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     onClick = { launch { processMod(currentStep.path) } }
                 )
             }
-            is Step.Preview -> {
+            is Preview -> {
                 if (currentStep.preview != null) {
                     Action(
                         icon = Icons.Outlined.Refresh,
@@ -254,7 +253,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     )
                 }
             }
-            is Step.Processing -> {}
+            is Processing -> {}
         }
     }
 
@@ -265,7 +264,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             .fillMaxSize()
             .padding(ThemeValue.Padding.EqualExtraValue)
             .dragAndDrop(
-                enabled = step is Step.Initial || step is Step.Prepare,
+                enabled = step is Initial || step is Prepare,
                 flag = DragFlag.FILE,
                 onDrop = {
                     val files = (it as? DropResult.File)?.path
@@ -275,23 +274,23 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     }
                 }
             ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Center
         ) {
             when (val currentStep = step) {
-                is Step.Initial -> {
+                is Initial -> {
                     Text(
                         text = currentStep.message,
                         color = if (currentStep.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
+                        textAlign = Center
                     )
                 }
-                is Step.Prepare -> {
+                is Prepare -> {
                     Text(
                         text = "已加载: ${currentStep.path.path}",
-                        textAlign = TextAlign.Center
+                        textAlign = Center
                     )
                 }
-                is Step.Preview -> {
+                is Preview -> {
                     val preview = currentStep.preview
                     if (preview == null) {
                         Column(
@@ -301,7 +300,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                             LoadingAnimation()
                             Text(
                                 text = "预览中...",
-                                textAlign = TextAlign.Center
+                                textAlign = Center
                             )
                         }
                     }
@@ -312,7 +311,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                         )
                     }
                 }
-                is Step.Processing -> {
+                is Processing -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
@@ -320,7 +319,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                         LoadingAnimation()
                         Text(
                             text = currentStep.message,
-                            textAlign = TextAlign.Center
+                            textAlign = Center
                         )
                     }
                 }

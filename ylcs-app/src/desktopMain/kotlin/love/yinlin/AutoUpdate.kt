@@ -2,7 +2,6 @@ package love.yinlin
 
 import love.yinlin.extension.catching
 import love.yinlin.platform.OS
-import love.yinlin.platform.Platform
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -52,7 +51,7 @@ object AutoUpdate {
 
     private fun startScript(currentDir: Path, newName: String) {
         ProcessBuilder(*OS.ifPlatform(
-            Platform.Windows,
+            Windows,
             ifTrue = { windowsScript(newName) },
             ifFalse = { unixScript(currentDir, newName) })
         ).inheritIO().start()

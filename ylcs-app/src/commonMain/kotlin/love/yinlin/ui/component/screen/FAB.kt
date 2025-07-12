@@ -45,7 +45,7 @@ private fun FABIcon(
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center
+        contentAlignment = Center
     ) {
         MiniIcon(
             icon = icon,
@@ -67,7 +67,7 @@ private fun FABIcon(
                 .clip(CircleShape)
                 .clickable(onClick = onClick)
                 .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+            contentAlignment = Center
         ) {
             MiniIcon(
                 icon = icon,

@@ -111,10 +111,10 @@ private enum class PaginationStatus {
 @Stable
 private class SwipeState {
 	var isReleaseEdge = false
-	var refreshStatus by mutableStateOf(PaginationStatus.IDLE)
-	var loadingStatus by mutableStateOf(PaginationStatus.IDLE)
+	var refreshStatus: PaginationStatus by mutableStateOf(IDLE)
+	var loadingStatus: PaginationStatus by mutableStateOf(IDLE)
 	var isAnimateOver by mutableStateOf(true)
-	val isRunning: Boolean get() = !isAnimateOver || refreshStatus == PaginationStatus.RUNNING || loadingStatus == PaginationStatus.RUNNING
+	val isRunning: Boolean get() = !isAnimateOver || refreshStatus == RUNNING || loadingStatus == RUNNING
 
 	private val mutatorMutex = MutatorMutex()
 	private val _indicatorOffset = Animatable(0f)
@@ -128,11 +128,11 @@ private class SwipeState {
 
 	suspend fun snapOffsetTo(headerHeightPx: Float, footerHeightPx: Float, offset: Float) = mutatorMutex.mutate(MutatePriority.UserInput) {
 		_indicatorOffset.snapTo(offset)
-		if (indicatorOffset >= headerHeightPx) refreshStatus = PaginationStatus.RELEASE
-		else if (indicatorOffset <= -footerHeightPx) loadingStatus = PaginationStatus.RELEASE
+		if (indicatorOffset >= headerHeightPx) refreshStatus = RELEASE
+		else if (indicatorOffset <= -footerHeightPx) loadingStatus = RELEASE
 		else {
-			if (indicatorOffset > 0) refreshStatus = PaginationStatus.PULL
-			if (indicatorOffset < 0) loadingStatus = PaginationStatus.PULL
+			if (indicatorOffset > 0) refreshStatus = PULL
+			if (indicatorOffset < 0) loadingStatus = PULL
 		}
 	}
 }
@@ -147,7 +147,7 @@ private fun DefaultSwipePaginationHeader(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
-		if (status == PaginationStatus.RUNNING) LoadingAnimation(
+		if (status == RUNNING) LoadingAnimation(
 			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
@@ -158,9 +158,9 @@ private fun DefaultSwipePaginationHeader(
 		)
 		Text(
 			text = when (status) {
-				PaginationStatus.RUNNING -> "刷新中..."
-				PaginationStatus.PULL -> "继续下拉刷新"
-				PaginationStatus.RELEASE -> "释放立即刷新"
+				RUNNING -> "刷新中..."
+				PULL -> "继续下拉刷新"
+				RELEASE -> "释放立即刷新"
 				else -> ""
 			},
 			color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -178,7 +178,7 @@ private fun DefaultSwipePaginationFooter(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 	) {
-		if (status == PaginationStatus.RUNNING) LoadingAnimation(
+		if (status == RUNNING) LoadingAnimation(
 			size = ThemeValue.Size.MediumIcon,
 			color = MaterialTheme.colorScheme.onPrimaryContainer
 		)
@@ -189,9 +189,9 @@ private fun DefaultSwipePaginationFooter(
 		)
 		Text(
 			text = when (status) {
-				PaginationStatus.RUNNING -> "加载中..."
-				PaginationStatus.PULL -> "上拉加载更多"
-				PaginationStatus.RELEASE -> "释放立即加载"
+				RUNNING -> "加载中..."
+				PULL -> "上拉加载更多"
+				RELEASE -> "释放立即加载"
 				else -> ""
 			},
 			color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -251,21 +251,21 @@ private fun SwipePaginationLayout(
 		override suspend fun onPreFling(available: Velocity): Velocity {
 			if (state.isRunning) return Velocity.Zero
 			state.isReleaseEdge = state.indicatorOffset != 0f
-			return if (state.indicatorOffset >= headerHeightPx && state.isReleaseEdge && state.refreshStatus != PaginationStatus.RUNNING) {
+			return if (state.indicatorOffset >= headerHeightPx && state.isReleaseEdge && state.refreshStatus != RUNNING) {
 				state.isAnimateOver = false
-				state.refreshStatus = PaginationStatus.RUNNING
+				state.refreshStatus = RUNNING
 				state.animateOffsetTo(headerHeightPx)
 				onRefresh?.invoke()
-				state.refreshStatus = PaginationStatus.IDLE
+				state.refreshStatus = IDLE
 				state.animateOffsetTo(0f)
 				available
 			}
-			else if (state.indicatorOffset <= -footerHeightPx && state.isReleaseEdge && state.loadingStatus != PaginationStatus.RUNNING) {
+			else if (state.indicatorOffset <= -footerHeightPx && state.isReleaseEdge && state.loadingStatus != RUNNING) {
 				state.isAnimateOver = false
-				state.loadingStatus = PaginationStatus.RUNNING
+				state.loadingStatus = RUNNING
 				state.animateOffsetTo(-footerHeightPx)
 				onLoading?.invoke()
-				state.loadingStatus = PaginationStatus.IDLE
+				state.loadingStatus = IDLE
 				state.animateOffsetTo(0f)
 				available
 			}
@@ -274,12 +274,12 @@ private fun SwipePaginationLayout(
 
 		override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
 			if (state.isRunning) return Velocity.Zero
-			if (state.indicatorOffset > 0 && state.refreshStatus != PaginationStatus.RUNNING) {
-				state.refreshStatus = PaginationStatus.IDLE
+			if (state.indicatorOffset > 0 && state.refreshStatus != RUNNING) {
+				state.refreshStatus = IDLE
 				state.animateOffsetTo(0f)
 			}
-			else if (state.indicatorOffset < 0 && state.loadingStatus != PaginationStatus.RUNNING) {
-				state.loadingStatus = PaginationStatus.IDLE
+			else if (state.indicatorOffset < 0 && state.loadingStatus != RUNNING) {
+				state.loadingStatus = IDLE
 				state.animateOffsetTo(0f)
 			}
 			return super.onPostFling(consumed, available)
@@ -313,16 +313,16 @@ private fun DefaultClickPaginationIndicator(
 ) {
 	Box(
 		modifier = Modifier.fillMaxWidth().clickable(onClick = onLoading),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Row(
 			modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
 		) {
-			if (status == PaginationStatus.RUNNING) LoadingAnimation(size = ThemeValue.Size.MediumIcon)
+			if (status == RUNNING) LoadingAnimation(size = ThemeValue.Size.MediumIcon)
 			else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.MediumIcon)
-			Text(text = if (status == PaginationStatus.RUNNING) "加载中..." else "加载更多")
+			Text(text = if (status == RUNNING) "加载中..." else "加载更多")
 		}
 	}
 }
@@ -344,7 +344,7 @@ private fun <T> ClickPaginationColumn(
 	itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by rememberState { PaginationStatus.IDLE }
+	var status: PaginationStatus by rememberState { IDLE }
 	LazyColumn(
 		state = state,
 		contentPadding = contentPadding,
@@ -364,11 +364,11 @@ private fun <T> ClickPaginationColumn(
 		if (canLoading) {
 			item(key = Unit) {
 				indicator(status) {
-					if (status != PaginationStatus.RUNNING) {
+					if (status != RUNNING) {
 						scope.launch {
-							status = PaginationStatus.RUNNING
+							status = RUNNING
 							onLoading?.invoke()
-							status = PaginationStatus.IDLE
+							status = IDLE
 						}
 					}
 				}
@@ -394,7 +394,7 @@ private fun <T> ClickPaginationGrid(
 	itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by rememberState { PaginationStatus.IDLE }
+	var status: PaginationStatus by rememberState { IDLE }
 	LazyVerticalGrid(
 		columns = columns,
 		state = state,
@@ -418,11 +418,11 @@ private fun <T> ClickPaginationGrid(
 				span = { GridItemSpan(maxLineSpan) }
 			) {
 				indicator(status) {
-					if (status != PaginationStatus.RUNNING) {
+					if (status != RUNNING) {
 						scope.launch {
-							status = PaginationStatus.RUNNING
+							status = RUNNING
 							onLoading?.invoke()
-							status = PaginationStatus.IDLE
+							status = IDLE
 						}
 					}
 				}
@@ -448,7 +448,7 @@ private fun <T> ClickPaginationStaggeredGrid(
 	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
-	var status by rememberState { PaginationStatus.IDLE }
+	var status: PaginationStatus by rememberState { IDLE }
 	LazyVerticalStaggeredGrid(
 		columns = columns,
 		state = state,
@@ -472,11 +472,11 @@ private fun <T> ClickPaginationStaggeredGrid(
 				span = StaggeredGridItemSpan.FullLine
 			) {
 				indicator(status) {
-					if (status != PaginationStatus.RUNNING) {
+					if (status != RUNNING) {
 						scope.launch {
-							status = PaginationStatus.RUNNING
+							status = RUNNING
 							onLoading?.invoke()
-							status = PaginationStatus.IDLE
+							status = IDLE
 						}
 					}
 				}

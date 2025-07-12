@@ -26,7 +26,7 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
     actual var url: String get() = mUrl
         set(value) { webview.value?.loadRequest(NSMutableURLRequest(NSURL(string = value))) }
 
-    internal var mLoadingState: WebPageLoadingState by mutableStateOf(WebPageLoadingState.Initializing)
+    internal var mLoadingState: WebPageLoadingState by mutableStateOf(Initializing)
     actual val loadingState: WebPageLoadingState get() = mLoadingState
 
     internal var mTitle: String by mutableStateOf("")
@@ -55,7 +55,7 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
         @ObjCSignatureOverride
         override fun webView(webView: WKWebView, didFinishNavigation: WKNavigation?) {
             webView.URL?.absoluteString?.let { mUrl = it }
-            mLoadingState = WebPageLoadingState.Finished
+            mLoadingState = Finished
             webView.title?.let { mTitle = it }
         }
 

@@ -21,21 +21,19 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.app
 import love.yinlin.platform.platform
-import love.yinlin.ui.component.screen.*
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.PrimaryLoadingButton
+import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
@@ -49,7 +47,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 
 	private var inviters by mutableStateOf(emptyList<String>())
 
-	private var mode by mutableStateOf(Mode.Login)
+	private var mode: Mode by mutableStateOf(Login)
 	private val loginId = TextInputState()
 	private val loginPwd = TextInputState()
 	private val registerId = TextInputState()
@@ -79,13 +77,13 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			)
 		)
 		when (result1) {
-			is Data.Success -> {
+			is Success -> {
 				val token = result1.data
 				app.config.userShortToken = DateEx.CurrentLong
 				app.config.userToken = token
 				pop()
 			}
-			is Data.Error -> slot.tip.error(result1.message)
+			is Failure -> slot.tip.error(result1.message)
 		}
 	}
 
@@ -115,13 +113,13 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			)
 		)
 		when (result) {
-			is Data.Success -> {
-				mode = Mode.Login
+			is Success -> {
+				mode = Login
 				loginId.text = id
 				loginPwd.text = ""
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -140,13 +138,13 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			)
 		)
 		when (result) {
-			is Data.Success -> {
-				mode = Mode.Login
+			is Success -> {
+				mode = Login
 				loginId.text = id
 				loginPwd.text = ""
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -168,7 +166,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = loginPwd,
 				hint = "密码",
-				inputType = InputType.PASSWORD,
+				inputType = PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH,
 				onImeClick = {
 					if (canLogin) launch { login() }
@@ -183,7 +181,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					text = "没有账号?",
 					color = MaterialTheme.colorScheme.primary,
 					modifier = Modifier.clickable {
-						mode = Mode.Register
+						mode = Register
 						registerId.text = loginId.text
 						registerPwd.text = ""
 						registerPwd2.text = ""
@@ -194,7 +192,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					text = "忘记密码?",
 					color = MaterialTheme.colorScheme.primary,
 					modifier = Modifier.clickable {
-						mode = Mode.ForgotPassword
+						mode = ForgotPassword
 						forgotPasswordId.text = loginId.text
 						forgotPasswordPwd.text = ""
 					}
@@ -227,7 +225,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd,
 				hint = "密码",
-				inputType = InputType.PASSWORD,
+				inputType = PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH,
 				imeAction = ImeAction.Next
 			)
@@ -235,7 +233,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = registerPwd2,
 				hint = "确认密码",
-				inputType = InputType.PASSWORD,
+				inputType = PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH,
 				imeAction = ImeAction.Next
 			)
@@ -278,7 +276,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				text = "返回登录",
 				color = MaterialTheme.colorScheme.primary,
 				modifier = Modifier.align(Alignment.End).clickable {
-					mode = Mode.Login
+					mode = Login
 					loginId.text = ""
 					loginPwd.text = ""
 				}
@@ -310,7 +308,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				modifier = Modifier.fillMaxWidth(),
 				state = forgotPasswordPwd,
 				hint = "新密码",
-				inputType = InputType.PASSWORD,
+				inputType = PASSWORD,
 				maxLength = UserConstraint.MAX_PWD_LENGTH,
 				onImeClick = {
 					if (canForgotPassword) launch { forgotPassword() }
@@ -320,7 +318,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				text = "返回登录",
 				color = MaterialTheme.colorScheme.primary,
 				modifier = Modifier.align(Alignment.End).clickable {
-					mode = Mode.Login
+					mode = Login
 					loginId.text = ""
 					loginPwd.text = ""
 				}
@@ -341,9 +339,9 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			modifier = modifier
 		) { animatedMode ->
 			when (animatedMode) {
-				Mode.Login -> ContentLogin(modifier = Modifier.fillMaxSize())
-				Mode.Register -> ContentRegister(modifier = Modifier.fillMaxSize())
-				Mode.ForgotPassword -> ContentForgotPassword(modifier = Modifier.fillMaxSize())
+				Login -> ContentLogin(modifier = Modifier.fillMaxSize())
+				Register -> ContentRegister(modifier = Modifier.fillMaxSize())
+				ForgotPassword -> ContentForgotPassword(modifier = Modifier.fillMaxSize())
 			}
 		}
 	}
@@ -378,7 +376,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		) {
 			Box(
 				modifier = Modifier.weight(1f).fillMaxHeight(),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				MiniIcon(
 					res = Res.drawable.img_logo,
@@ -387,7 +385,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			}
 			Box(
 				modifier = Modifier.weight(2f).fillMaxHeight(),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				ContentBox(modifier = Modifier.fillMaxSize())
 			}
@@ -396,20 +394,20 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 
 	override val title: String by derivedStateOf {
 		when (mode) {
-			Mode.Login -> "登录"
-			Mode.Register -> "注册"
-			Mode.ForgotPassword -> "忘记密码"
+			Login -> "登录"
+			Register -> "注册"
+			ForgotPassword -> "忘记密码"
 		}
 	}
 
 	override suspend fun initialize() {
 		val result = ClientAPI.request(route = API.User.Account.GetInviters)
-		if (result is Data.Success) inviters = result.data
+		if (result is Success) inviters = result.data
 	}
 
 	@Composable
 	override fun SubContent(device: Device) = when (device.type) {
-		Device.Type.PORTRAIT -> Portrait()
-		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+		PORTRAIT -> Portrait()
+		LANDSCAPE, SQUARE -> Landscape()
 	}
 }

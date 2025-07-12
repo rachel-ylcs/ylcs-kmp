@@ -6,7 +6,6 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
-import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameRank

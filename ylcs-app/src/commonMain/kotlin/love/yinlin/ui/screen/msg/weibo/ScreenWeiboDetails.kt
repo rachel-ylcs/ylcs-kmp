@@ -17,7 +17,6 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
@@ -165,7 +164,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 	override suspend fun initialize() {
 		weibo?.let {
 			val data = WeiboAPI.getWeiboDetails(it.id)
-			comments = if (data is Data.Success) data.data else emptyList()
+			comments = if (data is Success) data.data else emptyList()
 		}
 	}
 
@@ -176,8 +175,8 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			weibo?.let {
 				when (device.type) {
-					Device.Type.PORTRAIT -> Portrait(weibo = it)
-					Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(weibo = it)
+					PORTRAIT -> Portrait(weibo = it)
+					LANDSCAPE, SQUARE -> Landscape(weibo = it)
 				}
 			} ?: EmptyBox()
 		}

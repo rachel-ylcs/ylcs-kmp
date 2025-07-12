@@ -39,8 +39,8 @@ private sealed interface GameLockState {
 
 @Stable
 class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
-    private var state: GameState by mutableStateOf(GameState.Loading)
-    private var lockState: GameLockState by mutableStateOf(GameLockState.Normal)
+    private var state: GameState by mutableStateOf(Loading)
+    private var lockState: GameLockState by mutableStateOf(Normal)
 
     private fun pauseGame() {
 
@@ -76,10 +76,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameOverlay(modifier: Modifier) {
         Box(modifier = modifier) {
             when (state) {
-                GameState.Loading -> GameOverlayLoading()
-                GameState.Start -> GameOverlayStart()
-                GameState.Playing -> GameOverlayPlaying()
-                GameState.Settling -> GameOverlaySettling()
+                Loading -> GameOverlayLoading()
+                Start -> GameOverlayStart()
+                Playing -> GameOverlayPlaying()
+                Settling -> GameOverlaySettling()
             }
         }
     }
@@ -87,7 +87,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun GameScrimMask(modifier: Modifier) {
         Box(modifier = modifier) {
-            if (lockState !is GameLockState.Normal) {
+            if (lockState !is Normal) {
                 Box(modifier = modifier
                     .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
                     .clickableNoRipple { }
@@ -113,17 +113,17 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     override suspend fun initialize() {
         // 加载游戏
         delay(3000L)
-        state = GameState.Start
+        state = Start
     }
 
     @Composable
     override fun SubContent(device: Device) {
         LaunchedEffect(device.type) {
-            if (device.type == Device.Type.LANDSCAPE) {
-                if (lockState is GameLockState.PortraitLock) resumePauseTimer()
+            if (device.type == LANDSCAPE) {
+                if (lockState is PortraitLock) resumePauseTimer()
             }
             else {
-                lockState = GameLockState.PortraitLock
+                lockState = PortraitLock
                 pauseGame()
             }
         }

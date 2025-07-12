@@ -6,30 +6,18 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.SwapVert
-import androidx.compose.material.icons.outlined.Upload
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
@@ -38,9 +26,9 @@ import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.LoadingRachelButton
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
@@ -72,7 +60,7 @@ private fun WeiboUserItem(
 		}
 		Text(
 			text = user.name,
-			overflow = TextOverflow.Ellipsis,
+			overflow = Ellipsis,
 			modifier = Modifier.weight(1f)
 		)
 	}
@@ -81,7 +69,7 @@ private fun WeiboUserItem(
 @Stable
 class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 	private var isLocal by mutableStateOf(true)
-	private var state by mutableStateOf(BoxState.CONTENT)
+	private var state: BoxState by mutableStateOf(CONTENT)
 	private var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
 
 	private suspend fun refreshLocalUser() {
@@ -89,7 +77,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 		for ((index, user) in weiboUsers.withIndex()) {
 			if (user.avatar.isEmpty()) {
 				val data = WeiboAPI.getWeiboUser(user.id)
-				if (data is Data.Success) weiboUsers[index] = data.data.info
+				if (data is Success) weiboUsers[index] = data.data.info
 			}
 		}
 		isLocal = true
@@ -97,14 +85,14 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
 
 	private suspend fun onSearchWeiboUser() {
 		searchDialog.openSuspend()?.let { key ->
-			state = BoxState.LOADING
+			state = LOADING
 			val result = WeiboAPI.searchWeiboUser(key)
-			if (result is Data.Success) {
+			if (result is Success) {
 				val data = result.data
 				searchResult = data
-				state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+				state = if (data.isEmpty()) EMPTY else CONTENT
 			}
-			else state = BoxState.NETWORK_ERROR
+			else state = NETWORK_ERROR
 			isLocal = false
 		}
 	}

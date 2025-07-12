@@ -29,23 +29,23 @@ val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, Music
 val MusicInfo.videoPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Video.default.toString())
 
 val MusicResourceType?.background: Brush get() = when (this) {
-    MusicResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
-    MusicResourceType.Audio -> Brush.linearGradient(listOf(Colors.Pink3, Colors.Pink4, Colors.Pink5))
+    Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
+    Audio -> Brush.linearGradient(listOf(Colors.Pink3, Colors.Pink4, Colors.Pink5))
     MusicResourceType.Record -> Brush.linearGradient(listOf(Colors.Purple3, Colors.Purple4, Colors.Purple5))
-    MusicResourceType.Background -> Brush.linearGradient(listOf(Colors.Blue3, Colors.Blue4, Colors.Blue5))
+    Background -> Brush.linearGradient(listOf(Colors.Blue3, Colors.Blue4, Colors.Blue5))
     MusicResourceType.Animation -> Brush.linearGradient(listOf(Colors.Orange3, Colors.Orange4, Colors.Orange5))
-    MusicResourceType.LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
-    MusicResourceType.Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
+    LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
+    Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
     null -> Brush.linearGradient(listOf(Colors.Gray3, Colors.Gray4, Colors.Gray5))
 }
 
 val MusicResourceType?.icon: ImageVector get() = when (this) {
-    MusicResourceType.Config -> Icons.Outlined.Construction
-    MusicResourceType.Audio -> Icons.Outlined.AudioFile
+    Config -> Icons.Outlined.Construction
+    Audio -> Icons.Outlined.AudioFile
     MusicResourceType.Record -> Icons.Outlined.Album
-    MusicResourceType.Background -> Icons.Outlined.Image
+    Background -> Icons.Outlined.Image
     MusicResourceType.Animation -> Icons.Outlined.GifBox
-    MusicResourceType.LineLyrics -> Icons.Outlined.Lyrics
-    MusicResourceType.Video -> Icons.Outlined.Movie
+    LineLyrics -> Icons.Outlined.Lyrics
+    Video -> Icons.Outlined.Movie
     null -> Icons.Outlined.QuestionMark
 }

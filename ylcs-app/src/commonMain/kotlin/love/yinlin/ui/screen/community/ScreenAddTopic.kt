@@ -19,23 +19,17 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
-import love.yinlin.platform.ImageCompress
-import love.yinlin.platform.ImageProcessor
-import love.yinlin.platform.ImageQuality
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.app
+import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.input.SingleSelector
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.RichEditor
 import love.yinlin.ui.component.text.RichEditorState
@@ -61,7 +55,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
         Picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
                 OS.Storage.createTempFile { sink ->
-                    ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
+                    ImageProcessor(ImageCompress, quality = High).process(source, sink)
                 }?.let {
                     input.pics += Picture(it.toString())
                 }
@@ -91,7 +85,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
             }
         )
         when (result) {
-            is Data.Success -> {
+            is Success -> {
                 val (tid, pic) = result.data
                 val currentSection = discoveryPart.currentSection
                 if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
@@ -110,7 +104,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                 app.config.editedTopic = null
                 pop()
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Failure -> slot.tip.error(result.message)
         }
     }
 

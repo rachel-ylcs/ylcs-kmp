@@ -22,8 +22,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.profile.UserProfile
@@ -71,7 +69,7 @@ internal fun UserBar(
 				text = name,
 				style = MaterialTheme.typography.labelMedium,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
+				overflow = Ellipsis,
 				modifier = Modifier.fillMaxWidth()
 			)
 			Text(
@@ -79,7 +77,7 @@ internal fun UserBar(
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				style = MaterialTheme.typography.bodySmall,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis,
+				overflow = Ellipsis,
 				modifier = Modifier.fillMaxWidth()
 			)
 		}
@@ -97,7 +95,7 @@ internal fun BoxText(
 		modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace / 2)
 			.border(ThemeValue.Border.Small, color = color)
 			.condition(onClick != null) { clickable { onClick?.invoke() } },
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Text(
 			text = text,
@@ -158,7 +156,7 @@ internal fun UserProfileInfo(
 					text = profile.name,
 					style = MaterialTheme.typography.labelLarge,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth()
 				)
 				UserLabel(
@@ -208,7 +206,7 @@ internal fun UserProfileCard(
 						text = profile.signature,
 						style = MaterialTheme.typography.bodySmall,
 						maxLines = 2,
-						overflow = TextOverflow.Ellipsis,
+						overflow = Ellipsis,
 						modifier = Modifier.fillMaxWidth()
 					)
 				}
@@ -231,7 +229,7 @@ internal fun UserProfileCard(
                         value = profile.coin.toString(),
                         title = "银币"
                     )
-					PortraitValue(
+                    PortraitValue(
 						value = profile.follows.toString(),
 						title = "关注",
 						modifier = Modifier.clickableNoRipple { onFollowClick(FollowTabItem.FOLLOWS.ordinal) }
@@ -280,7 +278,7 @@ internal fun UserPublicProfileCard(
                         text = profile.signature,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = Ellipsis,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -344,9 +342,9 @@ data class TipButtonScope(private val equalRowScope: EqualRowScope) {
 								Text(
 									text = labelString,
 									color = MaterialTheme.colorScheme.onError,
-									textAlign = TextAlign.Center,
+									textAlign = Center,
 									maxLines = 1,
-									overflow = TextOverflow.Clip
+									overflow = Clip
 								)
 							}
 						)
@@ -355,7 +353,7 @@ data class TipButtonScope(private val equalRowScope: EqualRowScope) {
 				Text(
 					text = text,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 		}

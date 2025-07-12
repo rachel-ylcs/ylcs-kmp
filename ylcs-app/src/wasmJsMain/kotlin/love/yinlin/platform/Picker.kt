@@ -1,11 +1,11 @@
 package love.yinlin.platform
 
-import io.ktor.utils.io.core.readBytes
 import kotlinx.browser.document
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
+import kotlinx.io.readByteArray
 import love.yinlin.common.ArrayBufferSource
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
@@ -102,7 +102,7 @@ actual object Picker {
 
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
         val blob = Coroutines.io {
-            val bytes = (origin as Buffer).readBytes()
+            val bytes = (origin as Buffer).readByteArray()
             Blob(listOf(bytes.toInt8Array()).toJsArray(), BlobPropertyBag(type = MimeType.ANY))
         }
         val url = URL.createObjectURL(blob)

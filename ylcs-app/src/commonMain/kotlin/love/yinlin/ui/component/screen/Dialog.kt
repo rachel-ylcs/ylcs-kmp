@@ -19,37 +19,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.catchingNull
-import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.OffsetLayout
+import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.stringResource
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
 @Stable
 abstract class FloatingDialog<R>() : Floating<Unit>() {
-	override fun alignment(device: Device): Alignment = Alignment.Center
+	override fun alignment(device: Device): Alignment = Center
 	override fun enter(device: Device): EnterTransition = scaleIn(
 		animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)) +
 			fadeIn(tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)
@@ -110,19 +106,19 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 			val sizeType = LocalDevice.current.size
 
 			val rachelWidth = when (sizeType) {
-				Device.Size.SMALL -> 140.dp
-				Device.Size.MEDIUM -> 150.dp
-				Device.Size.LARGE -> 160.dp
+				SMALL -> 140.dp
+				MEDIUM -> 150.dp
+				LARGE -> 160.dp
 			}
 			val minContentHeight = when (sizeType) {
-				Device.Size.SMALL -> 50.dp
-				Device.Size.MEDIUM -> 45.dp
-				Device.Size.LARGE -> 40.dp
+				SMALL -> 50.dp
+				MEDIUM -> 45.dp
+				LARGE -> 40.dp
 			}
 			val maxContentHeight = when (sizeType) {
-				Device.Size.SMALL -> 260.dp
-				Device.Size.MEDIUM -> 280.dp
-				Device.Size.LARGE -> 300.dp
+				SMALL -> 260.dp
+				MEDIUM -> 280.dp
+				LARGE -> 300.dp
 			}
 
 			Column(
@@ -157,7 +153,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 								style = MaterialTheme.typography.titleLarge,
 								color = MaterialTheme.colorScheme.primary,
 								maxLines = 1,
-								overflow = TextOverflow.Ellipsis,
+								overflow = Ellipsis,
 								modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
 							)
 						}
@@ -254,7 +250,7 @@ open class FloatingDialogConfirm(
 @Stable
 open class FloatingDialogInput(
 	val hint: String = "",
-	val inputType: InputType = InputType.COMMON,
+	val inputType: InputType = COMMON,
 	val maxLength: Int = 0,
 	val maxLines: Int = 1,
 	val minLines: Int = maxLines,
@@ -420,7 +416,7 @@ open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
 		current = "0"
 		total = "0"
 		progress = 0f
-		CoroutineScope(coroutineContext).launch { awaitResult() }
+        Coroutines.startCurrent { awaitResult() }
 	}
 
 	@Composable
@@ -443,16 +439,16 @@ open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
 				) {
 					Text(
 						text = "${(progress * 100).roundToInt()}%",
-						textAlign = TextAlign.Start,
+						textAlign = Start,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
+						overflow = Ellipsis,
 						modifier = Modifier.weight(1f)
 					)
 					Text(
 						text = "$current / $total",
-						textAlign = TextAlign.End,
+						textAlign = End,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
+						overflow = Ellipsis,
 						modifier = Modifier.weight(1f)
 					)
 				}
@@ -467,7 +463,7 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
 	override val dismissOnClickOutside: Boolean = false
 
 	suspend fun openSuspend() {
-		CoroutineScope(coroutineContext).launch { awaitResult() }
+        Coroutines.startCurrent { awaitResult() }
 	}
 
 	@Composable

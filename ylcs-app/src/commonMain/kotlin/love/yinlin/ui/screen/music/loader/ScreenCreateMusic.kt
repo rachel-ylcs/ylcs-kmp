@@ -15,10 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import io.ktor.utils.io.core.writeText
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.writeString
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
@@ -72,7 +72,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                 OS.Storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
-                        ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
+                        ImageProcessor(ImageCrop(rect), quality = Full).process(source, sink)
                     }
                 }?.let { onPicAdd(it) }
             }
@@ -123,7 +123,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
                 chorus = null
             )
             SystemFileSystem.sink(info.configPath).buffered().use { sink ->
-                sink.writeText(info.toJsonString())
+                sink.writeString(info.toJsonString())
             }
             // 6. 写入音频
             SystemFileSystem.sink(info.audioPath).buffered().use { sink ->
@@ -145,7 +145,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             }
             // 9. 写入歌词
             SystemFileSystem.sink(info.lyricsPath).buffered().use { sink ->
-                sink.writeText(lyrics.toString())
+                sink.writeString(lyrics.toString())
             }
             // 10. 更新曲库
             app.musicFactory.updateMusicLibraryInfo(listOf(id))

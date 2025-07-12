@@ -6,7 +6,7 @@ import love.yinlin.api.API
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserPrivilege
@@ -31,7 +31,7 @@ fun Routing.songAPI(implMap: ImplMap){
 			FROM song
             WHERE id = ?
         """, id)
-        if (song == null) "此歌曲未收录".failedData else Data.Success(song.to())
+        if (song == null) "此歌曲未收录".failureData else Data.Success(song.to())
     }
 
     api(API.User.Song.SearchSongs) { key ->
@@ -76,7 +76,7 @@ fun Routing.songAPI(implMap: ImplMap){
             SELECT 1 FROM song_comment WHERE uid = ? AND cid = ? AND isDeleted = 0
             UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, cid, uid) == null) return@api "无权限".failedData
+        """, uid, cid, uid) == null) return@api "无权限".failureData
         // 逻辑删除
         DB.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
         "删除成功".successData

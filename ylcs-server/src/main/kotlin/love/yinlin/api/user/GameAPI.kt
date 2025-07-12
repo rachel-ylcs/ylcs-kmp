@@ -32,7 +32,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         try {
             type.manager.check(info, question, answer)
         } catch (_: Throwable) {
-            return@api "数据配置非法".failedData
+            return@api "数据配置非法".failureData
         }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
@@ -44,7 +44,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
                     "[]", info.toJsonString(), question.toJsonString(), answer.toJsonString()).toInt()
                 Data.Success(gid, "创建成功")
             }
-            else "银币不足".failedData
+            else "银币不足".failureData
         }
     }
 
@@ -57,7 +57,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
             if (userUid != uid) {
                 if (it.querySQLSingle("""
                     SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-                """, uid) == null) return@throwTransaction "无权限".failedData
+                """, uid) == null) return@throwTransaction "无权限".failureData
             }
             val reward = result["reward"].Int
             val useReward = (reward / result["num"].Int) * result["winner"].Array.size
@@ -139,9 +139,9 @@ fun Routing.gameAPI(implMap: ImplMap) {
             FROM game
             WHERE gid = ? AND isDeleted = 0
         """, gid).to<GameDetails>()
-        if (details.uid == uid) "不能参与自己创建的游戏哦".failedData
-            else if (details.isCompleted) "不能参与已经结算的游戏哦".failedData
-            else if (uid in details.winner) "不能参与完成过的游戏哦".failedData
+        if (details.uid == uid) "不能参与自己创建的游戏哦".failureData
+            else if (details.isCompleted) "不能参与已经结算的游戏哦".failureData
+            else if (uid in details.winner) "不能参与完成过的游戏哦".failureData
             else details.type.manager.preflight(uid, details).map { it.copy(info = details.info, question = details.question) }
     }
 
@@ -158,9 +158,9 @@ fun Routing.gameAPI(implMap: ImplMap) {
             FROM game
             WHERE gid = ? AND isDeleted = 0
         """, gid).to<GameDetails>()
-        if (details.uid == uid) "不能参与自己创建的游戏哦".failedData
-        else if (details.isCompleted) "不能参与已经结算的游戏哦".failedData
-        else if (uid in details.winner) "不能参与完成过的游戏哦".failedData
+        if (details.uid == uid) "不能参与自己创建的游戏哦".failureData
+        else if (details.isCompleted) "不能参与已经结算的游戏哦".failureData
+        else if (uid in details.winner) "不能参与完成过的游戏哦".failureData
         else details.type.manager.verify(uid, details, record, answer)
     }
 }

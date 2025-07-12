@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -31,29 +30,27 @@ import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
+import love.yinlin.common.*
+import love.yinlin.data.Data.Failure
+import love.yinlin.data.Data.Success
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_music_record
+import love.yinlin.resources.no_audio_source
+import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.input.ProgressSlider
@@ -86,7 +83,7 @@ private fun PlayingMusicStatusCard(
 				style = MaterialTheme.typography.labelMedium,
 				color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
 				maxLines = 1,
-				overflow = TextOverflow.MiddleEllipsis
+				overflow = MiddleEllipsis
 			)
 		},
 		right = {
@@ -94,7 +91,7 @@ private fun PlayingMusicStatusCard(
 				text = musicInfo.singer,
 				style = MaterialTheme.typography.bodySmall,
 				maxLines = 1,
-				overflow = TextOverflow.MiddleEllipsis,
+				overflow = MiddleEllipsis,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 			)
 		}
@@ -124,8 +121,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					data = musicInfo.id
 				)
 				when (result) {
-					is Data.Success -> navigate(ScreenSongDetails.Args(song = result.data))
-					is Data.Error -> slot.tip.error(result.message)
+					is Success -> navigate(ScreenSongDetails.Args(song = result.data))
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -246,7 +243,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		OffsetLayout(y = offset) {
 			Box(
 				modifier = modifier,
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				Image(
 					painter = painterResource(Res.drawable.img_music_record),
@@ -286,17 +283,17 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
 					color = MaterialTheme.colorScheme.primary,
 					style = MaterialTheme.typography.titleLarge,
-					textAlign = TextAlign.Center,
+					textAlign = Center,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 				Text(
 					text = musicInfo?.singer ?: stringResource(Res.string.unknown_singer),
 					color = Colors.White,
 					style = MaterialTheme.typography.bodyMedium,
-					textAlign = TextAlign.Center,
+					textAlign = Center,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 		}
@@ -314,17 +311,17 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
 				color = MaterialTheme.colorScheme.primary,
 				style = MaterialTheme.typography.displayMedium,
-				textAlign = TextAlign.Center,
+				textAlign = Center,
 				maxLines = 2,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 			Text(
 				text = musicInfo?.singer ?: stringResource(Res.string.unknown_singer),
 				color = Colors.White,
 				style = MaterialTheme.typography.headlineSmall,
-				textAlign = TextAlign.Center,
+				textAlign = Center,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 		}
 	}
@@ -348,7 +345,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			Text(
 				text = remember(duration) { duration.timeString },
 				color = Colors.White,
-				textAlign = TextAlign.End,
+				textAlign = End,
 				modifier = Modifier.weight(1f)
 			)
 		}
@@ -442,9 +439,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			EqualItem {
 				ClickIcon(
 					icon = when (factory.playMode) {
-                        MusicPlayMode.ORDER -> ExtraIcons.OrderMode
-                        MusicPlayMode.LOOP -> ExtraIcons.LoopMode
-                        MusicPlayMode.RANDOM -> ExtraIcons.ShuffleMode
+                        ORDER -> ExtraIcons.OrderMode
+                        LOOP -> ExtraIcons.LoopMode
+                        RANDOM -> ExtraIcons.ShuffleMode
                     },
                     tip = "播放模式",
 					color = Colors.White,
@@ -644,7 +641,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					Box(
 						modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue)
 							.fillMaxWidth().weight(1f),
-						contentAlignment = Alignment.Center
+						contentAlignment = Center
 					) {
 						val musicInfo = factory.currentMusic
 						if (musicInfo != null) {
@@ -669,7 +666,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			}
 			Box(
 				modifier = Modifier.fillMaxHeight().aspectRatio(0.6f),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				MusicBackground(
 					alpha = 0.7f,
@@ -708,7 +705,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					Box(
 						modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue)
 							.fillMaxWidth().weight(1f),
-						contentAlignment = Alignment.Center
+						contentAlignment = Center
 					) {
 						val musicInfo = factory.currentMusic
 						if (musicInfo != null) {
@@ -731,7 +728,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					) {
 						Box(
 							modifier = Modifier.width(ThemeValue.Size.CellWidth * 0.8f).fillMaxHeight(),
-							contentAlignment = Alignment.Center
+							contentAlignment = Center
 						) {
 							LandscapeMusicInfoLayout(modifier = Modifier.fillMaxWidth())
 						}
@@ -745,7 +742,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			}
 			Box(
 				modifier = Modifier.fillMaxHeight().aspectRatio(0.65f),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				MusicBackground(
 					alpha = 0.7f,
@@ -773,7 +770,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (musicInfo != null) catching {
 				Coroutines.io {
 					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-						lyrics.parseLrcString(source.readText())
+						lyrics.parseLrcString(source.readString())
 					}
 					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
 					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
@@ -795,9 +792,9 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> Portrait()
-			Device.Type.SQUARE -> Square()
-			Device.Type.LANDSCAPE -> Landscape()
+			PORTRAIT -> Portrait()
+			SQUARE -> Square()
+			LANDSCAPE -> Landscape()
 		}
 	}
 

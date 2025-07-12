@@ -24,21 +24,23 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_damai
+import love.yinlin.resources.img_maoyan
+import love.yinlin.resources.img_showstart
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
-import love.yinlin.resources.*
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 
 @Composable
@@ -107,11 +109,13 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 				aid = args.aid
 			)
 		)
-		if (result is Data.Success) {
-			msgPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
-			pop()
-		}
-		else if (result is Data.Error) slot.tip.error(result.message)
+        when (result) {
+            is Success -> {
+                msgPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
+                pop()
+            }
+            is Failure -> slot.tip.error(result.message)
+        }
 	}
 
 	@Composable
@@ -244,8 +248,8 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 	@Composable
 	override fun SubContent(device: Device) = activity?.let {
 		when (device.type) {
-			Device.Type.PORTRAIT -> Portrait(it)
-			Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
+			PORTRAIT -> Portrait(it)
+			LANDSCAPE, SQUARE -> Landscape(it)
 		}
 	} ?: EmptyBox()
 }

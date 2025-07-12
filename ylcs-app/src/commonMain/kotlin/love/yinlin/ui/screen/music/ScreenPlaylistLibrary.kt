@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -32,12 +31,12 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.*
 import love.yinlin.platform.app
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.container.Tree
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -84,15 +83,15 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             textAlign = TextAlign.Start,
             maxLines = 1,
-            overflow = TextOverflow.MiddleEllipsis,
+            overflow = MiddleEllipsis,
             modifier = Modifier.weight(2f)
         )
         Text(
             text = musicInfo.singer,
             style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
+            textAlign = End,
             maxLines = 1,
-            overflow = TextOverflow.MiddleEllipsis,
+            overflow = MiddleEllipsis,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
@@ -288,16 +287,16 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
             data = app.config.userToken
         )
         return when (result) {
-            is Data.Success -> {
+            is Success -> {
                 try {
                     val playlists: Map<String, MusicPlaylist> = result.data.to()
                     Data.Success(decodePlaylist(playlists))
                 }
                 catch (e: Throwable) {
-                    Data.Error(message = "云端歌单存在异常", throwable = e)
+                    Data.Failure(message = "云端歌单存在异常", throwable = e)
                 }
             }
-            is Data.Error -> result
+            is Failure -> result
         }
     }
 
@@ -336,7 +335,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         override suspend fun initialize() {
             playlists = emptyMap()
             val result = downloadCloudPlaylist()
-            if (result is Data.Success) playlists = result.data
+            if (result is Success) playlists = result.data
         }
 
         @Composable
@@ -413,11 +412,11 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                     )
                                 )
                                 when (result) {
-                                    is Data.Success -> {
+                                    is Success -> {
                                         playlists = decodePlaylist(playlistLibrary.items)
                                         slot.tip.success(result.message)
                                     }
-                                    is Data.Error -> slot.tip.error(result.message)
+                                    is Failure -> slot.tip.error(result.message)
                                 }
                             }
                         }

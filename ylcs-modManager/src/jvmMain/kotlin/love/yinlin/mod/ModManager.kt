@@ -124,14 +124,14 @@ private fun MergeUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Idle) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
     var filename by remember { mutableStateOf("${System.currentTimeMillis()}.rachel") }
     val filters = remember { MusicResourceType.entries.map { false }.toMutableStateList() }
 
     val reset = {
-        status = Status.Idle
+        status = Idle
         input = ""
         output = ""
         filename = "${System.currentTimeMillis()}.rachel"
@@ -237,7 +237,7 @@ private fun MergeUI(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ClickButton("运行") {
-                if (status !is Status.Idle) {
+                if (status !is Idle) {
                     status = Status.Error("请先重置")
                     return@ClickButton
                 }
@@ -270,11 +270,11 @@ private fun MergeUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
-                        is Data.Success -> Status.Completed
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Success -> Completed
+                        is Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }
@@ -288,12 +288,12 @@ private fun ReleaseUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Idle) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
 
     val reset = {
-        status = Status.Idle
+        status = Idle
         input = ""
         output = ""
     }
@@ -364,7 +364,7 @@ private fun ReleaseUI(
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ClickButton("运行") {
-                if (status !is Status.Idle) {
+                if (status !is Idle) {
                     status = Status.Error("请先重置")
                     return@ClickButton
                 }
@@ -385,11 +385,11 @@ private fun ReleaseUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
-                        is Data.Success -> Status.Completed
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Success -> Completed
+                        is Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }
@@ -486,12 +486,12 @@ private fun PreviewUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Idle) }
     var input by remember { mutableStateOf("") }
     var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null) }
 
     val reset = {
-        status = Status.Idle
+        status = Idle
         input = ""
         preview = null
     }
@@ -529,7 +529,7 @@ private fun PreviewUI(
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ClickButton("预览") {
-                if (status !is Status.Idle) {
+                if (status !is Idle) {
                     status = Status.Error("请先重置")
                     return@ClickButton
                 }
@@ -545,14 +545,14 @@ private fun PreviewUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
-                        is Data.Success -> {
+                        is Success -> {
                             preview = result.data
-                            Status.Completed
+                            Completed
                         }
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }
@@ -585,7 +585,7 @@ private fun MainUI() {
 fun main() = singleWindowApplication(
     title = "Mod管理器",
     state = WindowState(
-        position = WindowPosition(Alignment.Center),
+        position = WindowPosition(Center),
         size = DpSize(1200.dp, 800.dp)
     )
 ) {

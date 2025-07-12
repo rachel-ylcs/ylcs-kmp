@@ -52,7 +52,7 @@ fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState
 fun TextInput(
 	state: TextInputState,
 	hint: String? = null,
-	inputType: InputType = InputType.COMMON,
+	inputType: InputType = COMMON,
 	readOnly: Boolean = false,
 	maxLength: Int = 0,
 	maxLines: Int = 1,
@@ -91,15 +91,15 @@ fun TextInput(
 		readOnly = readOnly,
 		visualTransformation = remember(inputType) {
 			when (inputType) {
-				InputType.COMMON -> VisualTransformation.None
-				InputType.PASSWORD -> PasswordVisualTransformation()
+				COMMON -> VisualTransformation.None
+				PASSWORD -> PasswordVisualTransformation()
 			}
 		},
 		keyboardOptions = remember(inputType, imeAction) {
 			KeyboardOptions(
 				keyboardType = when (inputType) {
-					InputType.COMMON -> KeyboardType.Text
-					InputType.PASSWORD -> KeyboardType.Password
+					COMMON -> KeyboardType.Text
+					PASSWORD -> KeyboardType.Password
 				},
 				autoCorrectEnabled = false,
 				imeAction = imeAction

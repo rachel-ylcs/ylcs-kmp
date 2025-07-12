@@ -3,22 +3,18 @@ package love.yinlin.ui.component.screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.common.rememberImmersivePadding
+import love.yinlin.common.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitActionLayout
@@ -60,17 +56,17 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
 							.padding(immersivePadding.withoutBottom)
 							.fillMaxWidth()
 							.padding(vertical = ThemeValue.Padding.VerticalSpace),
-						contentAlignment = Alignment.Center
+						contentAlignment = Center
 					) {
 						Box(
 							modifier = Modifier.fillMaxWidth().zIndex(2f),
-							contentAlignment = Alignment.Center
+							contentAlignment = Center
 						) {
 							Text(
 								text = titleString,
 								style = MaterialTheme.typography.titleMedium,
 								maxLines = 1,
-								overflow = TextOverflow.Ellipsis
+								overflow = Ellipsis
 							)
 						}
 						SplitActionLayout(

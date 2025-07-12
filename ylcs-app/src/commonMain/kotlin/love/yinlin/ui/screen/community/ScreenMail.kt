@@ -8,11 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,15 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
@@ -45,7 +38,7 @@ import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage
 
 @Stable
 class ScreenMail(model: AppModel) : CommonSubScreen(model) {
-	private var state by mutableStateOf(BoxState.EMPTY)
+	private var state: BoxState by mutableStateOf(EMPTY)
 
 	private val page = object : PaginationArgs<Mail, Long, Long, Boolean>(Long.MAX_VALUE, false) {
 		override fun distinctValue(item: Mail): Long = item.mid
@@ -56,8 +49,8 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 	private val gridState = LazyGridState()
 
 	private suspend fun requestNewMails(loading: Boolean) {
-		if (state != BoxState.LOADING) {
-			if (loading) state = BoxState.LOADING
+		if (state != LOADING) {
+			if (loading) state = LOADING
 			val result = ClientAPI.request(
 				route = API.User.Mail.GetMails,
 				data = API.User.Mail.GetMails.Request(
@@ -65,9 +58,9 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 					num = page.pageNum
 				)
 			)
-			state = if (result is Data.Success) {
-				if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-			} else BoxState.NETWORK_ERROR
+			state = if (result is Success) {
+				if (page.newData(result.data)) CONTENT else EMPTY
+			} else NETWORK_ERROR
 		}
 	}
 
@@ -81,7 +74,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				num = page.pageNum
 			)
 		)
-		if (result is Data.Success) page.moreData(result.data)
+		if (result is Success) page.moreData(result.data)
 	}
 
 	private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
@@ -96,13 +89,13 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				)
 			)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					page.items.findAssign(predicate = { it.mid == mid }) {
 						it.copy(processed = true)
 					}
 					mailDetailsSheet.close()
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Failure -> slot.tip.error(result.message)
 			}
 			slot.loading.close()
 		}
@@ -119,11 +112,11 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				)
 			)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					page.items.removeAll { it.mid == mid }
 					mailDetailsSheet.close()
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Failure -> slot.tip.error(result.message)
 			}
 			slot.loading.close()
 		}
@@ -163,7 +156,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 						text = mail.title,
 						style = MaterialTheme.typography.labelMedium,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
+						overflow = Ellipsis,
 						modifier = Modifier.weight(1f)
 					)
 					Text(
@@ -171,7 +164,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						style = MaterialTheme.typography.bodySmall,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						overflow = Ellipsis
 					)
 				}
 				Text(
@@ -179,7 +172,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodySmall,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
@@ -238,9 +231,9 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
 				Text(
 					text = args.title,
 					style = MaterialTheme.typography.titleLarge,
-					textAlign = TextAlign.Center,
+					textAlign = Center,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth()
 				)
 				Row(

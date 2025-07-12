@@ -7,7 +7,7 @@ class ActualMusicFactory : MusicFactory() {
     override val isInit: Boolean = false
     override suspend fun init() {}
     override val error: Throwable? = null
-    override val playMode: MusicPlayMode = MusicPlayMode.ORDER
+    override val playMode: MusicPlayMode = ORDER
     override val musicList: List<MusicInfo> = emptyList()
     override val isReady: Boolean = false
     override val isPlaying: Boolean = false

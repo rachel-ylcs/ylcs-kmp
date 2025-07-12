@@ -1,14 +1,7 @@
 package love.yinlin.ui.screen.world.game
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
@@ -21,18 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.Local
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.rachel.game.Game
-import love.yinlin.data.rachel.game.GameConfig
-import love.yinlin.data.rachel.game.GameDetailsWithName
-import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.data.rachel.game.GameResult
-import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.data.rachel.game.*
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.CylinderSlider
 import love.yinlin.ui.component.input.RachelText
@@ -79,51 +66,51 @@ interface PlayGameState {
 }
 
 fun createGameState(type: Game, slot: SubScreenSlot): CreateGameState = when (type) {
-    Game.AnswerQuestion -> AnswerQuestionCreateGameState(slot)
-    Game.BlockText -> BlockTextCreateGameState(slot)
-    Game.FlowersOrder -> FlowersOrderCreateGameState(slot)
-    Game.SearchAll -> SearchAllCreateGameState(slot)
-    Game.Pictionary -> PictionaryCreateGameState(slot)
-    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
+    AnswerQuestion -> AnswerQuestionCreateGameState(slot)
+    BlockText -> BlockTextCreateGameState(slot)
+    FlowersOrder -> FlowersOrderCreateGameState(slot)
+    SearchAll -> SearchAllCreateGameState(slot)
+    Pictionary -> PictionaryCreateGameState(slot)
+    GuessLyrics, Rhyme -> error("Unknown type $type")
 }
 
 fun playGameState(type: Game, slot: SubScreenSlot): PlayGameState = when (type) {
-    Game.AnswerQuestion -> AnswerQuestionPlayGameState(slot)
-    Game.BlockText -> BlockTextPlayGameState(slot)
-    Game.FlowersOrder -> FlowersOrderPlayGameState(slot)
-    Game.SearchAll -> SearchAllPlayGameState(slot)
-    Game.Pictionary -> PictionaryPlayGameState(slot)
-    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
+    AnswerQuestion -> AnswerQuestionPlayGameState(slot)
+    BlockText -> BlockTextPlayGameState(slot)
+    FlowersOrder -> FlowersOrderPlayGameState(slot)
+    SearchAll -> SearchAllPlayGameState(slot)
+    Pictionary -> PictionaryPlayGameState(slot)
+    GuessLyrics, Rhyme -> error("Unknown type $type")
 }
 
 @Composable
 fun ColumnScope.GameCardInfo(game: GamePublicDetailsWithName) = when (game.type) {
-    Game.AnswerQuestion -> AnswerQuestionCardInfo(game)
-    Game.BlockText -> BlockTextCardInfo(game)
-    Game.FlowersOrder -> FlowersOrderCardInfo(game)
-    Game.SearchAll -> SearchAllCardInfo(game)
-    Game.Pictionary -> PictionaryCardInfo(game)
-    Game.GuessLyrics, Game.Rhyme -> error("Unknown type ${game.type}")
+    AnswerQuestion -> AnswerQuestionCardInfo(game)
+    BlockText -> BlockTextCardInfo(game)
+    FlowersOrder -> FlowersOrderCardInfo(game)
+    SearchAll -> SearchAllCardInfo(game)
+    Pictionary -> PictionaryCardInfo(game)
+    GuessLyrics, Rhyme -> error("Unknown type ${game.type}")
 }
 
 @Composable
 fun ColumnScope.GameCardQuestionAnswer(game: GameDetailsWithName) = when (game.type) {
-    Game.AnswerQuestion -> AnswerQuestionCardQuestionAnswer(game)
-    Game.BlockText -> BlockTextCardQuestionAnswer(game)
-    Game.FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
-    Game.SearchAll -> SearchAllCardQuestionAnswer(game)
-    Game.Pictionary -> PictionaryQuestionAnswer(game)
-    Game.GuessLyrics, Game.Rhyme -> error("Unknown type ${game.type}")
+    AnswerQuestion -> AnswerQuestionCardQuestionAnswer(game)
+    BlockText -> BlockTextCardQuestionAnswer(game)
+    FlowersOrder -> FlowersOrderCardQuestionAnswer(game)
+    SearchAll -> SearchAllCardQuestionAnswer(game)
+    Pictionary -> PictionaryQuestionAnswer(game)
+    GuessLyrics, Rhyme -> error("Unknown type ${game.type}")
 }
 
 @Composable
 fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElement) = when (type) {
-    Game.AnswerQuestion -> AnswerQuestionRecordCard(answer, info)
-    Game.BlockText -> BlockTextRecordCard(answer, info)
-    Game.FlowersOrder -> FlowersOrderRecordCard(answer, info)
-    Game.SearchAll -> SearchAllRecordCard(answer, info)
-    Game.Pictionary -> PictionaryRecordCard(answer, info)
-    Game.GuessLyrics, Game.Rhyme -> error("Unknown type $type")
+    AnswerQuestion -> AnswerQuestionRecordCard(answer, info)
+    BlockText -> BlockTextRecordCard(answer, info)
+    FlowersOrder -> FlowersOrderRecordCard(answer, info)
+    SearchAll -> SearchAllRecordCard(answer, info)
+    Pictionary -> PictionaryRecordCard(answer, info)
+    GuessLyrics, Rhyme -> error("Unknown type $type")
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()
@@ -147,7 +134,7 @@ fun <T : Number> GameSlider(
             text = title,
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = Ellipsis
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -164,14 +151,14 @@ fun <T : Number> GameSlider(
                 },
                 textAlign = TextAlign.Start,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = Ellipsis,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 text = remember(percent, minValue, maxValue) { "范围: $minValue ~ $maxValue" },
-                textAlign = TextAlign.End,
+                textAlign = End,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                overflow = Ellipsis,
                 modifier = Modifier.weight(1f)
             )
         }

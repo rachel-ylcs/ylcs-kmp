@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
@@ -42,7 +41,6 @@ import love.yinlin.ScreenPart
 import love.yinlin.common.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.data.rachel.game.GameType
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.ColorfulIcon
@@ -84,14 +82,14 @@ private fun GameCard(
 				text = game.title,
 				style = MaterialTheme.typography.titleLarge,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 			BoxText(
 				text = game.type.title,
 				color = when (game.type) {
-                    GameType.RANK -> MaterialTheme.colorScheme.primary
-					GameType.EXPLORATION, GameType.SINGLE -> MaterialTheme.colorScheme.secondary
-                    GameType.SPEED, GameType.BATTLE -> MaterialTheme.colorScheme.tertiary
+                    RANK -> MaterialTheme.colorScheme.primary
+					EXPLORATION, SINGLE -> MaterialTheme.colorScheme.secondary
+                    SPEED, BATTLE -> MaterialTheme.colorScheme.tertiary
                 }
 			)
 		}
@@ -119,15 +117,15 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 	private fun onGameClick(game: Game) {
 		when (game) {
-            Game.AnswerQuestion, Game.BlockText,
-            Game.FlowersOrder, Game.SearchAll,
-            Game.Pictionary -> navigate(ScreenGameHall.Args(game))
-			Game.GuessLyrics -> {
+            AnswerQuestion, BlockText,
+            FlowersOrder, SearchAll,
+            Pictionary -> navigate(ScreenGameHall.Args(game))
+			GuessLyrics -> {
 				val profile = app.config.userProfile
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
-            Game.Rhyme -> navigate<ScreenRhyme>()
+            Rhyme -> navigate<ScreenRhyme>()
 		}
 	}
 
@@ -182,9 +180,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			when (game) {
-                Game.AnswerQuestion, Game.BlockText,
-                Game.FlowersOrder, Game.SearchAll,
-                Game.Pictionary -> {
+                AnswerQuestion, BlockText,
+                FlowersOrder, SearchAll,
+                Pictionary -> {
                     ClickIcon(
                         icon = Icons.Outlined.Edit,
                         tip = "创建",
@@ -194,12 +192,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
                         }
                     )
                 }
-				Game.GuessLyrics, Game.Rhyme -> {}
+				GuessLyrics, Rhyme -> {}
 			}
             when (game) {
-                Game.AnswerQuestion, Game.BlockText,
-                Game.FlowersOrder, Game.SearchAll,
-                Game.Pictionary, Game.GuessLyrics -> {
+                AnswerQuestion, BlockText,
+                FlowersOrder, SearchAll,
+                Pictionary, GuessLyrics -> {
                     ClickIcon(
                         icon = ExtraIcons.RewardCup,
                         tip = "排行榜",
@@ -208,7 +206,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
                         }
                     )
                 }
-                Game.Rhyme -> {}
+                Rhyme -> {}
             }
 		}
 	}
@@ -261,7 +259,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun Landscape() {
 		Box(
 			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.Center
+			contentAlignment = Center
 		) {
 			GameBackground(
 				modifier = Modifier.fillMaxSize(),
@@ -278,7 +276,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 				Box(
 					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
-					contentAlignment = Alignment.Center
+					contentAlignment = Center
 				) {
 					if (currentPage > 0) {
 						ColorfulIcon(
@@ -317,7 +315,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 
 				Box(
 					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
-					contentAlignment = Alignment.Center
+					contentAlignment = Center
 				) {
 					if (currentPage < pagerState.pageCount - 1) {
 						ColorfulIcon(
@@ -340,8 +338,8 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> Portrait()
-			Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape()
+			PORTRAIT -> Portrait()
+			SQUARE, LANDSCAPE -> Landscape()
 		}
 	}
 

@@ -304,7 +304,7 @@ class KVConfig(private val kv: KV) {
 	/* ------------------  系统  ------------------ */
 
 	// 主题模式
-	var themeMode: ThemeMode by enumState(ThemeMode.SYSTEM)
+	var themeMode: ThemeMode by enumState(SYSTEM)
 	// 动画速度
 	var animationSpeed: Int by intState(400)
 	// 字体大小
@@ -329,7 +329,7 @@ class KVConfig(private val kv: KV) {
 	// 上次播放歌曲
 	var lastMusic by stringState("")
 	// 播放模式
-	var musicPlayMode: MusicPlayMode by enumState(MusicPlayMode.ORDER)
+	var musicPlayMode: MusicPlayMode by enumState(ORDER)
 	// 开启悬浮歌词
 	var enabledFloatingLyrics by booleanState(true)
 	// Android悬浮歌词配置

@@ -10,10 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
@@ -24,8 +21,8 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
@@ -82,7 +79,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                     end = this.maxWidth * (1 - androidConfig.right).coerceIn(0f, 1f),
                     top = ThemeValue.Padding.VerticalExtraSpace * 4f * androidConfig.top
                 ).fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Center
             ) {
                 Text(
                     text = "这是一条测试歌词~",
@@ -90,9 +87,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * androidConfig.textSize
                     ),
                     color = Colors.from(androidConfig.textColor),
-                    textAlign = TextAlign.Center,
+                    textAlign = Center,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.background(color = Colors.from(androidConfig.backgroundColor)).padding(ThemeValue.Padding.Value)
                 )
             }

@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SmartDisplay
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
@@ -26,7 +24,7 @@ fun NineGrid(
 		val pic = pics[0]
 		Box(
 			modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraImage else ThemeValue.Size.CardWidth),
-			contentAlignment = Alignment.Center
+			contentAlignment = Center
 		) {
 			WebImage(
 				uri = pic.image,
@@ -66,7 +64,7 @@ fun NineGrid(
 								WebImage(
 									uri = pics[index].image,
 									modifier = Modifier.size(squareSize),
-									contentScale = ContentScale.Crop,
+									contentScale = Crop,
 									onClick = { onImageClick(index) }
 								)
 							}

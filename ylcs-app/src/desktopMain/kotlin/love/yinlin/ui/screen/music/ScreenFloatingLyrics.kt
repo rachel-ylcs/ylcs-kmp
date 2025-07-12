@@ -4,7 +4,10 @@ package love.yinlin.ui.screen.music
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
@@ -15,16 +18,16 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
-import love.yinlin.platform.Platform
+import love.yinlin.platform.Platform.MacOS
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
 // ignoresMouseEvents on macOS is buggy, see https://stackoverflow.com/questions/29441015
 private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
-    OS.ifPlatform(Platform.MacOS, block = {
+    OS.ifPlatform(MacOS, block = {
         if (floatingLyrics.isAttached) {
             floatingLyrics.isAttached = false
             Coroutines.startMain {

@@ -1,18 +1,16 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Explicit
+import androidx.compose.material.icons.outlined.IndeterminateCheckBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,7 +23,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.datetime.DateTimeUnit
@@ -36,32 +33,34 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
-import love.yinlin.data.Data
-import love.yinlin.data.Failed
 import love.yinlin.data.ItemKey
+import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
-import love.yinlin.extension.*
+import love.yinlin.extension.DateEx
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_logo
+import love.yinlin.resources.img_not_login
+import love.yinlin.resources.login
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelButton
 import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenTest
-import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.msg.activity.ScreenActivityLink
+import love.yinlin.ui.screen.settings.ScreenSettings
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.concurrent.atomics.AtomicBoolean
@@ -82,7 +81,7 @@ private fun LevelItem(
 		Text(level.toString())
 		Box(
 			modifier = Modifier.weight(1f),
-			contentAlignment = Alignment.Center
+			contentAlignment = Center
 		) {
 			RachelText(
 				text = remember(item) {
@@ -94,7 +93,7 @@ private fun LevelItem(
 		}
 		Box(
 			modifier = Modifier.offset(y = -ThemeValue.Padding.LittleSpace),
-			contentAlignment = Alignment.Center
+			contentAlignment = Center
 		) {
 			UserLabel(
 				label = "",
@@ -130,11 +129,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			)
 			isUpdateToken.store(false)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					app.config.userShortToken = currentTime
 					app.config.userToken = result.data
 				}
-				is Data.Error if result.type == Failed.RequestError.Unauthorized -> {
+				is Failure if result.type == RequestError.Unauthorized -> {
 					cleanUserToken()
 					navigate<ScreenLogin>()
 				}
@@ -151,7 +150,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				route = API.User.Profile.GetProfile,
 				data = token
 			)
-			if (result is Data.Success) app.config.userProfile = result.data
+			if (result is Success) app.config.userProfile = result.data
 		}
 	}
 
@@ -274,7 +273,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 			}
 			Box(
 				modifier = Modifier.fillMaxWidth().weight(1f),
-				contentAlignment = Alignment.Center
+				contentAlignment = Center
 			) {
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
@@ -358,8 +357,8 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 	override fun Content() {
 		app.config.userProfile?.let { userProfile ->
 			when (LocalDevice.current.type) {
-				Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
+				PORTRAIT -> Portrait(userProfile = userProfile)
+				LANDSCAPE, SQUARE -> Landscape(userProfile = userProfile)
 			}
 		} ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
 	}
@@ -456,7 +455,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 				route = API.User.Profile.Signin,
 				data = app.config.userToken
 			)
-			if (result is Data.Success) {
+			if (result is Success) {
 				with(result.data) {
 					todaySignin = status
 					todayIndex = index
@@ -516,7 +515,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
 											text = "${date.month.number}月${date.day}日",
 											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
 											maxLines = 1,
-											overflow = TextOverflow.Ellipsis
+											overflow = Ellipsis
 										)
 									}
 								}

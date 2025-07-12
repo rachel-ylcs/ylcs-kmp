@@ -146,9 +146,9 @@ fun DeviceWrapper(
 	content: @Composable () -> Unit
 ) {
 	val isDarkMode = when (themeMode) {
-		ThemeMode.SYSTEM -> isSystemInDarkTheme()
-		ThemeMode.LIGHT -> false
-		ThemeMode.DARK -> true
+		SYSTEM -> isSystemInDarkTheme()
+		LIGHT -> false
+		DARK -> true
 	}
 
 	CompositionLocalProvider(

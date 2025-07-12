@@ -18,34 +18,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextOverflow
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.writeText
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
-import love.yinlin.extension.catching
-import love.yinlin.extension.catchingDefault
-import love.yinlin.extension.fileSizeString
-import love.yinlin.extension.findAssign
-import love.yinlin.extension.rememberFalse
-import love.yinlin.extension.replaceAll
-import love.yinlin.extension.toJsonString
+import love.yinlin.extension.*
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
@@ -56,6 +44,7 @@ import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 
@@ -133,7 +122,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                     OS.Storage.createTempFile { sink ->
                         SystemFileSystem.source(path).buffered().use { source ->
-                            ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
+                            ImageProcessor(ImageCrop(rect), ImageCompress, quality = Full).process(source, sink)
                         }
                     }?.let { SystemFileSystem.source(it).buffered() }
                 }
@@ -193,7 +182,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                                     val configPath = newInfo.configPath
                                     Coroutines.io {
                                         SystemFileSystem.sink(configPath).buffered().use { sink ->
-                                            sink.writeText(newInfo.toJsonString())
+                                            sink.writeString(newInfo.toJsonString())
                                         }
                                     }
                                     resources.findAssign(predicate = { it == item }) {
@@ -248,7 +237,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Center
                 ) {
                     Text(text = "暂未开放")
                 }
@@ -268,23 +257,23 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     companion object {
         private fun makeResourceItem(resource: MusicResource, length: Int): ResourceItem {
             val type = resource.type
-            val onDelete = when (type) {
-                MusicResourceType.Config, MusicResourceType.Record, MusicResourceType.Background -> DeleteStrategy.Disabled
-                MusicResourceType.Audio, MusicResourceType.LineLyrics -> if (type.defaultName == resource.name) DeleteStrategy.Disabled else DeleteStrategy.NoOption
-                MusicResourceType.Animation, MusicResourceType.Video, null -> DeleteStrategy.NoOption
+            val onDelete: DeleteStrategy = when (type) {
+                Config, MusicResourceType.Record, Background -> Disabled
+                Audio, LineLyrics -> if (type.defaultName == resource.name) Disabled else NoOption
+                MusicResourceType.Animation, Video, null -> NoOption
             }
-            val onReplace = when (type) {
-                MusicResourceType.Config, MusicResourceType.LineLyrics, null -> ReplaceStrategy.Disabled
-                MusicResourceType.Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
+            val onReplace: ReplaceStrategy = when (type) {
+                Config, LineLyrics, null -> Disabled
+                Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
                 MusicResourceType.Record -> ReplaceStrategy.Picture(aspectRatio = 1f)
-                MusicResourceType.Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
+                Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
                 MusicResourceType.Animation -> ReplaceStrategy.File(mimeType = listOf(MimeType.WEBP), filter = listOf("*.webp"))
-                MusicResourceType.Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
+                Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
             }
-            val onModify = when (type) {
-                MusicResourceType.Config -> ModifyStrategy.Config
-                MusicResourceType.LineLyrics -> ModifyStrategy.LineLyrics
-                else -> ModifyStrategy.Disabled
+            val onModify: ModifyStrategy = when (type) {
+                Config -> ModifyStrategy.Config
+                LineLyrics -> ModifyStrategy.LineLyrics
+                else -> Disabled
             }
             return ResourceItem(
                 resource = resource,
@@ -297,9 +286,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
         private suspend fun loadLyrics(info: MusicInfo): String = Coroutines.io {
             catchingDefault("") {
-                val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
-                    it.readText()
-                }
+                val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use { it.readString() }
                 LyricsLrc.Parser(lyrics).plainText
             }
         }
@@ -457,7 +444,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         text = item.resource.type?.description ?: "未知资源",
                         color = Colors.White,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -465,14 +452,14 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     text = item.resource.name,
                     color = Colors.White,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = remember(item) { item.length.toLong().fileSizeString },
                     color = Colors.White,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(
@@ -590,8 +577,8 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Composable
     override fun SubContent(device: Device) = when (device.type) {
-        Device.Type.PORTRAIT -> Portrait()
-        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+        PORTRAIT -> Portrait()
+        LANDSCAPE, SQUARE -> Landscape()
     }
 
     private val modifySheet = object : FloatingArgsSheet<ResourceItem>() {

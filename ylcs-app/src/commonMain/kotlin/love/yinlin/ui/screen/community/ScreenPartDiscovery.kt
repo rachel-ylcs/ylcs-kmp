@@ -9,14 +9,14 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
@@ -27,17 +27,16 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.screen.FABAction
 
 @Stable
@@ -62,7 +61,7 @@ private enum class DiscoveryItem(
 
 @Stable
 class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
-    private var state by mutableStateOf(BoxState.EMPTY)
+    private var state: BoxState by mutableStateOf(EMPTY)
 
     private val gridState = LazyStaggeredGridState()
 
@@ -76,8 +75,8 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
     }
 
     private suspend fun requestNewData(loading: Boolean) {
-        if (state != BoxState.LOADING) {
-            if (loading) state = BoxState.LOADING
+        if (state != LOADING) {
+            if (loading) state = LOADING
             val result = when (val section = currentSection) {
                 DiscoveryItem.LatestTopic.id -> ClientAPI.request(
                     route = API.User.Topic.GetLatestTopics,
@@ -105,11 +104,11 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                     )
                 )
             }
-            if (result is Data.Success) {
-                state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+            if (result is Success) {
+                state = if (page.newData(result.data)) CONTENT else EMPTY
                 gridState.scrollToItem(0)
             }
-            else state = BoxState.NETWORK_ERROR
+            else state = NETWORK_ERROR
         }
     }
 
@@ -146,7 +145,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 )
             )
         }
-        if (result is Data.Success) page.moreData(result.data)
+        if (result is Success) page.moreData(result.data)
     }
 
     private fun onTopicClick(topic: Topic) {
@@ -182,7 +181,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 Text(
                     text = topic.title,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
                 )
                 Spacer(Modifier.weight(1f))
@@ -208,9 +207,9 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                         Text(
                             text = topic.name,
                             style = MaterialTheme.typography.titleSmall,
-                            textAlign = TextAlign.Center,
+                            textAlign = Center,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                            overflow = Ellipsis,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Row(

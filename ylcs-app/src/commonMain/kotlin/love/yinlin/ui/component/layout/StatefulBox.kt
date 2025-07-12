@@ -71,7 +71,7 @@ fun LoadingAnimation(
 fun SimpleLoadingBox() {
 	Box(
 		modifier = Modifier.fillMaxSize(),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		LoadingAnimation()
 	}
@@ -81,7 +81,7 @@ fun SimpleLoadingBox() {
 fun LoadingBox() {
 	Box(
 		modifier = Modifier.fillMaxSize(),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -106,7 +106,7 @@ fun LoadingBox() {
 fun SimpleEmptyBox() {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -122,7 +122,7 @@ fun SimpleEmptyBox() {
 fun EmptyBox() {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,7 +147,7 @@ fun EmptyBox() {
 fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Alignment.Center
+		contentAlignment = Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -193,17 +193,17 @@ fun StatefulBox(
 		modifier = modifier,
 	) {
 		when (it) {
-			BoxState.CONTENT -> {
+			CONTENT -> {
 				Box(
 					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Alignment.Center
+					contentAlignment = Center
 				) {
 					content()
 				}
 			}
-			BoxState.LOADING -> LoadingBox()
-			BoxState.EMPTY -> EmptyBox()
-			BoxState.NETWORK_ERROR -> NetWorkErrorBox(retry)
+			LOADING -> LoadingBox()
+			EMPTY -> EmptyBox()
+			NETWORK_ERROR -> NetWorkErrorBox(retry)
 		}
 	}
 }

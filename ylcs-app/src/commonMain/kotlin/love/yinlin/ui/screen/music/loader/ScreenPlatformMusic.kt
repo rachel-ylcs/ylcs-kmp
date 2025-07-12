@@ -14,23 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
-import io.ktor.utils.io.core.writeText
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.common.Uri
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
@@ -45,8 +39,8 @@ import love.yinlin.resources.Res
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.input.RachelRadioButton
 import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
@@ -94,8 +88,8 @@ private fun PlatformMusicInfoCard(
             )
             Text(
                 text = remember(info) { LyricsLrc.Parser(info.lyrics).plainText },
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Clip,
+                textAlign = Center,
+                overflow = Clip,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -107,9 +101,9 @@ private interface PlatformMusicParser {
 
     companion object {
         fun build(type: PlatformMusicType): PlatformMusicParser = when (type) {
-            PlatformMusicType.QQMusic -> QQMusicParser()
-            PlatformMusicType.NetEaseCloud -> NetEaseCloudParser()
-            PlatformMusicType.Kugou -> KugouParser()
+            QQMusic -> QQMusicParser()
+            NetEaseCloud -> NetEaseCloudParser()
+            Kugou -> KugouParser()
         }
     }
 }
@@ -119,8 +113,8 @@ private class QQMusicParser : PlatformMusicParser {
         // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
         link.contains("c6.y.qq.com") -> Coroutines.io {
             when (val tmp = QQMusicAPI.requestMusicId(link)) {
-                is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
-                is Data.Error -> tmp
+                is Success -> QQMusicAPI.requestMusic(tmp.data)
+                is Failure -> tmp
             }
         }.map { listOf(it) }
         // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
@@ -130,12 +124,12 @@ private class QQMusicParser : PlatformMusicParser {
         // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
         link.contains("i2.y.qq.com") && link.contains("playlist") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Error()
+            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Failure()
         }
         // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
         link.contains("i.y.qq.com") && link.contains("taoge") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Error()
+            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Failure()
         }
         // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
         link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
@@ -153,19 +147,19 @@ private class NetEaseCloudParser : PlatformMusicParser {
         // 歌曲 http://163cn.tv/EElG0jr
         link.contains("163cn.tv") -> Coroutines.io {
             when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
-                is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
-                is Data.Error -> tmp
+                is Success -> NetEaseCloudAPI.requestMusic(tmp.data)
+                is Failure -> tmp
             }
         }.map { listOf(it) }
         // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
         link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Error()
+            if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Failure()
         }
         // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
         link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Error()
+            if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Failure()
         }.map { listOf(it) }
         // 歌曲 504686858
         else -> Coroutines.io {
@@ -176,7 +170,7 @@ private class NetEaseCloudParser : PlatformMusicParser {
 
 private class KugouParser : PlatformMusicParser {
     override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> {
-        return Data.Error()
+        return Data.Failure()
     }
 }
 
@@ -236,7 +230,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                         chorus = null
                     )
                     SystemFileSystem.sink(info.configPath).buffered().use { sink ->
-                        sink.writeText(info.toJsonString())
+                        sink.writeString(info.toJsonString())
                     }
                     // 5. 写入音频
                     SystemFileSystem.sink(info.audioPath).buffered().use { sink ->
@@ -256,7 +250,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                     }
                     // 8. 写入歌词
                     SystemFileSystem.sink(info.lyricsPath).buffered().use { sink ->
-                        sink.writeText(item.lyrics)
+                        sink.writeString(item.lyrics)
                     }
                     // 9. 更新曲库
                     ids += id
@@ -295,8 +289,8 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
         ) {
             val parser = PlatformMusicParser.build(platformType)
             when (val result = parser.parseLink(linkState.text)) {
-                is Data.Success -> items = result.data
-                is Data.Error -> slot.tip.warning("解析失败")
+                is Success -> items = result.data
+                is Failure -> slot.tip.warning("解析失败")
             }
         }
         ActionSuspend(

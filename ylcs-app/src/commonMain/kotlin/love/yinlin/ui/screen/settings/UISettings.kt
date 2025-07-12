@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
@@ -58,7 +57,7 @@ object SettingsScope {
 				style = MaterialTheme.typography.labelMedium,
 				color = color,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 			Space()
 			Box(
@@ -96,7 +95,7 @@ object SettingsScope {
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				style = MaterialTheme.typography.bodySmall,
 				maxLines = maxLines,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 		}
 	}
@@ -155,7 +154,7 @@ object SettingsScope {
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						style = MaterialTheme.typography.bodySmall,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						overflow = Ellipsis
 					)
 				}
 				MiniIcon(icon = Icons.AutoMirrored.Outlined.KeyboardArrowRight)
@@ -200,7 +199,7 @@ object SettingsScope {
 						color = MaterialTheme.colorScheme.onSurfaceVariant,
 						style = MaterialTheme.typography.bodySmall,
 						maxLines = 1,
-						overflow = TextOverflow.Ellipsis
+						overflow = Ellipsis
 					)
 				}
 				StaticLoadingIcon(
@@ -241,7 +240,7 @@ fun SettingsLayout(
 					style = MaterialTheme.typography.titleLarge,
 					color = MaterialTheme.colorScheme.primary,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 			SettingsScope.content()

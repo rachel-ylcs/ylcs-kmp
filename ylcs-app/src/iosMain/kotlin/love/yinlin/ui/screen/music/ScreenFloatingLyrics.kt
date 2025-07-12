@@ -1,14 +1,7 @@
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -16,10 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
@@ -27,8 +17,8 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
@@ -66,7 +56,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Center
             ) {
                 Text(
                     text = "这是一条测试歌词~",
@@ -74,9 +64,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * iosConfig.textSize
                     ),
                     color = Colors.from(iosConfig.textColor),
-                    textAlign = TextAlign.Center,
+                    textAlign = Center,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.background(color = Colors.from(iosConfig.backgroundColor)).padding(ThemeValue.Padding.Value)
                 )
             }

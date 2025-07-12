@@ -31,9 +31,9 @@ import love.yinlin.ui.screen.music.recordPath
 import java.io.File
 
 fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
-    shuffleModeEnabled -> MusicPlayMode.RANDOM
-    repeatMode == Player.REPEAT_MODE_ONE -> MusicPlayMode.LOOP
-    else -> MusicPlayMode.ORDER
+    shuffleModeEnabled -> RANDOM
+    repeatMode == Player.REPEAT_MODE_ONE -> LOOP
+    else -> ORDER
 }
 
 private val Timeline.extractMediaItems: List<MediaItem> get() {
@@ -113,12 +113,12 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
     private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Data<Bundle> {
         val result = Coroutines.main { controller?.sendCustomCommand(command, args)?.get() }
-        if (result == null) return Data.Error()
-        return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Error(message = "${result.sessionError}")
+        if (result == null) return Data.Failure()
+        return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Failure(message = "${result.sessionError}")
     }
 
     override var error: Throwable? by mutableStateOf(null)
-    override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
+    override var playMode: MusicPlayMode by mutableStateOf(ORDER)
     override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
@@ -195,7 +195,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                     Player.STATE_READY -> updateDuration(player)
                     Player.STATE_ENDED -> {
                         // 当因为删除当前媒体等原因停止了循环播放, 但仍然有剩余媒体则继续循环播放
-                        if (player.mediaItemCount != 0 && playMode == MusicPlayMode.LOOP) player.play()
+                        if (player.mediaItemCount != 0 && playMode == LOOP) player.play()
                         else {
                             // 已停止播放
                             musicList = emptyList()

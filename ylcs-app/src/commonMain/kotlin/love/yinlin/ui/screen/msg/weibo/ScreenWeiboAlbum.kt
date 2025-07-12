@@ -12,14 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
@@ -41,7 +39,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 		private const val PIC_MAX_LIMIT = 1000
 	}
 
-	private var state by mutableStateOf(BoxState.EMPTY)
+	private var state: BoxState by mutableStateOf(EMPTY)
 
 	private val caches = MutableList<AlbumCache?>(PIC_MAX_LIMIT) { null }
 	private var num by mutableIntStateOf(0)
@@ -50,13 +48,13 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 
 	private suspend fun requestAlbum(page: Int) {
 		if (caches[page] == null) { // 无缓存
-			state = BoxState.LOADING
+			state = LOADING
 			val result = WeiboAPI.getWeiboAlbumPics(args.containerId, page, PIC_LIMIT)
-			if (result is Data.Success) {
+			if (result is Success) {
 				val (data, count) = result.data
 				caches[page] = AlbumCache(count, data)
 			}
-			state = BoxState.CONTENT
+			state = CONTENT
 		}
 		val currentAlbum = caches[page]
 		if (currentAlbum != null) {
@@ -67,7 +65,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 	}
 
 	private fun onPrevious() {
-		if (state != BoxState.LOADING) {
+		if (state != LOADING) {
 			if (current > 1) {
 				launch { requestAlbum(current - 1) }
 			}
@@ -76,7 +74,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 	}
 
 	private fun onNext() {
-		if (state != BoxState.LOADING) {
+		if (state != LOADING) {
 			if ((maxNum == 0 || current < maxNum) && current < PIC_MAX_LIMIT - 2) {
 				launch { requestAlbum(current + 1) }
 			}
@@ -135,7 +133,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
 					Text(
 						text = "第 $current 页",
 						style = MaterialTheme.typography.bodyLarge,
-						textAlign = TextAlign.Center
+						textAlign = Center
 					)
 					ClickIcon(
 						icon = Icons.AutoMirrored.Outlined.LastPage,

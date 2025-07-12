@@ -16,7 +16,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
@@ -26,11 +25,11 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
-import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.ZoomWebImage
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
@@ -125,7 +124,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 				itemsIndexed(items = previews) { index, item ->
 					WebImage(
 						uri = item.pic.image,
-						contentScale = ContentScale.Crop,
+						contentScale = Crop,
 						modifier = Modifier.fillMaxWidth().aspectRatio(1f)
 							.condition(index == current) {
 								border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)
@@ -167,8 +166,8 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 
 	@Composable
 	override fun SubContent(device: Device) = when (device.type) {
-		Device.Type.PORTRAIT -> Portrait()
-		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+		PORTRAIT -> Portrait()
+		LANDSCAPE, SQUARE -> Landscape()
 	}
 
 	private val downloadDialog = FloatingDownloadDialog()

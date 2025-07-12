@@ -1,11 +1,12 @@
 package love.yinlin.ui.screen.settings
 
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.automirrored.outlined.Logout
@@ -19,8 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -30,7 +29,6 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
-import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
@@ -50,7 +48,6 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
-import love.yinlin.ui.component.text.InputType
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
@@ -67,7 +64,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
 				OS.Storage.createTempFile { sink ->
 					SystemFileSystem.source(path).buffered().use { source ->
-						ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
+						ImageProcessor(ImageCrop(rect), ImageCompress, quality = High).process(source, sink)
 					}
 				}
 			}
@@ -86,8 +83,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				}
 			)
 			when (result) {
-				is Data.Success -> app.config.cacheUserAvatar = KVConfig.UPDATE
-				is Data.Error -> slot.tip.error(result.message)
+				is Success -> app.config.cacheUserAvatar = KVConfig.UPDATE
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -104,8 +101,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				}
 			)
 			when (result) {
-				is Data.Success -> app.config.cacheUserWall = KVConfig.UPDATE
-				is Data.Error -> slot.tip.error(result.message)
+				is Success -> app.config.cacheUserWall = KVConfig.UPDATE
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -122,13 +119,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					)
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						app.config.userProfile = profile.copy(
 							name = text,
 							coin = profile.coin - UserConstraint.RENAME_COIN_COST
 						)
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -146,10 +143,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					)
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						app.config.userProfile = profile.copy(signature = text)
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -167,11 +164,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				)
 			)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					slot.tip.success("修改密码成功, 请重新登录")
 					mePart.cleanUserToken()
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -185,11 +182,11 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 					data = token
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						app.config.cacheUserAvatar = KVConfig.UPDATE
 						app.config.cacheUserWall = KVConfig.UPDATE
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -223,20 +220,20 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 			)
 		)
 		when (result) {
-			is Data.Success -> feedbackSheet.close()
-			is Data.Error -> slot.tip.error(result.message)
+			is Success -> feedbackSheet.close()
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
 	private suspend fun checkUpdate() {
         when (val result = ClientAPI.request<ServerStatus>(route = ServerRes.Server)) {
-			is Data.Success -> {
+			is Success -> {
 				val data = result.data
 				if (data.targetVersion > Local.VERSION) slot.tip.warning("新版本${data.targetVersion}可用")
 				else if (data.minVersion > Local.VERSION) slot.tip.error("当前版本不满足服务器最低兼容版本${data.minVersion}")
 				else slot.tip.success("当前已是最新版本")
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -334,9 +331,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				title = "主题",
 				icon = colorfulImageVector(
 					icon = when (app.config.themeMode) {
-						ThemeMode.SYSTEM -> Icons.Outlined.Contrast
-						ThemeMode.LIGHT -> Icons.Outlined.LightMode
-						ThemeMode.DARK -> Icons.Outlined.DarkMode
+						SYSTEM -> Icons.Outlined.Contrast
+						LIGHT -> Icons.Outlined.LightMode
+						DARK -> Icons.Outlined.DarkMode
 					},
 					background = MaterialTheme.colorScheme.primaryContainer
 				)
@@ -516,8 +513,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	override fun SubContent(device: Device) = when (device.type) {
-		Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(app.config.userProfile)
-		Device.Type.LANDSCAPE -> Landscape(app.config.userProfile)
+		PORTRAIT, SQUARE -> Portrait(app.config.userProfile)
+		LANDSCAPE -> Landscape(app.config.userProfile)
 	}
 
 	private val crashLogSheet = object : FloatingSheet() {
@@ -608,8 +605,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				Text(
 					text = stringResource(Res.string.app_description),
 					modifier = Modifier.fillMaxWidth(),
-					textAlign = TextAlign.Center,
-					overflow = TextOverflow.Ellipsis
+					textAlign = Center,
+					overflow = Ellipsis
 				)
 				Space()
 				Text(
@@ -703,7 +700,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				TextInput(
 					state = oldPassword,
 					hint = "旧密码",
-					inputType = InputType.PASSWORD,
+					inputType = PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
 					imeAction = ImeAction.Next,
 					modifier = Modifier.fillMaxWidth()
@@ -711,7 +708,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				TextInput(
 					state = newPassword1,
 					hint = "确认旧密码",
-					inputType = InputType.PASSWORD,
+					inputType = PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
 					imeAction = ImeAction.Next,
 					modifier = Modifier.fillMaxWidth()
@@ -719,7 +716,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 				TextInput(
 					state = newPassword2,
 					hint = "新密码",
-					inputType = InputType.PASSWORD,
+					inputType = PASSWORD,
 					maxLength = UserConstraint.MAX_PWD_LENGTH,
 					onImeClick = {
 						if (canSubmit) launch {

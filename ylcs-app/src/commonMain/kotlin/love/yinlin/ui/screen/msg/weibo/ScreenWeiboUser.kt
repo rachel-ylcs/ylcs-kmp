@@ -13,19 +13,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
@@ -33,13 +29,7 @@ import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.filenameOrRandom
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
-import love.yinlin.platform.Picker
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
-import love.yinlin.platform.app
-import love.yinlin.platform.safeDownload
+import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
@@ -80,7 +70,7 @@ private fun UserInfoCard(
 					style = MaterialTheme.typography.labelLarge,
 					color = MaterialTheme.colorScheme.primary,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
 				ClickIcon(
@@ -98,13 +88,13 @@ private fun UserInfoCard(
 					text = "关注 ${user.followNum}",
 					modifier = Modifier.weight(1f),
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 				Text(
 					text = "粉丝 ${user.fansNum}",
 					modifier = Modifier.weight(1f),
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 		}
@@ -144,15 +134,15 @@ private fun UserAlbumItem(
 					text = album.num,
 					style = MaterialTheme.typography.bodyMedium,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 				Text(
 					text = album.time,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodySmall,
-					textAlign = TextAlign.End,
+					textAlign = End,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
 			}
@@ -166,7 +156,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	@Serializable
 	data class Args(val id: String)
 
-	private var state by mutableStateOf(BoxState.EMPTY)
+	private var state: BoxState by mutableStateOf(EMPTY)
 	private var items by mutableStateOf(emptyList<Weibo>())
 	private val listState = LazyStaggeredGridState()
 	private var user: WeiboUser? by mutableStateOf(null)
@@ -267,10 +257,10 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 			item(key = ItemKey("Text")) {
 				Text(
 					text = "最新微博",
-					textAlign = TextAlign.Center,
+					textAlign = Center,
 					style = MaterialTheme.typography.titleMedium,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
 				)
 			}
@@ -361,21 +351,21 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 	override suspend fun initialize() {
 		launch {
 			val data = WeiboAPI.getWeiboUser(args.id)
-			user = if (data is Data.Success) data.data else null
+			user = if (data is Success) data.data else null
 			user?.info?.id?.let { id ->
-				if (state != BoxState.LOADING) {
-					state = BoxState.LOADING
+				if (state != LOADING) {
+					state = LOADING
 					val newItems = mutableMapOf<String, Weibo>()
 					val result = WeiboAPI.getUserWeibo(id)
-					if (result is Data.Success) newItems += result.data.associateBy { it.id }
+					if (result is Success) newItems += result.data.associateBy { it.id }
 					items = newItems.map { it.value }.sortedDescending()
-					state = if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
+					state = if (newItems.isEmpty()) NETWORK_ERROR else CONTENT
 				}
 			}
 		}
 		launch {
 			val data = WeiboAPI.getWeiboUserAlbum(args.id)
-			albums = if (data is Data.Success) data.data else null
+			albums = if (data is Success) data.data else null
 		}
 	}
 
@@ -386,8 +376,8 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
 		CompositionLocalProvider(LocalWeiboProcessor provides msgPart.processor) {
 			user?.let {
 				when (device.type) {
-					Device.Type.PORTRAIT -> Portrait(user = it, albums = albums)
-					Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(user = it, albums = albums)
+					PORTRAIT -> Portrait(user = it, albums = albums)
+					LANDSCAPE, SQUARE -> Landscape(user = it, albums = albums)
 				}
 			} ?: LoadingBox()
 		}

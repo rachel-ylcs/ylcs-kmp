@@ -23,8 +23,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonArray
@@ -35,7 +33,6 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
@@ -88,22 +85,22 @@ private sealed class PhotoItem(val name: String) {
 class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     private var photos by mutableStateOf(PhotoItem.Home)
     private var stack = mutableStateListOf(photos)
-    private var state by mutableStateOf(BoxState.EMPTY)
+    private var state: BoxState by mutableStateOf(EMPTY)
     private val listState = LazyListState()
     private val current by derivedStateOf { stack.last() }
 
     private suspend fun loadPhotos() {
-        if (state != BoxState.LOADING) {
-            state = BoxState.LOADING
+        if (state != LOADING) {
+            state = LOADING
             val result = ClientAPI.request<JsonObject>(route = ServerRes.Photo)
-            val data = Coroutines.cpu { catchingNull { PhotoItem.parseJson("相册", (result as Data.Success).data) } }
+            val data = Coroutines.cpu { catchingNull { PhotoItem.parseJson("相册", (result as Success).data) } }
             if (data != null) {
                 photos = data
                 stack.clear()
                 stack += photos
-                state = BoxState.CONTENT
+                state = CONTENT
             }
-            else state = BoxState.NETWORK_ERROR
+            else state = NETWORK_ERROR
         }
     }
 
@@ -111,7 +108,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         if (folder.name.contains(key, true)) return index
         else {
             for ((i, item) in folder.items.withIndex()) {
-                if (item is PhotoItem.Folder) {
+                if (item is Folder) {
                     virtualStack.add(item)
                     val fetchIndex = searchFolderItem(virtualStack, i, item, key)
                     if (fetchIndex != null) return fetchIndex
@@ -128,7 +125,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         val result = Coroutines.cpu { searchFolderItem(virtualStack, 0, photos, key) }
         if (result != null) {
             stack.clear()
-            val isAlbum = virtualStack.last().items.all { it is PhotoItem.File }
+            val isAlbum = virtualStack.last().items.all { it is File }
             if (isAlbum) virtualStack.removeLast()
             for (step in virtualStack) stack += step
             if (isAlbum) listState.animateScrollToItem(result)
@@ -154,8 +151,8 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                 items = folder.items,
                 key = { it.name }
             ) { item ->
-                if (item is PhotoItem.Folder) {
-                    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
+                if (item is Folder) {
+                    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is File } }
                     if (isAlbum) {
                         HorizontalMultiBrowseCarousel(
                             state = rememberCarouselState { item.items.size },
@@ -164,7 +161,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                             modifier = Modifier.fillMaxWidth().clipToBounds()
                         ) { index ->
                             WebImage(
-                                uri = (item.items[index] as PhotoItem.File).thumb,
+                                uri = (item.items[index] as File).thumb,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.width(ThemeValue.Size.CellWidth)
                                     .aspectRatio(0.66667f)
@@ -189,9 +186,9 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                     Text(
                         text = item.name,
                         style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
+                        textAlign = Center,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = Ellipsis,
                         modifier = Modifier.condition(isAlbum, ifTrue = { fillMaxWidth() }, ifFalse = { width(ThemeValue.Size.CellWidth) })
                     )
                 }
@@ -254,7 +251,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     onAlbumClick = { folder, index ->
                         val pics = folder.items.fastMap {
-                            val file = it as PhotoItem.File
+                            val file = it as File
                             Picture(file.thumb, file.source)
                         }
                         navigate(ScreenImagePreview.Args(pics, index))

@@ -1,32 +1,24 @@
 package love.yinlin.ui.component.common
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
 import love.yinlin.common.LocalDarkMode
 import love.yinlin.common.LocalDevice
-import love.yinlin.ui.component.node.clickableNoRipple
-import org.jetbrains.compose.resources.DrawableResource
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.ui.component.node.clickableNoRipple
+import org.jetbrains.compose.resources.DrawableResource
 
 private object UserLabelMeta {
 	private val labelNameFromLevel = arrayOf("BUG",
@@ -70,20 +62,20 @@ fun UserLabel(
 
 	val device = LocalDevice.current
 	val size = when (device.size) {
-        Device.Size.SMALL -> DpSize(92.4.dp, 35.2.dp)
-        Device.Size.MEDIUM -> DpSize(101.6.dp, 38.7.dp)
-        Device.Size.LARGE -> DpSize(111.8.dp, 42.6.dp)
+        SMALL -> DpSize(92.4.dp, 35.2.dp)
+        MEDIUM -> DpSize(101.6.dp, 38.7.dp)
+        LARGE -> DpSize(111.8.dp, 42.6.dp)
     }
 	val padding = when (device.size) {
-		Device.Size.SMALL -> PaddingValues(start = 12.3.dp, end = 12.3.dp, top = 15.2.dp, bottom = 5.3.dp)
-		Device.Size.MEDIUM -> PaddingValues(start = 13.4.dp, end = 13.4.dp, top = 16.6.dp, bottom = 5.8.dp)
-		Device.Size.LARGE -> PaddingValues(start = 14.7.dp, end = 14.7.dp, top = 18.3.dp, bottom = 6.4.dp)
+		SMALL -> PaddingValues(start = 12.3.dp, end = 12.3.dp, top = 15.2.dp, bottom = 5.3.dp)
+		MEDIUM -> PaddingValues(start = 13.4.dp, end = 13.4.dp, top = 16.6.dp, bottom = 5.8.dp)
+		LARGE -> PaddingValues(start = 14.7.dp, end = 14.7.dp, top = 18.3.dp, bottom = 6.4.dp)
 	}
 
 	CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
 		Box(
 			modifier = Modifier.size(size).clickableNoRipple(onClick = onClick),
-			contentAlignment = Alignment.Center
+			contentAlignment = Center
 		) {
 			MiniImage(
 				res = img,
@@ -94,9 +86,9 @@ fun UserLabel(
 				text = text,
 				color = if (isDarkMode) Colors.White else Colors.Dark,
 				style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
-				textAlign = TextAlign.Center,
+				textAlign = Center,
 				maxLines = 1,
-				overflow = TextOverflow.Clip
+				overflow = Clip
 			)
 		}
 	}

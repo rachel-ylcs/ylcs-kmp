@@ -1,26 +1,15 @@
 package love.yinlin.platform
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowScope
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
@@ -90,7 +79,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
                     DragArea(enabled = floatingLyrics.canMove) {
                         BoxWithConstraints(
                             modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) },
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Center
                         ) {
                             DeviceWrapper(
                                 device = remember(this.maxWidth) { Device(this.maxWidth) },
@@ -99,7 +88,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
                             ) {
                                 Box(
                                     modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Center
                                 ) {
                                     Text(
                                         text = lyrics,
@@ -107,9 +96,9 @@ class ActualFloatingLyrics : FloatingLyrics() {
                                             fontSize = MaterialTheme.typography.displayLarge.fontSize * config.textSize
                                         ),
                                         color = Colors.from(config.textColor),
-                                        textAlign = TextAlign.Center,
+                                        textAlign = Center,
                                         maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
+                                        overflow = Ellipsis,
                                         modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
                                     )
                                 }

@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
@@ -126,7 +125,7 @@ fun WeiboUserBar(
 				color = MaterialTheme.colorScheme.primary,
 				style = MaterialTheme.typography.labelMedium,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
@@ -137,7 +136,7 @@ fun WeiboUserBar(
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.weight(1f)
 				)
 				Text(
@@ -145,7 +144,7 @@ fun WeiboUserBar(
 					style = MaterialTheme.typography.bodySmall,
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 		}
@@ -168,7 +167,7 @@ fun WeiboLayout(
 	RichText(
 		text = weibo.text,
 		modifier = Modifier.fillMaxWidth(),
-		overflow = TextOverflow.Ellipsis,
+		overflow = Ellipsis,
 		onLinkClick = { processor.onWeiboLinkClick(it) },
 		onTopicClick = { processor.onWeiboTopicClick(it) },
 		onAtClick = { processor.onWeiboAtClick(it) }

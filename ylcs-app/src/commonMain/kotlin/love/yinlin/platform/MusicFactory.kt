@@ -1,10 +1,10 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
-import io.ktor.utils.io.core.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
@@ -27,7 +27,7 @@ abstract class MusicFactory {
         SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
             catching {
                 val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
-                val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                val info = SystemFileSystem.source(configPath).buffered().use { it.readString().parseJsonValue<MusicInfo>() }!!
                 musicLibrary[info.id] = info
             }
         }
@@ -51,7 +51,7 @@ abstract class MusicFactory {
 
     fun initFactory() {
         Coroutines.startCPU {
-            OS.ifNotPlatform(Platform.WebWasm) { initLibrary() }
+            OS.ifNotPlatform(WebWasm) { initLibrary() }
             init()
             if (isInit) initLastStatus()
         }
@@ -96,7 +96,7 @@ abstract class MusicFactory {
             val info = Coroutines.io {
                 catchingNull {
                     val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
-                    SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                    SystemFileSystem.source(configPath).buffered().use { it.readString().parseJsonValue<MusicInfo>() }!!
                 }
             }
             if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)

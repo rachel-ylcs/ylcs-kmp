@@ -15,7 +15,7 @@ import love.yinlin.api.user.userAPI
 import love.yinlin.copy
 import love.yinlin.currentUniqueId
 import love.yinlin.data.Data
-import love.yinlin.data.Failed
+import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.*
 import love.yinlin.logger
@@ -55,7 +55,7 @@ val EmptySuccessData: Data.Success<Response.Default> get() = Data.Success(Respon
 
 val String.successData: Data.Success<Response.Default> get() = Data.Success(Response.Default, this)
 
-val String.failedData: Data.Error get() = Data.Error(Failed.RequestError.InvalidArgument, this)
+val String.failureData: Data.Failure get() = Data.Failure(RequestError.InvalidArgument, this)
 
 class NineGridProcessor(val sourcePics: APIFiles) {
 	val actualPics: List<String> = if (sourcePics.size > 9) throw error("NineGrid invalid num") else List(sourcePics.size) { currentUniqueId(it) }
@@ -77,17 +77,17 @@ inline fun <reified Response: Any> Route.safeAPI(
 	handle {
 		try {
 			when (val result = Coroutines.io { body(call) }) {
-				is Data.Success -> call.respond(makeObject {
+				is Success -> call.respond(makeObject {
 					"code" with APICode.SUCCESS
 					result.message?.let { "msg" with it }
 					"data" with result.data.toJson()
 				})
-				is Data.Error -> when (result.type) {
-					Failed.RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
-					Failed.RequestError.Timeout -> call.respond("网络连接超时".failedObject)
-					Failed.RequestError.Canceled -> call.respond("操作取消".failedObject)
-					Failed.RequestError.Unauthorized -> call.respond("登录信息已过期".expireObject)
-					Failed.RequestError.InvalidArgument -> call.respond("${result.message}".failedObject)
+				is Failure -> when (result.type) {
+					RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
+					RequestError.Timeout -> call.respond("网络连接超时".failedObject)
+					RequestError.Canceled -> call.respond("操作取消".failedObject)
+					RequestError.Unauthorized -> call.respond("登录信息已过期".expireObject)
+					RequestError.InvalidArgument -> call.respond("${result.message}".failedObject)
 					else -> call.respond("未知错误: ${result.message}".failedObject)
 				}
 			}
@@ -123,7 +123,7 @@ inline fun <reified Request : Any> Route.api(
 inline fun <reified Response : Any> Route.api(
 	route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>,
 	crossinline body: suspend () -> Data<Response>
-): Route = safeAPI(HttpMethod.Get, route.toString()) { body() }
+): Route = safeAPI(Get, route.toString()) { body() }
 
 @JvmName("apiPost")
 inline fun <reified Request : Any, reified Response : Any> Route.api(
@@ -155,7 +155,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 			try {
 				val name: String = part.name ?: return@forEachPart
 				when (part) {
-					is PartData.FormItem -> {
+					is FormItem -> {
                         when (name) {
                             "#data#" -> dataString = part.value
                             "#ignoreFile#" -> {
@@ -168,7 +168,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                             }
                         }
 					}
-					is PartData.FileItem -> {
+					is FileItem -> {
 						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
 						val output = File(tmpDir, filename)
 						if (part.provider().copyAndClose(output.writeChannel()) > 0) {

@@ -14,14 +14,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Paid
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.MobiledataOff
+import androidx.compose.material.icons.outlined.MoveUp
+import androidx.compose.material.icons.outlined.VerticalAlignTop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
@@ -34,7 +35,6 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
@@ -50,7 +50,10 @@ import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.*
-import love.yinlin.ui.component.screen.*
+import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.ui.component.screen.FloatingDialogChoice
+import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.text.RichEditor
 import love.yinlin.ui.component.text.RichEditorState
 import love.yinlin.ui.component.text.RichString
@@ -97,14 +100,14 @@ private fun CoinLayout(
 					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodySmall,
 					maxLines = 1,
-					overflow = TextOverflow.Ellipsis
+					overflow = Ellipsis
 				)
 			}
 			Text(
 				text = "$num 银币",
 				style = MaterialTheme.typography.bodyLarge,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = Ellipsis
 			)
 		}
 	}
@@ -138,7 +141,7 @@ private fun AtUserItem(
 		)
 		Text(
 			text = info.name,
-			overflow = TextOverflow.Ellipsis,
+			overflow = Ellipsis,
 			modifier = Modifier.weight(1f)
 		)
 	}
@@ -204,7 +207,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			route = API.User.Topic.GetTopicDetails,
 			data = topic.tid
 		)
-		if (result is Data.Success) details = result.data
+		if (result is Success) details = result.data
 	}
 
 	private suspend fun requestNewComments() {
@@ -216,7 +219,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				num = pageComments.pageNum
 			)
 		)
-		if (result is Data.Success) pageComments.newData(result.data)
+		if (result is Success) pageComments.newData(result.data)
 	}
 
 	private suspend fun requestMoreComments() {
@@ -229,7 +232,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				isTop = pageComments.arg1
 			)
 		)
-		if (result is Data.Success) pageComments.moreData(result.data)
+		if (result is Success) pageComments.moreData(result.data)
 	}
 
 	private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
@@ -242,7 +245,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				num = num
 			)
 		)
-		return if (result is Data.Success) result.data else null
+		return if (result is Success) result.data else null
 	}
 
 	private fun onAvatarClick(uid: Int) {
@@ -263,8 +266,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			)
 		)
 		when (result) {
-			is Data.Success -> topic = topic.copy(isTop = value)
-			is Data.Error -> slot.tip.error(result.message)
+			is Success -> topic = topic.copy(isTop = value)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -278,11 +281,11 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				)
 			)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					discoveryPart.page.items.removeAll { it.tid == topic.tid }
 					pop()
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -305,12 +308,12 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					)
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						if (discoveryPart.currentSection == oldSection) discoveryPart.page.items.removeAll { it.tid == topic.tid }
 						details = oldDetails.copy(section = newSection)
 						slot.tip.success(result.message)
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -331,7 +334,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			)
 		)
 		when (result) {
-			is Data.Success -> {
+			is Success -> {
 				discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 					it.copy(coinNum = it.coinNum + num)
 				}
@@ -340,7 +343,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				}
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -359,7 +362,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					)
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 							it.copy(commentNum = it.commentNum + 1)
 						}
@@ -377,7 +380,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 						listState.animateScrollToItem(pageComments.items.size - 1)
 						return true
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 			else { // 回复评论
@@ -392,14 +395,14 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					)
 				)
 				when (result) {
-					is Data.Success -> {
+					is Success -> {
 						pageComments.items.findAssign(predicate = { it.cid == target.cid }) {
 							it.copy(subCommentNum = it.subCommentNum + 1)
 						}
 						currentSendComment = null
 						return true
 					}
-					is Data.Error -> slot.tip.error(result.message)
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -418,14 +421,14 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 			)
 		)
 		when (result) {
-			is Data.Success -> {
+			is Success -> {
 				pageComments.items.findAssign(predicate = { it.cid == cid }) {
 					it.copy(isTop = isTop)
 				}
 				pageComments.items.sort()
 				listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -441,13 +444,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				)
 			)
 			when (result) {
-				is Data.Success -> {
+				is Success -> {
 					discoveryPart.page.items.findAssign(predicate = { it.tid == topic.tid }) {
 						it.copy(commentNum = it.commentNum - 1)
 					}
 					pageComments.items.removeAll { it.cid == cid }
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -465,8 +468,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				)
 			)
 			when (result) {
-				is Data.Success -> onDelete()
-				is Data.Error -> slot.tip.error(result.message)
+				is Success -> onDelete()
+				is Failure -> slot.tip.error(result.message)
 			}
 		}
 	}
@@ -507,7 +510,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 					text = topic.title,
 					style = MaterialTheme.typography.titleMedium,
 					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
+					overflow = Ellipsis,
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
@@ -636,7 +639,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 						) {
 							Text(
 								text = "删除",
-								textAlign = TextAlign.End,
+								textAlign = End,
 								style = MaterialTheme.typography.labelMedium,
 								modifier = Modifier.clickable {
 									launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
@@ -825,8 +828,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 	override fun SubContent(device: Device) {
 		details?.let {
 			when (device.type) {
-				Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(details = it)
-				Device.Type.LANDSCAPE -> Landscape(details = it)
+				PORTRAIT, SQUARE -> Portrait(details = it)
+				LANDSCAPE -> Landscape(details = it)
 			}
 		} ?: EmptyBox()
 	}
@@ -897,7 +900,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 				Text(
 					text = "银币: ${app.config.userProfile?.coin ?: 0}",
 					style = MaterialTheme.typography.titleLarge,
-					textAlign = TextAlign.Center,
+					textAlign = Center,
 					modifier = Modifier.fillMaxWidth()
 				)
 				Row(

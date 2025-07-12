@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 @Composable
 actual fun rememberOrientationController(): OrientationController {
     return remember { object : OrientationController {
-        override var orientation: Orientation = Orientation.PORTRAIT
+        override var orientation: Orientation = PORTRAIT
 
         override fun rotate() {}
     } }

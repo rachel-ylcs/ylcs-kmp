@@ -7,17 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -28,12 +20,12 @@ import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.toNSData
 import org.jetbrains.skia.impl.use
-import platform.darwin.NSObject
-import platform.Foundation.*
-import platform.CoreGraphics.*
-import platform.UIKit.*
 import platform.AVFoundation.*
 import platform.AVKit.*
+import platform.CoreGraphics.*
+import platform.Foundation.*
+import platform.UIKit.*
+import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Stable
@@ -122,7 +114,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
         currentLyrics?.let { lyrics ->
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Center
             ) {
                 Text(
                     text = lyrics,
@@ -130,9 +122,9 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                     ),
                     color = Colors.from(config.textColor),
-                    textAlign = TextAlign.Center,
+                    textAlign = Center,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = Ellipsis,
                     modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
                 )
             }
