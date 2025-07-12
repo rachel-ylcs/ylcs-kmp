@@ -1,14 +1,8 @@
 import org.gradle.api.file.Directory
 
-open class TreeNode(path: Directory) : Directory by path {
-    override fun toString(): String = asFile.absolutePath
-}
+class BuildSrcNode(root: RootProjectNode) : Directory by root.dir("buildSrc")
 
-class BuildSrcNode(parent: RootProjectNode) : TreeNode(parent.dir("buildSrc")) {
-
-}
-
-class ConfigNode(c: Constants, parent: RootProjectNode) : TreeNode(parent.dir("config")) {
+class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("config") {
     private val packages = dir("packages")
     val currentPackages = packages.dir("${c.platform}-${c.architecture}")
 
@@ -21,38 +15,28 @@ class ConfigNode(c: Constants, parent: RootProjectNode) : TreeNode(parent.dir("c
     val androidKey = file("androidKey.jks")
 }
 
-class DesignAENode(parent: RootProjectNode) : TreeNode(parent.dir("design-AE")) {
+class DesignAENode(root: RootProjectNode) : Directory by root.dir("design-AE")
 
-}
+class DesignPSNode(root: RootProjectNode) : Directory by root.dir("design-PS")
 
-class DesignPSNode(parent: RootProjectNode) : TreeNode(parent.dir("design-PS")) {
+class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")
 
-}
-
-class DocsNode(parent: RootProjectNode) : TreeNode(parent.dir("docs")) {
-
-}
-
-class IosAppNode(parent: RootProjectNode) : TreeNode(parent.dir("iosApp")) {
+class IosAppNode(root: RootProjectNode) : Directory by root.dir("iosApp") {
     val core = dir("core")
     val podfile = file("Podfile")
     val configuration = dir("Configuration")
     val configurationFile = configuration.file("Version.xcconfig")
 }
 
-class NativeNode(parent: RootProjectNode) : TreeNode(parent.dir("native")) {
+class NativeNode(root: RootProjectNode) : Directory by root.dir("native") {
     val libs = dir("libs")
 }
 
-class OutputsNode(parent: RootProjectNode) : TreeNode(parent.dir("outputs")) {
+class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 
-}
+class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
 
-class ScriptNode(parent: RootProjectNode) : TreeNode(parent.dir("script")) {
-
-}
-
-class AppNode(c: Constants, parent: RootProjectNode) : TreeNode(parent.dir("ylcs-app")) {
+class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app") {
     private val proguard = dir("proguard")
     val commonR8Rule = proguard.file("R8Common.pro")
     val androidR8Rule = proguard.file("R8Android.pro")
@@ -65,44 +49,40 @@ class AppNode(c: Constants, parent: RootProjectNode) : TreeNode(parent.dir("ylcs
 
     val desktopWorkSpace = build.dir("desktopRun")
     val desktopOriginOutput = build.dir("compose").dir("binaries").dir("main-release").dir("app")
-    val desktopLibOutput = parent.outputs.dir(when (c.platform) {
+    val desktopLibOutput = root.outputs.dir(when (c.platform) {
         BuildPlatform.Windows -> "${c.app.name}/app"
         BuildPlatform.Linux -> "${c.app.name}/lib/app"
         BuildPlatform.Mac -> "${c.app.name}.app/Contents/app"
     })
-    val desktopPackagesOutput = parent.outputs.dir(when (c.platform) {
+    val desktopPackagesOutput = root.outputs.dir(when (c.platform) {
         BuildPlatform.Windows -> c.app.name
         BuildPlatform.Linux -> "${c.app.name}/bin"
         BuildPlatform.Mac -> "${c.app.name}.app/Contents/MacOS"
     })
 
     val webOriginOutput = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-    val webOutput = parent.outputs.dir("web")
+    val webOutput = root.outputs.dir("web")
 }
 
-class ModManagerNode(parent: RootProjectNode) : TreeNode(parent.dir("ylcs-modManager")) {
+class ModManagerNode(root: RootProjectNode) : Directory by root.dir("ylcs-modManager")
 
-}
+class MusicNode(root: RootProjectNode) : Directory by root.dir("ylcs-music")
 
-class MusicNode(parent: RootProjectNode) : TreeNode(parent.dir("ylcs-music")) {
-
-}
-
-class ServerNode(c: Constants, parent: RootProjectNode) : TreeNode(parent.dir("ylcs-server")) {
+class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-server") {
     val workspace = dir("build").dir("serverRun")
-    val outputs = parent.outputs
+    val outputs = root.outputs
     val outputFile = outputs.file(c.server.outputName)
 }
 
-class SharedNode(parent: RootProjectNode) : TreeNode(parent.dir("ylcs-shared")) {
+class SharedNode(root: RootProjectNode) : Directory by root.dir("ylcs-shared") {
     private val build = dir("build")
     val srcGenerated = build.dir("generated").dir("kotlin")
     val generatedLocalFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
 }
 
-class RootProjectNode(c: Constants, root: Directory) : TreeNode(root) {
+class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val buildSrc = BuildSrcNode(this)
-    val config = ConfigNode(c, this)
+    val config = ConfigNode(this, c)
     val designAE = DesignAENode(this)
     val designPS = DesignPSNode(this)
     val docs = DocsNode(this)
@@ -110,10 +90,10 @@ class RootProjectNode(c: Constants, root: Directory) : TreeNode(root) {
     val native = NativeNode(this)
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
-    val app = AppNode(c, this)
+    val app = AppNode(this, c)
     val modManager = ModManagerNode(this)
     val music = MusicNode(this)
-    val server = ServerNode(c, this)
+    val server = ServerNode(this, c)
     val shared = SharedNode(this)
     val libsVersion = file("libs.version.toml")
     val license = file("LICENSE")

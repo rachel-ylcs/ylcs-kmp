@@ -98,23 +98,23 @@ class Constants(project: Project) {
     val environment = BuildEnvironment.Prod
 
     // 平台
-    val platform = System.getProperty("os.name").let {
+    val platform = System.getProperty("os.name").lowercase().let {
         when {
-            it.lowercase().startsWith("windows") -> BuildPlatform.Windows
-            it.lowercase().startsWith("mac") -> BuildPlatform.Mac
+            it.startsWith("windows") -> BuildPlatform.Windows
+            it.startsWith("mac") -> BuildPlatform.Mac
             else -> BuildPlatform.Linux
         }
     }
 
     // 架构
-    val architecture = System.getProperty("os.arch").let {
+    val architecture = System.getProperty("os.arch").lowercase().let {
         when {
-            it.lowercase().startsWith("aarch64") -> BuildArchitecture.AARCH64
-            it.lowercase().startsWith("arm") -> BuildArchitecture.ARM
+            it.startsWith("aarch64") -> BuildArchitecture.AARCH64
+            it.startsWith("arm") -> BuildArchitecture.ARM
             // Windows x86_64
-            it.lowercase().startsWith("amd64") -> BuildArchitecture.X86_64
+            it.startsWith("amd64") -> BuildArchitecture.X86_64
             // macOS Intel
-            it.lowercase().startsWith("x86_64") -> BuildArchitecture.X86_64
+            it.startsWith("x86_64") -> BuildArchitecture.X86_64
             else -> error("Unsupported architecture: $it")
         }
     }
@@ -204,7 +204,7 @@ class Constants(project: Project) {
     )
 
     // 目录树
-    val root = RootProjectNode(this, rootProject.layout.projectDirectory)
+    val root = RootProjectNode(rootProject.layout.projectDirectory, this)
 }
 
 val projectMap = mutableMapOf<Project, Constants>()
