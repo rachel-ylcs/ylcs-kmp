@@ -2,6 +2,7 @@ package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import love.yinlin.data.rachel.game.Game
 
 @Stable
 @Serializable
@@ -45,6 +46,11 @@ enum class MusicResourceType(
         id = 40,
         description = "视频",
         defaultName = "pv"
+    ),
+    Rhyme(
+        id = 50,
+        description = "${Game.Rhyme.title}配置",
+        uniqueName = "rhyme"
     );
 
     companion object {
@@ -56,6 +62,7 @@ enum class MusicResourceType(
             22 -> Animation
             30 -> LineLyrics
             40 -> Video
+            50 -> Rhyme
             else -> null
         }
     }

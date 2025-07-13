@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -28,6 +27,7 @@ import love.yinlin.platform.app
 import love.yinlin.platform.platform
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
+import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.PrimaryLoadingButton
@@ -334,10 +334,10 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun ContentBox(modifier: Modifier = Modifier) {
-		AnimatedContent(
-			targetState = mode,
-			modifier = modifier
-		) { animatedMode ->
+        AnimationLayout(
+            state = mode,
+            modifier = modifier
+        ) { animatedMode ->
 			when (animatedMode) {
 				Login -> ContentLogin(modifier = Modifier.fillMaxSize())
 				Register -> ContentRegister(modifier = Modifier.fillMaxSize())

@@ -27,6 +27,8 @@ val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, Mu
 val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
 @Stable
 val MusicInfo.videoPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Video.default.toString())
+@Stable
+val MusicInfo.rhymePath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Rhyme.default.toString())
 
 val MusicResourceType?.background: Brush get() = when (this) {
     Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
@@ -36,6 +38,7 @@ val MusicResourceType?.background: Brush get() = when (this) {
     MusicResourceType.Animation -> Brush.linearGradient(listOf(Colors.Orange3, Colors.Orange4, Colors.Orange5))
     LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
     Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
+    Rhyme -> Brush.linearGradient(listOf(Colors.Cyan3, Colors.Cyan4, Colors.Cyan5))
     null -> Brush.linearGradient(listOf(Colors.Gray3, Colors.Gray4, Colors.Gray5))
 }
 
@@ -47,5 +50,6 @@ val MusicResourceType?.icon: ImageVector get() = when (this) {
     MusicResourceType.Animation -> Icons.Outlined.GifBox
     LineLyrics -> Icons.Outlined.Lyrics
     Video -> Icons.Outlined.Movie
+    Rhyme -> Icons.Outlined.MusicNote
     null -> Icons.Outlined.QuestionMark
 }

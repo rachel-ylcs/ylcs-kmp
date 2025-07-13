@@ -56,6 +56,7 @@ enum class Game(
 
     val xPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.x(this.ordinal + 1)}" }
     val yPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.y(this.ordinal + 1)}" }
+    val zPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.z(this.ordinal + 1)}" }
     fun xyPath(isX: Boolean): String = "${Local.API_BASE_URL}/${ServerRes.Game.xy(this.ordinal + 1, isX)}"
 
     object Serializer : KSerializer<Game> {

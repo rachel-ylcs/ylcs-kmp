@@ -260,10 +260,10 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             val onDelete: DeleteStrategy = when (type) {
                 Config, MusicResourceType.Record, Background -> Disabled
                 Audio, LineLyrics -> if (type.defaultName == resource.name) Disabled else NoOption
-                MusicResourceType.Animation, Video, null -> NoOption
+                MusicResourceType.Animation, Video, Rhyme, null -> NoOption
             }
             val onReplace: ReplaceStrategy = when (type) {
-                Config, LineLyrics, null -> Disabled
+                Config, LineLyrics, Rhyme, null -> Disabled
                 Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
                 MusicResourceType.Record -> ReplaceStrategy.Picture(aspectRatio = 1f)
                 Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)

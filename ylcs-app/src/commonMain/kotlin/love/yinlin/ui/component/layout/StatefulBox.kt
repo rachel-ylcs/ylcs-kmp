@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
+import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -78,7 +80,10 @@ fun SimpleLoadingBox() {
 }
 
 @Composable
-fun LoadingBox() {
+fun LoadingBox(
+    text: String = stringResource(Res.string.loading_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Center
@@ -96,14 +101,20 @@ fun LoadingBox() {
 				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
 				LoadingAnimation()
-				Text(text = stringResource(Res.string.loading_state_string))
+				Text(
+                    text = text,
+                    color = color
+                )
 			}
 		}
 	}
 }
 
 @Composable
-fun SimpleEmptyBox() {
+fun SimpleEmptyBox(
+    text: String = stringResource(Res.string.empty_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Center
@@ -112,14 +123,23 @@ fun SimpleEmptyBox() {
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 		) {
-			MiniIcon(Icons.Filled.Error)
-			Text(text = stringResource(Res.string.empty_state_string))
+			MiniIcon(
+                icon = Icons.Filled.Error,
+                color = color
+            )
+			Text(
+                text = text,
+                color = color
+            )
 		}
 	}
 }
 
 @Composable
-fun EmptyBox() {
+fun EmptyBox(
+    text: String = stringResource(Res.string.empty_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Center
@@ -136,15 +156,24 @@ fun EmptyBox() {
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
-				MiniIcon(Icons.Filled.Error)
-				Text(text = stringResource(Res.string.empty_state_string))
+				MiniIcon(
+                    icon = Icons.Filled.Error,
+                    color = color
+                )
+				Text(
+                    text = text,
+                    color = color
+                )
 			}
 		}
 	}
 }
 
 @Composable
-fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
+fun NetWorkErrorBox(
+    text: String = stringResource(Res.string.network_error_state_string),
+    retry: (suspend CoroutineScope.() -> Unit)? = null
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Center
@@ -166,7 +195,7 @@ fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 					color = MaterialTheme.colorScheme.error
 				)
 				Text(
-					text = stringResource(Res.string.network_error_state_string),
+					text = text,
 					color = MaterialTheme.colorScheme.error
 				)
 			}
@@ -203,7 +232,7 @@ fun StatefulBox(
 			}
 			LOADING -> LoadingBox()
 			EMPTY -> EmptyBox()
-			NETWORK_ERROR -> NetWorkErrorBox(retry)
+			NETWORK_ERROR -> NetWorkErrorBox(retry = retry)
 		}
 	}
 }

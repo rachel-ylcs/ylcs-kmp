@@ -19,6 +19,7 @@ object ServerRes : ResNode("public") {
     object Game : ResNode(this, "game") {
         fun x(id: Int) = ResNode(this, "game${id}x.webp")
         fun y(id: Int) = ResNode(this, "game${id}y.webp")
+        fun z(id: Int) = ResNode(this, "game${id}z.webp")
         fun xy(id: Int, isX: Boolean) = if (isX) x(id) else y(id)
     }
 
