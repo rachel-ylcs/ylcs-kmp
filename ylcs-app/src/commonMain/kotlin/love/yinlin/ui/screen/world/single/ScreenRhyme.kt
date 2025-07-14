@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -180,12 +182,41 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
     private var library = emptyList<MusicInfo>()
 
+    private var resumePauseJob: Job? = null
+
+    private fun onScreenOrientationChanged(type: Device.Type) {
+        if (type == LANDSCAPE) {
+            // 如果处于竖屏锁, 当转回横屏后启动恢复协程
+            if (lockState is PortraitLock) resumePauseTimer()
+        }
+        else {
+            // 转回竖屏后, 如果处于恢复状态则取消恢复协程
+            resumePauseJob?.cancel()
+            lockState = PortraitLock
+            pauseGame()
+        }
+    }
+
     private fun pauseGame() {
 
     }
 
     private fun resumePauseTimer() {
-        lockState = GameLockState.Resume(3)
+        if (resumePauseJob == null) {
+            resumePauseJob = launch {
+                try {
+                    // 倒计时 3 秒后解除暂停状态
+                    repeat(3) {
+                        lockState = GameLockState.Resume(3 - it)
+                        delay(1000L)
+                    }
+                    lockState = Normal
+                }
+                finally {
+                    resumePauseJob = null
+                }
+            }
+        }
     }
 
     @Composable
@@ -314,30 +345,35 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             if (lockState !is Normal) {
                 Box(
                     modifier = Modifier.fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
-                        .clickableNoRipple { }
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
+                        .clickableNoRipple { },
+                    contentAlignment = Center
                 ) {
-                    Surface(
+                    Box(
                         modifier = Modifier
                             .padding(ThemeValue.Padding.HorizontalExtraSpace * 2)
-                            .fillMaxSize(),
-                        shape = MaterialTheme.shapes.extraLarge,
-                        shadowElevation = ThemeValue.Shadow.Surface
+                            .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.extraLarge)
+                            .width(ThemeValue.Size.PanelWidth)
+                            .heightIn(max = ThemeValue.Size.PanelWidth)
+                            .background(Colors.Gray8, MaterialTheme.shapes.extraLarge)
+                            .padding(ThemeValue.Padding.HorizontalExtraSpace * 2),
+                        contentAlignment = Center
                     ) {
-                        when (lockState) {
+                        when (val currentLockState = lockState) {
                             Normal -> {}
                             PortraitLock -> {
                                 Column(
-                                    modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace, Alignment.CenterVertically)
+                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
                                 ) {
                                     MiniIcon(
                                         icon = Icons.Outlined.Lock,
+                                        color = Colors.White,
                                         size = ThemeValue.Size.Icon * 2
                                     )
                                     Text(
                                         text = "已锁定, 请保持设备横屏",
+                                        color = Colors.White,
                                         style = MaterialTheme.typography.labelLarge,
                                     )
                                 }
@@ -346,7 +382,21 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
                             }
                             is Resume -> {
-
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                                ) {
+                                    Text(
+                                        text = "请准备好",
+                                        color = Colors.White,
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
+                                    Text(
+                                        text = currentLockState.time.toString(),
+                                        color = Colors.White,
+                                        style = MaterialTheme.typography.displayMedium,
+                                    )
+                                }
                             }
                         }
                     }
@@ -403,25 +453,21 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     override fun onBack() {
-        when (state) {
-            Loading, Start -> pop()
-            MusicLibrary -> state = Start
-            MusicDetails -> state = MusicLibrary
-            Playing -> pauseGame()
-            Settling -> state = Start
+        if (lockState is GameLockState.Normal) {
+            when (state) {
+                Loading, Start -> pop()
+                MusicLibrary -> state = Start
+                MusicDetails -> state = MusicLibrary
+                Playing -> pauseGame()
+                Settling -> state = Start
+            }
         }
     }
 
     @Composable
     override fun SubContent(device: Device) {
         LaunchedEffect(device.type) {
-            if (device.type == LANDSCAPE) {
-                if (lockState is PortraitLock) resumePauseTimer()
-            }
-            else {
-                lockState = PortraitLock
-                pauseGame()
-            }
+            onScreenOrientationChanged(device.type)
         }
 
         Layout(
