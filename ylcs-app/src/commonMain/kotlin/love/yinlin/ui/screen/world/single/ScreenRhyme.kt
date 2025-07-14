@@ -13,9 +13,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MusicNote
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,6 +47,7 @@ import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
+import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.SplitLayout
@@ -54,16 +55,31 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.screen.music.recordPath
 import love.yinlin.ui.screen.music.rhymePath
-import kotlin.random.Random
+
+data object RhymeConfig {
+    const val PAUSE_TIME = 3
+}
 
 @Stable
-private enum class GameState {
-    Loading, // 加载中
-    Start, // 开始
-    MusicLibrary, // 音乐库
-    MusicDetails, // 音乐详情
-    Playing, // 游戏中
-    Settling, // 结算
+private data class GameMusic(
+    val musicInfo: MusicInfo,
+    val enabled: Boolean
+)
+
+@Stable
+private sealed interface GameState {
+    @Stable
+    data object Loading : GameState // 加载中
+    @Stable
+    data object Start : GameState // 开始
+    @Stable
+    data object MusicLibrary : GameState // 音乐库
+    @Stable
+    data class MusicDetails(val entry: GameMusic) : GameState // 音乐详情
+    @Stable
+    data object Playing : GameState // 游戏中
+    @Stable
+    data object Settling : GameState // 结算
 }
 
 @Stable
@@ -81,6 +97,7 @@ private sealed interface GameLockState {
 @Composable
 private fun GameButton(
     icon: ImageVector,
+    transparent: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -115,7 +132,7 @@ private fun GameButton(
                     shape = CircleShape
                 )
                 .clickable(onClick = onClick)
-                .background(acrylicColor.copy(alpha = 0.2f)),
+                .background(acrylicColor.copy(alpha = if (transparent) 0.2f else 0.6f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -129,50 +146,76 @@ private fun GameButton(
 }
 
 @Composable
+private fun GameOverlayLayout(
+    title: String,
+    onBack: () -> Unit,
+    action: @Composable BoxScope.() -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GameButton(
+                    icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                    transparent = false,
+                    onClick = onBack
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Colors.White
+                )
+            }
+            Box(contentAlignment = Alignment.CenterEnd) { action() }
+        }
+        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            content()
+        }
+    }
+}
+
+@Composable
 private fun GameMusicCard(
-    musicInfo: MusicInfo,
+    entry: GameMusic,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        shadowElevation = ThemeValue.Shadow.MiniSurface,
-    ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .clickable(onClick = onClick)
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.extraLarge)
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge)
+                .clickable(onClick = onClick)
+                .background(Colors.Gray8),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(modifier = Modifier.aspectRatio(1f).fillMaxHeight()) {
-                LocalFileImage(
-                    path = { musicInfo.recordPath },
-                    musicInfo,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
-                )
-            }
-            Column(
-                modifier = Modifier.weight(1f).fillMaxHeight().padding(ThemeValue.Padding.ExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-            ) {
-                Text(
-                    text = musicInfo.name,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = musicInfo.singer,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            LocalFileImage(
+                path = { entry.musicInfo.recordPath },
+                entry,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+            )
+            Text(
+                text = entry.musicInfo.name,
+                color = if (entry.enabled) Colors.Steel4 else Colors.White,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue)
+            )
         }
     }
 }
@@ -182,9 +225,23 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private var state: GameState by mutableStateOf(GameState.Loading)
     private var lockState: GameLockState by mutableStateOf(GameLockState.Normal)
 
-    private var library = emptyList<MusicInfo>()
+    private var library = emptyList<GameMusic>()
+    private var showEnabled by mutableStateOf(false)
 
     private var resumePauseJob: Job? = null
+
+    private suspend fun initGame() {
+        Coroutines.io {
+            // 检查包含游戏配置文件的 MOD
+            library = app.musicFactory.musicLibrary.values.map { info ->
+                GameMusic(
+                    musicInfo = info,
+                    enabled = SystemFileSystem.metadataOrNull(info.rhymePath)?.isRegularFile == true
+                )
+            }
+        }
+        delay(1000) // TODO: 结束测试后去除条件
+    }
 
     private fun onScreenOrientationChanged(type: Device.Type) {
         if (type == Device.Type.LANDSCAPE) {
@@ -207,9 +264,9 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         if (resumePauseJob == null) {
             resumePauseJob = launch {
                 try {
-                    // 倒计时 3 秒后解除暂停状态
-                    repeat(3) {
-                        lockState = GameLockState.Resume(3 - it)
+                    // 倒计时解除暂停状态
+                    repeat(RhymeConfig.PAUSE_TIME) {
+                        lockState = GameLockState.Resume(RhymeConfig.PAUSE_TIME - it)
                         delay(1000L)
                     }
                     lockState = GameLockState.Normal
@@ -273,53 +330,53 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     private fun GameMusicLibrary() {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        GameOverlayLayout(
+            title = "曲库",
+            onBack = ::onBack,
+            action = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Switch(
+                        checked = showEnabled,
+                        onCheckedChange = { showEnabled = it }
+                    )
+                    Text(
+                        text = "${if (showEnabled) "已" else "未"}解锁",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Colors.White,
+                    )
+                }
+            }
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                GameButton(
-                    icon = Icons.AutoMirrored.Outlined.ArrowBack,
-                    onClick = { onBack() }
-                )
-                Text(
-                    text = "曲库",
-                    style = MaterialTheme.typography.titleLarge,
+            val showLibrary = remember(library, showEnabled) {
+                if (showEnabled) library.filter { it.enabled } else library
+            }
+
+            if (showLibrary.isEmpty()) {
+                EmptyBox(
+                    text = "曲库中无支持的音乐MOD",
                     color = Colors.White
                 )
             }
-            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                if (library.isEmpty()) {
-                    EmptyBox(
-                        text = "曲库中无支持的音乐MOD",
-                        color = Colors.White
-                    )
-                }
-                else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(ThemeValue.Size.CellWidth * 1.25f),
-                        contentPadding = PaddingValues(horizontal = ThemeValue.Padding.EqualSpace),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                        modifier = Modifier.fillMaxSize()
+            else {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(ThemeValue.Size.LargeImage),
+                    contentPadding = PaddingValues(horizontal = ThemeValue.Padding.EqualSpace),
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        items = showLibrary,
+                        key = { it.musicInfo.id }
                     ) {
-                        items(
-                            items = library,
-                            key = { it.id }
-                        ) {
-                            GameMusicCard(
-                                musicInfo = it,
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-
-                                }
-                            )
-                        }
+                        GameMusicCard(
+                            entry = it,
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { state = GameState.MusicDetails(it) }
+                        )
                     }
                 }
             }
@@ -327,8 +384,25 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun GameMusicDetails() {
+    private fun GameMusicDetails(entry: GameMusic) {
+        GameOverlayLayout(
+            title = entry.musicInfo.name,
+            onBack = ::onBack,
+            action = {
+                GameButton(
+                    icon = Icons.Outlined.PlayArrow,
+                    transparent = false,
+                    onClick = {
+                        if (entry.enabled) {
 
+                        }
+                        else slot.tip.warning("此MOD不支持")
+                    }
+                )
+            }
+        ) {
+
+        }
     }
 
     @Composable
@@ -412,12 +486,12 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         Box(modifier = modifier) {
             AnimationLayout(state = state) {
                 when (it) {
-                    GameState.Loading -> GameOverlayLoading()
-                    GameState.Start -> GameOverlayStart()
-                    GameState.MusicLibrary -> GameMusicLibrary()
-                    GameState.MusicDetails -> GameMusicDetails()
-                    GameState.Playing -> GameOverlayPlaying()
-                    GameState.Settling -> GameOverlaySettling()
+                    is GameState.Loading -> GameOverlayLoading()
+                    is GameState.Start -> GameOverlayStart()
+                    is GameState.MusicLibrary -> GameMusicLibrary()
+                    is GameState.MusicDetails -> GameMusicDetails(it.entry)
+                    is GameState.Playing -> GameOverlayPlaying()
+                    is GameState.Settling -> GameOverlaySettling()
                 }
             }
         }
@@ -438,30 +512,18 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     override val title: String? = null
 
     override suspend fun initialize() {
-        if (app.musicFactory.isInit) {
-            // 加载游戏
-            Coroutines.io {
-                // TODO: 结束测试后去除条件
-                val testOption = Random.nextInt(1, 2) > 0
-                // 检查包含游戏配置文件的 MOD
-                library = app.musicFactory.musicLibrary.values.filter { info ->
-                    SystemFileSystem.metadataOrNull(info.rhymePath)?.isRegularFile == true || testOption
-                }
-            }
-            delay(1000)
-        }
-        // 切换到首页
+        if (app.musicFactory.isInit) initGame()
         state = GameState.Start
     }
 
     override fun onBack() {
         if (lockState is GameLockState.Normal) {
             when (state) {
-                GameState.Loading, GameState.Start -> pop()
-                GameState.MusicLibrary -> state = GameState.Start
-                GameState.MusicDetails -> state = GameState.MusicLibrary
-                GameState.Playing -> pauseGame()
-                GameState.Settling -> state = GameState.Start
+                is GameState.Loading, is GameState.Start -> pop()
+                is GameState.MusicLibrary -> state = GameState.Start
+                is GameState.MusicDetails -> state = GameState.MusicLibrary
+                is GameState.Playing -> pauseGame()
+                is GameState.Settling -> state = GameState.Start
             }
         }
     }
@@ -473,7 +535,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         }
 
         Layout(
-            modifier = Modifier.background(Colors.Black).fillMaxSize(),
+            modifier = Modifier
+                .background(Colors.Black)
+                .fillMaxSize()
+                .background(Colors.Dark),
             content = {
                 // 遮罩层
                 GameScrimMask(modifier = Modifier.fillMaxSize().zIndex(4f))
