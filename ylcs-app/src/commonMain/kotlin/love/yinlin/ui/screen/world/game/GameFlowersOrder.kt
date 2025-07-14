@@ -12,21 +12,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
-import love.yinlin.data.rachel.game.*
+import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GameDetailsWithName
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.FOConfig
 import love.yinlin.data.rachel.game.info.FOInfo
 import love.yinlin.data.rachel.game.info.FOType
-import love.yinlin.extension.*
+import love.yinlin.extension.Int
+import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
+import love.yinlin.extension.to
+import love.yinlin.extension.toJson
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
+import kotlin.to
 
 @Composable
 private fun FlowersOrderText(
@@ -41,9 +56,9 @@ private fun FlowersOrderText(
             text = remember(text, items) { buildAnnotatedString {
                 text.forEachIndexed { index, ch ->
                     when (items[index]) {
-                        CORRECT -> withStyle(SpanStyle(color = Colors.Green4)) { append(ch) }
-                        INVALID_POS -> withStyle(SpanStyle(color = Colors.Yellow4)) { append(ch) }
-                        INCORRECT -> withStyle(SpanStyle(color = Colors.Red4)) { append(ch) }
+                        FOType.CORRECT -> withStyle(SpanStyle(color = Colors.Green4)) { append(ch) }
+                        FOType.INVALID_POS -> withStyle(SpanStyle(color = Colors.Yellow4)) { append(ch) }
+                        FOType.INCORRECT -> withStyle(SpanStyle(color = Colors.Red4)) { append(ch) }
                     }
                 }
             } },
@@ -89,9 +104,9 @@ private fun ColumnScope.FlowersOrderRecordResult(text: String, result: Int) {
     Text(
         text = "提示",
         style = MaterialTheme.typography.titleLarge,
-        textAlign = Center,
+        textAlign = TextAlign.Center,
         maxLines = 1,
-        overflow = Ellipsis,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier.fillMaxWidth()
     )
     FlowersOrderText(
@@ -203,7 +218,7 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                     for (i in answer.indices.reversed()) {
                         val v = FOType.decode(result[i])
                         answer[i].forEachIndexed { index, ch ->
-                            if (v[index] == INCORRECT) incorrectSet.add(ch)
+                            if (v[index] == FOType.INCORRECT) incorrectSet.add(ch)
                             else correctSet.add(ch)
                         }
                     }
@@ -284,9 +299,9 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 text = "寻花令长度: $question",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             TextInput(
@@ -299,9 +314,9 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
             Text(
                 text = "历史记录",
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space()
@@ -318,15 +333,15 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
             Text(
                 text = "常用字表",
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space()
             Text(
                 text = oldCharacters,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
             Space()

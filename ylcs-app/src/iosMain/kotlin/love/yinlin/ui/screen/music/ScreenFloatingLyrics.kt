@@ -9,7 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
@@ -17,8 +20,8 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
+import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
@@ -56,7 +59,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "这是一条测试歌词~",
@@ -64,9 +67,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * iosConfig.textSize
                     ),
                     color = Colors.from(iosConfig.textColor),
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     maxLines = 2,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.background(color = Colors.from(iosConfig.backgroundColor)).padding(ThemeValue.Padding.Value)
                 )
             }

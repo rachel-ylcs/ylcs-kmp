@@ -14,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.io.buffered
@@ -88,8 +90,8 @@ private fun PlatformMusicInfoCard(
             )
             Text(
                 text = remember(info) { LyricsLrc.Parser(info.lyrics).plainText },
-                textAlign = Center,
-                overflow = Clip,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Clip,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -101,9 +103,9 @@ private interface PlatformMusicParser {
 
     companion object {
         fun build(type: PlatformMusicType): PlatformMusicParser = when (type) {
-            QQMusic -> QQMusicParser()
-            NetEaseCloud -> NetEaseCloudParser()
-            Kugou -> KugouParser()
+            PlatformMusicType.QQMusic -> QQMusicParser()
+            PlatformMusicType.NetEaseCloud -> NetEaseCloudParser()
+            PlatformMusicType.Kugou -> KugouParser()
         }
     }
 }
@@ -113,8 +115,8 @@ private class QQMusicParser : PlatformMusicParser {
         // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
         link.contains("c6.y.qq.com") -> Coroutines.io {
             when (val tmp = QQMusicAPI.requestMusicId(link)) {
-                is Success -> QQMusicAPI.requestMusic(tmp.data)
-                is Failure -> tmp
+                is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
+                is Data.Failure -> tmp
             }
         }.map { listOf(it) }
         // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
@@ -147,8 +149,8 @@ private class NetEaseCloudParser : PlatformMusicParser {
         // 歌曲 http://163cn.tv/EElG0jr
         link.contains("163cn.tv") -> Coroutines.io {
             when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
-                is Success -> NetEaseCloudAPI.requestMusic(tmp.data)
-                is Failure -> tmp
+                is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
+                is Data.Failure -> tmp
             }
         }.map { listOf(it) }
         // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
@@ -289,8 +291,8 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
         ) {
             val parser = PlatformMusicParser.build(platformType)
             when (val result = parser.parseLink(linkState.text)) {
-                is Success -> items = result.data
-                is Failure -> slot.tip.warning("解析失败")
+                is Data.Success -> items = result.data
+                is Data.Failure -> slot.tip.warning("解析失败")
             }
         }
         ActionSuspend(

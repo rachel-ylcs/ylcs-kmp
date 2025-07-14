@@ -26,7 +26,9 @@ import androidx.compose.ui.unit.sp
 import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
+import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
+import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 
@@ -135,13 +137,13 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override val width: Float get() = when (emoji?.type) {
 			null -> 1f
-			Lottie -> 1.25f
+            EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 
 		override val height: Float get() = when (emoji?.type) {
 			null -> 1f
-			Lottie -> 1.25f
+            EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 
@@ -157,13 +159,13 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		override fun Draw() {
 			if (emoji == null) Box(modifier = Modifier.fillMaxSize())
 			else when (emoji.type) {
-                Static, Dynamic -> {
+                EmojiType.Static, EmojiType.Dynamic -> {
 					WebImage(
 						uri = remember(emoji) { emoji.showPath },
 						modifier = Modifier.fillMaxSize()
 					)
 				}
-                Lottie -> {
+                EmojiType.Lottie -> {
 					val composition by rememberLottieComposition(emoji) {
 						LottieCompositionSpec.Url(emoji.showPath)
 					}
@@ -215,7 +217,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 			Box(modifier = Modifier.fillMaxSize().padding(horizontal = 0.5.dp * width)) {
 				WebImage(
 					uri = uri,
-					quality = Low,
+					quality = ImageQuality.Low,
 					modifier = Modifier.fillMaxSize()
 				)
 			}
@@ -442,7 +444,7 @@ fun RichText(
 	onAtClick: ((String) -> Unit)? = null,
 	style: TextStyle = LocalTextStyle.current,
 	color: Color = Colors.Unspecified,
-	overflow: TextOverflow = Clip,
+	overflow: TextOverflow = TextOverflow.Clip,
 	maxLines: Int = Int.MAX_VALUE,
 	canSelected: Boolean = true,
 	fixLineHeight: Boolean = false,

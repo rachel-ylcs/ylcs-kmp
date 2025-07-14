@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.LocalDate
 import love.yinlin.Local
 import love.yinlin.common.Colors
@@ -186,9 +188,9 @@ internal fun ContributorList(
                     Text(
                         text = contributorGroup.title,
                         style = MaterialTheme.typography.labelMedium,
-                        textAlign = Center,
+                        textAlign = TextAlign.Center,
                         maxLines = 1,
-                        overflow = Clip
+                        overflow = TextOverflow.Clip
                     )
                 }
                 Column(modifier = Modifier.padding(vertical = ThemeValue.Border.Small / 2).weight(2f).border(
@@ -198,12 +200,12 @@ internal fun ContributorList(
                     for (contributor in contributorGroup.names) {
                         Text(
                             text = contributor.name,
-                            textAlign = Center,
-                            maxLines = 1,
-                            overflow = Ellipsis,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                                 .clickable { onClick(contributor) }
                                 .padding(ThemeValue.Padding.ExtraValue),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -224,9 +226,9 @@ internal fun UpdateInfoLayout(
         Text(
             text = "${Local.NAME} ${Local.VERSION_NAME} 更新日志",
             style = MaterialTheme.typography.titleLarge,
-            textAlign = Center,
+            textAlign = TextAlign.Center,
             maxLines = 1,
-            overflow = Ellipsis,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.fillMaxWidth()
         )
         Space()
@@ -240,9 +242,9 @@ internal fun UpdateInfoLayout(
             Text(
                 text = remember { DateEx.Formatter.standardDate.format(updateInfo.date) ?: "" },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = End,
+                textAlign = TextAlign.End,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
         }

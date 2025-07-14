@@ -1,6 +1,14 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,6 +23,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.platform.app
@@ -152,12 +161,12 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                         )
                     )
                     when (result) {
-                        is Success -> {
+                        is Data.Success -> {
                             worldPart.slot.tip.success(result.message)
                             app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
                             pop()
                         }
-                        is Failure -> slot.tip.error(result.message)
+                        is Data.Failure -> slot.tip.error(result.message)
                     }
                 }
                 else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")
@@ -168,8 +177,8 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     @Composable
     override fun SubContent(device: Device) {
         when (LocalDevice.current.type) {
-            PORTRAIT -> Portrait()
-            LANDSCAPE, SQUARE -> Landscape()
+            Device.Type.PORTRAIT -> Portrait()
+            Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }
     }
 

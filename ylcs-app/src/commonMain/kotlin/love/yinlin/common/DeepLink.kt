@@ -3,7 +3,8 @@ package love.yinlin.common
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.data.Data.Success
+import love.yinlin.data.Data
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.platform.app
 import love.yinlin.ui.screen.community.ScreenUserCard
 import love.yinlin.ui.screen.music.ScreenSongDetails
@@ -51,7 +52,7 @@ class DeepLink(private val model: AppModel) {
                             route = API.User.Song.GetSong,
                             data = id
                         )
-                        if (result is Success) model.navigate(ScreenSongDetails.Args(result.data))
+                        if (result is Data.Success) model.navigate(ScreenSongDetails.Args(result.data))
                     }
                 }
             }
@@ -66,14 +67,14 @@ class DeepLink(private val model: AppModel) {
             Scheme.QQMusic -> {
                 if (!app.musicFactory.isReady) model.navigate(ScreenPlatformMusic.Args(
                     deeplink = uri.copy(scheme = Scheme.Https).toString(),
-                    type = QQMusic
+                    type = PlatformMusicType.QQMusic
                 ))
                 else model.slot.tip.warning("请先停止播放器")
             }
             Scheme.NetEaseCloud -> {
                 if (!app.musicFactory.isReady) model.navigate(ScreenPlatformMusic.Args(
                     deeplink = uri.copy(scheme = Scheme.Https).toString(),
-                    type = NetEaseCloud
+                    type = PlatformMusicType.NetEaseCloud
                 ))
                 else model.slot.tip.warning("请先停止播放器")
             }

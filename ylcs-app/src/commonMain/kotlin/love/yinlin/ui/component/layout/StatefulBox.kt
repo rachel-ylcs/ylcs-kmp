@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
-import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -73,7 +72,7 @@ fun LoadingAnimation(
 fun SimpleLoadingBox() {
 	Box(
 		modifier = Modifier.fillMaxSize(),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		LoadingAnimation()
 	}
@@ -86,7 +85,7 @@ fun LoadingBox(
 ) {
 	Box(
 		modifier = Modifier.fillMaxSize(),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -117,7 +116,7 @@ fun SimpleEmptyBox(
 ) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -142,7 +141,7 @@ fun EmptyBox(
 ) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -176,7 +175,7 @@ fun NetWorkErrorBox(
 ) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -222,17 +221,17 @@ fun StatefulBox(
 		modifier = modifier,
 	) {
 		when (it) {
-			CONTENT -> {
+            BoxState.CONTENT -> {
 				Box(
 					modifier = Modifier.fillMaxSize(),
-					contentAlignment = Center
+					contentAlignment = Alignment.Center
 				) {
 					content()
 				}
 			}
-			LOADING -> LoadingBox()
-			EMPTY -> EmptyBox()
-			NETWORK_ERROR -> NetWorkErrorBox(retry = retry)
+            BoxState.LOADING -> LoadingBox()
+            BoxState.EMPTY -> EmptyBox()
+            BoxState.NETWORK_ERROR -> NetWorkErrorBox(retry = retry)
 		}
 	}
 }

@@ -13,7 +13,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
 import love.yinlin.platform.OS
-import love.yinlin.platform.Platform.WebWasm
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.text.RichContainer
@@ -25,13 +25,13 @@ object WeiboAPI {
 	private const val WEIBO_PROXY_HOST: String = "web.${Local.MAIN_HOST}/weibo"
 
 	private val WEIBO_HOST: String = OS.ifPlatform(
-		WebWasm,
+		Platform.WebWasm,
 		ifTrue = { WEIBO_PROXY_HOST },
 		ifFalse = { WEIBO_SOURCE_HOST }
 	)
 
 	private fun transferWeiboImageUrl(src: String): String = OS.ifPlatform(
-		WebWasm,
+        Platform.WebWasm,
 		ifTrue = {
 			if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
 			else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
@@ -47,7 +47,7 @@ object WeiboAPI {
 	)
 
 	private fun transferWeiboVideoUrl(src: String): String = OS.ifPlatform(
-		WebWasm,
+        Platform.WebWasm,
 		ifTrue = { src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video") },
 		ifFalse = { src }
 	)

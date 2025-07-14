@@ -18,7 +18,6 @@ import androidx.media3.session.SessionToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import love.yinlin.R
 import love.yinlin.common.LocalFileProvider
 import love.yinlin.data.Data
@@ -31,9 +30,9 @@ import love.yinlin.ui.screen.music.recordPath
 import java.io.File
 
 fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
-    shuffleModeEnabled -> RANDOM
-    repeatMode == Player.REPEAT_MODE_ONE -> LOOP
-    else -> ORDER
+    shuffleModeEnabled -> MusicPlayMode.RANDOM
+    repeatMode == Player.REPEAT_MODE_ONE -> MusicPlayMode.LOOP
+    else -> MusicPlayMode.ORDER
 }
 
 private val Timeline.extractMediaItems: List<MediaItem> get() {
@@ -118,7 +117,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     }
 
     override var error: Throwable? by mutableStateOf(null)
-    override var playMode: MusicPlayMode by mutableStateOf(ORDER)
+    override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
@@ -164,7 +163,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                     updateProgressJob?.cancel()
                     updateProgressJob = if (value) Coroutines.startMain {
                         while (true) {
-                            if (!isActive) break
+                            if (!Coroutines.isActive()) break
                             currentPosition = player.currentPosition
                             delay(UPDATE_INTERVAL)
                         }
@@ -195,7 +194,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                     Player.STATE_READY -> updateDuration(player)
                     Player.STATE_ENDED -> {
                         // 当因为删除当前媒体等原因停止了循环播放, 但仍然有剩余媒体则继续循环播放
-                        if (player.mediaItemCount != 0 && playMode == LOOP) player.play()
+                        if (player.mediaItemCount != 0 && playMode == MusicPlayMode.LOOP) player.play()
                         else {
                             // 已停止播放
                             musicList = emptyList()

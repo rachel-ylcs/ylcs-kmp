@@ -69,7 +69,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
                 OS.Storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
-                        ImageProcessor(ImageCrop(rect), ImageCompress, quality = High).process(source, sink)
+                        ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
                 }?.let { onPicAdd(it) }
             }
@@ -81,7 +81,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
             val path = mutableListOf<Path>()
             for (source in sources) {
                 OS.Storage.createTempFile { sink ->
-                    ImageProcessor(ImageCompress, quality = High).process(source, sink)
+                    ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let { path += it }
             }
             if (path.isNotEmpty()) onPicsAdd(path)

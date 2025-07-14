@@ -24,9 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.request.url
+import io.ktor.http.HttpMethod
+import io.ktor.http.URLProtocol
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -77,9 +80,9 @@ private fun UserItem(
             )
             Text(
                 text = info.name,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             content?.invoke(this)
@@ -119,9 +122,9 @@ private fun GameResultUserItem(
                 text = result.player.name,
                 style = MaterialTheme.typography.labelLarge,
                 color = if (isWinner) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis
+                overflow = TextOverflow.Ellipsis
             )
         }
         Text(
@@ -158,7 +161,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         data class Settling(val result1: LyricsSockets.GameResult, val result2: LyricsSockets.GameResult) : Status
     }
 
-    private var currentStatus: Status by mutableStateOf(Hall)
+    private var currentStatus: Status by mutableStateOf(Status.Hall)
     private var session: DefaultClientWebSocketSession? by mutableStateOf(null)
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
@@ -191,13 +194,13 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     private suspend fun sendInvite(info: LyricsSockets.PlayerInfo) {
-        if (currentStatus is Hall && slot.confirm.openSuspend(content = "邀请${info.name}对战")) {
+        if (currentStatus == Status.Hall && slot.confirm.openSuspend(content = "邀请${info.name}对战")) {
             send(LyricsSockets.CM.InvitePlayer(info.uid))
             currentStatus = Status.InviteLoading(info, LyricsSockets.INVITE_TIME)
             launch {
                 for (i in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
                     delay(1000L)
-                    (currentStatus as? InviteLoading)?.let { status ->
+                    (currentStatus as? Status.InviteLoading)?.let { status ->
                         val time = status.time - 1000L
                         if (time <= 0L) break
                         currentStatus = status.copy(time = time)
@@ -208,24 +211,24 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     }
 
     private suspend fun onInviteResult(info: LyricsSockets.PlayerInfo, accept: Boolean) {
-        if (!accept) currentStatus = Hall
+        if (!accept) currentStatus = Status.Hall
         send(LyricsSockets.CM.InviteResponse(info.uid, accept))
     }
 
     private fun handleInvitation(info: LyricsSockets.PlayerInfo) {
         // 只有在大厅里才能接受邀请, 其他情况均默认拒绝
-        if (currentStatus is Hall) {
+        if (currentStatus == Status.Hall) {
             currentStatus = Status.InvitedLoading(info, LyricsSockets.INVITE_TIME)
             launch {
                 for (i in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
                     delay(1000L)
-                    (currentStatus as? InvitedLoading)?.let { status ->
+                    (currentStatus as? Status.InvitedLoading)?.let { status ->
                         val time = status.time - 1000L
                         if (time <= 0L) break
                         currentStatus = status.copy(time = time)
                     } ?: return@launch
                 }
-                currentStatus = Hall
+                currentStatus = Status.Hall
             }
         }
     }
@@ -235,7 +238,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         launch {
             for (i in 0 ..< (LyricsSockets.PREPARE_TIME / 1000L).toInt()) {
                 delay(1000L)
-                (currentStatus as? Preparing)?.let { status ->
+                (currentStatus as? Status.Preparing)?.let { status ->
                     val time = status.time - 1000L
                     if (time <= 0L) break
                     currentStatus = status.copy(time = time)
@@ -249,7 +252,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         launch {
             for (i in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
                 delay(1000L)
-                (currentStatus as? Playing)?.let { status ->
+                (currentStatus as? Status.Playing)?.let { status ->
                     val time = status.time - 1000L
                     if (time <= 0L) break
                     currentStatus = status.copy(time = time)
@@ -261,25 +264,25 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun dispatchMessage(msg: LyricsSockets.SM) {
         when (msg) {
             is LyricsSockets.SM.Error -> slot.tip.warning(msg.message)
-            is PlayerList -> players.replaceAll(msg.players)
-            is InviteReceived -> handleInvitation(msg.player)
-            is RefuseInvitation -> {
+            is LyricsSockets.SM.PlayerList -> players.replaceAll(msg.players)
+            is LyricsSockets.SM.InviteReceived -> handleInvitation(msg.player)
+            is LyricsSockets.SM.RefuseInvitation -> {
                 slot.tip.warning("${msg.player.name}拒绝了你的对战邀请")
-                currentStatus = Hall
+                currentStatus = Status.Hall
             }
-            is GamePrepare -> handlePreparing(msg.player1, msg.player2)
-            is GameStart -> {
+            is LyricsSockets.SM.GamePrepare -> handlePreparing(msg.player1, msg.player2)
+            is LyricsSockets.SM.GameStart -> {
                 require(msg.questions.size == LyricsSockets.QUESTION_COUNT)
-                (currentStatus as? Preparing)?.let { status ->
+                (currentStatus as? Status.Preparing)?.let { status ->
                     handlePlaying(info1 = status.info1, info2 = status.info2, questions = msg.questions)
                 }
             }
-            is AnswerUpdated -> {
-                (currentStatus as? Playing)?.let { status ->
+            is LyricsSockets.SM.AnswerUpdated -> {
+                (currentStatus as? Status.Playing)?.let { status ->
                     currentStatus = status.copy(count1 = msg.count1, count2 = msg.count2)
                 }
             }
-            is SendResult -> currentStatus = Status.Settling(msg.result1, msg.result2)
+            is LyricsSockets.SM.SendResult -> currentStatus = Status.Settling(msg.result1, msg.result2)
         }
     }
 
@@ -327,18 +330,18 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             Text(
                 text = "等待对方回应",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space(ThemeValue.Padding.VerticalExtraSpace)
             Text(
                 text = remember(status) { status.time.timeString },
                 style = MaterialTheme.typography.displayMedium,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -360,18 +363,18 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             Text(
                 text = "是否接受对战",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space(ThemeValue.Padding.VerticalExtraSpace)
             Text(
                 text = remember(status) { status.time.timeString },
                 style = MaterialTheme.typography.displayMedium,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space(ThemeValue.Padding.VerticalExtraSpace)
@@ -419,17 +422,17 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             Text(
                 text = remember(status) { status.time.timeString },
                 style = MaterialTheme.typography.displayMedium,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = "准备时间",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -461,9 +464,9 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             Text(
                 text = (index + 1).toString(),
                 style = MaterialTheme.typography.titleLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
             ClickIcon(
@@ -549,9 +552,9 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                         Text(
                             text = remember(status) { status.time.timeString },
                             style = MaterialTheme.typography.displayMedium,
-                            textAlign = Center,
+                            textAlign = TextAlign.Center,
                             maxLines = 1,
-                            overflow = Ellipsis
+                            overflow = TextOverflow.Ellipsis
                         )
                         PrimaryLoadingButton(
                             text = "提交",
@@ -560,7 +563,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                                 val blankCount = status.answers.count { it == null }
                                 val submit = if (blankCount > 0) slot.confirm.openSuspend(content = "还有${blankCount}题未填写, 是否提交?") else true
                                 if (submit) {
-                                    send(Submit)
+                                    send(LyricsSockets.CM.Submit)
                                     currentStatus = Status.Waiting(status.info2)
                                 }
                             }
@@ -605,9 +608,9 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
             Text(
                 text = "等待对方完成...",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Space(ThemeValue.Padding.VerticalExtraSpace)
@@ -655,8 +658,8 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     text = "返回大厅",
                     icon = Icons.AutoMirrored.Outlined.Reply,
                     onClick = {
-                        currentStatus = Hall
-                        send(GetPlayers)
+                        currentStatus = Status.Hall
+                        send(LyricsSockets.CM.GetPlayers)
                     }
                 )
             }
@@ -679,34 +682,34 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     override fun SubContent(device: Device) {
         Box(
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-            contentAlignment = Center
+            contentAlignment = Alignment.Center
         ) {
             when (val status = currentStatus) {
-                is Hall -> HallLayout()
-                is InviteLoading -> InviteLoadingLayout(status)
-                is InvitedLoading -> InvitedLoadingLayout(status)
-                is Preparing -> PreparingLayout(status)
-                is Playing -> GameLayout(status)
-                is Waiting -> WaitingLayout(status)
-                is Settling -> SettlingLayout(status)
+                is Status.Hall -> HallLayout()
+                is Status.InviteLoading -> InviteLoadingLayout(status)
+                is Status.InvitedLoading -> InvitedLoadingLayout(status)
+                is Status.Preparing -> PreparingLayout(status)
+                is Status.Playing -> GameLayout(status)
+                is Status.Waiting -> WaitingLayout(status)
+                is Status.Settling -> SettlingLayout(status)
             }
         }
     }
 
     override val fabIcon: ImageVector? by derivedStateOf {
         if (session != null) {
-            if (currentStatus is Hall) Icons.Outlined.Refresh else null
+            if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null
         }
         else ExtraIcons.Disconnect
     }
 
     override suspend fun onFabClick() {
         if (session != null) {
-            if (currentStatus is Hall) send(GetPlayers)
+            if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
         }
         else launch {
             players.clear()
-            currentStatus = Hall
+            currentStatus = Status.Hall
             sessionLoop()
         }
     }

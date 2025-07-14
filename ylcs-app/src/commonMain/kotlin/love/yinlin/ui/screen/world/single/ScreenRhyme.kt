@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
@@ -156,18 +158,18 @@ private fun GameMusicCard(
             ) {
                 Text(
                     text = musicInfo.name,
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
-                    overflow = MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = musicInfo.singer,
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
-                    overflow = MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -177,22 +179,22 @@ private fun GameMusicCard(
 
 @Stable
 class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
-    private var state: GameState by mutableStateOf(Loading)
-    private var lockState: GameLockState by mutableStateOf(Normal)
+    private var state: GameState by mutableStateOf(GameState.Loading)
+    private var lockState: GameLockState by mutableStateOf(GameLockState.Normal)
 
     private var library = emptyList<MusicInfo>()
 
     private var resumePauseJob: Job? = null
 
     private fun onScreenOrientationChanged(type: Device.Type) {
-        if (type == LANDSCAPE) {
+        if (type == Device.Type.LANDSCAPE) {
             // 如果处于竖屏锁, 当转回横屏后启动恢复协程
-            if (lockState is PortraitLock) resumePauseTimer()
+            if (lockState is GameLockState.PortraitLock) resumePauseTimer()
         }
         else {
             // 转回竖屏后, 如果处于恢复状态则取消恢复协程
             resumePauseJob?.cancel()
-            lockState = PortraitLock
+            lockState = GameLockState.PortraitLock
             pauseGame()
         }
     }
@@ -210,7 +212,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         lockState = GameLockState.Resume(3 - it)
                         delay(1000L)
                     }
-                    lockState = Normal
+                    lockState = GameLockState.Normal
                 }
                 finally {
                     resumePauseJob = null
@@ -342,12 +344,12 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun GameScrimMask(modifier: Modifier) {
         Box(modifier = modifier) {
-            if (lockState !is Normal) {
+            if (lockState !is GameLockState.Normal) {
                 Box(
                     modifier = Modifier.fillMaxSize()
                         .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
                         .clickableNoRipple { },
-                    contentAlignment = Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
@@ -357,11 +359,11 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                             .heightIn(max = ThemeValue.Size.PanelWidth)
                             .background(Colors.Gray8, MaterialTheme.shapes.extraLarge)
                             .padding(ThemeValue.Padding.HorizontalExtraSpace * 2),
-                        contentAlignment = Center
+                        contentAlignment = Alignment.Center
                     ) {
                         when (val currentLockState = lockState) {
-                            Normal -> {}
-                            PortraitLock -> {
+                            GameLockState.Normal -> {}
+                            GameLockState.PortraitLock -> {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
@@ -378,10 +380,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                                     )
                                 }
                             }
-                            Pause -> {
+                            GameLockState.Pause -> {
 
                             }
-                            is Resume -> {
+                            is GameLockState.Resume -> {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
@@ -410,12 +412,12 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         Box(modifier = modifier) {
             AnimationLayout(state = state) {
                 when (it) {
-                    Loading -> GameOverlayLoading()
-                    Start -> GameOverlayStart()
-                    MusicLibrary -> GameMusicLibrary()
-                    MusicDetails -> GameMusicDetails()
-                    Playing -> GameOverlayPlaying()
-                    Settling -> GameOverlaySettling()
+                    GameState.Loading -> GameOverlayLoading()
+                    GameState.Start -> GameOverlayStart()
+                    GameState.MusicLibrary -> GameMusicLibrary()
+                    GameState.MusicDetails -> GameMusicDetails()
+                    GameState.Playing -> GameOverlayPlaying()
+                    GameState.Settling -> GameOverlaySettling()
                 }
             }
         }
@@ -449,17 +451,17 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             delay(1000)
         }
         // 切换到首页
-        state = Start
+        state = GameState.Start
     }
 
     override fun onBack() {
         if (lockState is GameLockState.Normal) {
             when (state) {
-                Loading, Start -> pop()
-                MusicLibrary -> state = Start
-                MusicDetails -> state = MusicLibrary
-                Playing -> pauseGame()
-                Settling -> state = Start
+                GameState.Loading, GameState.Start -> pop()
+                GameState.MusicLibrary -> state = GameState.Start
+                GameState.MusicDetails -> state = GameState.MusicLibrary
+                GameState.Playing -> pauseGame()
+                GameState.Settling -> state = GameState.Start
             }
         }
     }

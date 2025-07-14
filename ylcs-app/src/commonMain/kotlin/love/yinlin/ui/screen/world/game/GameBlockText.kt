@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
@@ -25,10 +27,19 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.rachel.game.*
+import love.yinlin.data.rachel.game.GameConfig
+import love.yinlin.data.rachel.game.GameDetailsWithName
+import love.yinlin.data.rachel.game.GamePublicDetailsWithName
+import love.yinlin.data.rachel.game.GameResult
+import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
-import love.yinlin.extension.*
+import love.yinlin.extension.String
+import love.yinlin.extension.catchingNull
+import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberValueState
+import love.yinlin.extension.to
+import love.yinlin.extension.toJson
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -36,6 +47,7 @@ import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.jvm.JvmInline
 import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.to
 
 private fun Modifier.drawGrid(blockSize: Int, color: Color) = drawWithContent {
     drawContent()
@@ -99,10 +111,10 @@ private fun CharacterBlock(
 ) {
     Box(
         modifier = modifier,
-        contentAlignment = Center
+        contentAlignment = Alignment.Center
     ) {
         var openIndex by rememberValueState(-1)
-        var inputMode: CharacterBlockInputMode by rememberState { DISABLED }
+        var inputMode by rememberState { CharacterBlockInputMode.DISABLED }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(blockSize),
@@ -129,7 +141,7 @@ private fun CharacterBlock(
                                     if (openIndex != -1) -1 else index
                                 } else -1
                             }.padding(ThemeValue.Padding.LittleSpace * 16f / blockSize),
-                        contentAlignment = Center
+                        contentAlignment = Alignment.Center
                     ) {
                         if (ch != BTConfig.CHAR_EMPTY && ch != BTConfig.CHAR_BLOCK) {
                             BasicText(
@@ -138,7 +150,7 @@ private fun CharacterBlock(
                                     color = if (hide) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onPrimaryContainer
                                 ),
                                 maxLines = 1,
-                                overflow = Clip,
+                                overflow = TextOverflow.Clip,
                                 autoSize = TextAutoSize.StepBased()
                             )
                         }
@@ -160,32 +172,32 @@ private fun CharacterBlock(
                 ) {
                     val textChanged: suspend (Boolean, Int, Char) -> Unit =
                         remember(inputMode, onCharacterSelected, onStringSelected, onCharacterChanged) {
-                        { hide, index, ch ->
-                            if (inputMode == DISABLED) {
-                                val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
-                                onCharacterSelected(oldCharacter)?.let { newCharacter ->
-                                    if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
-                                        onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                            { hide, index, ch ->
+                                if (inputMode == CharacterBlockInputMode.DISABLED) {
+                                    val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
+                                    onCharacterSelected(oldCharacter)?.let { newCharacter ->
+                                        if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
+                                            onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                                        }
                                     }
                                 }
-                            }
-                            else {
-                                onStringSelected()?.let { newString ->
-                                    // 确定当前索引的位置
-                                    val startIndex = if (inputMode == HORIZONTAL) index % blockSize else index / blockSize
-                                    repeat(min(blockSize - startIndex, newString.length)) {
-                                        val actualIndex = if (inputMode == HORIZONTAL) index + it else index + it * blockSize
-                                        data[actualIndex].decode { currentCharacter, currentHide ->
-                                            // 防止将不可重写的格子重写
-                                            if (writeMode || (currentCharacter != BTConfig.CHAR_EMPTY && currentCharacter != BTConfig.CHAR_BLOCK && currentHide)) {
-                                                onCharacterChanged(actualIndex, BlockCharacter(newString[it], hide))
+                                else {
+                                    onStringSelected()?.let { newString ->
+                                        // 确定当前索引的位置
+                                        val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
+                                        repeat(min(blockSize - startIndex, newString.length)) {
+                                            val actualIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index + it else index + it * blockSize
+                                            data[actualIndex].decode { currentCharacter, currentHide ->
+                                                // 防止将不可重写的格子重写
+                                                if (writeMode || (currentCharacter != BTConfig.CHAR_EMPTY && currentCharacter != BTConfig.CHAR_BLOCK && currentHide)) {
+                                                    onCharacterChanged(actualIndex, BlockCharacter(newString[it], hide))
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
                     LoadingIcon(
                         icon = Icons.Outlined.VisibilityOff,
@@ -215,11 +227,11 @@ private fun CharacterBlock(
                     )
                     ClickIcon(
                         icon = when (inputMode) {
-                            DISABLED -> Icons.Outlined.MobiledataOff
-                            HORIZONTAL -> Icons.Outlined.SwapHoriz
-                            VERTICAL -> Icons.Outlined.SwapVert
+                            CharacterBlockInputMode.DISABLED -> Icons.Outlined.MobiledataOff
+                            CharacterBlockInputMode.HORIZONTAL -> Icons.Outlined.SwapHoriz
+                            CharacterBlockInputMode.VERTICAL -> Icons.Outlined.SwapVert
                         },
-                        color = if (inputMode == DISABLED) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
+                        color = if (inputMode == CharacterBlockInputMode.DISABLED) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
                         onClick = { inputMode = inputMode.next }
                     )
                 }
@@ -271,9 +283,9 @@ private fun ColumnScope.BlockTextRecordResult(result: BTResult) {
     Text(
         text = "正确率: $correctCount / $totalCount",
         style = MaterialTheme.typography.titleLarge,
-        textAlign = Center,
+        textAlign = TextAlign.Center,
         maxLines = 1,
-        overflow = Ellipsis,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier.fillMaxWidth()
     )
 }

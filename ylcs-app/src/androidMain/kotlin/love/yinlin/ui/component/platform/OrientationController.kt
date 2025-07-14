@@ -11,9 +11,9 @@ import androidx.compose.runtime.remember
 @Stable
 data class ActualOrientationController(val activity: Activity) : OrientationController {
     override var orientation: Orientation
-        get() = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) LANDSCAPE else PORTRAIT
+        get() = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) Orientation.LANDSCAPE else Orientation.PORTRAIT
         set(value) {
-            activity.requestedOrientation = if (value == LANDSCAPE) {
+            activity.requestedOrientation = if (value == Orientation.LANDSCAPE) {
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }

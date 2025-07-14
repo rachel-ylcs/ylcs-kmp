@@ -12,6 +12,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
@@ -57,7 +58,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			)
 		)
 		when (result) {
-			is Success -> {
+			is Data.Success -> {
 				activities.findAssign(predicate = { it.aid == args.aid }) {
 					it.copy(
 						ts = ts,
@@ -71,7 +72,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				}
 				slot.tip.success(result.message)
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -88,12 +89,12 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			) }
 		)
 		when (result) {
-			is Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPic = result.data
 				input.pic = it.picPath(newPic)
 				it.copy(pic = newPic)
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -108,11 +109,11 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			)
 		)
 		when (result) {
-			is Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				input.pic = null
 				it.copy(pic = null)
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -130,12 +131,12 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			) }
 		)
 		when (result) {
-			is Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				val newPics = result.data
 				input.pics += newPics.fastMap { pic -> Picture(it.picPath(pic)) }
 				it.copy(pics = it.pics + newPics)
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -143,7 +144,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 	private suspend fun modifyPictures(index: Int) {
 		Picker.pickPicture()?.use { source ->
 			OS.Storage.createTempFile { sink ->
-				ImageProcessor(ImageCompress, quality = High).process(source, sink)
+				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
 		}?.let { path ->
 			slot.loading.openSuspend()
@@ -159,12 +160,12 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				) }
 			)
 			when (result) {
-				is Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+				is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 					val newPic = result.data
 					input.pics[index] = Picture(it.picPath(newPic))
 					it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
 				}
-				is Failure -> slot.tip.error(result.message)
+				is Data.Failure -> slot.tip.error(result.message)
 			}
 			slot.loading.close()
 		}
@@ -181,11 +182,11 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 			)
 		)
 		when (result) {
-			is Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
 				input.pics.removeAt(index)
 				it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}

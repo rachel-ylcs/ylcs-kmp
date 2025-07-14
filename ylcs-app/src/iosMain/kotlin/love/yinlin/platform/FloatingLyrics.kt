@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -81,6 +84,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
     }
 
     override fun updateLyrics(lyrics: String?) {
+        // TODO: 这里的转换layer是long, 应该是不能转换成功的, 是否应该用native的指针
         (pipView.layer as? AVSampleBufferDisplayLayer)?.flush()
         currentLyrics = lyrics
         composeScene.render().use { image ->
@@ -114,7 +118,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
         currentLyrics?.let { lyrics ->
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = lyrics,
@@ -122,9 +126,9 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                     ),
                     color = Colors.from(config.textColor),
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     maxLines = 2,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
                 )
             }

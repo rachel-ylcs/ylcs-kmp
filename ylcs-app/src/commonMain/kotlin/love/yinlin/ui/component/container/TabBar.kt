@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.common.ThemeValue
@@ -21,102 +22,102 @@ import kotlin.jvm.JvmName
 
 @Composable
 private fun <T> TabBar(
-	currentPage: Int,
-	onNavigate: (Int) -> Unit,
-	onLongClick: ((Int) -> Unit)? = null,
-	items: List<T>,
-	modifier: Modifier = Modifier,
-	content: @Composable (Boolean, T) -> Unit,
+    currentPage: Int,
+    onNavigate: (Int) -> Unit,
+    onLongClick: ((Int) -> Unit)? = null,
+    items: List<T>,
+    modifier: Modifier = Modifier,
+    content: @Composable (Boolean, T) -> Unit,
 ) {
-	PrimaryScrollableTabRow(
-		modifier = modifier,
-		selectedTabIndex = currentPage,
-		edgePadding = ThemeValue.Padding.ZeroSpace,
-		indicator = {
-			if (currentPage < items.size) {
-				TabRowDefaults.PrimaryIndicator(
-					Modifier.tabIndicatorOffset(currentPage, matchContentSize = false),
-					width = Dp.Unspecified,
-					height = ThemeValue.Size.Little
-				)
-			}
-		},
-		divider = {}
-	) {
-		items.fastForEachIndexed { index, item ->
-			val isSelected = currentPage == index
-			Box(
-				modifier = Modifier.combinedClickable(
-					onClick = {
-						if (!isSelected) onNavigate(index)
-					},
-					onLongClick = {
-						if (currentPage == index) onLongClick?.invoke(index)
-					}
-				).padding(ThemeValue.Padding.EqualSpace),
-				contentAlignment = Center
-			) {
-				content(isSelected, item)
-			}
-		}
-	}
+    PrimaryScrollableTabRow(
+        modifier = modifier,
+        selectedTabIndex = currentPage,
+        edgePadding = ThemeValue.Padding.ZeroSpace,
+        indicator = {
+            if (currentPage < items.size) {
+                TabRowDefaults.PrimaryIndicator(
+                    Modifier.tabIndicatorOffset(currentPage, matchContentSize = false),
+                    width = Dp.Unspecified,
+                    height = ThemeValue.Size.Little
+                )
+            }
+        },
+        divider = {}
+    ) {
+        items.fastForEachIndexed { index, item ->
+            val isSelected = currentPage == index
+            Box(
+                modifier = Modifier.combinedClickable(
+                    onClick = {
+                        if (!isSelected) onNavigate(index)
+                    },
+                    onLongClick = {
+                        if (currentPage == index) onLongClick?.invoke(index)
+                    }
+                ).padding(ThemeValue.Padding.EqualSpace),
+                contentAlignment = Alignment.Center
+            ) {
+                content(isSelected, item)
+            }
+        }
+    }
 }
 
 @JvmName("TabBarWithIcon")
 @Composable
 fun TabBar(
-	currentPage: Int,
-	onNavigate: (Int) -> Unit,
-	onLongClick: ((Int) -> Unit)? = null,
-	items: List<Pair<String, ImageVector>>,
-	modifier: Modifier = Modifier
+    currentPage: Int,
+    onNavigate: (Int) -> Unit,
+    onLongClick: ((Int) -> Unit)? = null,
+    items: List<Pair<String, ImageVector>>,
+    modifier: Modifier = Modifier
 ) {
-	TabBar(
-		currentPage = currentPage,
-		onNavigate = onNavigate,
-		onLongClick = onLongClick,
-		items = items,
-		modifier = modifier
-	) { isSelected, (title, icon) ->
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			MiniIcon(
-				icon = icon,
-				size = ThemeValue.Size.MicroIcon,
-				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-			)
-			Text(
-				text = title,
-				color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-				style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-				textAlign = Center
-			)
-		}
-	}
+    TabBar(
+        currentPage = currentPage,
+        onNavigate = onNavigate,
+        onLongClick = onLongClick,
+        items = items,
+        modifier = modifier
+    ) { isSelected, (title, icon) ->
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MiniIcon(
+                icon = icon,
+                size = ThemeValue.Size.MicroIcon,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = title,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
 
 @Composable
 fun TabBar(
-	currentPage: Int,
-	onNavigate: (Int) -> Unit,
-	onLongClick: ((Int) -> Unit)? = null,
-	items: List<String>,
-	modifier: Modifier = Modifier
+    currentPage: Int,
+    onNavigate: (Int) -> Unit,
+    onLongClick: ((Int) -> Unit)? = null,
+    items: List<String>,
+    modifier: Modifier = Modifier
 ) {
-	TabBar(
-		currentPage = currentPage,
-		onNavigate = onNavigate,
-		onLongClick = onLongClick,
-		items = items,
-		modifier = modifier
-	) { isSelected, title ->
-		Text(
-			text = title,
-			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-			style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-			textAlign = Center
-		)
-	}
+    TabBar(
+        currentPage = currentPage,
+        onNavigate = onNavigate,
+        onLongClick = onLongClick,
+        items = items,
+        modifier = modifier
+    ) { isSelected, title ->
+        Text(
+            text = title,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            style = if (isSelected) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+    }
 }

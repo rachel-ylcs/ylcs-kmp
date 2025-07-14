@@ -211,7 +211,7 @@ object ModFactory {
             val resLength = readInt() // 读资源长度
             require(resLength > 0) { "资源长度非法 Length: $resLength" }
             val times = resLength / INTERVAL
-            val config = if (resource.type == Config) { // 读取媒体配置
+            val config = if (resource.type == MusicResourceType.Config) { // 读取媒体配置
                 val bytes = ByteArray(resLength)
                 readTo(bytes)
                 bytes.decodeToString().parseJsonValue<MusicInfo>()

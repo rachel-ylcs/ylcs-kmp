@@ -51,7 +51,7 @@ abstract class MusicFactory {
 
     fun initFactory() {
         Coroutines.startCPU {
-            OS.ifNotPlatform(WebWasm) { initLibrary() }
+            OS.ifNotPlatform(Platform.WebWasm) { initLibrary() }
             init()
             if (isInit) initLastStatus()
         }

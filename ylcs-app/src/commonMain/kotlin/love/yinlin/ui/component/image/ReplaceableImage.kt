@@ -21,7 +21,7 @@ import love.yinlin.common.ThemeValue
 @Composable
 fun ReplaceableImage(
     uri: String? = null,
-    contentScale: ContentScale = Fit,
+    contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier,
     onReplace: () -> Unit,
     onDelete: () -> Unit
@@ -33,7 +33,7 @@ fun ReplaceableImage(
                     .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.surface)
                     .clickable(onClick = onReplace),
-                contentAlignment = Center
+                contentAlignment = Alignment.Center
             ) {
                 MiniIcon(
                     icon = Icons.Outlined.Add,
@@ -44,7 +44,7 @@ fun ReplaceableImage(
         else {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Center
+                contentAlignment = Alignment.Center
             ) {
                 ClickIcon(
                     icon = Icons.Outlined.Cancel,

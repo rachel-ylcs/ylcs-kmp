@@ -104,6 +104,7 @@ afterEvaluate {
     val generateConstants by tasks.registering {
         val content = """
             package love.yinlin
+            
             import love.yinlin.platform.Platform
             import love.yinlin.platform.platform
             
@@ -120,7 +121,7 @@ afterEvaluate {
                 const val API_HOST: String = "${C.host.apiHost}"
                 @Suppress("HttpUrlsUsage")
                 val API_BASE_URL: String = run {
-                    if (platform == WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
+                    if (platform == Platform.WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
                 }
             }
         """.trimIndent()

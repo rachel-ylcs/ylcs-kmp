@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.DB
@@ -19,7 +18,6 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.values
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
 private suspend inline fun WebSocketServerSession.send(data: LyricsSockets.SM) = this.sendSerialized(data)
@@ -73,7 +71,7 @@ object LyricsSocketsManager {
 
     private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME)
-        if (coroutineContext.isActive) {
+        if (Coroutines.isActive()) {
             // 超时自动拒绝
             val target = players[targetInfo.uid]
             if (target == null || target.room == null) {
@@ -180,7 +178,7 @@ object LyricsSocketsManager {
             for (frame in session.incoming) {
                 if (frame !is Frame.Text) continue
                 when (val msg = frame.readText().parseJsonValue<LyricsSockets.CM>()!!) {
-                    is Login -> {
+                    is LyricsSockets.CM.Login -> {
                         val tokenUid = Coroutines.io { AN.throwExpireToken(msg.token) }
                         val (uid, name) = msg.info
                         require(tokenUid == uid && !players.containsKey(uid))
@@ -189,8 +187,8 @@ object LyricsSocketsManager {
                         players[uid] = player
                         session.send(LyricsSockets.SM.PlayerList(availablePlayers))
                     }
-                    GetPlayers if currentPlayer != null -> session.send(LyricsSockets.SM.PlayerList(availablePlayers))
-                    is InvitePlayer if currentPlayer != null -> {
+                    LyricsSockets.CM.GetPlayers if currentPlayer != null -> session.send(LyricsSockets.SM.PlayerList(availablePlayers))
+                    is LyricsSockets.CM.InvitePlayer if currentPlayer != null -> {
                         val target = players[msg.targetUid]
                         when {
                             target == null -> session.send(LyricsSockets.SM.Error("对方未上线"))
@@ -205,7 +203,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    is InviteResponse if currentPlayer != null -> {
+                    is LyricsSockets.CM.InviteResponse if currentPlayer != null -> {
                         val inviter = players[msg.inviterUid]
                         when {
                             inviter == null -> session.send(LyricsSockets.SM.Error("对方未上线"))
@@ -231,7 +229,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    is SaveAnswer if currentPlayer != null -> {
+                    is LyricsSockets.CM.SaveAnswer if currentPlayer != null -> {
                         currentPlayer.room?.let { room ->
                             val triple = when (currentPlayer.uid) {
                                 room.info1.uid -> Triple(room.answers1, room.info2.uid, room.answers2)
@@ -253,7 +251,7 @@ object LyricsSocketsManager {
                             }
                         }
                     }
-                    Submit if currentPlayer != null -> currentPlayer.room?.let { submitAnswers(it, currentPlayer.uid) }
+                    LyricsSockets.CM.Submit if currentPlayer != null -> currentPlayer.room?.let { submitAnswers(it, currentPlayer.uid) }
                     else -> {}
                 }
             }

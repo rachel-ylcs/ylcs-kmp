@@ -27,7 +27,7 @@ abstract class AppContext {
 	// 初始化部分
 
 	private fun initializePath() {
-		OS.ifNotPlatform(WebWasm) {
+		OS.ifNotPlatform(Platform.WebWasm) {
 			SystemFileSystem.createDirectories(OS.Storage.dataPath)
 			SystemFileSystem.createDirectories(OS.Storage.cachePath)
 

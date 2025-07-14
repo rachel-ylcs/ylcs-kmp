@@ -15,6 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -27,6 +29,7 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
@@ -94,18 +97,18 @@ private fun MusicCard(
             ) {
                 Text(
                     text = musicInfo.name,
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
-                    overflow = MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = musicInfo.singer,
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
-                    overflow = MiddleEllipsis,
+                    overflow = TextOverflow.MiddleEllipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -348,9 +351,9 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
             when (result) {
                 ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
                 ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
-                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, QQMusic))
-                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, NetEaseCloud))
-                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, Kugou))
+                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
+                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
+                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
             }
         }
     }

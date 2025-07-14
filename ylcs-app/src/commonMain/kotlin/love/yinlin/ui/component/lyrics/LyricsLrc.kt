@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
@@ -23,6 +24,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.util.fastDistinctBy
 import androidx.compose.ui.util.fastFilter
@@ -67,9 +70,9 @@ private fun LyricsLrcLine(
                 fontSize = fontSize,
                 fontWeight = fontWeight
             ),
-            textAlign = Center,
+            textAlign = TextAlign.Center,
             maxLines = 1,
-            overflow = MiddleEllipsis,
+            overflow = TextOverflow.MiddleEllipsis,
             modifier = Modifier.zIndex(2f)
         )
         if (offset == 0) {
@@ -89,9 +92,9 @@ private fun LyricsLrcLine(
                         join = StrokeJoin.Round
                     )
                 ),
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 maxLines = 1,
-                overflow = MiddleEllipsis,
+                overflow = TextOverflow.MiddleEllipsis,
                 textDecoration = null,
                 modifier = Modifier.semantics { hideFromAccessibility() }.alpha(0.7f).zIndex(1f)
             )
@@ -224,7 +227,7 @@ class LyricsLrc : LyricsEngine {
                                 .clickable(enabled = item.text.isNotEmpty()) {
                                     onLyricsClick(item.position)
                                 },
-                            contentAlignment = Center
+                            contentAlignment = Alignment.Center
                         ) {
                             LyricsLrcLine(
                                 text = item.text,

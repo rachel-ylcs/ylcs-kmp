@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.DouyinAPI
@@ -22,7 +23,11 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.douyin.DouyinVideo
-import love.yinlin.extension.*
+import love.yinlin.extension.Object
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.filenameOrRandom
+import love.yinlin.extension.parseJson
+import love.yinlin.extension.rememberIntState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.ClickIcon
@@ -38,7 +43,7 @@ import love.yinlin.ui.screen.common.ScreenVideo
 
 @Stable
 class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
-    private var state: BoxState by mutableStateOf(EMPTY)
+    private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
     private val browser = object : HeadlessBrowser() {
@@ -49,7 +54,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                 state = catchingDefault(BoxState.NETWORK_ERROR) {
                     val json = response.parseJson
                     items = Coroutines.cpu { DouyinAPI.getDouyinVideos(json.Object) }
-                    if (items.isEmpty()) EMPTY else CONTENT
+                    if (items.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
                 }
                 destroy()
             }
@@ -85,7 +90,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     text = item.title,
                     color = if (item.isTop) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     maxLines = 5,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
                 )
                 Text(
@@ -93,7 +98,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
                 )
                 Row(
@@ -170,7 +175,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "抖音"
 
     override suspend fun initialize() {
-        state = LOADING
+        state = BoxState.LOADING
         browser.load("https://www.douyin.com/user/MS4wLjABAAAATAf7yHksdW6CBPSjl9CW8k3c_x_drbwg0CVLTowlwzE")
     }
 

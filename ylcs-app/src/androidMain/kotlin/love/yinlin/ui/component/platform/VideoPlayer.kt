@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Fullscreen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.zIndex
 import androidx.media3.common.MediaItem
@@ -21,7 +22,6 @@ import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.extension.OffScreenEffect
@@ -50,7 +50,7 @@ private class VideoPlayerState {
                     updateProgressJob?.cancel()
                     updateProgressJob = if (value) Coroutines.startMain {
                         while (true) {
-                            if (!isActive) break
+                            if (!Coroutines.isActive()) break
                             position = player.currentPosition
                             delay(MusicFactory.UPDATE_INTERVAL)
                         }
@@ -122,7 +122,7 @@ actual fun VideoPlayer(
         Box(Modifier.fillMaxSize().background(Colors.Black).zIndex(1f))
         state.controller?.let { player ->
             val presentationState = rememberPresentationState(player)
-            val scaledModifier = Modifier.resizeWithContentScale(Inside, presentationState.videoSizeDp)
+            val scaledModifier = Modifier.resizeWithContentScale(ContentScale.Inside, presentationState.videoSizeDp)
 
             PlayerSurface(
                 player = player,

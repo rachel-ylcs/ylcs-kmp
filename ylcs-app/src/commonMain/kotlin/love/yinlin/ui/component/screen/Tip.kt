@@ -11,11 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeColor
@@ -32,7 +34,7 @@ open class Tip(private val scope: CoroutineScope) {
     }
 
     private val host = SnackbarHostState()
-    var type: Type by mutableStateOf(INFO)
+    var type: Type by mutableStateOf(Type.INFO)
         private set
 
     fun show(text: String?, type: Type) {
@@ -46,10 +48,10 @@ open class Tip(private val scope: CoroutineScope) {
         }
     }
 
-    fun info(text: String?) = show(text, INFO)
-    fun success(text: String?) = show(text, SUCCESS)
-    fun warning(text: String?) = show(text, WARNING)
-    fun error(text: String?) = show(text, ERROR)
+    fun info(text: String?) = show(text, Type.INFO)
+    fun success(text: String?) = show(text, Type.SUCCESS)
+    fun warning(text: String?) = show(text, Type.WARNING)
+    fun error(text: String?) = show(text, Type.ERROR)
 
     @Composable
     fun Land() {
@@ -61,21 +63,21 @@ open class Tip(private val scope: CoroutineScope) {
                 .zIndex(Floating.Z_INDEX_TIP)
         ) {
             val color = when (type) {
-                INFO -> MaterialTheme.colorScheme.secondaryContainer
-                SUCCESS -> MaterialTheme.colorScheme.primaryContainer
-                WARNING -> ThemeColor.warning
-                ERROR -> MaterialTheme.colorScheme.error
+                Type.INFO -> MaterialTheme.colorScheme.secondaryContainer
+                Type.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
+                Type.WARNING -> ThemeColor.warning
+                Type.ERROR -> MaterialTheme.colorScheme.error
             }
             val contentColor = when (type) {
-                INFO -> MaterialTheme.colorScheme.onSecondaryContainer
-                SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
-                WARNING -> ThemeColor.onWarning
-                ERROR -> MaterialTheme.colorScheme.onError
+                Type.INFO -> MaterialTheme.colorScheme.onSecondaryContainer
+                Type.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
+                Type.WARNING -> ThemeColor.onWarning
+                Type.ERROR -> MaterialTheme.colorScheme.onError
             }
             val tipPadding = PaddingValues(when (LocalDevice.current.size) {
-                SMALL -> 40.dp
-                MEDIUM -> 50.dp
-                LARGE -> 60.dp
+                Device.Size.SMALL -> 40.dp
+                Device.Size.MEDIUM -> 50.dp
+                Device.Size.LARGE -> 60.dp
             })
             Box(
                 modifier = Modifier.padding(tipPadding)
@@ -90,10 +92,10 @@ open class Tip(private val scope: CoroutineScope) {
                 ) {
                     MiniIcon(
                         icon = when (type) {
-                            INFO -> Icons.Outlined.Lightbulb
-                            SUCCESS -> Icons.Outlined.Check
-                            WARNING -> Icons.Outlined.Warning
-                            ERROR -> Icons.Outlined.Error
+                            Type.INFO -> Icons.Outlined.Lightbulb
+                            Type.SUCCESS -> Icons.Outlined.Check
+                            Type.WARNING -> Icons.Outlined.Warning
+                            Type.ERROR -> Icons.Outlined.Error
                         },
                         color = contentColor
                     )
@@ -101,7 +103,7 @@ open class Tip(private val scope: CoroutineScope) {
                         text = it.visuals.message,
                         color = contentColor,
                         maxLines = 2,
-                        overflow = Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                 }

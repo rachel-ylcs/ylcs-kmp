@@ -30,7 +30,7 @@ class ActualMusicFactory : MusicFactory() {
 
     override val isInit: Boolean get() = mediaPlayer != null
     override var error: Throwable? by mutableStateOf(null)
-    override var playMode: MusicPlayMode by mutableStateOf(ORDER)
+    override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
@@ -82,7 +82,7 @@ class ActualMusicFactory : MusicFactory() {
                     if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
                         Coroutines.startMain {
                             when (playMode) {
-                                LOOP -> setCurrentPlaying(currentIndex, true)
+                                MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
                                 else -> gotoNext()
                             }
                         }
@@ -188,7 +188,7 @@ class ActualMusicFactory : MusicFactory() {
             }
         } else {
             shuffleList += (oldSize until musicList.size).toList().let {
-                if (playMode == RANDOM) it.shuffled() else it
+                if (playMode == MusicPlayMode.RANDOM) it.shuffled() else it
             }
         }
     }
@@ -230,7 +230,7 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     private fun shufflePlayList(musicIndex: Int = shuffleList.getOrNull(currentIndex) ?: 0) {
-        shuffleList = if (playMode == RANDOM) {
+        shuffleList = if (playMode == MusicPlayMode.RANDOM) {
             listOf(musicIndex) + (0 until musicList.size).filter { it != musicIndex }.shuffled()
         } else {
             List(musicList.size) { it }
@@ -256,16 +256,16 @@ class ActualMusicFactory : MusicFactory() {
 
     private fun handleAudioSessionInterruption(type: AudioSessionInterruption, arg: Any?) {
         when (type) {
-            Began -> {
+            AudioSessionInterruption.Began -> {
                 isPlaying = false
             }
-            Ended -> {
+            AudioSessionInterruption.Ended -> {
                 val shouldPlay = arg as Boolean
                 if (isReady && shouldPlay) {
                     mediaPlayer?.play()
                 }
             }
-            Failed -> {}
+            AudioSessionInterruption.Failed -> {}
         }
     }
 

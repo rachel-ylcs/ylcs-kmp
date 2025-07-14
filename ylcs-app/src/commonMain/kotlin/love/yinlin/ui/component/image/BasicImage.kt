@@ -63,7 +63,7 @@ fun MiniIcon(
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Icon(
 			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
@@ -100,7 +100,7 @@ fun ColorfulIcon(
 			.clip(CircleShape)
 			.condition(onClick != null) { clickable { onClick?.invoke() } }
 			.background(icon.background.copy(alpha = 0.6f)),
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Icon(
 			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * gap).size(size),
@@ -246,7 +246,7 @@ fun MiniIcon(
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Image(
 			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
@@ -317,7 +317,7 @@ fun MiniImage(
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Image(
 			painter = rememberVectorPainter(icon),
@@ -330,14 +330,14 @@ fun MiniImage(
 @Composable
 fun MiniImage(
 	res: DrawableResource,
-	contentScale: ContentScale = Fit,
-	alignment: Alignment = Center,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Image(
 			painter = painterResource(res),
@@ -353,14 +353,14 @@ fun MiniImage(
 @Composable
 fun MiniImage(
 	painter: Painter,
-	contentScale: ContentScale = Fit,
-	alignment: Alignment = Center,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier
 ) {
 	Box(
 		modifier = modifier,
-		contentAlignment = Center
+		contentAlignment = Alignment.Center
 	) {
 		Image(
 			painter = painter,
@@ -376,8 +376,8 @@ fun MiniImage(
 @Composable
 fun ClickImage(
 	res: DrawableResource,
-	contentScale: ContentScale = Fit,
-	alignment: Alignment = Center,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
@@ -483,9 +483,9 @@ fun WebImage(
 	key: Any? = null,
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
-	quality: ImageQuality = Medium,
-	contentScale: ContentScale = Fit,
-	alignment: Alignment = Center,
+	quality: ImageQuality = ImageQuality.Medium,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	animated: Boolean = true,
 	state: AsyncImageState = rememberWebImageState(quality, animated = animated),
@@ -515,10 +515,10 @@ fun LocalFileImage(
 	vararg key: Any,
 	modifier: Modifier = Modifier,
 	circle: Boolean = false,
-	contentScale: ContentScale = Fit,
+	contentScale: ContentScale = ContentScale.Fit,
 	alpha: Float = 1f,
 	animated: Boolean = true,
-	state: AsyncImageState = rememberWebImageState(Full, background = null, animated = animated),
+	state: AsyncImageState = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
 	onClick: (() -> Unit)? = null
 ) {
 	val baseUri = remember(*key) { path().toString() }
@@ -528,7 +528,7 @@ fun LocalFileImage(
 			uri = rememberWebImageKeyUrl(baseUri, baseKey),
 			contentDescription = null,
 			state = state,
-			alignment = Center,
+			alignment = Alignment.Center,
 			contentScale = contentScale,
 			filterQuality = ImageQuality.Full.filterQuality,
 			alpha = alpha,
@@ -544,9 +544,9 @@ fun ZoomWebImage(
 	key: Any? = null,
 	zoomState: SketchZoomState = rememberSketchZoomState(),
 	modifier: Modifier = Modifier,
-	quality: ImageQuality = High,
-	contentScale: ContentScale = Fit,
-	alignment: Alignment = Center,
+	quality: ImageQuality = ImageQuality.High,
+	contentScale: ContentScale = ContentScale.Fit,
+	alignment: Alignment = Alignment.Center,
 	alpha: Float = 1f,
 	state: AsyncImageState = rememberWebImageState(quality, isCrossfade = false)
 ) {

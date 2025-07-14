@@ -77,12 +77,12 @@ inline fun <reified Response: Any> Route.safeAPI(
 	handle {
 		try {
 			when (val result = Coroutines.io { body(call) }) {
-				is Success -> call.respond(makeObject {
+				is Data.Success -> call.respond(makeObject {
 					"code" with APICode.SUCCESS
 					result.message?.let { "msg" with it }
 					"data" with result.data.toJson()
 				})
-				is Failure -> when (result.type) {
+				is Data.Failure -> when (result.type) {
 					RequestError.ClientError -> call.respond("客户端错误: ${result.message}".failedObject)
 					RequestError.Timeout -> call.respond("网络连接超时".failedObject)
 					RequestError.Canceled -> call.respond("操作取消".failedObject)
@@ -123,7 +123,7 @@ inline fun <reified Request : Any> Route.api(
 inline fun <reified Response : Any> Route.api(
 	route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>,
 	crossinline body: suspend () -> Data<Response>
-): Route = safeAPI(Get, route.toString()) { body() }
+): Route = safeAPI(HttpMethod.Get, route.toString()) { body() }
 
 @JvmName("apiPost")
 inline fun <reified Request : Any, reified Response : Any> Route.api(
@@ -155,7 +155,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 			try {
 				val name: String = part.name ?: return@forEachPart
 				when (part) {
-					is FormItem -> {
+					is PartData.FormItem -> {
                         when (name) {
                             "#data#" -> dataString = part.value
                             "#ignoreFile#" -> {
@@ -168,7 +168,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                             }
                         }
 					}
-					is FileItem -> {
+					is PartData.FileItem -> {
 						val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
 						val output = File(tmpDir, filename)
 						if (part.provider().copyAndClose(output.writeChannel()) > 0) {

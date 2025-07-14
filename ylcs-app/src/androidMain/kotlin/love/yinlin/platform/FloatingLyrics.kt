@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -25,7 +28,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.Scheme
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.catching
-import java.util.*
+import java.util.UUID
 
 @Stable
 class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLyrics() {
@@ -108,7 +111,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                     end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
                     top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
                 ).fillMaxWidth(),
-                contentAlignment = Center
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = lyrics,
@@ -116,9 +119,9 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                     ),
                     color = Colors.from(config.textColor),
-                    textAlign = Center,
+                    textAlign = TextAlign.Center,
                     maxLines = 2,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.wrapContentSize(unbounded = true)
                         .background(color = Colors.from(config.backgroundColor))
                         .padding(ThemeValue.Padding.Value)

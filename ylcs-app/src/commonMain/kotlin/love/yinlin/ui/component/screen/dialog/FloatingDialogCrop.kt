@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
@@ -27,6 +28,7 @@ import love.yinlin.extension.rememberDerivedState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.translate
 import love.yinlin.platform.CropResult
+import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.image.rememberWebImageState
 import love.yinlin.ui.component.input.RachelButton
@@ -36,9 +38,13 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Stable
-@Serializable
-private enum class TouchRegion {
-    TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, Inside
+private sealed interface TouchRegion {
+    @Stable
+    @Serializable
+    enum class Vertex : TouchRegion {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
+    }
+    data object Inside : TouchRegion
 }
 
 private fun DrawScope.drawCorner(
@@ -182,7 +188,7 @@ fun CropImage(
     modifier: Modifier = Modifier
 ) {
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
-    val imageState = rememberWebImageState(quality = High)
+    val imageState = rememberWebImageState(quality = ImageQuality.High)
     val imageSize by rememberDerivedState { imageState.result?.image?.size }
     var touchRegion: TouchRegion? by rememberState { null }
 
@@ -191,95 +197,95 @@ fun CropImage(
             if (imageSize != null) detectDragGestures(
                 onDragStart = { position ->
                     touchRegion = state.frameRect.run { when {
-                        Rect(topLeft, tolerance).contains(position) -> TOP_LEFT
-                        Rect(topRight, tolerance).contains(position) -> TOP_RIGHT
-                        Rect(bottomLeft, tolerance).contains(position) -> BOTTOM_LEFT
-                        Rect(bottomRight, tolerance).contains(position) -> BOTTOM_RIGHT
-                        contains(position) -> Inside
+                        Rect(topLeft, tolerance).contains(position) -> TouchRegion.Vertex.TOP_LEFT
+                        Rect(topRight, tolerance).contains(position) -> TouchRegion.Vertex.TOP_RIGHT
+                        Rect(bottomLeft, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_LEFT
+                        Rect(bottomRight, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_RIGHT
+                        contains(position) -> TouchRegion.Inside
                         else -> null
                     } }
                 },
                 onDragEnd = { touchRegion = null }
             ) { change, dragAmount ->
                 val imageRect = state.imageRect
-                touchRegion?.let { region ->
-                    state.frameRect = when (region) {
-                        Inside -> {
+                touchRegion?.let {
+                    state.frameRect = when (it) {
+                        is TouchRegion.Vertex -> {
+                            val minimumVertexDistance = tolerance * 2f
+                            state.frameRect.run {
+                                if (aspectRatio == 0f) {
+                                    val newLeft = (left + dragAmount.x)
+                                        .coerceAtLeast(imageRect.left)
+                                        .coerceAtMost(right - minimumVertexDistance)
+                                    val newTop = (top + dragAmount.y)
+                                        .coerceAtLeast(imageRect.top)
+                                        .coerceAtMost(bottom - minimumVertexDistance)
+                                    val newRight = (right + dragAmount.x)
+                                        .coerceAtMost(imageRect.right)
+                                        .coerceAtLeast(left + minimumVertexDistance)
+                                    val newBottom = (bottom + dragAmount.y)
+                                        .coerceAtMost(imageRect.bottom)
+                                        .coerceAtLeast(top + minimumVertexDistance)
+                                    when (it) {
+                                        TouchRegion.Vertex.TOP_LEFT -> Rect(newLeft, newTop, right, bottom)
+                                        TouchRegion.Vertex.TOP_RIGHT -> Rect(left, newTop, newRight, bottom)
+                                        TouchRegion.Vertex.BOTTOM_LEFT -> Rect(newLeft, top, right, newBottom)
+                                        TouchRegion.Vertex.BOTTOM_RIGHT -> Rect(left, top, newRight, newBottom)
+                                    }
+                                }
+                                else {
+                                    val (a, b) = when (it) {
+                                        TouchRegion.Vertex.TOP_LEFT, TouchRegion.Vertex.BOTTOM_RIGHT -> (bottom - top) / (right - left) to (right * top - left * bottom) / (right - left)
+                                        else -> (top - bottom) / (right - left) to (right * bottom - left * top) / (right - left)
+                                    }
+                                    when (it) {
+                                        TouchRegion.Vertex.TOP_LEFT -> {
+                                            val rLeft = (left + dragAmount.x)
+                                                .coerceAtLeast(imageRect.left)
+                                                .coerceAtMost(right - minimumVertexDistance)
+                                            val rTop = (a * rLeft + b)
+                                                .coerceAtLeast(imageRect.top)
+                                                .coerceAtMost(bottom - minimumVertexDistance)
+                                            copy(left = (rTop - b) / a, top = rTop)
+                                        }
+                                        TouchRegion.Vertex.TOP_RIGHT -> {
+                                            val rRight = (right + dragAmount.x)
+                                                .coerceAtMost(imageRect.right)
+                                                .coerceAtLeast(left + minimumVertexDistance)
+                                            val rTop = (a * rRight + b)
+                                                .coerceAtLeast(imageRect.top)
+                                                .coerceAtMost(bottom - minimumVertexDistance)
+                                            copy(right = (rTop - b) / a, top = rTop)
+                                        }
+                                        TouchRegion.Vertex.BOTTOM_LEFT -> {
+                                            val rLeft = (left + dragAmount.x)
+                                                .coerceAtLeast(imageRect.left)
+                                                .coerceAtMost(right - minimumVertexDistance)
+                                            val rBottom = (a * rLeft + b)
+                                                .coerceAtMost(imageRect.bottom)
+                                                .coerceAtLeast(top + minimumVertexDistance)
+                                            copy(left = (rBottom - b) / a, bottom = rBottom)
+                                        }
+                                        TouchRegion.Vertex.BOTTOM_RIGHT -> {
+                                            val rRight = (right + dragAmount.x)
+                                                .coerceAtMost(imageRect.right)
+                                                .coerceAtLeast(left + minimumVertexDistance)
+                                            val rBottom = (a * rRight + b)
+                                                .coerceAtMost(imageRect.bottom)
+                                                .coerceAtLeast(top + minimumVertexDistance)
+                                            copy(right = (rBottom - b) / a, bottom = rBottom)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        TouchRegion.Inside -> {
                             var newRect = state.frameRect.translate(dragAmount)
                             if (newRect.left < imageRect.left) newRect = newRect.translate(imageRect.left - newRect.left, 0f)
                             if (newRect.right > imageRect.right) newRect = newRect.translate(imageRect.right - newRect.right, 0f)
                             if (newRect.top < imageRect.top) newRect = newRect.translate(0f, imageRect.top - newRect.top)
                             if (newRect.bottom > imageRect.bottom) newRect = newRect.translate(0f, imageRect.bottom - newRect.bottom)
                             newRect
-                        }
-                        else -> state.frameRect.run {
-                            val minimumVertexDistance = tolerance * 2f
-                            if (aspectRatio == 0f) {
-                                val newLeft = (left + dragAmount.x)
-                                    .coerceAtLeast(imageRect.left)
-                                    .coerceAtMost(right - minimumVertexDistance)
-                                val newTop = (top + dragAmount.y)
-                                    .coerceAtLeast(imageRect.top)
-                                    .coerceAtMost(bottom - minimumVertexDistance)
-                                val newRight = (right + dragAmount.x)
-                                    .coerceAtMost(imageRect.right)
-                                    .coerceAtLeast(left + minimumVertexDistance)
-                                val newBottom = (bottom + dragAmount.y)
-                                    .coerceAtMost(imageRect.bottom)
-                                    .coerceAtLeast(top + minimumVertexDistance)
-                                when (region) {
-                                    TOP_LEFT -> Rect(newLeft, newTop, right, bottom)
-                                    TOP_RIGHT -> Rect(left, newTop, newRight, bottom)
-                                    BOTTOM_LEFT -> Rect(newLeft, top, right, newBottom)
-                                    BOTTOM_RIGHT -> Rect(left, top, newRight, newBottom)
-                                    else -> error("")
-                                }
-                            }
-                            else {
-                                val (a, b) = when (region) {
-                                    TOP_LEFT, BOTTOM_RIGHT -> (bottom - top) / (right - left) to (right * top - left * bottom) / (right - left)
-                                    else -> (top - bottom) / (right - left) to (right * bottom - left * top) / (right - left)
-                                }
-                                when (region) {
-                                    TOP_LEFT -> {
-                                        val rLeft = (left + dragAmount.x)
-                                            .coerceAtLeast(imageRect.left)
-                                            .coerceAtMost(right - minimumVertexDistance)
-                                        val rTop = (a * rLeft + b)
-                                            .coerceAtLeast(imageRect.top)
-                                            .coerceAtMost(bottom - minimumVertexDistance)
-                                        copy(left = (rTop - b) / a, top = rTop)
-                                    }
-                                    TOP_RIGHT -> {
-                                        val rRight = (right + dragAmount.x)
-                                            .coerceAtMost(imageRect.right)
-                                            .coerceAtLeast(left + minimumVertexDistance)
-                                        val rTop = (a * rRight + b)
-                                            .coerceAtLeast(imageRect.top)
-                                            .coerceAtMost(bottom - minimumVertexDistance)
-                                        copy(right = (rTop - b) / a, top = rTop)
-                                    }
-                                    BOTTOM_LEFT -> {
-                                        val rLeft = (left + dragAmount.x)
-                                            .coerceAtLeast(imageRect.left)
-                                            .coerceAtMost(right - minimumVertexDistance)
-                                        val rBottom = (a * rLeft + b)
-                                            .coerceAtMost(imageRect.bottom)
-                                            .coerceAtLeast(top + minimumVertexDistance)
-                                        copy(left = (rBottom - b) / a, bottom = rBottom)
-                                    }
-                                    BOTTOM_RIGHT -> {
-                                        val rRight = (right + dragAmount.x)
-                                            .coerceAtMost(imageRect.right)
-                                            .coerceAtLeast(left + minimumVertexDistance)
-                                        val rBottom = (a * rRight + b)
-                                            .coerceAtMost(imageRect.bottom)
-                                            .coerceAtLeast(top + minimumVertexDistance)
-                                        copy(right = (rBottom - b) / a, bottom = rBottom)
-                                    }
-                                    else -> error("")
-                                }
-                            }
                         }
                     }
                     change.consume()
@@ -325,8 +331,8 @@ fun CropImage(
                 WebImage(
                     uri = url,
                     state = imageState,
-                    quality = Low,
-                    contentScale = Inside,
+                    quality = ImageQuality.Low,
+                    contentScale = ContentScale.Inside,
                     modifier = Modifier.matchParentSize()
                 )
             }

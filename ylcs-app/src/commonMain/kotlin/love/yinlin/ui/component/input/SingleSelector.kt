@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 
@@ -55,7 +56,7 @@ class SingleSelectorScope<T>(
                     else Colors.Unspecified,
                 style = textStyle,
                 maxLines = 1,
-                overflow = Clip
+                overflow = TextOverflow.Clip
             )
         }
     }

@@ -35,7 +35,7 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun SubContent(device: Device) {
         OS.ifPlatform(
-            WebWasm, *Platform.Desktop,
+            Platform.WebWasm, *Platform.Desktop,
             ifTrue = {
                 UnsupportedComponent(modifier = Modifier.fillMaxSize())
             },

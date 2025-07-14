@@ -14,6 +14,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
@@ -25,27 +26,27 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
-    private var state: BoxState by mutableStateOf(EMPTY)
+    private var state: BoxState by mutableStateOf(BoxState.EMPTY)
     private var items = mutableStateListOf<Weibo>()
     private val gridState = LazyStaggeredGridState()
 
     private suspend fun requestWeibo() {
-        if (state != LOADING) {
+        if (state != BoxState.LOADING) {
             val users = app.config.weiboUsers.map { it.id }
-            if (users.isEmpty()) state = EMPTY
+            if (users.isEmpty()) state = BoxState.EMPTY
             else {
-                state = LOADING
+                state = BoxState.LOADING
                 items.clear()
                 for (id in users) {
                     val result = WeiboAPI.getUserWeibo(id)
-                    if (result is Success) {
+                    if (result is Data.Success) {
                         items += result.data
                         items.sortDescending()
-                        if (state == LOADING) state = CONTENT
+                        if (state == BoxState.LOADING) state = BoxState.CONTENT
                         gridState.scrollToItem(0)
                     }
                 }
-                if (state == LOADING) state = NETWORK_ERROR
+                if (state == BoxState.LOADING) state = BoxState.NETWORK_ERROR
             }
         }
     }

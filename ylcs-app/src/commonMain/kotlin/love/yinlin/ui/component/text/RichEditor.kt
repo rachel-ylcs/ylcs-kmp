@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
+import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.emoji.Emoji
@@ -118,7 +119,7 @@ open class RichEditorState {
     protected open val useTopic: Boolean get() = true
     protected open val useAt: Boolean get() = false
 
-    private var emojiClassify: EmojiType by mutableStateOf(Static)
+    private var emojiClassify by mutableStateOf(EmojiType.Static)
 
     val richString: RichString get() = RichEditorParser.parse(inputState.value.text)
     var text: String get() = inputState.value.text
@@ -358,7 +359,7 @@ open class RichEditorState {
         onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
-        if (LocalDevice.current.type == PORTRAIT) {
+        if (LocalDevice.current.type == Device.Type.PORTRAIT) {
             PortraitPreviewLayout(
                 hint = hint,
                 maxLength = maxLength,

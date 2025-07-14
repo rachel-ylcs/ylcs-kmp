@@ -67,17 +67,17 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		val user = DB.throwQuerySQLSingle("""
 			SELECT uid, name, signature, label, exp, follows, followers FROM user WHERE uid = ?
 		""", uid2)
-		val status: FollowStatus = if (uid1 == null) UNAUTHORIZE
-			else if (uid1 == uid2) SELF
+		val status: FollowStatus = if (uid1 == null) FollowStatus.UNAUTHORIZE
+			else if (uid1 == uid2) FollowStatus.SELF
 			else {
 				val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
 				if (relationship2 != true) when (relationship1) {
-					null -> UNFOLLOW
-					true -> BLOCKED
-					false -> FOLLOW
+					null -> FollowStatus.UNFOLLOW
+					true -> FollowStatus.BLOCKED
+					false -> FollowStatus.FOLLOW
 				}
-				else if (relationship1 == true) BIDIRECTIONAL_BLOCK
-				else BLOCK
+				else if (relationship1 == true) FollowStatus.BIDIRECTIONAL_BLOCK
+				else FollowStatus.BLOCK
 			}
 		Data.Success(makeObject {
 			merge(user)

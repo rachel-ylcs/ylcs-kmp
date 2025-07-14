@@ -22,6 +22,6 @@ sealed interface Data<out D> {
 }
 
 inline fun <T, R> Data<T>.map(map: (T) -> R): Data<R> = when (this) {
-	is Failure -> this
-	is Success -> Data.Success(map(data), message)
+	is Data.Failure -> this
+	is Data.Success -> Data.Success(map(data), message)
 }

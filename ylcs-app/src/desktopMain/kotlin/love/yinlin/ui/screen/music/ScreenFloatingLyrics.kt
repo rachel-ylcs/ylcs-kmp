@@ -18,7 +18,7 @@ import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
-import love.yinlin.platform.Platform.MacOS
+import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
@@ -27,7 +27,7 @@ import love.yinlin.ui.component.layout.SplitLayout
 
 // ignoresMouseEvents on macOS is buggy, see https://stackoverflow.com/questions/29441015
 private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
-    OS.ifPlatform(MacOS, block = {
+    OS.ifPlatform(Platform.MacOS, block = {
         if (floatingLyrics.isAttached) {
             floatingLyrics.isAttached = false
             Coroutines.startMain {

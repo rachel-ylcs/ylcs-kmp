@@ -46,58 +46,58 @@ import kotlin.math.absoluteValue
 // 分页数据实现
 @Stable
 abstract class Pagination<E, K, out T>(
-	private val default: T,
-	val pageNum: Int = APIConfig.MIN_PAGE_NUM
+    private val default: T,
+    val pageNum: Int = APIConfig.MIN_PAGE_NUM
 ) {
-	val items = mutableStateListOf<E>()
-	var canLoading by mutableStateOf(false)
+    val items = mutableStateListOf<E>()
+    var canLoading by mutableStateOf(false)
 
-	abstract fun distinctValue(item: E): K
-	abstract fun offset(item: E): T
-	private var mOffset: T = default
-	val offset: T get() = mOffset
+    abstract fun distinctValue(item: E): K
+    abstract fun offset(item: E): T
+    private var mOffset: T = default
+    val offset: T get() = mOffset
 
-	open fun processArgs(last: E?) {}
+    open fun processArgs(last: E?) {}
 
-	fun newData(newItems: List<E>): Boolean {
-		items.replaceAll(newItems)
-		val last = newItems.lastOrNull()
-		mOffset = last?.let { offset(it) } ?: default
-		processArgs(last)
-		canLoading = newItems.size == pageNum
-		return newItems.isNotEmpty()
-	}
+    fun newData(newItems: List<E>): Boolean {
+        items.replaceAll(newItems)
+        val last = newItems.lastOrNull()
+        mOffset = last?.let { offset(it) } ?: default
+        processArgs(last)
+        canLoading = newItems.size == pageNum
+        return newItems.isNotEmpty()
+    }
 
-	fun moreData(newItems: List<E>): Boolean {
-		if (newItems.isEmpty()) {
-			mOffset = default
-			processArgs(null)
-		}
-		else {
-			val existingItems = items.fastMap { distinctValue(it) }.toSet()
-			items += newItems.fastFilter { distinctValue(it) !in existingItems }
-			val last = newItems.lastOrNull()
-			mOffset = last?.let { offset(it) } ?: default
-			processArgs(last)
-		}
-		canLoading = offset != default && newItems.size == pageNum
-		return newItems.isNotEmpty()
-	}
+    fun moreData(newItems: List<E>): Boolean {
+        if (newItems.isEmpty()) {
+            mOffset = default
+            processArgs(null)
+        }
+        else {
+            val existingItems = items.fastMap { distinctValue(it) }.toSet()
+            items += newItems.fastFilter { distinctValue(it) !in existingItems }
+            val last = newItems.lastOrNull()
+            mOffset = last?.let { offset(it) } ?: default
+            processArgs(last)
+        }
+        canLoading = offset != default && newItems.size == pageNum
+        return newItems.isNotEmpty()
+    }
 }
 
 @Stable
 abstract class PaginationArgs<E, K, out T, out A1>(
-	default: T,
-	private val default1: A1,
-	pageNum: Int = APIConfig.MIN_PAGE_NUM
+    default: T,
+    private val default1: A1,
+    pageNum: Int = APIConfig.MIN_PAGE_NUM
 ) : Pagination<E, K, T>(default, pageNum) {
-	abstract fun arg1(item: E): A1
-	private var mArg1: A1 = default1
-	val arg1: A1 get() = mArg1
+    abstract fun arg1(item: E): A1
+    private var mArg1: A1 = default1
+    val arg1: A1 get() = mArg1
 
-	override fun processArgs(last: E?) {
-		mArg1 = last?.let { arg1(it) } ?: default1
-	}
+    override fun processArgs(last: E?) {
+        mArg1 = last?.let { arg1(it) } ?: default1
+    }
 }
 
 // 分页 UI 实现
@@ -105,579 +105,579 @@ abstract class PaginationArgs<E, K, out T, out A1>(
 @Stable
 @Serializable
 private enum class PaginationStatus {
-	IDLE, RUNNING, PULL, RELEASE
+    IDLE, RUNNING, PULL, RELEASE
 }
 
 @Stable
 private class SwipeState {
-	var isReleaseEdge = false
-	var refreshStatus: PaginationStatus by mutableStateOf(IDLE)
-	var loadingStatus: PaginationStatus by mutableStateOf(IDLE)
-	var isAnimateOver by mutableStateOf(true)
-	val isRunning: Boolean get() = !isAnimateOver || refreshStatus == RUNNING || loadingStatus == RUNNING
+    var isReleaseEdge = false
+    var refreshStatus by mutableStateOf(PaginationStatus.IDLE)
+    var loadingStatus by mutableStateOf(PaginationStatus.IDLE)
+    var isAnimateOver by mutableStateOf(true)
+    val isRunning: Boolean get() = !isAnimateOver || refreshStatus == PaginationStatus.RUNNING || loadingStatus == PaginationStatus.RUNNING
 
-	private val mutatorMutex = MutatorMutex()
-	private val _indicatorOffset = Animatable(0f)
-	val indicatorOffset: Float get() = _indicatorOffset.value
+    private val mutatorMutex = MutatorMutex()
+    private val _indicatorOffset = Animatable(0f)
+    val indicatorOffset: Float get() = _indicatorOffset.value
 
-	suspend fun animateOffsetTo(offset: Float) = mutatorMutex.mutate {
-		_indicatorOffset.animateTo(offset) {
-			if (this.value == 0f) isAnimateOver = true
-		}
-	}
+    suspend fun animateOffsetTo(offset: Float) = mutatorMutex.mutate {
+        _indicatorOffset.animateTo(offset) {
+            if (this.value == 0f) isAnimateOver = true
+        }
+    }
 
-	suspend fun snapOffsetTo(headerHeightPx: Float, footerHeightPx: Float, offset: Float) = mutatorMutex.mutate(MutatePriority.UserInput) {
-		_indicatorOffset.snapTo(offset)
-		if (indicatorOffset >= headerHeightPx) refreshStatus = RELEASE
-		else if (indicatorOffset <= -footerHeightPx) loadingStatus = RELEASE
-		else {
-			if (indicatorOffset > 0) refreshStatus = PULL
-			if (indicatorOffset < 0) loadingStatus = PULL
-		}
-	}
+    suspend fun snapOffsetTo(headerHeightPx: Float, footerHeightPx: Float, offset: Float) = mutatorMutex.mutate(MutatePriority.UserInput) {
+        _indicatorOffset.snapTo(offset)
+        if (indicatorOffset >= headerHeightPx) refreshStatus = PaginationStatus.RELEASE
+        else if (indicatorOffset <= -footerHeightPx) loadingStatus = PaginationStatus.RELEASE
+        else {
+            if (indicatorOffset > 0) refreshStatus = PaginationStatus.PULL
+            if (indicatorOffset < 0) loadingStatus = PaginationStatus.PULL
+        }
+    }
 }
 
 @Composable
 private fun DefaultSwipePaginationHeader(
-	status: PaginationStatus,
-	progress: Float
+    status: PaginationStatus,
+    progress: Float
 ) {
-	Row(
-		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
-	) {
-		if (status == RUNNING) LoadingAnimation(
-			size = ThemeValue.Size.MediumIcon,
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-		else MiniIcon(
-			icon = Icons.Outlined.ArrowDownward,
-			size = ThemeValue.Size.MediumIcon,
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-		Text(
-			text = when (status) {
-				RUNNING -> "刷新中..."
-				PULL -> "继续下拉刷新"
-				RELEASE -> "释放立即刷新"
-				else -> ""
-			},
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-	}
+    Row(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
+    ) {
+        if (status == PaginationStatus.RUNNING) LoadingAnimation(
+            size = ThemeValue.Size.MediumIcon,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        else MiniIcon(
+            icon = Icons.Outlined.ArrowDownward,
+            size = ThemeValue.Size.MediumIcon,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Text(
+            text = when (status) {
+                PaginationStatus.RUNNING -> "刷新中..."
+                PaginationStatus.PULL -> "继续下拉刷新"
+                PaginationStatus.RELEASE -> "释放立即刷新"
+                else -> ""
+            },
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
 }
 
 @Composable
 private fun DefaultSwipePaginationFooter(
-	status: PaginationStatus,
-	progress: Float
+    status: PaginationStatus,
+    progress: Float
 ) {
-	Row(
-		modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
-	) {
-		if (status == RUNNING) LoadingAnimation(
-			size = ThemeValue.Size.MediumIcon,
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-		else MiniIcon(
-			icon = Icons.Outlined.ArrowUpward,
-			size = ThemeValue.Size.MediumIcon,
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-		Text(
-			text = when (status) {
-				RUNNING -> "加载中..."
-				PULL -> "上拉加载更多"
-				RELEASE -> "释放立即加载"
-				else -> ""
-			},
-			color = MaterialTheme.colorScheme.onPrimaryContainer
-		)
-	}
+    Row(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = progress)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
+    ) {
+        if (status == PaginationStatus.RUNNING) LoadingAnimation(
+            size = ThemeValue.Size.MediumIcon,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        else MiniIcon(
+            icon = Icons.Outlined.ArrowUpward,
+            size = ThemeValue.Size.MediumIcon,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Text(
+            text = when (status) {
+                PaginationStatus.RUNNING -> "加载中..."
+                PaginationStatus.PULL -> "上拉加载更多"
+                PaginationStatus.RELEASE -> "释放立即加载"
+                else -> ""
+            },
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
 }
 
 @Composable
 private fun SwipePaginationLayout(
-	canRefresh: Boolean = true,
-	canLoading: Boolean = false,
-	onRefresh: (suspend () -> Unit)? = null,
-	onLoading: (suspend () -> Unit)? = null,
-	headerHeight: Dp = ThemeValue.Size.RefreshHeaderHeight,
-	header: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationHeader(status, progress) },
-	footerHeight: Dp = ThemeValue.Size.RefreshFooterHeight,
-	footer: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationFooter(status, progress) },
-	stickinessLevel: Float = 0.5f,
-	modifier: Modifier = Modifier,
-	content: @Composable BoxScope.() -> Unit
+    canRefresh: Boolean = true,
+    canLoading: Boolean = false,
+    onRefresh: (suspend () -> Unit)? = null,
+    onLoading: (suspend () -> Unit)? = null,
+    headerHeight: Dp = ThemeValue.Size.RefreshHeaderHeight,
+    header: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationHeader(status, progress) },
+    footerHeight: Dp = ThemeValue.Size.RefreshFooterHeight,
+    footer: @Composable (PaginationStatus, Float) -> Unit = { status, progress -> DefaultSwipePaginationFooter(status, progress) },
+    stickinessLevel: Float = 0.5f,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
 ) {
-	val scope = rememberCoroutineScope()
-	val state = remember { SwipeState() }
-	val (headerHeightPx, footerHeightPx) = with(LocalDensity.current) {
-		headerHeight.toPx() to footerHeight.toPx()
-	}
-	val connection = remember(
-		canRefresh, canLoading, onRefresh, onLoading, stickinessLevel, state, headerHeightPx, footerHeightPx
-	) { object : NestedScrollConnection {
-		private fun scroll(canConsumed: Float): Offset = if (canConsumed.absoluteValue > 0.5f) {
-			scope.launch {
-				state.snapOffsetTo(headerHeightPx, footerHeightPx, state.indicatorOffset + canConsumed)
-			}
-			Offset(0f, canConsumed / stickinessLevel)
-		} else Offset.Zero
+    val scope = rememberCoroutineScope()
+    val state = remember { SwipeState() }
+    val (headerHeightPx, footerHeightPx) = with(LocalDensity.current) {
+        headerHeight.toPx() to footerHeight.toPx()
+    }
+    val connection = remember(
+        canRefresh, canLoading, onRefresh, onLoading, stickinessLevel, state, headerHeightPx, footerHeightPx
+    ) { object : NestedScrollConnection {
+        private fun scroll(canConsumed: Float): Offset = if (canConsumed.absoluteValue > 0.5f) {
+            scope.launch {
+                state.snapOffsetTo(headerHeightPx, footerHeightPx, state.indicatorOffset + canConsumed)
+            }
+            Offset(0f, canConsumed / stickinessLevel)
+        } else Offset.Zero
 
-		override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset = when {
-			state.isRunning -> Offset.Zero
-			available.y < 0 && state.indicatorOffset > 0 -> scroll((available.y * stickinessLevel).coerceAtLeast(-state.indicatorOffset))
-			available.y > 0 && state.indicatorOffset < 0 -> scroll((available.y * stickinessLevel).coerceAtMost(-state.indicatorOffset))
-			else -> Offset.Zero
-		}
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset = when {
+            state.isRunning -> Offset.Zero
+            available.y < 0 && state.indicatorOffset > 0 -> scroll((available.y * stickinessLevel).coerceAtLeast(-state.indicatorOffset))
+            available.y > 0 && state.indicatorOffset < 0 -> scroll((available.y * stickinessLevel).coerceAtMost(-state.indicatorOffset))
+            else -> Offset.Zero
+        }
 
-		override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = when {
-			state.isRunning -> Offset.Zero
-			available.y > 0 && canRefresh -> scroll(canConsumed =
-				if (source == NestedScrollSource.SideEffect) (available.y * stickinessLevel).coerceAtMost(-state.indicatorOffset)
-				else (available.y * stickinessLevel).coerceAtMost(headerHeightPx - state.indicatorOffset)
-			)
-			available.y < 0 && canLoading -> scroll(canConsumed =
-				if (source == NestedScrollSource.SideEffect) (available.y * stickinessLevel).coerceAtLeast(-state.indicatorOffset)
-				else (available.y * stickinessLevel).coerceAtLeast(-footerHeightPx - state.indicatorOffset)
-			)
-			else -> Offset.Zero
-		}
+        override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset = when {
+            state.isRunning -> Offset.Zero
+            available.y > 0 && canRefresh -> scroll(canConsumed =
+                if (source == NestedScrollSource.SideEffect) (available.y * stickinessLevel).coerceAtMost(-state.indicatorOffset)
+                else (available.y * stickinessLevel).coerceAtMost(headerHeightPx - state.indicatorOffset)
+            )
+            available.y < 0 && canLoading -> scroll(canConsumed =
+                if (source == NestedScrollSource.SideEffect) (available.y * stickinessLevel).coerceAtLeast(-state.indicatorOffset)
+                else (available.y * stickinessLevel).coerceAtLeast(-footerHeightPx - state.indicatorOffset)
+            )
+            else -> Offset.Zero
+        }
 
-		override suspend fun onPreFling(available: Velocity): Velocity {
-			if (state.isRunning) return Velocity.Zero
-			state.isReleaseEdge = state.indicatorOffset != 0f
-			return if (state.indicatorOffset >= headerHeightPx && state.isReleaseEdge && state.refreshStatus != RUNNING) {
-				state.isAnimateOver = false
-				state.refreshStatus = RUNNING
-				state.animateOffsetTo(headerHeightPx)
-				onRefresh?.invoke()
-				state.refreshStatus = IDLE
-				state.animateOffsetTo(0f)
-				available
-			}
-			else if (state.indicatorOffset <= -footerHeightPx && state.isReleaseEdge && state.loadingStatus != RUNNING) {
-				state.isAnimateOver = false
-				state.loadingStatus = RUNNING
-				state.animateOffsetTo(-footerHeightPx)
-				onLoading?.invoke()
-				state.loadingStatus = IDLE
-				state.animateOffsetTo(0f)
-				available
-			}
-			else super.onPreFling(available)
-		}
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            if (state.isRunning) return Velocity.Zero
+            state.isReleaseEdge = state.indicatorOffset != 0f
+            return if (state.indicatorOffset >= headerHeightPx && state.isReleaseEdge && state.refreshStatus != PaginationStatus.RUNNING) {
+                state.isAnimateOver = false
+                state.refreshStatus = PaginationStatus.RUNNING
+                state.animateOffsetTo(headerHeightPx)
+                onRefresh?.invoke()
+                state.refreshStatus = PaginationStatus.IDLE
+                state.animateOffsetTo(0f)
+                available
+            }
+            else if (state.indicatorOffset <= -footerHeightPx && state.isReleaseEdge && state.loadingStatus != PaginationStatus.RUNNING) {
+                state.isAnimateOver = false
+                state.loadingStatus = PaginationStatus.RUNNING
+                state.animateOffsetTo(-footerHeightPx)
+                onLoading?.invoke()
+                state.loadingStatus = PaginationStatus.IDLE
+                state.animateOffsetTo(0f)
+                available
+            }
+            else super.onPreFling(available)
+        }
 
-		override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-			if (state.isRunning) return Velocity.Zero
-			if (state.indicatorOffset > 0 && state.refreshStatus != RUNNING) {
-				state.refreshStatus = IDLE
-				state.animateOffsetTo(0f)
-			}
-			else if (state.indicatorOffset < 0 && state.loadingStatus != RUNNING) {
-				state.loadingStatus = IDLE
-				state.animateOffsetTo(0f)
-			}
-			return super.onPostFling(consumed, available)
-		}
-	} }
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            if (state.isRunning) return Velocity.Zero
+            if (state.indicatorOffset > 0 && state.refreshStatus != PaginationStatus.RUNNING) {
+                state.refreshStatus = PaginationStatus.IDLE
+                state.animateOffsetTo(0f)
+            }
+            else if (state.indicatorOffset < 0 && state.loadingStatus != PaginationStatus.RUNNING) {
+                state.loadingStatus = PaginationStatus.IDLE
+                state.animateOffsetTo(0f)
+            }
+            return super.onPostFling(consumed, available)
+        }
+    } }
 
-	Box(modifier = modifier.clipToBounds().nestedScroll(connection)) {
-		Box(
-			modifier = Modifier.fillMaxWidth().height(headerHeight).align(Alignment.TopCenter)
-				.graphicsLayer { translationY = -headerHeightPx + state.indicatorOffset }
-		) {
-			header(state.refreshStatus, abs(state.indicatorOffset) / headerHeightPx)
-		}
-		Box(
-			modifier = Modifier.fillMaxSize().graphicsLayer { translationY = state.indicatorOffset },
-			content = content
-		)
-		Box(
-			modifier = Modifier.fillMaxWidth().height(footerHeight).align(Alignment.BottomCenter)
-				.graphicsLayer { translationY = footerHeightPx + state.indicatorOffset }
-		) {
-			footer(state.loadingStatus, -state.indicatorOffset / footerHeightPx)
-		}
-	}
+    Box(modifier = modifier.clipToBounds().nestedScroll(connection)) {
+        Box(
+            modifier = Modifier.fillMaxWidth().height(headerHeight).align(Alignment.TopCenter)
+                .graphicsLayer { translationY = -headerHeightPx + state.indicatorOffset }
+        ) {
+            header(state.refreshStatus, abs(state.indicatorOffset) / headerHeightPx)
+        }
+        Box(
+            modifier = Modifier.fillMaxSize().graphicsLayer { translationY = state.indicatorOffset },
+            content = content
+        )
+        Box(
+            modifier = Modifier.fillMaxWidth().height(footerHeight).align(Alignment.BottomCenter)
+                .graphicsLayer { translationY = footerHeightPx + state.indicatorOffset }
+        ) {
+            footer(state.loadingStatus, -state.indicatorOffset / footerHeightPx)
+        }
+    }
 }
 
 @Composable
 private fun DefaultClickPaginationIndicator(
-	status: PaginationStatus,
-	onLoading: () -> Unit
+    status: PaginationStatus,
+    onLoading: () -> Unit
 ) {
-	Box(
-		modifier = Modifier.fillMaxWidth().clickable(onClick = onLoading),
-		contentAlignment = Center
-	) {
-		Row(
-			modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
-			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
-		) {
-			if (status == RUNNING) LoadingAnimation(size = ThemeValue.Size.MediumIcon)
-			else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.MediumIcon)
-			Text(text = if (status == RUNNING) "加载中..." else "加载更多")
-		}
-	}
+    Box(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onLoading),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally)
+        ) {
+            if (status == PaginationStatus.RUNNING) LoadingAnimation(size = ThemeValue.Size.MediumIcon)
+            else MiniIcon(icon = Icons.Filled.Update, size = ThemeValue.Size.MediumIcon)
+            Text(text = if (status == PaginationStatus.RUNNING) "加载中..." else "加载更多")
+        }
+    }
 }
 
 @Composable
 private fun <T> ClickPaginationColumn(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	state: LazyListState = rememberLazyListState(),
-	canLoading: Boolean = false,
-	onLoading: (suspend () -> Unit)? = null,
-	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-	header: (@Composable LazyItemScope.() -> Unit)? = null,
-	itemDivider: PaddingValues? = null,
-	itemContent: @Composable LazyItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    state: LazyListState = rememberLazyListState(),
+    canLoading: Boolean = false,
+    onLoading: (suspend () -> Unit)? = null,
+    indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    header: (@Composable LazyItemScope.() -> Unit)? = null,
+    itemDivider: PaddingValues? = null,
+    itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-	val scope = rememberCoroutineScope()
-	var status: PaginationStatus by rememberState { IDLE }
-	LazyColumn(
-		state = state,
-		contentPadding = contentPadding,
-		verticalArrangement = verticalArrangement,
-		horizontalAlignment = horizontalAlignment,
-		modifier = modifier
-	) {
-		if (header != null) {
-			item(key = ItemKey("Header")) {
-				header()
-			}
-		}
-		itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
-			if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
-			itemContent(item)
-		}
-		if (canLoading) {
-			item(key = Unit) {
-				indicator(status) {
-					if (status != RUNNING) {
-						scope.launch {
-							status = RUNNING
-							onLoading?.invoke()
-							status = IDLE
-						}
-					}
-				}
-			}
-		}
-	}
+    val scope = rememberCoroutineScope()
+    var status by rememberState { PaginationStatus.IDLE }
+    LazyColumn(
+        state = state,
+        contentPadding = contentPadding,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        modifier = modifier
+    ) {
+        if (header != null) {
+            item(key = ItemKey("Header")) {
+                header()
+            }
+        }
+        itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
+            if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
+            itemContent(item)
+        }
+        if (canLoading) {
+            item(key = Unit) {
+                indicator(status) {
+                    if (status != PaginationStatus.RUNNING) {
+                        scope.launch {
+                            status = PaginationStatus.RUNNING
+                            onLoading?.invoke()
+                            status = PaginationStatus.IDLE
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun <T> ClickPaginationGrid(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	columns: GridCells,
-	state: LazyGridState = rememberLazyGridState(),
-	canLoading: Boolean = false,
-	onLoading: (suspend () -> Unit)? = null,
-	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
-	itemContent: @Composable LazyGridItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    columns: GridCells,
+    state: LazyGridState = rememberLazyGridState(),
+    canLoading: Boolean = false,
+    onLoading: (suspend () -> Unit)? = null,
+    indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    header: (@Composable LazyGridItemScope.() -> Unit)? = null,
+    itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-	val scope = rememberCoroutineScope()
-	var status: PaginationStatus by rememberState { IDLE }
-	LazyVerticalGrid(
-		columns = columns,
-		state = state,
-		contentPadding = contentPadding,
-		verticalArrangement = verticalArrangement,
-		horizontalArrangement = horizontalArrangement,
-		modifier = modifier
-	) {
-		if (header != null) {
-			item(
-				key = ItemKey("Header"),
-				span = { GridItemSpan(maxLineSpan) }
-			) {
-				header()
-			}
-		}
-		items(items = items, key = key, itemContent = itemContent)
-		if (canLoading) {
-			item(
-				key = Unit,
-				span = { GridItemSpan(maxLineSpan) }
-			) {
-				indicator(status) {
-					if (status != RUNNING) {
-						scope.launch {
-							status = RUNNING
-							onLoading?.invoke()
-							status = IDLE
-						}
-					}
-				}
-			}
-		}
-	}
+    val scope = rememberCoroutineScope()
+    var status by rememberState { PaginationStatus.IDLE }
+    LazyVerticalGrid(
+        columns = columns,
+        state = state,
+        contentPadding = contentPadding,
+        verticalArrangement = verticalArrangement,
+        horizontalArrangement = horizontalArrangement,
+        modifier = modifier
+    ) {
+        if (header != null) {
+            item(
+                key = ItemKey("Header"),
+                span = { GridItemSpan(maxLineSpan) }
+            ) {
+                header()
+            }
+        }
+        items(items = items, key = key, itemContent = itemContent)
+        if (canLoading) {
+            item(
+                key = Unit,
+                span = { GridItemSpan(maxLineSpan) }
+            ) {
+                indicator(status) {
+                    if (status != PaginationStatus.RUNNING) {
+                        scope.launch {
+                            status = PaginationStatus.RUNNING
+                            onLoading?.invoke()
+                            status = PaginationStatus.IDLE
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun <T> ClickPaginationStaggeredGrid(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	columns: StaggeredGridCells,
-	state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
-	canLoading: Boolean = false,
-	onLoading: (suspend () -> Unit)? = null,
-	indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
-	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
-	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    columns: StaggeredGridCells,
+    state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    canLoading: Boolean = false,
+    onLoading: (suspend () -> Unit)? = null,
+    indicator: @Composable (PaginationStatus, () -> Unit) -> Unit = { status, onClick -> DefaultClickPaginationIndicator(status, onClick) },
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
+    header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
+    itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-	val scope = rememberCoroutineScope()
-	var status: PaginationStatus by rememberState { IDLE }
-	LazyVerticalStaggeredGrid(
-		columns = columns,
-		state = state,
-		contentPadding = contentPadding,
-		verticalItemSpacing = verticalItemSpacing,
-		horizontalArrangement = horizontalArrangement,
-		modifier = modifier
-	) {
-		if (header != null) {
-			item(
-				key = ItemKey("Header"),
-				span = StaggeredGridItemSpan.FullLine
-			) {
-				header()
-			}
-		}
-		items(items = items, key = key, itemContent = itemContent)
-		if (canLoading) {
-			item(
-				key = Unit,
-				span = StaggeredGridItemSpan.FullLine
-			) {
-				indicator(status) {
-					if (status != RUNNING) {
-						scope.launch {
-							status = RUNNING
-							onLoading?.invoke()
-							status = IDLE
-						}
-					}
-				}
-			}
-		}
-	}
+    val scope = rememberCoroutineScope()
+    var status by rememberState { PaginationStatus.IDLE }
+    LazyVerticalStaggeredGrid(
+        columns = columns,
+        state = state,
+        contentPadding = contentPadding,
+        verticalItemSpacing = verticalItemSpacing,
+        horizontalArrangement = horizontalArrangement,
+        modifier = modifier
+    ) {
+        if (header != null) {
+            item(
+                key = ItemKey("Header"),
+                span = StaggeredGridItemSpan.FullLine
+            ) {
+                header()
+            }
+        }
+        items(items = items, key = key, itemContent = itemContent)
+        if (canLoading) {
+            item(
+                key = Unit,
+                span = StaggeredGridItemSpan.FullLine
+            ) {
+                indicator(status) {
+                    if (status != PaginationStatus.RUNNING) {
+                        scope.launch {
+                            status = PaginationStatus.RUNNING
+                            onLoading?.invoke()
+                            status = PaginationStatus.IDLE
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
 fun <T> PaginationColumn(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	state: LazyListState = rememberLazyListState(),
-	canRefresh: Boolean = true,
-	canLoading: Boolean = false,
-	onRefresh: (suspend () -> Unit)? = null,
-	onLoading: (suspend () -> Unit)? = null,
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-	horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-	header: (@Composable LazyItemScope.() -> Unit)? = null,
-	itemDivider: PaddingValues? = null,
-	itemContent: @Composable LazyItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    state: LazyListState = rememberLazyListState(),
+    canRefresh: Boolean = true,
+    canLoading: Boolean = false,
+    onRefresh: (suspend () -> Unit)? = null,
+    onLoading: (suspend () -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    header: (@Composable LazyItemScope.() -> Unit)? = null,
+    itemDivider: PaddingValues? = null,
+    itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-	OS.ifPlatform(
-		*Platform.Phone,
-		ifTrue = {
-			SwipePaginationLayout(
-				canRefresh = canRefresh,
-				canLoading = canLoading,
-				onRefresh = onRefresh,
-				onLoading = onLoading,
-				modifier = modifier
-			) {
-				LazyColumn(
-					modifier = Modifier.fillMaxSize(),
-					state = state,
-					contentPadding = contentPadding,
-					verticalArrangement = verticalArrangement,
-					horizontalAlignment = horizontalAlignment,
-				) {
-					if (header != null) {
-						item(key = ItemKey("Header")) {
-							header()
-						}
-					}
-					itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
-						if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
-						itemContent(item)
-					}
-				}
-			}
-		},
-		ifFalse = {
-			ClickPaginationColumn(
-				items = items,
-				key = key,
-				state = state,
-				canLoading = canLoading,
-				onLoading = onLoading,
-				modifier = modifier,
-				contentPadding = contentPadding,
-				verticalArrangement = verticalArrangement,
-				horizontalAlignment = horizontalAlignment,
-				header = header,
-				itemDivider = itemDivider,
-				itemContent = itemContent
-			)
-		}
-	)
+    OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = {
+            SwipePaginationLayout(
+                canRefresh = canRefresh,
+                canLoading = canLoading,
+                onRefresh = onRefresh,
+                onLoading = onLoading,
+                modifier = modifier
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    contentPadding = contentPadding,
+                    verticalArrangement = verticalArrangement,
+                    horizontalAlignment = horizontalAlignment,
+                ) {
+                    if (header != null) {
+                        item(key = ItemKey("Header")) {
+                            header()
+                        }
+                    }
+                    itemsIndexed(items = items, key = key?.let { { index, item -> it(item) } }) {index, item->
+                        if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
+                        itemContent(item)
+                    }
+                }
+            }
+        },
+        ifFalse = {
+            ClickPaginationColumn(
+                items = items,
+                key = key,
+                state = state,
+                canLoading = canLoading,
+                onLoading = onLoading,
+                modifier = modifier,
+                contentPadding = contentPadding,
+                verticalArrangement = verticalArrangement,
+                horizontalAlignment = horizontalAlignment,
+                header = header,
+                itemDivider = itemDivider,
+                itemContent = itemContent
+            )
+        }
+    )
 }
 
 @Composable
 fun <T> PaginationGrid(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	columns: GridCells,
-	state: LazyGridState = rememberLazyGridState(),
-	canRefresh: Boolean = true,
-	canLoading: Boolean = false,
-	onRefresh: (suspend () -> Unit)? = null,
-	onLoading: (suspend () -> Unit)? = null,
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-	header: (@Composable LazyGridItemScope.() -> Unit)? = null,
-	itemContent: @Composable LazyGridItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    columns: GridCells,
+    state: LazyGridState = rememberLazyGridState(),
+    canRefresh: Boolean = true,
+    canLoading: Boolean = false,
+    onRefresh: (suspend () -> Unit)? = null,
+    onLoading: (suspend () -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    header: (@Composable LazyGridItemScope.() -> Unit)? = null,
+    itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-	OS.ifPlatform(
-		*Platform.Phone,
-		ifTrue = {
-			SwipePaginationLayout(
-				canRefresh = canRefresh,
-				canLoading = canLoading,
-				onRefresh = onRefresh,
-				onLoading = onLoading,
-				modifier = modifier
-			) {
-				LazyVerticalGrid(
-					columns = columns,
-					modifier = Modifier.fillMaxSize(),
-					state = state,
-					contentPadding = contentPadding,
-					verticalArrangement = verticalArrangement,
-					horizontalArrangement = horizontalArrangement,
-				) {
-					if (header != null) {
-						item(
-							key = ItemKey("Header"),
-							span = { GridItemSpan(maxLineSpan) }
-						) {
-							header()
-						}
-					}
-					items(items = items, key = key, itemContent = itemContent)
-				}
-			}
-		},
-		ifFalse = {
-			ClickPaginationGrid(
-				items = items,
-				key = key,
-				columns = columns,
-				state = state,
-				canLoading = canLoading,
-				onLoading = onLoading,
-				modifier = modifier,
-				contentPadding = contentPadding,
-				verticalArrangement = verticalArrangement,
-				horizontalArrangement = horizontalArrangement,
-				header = header,
-				itemContent = itemContent
-			)
-		}
-	)
+    OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = {
+            SwipePaginationLayout(
+                canRefresh = canRefresh,
+                canLoading = canLoading,
+                onRefresh = onRefresh,
+                onLoading = onLoading,
+                modifier = modifier
+            ) {
+                LazyVerticalGrid(
+                    columns = columns,
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    contentPadding = contentPadding,
+                    verticalArrangement = verticalArrangement,
+                    horizontalArrangement = horizontalArrangement,
+                ) {
+                    if (header != null) {
+                        item(
+                            key = ItemKey("Header"),
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            header()
+                        }
+                    }
+                    items(items = items, key = key, itemContent = itemContent)
+                }
+            }
+        },
+        ifFalse = {
+            ClickPaginationGrid(
+                items = items,
+                key = key,
+                columns = columns,
+                state = state,
+                canLoading = canLoading,
+                onLoading = onLoading,
+                modifier = modifier,
+                contentPadding = contentPadding,
+                verticalArrangement = verticalArrangement,
+                horizontalArrangement = horizontalArrangement,
+                header = header,
+                itemContent = itemContent
+            )
+        }
+    )
 }
 
 @Composable
 fun <T> PaginationStaggeredGrid(
-	items: List<T>,
-	key: ((T) -> Any)? = null,
-	columns: StaggeredGridCells,
-	state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
-	canRefresh: Boolean = true,
-	canLoading: Boolean = false,
-	onRefresh: (suspend () -> Unit)? = null,
-	onLoading: (suspend () -> Unit)? = null,
-	modifier: Modifier = Modifier,
-	contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
-	verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
-	horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
-	header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
-	itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
+    items: List<T>,
+    key: ((T) -> Any)? = null,
+    columns: StaggeredGridCells,
+    state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+    canRefresh: Boolean = true,
+    canLoading: Boolean = false,
+    onRefresh: (suspend () -> Unit)? = null,
+    onLoading: (suspend () -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = ThemeValue.Padding.ZeroValue,
+    verticalItemSpacing: Dp = ThemeValue.Padding.ZeroSpace,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.ZeroSpace),
+    header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
+    itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-	OS.ifPlatform(
-		*Platform.Phone,
-		ifTrue = {
-			SwipePaginationLayout(
-				canRefresh = canRefresh,
-				canLoading = canLoading,
-				onRefresh = onRefresh,
-				onLoading = onLoading,
-				modifier = modifier
-			) {
-				LazyVerticalStaggeredGrid(
-					columns = columns,
-					modifier = Modifier.fillMaxSize(),
-					state = state,
-					contentPadding = contentPadding,
-					verticalItemSpacing = verticalItemSpacing,
-					horizontalArrangement = horizontalArrangement
-				) {
-					if (header != null) {
-						item(
-							key = ItemKey("Header"),
-							span = StaggeredGridItemSpan.FullLine
-						) {
-							header()
-						}
-					}
-					items(items = items, key = key, itemContent = itemContent)
-				}
-			}
-		},
-		ifFalse = {
-			ClickPaginationStaggeredGrid(
-				items = items,
-				key = key,
-				columns = columns,
-				state = state,
-				canLoading = canLoading,
-				onLoading = onLoading,
-				modifier = modifier,
-				contentPadding = contentPadding,
-				verticalItemSpacing = verticalItemSpacing,
-				horizontalArrangement = horizontalArrangement,
-				header = header,
-				itemContent = itemContent
-			)
-		}
-	)
+    OS.ifPlatform(
+        *Platform.Phone,
+        ifTrue = {
+            SwipePaginationLayout(
+                canRefresh = canRefresh,
+                canLoading = canLoading,
+                onRefresh = onRefresh,
+                onLoading = onLoading,
+                modifier = modifier
+            ) {
+                LazyVerticalStaggeredGrid(
+                    columns = columns,
+                    modifier = Modifier.fillMaxSize(),
+                    state = state,
+                    contentPadding = contentPadding,
+                    verticalItemSpacing = verticalItemSpacing,
+                    horizontalArrangement = horizontalArrangement
+                ) {
+                    if (header != null) {
+                        item(
+                            key = ItemKey("Header"),
+                            span = StaggeredGridItemSpan.FullLine
+                        ) {
+                            header()
+                        }
+                    }
+                    items(items = items, key = key, itemContent = itemContent)
+                }
+            }
+        },
+        ifFalse = {
+            ClickPaginationStaggeredGrid(
+                items = items,
+                key = key,
+                columns = columns,
+                state = state,
+                canLoading = canLoading,
+                onLoading = onLoading,
+                modifier = modifier,
+                contentPadding = contentPadding,
+                verticalItemSpacing = verticalItemSpacing,
+                horizontalArrangement = horizontalArrangement,
+                header = header,
+                itemContent = itemContent
+            )
+        }
+    )
 }

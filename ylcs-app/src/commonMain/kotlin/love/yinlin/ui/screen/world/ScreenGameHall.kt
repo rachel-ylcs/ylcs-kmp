@@ -21,6 +21,7 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.extension.rememberDerivedState
@@ -39,7 +40,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
     @Serializable
     data class Args(val type: Game)
 
-    private var state: BoxState by mutableStateOf(EMPTY)
+    private var state by mutableStateOf(BoxState.EMPTY)
 
     private var page = object : Pagination<GamePublicDetailsWithName, Int, Int>(Int.MAX_VALUE) {
         override fun distinctValue(item: GamePublicDetailsWithName): Int = item.gid
@@ -51,8 +52,8 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
     override val title: String = args.type.title
 
     private suspend fun requestNewGames(loading: Boolean) {
-        if (state != LOADING) {
-            if (loading) state = LOADING
+        if (state != BoxState.LOADING) {
+            if (loading) state = BoxState.LOADING
             val result = ClientAPI.request(
                 route = API.User.Game.GetGames,
                 data = API.User.Game.GetGames.Request(
@@ -60,9 +61,9 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                     num = page.pageNum
                 )
             )
-            state = if (result is Success) {
-                if (page.newData(result.data)) CONTENT else EMPTY
-            } else NETWORK_ERROR
+            state = if (result is Data.Success) {
+                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+            } else BoxState.NETWORK_ERROR
         }
     }
 
@@ -75,7 +76,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
                 num = page.pageNum
             )
         )
-        if (result is Success) page.moreData(result.data)
+        if (result is Data.Success) page.moreData(result.data)
     }
 
     private suspend fun deleteGame(gid: Int) {
@@ -87,8 +88,8 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
             )
         )
         when (result) {
-            is Success -> page.items.removeAll { it.gid == gid }
-            is Failure -> slot.tip.error(result.message)
+            is Data.Success -> page.items.removeAll { it.gid == gid }
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 

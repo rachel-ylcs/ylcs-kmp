@@ -22,27 +22,27 @@ import love.yinlin.ui.component.image.ClickIcon
 @Stable
 @Serializable
 enum class InputType {
-	COMMON,
-	PASSWORD
+    COMMON,
+    PASSWORD
 }
 
 @Stable
 class TextInputState(str: String = "") {
-	var value: TextFieldValue by mutableStateOf(TextFieldValue(str))
-	var overflow: Boolean by mutableStateOf(false)
+    var value: TextFieldValue by mutableStateOf(TextFieldValue(str))
+    var overflow: Boolean by mutableStateOf(false)
 
-	var text: String get() = value.text
-		set(value) { this.value = TextFieldValue(value) }
+    var text: String get() = value.text
+        set(value) { this.value = TextFieldValue(value) }
 
-	val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
+    val ok: Boolean by derivedStateOf { !overflow && text.isNotEmpty() }
 
-	fun insert(str: String) {
-		val selection = value.selection
-		value = value.copy(
-			text = value.text.replaceRange(selection.start, selection.end, str),
-			selection = TextRange(selection.start + str.length)
-		)
-	}
+    fun insert(str: String) {
+        val selection = value.selection
+        value = value.copy(
+            text = value.text.replaceRange(selection.start, selection.end, str),
+            selection = TextRange(selection.start + str.length)
+        )
+    }
 }
 
 @Composable
@@ -50,75 +50,75 @@ fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState
 
 @Composable
 fun TextInput(
-	state: TextInputState,
-	hint: String? = null,
-	inputType: InputType = COMMON,
-	readOnly: Boolean = false,
-	maxLength: Int = 0,
-	maxLines: Int = 1,
-	minLines: Int = maxLines,
-	clearButton: Boolean = true,
-	leadingIcon: @Composable (() -> Unit)? = null,
-	trailingIcon: @Composable (() -> Unit)? = if (clearButton) {
-		{
-			ClickIcon(
-				icon = Icons.Outlined.Clear,
-				onClick = {
-					state.text = ""
-					state.overflow = false
-				}
-			)
-		}
-	} else null,
-	imeAction: ImeAction = ImeAction.Done,
-	onImeClick: (KeyboardActionScope.() -> Unit)? = null,
-	modifier: Modifier = Modifier
+    state: TextInputState,
+    hint: String? = null,
+    inputType: InputType = InputType.COMMON,
+    readOnly: Boolean = false,
+    maxLength: Int = 0,
+    maxLines: Int = 1,
+    minLines: Int = maxLines,
+    clearButton: Boolean = true,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = if (clearButton) {
+        {
+            ClickIcon(
+                icon = Icons.Outlined.Clear,
+                onClick = {
+                    state.text = ""
+                    state.overflow = false
+                }
+            )
+        }
+    } else null,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeClick: (KeyboardActionScope.() -> Unit)? = null,
+    modifier: Modifier = Modifier
 ) {
-	OutlinedTextField(
-		value = state.value,
-		onValueChange = {
-			state.value = it
-			state.overflow = maxLength > 0 && it.text.length > maxLength
-		},
-		label = hint?.let { label -> {
-			Text(
-				text = label,
-				style = MaterialTheme.typography.titleMedium
-			)
-		} },
-		leadingIcon = leadingIcon,
-		trailingIcon = trailingIcon,
-		readOnly = readOnly,
-		visualTransformation = remember(inputType) {
-			when (inputType) {
-				COMMON -> VisualTransformation.None
-				PASSWORD -> PasswordVisualTransformation()
-			}
-		},
-		keyboardOptions = remember(inputType, imeAction) {
-			KeyboardOptions(
-				keyboardType = when (inputType) {
-					COMMON -> KeyboardType.Text
-					PASSWORD -> KeyboardType.Password
-				},
-				autoCorrectEnabled = false,
-				imeAction = imeAction
-			)
-		},
-		keyboardActions = remember(imeAction, onImeClick) {
-			KeyboardActions(
-				onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,
-				onGo = if (imeAction == ImeAction.Go && onImeClick != null) onImeClick else null,
-				onNext = if (imeAction == ImeAction.Next && onImeClick != null) onImeClick else null,
-				onPrevious = if (imeAction == ImeAction.Previous && onImeClick != null) onImeClick else null,
-				onSearch = if (imeAction == ImeAction.Search && onImeClick != null) onImeClick else null,
-				onSend = if (imeAction == ImeAction.Send && onImeClick != null) onImeClick else null,
-			)
-		},
-		singleLine = maxLines.coerceAtLeast(1) == 1,
-		minLines = minLines.coerceAtLeast(1),
-		maxLines = maxLines.coerceAtLeast(1),
-		isError = state.overflow,
-		modifier = modifier
-	)
+    OutlinedTextField(
+        value = state.value,
+        onValueChange = {
+            state.value = it
+            state.overflow = maxLength > 0 && it.text.length > maxLength
+        },
+        label = hint?.let { label -> {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium
+            )
+        } },
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        readOnly = readOnly,
+        visualTransformation = remember(inputType) {
+            when (inputType) {
+                InputType.COMMON -> VisualTransformation.None
+                InputType.PASSWORD -> PasswordVisualTransformation()
+            }
+        },
+        keyboardOptions = remember(inputType, imeAction) {
+            KeyboardOptions(
+                keyboardType = when (inputType) {
+                    InputType.COMMON -> KeyboardType.Text
+                    InputType.PASSWORD -> KeyboardType.Password
+                },
+                autoCorrectEnabled = false,
+                imeAction = imeAction
+            )
+        },
+        keyboardActions = remember(imeAction, onImeClick) {
+            KeyboardActions(
+                onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,
+                onGo = if (imeAction == ImeAction.Go && onImeClick != null) onImeClick else null,
+                onNext = if (imeAction == ImeAction.Next && onImeClick != null) onImeClick else null,
+                onPrevious = if (imeAction == ImeAction.Previous && onImeClick != null) onImeClick else null,
+                onSearch = if (imeAction == ImeAction.Search && onImeClick != null) onImeClick else null,
+                onSend = if (imeAction == ImeAction.Send && onImeClick != null) onImeClick else null,
+            )
+        },
+        singleLine = maxLines.coerceAtLeast(1) == 1,
+        minLines = minLines.coerceAtLeast(1),
+        maxLines = maxLines.coerceAtLeast(1),
+        isError = state.overflow,
+        modifier = modifier
+    )
 }

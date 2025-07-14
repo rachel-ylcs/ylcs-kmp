@@ -16,6 +16,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
@@ -124,7 +125,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 				itemsIndexed(items = previews) { index, item ->
 					WebImage(
 						uri = item.pic.image,
-						contentScale = Crop,
+						contentScale = ContentScale.Crop,
 						modifier = Modifier.fillMaxWidth().aspectRatio(1f)
 							.condition(index == current) {
 								border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)
@@ -165,10 +166,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 	}
 
 	@Composable
-	override fun SubContent(device: Device) = when (device.type) {
-		PORTRAIT -> Portrait()
-		LANDSCAPE, SQUARE -> Landscape()
-	}
+    override fun SubContent(device: Device) = when (device.type) {
+        Device.Type.PORTRAIT -> Portrait()
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+    }
 
 	private val downloadDialog = FloatingDownloadDialog()
 

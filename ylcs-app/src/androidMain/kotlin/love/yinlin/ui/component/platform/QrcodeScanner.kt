@@ -94,7 +94,7 @@ actual fun QrcodeScanner(
         )
         Row(
             modifier = Modifier.fillMaxWidth()
-                .align(BottomCenter)
+                .align(Alignment.BottomCenter)
                 .padding(ThemeValue.Padding.VerticalExtraSpace * 4)
                 .zIndex(3f),
             horizontalArrangement = Arrangement.SpaceEvenly,

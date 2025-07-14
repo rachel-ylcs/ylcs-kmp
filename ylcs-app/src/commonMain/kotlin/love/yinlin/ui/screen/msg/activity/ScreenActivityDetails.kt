@@ -24,6 +24,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.Uri
+import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
@@ -110,11 +111,11 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 			)
 		)
         when (result) {
-            is Success -> {
+            is Data.Success -> {
                 msgPart.activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
                 pop()
             }
-            is Failure -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
 	}
 
@@ -247,9 +248,9 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 
 	@Composable
 	override fun SubContent(device: Device) = activity?.let {
-		when (device.type) {
-			PORTRAIT -> Portrait(it)
-			LANDSCAPE, SQUARE -> Landscape(it)
-		}
+        when (device.type) {
+            Device.Type.PORTRAIT -> Portrait(it)
+            Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
+        }
 	} ?: EmptyBox()
 }

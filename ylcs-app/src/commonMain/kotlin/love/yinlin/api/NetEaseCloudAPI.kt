@@ -47,11 +47,11 @@ object NetEaseCloudAPI {
             getCloudMusic(json.arr("songs")[0].Object)
         }
         return when (result1) {
-            is Success -> when (val result2 = requestLyrics(id)) {
-                is Success -> Data.Success(result1.data.copy(lyrics = result2.data))
-                is Failure -> Data.Failure()
+            is Data.Success -> when (val result2 = requestLyrics(id)) {
+                is Data.Success -> Data.Success(result1.data.copy(lyrics = result2.data))
+                is Data.Failure -> Data.Failure()
             }
-            is Failure -> result1
+            is Data.Failure -> result1
         }
     }
 
@@ -64,16 +64,16 @@ object NetEaseCloudAPI {
             }
         }
         return when (result1) {
-            is Success -> {
+            is Data.Success -> {
                 val data = result1.data.toMutableList()
                 for (i in data.indices) {
                     val result2 = requestLyrics(data[i].id)
-                    if (result2 is Success) data[i] = data[i].copy(lyrics = result2.data)
+                    if (result2 is Data.Success) data[i] = data[i].copy(lyrics = result2.data)
                 }
                 data.removeAll { it.lyrics.isEmpty() }
                 if (data.isEmpty()) Data.Failure() else Data.Success(data)
             }
-            is Failure -> result1
+            is Data.Failure -> result1
         }
     }
 }

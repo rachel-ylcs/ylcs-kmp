@@ -180,21 +180,21 @@ fun rachelColorScheme(isDarkMode: Boolean): ColorScheme = remember(isDarkMode) {
 
 @Composable
 fun rachelShapes(device: Device): Shapes = remember(device) { when (device.size) {
-	SMALL -> Shapes(
+    Device.Size.SMALL -> Shapes(
 		extraSmall = RoundedCornerShape(3.dp),
 		small = RoundedCornerShape(5.dp),
 		medium = RoundedCornerShape(7.dp),
 		large = RoundedCornerShape(9.dp),
 		extraLarge = RoundedCornerShape(11.dp)
 	)
-	MEDIUM -> Shapes(
+    Device.Size.MEDIUM -> Shapes(
 		extraSmall = RoundedCornerShape(3.5.dp),
 		small = RoundedCornerShape(5.5.dp),
 		medium = RoundedCornerShape(7.5.dp),
 		large = RoundedCornerShape(9.5.dp),
 		extraLarge = RoundedCornerShape(11.5.dp)
 	)
-	LARGE -> Shapes(
+    Device.Size.LARGE -> Shapes(
 		extraSmall = RoundedCornerShape(4.dp),
 		small = RoundedCornerShape(6.dp),
 		medium = RoundedCornerShape(8.dp),
@@ -231,7 +231,7 @@ private fun rachelTextStyle(
 fun rachelTypography(device: Device): Typography {
 	val font = rachelFont()
 	return remember(device, font) { when (device.size) {
-        SMALL -> Typography(
+        Device.Size.SMALL -> Typography(
 			displayLarge = baseTextStyle(font, 28.sp, true),
 			displayMedium = baseTextStyle(font, 24.sp, true),
 			displaySmall = baseTextStyle(font, 20.sp, true),
@@ -248,7 +248,7 @@ fun rachelTypography(device: Device): Typography {
 			labelMedium = baseTextStyle(font, 14.sp, true),
 			labelSmall = baseTextStyle(font, 12.sp, true),
 		)
-        MEDIUM -> Typography(
+        Device.Size.MEDIUM -> Typography(
 			displayLarge = baseTextStyle(font, 30.sp, true),
 			displayMedium = baseTextStyle(font, 26.sp, true),
 			displaySmall = baseTextStyle(font, 22.sp, true),
@@ -265,7 +265,7 @@ fun rachelTypography(device: Device): Typography {
 			labelMedium = baseTextStyle(font, 15.sp, true),
 			labelSmall = baseTextStyle(font, 13.sp, true),
 		)
-        LARGE -> Typography(
+        Device.Size.LARGE -> Typography(
 			displayLarge = baseTextStyle(font, 32.sp, true),
 			displayMedium = baseTextStyle(font, 28.sp, true),
 			displaySmall = baseTextStyle(font, 24.sp, true),
@@ -288,14 +288,14 @@ fun rachelTypography(device: Device): Typography {
 @Stable
 object ThemeStyle {
 	val bodyExtraSmall: TextStyle @Composable get() = when (LocalDevice.current.size) {
-		SMALL -> rachelTextStyle(10.sp, false)
-		MEDIUM -> rachelTextStyle(11.sp, false)
-		LARGE -> rachelTextStyle(12.sp, false)
+        Device.Size.SMALL -> rachelTextStyle(10.sp, false)
+        Device.Size.MEDIUM -> rachelTextStyle(11.sp, false)
+        Device.Size.LARGE -> rachelTextStyle(12.sp, false)
 	}
 	val DisplayExtraLarge: TextStyle @Composable get() = when (LocalDevice.current.size) {
-        SMALL -> rachelTextStyle(32.sp, true)
-        MEDIUM -> rachelTextStyle(34.sp, true)
-        LARGE -> rachelTextStyle(36.sp, true)
+        Device.Size.SMALL -> rachelTextStyle(32.sp, true)
+        Device.Size.MEDIUM -> rachelTextStyle(34.sp, true)
+        Device.Size.LARGE -> rachelTextStyle(36.sp, true)
     }
 }
 
@@ -304,144 +304,144 @@ object ThemeValue {
 	@Stable
 	object Size {
 		val Little: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.5.dp
-			MEDIUM -> 3.dp
-			LARGE -> 3.5.dp
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
 		}
 		val MicroIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 18.dp
-			MEDIUM -> 20.dp
-			LARGE -> 22.dp
+			Device.Size.SMALL -> 18.dp
+			Device.Size.MEDIUM -> 20.dp
+			Device.Size.LARGE -> 22.dp
 		}
 		val Icon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 22.dp
-			MEDIUM -> 24.dp
-			LARGE -> 26.dp
+			Device.Size.SMALL -> 22.dp
+			Device.Size.MEDIUM -> 24.dp
+			Device.Size.LARGE -> 26.dp
 		}
 		val MediumIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 26.dp
-			MEDIUM -> 28.dp
-			LARGE -> 30.dp
+			Device.Size.SMALL -> 26.dp
+			Device.Size.MEDIUM -> 28.dp
+			Device.Size.LARGE -> 30.dp
 		}
 		val LargeIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 30.dp
-			MEDIUM -> 32.dp
-			LARGE -> 34.dp
+			Device.Size.SMALL -> 30.dp
+			Device.Size.MEDIUM -> 32.dp
+			Device.Size.LARGE -> 34.dp
 		}
 		val ExtraIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 34.dp
-			MEDIUM -> 36.dp
-			LARGE -> 38.dp
+			Device.Size.SMALL -> 34.dp
+			Device.Size.MEDIUM -> 36.dp
+			Device.Size.LARGE -> 38.dp
 		}
 		val SmallInput: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 36.dp
-			MEDIUM -> 40.dp
-			LARGE -> 44.dp
+			Device.Size.SMALL -> 36.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 44.dp
 		}
 		val MediumInput: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 44.dp
-			MEDIUM -> 50.dp
-			LARGE -> 56.dp
+			Device.Size.SMALL -> 44.dp
+			Device.Size.MEDIUM -> 50.dp
+			Device.Size.LARGE -> 56.dp
 		}
 		val LargeInput: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 56.dp
-			MEDIUM -> 64.dp
-			LARGE -> 72.dp
+			Device.Size.SMALL -> 56.dp
+			Device.Size.MEDIUM -> 64.dp
+			Device.Size.LARGE -> 72.dp
 		}
 		val ExtraInput: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 72.dp
-			MEDIUM -> 80.dp
-			LARGE -> 88.dp
+			Device.Size.SMALL -> 72.dp
+			Device.Size.MEDIUM -> 80.dp
+			Device.Size.LARGE -> 88.dp
 		}
         val SliderWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-            SMALL -> 90.dp
-            MEDIUM -> 96.dp
-            LARGE -> 102.dp
+            Device.Size.SMALL -> 90.dp
+            Device.Size.MEDIUM -> 96.dp
+            Device.Size.LARGE -> 102.dp
         }
 		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 40.dp
-			MEDIUM -> 44.dp
-			LARGE -> 48.dp
+			Device.Size.SMALL -> 40.dp
+			Device.Size.MEDIUM -> 44.dp
+			Device.Size.LARGE -> 48.dp
 		}
 		val MicroImage: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 32.dp
-			MEDIUM -> 40.dp
-			LARGE -> 48.dp
+			Device.Size.SMALL -> 32.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 48.dp
 		}
 		val Image: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 48.dp
-			MEDIUM -> 56.dp
-			LARGE -> 64.dp
+			Device.Size.SMALL -> 48.dp
+			Device.Size.MEDIUM -> 56.dp
+			Device.Size.LARGE -> 64.dp
 		}
 		val MediumImage: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 64.dp
-			MEDIUM -> 72.dp
-			LARGE -> 80.dp
+			Device.Size.SMALL -> 64.dp
+			Device.Size.MEDIUM -> 72.dp
+			Device.Size.LARGE -> 80.dp
 		}
 		val LargeImage: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 100.dp
-			MEDIUM -> 125.dp
-			LARGE -> 150.dp
+			Device.Size.SMALL -> 100.dp
+			Device.Size.MEDIUM -> 125.dp
+			Device.Size.LARGE -> 150.dp
 		}
 		val ExtraImage: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 200.dp
-			MEDIUM -> 225.dp
-			LARGE -> 250.dp
+			Device.Size.SMALL -> 200.dp
+			Device.Size.MEDIUM -> 225.dp
+			Device.Size.LARGE -> 250.dp
 		}
 		val ProgressHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 4.dp
-			MEDIUM -> 5.dp
-			LARGE -> 6.dp
+			Device.Size.SMALL -> 4.dp
+			Device.Size.MEDIUM -> 5.dp
+			Device.Size.LARGE -> 6.dp
 		}
 		val SliderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 8.dp
-			MEDIUM -> 10.dp
-			LARGE -> 12.dp
+			Device.Size.SMALL -> 8.dp
+			Device.Size.MEDIUM -> 10.dp
+			Device.Size.LARGE -> 12.dp
 		}
 		val dotHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 10.dp
-			MEDIUM -> 12.dp
-			LARGE -> 14.dp
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 12.dp
+			Device.Size.LARGE -> 14.dp
 		}
 		val RefreshHeaderHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 70.dp
-			MEDIUM -> 75.dp
-			LARGE -> 80.dp
+			Device.Size.SMALL -> 70.dp
+			Device.Size.MEDIUM -> 75.dp
+			Device.Size.LARGE -> 80.dp
 		}
 		val RefreshFooterHeight: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 50.dp
-			MEDIUM -> 55.dp
-			LARGE -> 60.dp
+			Device.Size.SMALL -> 50.dp
+			Device.Size.MEDIUM -> 55.dp
+			Device.Size.LARGE -> 60.dp
 		}
 		val MicroCellWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 75.dp
-			MEDIUM -> 90.dp
-			LARGE -> 115.dp
+			Device.Size.SMALL -> 75.dp
+			Device.Size.MEDIUM -> 90.dp
+			Device.Size.LARGE -> 115.dp
 		}
 		val CellWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 150.dp
-			MEDIUM -> 180.dp
-			LARGE -> 200.dp
+			Device.Size.SMALL -> 150.dp
+			Device.Size.MEDIUM -> 180.dp
+			Device.Size.LARGE -> 200.dp
 		}
 		val CardWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 300.dp
-			MEDIUM -> 320.dp
-			LARGE -> 350.dp
+			Device.Size.SMALL -> 300.dp
+			Device.Size.MEDIUM -> 320.dp
+			Device.Size.LARGE -> 350.dp
 		}
 		val DialogWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 300.dp
-			MEDIUM -> 400.dp
-			LARGE -> 500.dp
+			Device.Size.SMALL -> 300.dp
+			Device.Size.MEDIUM -> 400.dp
+			Device.Size.LARGE -> 500.dp
 		}
 		val SheetWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 360.dp
-			MEDIUM -> 400.dp
-			LARGE -> 450.dp
+			Device.Size.SMALL -> 360.dp
+			Device.Size.MEDIUM -> 400.dp
+			Device.Size.LARGE -> 450.dp
 		}
 		val PanelWidth: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 360.dp
-			MEDIUM -> 380.dp
-			LARGE -> 400.dp
+			Device.Size.SMALL -> 360.dp
+			Device.Size.MEDIUM -> 380.dp
+			Device.Size.LARGE -> 400.dp
 		}
 	}
 
@@ -449,44 +449,44 @@ object ThemeValue {
 	object Padding {
 		val ZeroSpace: Dp = 0.dp
 		val LittleSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.5.dp
-			MEDIUM -> 3.dp
-			LARGE -> 3.5.dp
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
 		}
 		val EqualSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 7.5.dp
-			MEDIUM -> 9.dp
-			LARGE -> 10.5.dp
+			Device.Size.SMALL -> 7.5.dp
+			Device.Size.MEDIUM -> 9.dp
+			Device.Size.LARGE -> 10.5.dp
 		}
 		val HorizontalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 10.dp
-			MEDIUM -> 12.dp
-			LARGE -> 14.dp
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 12.dp
+			Device.Size.LARGE -> 14.dp
 		}
 		val VerticalSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 5.dp
-			MEDIUM -> 6.dp
-			LARGE -> 7.dp
+			Device.Size.SMALL -> 5.dp
+			Device.Size.MEDIUM -> 6.dp
+			Device.Size.LARGE -> 7.dp
 		}
 		val EqualExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 11.25.dp
-			MEDIUM -> 13.125.dp
-			LARGE -> 15.dp
+			Device.Size.SMALL -> 11.25.dp
+			Device.Size.MEDIUM -> 13.125.dp
+			Device.Size.LARGE -> 15.dp
 		}
 		val HorizontalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 15.dp
-			MEDIUM -> 17.5.dp
-			LARGE -> 20.dp
+			Device.Size.SMALL -> 15.dp
+			Device.Size.MEDIUM -> 17.5.dp
+			Device.Size.LARGE -> 20.dp
 		}
 		val VerticalExtraSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 7.5.dp
-			MEDIUM -> 8.75.dp
-			LARGE -> 10.dp
+			Device.Size.SMALL -> 7.5.dp
+			Device.Size.MEDIUM -> 8.75.dp
+			Device.Size.LARGE -> 10.dp
 		}
 		val InnerIcon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.5.dp
-			MEDIUM -> 3.dp
-			LARGE -> 3.5.dp
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
 		}
 		val ZeroValue: PaddingValues = PaddingValues(0.dp)
 		val LittleValue: PaddingValues @Composable get() = PaddingValues(horizontal = LittleSpace, vertical = LittleSpace * 0.8f)
@@ -495,18 +495,18 @@ object ThemeValue {
 		val EqualExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = EqualExtraSpace, vertical = EqualExtraSpace)
 		val ExtraValue: PaddingValues @Composable get() = PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
 		val FAB: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 16.dp
-			MEDIUM -> 20.dp
-			LARGE -> 24.dp
+			Device.Size.SMALL -> 16.dp
+			Device.Size.MEDIUM -> 20.dp
+			Device.Size.LARGE -> 24.dp
 		}
 		val SheetValue: PaddingValues @Composable get() = when (LocalDevice.current.type) {
-			PORTRAIT -> PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
+			Device.Type.PORTRAIT -> PaddingValues(horizontal = HorizontalExtraSpace, vertical = VerticalExtraSpace)
 			else -> PaddingValues(top = HorizontalExtraSpace, bottom = HorizontalExtraSpace, end = HorizontalExtraSpace)
 		}
 		val CardSpace: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 32.dp
-			MEDIUM -> 40.dp
-			LARGE -> 48.dp
+			Device.Size.SMALL -> 32.dp
+			Device.Size.MEDIUM -> 40.dp
+			Device.Size.LARGE -> 48.dp
 		}
 		val CardValue: PaddingValues @Composable get() = PaddingValues(CardSpace)
 	}
@@ -514,53 +514,53 @@ object ThemeValue {
 	@Stable
 	object Border {
 		val Small: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 1.dp
-			MEDIUM -> 1.5.dp
-			LARGE -> 2.dp
+			Device.Size.SMALL -> 1.dp
+			Device.Size.MEDIUM -> 1.5.dp
+			Device.Size.LARGE -> 2.dp
 		}
 		val Medium: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.dp
-			MEDIUM -> 2.5.dp
-			LARGE -> 3.dp
+			Device.Size.SMALL -> 2.dp
+			Device.Size.MEDIUM -> 2.5.dp
+			Device.Size.LARGE -> 3.dp
 		}
 		val Large: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 3.dp
-			MEDIUM -> 4.dp
-			LARGE -> 5.dp
+			Device.Size.SMALL -> 3.dp
+			Device.Size.MEDIUM -> 4.dp
+			Device.Size.LARGE -> 5.dp
 		}
 	}
 
 	@Stable
 	object Shadow {
 		val Icon: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.5.dp
-			MEDIUM -> 3.dp
-			LARGE -> 3.5.dp
+			Device.Size.SMALL -> 2.5.dp
+			Device.Size.MEDIUM -> 3.dp
+			Device.Size.LARGE -> 3.5.dp
 		}
 		val Item: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 1.dp
-			MEDIUM -> 1.5.dp
-			LARGE -> 2.dp
+			Device.Size.SMALL -> 1.dp
+			Device.Size.MEDIUM -> 1.5.dp
+			Device.Size.LARGE -> 2.dp
 		}
 		val MiniSurface: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 2.dp
-			MEDIUM -> 2.25.dp
-			LARGE -> 2.5.dp
+			Device.Size.SMALL -> 2.dp
+			Device.Size.MEDIUM -> 2.25.dp
+			Device.Size.LARGE -> 2.5.dp
 		}
 		val Surface: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 4.dp
-			MEDIUM -> 4.5.dp
-			LARGE -> 5.dp
+			Device.Size.SMALL -> 4.dp
+			Device.Size.MEDIUM -> 4.5.dp
+			Device.Size.LARGE -> 5.dp
 		}
 		val Card: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 10.dp
-			MEDIUM -> 15.dp
-			LARGE -> 20.dp
+			Device.Size.SMALL -> 10.dp
+			Device.Size.MEDIUM -> 15.dp
+			Device.Size.LARGE -> 20.dp
 		}
 		val Tonal: Dp @Composable get() = when (LocalDevice.current.size) {
-			SMALL -> 1.dp
-			MEDIUM -> 1.5.dp
-			LARGE -> 2.dp
+			Device.Size.SMALL -> 1.dp
+			Device.Size.MEDIUM -> 1.5.dp
+			Device.Size.LARGE -> 2.dp
 		}
 	}
 }

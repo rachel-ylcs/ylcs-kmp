@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.AppModel
 import love.yinlin.Local
@@ -24,7 +25,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data.Success
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.extension.Array
@@ -46,7 +47,7 @@ import love.yinlin.ui.screen.world.game.GameRecordCard
 
 @Stable
 class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
-    private var state: BoxState by mutableStateOf(EMPTY)
+    private var state by mutableStateOf(BoxState.EMPTY)
 
     private val page = object : Pagination<GameRecordWithName, Long, Long>(Long.MAX_VALUE) {
         override fun distinctValue(item: GameRecordWithName): Long = item.rid
@@ -56,8 +57,8 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
     private val gridState = LazyStaggeredGridState()
 
     private suspend fun requestNewGameRecords(loading: Boolean) {
-        if (state != LOADING) {
-            if (loading) state = LOADING
+        if (state != BoxState.LOADING) {
+            if (loading) state = BoxState.LOADING
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGameRecords,
                 data = API.User.Game.GetUserGameRecords.Request(
@@ -65,9 +66,9 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                     num = page.pageNum
                 )
             )
-            state = if (result is Success) {
-                if (page.newData(result.data)) CONTENT else EMPTY
-            } else NETWORK_ERROR
+            state = if (result is Data.Success) {
+                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+            } else BoxState.NETWORK_ERROR
         }
     }
 
@@ -80,7 +81,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                 num = page.pageNum
             )
         )
-        if (result is Success) page.moreData(result.data)
+        if (result is Data.Success) page.moreData(result.data)
     }
 
     @Composable
@@ -207,7 +208,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                             style = MaterialTheme.typography.displayMedium,
                             color = Colors.Yellow4,
                             maxLines = 1,
-                            overflow = Ellipsis
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -233,7 +234,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                                     style = MaterialTheme.typography.displayMedium,
                                     color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
                                     maxLines = 1,
-                                    overflow = Ellipsis
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                             Space()

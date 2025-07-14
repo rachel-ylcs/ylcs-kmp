@@ -9,7 +9,7 @@ import love.yinlin.platform.UnsupportedComponent
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
 	actual var url: String = initUrl
-	actual val loadingState: WebPageLoadingState = Initializing
+	actual val loadingState: WebPageLoadingState = WebPageLoadingState.Initializing
 	actual val title: String = ""
 	actual val icon: BitmapPainter? = null
 	actual val canGoBack: Boolean = false

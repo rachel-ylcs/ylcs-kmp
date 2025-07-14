@@ -29,7 +29,7 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override var error: Throwable? by mutableStateOf(null)
-    override var playMode: MusicPlayMode by mutableStateOf(ORDER)
+    override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override val musicList = mutableStateListOf<MusicInfo>()
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
@@ -73,9 +73,9 @@ class ActualMusicFactory : MusicFactory() {
         override fun stopped(mediaPlayer: MediaPlayer?) {
             // 可能是因为播放完当前媒体停止 也可能是手动停止(此处要排除)
             if (isReady && mediaPlayer != null) mediaPlayer.innerGotoIndex(when (playMode) {
-                ORDER -> loopNextIndex
-                LOOP -> currentIndex
-                RANDOM -> randomNextIndex ?: reshuffled()
+                MusicPlayMode.ORDER -> loopNextIndex
+                MusicPlayMode.LOOP -> currentIndex
+                MusicPlayMode.RANDOM -> randomNextIndex ?: reshuffled()
             })
         }
         override fun error(mediaPlayer: MediaPlayer?) {
@@ -144,7 +144,7 @@ class ActualMusicFactory : MusicFactory() {
         playMode = musicPlayMode
         onPlayModeChanged(musicPlayMode)
         // 重新换模式要重设洗牌顺序
-        if (musicPlayMode == RANDOM) reshuffled(start = currentIndex)
+        if (musicPlayMode == MusicPlayMode.RANDOM) reshuffled(start = currentIndex)
     }
 
     override suspend fun play() = withReadyPlayer { player ->
@@ -158,11 +158,11 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun stop() = withReadyPlayer { player -> player.innerStop() }
 
     override suspend fun gotoPrevious() = withReadyPlayer { player ->
-        player.innerGotoIndex(if (playMode == RANDOM) randomPreviousIndex ?: reshuffled() else loopPreviousIndex)
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomPreviousIndex ?: reshuffled() else loopPreviousIndex)
     }
 
     override suspend fun gotoNext() = withReadyPlayer { player ->
-        player.innerGotoIndex(if (playMode == RANDOM) randomNextIndex ?: reshuffled() else loopNextIndex)
+        player.innerGotoIndex(if (playMode == MusicPlayMode.RANDOM) randomNextIndex ?: reshuffled() else loopNextIndex)
     }
 
     override suspend fun gotoIndex(index: Int) = withReadyPlayer { player -> player.innerGotoIndex(index) }
@@ -191,7 +191,7 @@ class ActualMusicFactory : MusicFactory() {
         * 得到新的随机序索引表
         *  */
         val indices = shuffledList.indices
-        if (playMode == RANDOM) {
+        if (playMode == MusicPlayMode.RANDOM) {
             val indexInShuffled = indices.indexOf(currentIndex)
             val rotated = indices.subList(indexInShuffled, indices.size) + indices.subList(0, indexInShuffled)
             val head = rotated.first()
@@ -212,7 +212,7 @@ class ActualMusicFactory : MusicFactory() {
             if (size == 1) player.innerStop()
             else {
                 musicList.removeAt(index)
-                if (playMode == RANDOM) {
+                if (playMode == MusicPlayMode.RANDOM) {
                     if (currentIndex == index) player.innerGotoIndex(reshuffled(size = size - 1))
                     else {
                         // 如果删除了随机序的起点则重新令当前播放的为起点

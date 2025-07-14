@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
@@ -122,7 +123,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                     OS.Storage.createTempFile { sink ->
                         SystemFileSystem.source(path).buffered().use { source ->
-                            ImageProcessor(ImageCrop(rect), ImageCompress, quality = Full).process(source, sink)
+                            ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
                         }
                     }?.let { SystemFileSystem.source(it).buffered() }
                 }
@@ -237,7 +238,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                    contentAlignment = Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(text = "暂未开放")
                 }
@@ -258,22 +259,22 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         private fun makeResourceItem(resource: MusicResource, length: Int): ResourceItem {
             val type = resource.type
             val onDelete: DeleteStrategy = when (type) {
-                Config, MusicResourceType.Record, Background -> Disabled
-                Audio, LineLyrics -> if (type.defaultName == resource.name) Disabled else NoOption
-                MusicResourceType.Animation, Video, Rhyme, null -> NoOption
+                MusicResourceType.Config, MusicResourceType.Record, MusicResourceType.Background -> DeleteStrategy.Disabled
+                MusicResourceType.Audio, MusicResourceType.LineLyrics -> if (type.defaultName == resource.name) DeleteStrategy.Disabled else DeleteStrategy.NoOption
+                MusicResourceType.Animation, MusicResourceType.Video, MusicResourceType.Rhyme, null -> DeleteStrategy.NoOption
             }
             val onReplace: ReplaceStrategy = when (type) {
-                Config, LineLyrics, Rhyme, null -> Disabled
-                Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
+                MusicResourceType.Config, MusicResourceType.LineLyrics, MusicResourceType.Rhyme, null -> ReplaceStrategy.Disabled
+                MusicResourceType.Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
                 MusicResourceType.Record -> ReplaceStrategy.Picture(aspectRatio = 1f)
-                Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
+                MusicResourceType.Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
                 MusicResourceType.Animation -> ReplaceStrategy.File(mimeType = listOf(MimeType.WEBP), filter = listOf("*.webp"))
-                Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
+                MusicResourceType.Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
             }
             val onModify: ModifyStrategy = when (type) {
-                Config -> ModifyStrategy.Config
-                LineLyrics -> ModifyStrategy.LineLyrics
-                else -> Disabled
+                MusicResourceType.Config -> ModifyStrategy.Config
+                MusicResourceType.LineLyrics -> ModifyStrategy.LineLyrics
+                else -> ModifyStrategy.Disabled
             }
             return ResourceItem(
                 resource = resource,
@@ -444,7 +445,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                         text = item.resource.type?.description ?: "未知资源",
                         color = Colors.White,
                         maxLines = 1,
-                        overflow = Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -452,14 +453,14 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     text = item.resource.name,
                     color = Colors.White,
                     maxLines = 1,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = remember(item) { item.length.toLong().fileSizeString },
                     color = Colors.White,
                     maxLines = 1,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(
@@ -577,8 +578,8 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
     @Composable
     override fun SubContent(device: Device) = when (device.type) {
-        PORTRAIT -> Portrait()
-        LANDSCAPE, SQUARE -> Landscape()
+        Device.Type.PORTRAIT -> Portrait()
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
     }
 
     private val modifySheet = object : FloatingArgsSheet<ResourceItem>() {

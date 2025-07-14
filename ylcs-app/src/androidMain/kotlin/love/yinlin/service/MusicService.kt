@@ -72,9 +72,9 @@ object CustomCommands {
 
     fun prepareButtons(mode: MusicPlayMode): List<CommandButton> = buildList {
         add(when (mode) {
-            ORDER -> OrderModeButton
-            LOOP -> LoopModeButton
-            RANDOM -> RandomModeButton
+            MusicPlayMode.ORDER -> OrderModeButton
+            MusicPlayMode.LOOP -> LoopModeButton
+            MusicPlayMode.RANDOM -> RandomModeButton
         })
         add(StopButton)
     }
@@ -99,17 +99,17 @@ class MusicService : MediaSessionService() {
             return when (customCommand) {
                 CustomCommands.SetMode -> {
                     val playMode = if (args.isEmpty) mergePlayMode(player.repeatMode, player.shuffleModeEnabled).next
-                    else MusicPlayMode.fromInt(args.getInt(CustomCommands.Args.SET_MODE_ARG_MODE)) ?: ORDER
+                    else MusicPlayMode.fromInt(args.getInt(CustomCommands.Args.SET_MODE_ARG_MODE)) ?: MusicPlayMode.ORDER
                     when (playMode) {
-                        ORDER -> {
+                        MusicPlayMode.ORDER -> {
                             player.repeatMode = Player.REPEAT_MODE_ALL
                             player.shuffleModeEnabled = false
                         }
-                        LOOP -> {
+                        MusicPlayMode.LOOP -> {
                             player.repeatMode = Player.REPEAT_MODE_ONE
                             player.shuffleModeEnabled = false
                         }
-                        RANDOM -> {
+                        MusicPlayMode.RANDOM -> {
                             player.repeatMode = Player.REPEAT_MODE_ALL
                             player.shuffleModeEnabled = true
                         }
@@ -135,7 +135,7 @@ class MusicService : MediaSessionService() {
         val forwardPlayer = ForwardPlayer(ffmpegPlayer)
         exoPlayer = ffmpegPlayer
         session = MediaSession.Builder(context, forwardPlayer)
-            .setCustomLayout(CustomCommands.prepareButtons(ORDER))
+            .setCustomLayout(CustomCommands.prepareButtons(MusicPlayMode.ORDER))
             .setCallback(listener)
             .setSessionActivity(
                 PendingIntent.getActivity(context, 0,

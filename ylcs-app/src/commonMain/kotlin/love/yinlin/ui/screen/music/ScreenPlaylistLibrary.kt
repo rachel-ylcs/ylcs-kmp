@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.API
@@ -83,15 +84,15 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
             textDecoration = if (musicInfo.isDeleted) TextDecoration.LineThrough else null,
             textAlign = TextAlign.Start,
             maxLines = 1,
-            overflow = MiddleEllipsis,
+            overflow = TextOverflow.MiddleEllipsis,
             modifier = Modifier.weight(2f)
         )
         Text(
             text = musicInfo.singer,
             style = MaterialTheme.typography.bodySmall,
-            textAlign = End,
+            textAlign = TextAlign.End,
             maxLines = 1,
-            overflow = MiddleEllipsis,
+            overflow = TextOverflow.MiddleEllipsis,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
@@ -287,7 +288,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
             data = app.config.userToken
         )
         return when (result) {
-            is Success -> {
+            is Data.Success -> {
                 try {
                     val playlists: Map<String, MusicPlaylist> = result.data.to()
                     Data.Success(decodePlaylist(playlists))
@@ -296,7 +297,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     Data.Failure(message = "云端歌单存在异常", throwable = e)
                 }
             }
-            is Failure -> result
+            is Data.Failure -> result
         }
     }
 
@@ -335,7 +336,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         override suspend fun initialize() {
             playlists = emptyMap()
             val result = downloadCloudPlaylist()
-            if (result is Success) playlists = result.data
+            if (result is Data.Success) playlists = result.data
         }
 
         @Composable
@@ -412,11 +413,11 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                     )
                                 )
                                 when (result) {
-                                    is Success -> {
+                                    is Data.Success -> {
                                         playlists = decodePlaylist(playlistLibrary.items)
                                         slot.tip.success(result.message)
                                     }
-                                    is Failure -> slot.tip.error(result.message)
+                                    is Data.Failure -> slot.tip.error(result.message)
                                 }
                             }
                         }

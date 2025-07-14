@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.ui.component.image.MiniIcon
@@ -28,7 +29,7 @@ private fun BreadcrumbItem(
         text = text,
         color = color,
         maxLines = 1,
-        overflow = Ellipsis,
+        overflow = TextOverflow.Ellipsis,
         modifier = Modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue)
     )
 }

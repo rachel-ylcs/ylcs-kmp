@@ -1,3 +1,3 @@
 package love.yinlin.platform
 
-actual val platform: Platform = Android
+actual val platform: Platform = Platform.Android

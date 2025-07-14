@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.ServerRes
+import love.yinlin.data.rachel.follows.FollowStatus
 
 @Stable
 @Serializable
@@ -29,7 +30,7 @@ data class UserProfile(
 
 	val level: Int by lazy { UserLevel.level(exp) }
 
-	val publicProfile: UserPublicProfile get() = UserPublicProfile(uid, name, signature, label, exp, follows, followers, SELF)
+	val publicProfile: UserPublicProfile get() = UserPublicProfile(uid, name, signature, label, exp, follows, followers, FollowStatus.SELF)
 
 	val hasPrivilegeBackup: Boolean get() = UserPrivilege.backup(privilege)
 

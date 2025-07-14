@@ -13,7 +13,7 @@ object IntentProcessor {
         fun process(data: android.net.Uri) {
             val uri = data.toUri()
             when (uri.scheme) {
-                Content -> DeepLinkHandler.onOpenUri(uri)
+                Scheme.Content -> DeepLinkHandler.onOpenUri(uri)
             }
         }
     }
@@ -37,7 +37,7 @@ object IntentProcessor {
         object SendBinary {
             fun process(data: android.net.Uri) {
                 val uri = data.toUri()
-                if (uri.scheme == Content) {
+                if (uri.scheme == Scheme.Content) {
                     DeepLinkHandler.onOpenUri(uri)
                 }
             }

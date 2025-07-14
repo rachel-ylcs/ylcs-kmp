@@ -1,7 +1,19 @@
 package love.yinlin.ui.screen.world
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.serialization.Serializable
@@ -19,8 +33,12 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.*
-import love.yinlin.data.Data.Success
+import love.yinlin.common.Device
+import love.yinlin.common.ExtraIcons
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.ui.component.image.MiniImage
@@ -42,7 +60,7 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
             route = API.User.Game.GetGameRank,
             data = args.type
         )
-        if (result is Success) items = result.data
+        if (result is Data.Success) items = result.data
     }
 
     @Composable
@@ -67,14 +85,14 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
                     3 -> MiniImage(icon = ExtraIcons.Rank3)
                     else -> Box(
                         modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(ThemeValue.Size.Icon),
-                        contentAlignment = Center
+                        contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = index.toString(),
                             style = MaterialTheme.typography.titleLarge,
-                            textAlign = Center,
+                            textAlign = TextAlign.Center,
                             maxLines = 1,
-                            overflow = Ellipsis,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.matchParentSize()
                         )
                     }
@@ -94,14 +112,14 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
                         else -> MaterialTheme.colorScheme.onSurface
                     },
                     maxLines = 1,
-                    overflow = Ellipsis,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = rank.cnt.toString(),
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
-                    overflow = Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -117,9 +135,9 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
     override fun SubContent(device: Device) {
         Box(
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-            contentAlignment = Center
+            contentAlignment = Alignment.Center
         ) {
-            val isLandscape = LocalDevice.current.type != PORTRAIT
+            val isLandscape = LocalDevice.current.type != Device.Type.PORTRAIT
 
             WebImage(
                 uri = remember(isLandscape) { args.type.xyPath(isLandscape) },

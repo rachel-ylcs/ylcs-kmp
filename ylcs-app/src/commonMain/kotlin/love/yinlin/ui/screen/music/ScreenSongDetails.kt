@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
@@ -30,9 +31,11 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
+import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
@@ -83,8 +86,8 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             )
         )
         when (result) {
-            is Success -> pageComments.newData(result.data)
-            is Failure -> slot.tip.error(result.message)
+            is Data.Success -> pageComments.newData(result.data)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -97,7 +100,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 num = pageComments.pageNum
             )
         )
-        if (result is Success) pageComments.moreData(result.data)
+        if (result is Data.Success) pageComments.moreData(result.data)
     }
 
     private suspend fun onSendComment(content: String): Boolean {
@@ -111,7 +114,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 )
             )
             when (result) {
-                is Success -> {
+                is Data.Success -> {
                     pageComments.items += SongComment(
                         cid = result.data,
                         uid = user.uid,
@@ -124,7 +127,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                     listState.animateScrollToItem(pageComments.items.size - 1)
                     return true
                 }
-                is Failure -> slot.tip.error(result.message)
+                is Data.Failure -> slot.tip.error(result.message)
             }
         }
         return false
@@ -140,8 +143,8 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 )
             )
             when (result) {
-                is Success -> pageComments.items.removeAll { it.cid == cid }
-                is Failure -> slot.tip.error(result.message)
+                is Data.Success -> pageComments.items.removeAll { it.cid == cid }
+                is Data.Failure -> slot.tip.error(result.message)
             }
         }
     }
@@ -371,11 +374,11 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             shareSheet.open()
         }
         Action(Icons.Outlined.Download, "下载") {
-            val group: ModQQGroup? = when (args.song.album) {
+            val group = when (args.song.album) {
                 "腐草为萤", "蚍蜉渡海", "琉璃", "山色有无中", "风花雪月", "离地十公分·A面", "离地十公分·B面", "银临" -> ModQQGroup.Album
-                "单曲集" -> Single
-                "影视剧OST" -> Video
-                "游戏OST" -> Game
+                "单曲集" -> ModQQGroup.Single
+                "影视剧OST" -> ModQQGroup.Video
+                "游戏OST" -> ModQQGroup.Game
                 else -> null
             }
             launch {
@@ -404,8 +407,8 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     @Composable
     override fun SubContent(device: Device) {
         when (device.type) {
-            PORTRAIT, SQUARE -> Portrait(song = args.song)
-            LANDSCAPE -> Landscape(song = args.song)
+            Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(song = args.song)
+            Device.Type.LANDSCAPE -> Landscape(song = args.song)
         }
     }
 
@@ -456,7 +459,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         style = MaterialTheme.typography.displaySmall,
                         color = Colors.Ghost,
                         maxLines = 1,
-                        overflow = Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                     )
                     Text(
@@ -464,7 +467,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         style = MaterialTheme.typography.titleLarge,
                         color = Colors.Ghost,
                         maxLines = 1,
-                        overflow = Ellipsis,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
                     )
                     Row(
@@ -474,7 +477,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         WebImage(
                             uri = args.song.recordPath,
                             key = Local.VERSION,
-                            quality = Full,
+                            quality = ImageQuality.Full,
                             modifier = Modifier.fillMaxWidth(fraction = 0.65f)
                                 .aspectRatio(1f)
                                 .clip(MaterialTheme.shapes.extraLarge.copy(topStart = CornerSize(0), bottomEnd = CornerSize(0)))

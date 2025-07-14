@@ -10,6 +10,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
+import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
@@ -49,7 +50,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 			) }
 		)
 		when (result) {
-			is Success -> {
+			is Data.Success -> {
 				val (aid, serverPic, serverPics) = result.data
 				msgPart.activities.add(0, activity.copy(
 					aid = aid,
@@ -58,7 +59,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 				))
 				pop()
 			}
-			is Failure -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 

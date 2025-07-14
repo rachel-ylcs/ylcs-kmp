@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.Device
@@ -64,7 +65,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     private suspend fun loadModFile() {
         OS.ifPlatform(
-            WebWasm,
+            Platform.WebWasm,
             ifTrue = {
                 slot.tip.warning(UnsupportedPlatformText)
             },
@@ -87,8 +88,8 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             Data.Failure(throwable = e)
         }
         step = when (data) {
-            is Success -> Step.Preview(path, data.data)
-            is Failure -> Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Data.Success -> Step.Preview(path, data.data)
+            is Data.Failure -> Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 
@@ -104,12 +105,12 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             Data.Failure(throwable = e)
         }
         when (data) {
-            is Success -> {
+            is Data.Success -> {
                 app.musicFactory.updateMusicLibraryInfo(data.data.medias)
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }
-            is Failure -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Data.Failure -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 
@@ -208,7 +209,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
 
     @Composable
     override fun ActionScope.LeftActions() {
-        if (step is Prepare) {
+        if (step is Step.Prepare) {
             Action(
                 icon = Icons.Outlined.Refresh,
                 tip = "重置",
@@ -220,14 +221,14 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     @Composable
     override fun ActionScope.RightActions() {
         when (val currentStep = step) {
-            is Initial -> {
+            is Step.Initial -> {
                 ActionSuspend(
                     icon = Icons.Outlined.Add,
                     tip = "添加",
                     onClick = { loadModFile() }
                 )
             }
-            is Prepare -> {
+            is Step.Prepare -> {
                 Action(
                     icon = Icons.Outlined.Preview,
                     tip = "预览",
@@ -239,7 +240,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     onClick = { launch { processMod(currentStep.path) } }
                 )
             }
-            is Preview -> {
+            is Step.Preview -> {
                 if (currentStep.preview != null) {
                     Action(
                         icon = Icons.Outlined.Refresh,
@@ -253,7 +254,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     )
                 }
             }
-            is Processing -> {}
+            is Step.Processing -> {}
         }
     }
 
@@ -264,7 +265,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             .fillMaxSize()
             .padding(ThemeValue.Padding.EqualExtraValue)
             .dragAndDrop(
-                enabled = step is Initial || step is Prepare,
+                enabled = step is Step.Initial || step is Step.Prepare,
                 flag = DragFlag.FILE,
                 onDrop = {
                     val files = (it as? DropResult.File)?.path
@@ -274,23 +275,23 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                     }
                 }
             ),
-            contentAlignment = Center
+            contentAlignment = Alignment.Center
         ) {
             when (val currentStep = step) {
-                is Initial -> {
+                is Step.Initial -> {
                     Text(
                         text = currentStep.message,
                         color = if (currentStep.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
-                        textAlign = Center
+                        textAlign = TextAlign.Center
                     )
                 }
-                is Prepare -> {
+                is Step.Prepare -> {
                     Text(
                         text = "已加载: ${currentStep.path.path}",
-                        textAlign = Center
+                        textAlign = TextAlign.Center
                     )
                 }
-                is Preview -> {
+                is Step.Preview -> {
                     val preview = currentStep.preview
                     if (preview == null) {
                         Column(
@@ -300,7 +301,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                             LoadingAnimation()
                             Text(
                                 text = "预览中...",
-                                textAlign = Center
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -311,7 +312,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                         )
                     }
                 }
-                is Processing -> {
+                is Step.Processing -> {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
@@ -319,7 +320,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                         LoadingAnimation()
                         Text(
                             text = currentStep.message,
-                            textAlign = Center
+                            textAlign = TextAlign.Center
                         )
                     }
                 }

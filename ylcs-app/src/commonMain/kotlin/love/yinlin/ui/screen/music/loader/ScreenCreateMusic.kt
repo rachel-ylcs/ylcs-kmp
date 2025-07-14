@@ -72,7 +72,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                 OS.Storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
-                        ImageProcessor(ImageCrop(rect), quality = Full).process(source, sink)
+                        ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
                     }
                 }?.let { onPicAdd(it) }
             }

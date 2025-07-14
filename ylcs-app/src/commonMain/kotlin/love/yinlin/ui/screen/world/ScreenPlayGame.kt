@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import love.yinlin.AppModel
@@ -21,6 +22,8 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.data.Data
+import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
@@ -48,14 +51,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     private val game: GamePublicDetailsWithName? = worldPart.currentGame
 
-    private var status: Status by mutableStateOf(Preparing)
+    private var status by mutableStateOf(Status.Preparing)
 
-    private val state = playGameState(game?.type ?: AnswerQuestion, slot)
+    private val state = playGameState(game?.type ?: Game.AnswerQuestion, slot)
 
     private var preflightResult: PreflightResult? by mutableStateOf(null)
     private var gameResult: GameResult? by mutableStateOf(null)
 
-    private val canSubmit by derivedStateOf { status == Playing && preflightResult != null && state.canSubmit }
+    private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
 
     private suspend fun preflight() {
         val result = ClientAPI.request(
@@ -66,12 +69,12 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
             )
         )
         when (result) {
-            is Success -> {
+            is Data.Success -> {
                 preflightResult = result.data
                 state.init(viewModelScope, result.data)
-                status = Playing
+                status = Status.Playing
             }
-            is Failure -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -82,14 +85,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
             contentAlignment = Alignment.TopCenter
         ) {
             when (status) {
-                Preparing -> {
+                Status.Preparing -> {
                     SecondaryLoadingButton(
                         text = "开始",
                         modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace),
                         onClick = { preflight() }
                     )
                 }
-                Playing -> {
+                Status.Playing -> {
                     preflightResult?.let {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
@@ -107,7 +110,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         }
                     }
                 }
-                Settling -> {
+                Status.Settling -> {
                     gameResult?.let { result ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
@@ -139,14 +142,14 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                                             style = MaterialTheme.typography.displayMedium,
                                             color = if (result.isCompleted) Colors.Green4 else Colors.Red4,
                                             maxLines = 1,
-                                            overflow = Ellipsis
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                         SecondaryButton(
                                             text = "返回",
                                             onClick = {
                                                 preflightResult = null
                                                 gameResult = null
-                                                status = Preparing
+                                                status = Status.Preparing
                                             }
                                         )
                                     }
@@ -218,7 +221,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     override val title: String = game?.type?.title ?: "未知游戏"
 
     override fun onBack() {
-        if (status == Playing) {
+        if (status == Status.Playing) {
             launch {
                 if (slot.confirm.openSuspend(content = "中途退出将以失败结算")) pop()
             }
@@ -228,7 +231,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (game != null && status == Playing) {
+        if (game != null && status == Status.Playing) {
             ActionSuspend(
                 icon = Icons.Outlined.Check,
                 tip = "提交",
@@ -245,13 +248,13 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         )
                     )
                     when (result) {
-                        is Success -> {
+                        is Data.Success -> {
                             gameResult = result.data
                             state.settle(result.data)
                             preflightResult = null
-                            status = Settling
+                            status = Status.Settling
                         }
-                        is Failure -> slot.tip.error(result.message)
+                        is Data.Failure -> slot.tip.error(result.message)
                     }
                 }
             }
@@ -265,7 +268,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 val deviceType = LocalDevice.current.type
 
                 WebImage(
-                    uri = remember(deviceType) { game.type.xyPath(deviceType != PORTRAIT) },
+                    uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT) },
                     key = Local.VERSION,
                     contentScale = ContentScale.Crop,
                     alpha = 0.75f,
@@ -274,8 +277,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
                 Box(modifier = Modifier.fillMaxSize().zIndex(2f)) {
                     when (deviceType) {
-                        PORTRAIT -> Portrait(details)
-                        SQUARE, LANDSCAPE -> Landscape(details)
+                        Device.Type.PORTRAIT -> Portrait(details)
+                        Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape(details)
                     }
                 }
             }

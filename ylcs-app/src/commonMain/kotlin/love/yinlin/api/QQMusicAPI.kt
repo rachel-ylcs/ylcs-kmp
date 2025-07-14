@@ -91,15 +91,15 @@ object QQMusicAPI {
             json.arr("songlist").fastMap { it.Object["mid"].String }
         }
         return when (result1) {
-            is Success -> {
+            is Data.Success -> {
                 val items = mutableListOf<PlatformMusicInfo>()
                 for (mid in result1.data) {
                     val result2 = requestMusic(mid)
-                    if (result2 is Success) items += result2.data
+                    if (result2 is Data.Success) items += result2.data
                 }
                 if (items.isEmpty()) Data.Failure() else Data.Success(items)
             }
-            is Failure -> result1
+            is Data.Failure -> result1
         }
     }
 }

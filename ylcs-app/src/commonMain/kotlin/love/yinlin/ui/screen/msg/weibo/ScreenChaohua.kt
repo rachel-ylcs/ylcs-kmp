@@ -18,6 +18,7 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
@@ -29,31 +30,31 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
 class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
-    private var state: BoxState by mutableStateOf(EMPTY)
+    private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableStateOf(emptyList<Weibo>())
     private val gridState = LazyStaggeredGridState()
     private var sinceId: Long = 0L
     private var canLoading by mutableStateOf(false)
 
     private suspend fun requestNewData(loading: Boolean) {
-        if (state != LOADING) {
-            if (loading) state = LOADING
+        if (state != BoxState.LOADING) {
+            if (loading) state = BoxState.LOADING
             canLoading = false
             val result = WeiboAPI.extractChaohua(0L)
-            state = if (result is Success) {
+            state = if (result is Data.Success) {
                 val (data, newSinceId) = result.data
                 sinceId = newSinceId
                 canLoading = newSinceId != 0L
                 items = data
-                if (data.isEmpty()) EMPTY else CONTENT
+                if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
             }
-            else NETWORK_ERROR
+            else BoxState.NETWORK_ERROR
         }
     }
 
     private suspend fun requestMoreData() {
         val result = WeiboAPI.extractChaohua(sinceId)
-        if (result is Success) {
+        if (result is Data.Success) {
             val (data, newSinceId) = result.data
             sinceId = newSinceId
             canLoading = newSinceId != 0L

@@ -10,12 +10,12 @@ import love.yinlin.updateSQL
 import java.sql.Connection
 
 internal val Game.manager: GameManager get() = when (this) {
-    AnswerQuestion -> AnswerQuestionManager
-    BlockText -> BlockTextManager
-    FlowersOrder -> FlowersOrderManager
-    SearchAll -> SearchAllManager
-    Pictionary -> PictionaryManager
-    GuessLyrics, Rhyme -> error("Unknown game: $this")
+    Game.AnswerQuestion -> AnswerQuestionManager
+    Game.BlockText -> BlockTextManager
+    Game.FlowersOrder -> FlowersOrderManager
+    Game.SearchAll -> SearchAllManager
+    Game.Pictionary -> PictionaryManager
+    Game.GuessLyrics, Game.Rhyme -> error("Unknown game: $this")
 }
 
 sealed class GameManager {

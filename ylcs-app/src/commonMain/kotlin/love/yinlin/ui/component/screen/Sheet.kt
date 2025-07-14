@@ -33,27 +33,27 @@ import kotlin.math.roundToInt
 @Stable
 abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     override fun alignment(device: Device): Alignment = when (device.type) {
-        PORTRAIT -> BottomCenter
-        LANDSCAPE, SQUARE -> CenterEnd
+        Device.Type.PORTRAIT -> Alignment.BottomCenter
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
     }
 
     override fun enter(device: Device): EnterTransition = when (device.type) {
-        PORTRAIT -> slideInVertically(
+        Device.Type.PORTRAIT -> slideInVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
-        LANDSCAPE, SQUARE -> slideInHorizontally(
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
 
     override fun exit(device: Device): ExitTransition = when (device.type) {
-        PORTRAIT -> slideOutVertically(
+        Device.Type.PORTRAIT -> slideOutVertically(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetY = { it }
         )
-        LANDSCAPE, SQUARE -> slideOutHorizontally(
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
             animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
@@ -190,8 +190,8 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
     @Composable
     final override fun Wrapper(block: @Composable () -> Unit) {
         when (LocalDevice.current.type) {
-            PORTRAIT -> PortraitWrapper(block)
-            LANDSCAPE, SQUARE -> LandscapeWrapper(block)
+            Device.Type.PORTRAIT -> PortraitWrapper(block)
+            Device.Type.LANDSCAPE, Device.Type.SQUARE -> LandscapeWrapper(block)
         }
     }
 

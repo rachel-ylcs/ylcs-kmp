@@ -6,7 +6,10 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -79,7 +82,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
                     DragArea(enabled = floatingLyrics.canMove) {
                         BoxWithConstraints(
                             modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) },
-                            contentAlignment = Center
+                            contentAlignment = Alignment.Center
                         ) {
                             DeviceWrapper(
                                 device = remember(this.maxWidth) { Device(this.maxWidth) },
@@ -88,7 +91,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
                             ) {
                                 Box(
                                     modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Center
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Text(
                                         text = lyrics,
@@ -96,9 +99,9 @@ class ActualFloatingLyrics : FloatingLyrics() {
                                             fontSize = MaterialTheme.typography.displayLarge.fontSize * config.textSize
                                         ),
                                         color = Colors.from(config.textColor),
-                                        textAlign = Center,
+                                        textAlign = TextAlign.Center,
                                         maxLines = 2,
-                                        overflow = Ellipsis,
+                                        overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
                                     )
                                 }

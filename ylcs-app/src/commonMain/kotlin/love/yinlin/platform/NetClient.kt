@@ -143,4 +143,4 @@ suspend inline fun HttpClient.safeDownload(
 	}.execute { response ->
 		response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
 	}
-} as? Success)?.data == true
+} as? Data.Success)?.data == true

@@ -16,8 +16,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
+import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
@@ -69,7 +71,7 @@ private fun NavigationIcon(
 			style = MaterialTheme.typography.labelMedium,
 			color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
 			maxLines = 1,
-			overflow = Ellipsis
+			overflow = TextOverflow.Ellipsis
 		)
 	}
 }
@@ -218,10 +220,10 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 	override fun Content() {
 		val immersivePadding = rememberImmersivePadding()
 		CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
-			when (LocalDevice.current.type) {
-				PORTRAIT -> Portrait()
-				LANDSCAPE, SQUARE -> Landscape()
-			}
+            when (LocalDevice.current.type) {
+                Device.Type.PORTRAIT -> Portrait()
+                Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+            }
 		}
 	}
 

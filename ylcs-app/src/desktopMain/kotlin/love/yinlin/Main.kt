@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -43,9 +44,9 @@ private object LibraryLoader {
         // VLC
         val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
             when (platform) {
-                Windows -> it.resolve("vlc")
-                Linux -> it.resolve("bin/vlc")
-                MacOS -> it.resolve("MacOS/vlc")
+                Platform.Windows -> it.resolve("vlc")
+                Platform.Linux -> it.resolve("bin/vlc")
+                Platform.MacOS -> it.resolve("MacOS/vlc")
                 else -> it
             }
         }
@@ -73,7 +74,7 @@ fun main() {
         initialize()
     }
 
-    OS.ifPlatform(MacOS) {
+    OS.ifPlatform(Platform.MacOS) {
         Desktop.getDesktop().setOpenURIHandler { event ->
             DeepLinkHandler.onOpenUri(event.uri.toUri())
         }
@@ -86,7 +87,7 @@ fun main() {
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,
-            position = WindowPosition.Aligned(Center),
+            position = WindowPosition.Aligned(Alignment.Center),
             width = 1200.dp,
             height = 700.dp
         )
@@ -107,7 +108,7 @@ fun main() {
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
                 // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                OS.ifPlatform(Windows) {
+                OS.ifPlatform(Platform.Windows) {
                     val screenBounds = window.graphicsConfiguration.bounds
                     val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
                     window.maximizedBounds = Rectangle(

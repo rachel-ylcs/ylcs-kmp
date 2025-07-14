@@ -96,7 +96,7 @@ expect class ImageCrop(rect: CropResult): ImageOp {
 @Stable
 class ImageProcessor(
     vararg items: ImageOp,
-    private val quality: ImageQuality = Medium
+    private val quality: ImageQuality = ImageQuality.Medium
 ) {
     private val items = mutableListOf(*items)
     operator fun invoke(op: ImageOp): ImageProcessor = apply { items += op }
