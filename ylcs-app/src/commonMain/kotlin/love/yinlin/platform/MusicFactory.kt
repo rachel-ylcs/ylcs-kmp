@@ -142,3 +142,17 @@ abstract class MusicFactory {
         app.config.lastMusic = ""
     }
 }
+
+@Stable
+expect class MusicPlayer() {
+    val isInit: Boolean
+    val isPlaying: Boolean
+    var position: Long
+    val duration: Long
+    suspend fun init()
+    suspend fun load(path: Path)
+    suspend fun play()
+    suspend fun pause()
+    suspend fun stop()
+    fun release()
+}

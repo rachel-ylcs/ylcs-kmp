@@ -2,6 +2,7 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
+import kotlinx.io.files.Path
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
@@ -231,5 +232,82 @@ class ActualMusicFactory : MusicFactory() {
                 }
             }
         }
+    }
+}
+
+@Stable
+actual class MusicPlayer {
+    private var controller: AudioPlayerComponent? = null
+
+    actual val isInit: Boolean get() = controller != null
+
+    private var mIsPlaying by mutableStateOf(false)
+    actual val isPlaying: Boolean get() = mIsPlaying
+
+    private var mPosition by mutableLongStateOf(0L)
+    actual var position: Long get() = mPosition
+        set(value) {
+            controller?.mediaPlayer()?.let {
+                it.controls().setTime(value)
+                if (!it.status().isPlaying) it.controls().play()
+            }
+        }
+
+    private var mDuration by mutableLongStateOf(0L)
+    actual val duration: Long get() = mDuration
+
+    private fun innerStop() {
+        mIsPlaying = false
+        mPosition = 0L
+        mDuration = 0L
+        controller?.mediaPlayer()?.let {
+            it.controls().stop()
+            it.media().reset()
+        }
+    }
+
+    actual suspend fun init() {
+        Coroutines.cpu {
+            catching {
+                val component = AudioPlayerComponent()
+                component.mediaPlayer().events().apply {
+                    addMediaEventListener(object : MediaEventAdapter() {
+                        override fun mediaDurationChanged(media: Media?, newDuration: Long) { mDuration = newDuration }
+                    })
+                    addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
+                        override fun playing(mediaPlayer: MediaPlayer?) { mIsPlaying = true }
+                        override fun paused(mediaPlayer: MediaPlayer?) { mIsPlaying = false }
+                        override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { mPosition = newTime }
+                        override fun stopped(mediaPlayer: MediaPlayer?) { innerStop() }
+                        override fun error(mediaPlayer: MediaPlayer?) { innerStop() }
+                    })
+                }
+                controller = component
+            }
+        }
+    }
+
+    actual suspend fun load(path: Path) {
+        controller?.mediaPlayer()?.media()?.play(path.toString())
+    }
+
+    actual suspend fun play() {
+        controller?.mediaPlayer()?.let {
+            if (!it.status().isPlaying) it.controls().play()
+        }
+    }
+
+    actual suspend fun pause() {
+        controller?.mediaPlayer()?.let {
+            if (it.status().isPlaying) it.controls().pause()
+        }
+    }
+
+    actual suspend fun stop() {
+        innerStop()
+    }
+
+    actual fun release() {
+        controller?.release()
     }
 }

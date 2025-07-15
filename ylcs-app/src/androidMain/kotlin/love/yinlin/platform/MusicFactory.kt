@@ -18,11 +18,14 @@ import androidx.media3.session.SessionToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.io.files.Path
 import love.yinlin.R
+import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.common.LocalFileProvider
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.platform.MusicFactory.Companion.UPDATE_INTERVAL
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
 import love.yinlin.ui.screen.music.audioPath
@@ -280,4 +283,105 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         player.addMediaItems(medias.map { it.asMediaItem })
     }
     override suspend fun removeMedia(index: Int) = withMainPlayer { it.removeMediaItem(index)  }
+}
+
+@Stable
+actual class MusicPlayer {
+    private var player by mutableStateOf<ExoPlayer?>(null)
+    private var updateProgressJob: Job? = null
+    private val updateProgressJobLock = Any()
+
+    actual val isInit: Boolean get() = player != null
+
+    private var mIsPlaying by mutableStateOf(false)
+    actual val isPlaying: Boolean get() = mIsPlaying
+
+    private var mPosition by mutableLongStateOf(0L)
+    actual var position: Long get() = mPosition
+        set(value) {
+            player?.let {
+                it.seekTo(value)
+                if (!it.isPlaying) it.play()
+            }
+        }
+
+    private var mDuration by mutableLongStateOf(0L)
+    actual val duration: Long get() = mDuration
+
+    actual suspend fun init() {
+        player = FfmpegRenderersFactory.build(appNative.context, false).apply {
+            repeatMode = Player.REPEAT_MODE_OFF
+            shuffleModeEnabled = false
+            addListener(object : Player.Listener {
+                private fun updateInfo() {
+                    val p = this@apply.currentPosition
+                    val d = this@apply.duration
+                    mPosition = if (p == C.TIME_UNSET) 0L else p
+                    mDuration = if (d == C.TIME_UNSET) 0L else d
+                }
+
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    super.onIsPlayingChanged(isPlaying)
+                    mIsPlaying = isPlaying
+                    synchronized(updateProgressJobLock) {
+                        updateProgressJob?.cancel()
+                        updateProgressJob = if (isPlaying) Coroutines.startMain {
+                            while (true) {
+                                if (!Coroutines.isActive()) break
+                                mPosition = this@apply.currentPosition
+                                delay(UPDATE_INTERVAL)
+                            }
+                        } else null
+                    }
+                }
+
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    super.onPlaybackStateChanged(playbackState)
+                    when (playbackState) {
+                        Player.STATE_IDLE, Player.STATE_BUFFERING -> {}
+                        Player.STATE_READY -> updateInfo()
+                        Player.STATE_ENDED -> this@apply.clearMediaItems()
+                    }
+                }
+
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    super.onMediaItemTransition(mediaItem, reason)
+                    updateInfo()
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    super.onPlayerError(error)
+                    this@apply.clearMediaItems()
+                }
+            })
+        }
+    }
+
+    actual suspend fun load(path: Path) {
+        player?.let {
+            it.setMediaItem(MediaItem.fromUri(path.toString()))
+            it.prepare()
+            it.play()
+        }
+    }
+
+    actual suspend fun play() {
+        player?.let {
+            if (!it.isPlaying) it.play()
+        }
+    }
+
+    actual suspend fun pause() {
+        player?.let {
+            if (it.isPlaying) it.pause()
+        }
+    }
+
+    actual suspend fun stop() {
+        player?.clearMediaItems()
+    }
+
+    actual fun release() {
+        player?.release()
+    }
 }

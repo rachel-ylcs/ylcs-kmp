@@ -1,5 +1,7 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
+import kotlinx.io.files.Path
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 
@@ -25,4 +27,18 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun prepareMedias(medias: List<MusicInfo>, startIndex: Int?, playing: Boolean) {}
     override suspend fun addMedias(medias: List<MusicInfo>) {}
     override suspend fun removeMedia(index: Int) {}
+}
+
+@Stable
+actual class MusicPlayer {
+    actual val isInit: Boolean = false
+    actual val isPlaying: Boolean = false
+    actual var position: Long = 0L
+    actual val duration: Long = 0L
+    actual suspend fun init() {}
+    actual suspend fun load(path: Path) {}
+    actual suspend fun play() {}
+    actual suspend fun pause() {}
+    actual suspend fun stop() {}
+    actual fun release() {}
 }

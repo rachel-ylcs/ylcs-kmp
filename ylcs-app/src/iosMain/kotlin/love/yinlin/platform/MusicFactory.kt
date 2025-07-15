@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -10,6 +11,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
+import kotlinx.io.files.Path
 import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
@@ -338,4 +340,19 @@ class ActualMusicFactory : MusicFactory() {
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = mediaPlayer?.rate
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
+}
+
+@Stable
+actual class MusicPlayer {
+    // TODO: iOS端待实现
+    actual val isInit: Boolean = false
+    actual val isPlaying: Boolean = false
+    actual var position: Long = 0L
+    actual val duration: Long = 0L
+    actual suspend fun init() {}
+    actual suspend fun load(path: Path) {}
+    actual suspend fun play() {}
+    actual suspend fun pause() {}
+    actual suspend fun stop() {}
+    actual fun release() {}
 }
