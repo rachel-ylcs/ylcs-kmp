@@ -33,6 +33,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
@@ -42,6 +44,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LocalFileImage
@@ -228,6 +231,8 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private var library = emptyList<GameMusic>()
     private var showEnabled by mutableStateOf(false)
 
+    private val musicPlayer = MusicPlayer()
+
     private var resumePauseJob: Job? = null
 
     private suspend fun initGame() {
@@ -254,6 +259,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             lockState = GameLockState.PortraitLock
             pauseGame()
         }
+    }
+
+    private fun startGame() {
+        state = GameState.Playing
     }
 
     private fun pauseGame() {
@@ -393,9 +402,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) {
-
-                        }
+                        if (entry.enabled) startGame()
                         else slot.tip.warning("此MOD不支持")
                     }
                 )
@@ -512,8 +519,19 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     override val title: String? = null
 
     override suspend fun initialize() {
-        if (app.musicFactory.isInit) initGame()
+        if (app.musicFactory.isInit) {
+            coroutineScope {
+                val task1 = async { musicPlayer.init() }
+                val task2 = async { initGame() }
+                task1.await()
+                task2.await()
+            }
+        }
         state = GameState.Start
+    }
+
+    override fun finalize() {
+        musicPlayer.release()
     }
 
     override fun onBack() {
