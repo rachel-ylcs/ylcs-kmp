@@ -33,6 +33,7 @@ import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.filenameOrRandom
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
@@ -167,10 +168,10 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
     data class Args(val id: String)
 
     private var state by mutableStateOf(BoxState.EMPTY)
-    private var items by mutableStateOf(emptyList<Weibo>())
+    private var items by mutableRefStateOf(emptyList<Weibo>())
     private val listState = LazyStaggeredGridState()
-    private var user: WeiboUser? by mutableStateOf(null)
-    private var albums: List<WeiboAlbum>? by mutableStateOf(null)
+    private var user: WeiboUser? by mutableRefStateOf(null)
+    private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
 
     private fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
         val weiboUsers = app.config.weiboUsers

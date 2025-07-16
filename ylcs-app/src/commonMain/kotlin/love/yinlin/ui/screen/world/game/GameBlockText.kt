@@ -36,6 +36,7 @@ import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
@@ -399,8 +400,8 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config = BTConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: BTResult? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: BTResult? by mutableRefStateOf(null)
 
     private val data = List(BTConfig.maxBlockSize * BTConfig.maxBlockSize) { BlockCharacter.Empty }.toMutableStateList()
 

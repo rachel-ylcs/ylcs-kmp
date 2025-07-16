@@ -112,7 +112,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var hasVideo by mutableStateOf(false)
 	private var lyrics = LyricsLrc()
 
-	private var sleepJob: Job? by mutableStateOf(null)
+	private var sleepJob: Job? by mutableRefStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
 	private fun openMusicComment() {
@@ -205,7 +205,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		musicInfo: MusicInfo,
 		modifier: Modifier = Modifier
 	) {
-		var animationRecord by rememberState { Animatable(0f) }
+		var animationRecord by rememberRefState { Animatable(0f) }
 		var lastDegree by rememberValueState(0f)
 		val isForeground = rememberOffScreenState()
 

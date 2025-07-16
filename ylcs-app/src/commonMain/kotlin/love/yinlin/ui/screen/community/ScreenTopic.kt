@@ -43,6 +43,7 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
@@ -150,8 +151,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
     @Serializable
     data class Args(val currentTopic: Topic)
 
-    private var details: TopicDetails? by mutableStateOf(null)
-    private var topic: Topic by mutableStateOf(args.currentTopic)
+    private var details: TopicDetails? by mutableRefStateOf(null)
+    private var topic: Topic by mutableRefStateOf(args.currentTopic)
 
     private val pageComments = object : PaginationArgs<Comment, Int, Int, Boolean>(0, true) {
         override fun distinctValue(item: Comment): Int = item.cid
@@ -161,7 +162,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
     private val listState = LazyListState()
 
-    private var currentSendComment: Comment? by mutableStateOf(null)
+    private var currentSendComment: Comment? by mutableRefStateOf(null)
 
     private val sendCommentState = object : RichEditorState() {
         override val useImage: Boolean = true
@@ -832,7 +833,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
     }
 
     private val subCommentSheet = object : FloatingArgsSheet<Comment>() {
-        var page: Pagination<SubComment, Int, Int> by mutableStateOf(object : Pagination<SubComment, Int, Int>(0) {
+        var page: Pagination<SubComment, Int, Int> by mutableRefStateOf(object : Pagination<SubComment, Int, Int>(0) {
             override fun distinctValue(item: SubComment): Int = item.cid
             override fun offset(item: SubComment): Int = item.cid
         })

@@ -11,6 +11,7 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJsonValue
 
 @Stable
@@ -58,7 +59,7 @@ abstract class MusicFactory {
     }
 
     // 悬浮歌词
-    var floatingLyrics: FloatingLyrics? by mutableStateOf(null)
+    var floatingLyrics: FloatingLyrics? by mutableRefStateOf(null)
 
     // 当前状态
     abstract val error: Throwable?
@@ -86,7 +87,7 @@ abstract class MusicFactory {
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()
 
-    var currentPlaylist: MusicPlaylist? by mutableStateOf(null)
+    var currentPlaylist: MusicPlaylist? by mutableRefStateOf(null)
         protected set
 
     // 通用操作

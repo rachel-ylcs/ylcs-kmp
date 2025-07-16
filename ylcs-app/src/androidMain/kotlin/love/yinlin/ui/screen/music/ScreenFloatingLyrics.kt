@@ -20,7 +20,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
@@ -59,7 +59,7 @@ private fun ScreenFloatingLyrics.enableFloatingLyrics(value: Boolean) {
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var androidConfig by rememberState { app.config.floatingLyricsAndroidConfig }
+    var androidConfig by rememberRefState { app.config.floatingLyricsAndroidConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)

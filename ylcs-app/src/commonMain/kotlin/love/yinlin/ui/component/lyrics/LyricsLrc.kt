@@ -36,6 +36,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.catching
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.timeString
 import love.yinlin.ui.component.layout.fadingEdges
 import kotlin.math.abs
@@ -155,7 +156,7 @@ class LyricsLrc : LyricsEngine {
         } ?: ""
     }
 
-    private var lines: List<LrcLine>? by mutableStateOf(null)
+    private var lines: List<LrcLine>? by mutableRefStateOf(null)
     private val listState = LazyListState()
     private var currentIndex by mutableIntStateOf(-1)
     private var isDragging by mutableStateOf(false)

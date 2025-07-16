@@ -21,6 +21,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.Space
@@ -30,7 +31,7 @@ import love.yinlin.ui.component.text.RichText
 @Stable
 class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
     private val weibo: Weibo? = msgPart.currentWeibo
-    private var comments: List<WeiboComment>? by mutableStateOf(null)
+    private var comments: List<WeiboComment>? by mutableRefStateOf(null)
 
     @Composable
     private fun WeiboCommentCard(comment: WeiboComment) {

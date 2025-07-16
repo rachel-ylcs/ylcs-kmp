@@ -32,6 +32,7 @@ import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
@@ -184,7 +185,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
 
     private var platformType by mutableStateOf(args.type)
     private var linkState = TextInputState(args.deeplink ?: "")
-    private var items by mutableStateOf(emptyList<PlatformMusicInfo>())
+    private var items by mutableRefStateOf(emptyList<PlatformMusicInfo>())
 
     private suspend fun downloadMusic() {
         try {

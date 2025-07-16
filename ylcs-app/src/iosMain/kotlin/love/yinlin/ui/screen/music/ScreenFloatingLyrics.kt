@@ -17,7 +17,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
@@ -27,7 +27,7 @@ import love.yinlin.ui.component.layout.SplitLayout
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var iosConfig by rememberState { app.config.floatingLyricsIOSConfig }
+    var iosConfig by rememberRefState { app.config.floatingLyricsIOSConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)

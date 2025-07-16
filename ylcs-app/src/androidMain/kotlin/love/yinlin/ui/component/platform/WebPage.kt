@@ -11,24 +11,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.appNative
 import love.yinlin.ui.CustomUI
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-	internal val webview = mutableStateOf<WebView?>(null)
+	internal val webview = mutableRefStateOf<WebView?>(null)
 
 	internal var mUrl: String by mutableStateOf(initUrl)
 	actual var url: String get() = mUrl
 		set(value) { webview.value?.loadUrl(value) }
 
-	internal var mLoadingState: WebPageLoadingState by mutableStateOf(WebPageLoadingState.Initializing)
+	internal var mLoadingState: WebPageLoadingState by mutableRefStateOf(WebPageLoadingState.Initializing)
 	actual val loadingState: WebPageLoadingState get() = mLoadingState
 
 	internal var mTitle: String by mutableStateOf("")
 	actual val title: String get() = mTitle
 
-	internal var mIcon: BitmapPainter? by mutableStateOf(null)
+	internal var mIcon: BitmapPainter? by mutableRefStateOf(null)
 	actual val icon: BitmapPainter? get() = mIcon
 
 	internal var mCanGoBack: Boolean by mutableStateOf(false)
@@ -37,7 +38,7 @@ actual class WebPageState actual constructor(val settings: WebPageSettings, init
 	internal var mCanGoForward: Boolean by mutableStateOf(false)
 	actual val canGoForward: Boolean get() = mCanGoForward
 
-	internal var mError: WebPageError? by mutableStateOf(null)
+	internal var mError: WebPageError? by mutableRefStateOf(null)
 	actual val error: WebPageError? get() = mError
 
 	internal val client = object : WebViewClient() {

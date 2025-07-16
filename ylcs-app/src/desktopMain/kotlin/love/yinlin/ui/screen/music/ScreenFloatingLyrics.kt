@@ -14,6 +14,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberRefState
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
@@ -39,7 +40,7 @@ private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var desktopConfig by rememberState { app.config.floatingLyricsDesktopConfig }
+    var desktopConfig by rememberRefState { app.config.floatingLyricsDesktopConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)

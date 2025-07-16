@@ -41,6 +41,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.ui.component.image.MiniImage
 import love.yinlin.ui.component.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
@@ -53,7 +54,7 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
     @Serializable
     data class Args(val type: Game)
 
-    private var items by mutableStateOf(emptyList<GameRank>())
+    private var items by mutableRefStateOf(emptyList<GameRank>())
 
     private suspend fun requestRank() {
         val result = ClientAPI.request(

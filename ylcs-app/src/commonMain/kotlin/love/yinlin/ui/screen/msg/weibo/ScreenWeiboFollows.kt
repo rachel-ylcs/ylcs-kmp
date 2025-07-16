@@ -32,6 +32,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.app
@@ -82,7 +83,7 @@ private fun WeiboUserItem(
 class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
     private var isLocal by mutableStateOf(true)
     private var state by mutableStateOf(BoxState.CONTENT)
-    private var searchResult by mutableStateOf(emptyList<WeiboUserInfo>())
+    private var searchResult by mutableRefStateOf(emptyList<WeiboUserInfo>())
 
     private suspend fun refreshLocalUser() {
         val weiboUsers = app.config.weiboUsers

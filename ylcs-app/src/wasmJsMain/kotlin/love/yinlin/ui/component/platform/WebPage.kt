@@ -2,16 +2,16 @@ package love.yinlin.ui.component.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.browser.document
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.ui.CustomUI
 import org.w3c.dom.HTMLIFrameElement
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
-    internal val webview = mutableStateOf<HTMLIFrameElement?>(null)
+    internal val webview = mutableRefStateOf<HTMLIFrameElement?>(null)
     actual var url: String = initUrl
 	actual val loadingState: WebPageLoadingState = WebPageLoadingState.Finished
 	actual val title: String = ""

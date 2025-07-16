@@ -27,6 +27,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_state_loading
@@ -55,8 +56,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     private val state = playGameState(game?.type ?: Game.AnswerQuestion, slot)
 
-    private var preflightResult: PreflightResult? by mutableStateOf(null)
-    private var gameResult: GameResult? by mutableStateOf(null)
+    private var preflightResult: PreflightResult? by mutableRefStateOf(null)
+    private var gameResult: GameResult? by mutableRefStateOf(null)
 
     private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
 

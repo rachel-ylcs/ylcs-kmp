@@ -39,6 +39,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.Coroutines
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_photo_album
@@ -86,7 +87,7 @@ private sealed class PhotoItem(val name: String) {
 
 @Stable
 class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
-    private var photos by mutableStateOf(PhotoItem.Home)
+    private var photos by mutableRefStateOf(PhotoItem.Home)
     private var stack = mutableStateListOf(photos)
     private var state by mutableStateOf(BoxState.EMPTY)
     private val listState = LazyListState()

@@ -26,6 +26,7 @@ import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.filenameOrRandom
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJson
 import love.yinlin.extension.rememberIntState
 import love.yinlin.platform.Coroutines
@@ -44,7 +45,7 @@ import love.yinlin.ui.screen.common.ScreenVideo
 @Stable
 class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
-    private var items by mutableStateOf(emptyList<DouyinVideo>())
+    private var items by mutableRefStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
     private val browser = object : HeadlessBrowser() {
         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")

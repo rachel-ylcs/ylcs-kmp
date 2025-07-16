@@ -331,7 +331,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     private val cloudBackupSheet = object : FloatingSheet() {
-        var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
+        var playlists: Map<String, List<PlaylistPreviewItem>> by mutableRefStateOf(emptyMap())
 
         override suspend fun initialize() {
             playlists = emptyMap()

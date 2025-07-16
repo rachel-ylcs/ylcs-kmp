@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.serialization.Serializable
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.ui.component.image.ClickIcon
 
 @Stable
@@ -28,7 +29,7 @@ enum class InputType {
 
 @Stable
 class TextInputState(str: String = "") {
-    var value: TextFieldValue by mutableStateOf(TextFieldValue(str))
+    var value: TextFieldValue by mutableRefStateOf(TextFieldValue(str))
     var overflow: Boolean by mutableStateOf(false)
 
     var text: String get() = value.text

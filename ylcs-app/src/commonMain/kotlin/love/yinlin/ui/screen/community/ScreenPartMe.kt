@@ -444,7 +444,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
     }
 
     private val signinSheet = object : FloatingArgsSheet<UserProfile>() {
-        var signinData by mutableStateOf(BooleanArray(8) { false })
+        var signinData by mutableRefStateOf(BooleanArray(8) { false })
         var todayIndex by mutableIntStateOf(-1)
         var todaySignin by mutableStateOf(true)
 

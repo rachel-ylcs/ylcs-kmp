@@ -33,6 +33,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
@@ -48,7 +49,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
     @Serializable
     data class Args(val uid: Int)
 
-    private var profile: UserPublicProfile? by mutableStateOf(null)
+    private var profile: UserPublicProfile? by mutableRefStateOf(null)
 
     private val listState = LazyStaggeredGridState()
 

@@ -1,12 +1,11 @@
 package love.yinlin.ui.component.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.browser.document
 import love.yinlin.data.MimeType
 import love.yinlin.extension.OffScreenEffect
+import love.yinlin.extension.rememberRefState
 import love.yinlin.ui.CustomUI
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
@@ -17,7 +16,7 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val view = remember { mutableStateOf<HTMLVideoElement?>(null) }
+    val view = rememberRefState<HTMLVideoElement?> { null }
 
     OffScreenEffect { isForeground ->
         view.value?.let { video ->

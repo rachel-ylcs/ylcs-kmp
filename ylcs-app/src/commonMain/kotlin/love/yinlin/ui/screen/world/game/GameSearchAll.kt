@@ -35,6 +35,7 @@ import love.yinlin.data.rachel.game.info.SAInfo
 import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -200,8 +201,8 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config = SAConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: SAResult? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: SAResult? by mutableRefStateOf(null)
 
     private val inputState = TextInputState()
     private val items = mutableStateSetOf<String>()

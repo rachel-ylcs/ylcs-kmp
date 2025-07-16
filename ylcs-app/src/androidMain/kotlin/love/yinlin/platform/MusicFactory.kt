@@ -25,6 +25,7 @@ import love.yinlin.common.LocalFileProvider
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.MusicFactory.Companion.UPDATE_INTERVAL
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
@@ -88,7 +89,7 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
 }
 
 class ActualMusicFactory(private val context: Context) : MusicFactory() {
-    private var controller: MediaController? by mutableStateOf(null)
+    private var controller: MediaController? by mutableRefStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
     override suspend fun init() {
@@ -119,14 +120,14 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Failure(message = "${result.sessionError}")
     }
 
-    override var error: Throwable? by mutableStateOf(null)
+    override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
-    override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
+    override var musicList: List<MusicInfo> by mutableRefStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
-    override var currentMusic: MusicInfo? by mutableStateOf(null)
+    override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = Any()
@@ -287,7 +288,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
 @Stable
 actual class MusicPlayer {
-    private var player by mutableStateOf<ExoPlayer?>(null)
+    private var player by mutableRefStateOf<ExoPlayer?>(null)
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = Any()
 

@@ -6,6 +6,7 @@ import kotlinx.io.files.Path
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.replaceAll
 import love.yinlin.ui.screen.music.audioPath
 import uk.co.caprica.vlcj.media.Media
@@ -17,7 +18,7 @@ import uk.co.caprica.vlcj.player.component.AudioPlayerComponent
 import kotlin.random.Random
 
 class ActualMusicFactory : MusicFactory() {
-    private var controller: AudioPlayerComponent? by mutableStateOf(null)
+    private var controller: AudioPlayerComponent? by mutableRefStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
     override suspend fun init() = catching {
@@ -29,14 +30,14 @@ class ActualMusicFactory : MusicFactory() {
         controller = component
     }
 
-    override var error: Throwable? by mutableStateOf(null)
+    override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override val musicList = mutableStateListOf<MusicInfo>()
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
-    override var currentMusic: MusicInfo? by mutableStateOf(null)
+    override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     private var currentIndex: Int by mutableIntStateOf(-1)
 

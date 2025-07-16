@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import love.yinlin.extension.localComposition
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberRefState
 
 @Stable
 data class ImmersivePadding(
@@ -52,7 +52,7 @@ val LocalImmersivePadding = localComposition<ImmersivePadding>()
 @Composable
 fun rememberImmersivePadding(): ImmersivePadding {
     val inset = WindowInsets.systemBars.asPaddingValues()
-    var padding by rememberState { ImmersivePadding(inset) }
+    var padding by rememberRefState { ImmersivePadding(inset) }
     LaunchedEffect(inset, LocalDevice.current) {
         padding = ImmersivePadding(inset)
     }

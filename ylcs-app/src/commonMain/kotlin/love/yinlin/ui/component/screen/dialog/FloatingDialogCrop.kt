@@ -25,6 +25,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberDerivedState
+import love.yinlin.extension.rememberRefState
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.translate
 import love.yinlin.platform.CropResult
@@ -190,7 +191,7 @@ fun CropImage(
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
     val imageState = rememberWebImageState(quality = ImageQuality.High)
     val imageSize by rememberDerivedState { imageState.result?.image?.size }
-    var touchRegion: TouchRegion? by rememberState { null }
+    var touchRegion: TouchRegion? by rememberRefState { null }
 
     BoxWithConstraints(
         modifier = modifier.pointerInput(aspectRatio, imageSize) {

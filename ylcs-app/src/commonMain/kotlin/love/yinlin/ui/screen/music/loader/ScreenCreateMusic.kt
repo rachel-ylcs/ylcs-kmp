@@ -26,6 +26,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
@@ -50,7 +51,7 @@ private class MusicInfoState {
     val lyrics = TextInputState("")
     var record: String? by mutableStateOf(null)
     var background: String? by mutableStateOf(null)
-    var audioUri: ImplicitPath? by mutableStateOf(null)
+    var audioUri: ImplicitPath? by mutableRefStateOf(null)
 
     val canSubmit by derivedStateOf {
         id.ok && name.ok && singer.ok && lyricist.ok && composer.ok &&

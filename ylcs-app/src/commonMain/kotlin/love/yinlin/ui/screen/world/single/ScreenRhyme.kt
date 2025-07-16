@@ -43,6 +43,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
@@ -225,8 +226,8 @@ private fun GameMusicCard(
 
 @Stable
 class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
-    private var state: GameState by mutableStateOf(GameState.Loading, referentialEqualityPolicy())
-    private var lockState: GameLockState by mutableStateOf(GameLockState.Normal, referentialEqualityPolicy())
+    private var state: GameState by mutableRefStateOf(GameState.Loading)
+    private var lockState: GameLockState by mutableRefStateOf(GameLockState.Normal)
 
     private var library = emptyList<GameMusic>()
     private var showEnabled by mutableStateOf(false)

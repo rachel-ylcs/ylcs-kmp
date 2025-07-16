@@ -124,7 +124,7 @@ private fun MergeUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
     var filename by remember { mutableStateOf("${System.currentTimeMillis()}.rachel") }
@@ -288,7 +288,7 @@ private fun ReleaseUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
 
@@ -486,9 +486,9 @@ private fun PreviewUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
-    var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null) }
+    var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null, referentialEqualityPolicy()) }
 
     val reset = {
         status = Status.Idle

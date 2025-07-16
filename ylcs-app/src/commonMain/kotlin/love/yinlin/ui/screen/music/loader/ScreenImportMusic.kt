@@ -27,6 +27,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.ActionScope
@@ -57,7 +58,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
         data class Processing(val message: String) : Step
     }
 
-    private var step: Step by mutableStateOf(Step.Initial())
+    private var step: Step by mutableRefStateOf(Step.Initial())
 
     private fun reset() {
         step = Step.Initial()

@@ -15,7 +15,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.extension.rememberRefState
 import love.yinlin.ui.component.image.ClickIcon
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory
 import uk.co.caprica.vlcj.media.Media
@@ -34,9 +35,9 @@ internal val PLAYER_ARGS = arrayOf(
 
 @Stable
 private class VideoPlayerState(val url: String) {
-    var playerFactory by mutableStateOf<MediaPlayerFactory?>(null)
-    var player by mutableStateOf<EmbeddedMediaPlayer?>(null)
-    var surface by mutableStateOf<ComposeVideoSurface?>(null)
+    var playerFactory by mutableRefStateOf<MediaPlayerFactory?>(null)
+    var player by mutableRefStateOf<EmbeddedMediaPlayer?>(null)
+    var surface by mutableRefStateOf<ComposeVideoSurface?>(null)
 
     var isPlaying by mutableStateOf(false)
     var position by mutableLongStateOf(0L)
@@ -80,7 +81,7 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val state by rememberState { VideoPlayerState(url) }
+    val state by rememberRefState { VideoPlayerState(url) }
 
     DisposableEffect(Unit) {
         state.playerFactory = MediaPlayerFactory(*PLAYER_ARGS)

@@ -25,7 +25,8 @@ import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
@@ -33,7 +34,7 @@ import love.yinlin.ui.component.image.ClickIcon
 
 @Stable
 private class VideoPlayerState {
-    var controller by mutableStateOf<Player?>(null)
+    var controller by mutableRefStateOf<Player?>(null)
 
     var isPlaying by mutableStateOf(false)
     var position by mutableLongStateOf(0L)
@@ -92,7 +93,7 @@ actual fun VideoPlayer(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val state by rememberState { VideoPlayerState() }
+    val state by rememberRefState { VideoPlayerState() }
     val orientationController = rememberOrientationController()
 
     DisposableEffect(Unit) {

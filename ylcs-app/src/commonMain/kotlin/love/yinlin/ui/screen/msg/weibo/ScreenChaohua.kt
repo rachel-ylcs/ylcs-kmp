@@ -21,6 +21,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
@@ -31,7 +32,7 @@ import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 @Stable
 class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
-    private var items by mutableStateOf(emptyList<Weibo>())
+    private var items by mutableRefStateOf(emptyList<Weibo>())
     private val gridState = LazyStaggeredGridState()
     private var sinceId: Long = 0L
     private var canLoading by mutableStateOf(false)
