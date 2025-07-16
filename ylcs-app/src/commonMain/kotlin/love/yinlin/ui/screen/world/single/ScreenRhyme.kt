@@ -225,8 +225,8 @@ private fun GameMusicCard(
 
 @Stable
 class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
-    private var state: GameState by mutableStateOf(GameState.Loading)
-    private var lockState: GameLockState by mutableStateOf(GameLockState.Normal)
+    private var state: GameState by mutableStateOf(GameState.Loading, referentialEqualityPolicy())
+    private var lockState: GameLockState by mutableStateOf(GameLockState.Normal, referentialEqualityPolicy())
 
     private var library = emptyList<GameMusic>()
     private var showEnabled by mutableStateOf(false)
