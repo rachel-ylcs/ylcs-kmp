@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -25,9 +26,11 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -36,18 +39,27 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
+import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.extension.OffScreenEffect
+import love.yinlin.extension.catchingNull
+import love.yinlin.extension.launchFlag
 import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
 import love.yinlin.ui.component.animation.AnimationLayout
+import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.WebImage
@@ -56,12 +68,19 @@ import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.ui.component.platform.Orientation
+import love.yinlin.ui.component.platform.rememberOrientationController
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.text.StrokeText
+import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
 import love.yinlin.ui.screen.music.rhymePath
+import kotlin.time.Duration.Companion.milliseconds
 
+// 游戏配置
 data object RhymeConfig {
-    const val PAUSE_TIME = 3
+    const val PAUSE_TIME = 3 // 暂停时间
+    const val LOCK_SCRIM_ALPHA = 0.5f // 锁定遮罩透明度
 }
 
 @Stable
@@ -70,6 +89,7 @@ private data class GameMusic(
     val enabled: Boolean
 )
 
+// 游戏页状态
 @Stable
 private sealed interface GameState {
     @Stable
@@ -86,6 +106,7 @@ private sealed interface GameState {
     data object Settling : GameState // 结算
 }
 
+// 游戏锁状态
 @Stable
 private sealed interface GameLockState {
     @Stable
@@ -98,6 +119,42 @@ private sealed interface GameLockState {
     data class Resume(val time: Int) : GameLockState // 恢复准备
 }
 
+// 游戏渲染实体
+@Stable
+private sealed interface GameObject {
+    fun DrawScope.draw(scale: Float)
+}
+
+// 游戏舞台
+@Stable
+private class GameStage : GameObject {
+    private var frame: Long = 0L
+
+    private val scene = mutableStateListOf<GameObject>()
+    private val notes = mutableStateListOf<GameObject>()
+    private val particles = mutableStateListOf<GameObject>()
+
+    override fun DrawScope.draw(scale: Float) {
+
+    }
+
+    fun init() {
+
+    }
+
+    fun clear() {
+        frame = 0L
+        scene.clear()
+        notes.clear()
+        particles.clear()
+    }
+
+    fun update(position: Long) {
+        ++frame
+        println("$frame $position")
+    }
+}
+
 @Composable
 private fun GameButton(
     icon: ImageVector,
@@ -105,7 +162,7 @@ private fun GameButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val acrylicColor = Colors.from(0x99F2F2F2)
+    val acrylicColor = Colors.from(0x99f2f2f2)
 
     Box(modifier = modifier) {
         Box(
@@ -233,8 +290,24 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private var showEnabled by mutableStateOf(false)
 
     private val musicPlayer = MusicPlayer()
+    private var lyrics: RhymeLyricsConfig? = null
+    private val stage = GameStage()
 
+    private var canvasFrameJob: Job? = null
     private var resumePauseJob: Job? = null
+
+    private val orientationStarter = launchFlag()
+
+    private fun onScreenOrientationChanged(type: Device.Type) {
+        if (type == Device.Type.LANDSCAPE) {
+            // 如果处于竖屏锁, 当转回横屏后启动恢复协程
+            if (lockState is GameLockState.PortraitLock) {
+                if (state is GameState.Playing) resumePauseTimer()
+                else lockState = GameLockState.Normal
+            }
+        }
+        else pauseGame(GameLockState.PortraitLock)
+    }
 
     private suspend fun initGame() {
         Coroutines.io {
@@ -249,25 +322,45 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         delay(1000) // TODO: 结束测试后去除条件
     }
 
-    private fun onScreenOrientationChanged(type: Device.Type) {
-        if (type == Device.Type.LANDSCAPE) {
-            // 如果处于竖屏锁, 当转回横屏后启动恢复协程
-            if (lockState is GameLockState.PortraitLock) resumePauseTimer()
-        }
-        else {
-            // 转回竖屏后, 如果处于恢复状态则取消恢复协程
-            resumePauseJob?.cancel()
-            lockState = GameLockState.PortraitLock
-            pauseGame()
+    private fun monitorGamePosition(): Job = launch {
+        while (true) {
+            stage.update(musicPlayer.position)
+            delay(16.milliseconds)
         }
     }
 
-    private fun startGame() {
-        state = GameState.Playing
+    private fun startGame(info: MusicInfo) {
+        launch {
+            lyrics = Coroutines.io {
+                catchingNull { SystemFileSystem.source(info.rhymePath).buffered().readString().parseJsonValue<RhymeLyricsConfig>() }
+            }
+            if (lyrics != null && canvasFrameJob == null) {
+                musicPlayer.load(info.audioPath)
+                stage.init()
+                canvasFrameJob = monitorGamePosition()
+                state = GameState.Playing
+            }
+        }
     }
 
-    private fun pauseGame() {
+    private fun stopGame() {
+        musicPlayer.stop()
+        canvasFrameJob?.cancel()
+        canvasFrameJob = null
+        stage.clear()
+        lyrics = null
+        state = GameState.Start
+    }
 
+    private fun pauseGame(newState: GameLockState) {
+        resumePauseJob?.cancel()
+        resumePauseJob = null
+        if (state is GameState.Playing) {
+            musicPlayer.pause()
+            canvasFrameJob?.cancel()
+            canvasFrameJob = null
+        }
+        lockState = newState
     }
 
     private fun resumePauseTimer() {
@@ -280,12 +373,101 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         delay(1000L)
                     }
                     lockState = GameLockState.Normal
+                    musicPlayer.play()
+                    if (canvasFrameJob == null) canvasFrameJob = monitorGamePosition()
                 }
                 finally {
                     resumePauseJob = null
                 }
             }
         }
+    }
+
+    @Composable
+    private fun GameMaskPortraitLock() {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                LoadingCircle(
+                    size = ThemeValue.Size.Image * 1.25f,
+                    color = Colors.White,
+                    modifier = Modifier.zIndex(1f)
+                )
+                MiniIcon(
+                    icon = Icons.Outlined.Lock,
+                    color = Colors.White,
+                    size = ThemeValue.Size.Image,
+                    modifier = Modifier.zIndex(2f)
+                )
+            }
+            StrokeText(
+                text = "请保持横屏",
+                color = Colors.Steel4,
+                strokeColor = Colors.White,
+                style = MaterialTheme.typography.displayLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Clip
+            )
+        }
+    }
+
+    @Composable
+    private fun GameMaskPause() {
+        Column(
+            modifier = Modifier
+                .padding(ThemeValue.Padding.HorizontalExtraSpace * 2)
+                .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.extraLarge)
+                .background(Colors.Gray8, MaterialTheme.shapes.extraLarge)
+                .padding(
+                    horizontal = ThemeValue.Padding.HorizontalExtraSpace * 4,
+                    vertical = ThemeValue.Padding.VerticalExtraSpace * 2
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 4)
+        ) {
+            Text(
+                text = "暂停中",
+                color = Colors.White,
+                style = MaterialTheme.typography.displayLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Clip
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GameButton(
+                    icon = Icons.Outlined.Close,
+                    transparent = false,
+                    onClick = {
+                        lockState = GameLockState.Normal
+                        stopGame()
+                    }
+                )
+                GameButton(
+                    icon = Icons.Outlined.PlayArrow,
+                    transparent = false,
+                    onClick = { resumePauseTimer() }
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun GameMaskResume(resumeState: GameLockState.Resume) {
+        StrokeText(
+            text = remember(resumeState) { resumeState.time.toString() },
+            color = Colors.Steel4,
+            strokeColor = Colors.White,
+            fontStyle = FontStyle.Italic,
+            style = ThemeStyle.RhymeDisplay.copy(
+                brush = Brush.linearGradient(listOf(Colors.Steel4, Colors.Blue4, Colors.Purple4))
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Clip
+        )
     }
 
     @Composable
@@ -339,7 +521,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun GameMusicLibrary() {
+    private fun GameOverlayMusicLibrary() {
         GameOverlayLayout(
             title = "曲库",
             onBack = ::onBack,
@@ -394,7 +576,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun GameMusicDetails(entry: GameMusic) {
+    private fun GameOverlayMusicDetails(entry: GameMusic) {
         GameOverlayLayout(
             title = entry.musicInfo.name,
             onBack = ::onBack,
@@ -403,7 +585,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) startGame()
+                        if (entry.enabled) startGame(entry.musicInfo)
                         else slot.tip.warning("此MOD不支持")
                     }
                 )
@@ -415,7 +597,9 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     private fun GameOverlayPlaying() {
+        Box(modifier = Modifier.fillMaxSize()) {
 
+        }
     }
 
     @Composable
@@ -426,63 +610,19 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun GameScrimMask(modifier: Modifier) {
         Box(modifier = modifier) {
-            if (lockState !is GameLockState.Normal) {
+            val currentLockState = lockState
+            if (currentLockState !is GameLockState.Normal && state != GameState.Loading) {
                 Box(
                     modifier = Modifier.fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = RhymeConfig.LOCK_SCRIM_ALPHA))
                         .clickableNoRipple { },
                     contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(ThemeValue.Padding.HorizontalExtraSpace * 2)
-                            .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.extraLarge)
-                            .width(ThemeValue.Size.PanelWidth)
-                            .heightIn(max = ThemeValue.Size.PanelWidth)
-                            .background(Colors.Gray8, MaterialTheme.shapes.extraLarge)
-                            .padding(ThemeValue.Padding.HorizontalExtraSpace * 2),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        when (val currentLockState = lockState) {
-                            GameLockState.Normal -> {}
-                            GameLockState.PortraitLock -> {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-                                ) {
-                                    MiniIcon(
-                                        icon = Icons.Outlined.Lock,
-                                        color = Colors.White,
-                                        size = ThemeValue.Size.Icon * 2
-                                    )
-                                    Text(
-                                        text = "已锁定, 请保持设备横屏",
-                                        color = Colors.White,
-                                        style = MaterialTheme.typography.labelLarge,
-                                    )
-                                }
-                            }
-                            GameLockState.Pause -> {
-
-                            }
-                            is GameLockState.Resume -> {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-                                ) {
-                                    Text(
-                                        text = "请准备好",
-                                        color = Colors.White,
-                                        style = MaterialTheme.typography.labelLarge,
-                                    )
-                                    Text(
-                                        text = currentLockState.time.toString(),
-                                        color = Colors.White,
-                                        style = MaterialTheme.typography.displayMedium,
-                                    )
-                                }
-                            }
-                        }
+                    when (currentLockState) {
+                        is GameLockState.Normal -> {}
+                        is GameLockState.PortraitLock -> GameMaskPortraitLock()
+                        is GameLockState.Pause -> GameMaskPause()
+                        is GameLockState.Resume -> GameMaskResume(currentLockState)
                     }
                 }
             }
@@ -496,8 +636,8 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 when (it) {
                     is GameState.Loading -> GameOverlayLoading()
                     is GameState.Start -> GameOverlayStart()
-                    is GameState.MusicLibrary -> GameMusicLibrary()
-                    is GameState.MusicDetails -> GameMusicDetails(it.entry)
+                    is GameState.MusicLibrary -> GameOverlayMusicLibrary()
+                    is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
                     is GameState.Playing -> GameOverlayPlaying()
                     is GameState.Settling -> GameOverlaySettling()
                 }
@@ -506,9 +646,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun GameStage(modifier: Modifier) {
+    private fun GameCanvas(modifier: Modifier) {
         Canvas(modifier = modifier) {
             val scale = 1920 / size.width
+            with(stage) { draw(scale) }
         }
     }
 
@@ -541,7 +682,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 is GameState.Loading, is GameState.Start -> pop()
                 is GameState.MusicLibrary -> state = GameState.Start
                 is GameState.MusicDetails -> state = GameState.MusicLibrary
-                is GameState.Playing -> pauseGame()
+                is GameState.Playing -> pauseGame(GameLockState.Pause)
                 is GameState.Settling -> state = GameState.Start
             }
         }
@@ -550,7 +691,21 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     override fun SubContent(device: Device) {
         LaunchedEffect(device.type) {
+            // 监听屏幕朝向变化
             onScreenOrientationChanged(device.type)
+        }
+
+        // 首次打开切换横屏
+        val controller = rememberOrientationController()
+        orientationStarter {
+            controller.orientation = Orientation.LANDSCAPE
+        }
+
+        OffScreenEffect { isForeground ->
+            // 离屏且处于游戏状态时自动暂停
+            if (!isForeground && state is GameState.Playing) {
+                pauseGame(GameLockState.Pause)
+            }
         }
 
         Layout(
@@ -564,7 +719,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 // 状态层
                 GameOverlay(modifier = Modifier.fillMaxSize().zIndex(3f))
                 // 画布层
-                GameStage(modifier = Modifier.fillMaxSize().zIndex(2f))
+                GameCanvas(modifier = Modifier.fillMaxSize().zIndex(2f))
                 // 背景层
                 GameBackground(modifier = Modifier.fillMaxSize().zIndex(1f))
             },

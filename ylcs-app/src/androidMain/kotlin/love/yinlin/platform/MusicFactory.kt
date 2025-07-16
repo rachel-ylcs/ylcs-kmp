@@ -1,15 +1,12 @@
-@file:OptIn(UnstableApi::class)
 @file:JvmName("MusicFactoryAndroid")
 package love.yinlin.platform
 
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
-import androidx.annotation.OptIn
 import androidx.compose.runtime.*
 import androidx.core.net.toUri
 import androidx.media3.common.*
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
@@ -26,7 +23,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.mutableRefStateOf
-import love.yinlin.platform.MusicFactory.Companion.UPDATE_INTERVAL
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
 import love.yinlin.ui.screen.music.audioPath
@@ -289,16 +285,13 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 @Stable
 actual class MusicPlayer {
     private var player by mutableRefStateOf<ExoPlayer?>(null)
-    private var updateProgressJob: Job? = null
-    private val updateProgressJobLock = Any()
 
     actual val isInit: Boolean get() = player != null
 
     private var mIsPlaying by mutableStateOf(false)
     actual val isPlaying: Boolean get() = mIsPlaying
 
-    private var mPosition by mutableLongStateOf(0L)
-    actual var position: Long get() = mPosition
+    actual var position: Long get() = player?.currentPosition ?:  0L
         set(value) {
             player?.let {
                 it.seekTo(value)
@@ -315,25 +308,13 @@ actual class MusicPlayer {
             shuffleModeEnabled = false
             addListener(object : Player.Listener {
                 private fun updateInfo() {
-                    val p = this@apply.currentPosition
                     val d = this@apply.duration
-                    mPosition = if (p == C.TIME_UNSET) 0L else p
                     mDuration = if (d == C.TIME_UNSET) 0L else d
                 }
 
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     super.onIsPlayingChanged(isPlaying)
                     mIsPlaying = isPlaying
-                    synchronized(updateProgressJobLock) {
-                        updateProgressJob?.cancel()
-                        updateProgressJob = if (isPlaying) Coroutines.startMain {
-                            while (true) {
-                                if (!Coroutines.isActive()) break
-                                mPosition = this@apply.currentPosition
-                                delay(UPDATE_INTERVAL)
-                            }
-                        } else null
-                    }
                 }
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
@@ -341,7 +322,7 @@ actual class MusicPlayer {
                     when (playbackState) {
                         Player.STATE_IDLE, Player.STATE_BUFFERING -> {}
                         Player.STATE_READY -> updateInfo()
-                        Player.STATE_ENDED -> this@apply.clearMediaItems()
+                        Player.STATE_ENDED -> stop()
                     }
                 }
 
@@ -352,7 +333,7 @@ actual class MusicPlayer {
 
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
-                    this@apply.clearMediaItems()
+                    stop()
                 }
             })
         }
@@ -366,19 +347,19 @@ actual class MusicPlayer {
         }
     }
 
-    actual suspend fun play() {
+    actual fun play() {
         player?.let {
             if (!it.isPlaying) it.play()
         }
     }
 
-    actual suspend fun pause() {
+    actual fun pause() {
         player?.let {
             if (it.isPlaying) it.pause()
         }
     }
 
-    actual suspend fun stop() {
+    actual fun stop() {
         player?.clearMediaItems()
     }
 

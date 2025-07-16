@@ -352,8 +352,8 @@ actual class MusicPlayer {
     actual val duration: Long = 0L
     actual suspend fun init() {}
     actual suspend fun load(path: Path) {}
-    actual suspend fun play() {}
-    actual suspend fun pause() {}
-    actual suspend fun stop() {}
+    actual fun play() {}
+    actual fun pause() {}
+    actual fun stop() {}
     actual fun release() {}
 }

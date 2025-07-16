@@ -245,8 +245,7 @@ actual class MusicPlayer {
     private var mIsPlaying by mutableStateOf(false)
     actual val isPlaying: Boolean get() = mIsPlaying
 
-    private var mPosition by mutableLongStateOf(0L)
-    actual var position: Long get() = mPosition
+    actual var position: Long get() = controller?.mediaPlayer()?.status()?.time() ?: 0L
         set(value) {
             controller?.mediaPlayer()?.let {
                 it.controls().setTime(value)
@@ -256,16 +255,6 @@ actual class MusicPlayer {
 
     private var mDuration by mutableLongStateOf(0L)
     actual val duration: Long get() = mDuration
-
-    private fun innerStop() {
-        mIsPlaying = false
-        mPosition = 0L
-        mDuration = 0L
-        controller?.mediaPlayer()?.let {
-            it.controls().stop()
-            it.media().reset()
-        }
-    }
 
     actual suspend fun init() {
         Coroutines.cpu {
@@ -278,9 +267,8 @@ actual class MusicPlayer {
                     addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
                         override fun playing(mediaPlayer: MediaPlayer?) { mIsPlaying = true }
                         override fun paused(mediaPlayer: MediaPlayer?) { mIsPlaying = false }
-                        override fun timeChanged(mediaPlayer: MediaPlayer?, newTime: Long) { mPosition = newTime }
-                        override fun stopped(mediaPlayer: MediaPlayer?) { innerStop() }
-                        override fun error(mediaPlayer: MediaPlayer?) { innerStop() }
+                        override fun stopped(mediaPlayer: MediaPlayer?) { stop() }
+                        override fun error(mediaPlayer: MediaPlayer?) { stop() }
                     })
                 }
                 controller = component
@@ -292,20 +280,25 @@ actual class MusicPlayer {
         controller?.mediaPlayer()?.media()?.play(path.toString())
     }
 
-    actual suspend fun play() {
+    actual fun play() {
         controller?.mediaPlayer()?.let {
             if (!it.status().isPlaying) it.controls().play()
         }
     }
 
-    actual suspend fun pause() {
+    actual fun pause() {
         controller?.mediaPlayer()?.let {
             if (it.status().isPlaying) it.controls().pause()
         }
     }
 
-    actual suspend fun stop() {
-        innerStop()
+    actual fun stop() {
+        mIsPlaying = false
+        mDuration = 0L
+        controller?.mediaPlayer()?.let {
+            it.controls().stop()
+            it.media().reset()
+        }
     }
 
     actual fun release() {

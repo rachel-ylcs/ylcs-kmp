@@ -152,8 +152,8 @@ expect class MusicPlayer() {
     val duration: Long
     suspend fun init()
     suspend fun load(path: Path)
-    suspend fun play()
-    suspend fun pause()
-    suspend fun stop()
+    fun play()
+    fun pause()
+    fun stop()
     fun release()
 }

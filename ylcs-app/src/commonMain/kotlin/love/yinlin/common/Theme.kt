@@ -297,6 +297,7 @@ object ThemeStyle {
         Device.Size.MEDIUM -> rachelTextStyle(34.sp, true)
         Device.Size.LARGE -> rachelTextStyle(36.sp, true)
     }
+    val RhymeDisplay: TextStyle @Composable get() = rachelTextStyle(100.sp, true)
 }
 
 @Stable
