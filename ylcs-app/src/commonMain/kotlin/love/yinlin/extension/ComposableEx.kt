@@ -11,7 +11,9 @@ import kotlin.jvm.JvmInline
 
 fun Offset.translate(x: Float = 0f, y: Float = 0f) = copy(x = this.x + x, y = this.y + y)
 
-// rememberState
+// State
+
+fun <T> mutableRefStateOf(value: T) = mutableStateOf(value, referentialEqualityPolicy())
 
 @Composable
 inline fun <T> rememberState(crossinline init: () -> T) =
@@ -28,6 +30,22 @@ inline fun <T> rememberState(key1: Any?, key2: Any?, key3: Any?, crossinline ini
 @Composable
 inline fun <T> rememberState(vararg keys: Any?, crossinline init: () -> T) =
 	remember(*keys) { mutableStateOf(init()) }
+
+@Composable
+inline fun <T> rememberRefState(crossinline init: () -> T) =
+    remember { mutableStateOf(init(), referentialEqualityPolicy()) }
+@Composable
+inline fun <T> rememberRefState(key1: Any?, crossinline init: () -> T) =
+    remember(key1) { mutableStateOf(init(), referentialEqualityPolicy()) }
+@Composable
+inline fun <T> rememberRefState(key1: Any?, key2: Any?, crossinline init: () -> T) =
+    remember(key1, key2) { mutableStateOf(init(), referentialEqualityPolicy()) }
+@Composable
+inline fun <T> rememberRefState(key1: Any?, key2: Any?, key3: Any?, crossinline init: () -> T) =
+    remember(key1, key2, key3) { mutableStateOf(init(), referentialEqualityPolicy()) }
+@Composable
+inline fun <T> rememberRefState(vararg keys: Any?, crossinline init: () -> T) =
+    remember(*keys) { mutableStateOf(init(), referentialEqualityPolicy()) }
 
 @Composable
 fun rememberFalse(vararg keys: Any?) = remember(*keys) { mutableStateOf(false) }

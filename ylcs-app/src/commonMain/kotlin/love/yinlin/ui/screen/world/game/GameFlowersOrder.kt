@@ -34,6 +34,7 @@ import love.yinlin.data.rachel.game.info.FOType
 import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.input.RachelText
@@ -193,8 +194,8 @@ class FlowersOrderPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config = FOConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: Int? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: Int? by mutableRefStateOf(null)
 
     private val inputState = TextInputState()
 

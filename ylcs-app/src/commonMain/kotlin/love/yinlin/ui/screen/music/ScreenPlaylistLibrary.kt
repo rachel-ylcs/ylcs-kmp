@@ -32,12 +32,12 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.*
 import love.yinlin.platform.app
+import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.container.Tree
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.input.LoadingRachelButton
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
@@ -294,10 +294,10 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     Data.Success(decodePlaylist(playlists))
                 }
                 catch (e: Throwable) {
-                    Data.Error(message = "云端歌单存在异常", throwable = e)
+                    Data.Failure(message = "云端歌单存在异常", throwable = e)
                 }
             }
-            is Data.Error -> result
+            is Data.Failure -> result
         }
     }
 
@@ -331,7 +331,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
     }
 
     private val cloudBackupSheet = object : FloatingSheet() {
-        var playlists: Map<String, List<PlaylistPreviewItem>> by mutableStateOf(emptyMap())
+        var playlists: Map<String, List<PlaylistPreviewItem>> by mutableRefStateOf(emptyMap())
 
         override suspend fun initialize() {
             playlists = emptyMap()
@@ -417,7 +417,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                                         playlists = decodePlaylist(playlistLibrary.items)
                                         slot.tip.success(result.message)
                                     }
-                                    is Data.Error -> slot.tip.error(result.message)
+                                    is Data.Failure -> slot.tip.error(result.message)
                                 }
                             }
                         }

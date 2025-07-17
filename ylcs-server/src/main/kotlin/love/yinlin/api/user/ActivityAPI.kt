@@ -27,7 +27,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		val picName = if (pic == null) null else currentUniqueId()
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		// 插入活动
 		val aid = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO activity(ts, title, content, pic, pics, showstart, damai, maoyan, link) ${values(9)}
@@ -48,7 +48,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwEmpty(activity.content)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		DB.throwExecuteSQL("""
 			UPDATE activity
 			SET ts = ? , title = ? , content = ? , showstart = ? , damai = ? , maoyan = ? , link = ?
@@ -63,7 +63,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		val picName = currentUniqueId()
 		DB.throwExecuteSQL("UPDATE activity SET pic = ? WHERE aid = ?", picName, aid)
 		pic.copy(ServerRes.Activity.activity(picName))
@@ -74,7 +74,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		DB.throwExecuteSQL("UPDATE activity SET pic = NULL WHERE aid = ?", aid)
 		"删除成功".successData
 	}
@@ -84,7 +84,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		val ngp = NineGridProcessor(pics)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		val activities = DB.throwQuerySQLSingle("SELECT pics FROM activity WHERE aid = ?", aid)
 		val oldPics = activities["pics"]!!.to<MutableList<String>>()
 		VN.throwIf(pics.isEmpty(), oldPics.size + pics.size > 9)
@@ -98,7 +98,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		val activities = DB.throwQuerySQLSingle("SELECT pics FROM activity WHERE aid = ?", aid)
 		val pics = activities["pics"]!!.to<MutableList<String>>()
 		VN.throwIf(index < 0, index >= pics.size)
@@ -113,7 +113,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		val activities = DB.throwQuerySQLSingle("SELECT pics FROM activity WHERE aid = ?", aid)
 		val pics = activities["pics"]!!.to<MutableList<String>>()
 		VN.throwIf(index < 0, index >= pics.size)
@@ -126,8 +126,8 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failedData
-		if (!DB.deleteSQL("DELETE FROM activity WHERE aid = ?", aid)) return@api "该活动不存在".failedData
+		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
+		if (!DB.deleteSQL("DELETE FROM activity WHERE aid = ?", aid)) return@api "该活动不存在".failureData
 		"删除成功".successData
 	}
 }

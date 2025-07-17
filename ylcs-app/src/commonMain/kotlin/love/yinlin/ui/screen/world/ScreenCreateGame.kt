@@ -166,7 +166,7 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
                             app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
                             pop()
                         }
-                        is Data.Error -> slot.tip.error(result.message)
+                        is Data.Failure -> slot.tip.error(result.message)
                     }
                 }
                 else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")

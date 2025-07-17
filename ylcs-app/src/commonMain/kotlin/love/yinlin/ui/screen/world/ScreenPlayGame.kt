@@ -1,14 +1,6 @@
 package love.yinlin.ui.screen.world
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -29,16 +21,13 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_state_loading
@@ -67,8 +56,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
 
     private val state = playGameState(game?.type ?: Game.AnswerQuestion, slot)
 
-    private var preflightResult: PreflightResult? by mutableStateOf(null)
-    private var gameResult: GameResult? by mutableStateOf(null)
+    private var preflightResult: PreflightResult? by mutableRefStateOf(null)
+    private var gameResult: GameResult? by mutableRefStateOf(null)
 
     private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
 
@@ -86,7 +75,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 state.init(viewModelScope, result.data)
                 status = Status.Playing
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -266,7 +255,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                             preflightResult = null
                             status = Status.Settling
                         }
-                        is Data.Error -> slot.tip.error(result.message)
+                        is Data.Failure -> slot.tip.error(result.message)
                     }
                 }
             }

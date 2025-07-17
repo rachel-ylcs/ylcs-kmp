@@ -49,9 +49,9 @@ object NetEaseCloudAPI {
         return when (result1) {
             is Data.Success -> when (val result2 = requestLyrics(id)) {
                 is Data.Success -> Data.Success(result1.data.copy(lyrics = result2.data))
-                is Data.Error -> Data.Error()
+                is Data.Failure -> Data.Failure()
             }
-            is Data.Error -> result1
+            is Data.Failure -> result1
         }
     }
 
@@ -71,9 +71,9 @@ object NetEaseCloudAPI {
                     if (result2 is Data.Success) data[i] = data[i].copy(lyrics = result2.data)
                 }
                 data.removeAll { it.lyrics.isEmpty() }
-                if (data.isEmpty()) Data.Error() else Data.Success(data)
+                if (data.isEmpty()) Data.Failure() else Data.Success(data)
             }
-            is Data.Error -> result1
+            is Data.Failure -> result1
         }
     }
 }

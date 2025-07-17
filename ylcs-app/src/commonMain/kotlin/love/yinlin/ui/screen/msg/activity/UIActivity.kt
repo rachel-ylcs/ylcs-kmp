@@ -20,6 +20,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.*
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
@@ -33,7 +34,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     val initDate = initActivity?.ts?.let { DateEx.Formatter.standardDate.parse(it) }
 
     internal val title = TextInputState(initActivity?.title ?: "")
-    internal var date: LocalDate? by mutableStateOf(initDate)
+    internal var date: LocalDate? by mutableRefStateOf(initDate)
     internal val content = TextInputState(initActivity?.content ?: "")
     internal val showstart = TextInputState(initActivity?.showstart ?: "")
     internal val damai = TextInputState(initActivity?.damai ?: "")

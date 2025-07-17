@@ -15,9 +15,9 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.app
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
@@ -59,7 +59,7 @@ class ScreenAddActivity(model: AppModel) : CommonSubScreen(model) {
 				))
 				pop()
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 

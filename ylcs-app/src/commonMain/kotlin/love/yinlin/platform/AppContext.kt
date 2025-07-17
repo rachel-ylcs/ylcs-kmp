@@ -3,7 +3,7 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource

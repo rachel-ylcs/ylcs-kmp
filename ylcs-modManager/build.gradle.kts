@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -9,55 +8,52 @@ plugins {
 }
 
 kotlin {
+    C.useCompilerFeatures(this)
+
     jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+        C.jvmTarget(this)
     }
     
     sourceSets {
-        jvmMain.dependencies {
-            implementation(projects.ylcsShared)
-            implementation(projects.ylcsMusic)
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.material3.icons)
-            implementation(libs.compose.ui)
-
-            implementation(libs.kotlinx.coroutines)
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.kotlinx.io)
-            implementation(libs.kotlinx.json)
-
-            implementation(libs.runtime.viewmodel)
-            implementation(libs.runtime.lifecycle)
-
-            implementation(compose.desktop.currentOs)
+        jvmMain.configure {
+            useLib(
+                // project
+                projects.ylcsShared, projects.ylcsMusic,
+                // compose
+                libs.compose.runtime, libs.compose.foundation,
+                libs.compose.material3, libs.compose.material3.icons,
+                libs.compose.ui,
+                compose.desktop.currentOs,
+                // kotlinx
+                libs.kotlinx.coroutines, libs.kotlinx.coroutines.swing,
+                libs.kotlinx.io, libs.kotlinx.json,
+                // runtime
+                libs.runtime.viewmodel, libs.runtime.lifecycle,
+            )
         }
     }
 }
 
-
 compose.desktop {
     application {
-        mainClass = "love.yinlin.mod.ModManagerKt"
+        mainClass = C.modManager.mainClass
 
         buildTypes.release.proguard {
-            version = "7.7.0"
+            version = C.proguard.version
             isEnabled = true
             optimize = true
             obfuscate = true
-            configurationFiles.from(
-                rootProject.extra["commonR8File"],
-                rootProject.extra["desktopR8File"]
-            )
+            configurationFiles.from(C.root.app.commonR8Rule, C.root.app.desktopR8Rule)
         }
 
         nativeDistributions {
-            packageName = "ModManager"
+            packageName = C.modManager.name
 
             targetFormats(TargetFormat.Exe)
+
+            windows {
+                console = false
+            }
         }
     }
 }

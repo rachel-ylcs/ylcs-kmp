@@ -7,7 +7,7 @@ import love.yinlin.api.APICode
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.api.successObject
 import love.yinlin.data.Data
@@ -40,7 +40,7 @@ fun Routing.mailAPI(implMap: ImplMap) {
 			FROM mail
 			WHERE mid = ? AND uid = ?
 		""", mid, uid).to<MailEntry>()
-		if (mailEntry.processed) return@api "此邮件已被处理".failedData
+		if (mailEntry.processed) return@api "此邮件已被处理".failureData
 		val ret = if (confirm) {
 			val implFunc = implMap[mailEntry.filter]!!
 			implFunc(mailEntry)
@@ -50,7 +50,7 @@ fun Routing.mailAPI(implMap: ImplMap) {
 			DB.throwExecuteSQL("UPDATE mail SET processed = 1 WHERE mid = ?", mid)
 			ret["msg"].String.successData
 		}
-		else ret["msg"].String.failedData
+		else ret["msg"].String.failureData
 	}
 
 	api(API.User.Mail.DeleteMail) { (token, mid) ->

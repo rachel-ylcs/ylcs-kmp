@@ -27,14 +27,15 @@ import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
+import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.LoadingAnimation
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult
 import love.yinlin.ui.component.platform.dragAndDrop
-import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
@@ -57,7 +58,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
         data class Processing(val message: String) : Step
     }
 
-    private var step: Step by mutableStateOf(Step.Initial())
+    private var step: Step by mutableRefStateOf(Step.Initial())
 
     private fun reset() {
         step = Step.Initial()
@@ -85,11 +86,11 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             }
         }
         catch (e: Throwable) {
-            Data.Error(throwable = e)
+            Data.Failure(throwable = e)
         }
         step = when (data) {
             is Data.Success -> Step.Preview(path, data.data)
-            is Data.Error -> Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Data.Failure -> Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 
@@ -102,7 +103,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
             }
         }
         catch (e: Throwable) {
-            Data.Error(throwable = e)
+            Data.Failure(throwable = e)
         }
         when (data) {
             is Data.Success -> {
@@ -110,7 +111,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }
-            is Data.Error -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
+            is Data.Failure -> step = Step.Initial(data.throwable?.message ?: "未知错误", true)
         }
     }
 

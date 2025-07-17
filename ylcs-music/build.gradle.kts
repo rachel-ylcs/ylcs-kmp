@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,20 +7,23 @@ plugins {
 }
 
 kotlin {
+    C.useCompilerFeatures(this)
+
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
+        C.jvmTarget(this)
+    }
+
+    iosArm64()
+    if (C.platform == BuildPlatform.Mac) {
+        when (C.architecture) {
+            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
+            BuildArchitecture.X86_64 -> iosX64()
+            else -> {}
         }
     }
 
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
     jvm {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+        C.jvmTarget(this)
     }
 
     @OptIn(ExperimentalWasmDsl::class)
@@ -30,27 +32,31 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            implementation(projects.ylcsShared)
-
-            implementation(libs.compose.runtime)
-            implementation(libs.kotlinx.json)
-            implementation(libs.kotlinx.io)
+        commonMain.configure {
+            useLib(
+                // project
+                projects.ylcsShared,
+                // compose
+                libs.compose.runtime,
+                // kotlinx
+                libs.kotlinx.json,
+                libs.kotlinx.io
+            )
         }
     }
 }
 
 android {
-    namespace = "${rootProject.extra["appPackageName"]}.music"
-    compileSdk = rootProject.extra["androidBuildSDK"] as Int
+    namespace = "${C.app.packageName}.music"
+    compileSdk = C.android.compileSdk
 
     defaultConfig {
-        minSdk = rootProject.extra["androidMinSDK"] as Int
-        lint.targetSdk = rootProject.extra["androidBuildSDK"] as Int
+        minSdk = C.android.minSdk
+        lint.targetSdk = C.android.targetSdk
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = C.jvm.compatibility
+        targetCompatibility = C.jvm.compatibility
     }
 }

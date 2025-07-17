@@ -5,7 +5,7 @@ import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.extension.Boolean
@@ -29,7 +29,7 @@ fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
 fun Routing.followsAPI(implMap: ImplMap) {
     api(API.User.Follows.FollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
-        if (uid1 == uid2) return@api "不能关注自己哦".failedData
+        if (uid1 == uid2) return@api "不能关注自己哦".failureData
         val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
         if (relationship1 == null && relationship2 != true) DB.throwTransaction {
             it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
@@ -42,13 +42,13 @@ fun Routing.followsAPI(implMap: ImplMap) {
             """, uid1, uid2, uid1, uid2)
             "关注成功".successData
         }
-        else if (relationship1 == true) "已被拉黑".failedData
-        else "已关注对方".failedData
+        else if (relationship1 == true) "已被拉黑".failureData
+        else "已关注对方".failureData
     }
 
     api(API.User.Follows.UnfollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
-        if (uid1 == uid2) return@api "不能关注自己哦".failedData
+        if (uid1 == uid2) return@api "不能关注自己哦".failureData
         val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
         if (relationship1 == false && relationship2 != true) DB.throwTransaction {
             it.throwExecuteSQL("DELETE FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
@@ -61,7 +61,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
             """, uid1, uid2, uid1, uid2)
             "取消关注成功".successData
         }
-        else "未关注对方".failedData
+        else "未关注对方".failureData
     }
 
     api(API.User.Follows.GetFollows) { (token, score, fid, num) ->
@@ -94,7 +94,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
 
     api(API.User.Follows.BlockUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
-        if (uid1 == uid2) return@api "不能拉黑自己哦".failedData
+        if (uid1 == uid2) return@api "不能拉黑自己哦".failureData
         val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
         DB.throwTransaction {
             if (follow == null) it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2, isBlocked) ${values(3)}", uid2, uid1, true)

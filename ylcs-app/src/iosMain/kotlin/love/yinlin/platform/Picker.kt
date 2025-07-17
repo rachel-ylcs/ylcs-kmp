@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import io.ktor.utils.io.core.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
@@ -8,6 +7,7 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readByteArray
 import love.yinlin.common.toNSData
 import love.yinlin.common.toPath
 import love.yinlin.extension.Sources
@@ -41,9 +41,9 @@ actual object Picker {
                 val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
                     val images = mutableListOf<Path>()
                     var processedImages = 0
-                    results.forEach {
-                        it.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
-                                url, error ->
+                    results.forEach { pickerResult ->
+                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
+                                url, _ ->
                             val tempUrl = copyToTempDir(url)
                             tempUrl?.toPath()?.let { path -> images.add(path) }
                             processedImages++
@@ -124,7 +124,7 @@ actual object Picker {
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
         Coroutines.startMain {
-            var picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
+            val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
             documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
                 override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
                     val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
@@ -158,7 +158,7 @@ actual object Picker {
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
         when (origin) {
             is Photo -> {
-                val bytes = origin.buffer.readBytes()
+                val bytes = origin.buffer.readByteArray()
                 val data = bytes.toNSData()
                 val image = UIImage(data)
                 UIImageWriteToSavedPhotosAlbum(image, null, null, null)

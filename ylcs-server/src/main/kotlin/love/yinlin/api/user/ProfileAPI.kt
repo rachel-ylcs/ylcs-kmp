@@ -1,24 +1,20 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.ServerRes
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.copy
 import love.yinlin.currentTS
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
-import love.yinlin.data.rachel.profile.UserNotification
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.JsonConverter
-import love.yinlin.extension.Object
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -71,7 +67,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		val user = DB.throwQuerySQLSingle("""
 			SELECT uid, name, signature, label, exp, follows, followers FROM user WHERE uid = ?
 		""", uid2)
-		val status = if (uid1 == null) FollowStatus.UNAUTHORIZE
+		val status: FollowStatus = if (uid1 == null) FollowStatus.UNAUTHORIZE
 			else if (uid1 == uid2) FollowStatus.SELF
 			else {
 				val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
@@ -93,11 +89,11 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		VN.throwName(name)
 		val uid = AN.throwExpireToken(token)
 		if (DB.querySQLSingle("SELECT 1 FROM user WHERE name = ?", name) != null)
-			return@api "ID\"${name}\"已被注册".failedData
+			return@api "ID\"${name}\"已被注册".failureData
 		if (DB.updateSQL("""
             UPDATE user SET name = ? , coin = coin - ? WHERE uid = ? AND coin >= ?
         """, name, UserConstraint.RENAME_COIN_COST, uid, UserConstraint.RENAME_COIN_COST)) "修改ID成功".successData
-		else "你的银币不够哦".failedData
+		else "你的银币不够哦".failureData
 	}
 
 	api(API.User.Profile.UpdateAvatar) { token, (avatar) ->

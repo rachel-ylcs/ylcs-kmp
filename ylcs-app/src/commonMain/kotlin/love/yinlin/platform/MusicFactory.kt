@@ -1,16 +1,17 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
-import io.ktor.utils.io.core.*
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJsonValue
 
 @Stable
@@ -27,7 +28,7 @@ abstract class MusicFactory {
         SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
             catching {
                 val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
-                val info = SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                val info = SystemFileSystem.source(configPath).buffered().use { it.readString().parseJsonValue<MusicInfo>() }!!
                 musicLibrary[info.id] = info
             }
         }
@@ -58,7 +59,7 @@ abstract class MusicFactory {
     }
 
     // 悬浮歌词
-    var floatingLyrics: FloatingLyrics? by mutableStateOf(null)
+    var floatingLyrics: FloatingLyrics? by mutableRefStateOf(null)
 
     // 当前状态
     abstract val error: Throwable?
@@ -86,7 +87,7 @@ abstract class MusicFactory {
     // 库
     val musicLibrary = mutableStateMapOf<String, MusicInfo>()
 
-    var currentPlaylist: MusicPlaylist? by mutableStateOf(null)
+    var currentPlaylist: MusicPlaylist? by mutableRefStateOf(null)
         protected set
 
     // 通用操作
@@ -96,7 +97,7 @@ abstract class MusicFactory {
             val info = Coroutines.io {
                 catchingNull {
                     val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
-                    SystemFileSystem.source(configPath).buffered().use { it.readText().parseJsonValue<MusicInfo>() }!!
+                    SystemFileSystem.source(configPath).buffered().use { it.readString().parseJsonValue<MusicInfo>() }!!
                 }
             }
             if (info != null) musicLibrary[id] = info.copy(modification = modification + 1)
@@ -141,4 +142,18 @@ abstract class MusicFactory {
         app.config.lastPlaylist = ""
         app.config.lastMusic = ""
     }
+}
+
+@Stable
+expect class MusicPlayer() {
+    val isInit: Boolean
+    val isPlaying: Boolean
+    var position: Long
+    val duration: Long
+    suspend fun init()
+    suspend fun load(path: Path)
+    fun play()
+    fun pause()
+    fun stop()
+    fun release()
 }

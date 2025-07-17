@@ -1,27 +1,14 @@
 package love.yinlin.ui.component.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,8 +22,8 @@ import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeValue
-import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.ui.component.node.clickableNoRipple
 
 @Stable
 open class Tip(private val scope: CoroutineScope) {
@@ -47,7 +34,7 @@ open class Tip(private val scope: CoroutineScope) {
     }
 
     private val host = SnackbarHostState()
-    var type by mutableStateOf(Type.INFO)
+    var type: Type by mutableStateOf(Type.INFO)
         private set
 
     fun show(text: String?, type: Type) {

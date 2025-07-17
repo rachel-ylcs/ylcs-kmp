@@ -2,7 +2,7 @@ package love.yinlin.api.user.game
 
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.DB
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
@@ -21,7 +21,7 @@ abstract class RankGameManager : GameManager() {
 
     override fun preflight(uid: Int, details: GameDetails): Data<PreflightResult> = DB.throwTransaction {
         // 消费银币
-        if (!it.consumeCoin(uid, details)) return@throwTransaction "没有足够的银币参与".failedData
+        if (!it.consumeCoin(uid, details)) return@throwTransaction "没有足够的银币参与".failureData
         // 插入游戏记录
         val rid = it.throwInsertSQLGeneratedKey("""
             INSERT INTO game_record(gid, uid) ${values(2)}

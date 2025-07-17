@@ -1,15 +1,12 @@
-@file:OptIn(UnstableApi::class)
 @file:JvmName("MusicFactoryAndroid")
 package love.yinlin.platform
 
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
-import androidx.annotation.OptIn
 import androidx.compose.runtime.*
 import androidx.core.net.toUri
 import androidx.media3.common.*
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
@@ -18,12 +15,14 @@ import androidx.media3.session.SessionToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
+import kotlinx.io.files.Path
 import love.yinlin.R
+import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.common.LocalFileProvider
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
 import love.yinlin.ui.screen.music.audioPath
@@ -86,7 +85,7 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
 }
 
 class ActualMusicFactory(private val context: Context) : MusicFactory() {
-    private var controller: MediaController? by mutableStateOf(null)
+    private var controller: MediaController? by mutableRefStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
     override suspend fun init() {
@@ -113,18 +112,18 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
     private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Data<Bundle> {
         val result = Coroutines.main { controller?.sendCustomCommand(command, args)?.get() }
-        if (result == null) return Data.Error()
-        return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Error(message = "${result.sessionError}")
+        if (result == null) return Data.Failure()
+        return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Failure(message = "${result.sessionError}")
     }
 
-    override var error: Throwable? by mutableStateOf(null)
+    override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
-    override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
+    override var musicList: List<MusicInfo> by mutableRefStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
-    override var currentMusic: MusicInfo? by mutableStateOf(null)
+    override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = Any()
@@ -164,7 +163,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                     updateProgressJob?.cancel()
                     updateProgressJob = if (value) Coroutines.startMain {
                         while (true) {
-                            if (!isActive) break
+                            if (!Coroutines.isActive()) break
                             currentPosition = player.currentPosition
                             delay(UPDATE_INTERVAL)
                         }
@@ -281,4 +280,90 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
         player.addMediaItems(medias.map { it.asMediaItem })
     }
     override suspend fun removeMedia(index: Int) = withMainPlayer { it.removeMediaItem(index)  }
+}
+
+@Stable
+actual class MusicPlayer {
+    private var player by mutableRefStateOf<ExoPlayer?>(null)
+
+    actual val isInit: Boolean get() = player != null
+
+    private var mIsPlaying by mutableStateOf(false)
+    actual val isPlaying: Boolean get() = mIsPlaying
+
+    actual var position: Long get() = player?.currentPosition ?:  0L
+        set(value) {
+            player?.let {
+                it.seekTo(value)
+                if (!it.isPlaying) it.play()
+            }
+        }
+
+    private var mDuration by mutableLongStateOf(0L)
+    actual val duration: Long get() = mDuration
+
+    actual suspend fun init() {
+        player = FfmpegRenderersFactory.build(appNative.context, false).apply {
+            repeatMode = Player.REPEAT_MODE_OFF
+            shuffleModeEnabled = false
+            addListener(object : Player.Listener {
+                private fun updateInfo() {
+                    val d = this@apply.duration
+                    mDuration = if (d == C.TIME_UNSET) 0L else d
+                }
+
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    super.onIsPlayingChanged(isPlaying)
+                    mIsPlaying = isPlaying
+                }
+
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    super.onPlaybackStateChanged(playbackState)
+                    when (playbackState) {
+                        Player.STATE_IDLE, Player.STATE_BUFFERING -> {}
+                        Player.STATE_READY -> updateInfo()
+                        Player.STATE_ENDED -> stop()
+                    }
+                }
+
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    super.onMediaItemTransition(mediaItem, reason)
+                    updateInfo()
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    super.onPlayerError(error)
+                    stop()
+                }
+            })
+        }
+    }
+
+    actual suspend fun load(path: Path) {
+        player?.let {
+            it.setMediaItem(MediaItem.fromUri(path.toString()))
+            it.prepare()
+            it.play()
+        }
+    }
+
+    actual fun play() {
+        player?.let {
+            if (!it.isPlaying) it.play()
+        }
+    }
+
+    actual fun pause() {
+        player?.let {
+            if (it.isPlaying) it.pause()
+        }
+    }
+
+    actual fun stop() {
+        player?.clearMediaItems()
+    }
+
+    actual fun release() {
+        player?.release()
+    }
 }

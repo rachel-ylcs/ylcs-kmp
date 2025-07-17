@@ -2,7 +2,7 @@ package love.yinlin.api.user.game
 
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.DB
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.ExplorationConfig
 import love.yinlin.data.rachel.game.GameDetails
@@ -36,11 +36,11 @@ abstract class ExplorationGameManager : GameManager() {
         """, uid, details.gid)
         val oldAnswer = oldRecord?.get("answer").ArrayEmpty
         val oldResult = oldRecord?.get("result").ArrayEmpty
-        if (oldAnswer.size >= fetchTryCount(details.info)) return "重试次数达到上限".failedData
+        if (oldAnswer.size >= fetchTryCount(details.info)) return "重试次数达到上限".failureData
         return DB.throwTransaction {
             val rid = if (oldRecord == null) {
                 // 消费银币
-                if (!it.consumeCoin(uid, details)) return@throwTransaction "没有足够的银币参与".failedData
+                if (!it.consumeCoin(uid, details)) return@throwTransaction "没有足够的银币参与".failureData
                 // 插入游戏记录
                 it.throwInsertSQLGeneratedKey("""
                     INSERT INTO game_record(gid, uid, answer, result) ${values(4)}

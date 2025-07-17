@@ -161,8 +161,8 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         data class Settling(val result1: LyricsSockets.GameResult, val result2: LyricsSockets.GameResult) : Status
     }
 
-    private var currentStatus: Status by mutableStateOf(Status.Hall)
-    private var session: DefaultClientWebSocketSession? by mutableStateOf(null)
+    private var currentStatus: Status by mutableRefStateOf(Status.Hall)
+    private var session: DefaultClientWebSocketSession? by mutableRefStateOf(null)
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
     private suspend fun sessionLoop() {

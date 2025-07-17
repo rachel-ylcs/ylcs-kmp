@@ -124,7 +124,7 @@ private fun MergeUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
     var filename by remember { mutableStateOf("${System.currentTimeMillis()}.rachel") }
@@ -270,11 +270,11 @@ private fun MergeUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Data.Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }
@@ -288,7 +288,7 @@ private fun ReleaseUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
     var output by remember { mutableStateOf("") }
 
@@ -385,11 +385,11 @@ private fun ReleaseUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> Status.Completed
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Data.Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }
@@ -486,9 +486,9 @@ private fun PreviewUI(
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
-    var status: Status by remember { mutableStateOf(Status.Idle) }
+    var status: Status by remember { mutableStateOf(Status.Idle, referentialEqualityPolicy()) }
     var input by remember { mutableStateOf("") }
-    var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null) }
+    var preview: ModFactory.Preview.PreviewResult? by remember { mutableStateOf(null, referentialEqualityPolicy()) }
 
     val reset = {
         status = Status.Idle
@@ -545,14 +545,14 @@ private fun PreviewUI(
                         }
                     }
                     catch (e: Throwable) {
-                        Data.Error(throwable = e)
+                        Data.Failure(throwable = e)
                     }
                     status = when (result) {
                         is Data.Success -> {
                             preview = result.data
                             Status.Completed
                         }
-                        is Data.Error -> Status.Error("错误 -> ${result.throwable?.message}")
+                        is Data.Failure -> Status.Error("错误 -> ${result.throwable?.message}")
                     }
                 }
             }

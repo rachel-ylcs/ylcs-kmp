@@ -12,11 +12,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -133,7 +129,7 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
                 pageSongs.newData(result.data)
                 gridState.scrollToItem(0)
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -159,7 +155,7 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
                 pageSongs.canLoading = false
                 gridState.scrollToItem(0)
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 

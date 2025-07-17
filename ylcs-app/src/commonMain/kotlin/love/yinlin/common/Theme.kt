@@ -180,21 +180,21 @@ fun rachelColorScheme(isDarkMode: Boolean): ColorScheme = remember(isDarkMode) {
 
 @Composable
 fun rachelShapes(device: Device): Shapes = remember(device) { when (device.size) {
-	Device.Size.SMALL -> Shapes(
+    Device.Size.SMALL -> Shapes(
 		extraSmall = RoundedCornerShape(3.dp),
 		small = RoundedCornerShape(5.dp),
 		medium = RoundedCornerShape(7.dp),
 		large = RoundedCornerShape(9.dp),
 		extraLarge = RoundedCornerShape(11.dp)
 	)
-	Device.Size.MEDIUM -> Shapes(
+    Device.Size.MEDIUM -> Shapes(
 		extraSmall = RoundedCornerShape(3.5.dp),
 		small = RoundedCornerShape(5.5.dp),
 		medium = RoundedCornerShape(7.5.dp),
 		large = RoundedCornerShape(9.5.dp),
 		extraLarge = RoundedCornerShape(11.5.dp)
 	)
-	Device.Size.LARGE -> Shapes(
+    Device.Size.LARGE -> Shapes(
 		extraSmall = RoundedCornerShape(4.dp),
 		small = RoundedCornerShape(6.dp),
 		medium = RoundedCornerShape(8.dp),
@@ -288,15 +288,16 @@ fun rachelTypography(device: Device): Typography {
 @Stable
 object ThemeStyle {
 	val bodyExtraSmall: TextStyle @Composable get() = when (LocalDevice.current.size) {
-		Device.Size.SMALL -> rachelTextStyle(10.sp, false)
-		Device.Size.MEDIUM -> rachelTextStyle(11.sp, false)
-		Device.Size.LARGE -> rachelTextStyle(12.sp, false)
+        Device.Size.SMALL -> rachelTextStyle(10.sp, false)
+        Device.Size.MEDIUM -> rachelTextStyle(11.sp, false)
+        Device.Size.LARGE -> rachelTextStyle(12.sp, false)
 	}
 	val DisplayExtraLarge: TextStyle @Composable get() = when (LocalDevice.current.size) {
         Device.Size.SMALL -> rachelTextStyle(32.sp, true)
         Device.Size.MEDIUM -> rachelTextStyle(34.sp, true)
         Device.Size.LARGE -> rachelTextStyle(36.sp, true)
     }
+    val RhymeDisplay: TextStyle @Composable get() = rachelTextStyle(100.sp, true)
 }
 
 @Stable

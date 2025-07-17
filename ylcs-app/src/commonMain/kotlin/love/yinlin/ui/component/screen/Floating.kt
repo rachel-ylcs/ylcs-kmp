@@ -26,6 +26,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 
@@ -48,7 +49,7 @@ abstract class Floating<A : Any> {
     protected open val dismissOnBackPress: Boolean = true // 返回键结束
     protected open val dismissOnClickOutside: Boolean = true // 点击遮罩结束
 
-    private var state: A? by mutableStateOf(null)
+    private var state: A? by mutableRefStateOf(null)
     private var visible: Boolean by mutableStateOf(false)
     val isOpen: Boolean get() = state != null
     fun open(args: A) { state = args }

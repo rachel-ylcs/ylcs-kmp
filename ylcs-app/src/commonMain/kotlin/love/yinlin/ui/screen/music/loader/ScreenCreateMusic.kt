@@ -15,10 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import io.ktor.utils.io.core.writeText
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.writeString
 import love.yinlin.AppModel
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
@@ -26,6 +26,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
@@ -50,7 +51,7 @@ private class MusicInfoState {
     val lyrics = TextInputState("")
     var record: String? by mutableStateOf(null)
     var background: String? by mutableStateOf(null)
-    var audioUri: ImplicitPath? by mutableStateOf(null)
+    var audioUri: ImplicitPath? by mutableRefStateOf(null)
 
     val canSubmit by derivedStateOf {
         id.ok && name.ok && singer.ok && lyricist.ok && composer.ok &&
@@ -123,7 +124,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
                 chorus = null
             )
             SystemFileSystem.sink(info.configPath).buffered().use { sink ->
-                sink.writeText(info.toJsonString())
+                sink.writeString(info.toJsonString())
             }
             // 6. 写入音频
             SystemFileSystem.sink(info.audioPath).buffered().use { sink ->
@@ -145,7 +146,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             }
             // 9. 写入歌词
             SystemFileSystem.sink(info.lyricsPath).buffered().use { sink ->
-                sink.writeText(lyrics.toString())
+                sink.writeString(lyrics.toString())
             }
             // 10. 更新曲库
             app.musicFactory.updateMusicLibraryInfo(listOf(id))

@@ -110,7 +110,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                 app.config.editedTopic = null
                 pop()
             }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 

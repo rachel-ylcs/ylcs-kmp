@@ -4,21 +4,25 @@ package love.yinlin.ui.screen.music
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.rememberRefState
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
@@ -36,7 +40,7 @@ private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var desktopConfig by rememberState { app.config.floatingLyricsDesktopConfig }
+    var desktopConfig by rememberRefState { app.config.floatingLyricsDesktopConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)

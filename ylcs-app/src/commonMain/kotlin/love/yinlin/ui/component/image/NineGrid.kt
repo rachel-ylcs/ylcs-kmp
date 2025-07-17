@@ -15,65 +15,65 @@ import love.yinlin.data.common.Picture
 
 @Composable
 fun NineGrid(
-	pics: List<Picture>,
-	padding: Dp = ThemeValue.Padding.LittleSpace,
-	modifier: Modifier = Modifier,
-	onImageClick: (Int) -> Unit,
-	onVideoClick: (Picture) -> Unit
+    pics: List<Picture>,
+    padding: Dp = ThemeValue.Padding.LittleSpace,
+    modifier: Modifier = Modifier,
+    onImageClick: (Int) -> Unit,
+    onVideoClick: (Picture) -> Unit
 ) {
-	val size = pics.size.coerceAtMost(9)
-	if (size == 1) {
-		val pic = pics[0]
-		Box(
-			modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraImage else ThemeValue.Size.CardWidth),
-			contentAlignment = Alignment.Center
-		) {
-			WebImage(
-				uri = pic.image,
-				modifier = Modifier.matchParentSize().zIndex(1f),
-				onClick = {
-					if (pic.isVideo) onVideoClick(pic)
-					else onImageClick(0)
-				}
-			)
-			if (pic.isVideo) {
-				MiniIcon(
-					icon = Icons.Outlined.SmartDisplay,
-					size = ThemeValue.Size.Image,
-					color = Colors.White,
-					modifier = Modifier.zIndex(2f)
-				)
-			}
-		}
-	}
-	else {
-		BoxWithConstraints(modifier = modifier) {
-			val columnCount = if (size in 2 .. 4) 2 else 3
-			val rowCount = (size + columnCount - 1) / columnCount
-			val squareSize = (maxWidth - padding * (columnCount - 1)) / columnCount
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				verticalArrangement = Arrangement.spacedBy(padding)
-			) {
-				repeat(rowCount) { row ->
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.spacedBy(padding)
-					) {
-						repeat(columnCount) { col ->
-							val index = row * columnCount + col
-							if (index < size) {
-								WebImage(
-									uri = pics[index].image,
-									modifier = Modifier.size(squareSize),
-									contentScale = ContentScale.Crop,
-									onClick = { onImageClick(index) }
-								)
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    val size = pics.size.coerceAtMost(9)
+    if (size == 1) {
+        val pic = pics[0]
+        Box(
+            modifier = modifier.height(if (pic.isVideo) ThemeValue.Size.ExtraImage else ThemeValue.Size.CardWidth),
+            contentAlignment = Alignment.Center
+        ) {
+            WebImage(
+                uri = pic.image,
+                modifier = Modifier.matchParentSize().zIndex(1f),
+                onClick = {
+                    if (pic.isVideo) onVideoClick(pic)
+                    else onImageClick(0)
+                }
+            )
+            if (pic.isVideo) {
+                MiniIcon(
+                    icon = Icons.Outlined.SmartDisplay,
+                    size = ThemeValue.Size.Image,
+                    color = Colors.White,
+                    modifier = Modifier.zIndex(2f)
+                )
+            }
+        }
+    }
+    else {
+        BoxWithConstraints(modifier = modifier) {
+            val columnCount = if (size in 2 .. 4) 2 else 3
+            val rowCount = (size + columnCount - 1) / columnCount
+            val squareSize = (maxWidth - padding * (columnCount - 1)) / columnCount
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(padding)
+            ) {
+                repeat(rowCount) { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(padding)
+                    ) {
+                        repeat(columnCount) { col ->
+                            val index = row * columnCount + col
+                            if (index < size) {
+                                WebImage(
+                                    uri = pics[index].image,
+                                    modifier = Modifier.size(squareSize),
+                                    contentScale = ContentScale.Crop,
+                                    onClick = { onImageClick(index) }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

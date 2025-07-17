@@ -29,6 +29,7 @@ import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.WebImage
@@ -90,7 +91,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
     @Serializable
     data class Args(val tab: Int)
 
-    private var tab by mutableStateOf(FollowTabItem.fromInt(args.tab))
+    private var tab by mutableRefStateOf(FollowTabItem.fromInt(args.tab))
     private val gridState = LazyGridState()
 
     private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(Int.MAX_VALUE, 0L) {
@@ -141,7 +142,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         pageFollows.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Data.Failure -> slot.tip.error(result.message)
                 }
             }
             FollowTabItem.FOLLOWERS -> {
@@ -157,7 +158,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         pageFollowers.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Data.Failure -> slot.tip.error(result.message)
                 }
             }
             FollowTabItem.BLOCK_USERS -> {
@@ -173,7 +174,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                         pageBlockUsers.newData(result.data)
                         gridState.scrollToItem(0)
                     }
-                    is Data.Error -> slot.tip.error(result.message)
+                    is Data.Failure -> slot.tip.error(result.message)
                 }
             }
         }
@@ -229,7 +230,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
         )
         when (result) {
             is Data.Success -> pageBlockUsers.items.removeAll { it.fid == item.fid }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 

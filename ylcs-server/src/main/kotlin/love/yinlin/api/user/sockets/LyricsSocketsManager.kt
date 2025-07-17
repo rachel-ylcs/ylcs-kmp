@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.DB
@@ -19,7 +18,6 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.values
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
 private suspend inline fun WebSocketServerSession.send(data: LyricsSockets.SM) = this.sendSerialized(data)
@@ -73,7 +71,7 @@ object LyricsSocketsManager {
 
     private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME)
-        if (coroutineContext.isActive) {
+        if (Coroutines.isActive()) {
             // 超时自动拒绝
             val target = players[targetInfo.uid]
             if (target == null || target.room == null) {

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.gradleApplication)
     alias(libs.plugins.kotlinJvm)
@@ -8,56 +6,49 @@ plugins {
 }
 
 kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+    C.useCompilerFeatures(this)
+    C.jvmTarget(this)
+
+    sourceSets {
+        main.configure {
+            useLib(
+                // project
+                projects.ylcsShared,
+                // kotlinx
+                libs.kotlinx.json,
+                // ktor
+                libs.ktor.json,
+                libs.ktor.server,
+                libs.ktor.server.host,
+                libs.ktor.server.config,
+                libs.ktor.server.netty,
+                libs.ktor.server.negotiation,
+                libs.ktor.server.websockets,
+                // middleware
+                libs.logback,
+                libs.mysql,
+                libs.mysql.pool,
+                libs.redis,
+            )
+        }
     }
-}
-
-dependencies {
-    implementation(projects.ylcsShared)
-
-    implementation(libs.kotlinx.json)
-
-    implementation(libs.ktor.json)
-    implementation(libs.ktor.server)
-    implementation(libs.ktor.server.host)
-    implementation(libs.ktor.server.config)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.negotiation)
-    implementation(libs.ktor.server.websockets)
-
-    implementation(libs.logback)
-    implementation(libs.mysql)
-    implementation(libs.mysql.pool)
-    implementation(libs.redis)
 }
 
 application {
-    mainClass.set(rootProject.extra["appMainClass"] as String)
-    applicationName = rootProject.extra["appName"] as String
+    mainClass.set(C.app.mainClass)
+    applicationName = C.app.name
 
-    val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
-    if (!taskName.contains("serverPublish")) {
-        val serverCurrentDir: Directory by rootProject.extra
-        serverCurrentDir.asFile.mkdir()
-    }
+    if ("serverPublish" !in currentTaskName) C.root.server.workspace.asFile.mkdir()
 }
-
-val outputFileName = rootProject.extra["serverOutputFileName"] as String
-val outputDir = rootProject.extra["serverOutputDir"] as Directory
-val outputFile = outputDir.file(outputFileName)
 
 ktor {
     fatJar {
-        archiveFileName = outputFileName
+        archiveFileName = C.server.outputName
     }
 }
 
 tasks.withType<Jar> {
-    excludes += arrayOf(
-        "/META-INF/{AL2.0,LGPL2.1}",
-        "DebugProbesKt.bin"
-    )
+    excludes += C.excludes
 }
 
 afterEvaluate {
@@ -68,13 +59,13 @@ afterEvaluate {
         shadowDistZip { enabled = false }
         jar { enabled = false }
         shadowJar {
-            destinationDirectory = outputDir
+            destinationDirectory = C.root.server.outputs
         }
     }
 
     val cleanFatJar by tasks.registering {
         doLast {
-            delete(outputFile)
+            delete(C.root.server.outputFile)
         }
     }
 

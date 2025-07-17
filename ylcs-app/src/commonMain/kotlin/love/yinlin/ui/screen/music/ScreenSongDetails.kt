@@ -23,24 +23,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import io.github.alexzhirkevich.qrose.options.QrBallShape
-import io.github.alexzhirkevich.qrose.options.QrBrush
-import io.github.alexzhirkevich.qrose.options.QrFrameShape
-import io.github.alexzhirkevich.qrose.options.circle
-import io.github.alexzhirkevich.qrose.options.roundCorners
-import io.github.alexzhirkevich.qrose.options.solid
+import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.common.UriGenerator
+import love.yinlin.common.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
@@ -49,11 +39,7 @@ import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ColorfulIcon
-import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.colorfulImageVector
+import love.yinlin.ui.component.image.*
 import love.yinlin.ui.component.input.RachelText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
@@ -101,7 +87,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
         )
         when (result) {
             is Data.Success -> pageComments.newData(result.data)
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 
@@ -141,7 +127,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                     listState.animateScrollToItem(pageComments.items.size - 1)
                     return true
                 }
-                is Data.Error -> slot.tip.error(result.message)
+                is Data.Failure -> slot.tip.error(result.message)
             }
         }
         return false
@@ -158,7 +144,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             )
             when (result) {
                 is Data.Success -> pageComments.items.removeAll { it.cid == cid }
-                is Data.Error -> slot.tip.error(result.message)
+                is Data.Failure -> slot.tip.error(result.message)
             }
         }
     }
@@ -397,11 +383,13 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             }
             launch {
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
-                else if (!OS.ifPlatform(*Platform.Phone, ifTrue = {
-                    OS.Application.startAppIntent(UriGenerator.qqGroup(group.id))
-                }, ifFalse = {
-                    OS.Application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey))
-                })) slot.tip.warning("未安装QQ")
+                else {
+                    val result = OS.ifPlatform(*Platform.Phone,
+                        ifTrue = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.id)) },
+                        ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
+                    )
+                    if (!result) slot.tip.warning("未安装QQ")
+                }
             }
         }
     }

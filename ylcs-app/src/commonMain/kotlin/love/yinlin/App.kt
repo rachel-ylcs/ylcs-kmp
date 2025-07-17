@@ -51,9 +51,7 @@ abstract class ScreenPart(val model: AppModel) {
 	inline fun <reified T : Screen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
-	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) {
-		launch { snapshotFlow(state).collectLatest(action) }
-	}
+	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
 
 	open suspend fun initialize() {}
 	open suspend fun update() {}
@@ -146,9 +144,9 @@ fun DeviceWrapper(
 	content: @Composable () -> Unit
 ) {
 	val isDarkMode = when (themeMode) {
-		ThemeMode.SYSTEM -> isSystemInDarkTheme()
-		ThemeMode.LIGHT -> false
-		ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
 	}
 
 	CompositionLocalProvider(

@@ -36,6 +36,7 @@ import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
@@ -172,32 +173,32 @@ private fun CharacterBlock(
                 ) {
                     val textChanged: suspend (Boolean, Int, Char) -> Unit =
                         remember(inputMode, onCharacterSelected, onStringSelected, onCharacterChanged) {
-                        { hide, index, ch ->
-                            if (inputMode == CharacterBlockInputMode.DISABLED) {
-                                val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
-                                onCharacterSelected(oldCharacter)?.let { newCharacter ->
-                                    if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
-                                        onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                            { hide, index, ch ->
+                                if (inputMode == CharacterBlockInputMode.DISABLED) {
+                                    val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
+                                    onCharacterSelected(oldCharacter)?.let { newCharacter ->
+                                        if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
+                                            onCharacterChanged(index, BlockCharacter(newCharacter, hide))
+                                        }
                                     }
                                 }
-                            }
-                            else {
-                                onStringSelected()?.let { newString ->
-                                    // 确定当前索引的位置
-                                    val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
-                                    repeat(min(blockSize - startIndex, newString.length)) {
-                                        val actualIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index + it else index + it * blockSize
-                                        data[actualIndex].decode { currentCharacter, currentHide ->
-                                            // 防止将不可重写的格子重写
-                                            if (writeMode || (currentCharacter != BTConfig.CHAR_EMPTY && currentCharacter != BTConfig.CHAR_BLOCK && currentHide)) {
-                                                onCharacterChanged(actualIndex, BlockCharacter(newString[it], hide))
+                                else {
+                                    onStringSelected()?.let { newString ->
+                                        // 确定当前索引的位置
+                                        val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
+                                        repeat(min(blockSize - startIndex, newString.length)) {
+                                            val actualIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index + it else index + it * blockSize
+                                            data[actualIndex].decode { currentCharacter, currentHide ->
+                                                // 防止将不可重写的格子重写
+                                                if (writeMode || (currentCharacter != BTConfig.CHAR_EMPTY && currentCharacter != BTConfig.CHAR_BLOCK && currentHide)) {
+                                                    onCharacterChanged(actualIndex, BlockCharacter(newString[it], hide))
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
                     LoadingIcon(
                         icon = Icons.Outlined.VisibilityOff,
@@ -399,8 +400,8 @@ class BlockTextPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config = BTConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: BTResult? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: BTResult? by mutableRefStateOf(null)
 
     private val data = List(BTConfig.maxBlockSize * BTConfig.maxBlockSize) { BlockCharacter.Empty }.toMutableStateList()
 

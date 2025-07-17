@@ -26,55 +26,55 @@ import love.yinlin.extension.rememberDerivedState
 
 @Composable
 fun ImageAdder(
-	maxNum: Int,
-	pics: List<Picture>,
-	size: Dp,
-	space: Dp = ThemeValue.Padding.EqualSpace,
-	modifier: Modifier = Modifier,
-	onAdd: () -> Unit,
-	onDelete: (Int) -> Unit,
-	onClick: (Int) -> Unit
+    maxNum: Int,
+    pics: List<Picture>,
+    size: Dp,
+    space: Dp = ThemeValue.Padding.EqualSpace,
+    modifier: Modifier = Modifier,
+    onAdd: () -> Unit,
+    onDelete: (Int) -> Unit,
+    onClick: (Int) -> Unit
 ) {
-	FlowRow(
-		modifier = modifier,
-		horizontalArrangement = Arrangement.spacedBy(space),
-		verticalArrangement = Arrangement.spacedBy(space)
-	) {
-		val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
+    FlowRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(space),
+        verticalArrangement = Arrangement.spacedBy(space)
+    ) {
+        val actualPics by rememberDerivedState(pics, maxNum) { pics.take(maxNum) }
 
-		actualPics.fastForEachIndexed { index, pic ->
-			Box(
-				modifier = Modifier.size(size),
-				contentAlignment = Alignment.TopEnd
-			) {
-				ClickIcon(
-					icon = Icons.Outlined.Cancel,
-					color = MaterialTheme.colorScheme.error,
-					size = size / 3.5f,
-					modifier = Modifier.zIndex(2f),
-					onClick = { onDelete(index) }
-				)
-				WebImage(
-					uri = pic.image,
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.fillMaxSize().zIndex(1f),
-					onClick = { onClick(index) }
-				)
-			}
-		}
-		if (actualPics.size < maxNum) {
-			Box(
-				modifier = Modifier.size(size)
-					.clip(MaterialTheme.shapes.small)
-					.background(MaterialTheme.colorScheme.surface)
-					.clickable(onClick = onAdd),
-				contentAlignment = Alignment.Center
-			) {
-				MiniIcon(
-					icon = Icons.Outlined.Add,
-					size = size / 2
-				)
-			}
-		}
-	}
+        actualPics.fastForEachIndexed { index, pic ->
+            Box(
+                modifier = Modifier.size(size),
+                contentAlignment = Alignment.TopEnd
+            ) {
+                ClickIcon(
+                    icon = Icons.Outlined.Cancel,
+                    color = MaterialTheme.colorScheme.error,
+                    size = size / 3.5f,
+                    modifier = Modifier.zIndex(2f),
+                    onClick = { onDelete(index) }
+                )
+                WebImage(
+                    uri = pic.image,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().zIndex(1f),
+                    onClick = { onClick(index) }
+                )
+            }
+        }
+        if (actualPics.size < maxNum) {
+            Box(
+                modifier = Modifier.size(size)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .clickable(onClick = onAdd),
+                contentAlignment = Alignment.Center
+            ) {
+                MiniIcon(
+                    icon = Icons.Outlined.Add,
+                    size = size / 2
+                )
+            }
+        }
+    }
 }

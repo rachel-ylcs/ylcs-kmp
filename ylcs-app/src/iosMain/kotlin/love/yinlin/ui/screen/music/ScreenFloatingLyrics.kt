@@ -1,14 +1,7 @@
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +17,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
@@ -34,7 +27,7 @@ import love.yinlin.ui.component.layout.SplitLayout
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var iosConfig by rememberState { app.config.floatingLyricsIOSConfig }
+    var iosConfig by rememberRefState { app.config.floatingLyricsIOSConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)

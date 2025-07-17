@@ -45,9 +45,7 @@ abstract class Screen<A>(val model: AppModel) : ViewModel() {
 	fun pop() = model.pop()
 	fun deeplink(uri: Uri) = model.deeplink.process(uri)
 
-	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) {
-		launch { snapshotFlow(state).collectLatest(action) }
-	}
+	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
 
 	val msgPart = model.msgPart
 	val worldPart = model.worldPart

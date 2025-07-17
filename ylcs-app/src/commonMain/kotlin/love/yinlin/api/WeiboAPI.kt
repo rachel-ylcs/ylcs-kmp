@@ -8,30 +8,16 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.common.Uri
-import love.yinlin.platform.app
-import love.yinlin.ui.component.text.RichContainer
-import love.yinlin.ui.component.text.RichString
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.data.weibo.Weibo
-import love.yinlin.data.weibo.WeiboAlbum
-import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.data.weibo.WeiboSubComment
-import love.yinlin.data.weibo.WeiboUser
-import love.yinlin.data.weibo.WeiboUserInfo
-import love.yinlin.extension.ArrayEmpty
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.Int
-import love.yinlin.extension.Long
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
-import love.yinlin.extension.StringNull
-import love.yinlin.extension.arr
-import love.yinlin.extension.catching
-import love.yinlin.extension.obj
+import love.yinlin.data.weibo.*
+import love.yinlin.extension.*
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
+import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
+import love.yinlin.ui.component.text.RichContainer
+import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.buildRichString
 
 object WeiboAPI {
@@ -45,7 +31,7 @@ object WeiboAPI {
 	)
 
 	private fun transferWeiboImageUrl(src: String): String = OS.ifPlatform(
-		Platform.WebWasm,
+        Platform.WebWasm,
 		ifTrue = {
 			if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
 			else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
@@ -61,7 +47,7 @@ object WeiboAPI {
 	)
 
 	private fun transferWeiboVideoUrl(src: String): String = OS.ifPlatform(
-		Platform.WebWasm,
+        Platform.WebWasm,
 		ifTrue = { src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video") },
 		ifFalse = { src }
 	)

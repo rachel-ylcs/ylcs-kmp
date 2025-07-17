@@ -63,6 +63,7 @@ fun StrokeText(
             minLines = minLines,
             onTextLayout = onTextLayout,
             style = style.copy(
+                brush = null,
                 drawStyle = Stroke(
                     width = borderWidth,
                     join = StrokeJoin.Round

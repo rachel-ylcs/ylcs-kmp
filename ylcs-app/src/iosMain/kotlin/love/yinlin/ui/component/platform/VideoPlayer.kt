@@ -12,7 +12,8 @@ import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberState
+import love.yinlin.extension.rememberFalse
+import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI
@@ -76,19 +77,19 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val wasMusicPlaying = rememberState { false }
-    val state: MutableState<VideoPlayerView?> = rememberState { null }
+    var wasMusicPlaying by rememberFalse()
+    val state = rememberRefState<VideoPlayerView?> { null }
 
     if (app.config.audioFocus) {
         DisposableEffect(Unit) {
-            wasMusicPlaying.value = app.musicFactory.isPlaying
-            if (wasMusicPlaying.value) {
+            wasMusicPlaying = app.musicFactory.isPlaying
+            if (wasMusicPlaying) {
                 Coroutines.startMain {
                     app.musicFactory.pause()
                 }
             }
             onDispose {
-                if (wasMusicPlaying.value) {
+                if (wasMusicPlaying) {
                     Coroutines.startMain {
                         app.musicFactory.play()
                     }

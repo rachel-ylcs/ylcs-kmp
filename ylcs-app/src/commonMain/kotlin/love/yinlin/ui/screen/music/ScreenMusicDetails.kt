@@ -19,33 +19,22 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
-import io.ktor.utils.io.*
-import io.ktor.utils.io.core.writeText
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
+import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
+import love.yinlin.common.*
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
-import love.yinlin.extension.catching
-import love.yinlin.extension.catchingDefault
-import love.yinlin.extension.fileSizeString
-import love.yinlin.extension.findAssign
-import love.yinlin.extension.rememberFalse
-import love.yinlin.extension.replaceAll
-import love.yinlin.extension.toJsonString
+import love.yinlin.extension.*
 import love.yinlin.platform.*
 import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.image.MiniIcon
@@ -56,6 +45,7 @@ import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.text.TextInput
 import love.yinlin.ui.component.text.TextInputState
 
@@ -193,7 +183,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                                     val configPath = newInfo.configPath
                                     Coroutines.io {
                                         SystemFileSystem.sink(configPath).buffered().use { sink ->
-                                            sink.writeText(newInfo.toJsonString())
+                                            sink.writeString(newInfo.toJsonString())
                                         }
                                     }
                                     resources.findAssign(predicate = { it == item }) {
@@ -268,20 +258,20 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     companion object {
         private fun makeResourceItem(resource: MusicResource, length: Int): ResourceItem {
             val type = resource.type
-            val onDelete = when (type) {
+            val onDelete: DeleteStrategy = when (type) {
                 MusicResourceType.Config, MusicResourceType.Record, MusicResourceType.Background -> DeleteStrategy.Disabled
                 MusicResourceType.Audio, MusicResourceType.LineLyrics -> if (type.defaultName == resource.name) DeleteStrategy.Disabled else DeleteStrategy.NoOption
-                MusicResourceType.Animation, MusicResourceType.Video, null -> DeleteStrategy.NoOption
+                MusicResourceType.Animation, MusicResourceType.Video, MusicResourceType.Rhyme, null -> DeleteStrategy.NoOption
             }
-            val onReplace = when (type) {
-                MusicResourceType.Config, MusicResourceType.LineLyrics, null -> ReplaceStrategy.Disabled
+            val onReplace: ReplaceStrategy = when (type) {
+                MusicResourceType.Config, MusicResourceType.LineLyrics, MusicResourceType.Rhyme, null -> ReplaceStrategy.Disabled
                 MusicResourceType.Audio -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP3, MimeType.FLAC), filter = listOf("*.mp3", "*.flac"))
                 MusicResourceType.Record -> ReplaceStrategy.Picture(aspectRatio = 1f)
                 MusicResourceType.Background -> ReplaceStrategy.Picture(aspectRatio = 0.5625f)
                 MusicResourceType.Animation -> ReplaceStrategy.File(mimeType = listOf(MimeType.WEBP), filter = listOf("*.webp"))
                 MusicResourceType.Video -> ReplaceStrategy.File(mimeType = listOf(MimeType.MP4), filter = listOf("*.mp4"))
             }
-            val onModify = when (type) {
+            val onModify: ModifyStrategy = when (type) {
                 MusicResourceType.Config -> ModifyStrategy.Config
                 MusicResourceType.LineLyrics -> ModifyStrategy.LineLyrics
                 else -> ModifyStrategy.Disabled
@@ -297,9 +287,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
 
         private suspend fun loadLyrics(info: MusicInfo): String = Coroutines.io {
             catchingDefault("") {
-                val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use {
-                    it.readText()
-                }
+                val lyrics = SystemFileSystem.source(info.lyricsPath).buffered().use { it.readString() }
                 LyricsLrc.Parser(lyrics).plainText
             }
         }

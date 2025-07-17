@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
@@ -34,9 +35,9 @@ import java.util.*
 
 @Stable
 private class QrCodeScannerState {
-    val previewView = mutableStateOf<PreviewView?>(null)
-    val viewFinderView = mutableStateOf<ViewfinderView?>(null)
-    var cameraScan by mutableStateOf<BaseCameraScan<com.google.zxing.Result>?>(null)
+    val previewView = mutableRefStateOf<PreviewView?>(null)
+    val viewFinderView = mutableRefStateOf<ViewfinderView?>(null)
+    var cameraScan by mutableRefStateOf<BaseCameraScan<com.google.zxing.Result>?>(null)
 }
 
 @Composable

@@ -22,6 +22,7 @@ import love.yinlin.data.rachel.game.info.PConfig
 import love.yinlin.data.rachel.game.info.PictionaryQuestion
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.container.PaintCanvas
@@ -113,8 +114,8 @@ class PictionaryPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config: PConfig = PConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: Unit? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: Unit? by mutableRefStateOf(null)
 
     private val inputState = TextInputState()
 

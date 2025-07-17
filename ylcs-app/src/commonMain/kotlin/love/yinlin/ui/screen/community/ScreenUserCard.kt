@@ -33,6 +33,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage
@@ -44,188 +45,188 @@ import love.yinlin.ui.component.screen.SubScreen
 
 @Stable
 class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<ScreenUserCard.Args>(model) {
-	@Stable
-	@Serializable
-	data class Args(val uid: Int)
+    @Stable
+    @Serializable
+    data class Args(val uid: Int)
 
-	private var profile: UserPublicProfile? by mutableStateOf(null)
+    private var profile: UserPublicProfile? by mutableRefStateOf(null)
 
-	private val listState = LazyStaggeredGridState()
+    private val listState = LazyStaggeredGridState()
 
-	private val page = object : PaginationArgs<Topic, Int, Int, Boolean>(Int.MAX_VALUE, true) {
-		override fun distinctValue(item: Topic): Int = item.tid
-		override fun offset(item: Topic): Int = item.tid
-		override fun arg1(item: Topic): Boolean = item.isTop
-	}
+    private val page = object : PaginationArgs<Topic, Int, Int, Boolean>(Int.MAX_VALUE, true) {
+        override fun distinctValue(item: Topic): Int = item.tid
+        override fun offset(item: Topic): Int = item.tid
+        override fun arg1(item: Topic): Boolean = item.isTop
+    }
 
-	private suspend fun requestUserProfile() {
-		val result = ClientAPI.request(
-			route = API.User.Profile.GetPublicProfile,
-			data = API.User.Profile.GetPublicProfile.Request(
-				token = app.config.userToken.ifEmpty { null },
-				uid = args.uid
-			)
-		)
-		if (result is Data.Success) profile = result.data
-	}
+    private suspend fun requestUserProfile() {
+        val result = ClientAPI.request(
+            route = API.User.Profile.GetPublicProfile,
+            data = API.User.Profile.GetPublicProfile.Request(
+                token = app.config.userToken.ifEmpty { null },
+                uid = args.uid
+            )
+        )
+        if (result is Data.Success) profile = result.data
+    }
 
-	private suspend fun requestNewTopics() {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopics,
-			data = API.User.Topic.GetTopics.Request(
-				uid = args.uid,
-				num = page.pageNum
-			)
-		)
-		if (result is Data.Success) page.newData(result.data)
-	}
+    private suspend fun requestNewTopics() {
+        val result = ClientAPI.request(
+            route = API.User.Topic.GetTopics,
+            data = API.User.Topic.GetTopics.Request(
+                uid = args.uid,
+                num = page.pageNum
+            )
+        )
+        if (result is Data.Success) page.newData(result.data)
+    }
 
-	private suspend fun requestMoreTopics() {
-		val result = ClientAPI.request(
-			route = API.User.Topic.GetTopics,
-			data = API.User.Topic.GetTopics.Request(
-				uid = args.uid,
-				isTop = page.arg1,
-				tid = page.offset,
-				num = page.pageNum
-			)
-		)
-		if (result is Data.Success) page.moreData(result.data)
-	}
+    private suspend fun requestMoreTopics() {
+        val result = ClientAPI.request(
+            route = API.User.Topic.GetTopics,
+            data = API.User.Topic.GetTopics.Request(
+                uid = args.uid,
+                isTop = page.arg1,
+                tid = page.offset,
+                num = page.pageNum
+            )
+        )
+        if (result is Data.Success) page.moreData(result.data)
+    }
 
-	private suspend fun followUser(profile: UserPublicProfile) {
-		val result = ClientAPI.request(
-			route = API.User.Follows.FollowUser,
-			data = API.User.Follows.FollowUser.Request(
-				token = app.config.userToken,
-				uid = profile.uid
-			)
-		)
-		when (result) {
-			is Data.Success -> this.profile = profile.copy(
-				status = FollowStatus.FOLLOW,
-				followers = profile.followers + 1
-			)
-			is Data.Error -> slot.tip.error(result.message)
-		}
-	}
+    private suspend fun followUser(profile: UserPublicProfile) {
+        val result = ClientAPI.request(
+            route = API.User.Follows.FollowUser,
+            data = API.User.Follows.FollowUser.Request(
+                token = app.config.userToken,
+                uid = profile.uid
+            )
+        )
+        when (result) {
+            is Data.Success -> this.profile = profile.copy(
+                status = FollowStatus.FOLLOW,
+                followers = profile.followers + 1
+            )
+            is Data.Failure -> slot.tip.error(result.message)
+        }
+    }
 
-	private suspend fun unfollowUser(profile: UserPublicProfile) {
-		val result = ClientAPI.request(
-			route = API.User.Follows.UnfollowUser,
-			data = API.User.Follows.UnfollowUser.Request(
-				token = app.config.userToken,
-				uid = profile.uid
-			)
-		)
-		when (result) {
-			is Data.Success -> this.profile = profile.copy(
-				status = FollowStatus.UNFOLLOW,
-				followers = profile.followers - 1
-			)
-			is Data.Error -> slot.tip.error(result.message)
-		}
-	}
+    private suspend fun unfollowUser(profile: UserPublicProfile) {
+        val result = ClientAPI.request(
+            route = API.User.Follows.UnfollowUser,
+            data = API.User.Follows.UnfollowUser.Request(
+                token = app.config.userToken,
+                uid = profile.uid
+            )
+        )
+        when (result) {
+            is Data.Success -> this.profile = profile.copy(
+                status = FollowStatus.UNFOLLOW,
+                followers = profile.followers - 1
+            )
+            is Data.Failure -> slot.tip.error(result.message)
+        }
+    }
 
-	private suspend fun blockUser(profile: UserPublicProfile) {
-		val result = ClientAPI.request(
-			route = API.User.Follows.BlockUser,
-			data = API.User.Follows.BlockUser.Request(
-				token = app.config.userToken,
-				uid = profile.uid
-			)
-		)
-		when (result) {
-			is Data.Success -> this.profile = profile.copy(status = FollowStatus.BLOCK)
-			is Data.Error -> slot.tip.error(result.message)
-		}
-	}
+    private suspend fun blockUser(profile: UserPublicProfile) {
+        val result = ClientAPI.request(
+            route = API.User.Follows.BlockUser,
+            data = API.User.Follows.BlockUser.Request(
+                token = app.config.userToken,
+                uid = profile.uid
+            )
+        )
+        when (result) {
+            is Data.Success -> this.profile = profile.copy(status = FollowStatus.BLOCK)
+            is Data.Failure -> slot.tip.error(result.message)
+        }
+    }
 
-	private fun onTopicClick(topic: Topic) {
-		navigate(ScreenTopic.Args(topic))
-	}
+    private fun onTopicClick(topic: Topic) {
+        navigate(ScreenTopic.Args(topic))
+    }
 
-	@Composable
-	private fun TopicCard(
-		topic: Topic,
-		cardWidth: Dp,
-		modifier: Modifier = Modifier
-	) {
-		Surface(
-			modifier = modifier,
-			shape = MaterialTheme.shapes.large,
-			shadowElevation = ThemeValue.Shadow.Surface
-		) {
-			Column(modifier = Modifier.fillMaxWidth()
-				.heightIn(min = cardWidth * 0.777777f)
-				.clickable { onTopicClick(topic) }
-			) {
-				if (topic.pic != null) {
-					WebImage(
-						uri = topic.picPath,
-						modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
-						contentScale = ContentScale.Crop
-					)
-				}
-				if (topic.isTop) {
-					Row(
-						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
-					}
-				}
-				Text(
-					text = topic.title,
-					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
-				)
-				Spacer(Modifier.weight(1f))
-				Row(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					RachelText(
-						text = topic.commentNum.toString(),
-						icon = Icons.AutoMirrored.Outlined.Comment,
-						style = MaterialTheme.typography.bodySmall,
-						padding = ThemeValue.Padding.ZeroValue,
-						modifier = Modifier.weight(1f)
-					)
-					RachelText(
-						text = topic.coinNum.toString(),
-						icon = Icons.Outlined.Paid,
-						style = MaterialTheme.typography.bodySmall,
-						padding = ThemeValue.Padding.ZeroValue,
-						modifier = Modifier.weight(1f)
-					)
-				}
-			}
-		}
-	}
+    @Composable
+    private fun TopicCard(
+        topic: Topic,
+        cardWidth: Dp,
+        modifier: Modifier = Modifier
+    ) {
+        Surface(
+            modifier = modifier,
+            shape = MaterialTheme.shapes.large,
+            shadowElevation = ThemeValue.Shadow.Surface
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()
+                .heightIn(min = cardWidth * 0.777777f)
+                .clickable { onTopicClick(topic) }
+            ) {
+                if (topic.pic != null) {
+                    WebImage(
+                        uri = topic.picPath,
+                        modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                if (topic.isTop) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+                Text(
+                    text = topic.title,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+                )
+                Spacer(Modifier.weight(1f))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RachelText(
+                        text = topic.commentNum.toString(),
+                        icon = Icons.AutoMirrored.Outlined.Comment,
+                        style = MaterialTheme.typography.bodySmall,
+                        padding = ThemeValue.Padding.ZeroValue,
+                        modifier = Modifier.weight(1f)
+                    )
+                    RachelText(
+                        text = topic.coinNum.toString(),
+                        icon = Icons.Outlined.Paid,
+                        style = MaterialTheme.typography.bodySmall,
+                        padding = ThemeValue.Padding.ZeroValue,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
 
-	@Composable
-	private fun UserProfileCardLayout(
-		profile: UserPublicProfile,
-		shape: Shape = RectangleShape,
-		modifier: Modifier = Modifier
-	) {
-		UserPublicProfileCard(
-			profile = profile,
-			shape = shape,
-			modifier = modifier
-		) {
-			Row(
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.End),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				val status = profile.status
-				when (val isFollowed = status.isFollowed) {
-					null -> {}
-					else -> {
+    @Composable
+    private fun UserProfileCardLayout(
+        profile: UserPublicProfile,
+        shape: Shape = RectangleShape,
+        modifier: Modifier = Modifier
+    ) {
+        UserPublicProfileCard(
+            profile = profile,
+            shape = shape,
+            modifier = modifier
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val status = profile.status
+                when (val isFollowed = status.isFollowed) {
+                    null -> {}
+                    else -> {
                         LoadingIcon(
                             icon = if (isFollowed) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                             tip = if (isFollowed) "取消关注" else "关注",
@@ -233,105 +234,105 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
                             onClick = { if (isFollowed) unfollowUser(profile) else followUser(profile) }
                         )
                     }
-				}
-				if (status.canBlock) {
-					LoadingIcon(
-						icon = Icons.Filled.Block,
-						color = MaterialTheme.colorScheme.error,
-						onClick = {
-							if (slot.confirm.openSuspend(content = "拉黑对方")) blockUser(profile)
-						}
-					)
-				}
-			}
-		}
-	}
+                }
+                if (status.canBlock) {
+                    LoadingIcon(
+                        icon = Icons.Filled.Block,
+                        color = MaterialTheme.colorScheme.error,
+                        onClick = {
+                            if (slot.confirm.openSuspend(content = "拉黑对方")) blockUser(profile)
+                        }
+                    )
+                }
+            }
+        }
+    }
 
-	@Composable
-	private fun Portrait(profile: UserPublicProfile) {
-		if (profile.status.canShowTopics) {
-			bindPauseLoadWhenScrolling(listState)
+    @Composable
+    private fun Portrait(profile: UserPublicProfile) {
+        if (profile.status.canShowTopics) {
+            bindPauseLoadWhenScrolling(listState)
 
-			PaginationStaggeredGrid(
-				items = page.items,
-				key = { it.tid },
-				columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
-				state = listState,
-				canRefresh = false,
-				canLoading = page.canLoading,
-				onLoading = { requestMoreTopics() },
-				modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-				verticalItemSpacing = ThemeValue.Padding.EqualSpace,
-				header = {
-					UserProfileCardLayout(
-						profile = profile,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			) {  topic ->
-				TopicCard(
-					topic = topic,
-					cardWidth = ThemeValue.Size.CellWidth,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
-				)
-			}
-		}
-		else {
-			UserProfileCardLayout(
-				profile = profile,
-				modifier = Modifier.fillMaxWidth()
-			)
-		}
-	}
+            PaginationStaggeredGrid(
+                items = page.items,
+                key = { it.tid },
+                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                state = listState,
+                canRefresh = false,
+                canLoading = page.canLoading,
+                onLoading = { requestMoreTopics() },
+                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+                verticalItemSpacing = ThemeValue.Padding.EqualSpace,
+                header = {
+                    UserProfileCardLayout(
+                        profile = profile,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            ) {  topic ->
+                TopicCard(
+                    topic = topic,
+                    cardWidth = ThemeValue.Size.CellWidth,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
+                )
+            }
+        }
+        else {
+            UserProfileCardLayout(
+                profile = profile,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 
-	@Composable
-	private fun Landscape(profile: UserPublicProfile) {
-		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-			UserProfileCardLayout(
-				profile = profile,
-				shape = MaterialTheme.shapes.large,
-				modifier = Modifier.width(ThemeValue.Size.PanelWidth).padding(ThemeValue.Padding.EqualExtraValue)
-			)
-			if (profile.status.canShowTopics) {
-				bindPauseLoadWhenScrolling(listState)
+    @Composable
+    private fun Landscape(profile: UserPublicProfile) {
+        Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+            UserProfileCardLayout(
+                profile = profile,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.width(ThemeValue.Size.PanelWidth).padding(ThemeValue.Padding.EqualExtraValue)
+            )
+            if (profile.status.canShowTopics) {
+                bindPauseLoadWhenScrolling(listState)
 
-				PaginationStaggeredGrid(
-					items = page.items,
-					key = { it.tid },
-					columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
-					state = listState,
-					canRefresh = false,
-					canLoading = page.canLoading,
-					onLoading = { requestMoreTopics() },
-					modifier = Modifier.weight(1f).fillMaxHeight(),
-					contentPadding = ThemeValue.Padding.EqualValue,
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-					verticalItemSpacing = ThemeValue.Padding.EqualSpace
-				) {  topic ->
-					TopicCard(
-						topic = topic,
-						cardWidth = ThemeValue.Size.CellWidth,
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
-			}
-		}
-	}
+                PaginationStaggeredGrid(
+                    items = page.items,
+                    key = { it.tid },
+                    columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                    state = listState,
+                    canRefresh = false,
+                    canLoading = page.canLoading,
+                    onLoading = { requestMoreTopics() },
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    contentPadding = ThemeValue.Padding.EqualValue,
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                ) {  topic ->
+                    TopicCard(
+                        topic = topic,
+                        cardWidth = ThemeValue.Size.CellWidth,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
 
-	override suspend fun initialize() {
-		requestUserProfile()
-		requestNewTopics()
-	}
+    override suspend fun initialize() {
+        requestUserProfile()
+        requestNewTopics()
+    }
 
-	override val title: String = "主页"
+    override val title: String = "主页"
 
-	@Composable
-	override fun SubContent(device: Device) {
-		profile?.let {
-			when (device.type) {
-				Device.Type.PORTRAIT -> Portrait(it)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
-			}
-		} ?: EmptyBox()
-	}
+    @Composable
+    override fun SubContent(device: Device) {
+        profile?.let {
+            when (device.type) {
+                Device.Type.PORTRAIT -> Portrait(it)
+                Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
+            }
+        } ?: EmptyBox()
+    }
 }

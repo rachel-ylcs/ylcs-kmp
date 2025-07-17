@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.WifiOff
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +79,10 @@ fun SimpleLoadingBox() {
 }
 
 @Composable
-fun LoadingBox() {
+fun LoadingBox(
+    text: String = stringResource(Res.string.loading_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
@@ -96,14 +100,20 @@ fun LoadingBox() {
 				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
 				LoadingAnimation()
-				Text(text = stringResource(Res.string.loading_state_string))
+				Text(
+                    text = text,
+                    color = color
+                )
 			}
 		}
 	}
 }
 
 @Composable
-fun SimpleEmptyBox() {
+fun SimpleEmptyBox(
+    text: String = stringResource(Res.string.empty_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
@@ -112,14 +122,23 @@ fun SimpleEmptyBox() {
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 		) {
-			MiniIcon(Icons.Filled.Error)
-			Text(text = stringResource(Res.string.empty_state_string))
+			MiniIcon(
+                icon = Icons.Filled.Error,
+                color = color
+            )
+			Text(
+                text = text,
+                color = color
+            )
 		}
 	}
 }
 
 @Composable
-fun EmptyBox() {
+fun EmptyBox(
+    text: String = stringResource(Res.string.empty_state_string),
+    color: Color = LocalContentColor.current
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
@@ -136,15 +155,24 @@ fun EmptyBox() {
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
 			) {
-				MiniIcon(Icons.Filled.Error)
-				Text(text = stringResource(Res.string.empty_state_string))
+				MiniIcon(
+                    icon = Icons.Filled.Error,
+                    color = color
+                )
+				Text(
+                    text = text,
+                    color = color
+                )
 			}
 		}
 	}
 }
 
 @Composable
-fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
+fun NetWorkErrorBox(
+    text: String = stringResource(Res.string.network_error_state_string),
+    retry: (suspend CoroutineScope.() -> Unit)? = null
+) {
 	Box(
 		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
 		contentAlignment = Alignment.Center
@@ -166,7 +194,7 @@ fun NetWorkErrorBox(retry: (suspend CoroutineScope.() -> Unit)? = null) {
 					color = MaterialTheme.colorScheme.error
 				)
 				Text(
-					text = stringResource(Res.string.network_error_state_string),
+					text = text,
 					color = MaterialTheme.colorScheme.error
 				)
 			}
@@ -193,7 +221,7 @@ fun StatefulBox(
 		modifier = modifier,
 	) {
 		when (it) {
-			BoxState.CONTENT -> {
+            BoxState.CONTENT -> {
 				Box(
 					modifier = Modifier.fillMaxSize(),
 					contentAlignment = Alignment.Center
@@ -201,9 +229,9 @@ fun StatefulBox(
 					content()
 				}
 			}
-			BoxState.LOADING -> LoadingBox()
-			BoxState.EMPTY -> EmptyBox()
-			BoxState.NETWORK_ERROR -> NetWorkErrorBox(retry)
+            BoxState.LOADING -> LoadingBox()
+            BoxState.EMPTY -> EmptyBox()
+            BoxState.NETWORK_ERROR -> NetWorkErrorBox(retry = retry)
 		}
 	}
 }

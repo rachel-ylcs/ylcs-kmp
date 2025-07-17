@@ -1,9 +1,9 @@
 package love.yinlin.ui.component.platform
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
+import love.yinlin.extension.mutableRefStateOf
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
@@ -25,7 +25,7 @@ internal class ComposeVideoSurface : VideoSurface(null) {
     private lateinit var imageInfo: ImageInfo
     private lateinit var frameBytes: ByteArray
     private val skiaBitmap: Bitmap = Bitmap()
-    private val composeBitmap = mutableStateOf<ImageBitmap?>(null)
+    private val composeBitmap = mutableRefStateOf<ImageBitmap?>(null)
 
     val bitmap: State<ImageBitmap?> = composeBitmap
 

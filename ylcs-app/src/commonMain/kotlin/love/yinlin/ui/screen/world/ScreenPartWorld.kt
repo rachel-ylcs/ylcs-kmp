@@ -52,6 +52,7 @@ import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
+import love.yinlin.ui.screen.world.single.ScreenRhyme
 import kotlin.math.absoluteValue
 
 @Composable
@@ -89,7 +90,7 @@ private fun GameCard(
 				text = game.type.title,
 				color = when (game.type) {
                     GameType.RANK -> MaterialTheme.colorScheme.primary
-					GameType.EXPLORATION, GameType.SINGLE -> MaterialTheme.colorScheme.secondary
+                    GameType.EXPLORATION, GameType.SINGLE -> MaterialTheme.colorScheme.secondary
                     GameType.SPEED, GameType.BATTLE -> MaterialTheme.colorScheme.tertiary
                 }
 			)
@@ -121,12 +122,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
             Game.AnswerQuestion, Game.BlockText,
             Game.FlowersOrder, Game.SearchAll,
             Game.Pictionary -> navigate(ScreenGameHall.Args(game))
-			Game.GuessLyrics -> {
+            Game.GuessLyrics -> {
 				val profile = app.config.userProfile
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
-            Game.Rhyme -> launch { }
+            Game.Rhyme -> navigate<ScreenRhyme>()
 		}
 	}
 
@@ -193,7 +194,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
                         }
                     )
                 }
-				Game.GuessLyrics, Game.Rhyme -> {}
+                Game.GuessLyrics, Game.Rhyme -> {}
 			}
             when (game) {
                 Game.AnswerQuestion, Game.BlockText,
@@ -339,8 +340,8 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	@Composable
 	override fun Content() {
 		when (LocalDevice.current.type) {
-			Device.Type.PORTRAIT -> Portrait()
-			Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape()
+            Device.Type.PORTRAIT -> Portrait()
+            Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape()
 		}
 	}
 

@@ -5,7 +5,7 @@ import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserPrivilege
@@ -19,7 +19,7 @@ fun Routing.backupAPI(implMap: ImplMap) {
 		if (DB.updateSQL("""
             UPDATE user SET playlist = ? WHERE uid = ? AND (privilege & ${UserPrivilege.BACKUP}) != 0
         """, playlist.toJsonString(), uid)) "上传成功".successData
-		else "无权限".failedData
+		else "无权限".failureData
 	}
 
 	api(API.User.Backup.DownloadPlaylist) { token ->
@@ -27,6 +27,6 @@ fun Routing.backupAPI(implMap: ImplMap) {
 		val user = DB.throwGetUser(uid, "privilege, playlist")
 		if (UserPrivilege.backup(user["privilege"].Int))
 			Data.Success(user["playlist"].Object, "下载成功")
-		else "无权限".failedData
+		else "无权限".failureData
 	}
 }

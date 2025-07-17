@@ -18,10 +18,9 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.*
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
-import kotlin.collections.plus
+import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 
 @Stable
 class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<ScreenModifyActivity.Args>(model) {
@@ -73,7 +72,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				}
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -95,7 +94,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				input.pic = it.picPath(newPic)
 				it.copy(pic = newPic)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -114,7 +113,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				input.pic = null
 				it.copy(pic = null)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -137,7 +136,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				input.pics += newPics.fastMap { pic -> Picture(it.picPath(pic)) }
 				it.copy(pics = it.pics + newPics)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}
@@ -166,7 +165,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 					input.pics[index] = Picture(it.picPath(newPic))
 					it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
 				}
-				is Data.Error -> slot.tip.error(result.message)
+				is Data.Failure -> slot.tip.error(result.message)
 			}
 			slot.loading.close()
 		}
@@ -187,7 +186,7 @@ class ScreenModifyActivity(model: AppModel, private val args: Args) : SubScreen<
 				input.pics.removeAt(index)
 				it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 		slot.loading.close()
 	}

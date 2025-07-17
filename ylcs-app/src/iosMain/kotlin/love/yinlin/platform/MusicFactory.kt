@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -10,6 +11,8 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
+import kotlinx.io.files.Path
+import love.yinlin.extension.mutableRefStateOf
 import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
@@ -29,14 +32,14 @@ class ActualMusicFactory : MusicFactory() {
     private var currentIndex = -1
 
     override val isInit: Boolean get() = mediaPlayer != null
-    override var error: Throwable? by mutableStateOf(null)
+    override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
-    override var musicList: List<MusicInfo> by mutableStateOf(emptyList())
+    override var musicList: List<MusicInfo> by mutableRefStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
     override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
-    override var currentMusic: MusicInfo? by mutableStateOf(null)
+    override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     enum class AudioSessionInterruption {
         Began, Ended, Failed;
@@ -338,4 +341,19 @@ class ActualMusicFactory : MusicFactory() {
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = mediaPlayer?.rate
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
+}
+
+@Stable
+actual class MusicPlayer {
+    // TODO: iOS端待实现
+    actual val isInit: Boolean = false
+    actual val isPlaying: Boolean = false
+    actual var position: Long = 0L
+    actual val duration: Long = 0L
+    actual suspend fun init() {}
+    actual suspend fun load(path: Path) {}
+    actual fun play() {}
+    actual fun pause() {}
+    actual fun stop() {}
+    actual fun release() {}
 }

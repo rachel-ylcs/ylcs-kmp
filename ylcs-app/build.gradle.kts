@@ -1,8 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -13,47 +13,21 @@ plugins {
     alias(libs.plugins.androidApplication)
 }
 
-val appName: String by rootProject.extra
-val appVersionName: String by rootProject.extra
-
-enum class GradlePlatform {
-    Windows, Linux, Mac;
-
-    override fun toString(): String = when (this) {
-        Windows -> "win"
-        Linux -> "linux"
-        Mac -> "mac"
-    }
-}
-
-val desktopPlatform = System.getProperty("os.name").let { when {
-    it.lowercase().startsWith("windows") -> GradlePlatform.Windows
-    it.lowercase().startsWith("mac") -> GradlePlatform.Mac
-    else -> GradlePlatform.Linux
-} }
-
-val desktopArchitecture = System.getProperty("os.arch").let { when {
-    it.lowercase().startsWith("aarch64") -> "aarch64"
-    it.lowercase().startsWith("arm") -> "arm"
-    it.lowercase().startsWith("amd64") -> "x86_64"
-    else -> it
-} }!!
-
 kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xexpect-actual-classes")
-    }
+    C.useCompilerFeatures(this)
 
     androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+        C.jvmTarget(this)
     }
 
     buildList {
         add(iosArm64())
-        if (desktopPlatform == GradlePlatform.Mac) {
-            add(if (desktopArchitecture == "aarch64") iosSimulatorArm64() else iosX64())
+        if (C.platform == BuildPlatform.Mac) {
+            when (C.architecture) {
+                BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
+                BuildArchitecture.X86_64 -> add(iosX64())
+                else -> {}
+            }
         }
     }.forEach {
         it.compilations.getByName("main") {
@@ -62,65 +36,59 @@ kotlin {
     }
 
     cocoapods {
-        name = rootProject.extra["appProjectName"] as String
-        version = appVersionName
-        summary = "银临茶舍 KMP Framework"
-        homepage = "https://github.com/rachel-ylcs/ylcs-kmp"
-        ios.deploymentTarget = "16.0"
+        name = C.app.projectName
+        version = C.app.versionName
+        summary = C.app.description
+        homepage = C.app.homepage
+        ios.deploymentTarget = C.ios.target
 
         framework {
-            baseName = rootProject.extra["appProjectName"] as String
+            baseName = C.app.projectName
             isStatic = true
         }
 
         pod("YLCSCore") {
             moduleName = "YLCSCore"
             extraOpts += listOf("-compiler-option", "-fmodules")
-            source = path(project.file("../iosApp/core"))
+            source = path(C.root.iosApp.core.asFile)
         }
         pod("MMKV") {
             version = libs.versions.mmkv.get()
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
         pod("MobileVLCKit") {
-            version = "3.6.1b1"
+            version = libs.versions.vlcKit.get()
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
         pod("SGQRCode") {
-            version = "4.1.0"
+            version = libs.versions.sgQrcode.get()
             extraOpts += listOf("-compiler-option", "-fmodules")
         }
-        podfile = project.file("../iosApp/Podfile")
+        podfile = C.root.iosApp.podfile.asFile
 
         xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
         xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
     }
 
     jvm("desktop") {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
+        C.jvmTarget(this)
     }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        compilerOptions {
-            sourceMap = false
-        }
         browser {
-            val webUseProxy: Boolean by rootProject.extra
             commonWebpackConfig {
-                outputFileName = "${rootProject.extra["appProjectName"]}.js"
+                outputFileName = "${C.app.projectName}.js"
                 cssSupport {
                     enabled = true
                 }
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    port = rootProject.extra["webServerPort"] as Int
+                    port = C.host.webServerPort
                     client?.overlay = false
-                    if (webUseProxy) {
+                    if (C.host.webUseProxy) {
                         proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
                             context = mutableListOf("/public", "/user", "/test"),
-                            target = rootProject.extra["apiBaseUrl"] as String,
+                            target = C.host.apiUrl,
                             secure = false
                         ))
                     }
@@ -132,175 +100,144 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            dependencies {
-                implementation(projects.ylcsShared)
-                implementation(projects.ylcsMusic)
-
-                implementation(libs.compose.runtime)
-                implementation(libs.compose.foundation)
-                implementation(libs.compose.material3)
-                implementation(libs.compose.material3.icons)
-                implementation(libs.compose.material3.iconsExtended)
-                implementation(libs.compose.ui)
-                implementation(libs.compose.ui.backhandler)
-                implementation(libs.compose.components.uiToolingPreview)
-                implementation(libs.compose.components.resources)
-
-                implementation(libs.kotlinx.coroutines)
-                implementation(libs.kotlinx.datetime)
-                implementation(libs.kotlinx.io)
-                implementation(libs.kotlinx.json)
-
-                implementation(libs.runtime.shapes)
-                implementation(libs.runtime.navigation)
-                implementation(libs.runtime.savedstate)
-                implementation(libs.runtime.viewmodel)
-                implementation(libs.runtime.lifecycle)
-
-                implementation(libs.ktor.client)
-                implementation(libs.ktor.client.negotiation)
-                implementation(libs.ktor.client.websockets)
-                implementation(libs.ktor.json)
-
-                implementation(libs.sketch)
-                implementation(libs.sketch.http)
-                implementation(libs.sketch.resources)
-                implementation(libs.sketch.gif)
-                implementation(libs.sketch.webp)
-                implementation(libs.sketch.extensions.compose)
-                implementation(libs.sketch.zoom)
-
-                implementation(libs.lottie)
-                implementation(libs.lottie.network)
-
-                implementation(libs.tool.html)
-                implementation(libs.tool.blur)
-                implementation(libs.tool.reorder)
-                implementation(libs.tool.qrcode)
-            }
+            useLib(
+                // project
+                projects.ylcsShared,
+                projects.ylcsMusic,
+                // compose
+                libs.compose.runtime, libs.compose.foundation,
+                libs.compose.material3, libs.compose.material3.icons,
+                libs.compose.material3.iconsExtended,
+                libs.compose.ui, libs.compose.ui.backhandler,
+                libs.compose.components.resources,
+                libs.compose.components.uiToolingPreview,
+                // kotlinx
+                libs.kotlinx.coroutines, libs.kotlinx.datetime,
+                libs.kotlinx.io, libs.kotlinx.json,
+                // runtime
+                libs.runtime.shapes, libs.runtime.navigation,
+                libs.runtime.savedstate, libs.runtime.viewmodel,
+                libs.runtime.lifecycle,
+                // ktor
+                libs.ktor.client, libs.ktor.client.negotiation,
+                libs.ktor.client.websockets, libs.ktor.json,
+                // sketch
+                libs.sketch, libs.sketch.http,
+                libs.sketch.resources,
+                libs.sketch.gif, libs.sketch.webp,
+                libs.sketch.extensions.compose, libs.sketch.zoom,
+                // lottie
+                libs.lottie, libs.lottie.network,
+                // tool
+                libs.tool.html, libs.tool.blur,
+                libs.tool.reorder, libs.tool.qrcode
+            )
         }
 
         val nonAndroidMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-
-            }
+            useSourceSet(commonMain)
         }
 
         val nonWasmJsMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-
-            }
+            useSourceSet(commonMain)
         }
 
         val nonDesktopMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-
-            }
+            useSourceSet(commonMain)
         }
 
         val appleMain = appleMain.get().apply {
-            dependsOn(nonAndroidMain)
-            dependsOn(nonWasmJsMain)
-            dependencies {
-
-            }
+            useSourceSet(nonAndroidMain, nonWasmJsMain)
         }
 
         val jvmMain by creating {
-            dependsOn(nonWasmJsMain)
-            dependencies {
-                implementation(libs.ktor.okhttp)
-
-                implementation(fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar"))))
-            }
+            useSourceSet(nonWasmJsMain)
+            useLib(
+                // ktor
+                libs.ktor.okhttp,
+                // local
+                fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar")))
+            )
         }
 
-        androidMain.get().apply {
-            dependsOn(jvmMain)
-            dependsOn(nonDesktopMain)
-            dependencies {
-                implementation(compose.preview)
-                implementation(libs.kotlinx.coroutines.android)
-                implementation(libs.compose.activity)
-
-                implementation(libs.media3.ui)
-                implementation(libs.media3.session)
-                implementation(libs.media3.player)
-
-                implementation(libs.mmkv.android)
-                implementation(libs.scan.android)
-                implementation(libs.scan.camera.android)
-
-                implementation(fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar"))))
-            }
+        androidMain.configure {
+            useSourceSet(jvmMain, nonDesktopMain)
+            useLib(
+                // compose
+                compose.preview,
+                libs.compose.activity,
+                // kotlinx
+                libs.kotlinx.coroutines.android,
+                // media3
+                libs.media3.ui, libs.media3.session, libs.media3.player,
+                // mmkv
+                libs.mmkv.android,
+                // scan
+                libs.scan.android, libs.scan.camera.android,
+                // local
+                fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar")))
+            )
         }
 
         val desktopMain by getting {
-            dependsOn(nonAndroidMain)
-            dependsOn(jvmMain)
-            dependencies {
-                implementation(compose.desktop.currentOs)
-                implementation(libs.kotlinx.coroutines.swing)
-                implementation(libs.vlcj)
-
-                implementation(fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar"))))
-            }
+            useSourceSet(nonAndroidMain, jvmMain)
+            useLib(
+                // compose
+                compose.desktop.currentOs,
+                // kotlinx
+                libs.kotlinx.coroutines.swing,
+                // vlcj
+                libs.vlcj,
+                // local
+                fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
+            )
         }
 
         val iosMain = iosMain.get().apply {
-            dependsOn(appleMain)
-            dependsOn(nonDesktopMain)
-            dependencies {
-                implementation(libs.ktor.apple)
-            }
+            useSourceSet(appleMain, nonDesktopMain)
+            useLib(
+                // ktor
+                libs.ktor.apple
+            )
         }
 
         buildList {
             add(iosArm64Main)
-            if (desktopPlatform == GradlePlatform.Mac) {
-                add(if (desktopArchitecture == "aarch64") iosSimulatorArm64Main else iosX64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
             }
         }.forEach {
-            it.get().apply {
-                dependsOn(iosMain)
-                dependencies {
-
-                }
+            it.configure {
+                useSourceSet(iosMain)
             }
         }
 
-        wasmJsMain.get().apply {
-            dependsOn(nonAndroidMain)
-            dependsOn(nonDesktopMain)
-            dependencies {
-                implementation(libs.ktor.js)
-            }
+        wasmJsMain.configure {
+            useSourceSet(nonAndroidMain, nonDesktopMain)
+            useLib(
+                // ktor
+                libs.ktor.js
+            )
         }
     }
 }
 
 configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            if (requested.group == "net.java.dev.jna" && requested.name == "jna-jpms") useTarget(libs.jna)
-            else if (requested.group == "net.java.dev.jna" && requested.name == "jna-platform-jpms") useTarget(libs.jna.platform)
-        }
-        force(libs.jna)
-        force(libs.jna.platform)
-    }
+    forceVersion(libs.jna.core, libs.jna.platform)
 }
 
 composeCompiler {
-    stabilityConfigurationFiles.add(rootProject.extra["composeStabilityFile"] as RegularFile)
-    reportsDestination = layout.buildDirectory.dir("composeCompiler")
-    metricsDestination = layout.buildDirectory.dir("composeCompiler")
+    stabilityConfigurationFiles.add(C.root.config.stability)
+    reportsDestination = C.root.app.composeCompilerReport
+    metricsDestination = C.root.app.composeCompilerReport
 }
 
 compose.resources {
-    packageOfResClass = "${rootProject.extra["appPackageName"] as String}.resources"
+    packageOfResClass = "${C.app.packageName}.resources"
 }
 
 dependencies {
@@ -310,38 +247,44 @@ dependencies {
 }
 
 android {
-    namespace = rootProject.extra["appPackageName"] as String
-    compileSdk = rootProject.extra["androidBuildSDK"] as Int
+    namespace = C.app.packageName
+    compileSdk = C.android.compileSdk
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = C.jvm.compatibility
+        targetCompatibility = C.jvm.compatibility
     }
 
     defaultConfig {
-        applicationId = rootProject.extra["appPackageName"] as String
-        minSdk = rootProject.extra["androidMinSDK"] as Int
-        targetSdk = rootProject.extra["androidBuildSDK"] as Int
-        versionCode = rootProject.extra["appVersion"] as Int
-        versionName = appVersionName
+        applicationId = C.app.packageName
+        minSdk = C.android.minSdk
+        targetSdk = C.android.targetSdk
+        versionCode = C.app.version
+        versionName = C.app.versionName
 
         ndk {
-            for (abi in rootProject.extra["androidNDKABI"] as Array<*>) {
-                abiFilters += abi.toString()
-            }
+            for (abi in C.android.ndkAbi) abiFilters += abi
         }
     }
 
-    val androidKeyName: String by rootProject.extra
-    val androidKeyPassword: String by rootProject.extra
-
-    signingConfigs {
-        register(androidKeyName) {
-            keyAlias = androidKeyName
-            keyPassword = androidKeyPassword
-            storeFile = (rootProject.extra["androidKeyFile"] as RegularFile).asFile
-            storePassword = androidKeyPassword
+    val androidSigningConfig = try {
+        val localProperties = Properties().also { p ->
+            C.root.localProperties.asFile.inputStream().use { p.load(it) }
         }
+        val androidKeyName = localProperties.getProperty("androidKeyName")
+        val androidKeyPassword = localProperties.getProperty("androidKeyPassword")
+        signingConfigs {
+            register(androidKeyName) {
+                keyAlias = androidKeyName
+                keyPassword = androidKeyPassword
+                storeFile = C.root.config.androidKey.asFile
+                storePassword = androidKeyPassword
+            }
+        }
+        signingConfigs.getByName(androidKeyName)
+    } catch (e: Throwable) {
+        println("Can't load android signing config, error: ${e.message}")
+        null
     }
 
     buildTypes {
@@ -349,7 +292,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             isDebuggable = true
-            signingConfig = signingConfigs.getByName(androidKeyName)
+            signingConfig = androidSigningConfig
         }
 
         release {
@@ -357,20 +300,16 @@ android {
             isShrinkResources = true
             isDebuggable = false
             proguardFiles(
-                getDefaultProguardFile(rootProject.extra["r8OptimizeFilename"] as String),
-                rootProject.extra["commonR8File"]!!,
-                rootProject.extra["androidR8File"]!!
+                getDefaultProguardFile(C.proguard.defaultRule),
+                C.root.app.commonR8Rule, C.root.app.androidR8Rule
             )
-            signingConfig = signingConfigs.getByName(androidKeyName)
+            signingConfig = androidSigningConfig
         }
     }
 
     packaging {
         resources {
-            excludes += arrayOf(
-                "/META-INF/{AL2.0,LGPL2.1}",
-                "DebugProbesKt.bin"
-            )
+            excludes += C.excludes
         }
 
         dex {
@@ -385,61 +324,49 @@ android {
 
 compose.desktop {
     application {
-        mainClass = rootProject.extra["appMainClass"] as String
+        mainClass = C.app.mainClass
 
-        // 为调试运行提供工作目录与库目录, 但发布打包时不需要
-        val taskName = project.gradle.startParameter.taskNames.firstOrNull() ?: ""
-        if (taskName.contains("desktopRun")) {
-            val desktopCurrentDir: Directory by rootProject.extra
-            desktopCurrentDir.asFile.mkdir()
-            jvmArgs += "-Duser.dir=${desktopCurrentDir}"
-            jvmArgs += "-Djava.library.path=${rootProject.extra["nativeLibsDir"]}"
+        if ("desktopRun" in currentTaskName) {
+            val desktopWorkSpace = C.root.app.desktopWorkSpace.asFile
+            desktopWorkSpace.mkdir()
+            jvmArgs += "-Duser.dir=$desktopWorkSpace"
+            jvmArgs += "-Djava.library.path=${C.root.native.libs}"
         }
 
         buildTypes.release.proguard {
-            version = "7.7.0"
+            version = C.proguard.version
             isEnabled = true
             optimize = true
             obfuscate = true
-            configurationFiles.from(
-                rootProject.extra["commonR8File"],
-                rootProject.extra["desktopR8File"]
-            )
+            configurationFiles.from(C.root.app.commonR8Rule, C.root.app.desktopR8Rule)
         }
 
         nativeDistributions {
-            packageName = appName
-            packageVersion = appVersionName
-            description = "银临茶舍KMP跨平台APP"
-            copyright = "© 2024-2025 银临茶舍 版权所有"
-            vendor = "银临茶舍"
-            licenseFile.set(rootProject.file("LICENSE"))
+            packageName = C.app.name
+            packageVersion = C.app.versionName
+            description = C.app.description
+            copyright = C.app.copyright
+            vendor = C.app.vendor
+            licenseFile.set(C.root.license)
 
             targetFormats(TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Pkg)
 
-            modules(
-                "java.instrument",
-                "java.net.http",
-                "java.management",
-                "jdk.unsupported",
-            )
-
-            val dirConfig: Directory by rootProject.extra
+            modules(*C.desktop.modules)
 
             windows {
                 console = false
-                exePackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.ico"))
+                exePackageVersion = C.app.versionName
+                iconFile.set(C.root.config.icon)
             }
 
             linux {
-                debPackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.png"))
+                debPackageVersion = C.app.versionName
+                iconFile.set(C.root.config.icon)
             }
 
             macOS {
-                pkgPackageVersion = appVersionName
-                iconFile.set(dirConfig.file("icon.icns"))
+                pkgPackageVersion = C.app.versionName
+                iconFile.set(C.root.config.icon)
             }
         }
     }
@@ -454,9 +381,9 @@ afterEvaluate {
         mustRunAfter(assembleRelease)
         doLast {
             copy {
-                from(rootProject.extra["androidOriginOutputPath"])
-                into(rootProject.extra["androidOutputDir"]!!)
-                rename { _ -> rootProject.extra["androidOutputFileName"] as String }
+                from(C.root.app.androidOriginOutput)
+                into(C.root.outputs)
+                rename { _ -> C.android.outputName }
             }
         }
     }
@@ -469,13 +396,13 @@ afterEvaluate {
 
     // 生成苹果版本号配置
     val appleGenVersionConfig by tasks.registering {
-        val configFile = file(project.rootDir.toString() + "/iosApp/Configuration/Version.xcconfig")
-        outputs.file(configFile)
         val content = """
-            BUNDLE_VERSION=${rootProject.extra["appVersion"]}
-            BUNDLE_SHORT_VERSION_STRING=${appVersionName}
+            BUNDLE_VERSION=${C.app.version}
+            BUNDLE_SHORT_VERSION_STRING=${C.app.versionName}
         """.trimIndent()
 
+        val configFile = C.root.iosApp.configurationFile.asFile
+        outputs.file(configFile)
         outputs.upToDateWhen {
             configFile.takeIf { it.exists() }?.readText() == content
         }
@@ -508,8 +435,8 @@ afterEvaluate {
         mustRunAfter(createReleaseDistributable)
         doLast {
             copy {
-                from(rootProject.extra["desktopOriginOutputPath"])
-                into(rootProject.extra["dirOutput"]!!)
+                from(C.root.app.desktopOriginOutput)
+                into(C.root.outputs)
             }
         }
     }
@@ -518,16 +445,8 @@ afterEvaluate {
         mustRunAfter(desktopCopyDir)
         doLast {
             copy {
-                val dirOutput: Directory by rootProject.extra
-                val outputAppLibDir = dirOutput.let {
-                    when (desktopPlatform) {
-                        GradlePlatform.Windows -> it.dir("$appName/app")
-                        GradlePlatform.Linux -> it.dir("$appName/lib/app")
-                        GradlePlatform.Mac -> it.dir("$appName.app/Contents/app")
-                    }
-                }
-                from(rootProject.extra["nativeLibsDir"])
-                into(outputAppLibDir)
+                from(C.root.native.libs)
+                into(C.root.app.desktopLibOutput)
             }
         }
     }
@@ -536,17 +455,8 @@ afterEvaluate {
         mustRunAfter(desktopCopyLibs)
         doLast {
             copy {
-                val srcPath = rootProject.extra["dirPackages"] as Directory
-                val dirOutput: Directory by rootProject.extra
-                val outputAppDir = dirOutput.let {
-                    when (desktopPlatform) {
-                        GradlePlatform.Windows -> it.dir(appName)
-                        GradlePlatform.Linux -> it.dir("$appName/bin")
-                        GradlePlatform.Mac -> it.dir("$appName.app/Contents/MacOS")
-                    }
-                }
-                from(srcPath.dir("$desktopPlatform-$desktopArchitecture"))
-                into(outputAppDir)
+                from(C.root.config.currentPackages)
+                into(C.root.app.desktopPackagesOutput)
             }
         }
     }
@@ -566,8 +476,8 @@ afterEvaluate {
         mustRunAfter(wasmJsBrowserDistribution)
         doLast {
             copy {
-                from(rootProject.extra["webOriginOutputPath"])
-                into(rootProject.extra["webOutputDir"]!!)
+                from(C.root.app.webOriginOutput)
+                into(C.root.app.webOutput)
             }
         }
     }

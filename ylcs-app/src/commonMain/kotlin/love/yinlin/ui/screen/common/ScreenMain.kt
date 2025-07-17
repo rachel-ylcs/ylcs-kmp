@@ -19,7 +19,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.*
+import love.yinlin.common.Device
+import love.yinlin.common.LocalDevice
+import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.common.ThemeValue
+import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
@@ -216,10 +220,10 @@ class ScreenMain(model: AppModel) : Screen<Unit>(model) {
 	override fun Content() {
 		val immersivePadding = rememberImmersivePadding()
 		CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
-			when (LocalDevice.current.type) {
-				Device.Type.PORTRAIT -> Portrait()
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
-			}
+            when (LocalDevice.current.type) {
+                Device.Type.PORTRAIT -> Portrait()
+                Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+            }
 		}
 	}
 

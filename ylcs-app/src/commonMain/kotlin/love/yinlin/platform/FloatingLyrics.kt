@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors

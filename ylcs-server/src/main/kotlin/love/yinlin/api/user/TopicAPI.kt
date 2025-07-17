@@ -8,7 +8,7 @@ import love.yinlin.api.ImplMap
 import love.yinlin.api.NineGridProcessor
 import love.yinlin.api.ServerRes
 import love.yinlin.api.api
-import love.yinlin.api.failedData
+import love.yinlin.api.failureData
 import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
@@ -190,7 +190,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
 		if (!UserPrivilege.topic(privilege) ||
 			(section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
-			return@api "无权限".failedData
+			return@api "无权限".failureData
 		val tid = DB.throwInsertSQLGeneratedKey("""
             INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
         """, uid, title, content, ngp.jsonString, section, section).toInt()
@@ -207,7 +207,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		if (DB.updateSQL("""
 			UPDATE topic SET isTop = ? WHERE uid = ? AND tid = ? AND isDeleted = 0
 		""", isTop, uid, tid)) "${if (isTop) "" else "取消"}置顶成功".successData
-		else "无权限".failedData
+		else "无权限".failureData
 	}
 
 	api(API.User.Topic.DeleteTopic) { (token, tid) ->
@@ -218,7 +218,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
             SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
 			SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, uid) == null) return@api "无权限".failedData
+        """, uid, tid, uid) == null) return@api "无权限".failureData
 		// 逻辑删除
 		DB.throwExecuteSQL("UPDATE topic SET isDeleted = 1 WHERE tid = ? AND isDeleted = 0", tid)
 		"删除成功".successData
@@ -230,7 +230,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		val uid = AN.throwExpireToken(token)
 		// 权限：超管
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.vipTopic(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.vipTopic(user["privilege"].Int)) return@api "无权限".failureData
 		// 移动主题
 		DB.throwExecuteSQL("UPDATE topic SET section = ? WHERE tid = ? AND isDeleted = 0", section, tid)
 		"移动成功".successData
@@ -240,10 +240,10 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		VN.throwId(uid, tid)
 		VN.throwIf(value <= 0, value > UserConstraint.MIN_COIN_REWARD)
 		val srcUid = AN.throwExpireToken(token)
-		if (srcUid == uid) return@api "不能给自己投币哦".failedData
+		if (srcUid == uid) return@api "不能给自己投币哦".failureData
 		val user = DB.throwGetUser(srcUid, "coin, privilege")
-		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failedData
-		if ((user["coin"].Int) < value) return@api "你的银币不够哦".failedData
+		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failureData
+		if ((user["coin"].Int) < value) return@api "你的银币不够哦".failureData
 		DB.throwTransaction {
 			// 更新主题投币数
 			it.throwExecuteSQL("""
@@ -270,7 +270,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		val tableName = VN.throwSection(rawSection)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failureData
 		val cid = DB.throwTransaction {
 			it.throwExecuteSQL("""
 				UPDATE topic SET commentNum = commentNum + 1 WHERE tid = ? AND isDeleted = 0
@@ -288,7 +288,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		val tableName = VN.throwSection(rawSection)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
-		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failedData
+		if (!UserPrivilege.topic(user["privilege"].Int)) return@api "无权限".failureData
 		val cid = DB.throwTransaction {
 			it.throwExecuteSQL("""
 				UPDATE $tableName SET subCommentNum = subCommentNum + 1 WHERE cid = ? AND isDeleted = 0
@@ -309,7 +309,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, uid) == null) return@api "无权限".failedData
+        """, uid, tid, uid) == null) return@api "无权限".failureData
 		DB.throwExecuteSQL("UPDATE $tableName SET isTop = ? WHERE cid = ? AND isDeleted = 0", isTop, cid)
 		"${if (isTop) "" else "取消"}置顶成功".successData
 	}
@@ -325,7 +325,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, cid, uid, tid, uid) == null) return@api "无权限".failedData
+        """, uid, tid, cid, uid, tid, uid) == null) return@api "无权限".failureData
 		DB.throwTransaction {
 			// 逻辑删除
 			it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE cid = ? AND isDeleted = 0", cid)
@@ -346,7 +346,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, pid, cid, uid, tid, uid) == null) return@api "无权限".failedData
+        """, uid, tid, pid, cid, uid, tid, uid) == null) return@api "无权限".failureData
 		DB.throwTransaction {
 			// 逻辑删除
 			it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE pid = ? AND cid = ? AND isDeleted = 0", pid, cid)

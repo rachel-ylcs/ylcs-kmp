@@ -89,7 +89,7 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
         )
         when (result) {
             is Data.Success -> page.items.removeAll { it.gid == gid }
-            is Data.Error -> slot.tip.error(result.message)
+            is Data.Failure -> slot.tip.error(result.message)
         }
     }
 

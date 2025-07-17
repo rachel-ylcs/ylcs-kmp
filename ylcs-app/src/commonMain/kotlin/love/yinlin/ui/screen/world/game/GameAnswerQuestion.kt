@@ -35,6 +35,7 @@ import love.yinlin.data.rachel.game.info.AQQuestion
 import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.data.rachel.game.info.AQUserAnswer
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberValueState
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -634,8 +635,8 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
 
     override val config = AQConfig
 
-    private var preflight: Preflight? by mutableStateOf(null)
-    private var result: AQResult? by mutableStateOf(null)
+    private var preflight: Preflight? by mutableRefStateOf(null)
+    private var result: AQResult? by mutableRefStateOf(null)
 
     private val answers = mutableStateListOf<AQUserAnswer>()
     private var currentIndex by mutableIntStateOf(0)

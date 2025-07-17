@@ -31,29 +31,28 @@ import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import io.ktor.utils.io.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readString
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.ThemeValue
-import love.yinlin.data.Data
+import love.yinlin.common.*
+import love.yinlin.data.Data.Failure
+import love.yinlin.data.Data.Success
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
-import love.yinlin.resources.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.img_music_record
+import love.yinlin.resources.no_audio_source
+import love.yinlin.resources.unknown_singer
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LocalFileImage
 import love.yinlin.ui.component.input.ProgressSlider
@@ -113,7 +112,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private var hasVideo by mutableStateOf(false)
 	private var lyrics = LyricsLrc()
 
-	private var sleepJob: Job? by mutableStateOf(null)
+	private var sleepJob: Job? by mutableRefStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
 	private fun openMusicComment() {
@@ -124,8 +123,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					data = musicInfo.id
 				)
 				when (result) {
-					is Data.Success -> navigate(ScreenSongDetails.Args(song = result.data))
-					is Data.Error -> slot.tip.error(result.message)
+					is Success -> navigate(ScreenSongDetails.Args(song = result.data))
+					is Failure -> slot.tip.error(result.message)
 				}
 			}
 		}
@@ -206,7 +205,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		musicInfo: MusicInfo,
 		modifier: Modifier = Modifier
 	) {
-		var animationRecord by rememberState { Animatable(0f) }
+		var animationRecord by rememberRefState { Animatable(0f) }
 		var lastDegree by rememberValueState(0f)
 		val isForeground = rememberOffScreenState()
 
@@ -773,7 +772,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			if (musicInfo != null) catching {
 				Coroutines.io {
 					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-						lyrics.parseLrcString(source.readText())
+						lyrics.parseLrcString(source.readString())
 					}
 					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
 					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true

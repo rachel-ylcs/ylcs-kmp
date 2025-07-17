@@ -23,11 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.alexzhirkevich.compottie.Compottie
-import io.github.alexzhirkevich.compottie.LottieCompositionSpec
-import io.github.alexzhirkevich.compottie.Url
-import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import io.github.alexzhirkevich.compottie.rememberLottiePainter
+import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
 import love.yinlin.data.rachel.emoji.EmojiType
@@ -141,13 +137,13 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override val width: Float get() = when (emoji?.type) {
 			null -> 1f
-			EmojiType.Lottie -> 1.25f
+            EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 
 		override val height: Float get() = when (emoji?.type) {
 			null -> 1f
-			EmojiType.Lottie -> 1.25f
+            EmojiType.Lottie -> 1.25f
 			else -> 3f
 		}
 

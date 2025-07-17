@@ -1,6 +1,5 @@
 package love.yinlin.ui.screen.community
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -27,15 +26,16 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.app
 import love.yinlin.platform.platform
-import love.yinlin.ui.component.screen.*
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
+import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.PrimaryLoadingButton
+import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.text.InputType
+import love.yinlin.ui.component.text.TextInput
+import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
@@ -49,7 +49,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 
 	private var inviters by mutableStateOf(emptyList<String>())
 
-	private var mode by mutableStateOf(Mode.Login)
+	private var mode: Mode by mutableStateOf(Mode.Login)
 	private val loginId = TextInputState()
 	private val loginPwd = TextInputState()
 	private val registerId = TextInputState()
@@ -85,7 +85,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				app.config.userToken = token
 				pop()
 			}
-			is Data.Error -> slot.tip.error(result1.message)
+			is Data.Failure -> slot.tip.error(result1.message)
 		}
 	}
 
@@ -121,7 +121,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				loginPwd.text = ""
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -146,7 +146,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				loginPwd.text = ""
 				slot.tip.success(result.message)
 			}
-			is Data.Error -> slot.tip.error(result.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 
@@ -336,10 +336,10 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 
 	@Composable
 	private fun ContentBox(modifier: Modifier = Modifier) {
-		AnimatedContent(
-			targetState = mode,
-			modifier = modifier
-		) { animatedMode ->
+        AnimationLayout(
+            state = mode,
+            modifier = modifier
+        ) { animatedMode ->
 			when (animatedMode) {
 				Mode.Login -> ContentLogin(modifier = Modifier.fillMaxSize())
 				Mode.Register -> ContentRegister(modifier = Modifier.fillMaxSize())
@@ -408,8 +408,8 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 	}
 
 	@Composable
-	override fun SubContent(device: Device) = when (device.type) {
-		Device.Type.PORTRAIT -> Portrait()
-		Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
-	}
+    override fun SubContent(device: Device) = when (device.type) {
+        Device.Type.PORTRAIT -> Portrait()
+        Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
+    }
 }

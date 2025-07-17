@@ -37,8 +37,8 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
 import love.yinlin.data.Data
-import love.yinlin.data.Failed
 import love.yinlin.data.ItemKey
+import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.*
@@ -69,517 +69,517 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @Composable
 private fun LevelItem(
-	index: Int,
-	item: Pair<Int, Int>,
-	modifier: Modifier = Modifier
+    index: Int,
+    item: Pair<Int, Int>,
+    modifier: Modifier = Modifier
 ) {
-	val level = index + 1
-	Row(
-		modifier = modifier,
-		horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Text(level.toString())
-		Box(
-			modifier = Modifier.weight(1f),
-			contentAlignment = Alignment.Center
-		) {
-			RachelText(
-				text = remember(item) {
-					if (item.second != Int.MAX_VALUE) "${item.first} ~ ${item.second}"
-					else "> ${item.first}"
-				},
-				icon = Icons.Outlined.Explicit
-			)
-		}
-		Box(
-			modifier = Modifier.offset(y = -ThemeValue.Padding.LittleSpace),
-			contentAlignment = Alignment.Center
-		) {
-			UserLabel(
-				label = "",
-				level = level
-			)
-		}
-	}
+    val level = index + 1
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(level.toString())
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            RachelText(
+                text = remember(item) {
+                    if (item.second != Int.MAX_VALUE) "${item.first} ~ ${item.second}"
+                    else "> ${item.first}"
+                },
+                icon = Icons.Outlined.Explicit
+            )
+        }
+        Box(
+            modifier = Modifier.offset(y = -ThemeValue.Padding.LittleSpace),
+            contentAlignment = Alignment.Center
+        ) {
+            UserLabel(
+                label = "",
+                level = level
+            )
+        }
+    }
 }
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-	@OptIn(ExperimentalAtomicApi::class)
+    @OptIn(ExperimentalAtomicApi::class)
     private val isUpdateToken = AtomicBoolean(false)
 
-	fun cleanUserToken() {
-		app.config.userShortToken = 0L
-		app.config.userToken = ""
-		app.config.userProfile = null
-		app.config.cacheUserAvatar = KVConfig.UPDATE
-		app.config.cacheUserWall = KVConfig.UPDATE
-	}
+    fun cleanUserToken() {
+        app.config.userShortToken = 0L
+        app.config.userToken = ""
+        app.config.userProfile = null
+        app.config.cacheUserAvatar = KVConfig.UPDATE
+        app.config.cacheUserWall = KVConfig.UPDATE
+    }
 
-	@OptIn(ExperimentalAtomicApi::class)
-	suspend fun updateUserToken() {
-		val token = app.config.userToken
-		val currentTime = DateEx.CurrentLong
-		val duration = currentTime - app.config.userShortToken
-		if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
-			isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
-			val result = ClientAPI.request(
-				route = API.User.Account.UpdateToken,
-				data = token
-			)
-			isUpdateToken.store(false)
-			when (result) {
-				is Data.Success -> {
-					app.config.userShortToken = currentTime
-					app.config.userToken = result.data
-				}
-				is Data.Error if result.type == Failed.RequestError.Unauthorized -> {
-					cleanUserToken()
-					navigate<ScreenLogin>()
-				}
-				else -> {}
-			}
-		}
-	}
+    @OptIn(ExperimentalAtomicApi::class)
+    suspend fun updateUserToken() {
+        val token = app.config.userToken
+        val currentTime = DateEx.CurrentLong
+        val duration = currentTime - app.config.userShortToken
+        if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
+            isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
+            val result = ClientAPI.request(
+                route = API.User.Account.UpdateToken,
+                data = token
+            )
+            isUpdateToken.store(false)
+            when (result) {
+                is Data.Success -> {
+                    app.config.userShortToken = currentTime
+                    app.config.userToken = result.data
+                }
+                is Data.Failure if result.type == RequestError.Unauthorized -> {
+                    cleanUserToken()
+                    navigate<ScreenLogin>()
+                }
+                else -> {}
+            }
+        }
+    }
 
-	@OptIn(ExperimentalAtomicApi::class)
-	suspend fun updateUserProfile() {
-		val token = app.config.userToken
-		if (token.isNotEmpty() && !isUpdateToken.load()) {
-			val result = ClientAPI.request(
-				route = API.User.Profile.GetProfile,
-				data = token
-			)
-			if (result is Data.Success) app.config.userProfile = result.data
-		}
-	}
+    @OptIn(ExperimentalAtomicApi::class)
+    suspend fun updateUserProfile() {
+        val token = app.config.userToken
+        if (token.isNotEmpty() && !isUpdateToken.load()) {
+            val result = ClientAPI.request(
+                route = API.User.Profile.GetProfile,
+                data = token
+            )
+            if (result is Data.Success) app.config.userProfile = result.data
+        }
+    }
 
-	@Composable
-	private fun ToolContainer(
-		modifier: Modifier = Modifier,
-		shape: Shape = RectangleShape
-	) {
-		TipButtonContainer(
-			modifier = modifier,
-			shape = shape,
-			title = "功能栏"
-		) {
-			Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
-			Item("名片", Icons.Filled.AccountBox) {
-				app.config.userProfile?.let {
-					userCardSheet.open(it)
-				} ?: slot.tip.warning("请先登录")
-			}
-			Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
-		}
-	}
+    @Composable
+    private fun ToolContainer(
+        modifier: Modifier = Modifier,
+        shape: Shape = RectangleShape
+    ) {
+        TipButtonContainer(
+            modifier = modifier,
+            shape = shape,
+            title = "功能栏"
+        ) {
+            Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
+            Item("名片", Icons.Filled.AccountBox) {
+                app.config.userProfile?.let {
+                    userCardSheet.open(it)
+                } ?: slot.tip.warning("请先登录")
+            }
+            Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
+        }
+    }
 
-	@Composable
-	private fun UserSpaceContainer(
-		modifier: Modifier = Modifier,
-		shape: Shape = RectangleShape
-	) {
-		TipButtonContainer(
-			modifier = modifier,
-			shape = shape,
-			title = "个人空间"
-		) {
-			val notification = app.config.userProfile?.notification
+    @Composable
+    private fun UserSpaceContainer(
+        modifier: Modifier = Modifier,
+        shape: Shape = RectangleShape
+    ) {
+        TipButtonContainer(
+            modifier = modifier,
+            shape = shape,
+            title = "个人空间"
+        ) {
+            val notification = app.config.userProfile?.notification
 
-			Item(
-				text = "签到",
-				icon = Icons.Filled.EventAvailable,
-				label = if (notification?.isSignin == false) 1 else 0
-			) {
-				app.config.userProfile?.let {
-					signinSheet.open(it)
-				} ?: slot.tip.warning("请先登录")
-			}
-			Item("主题", Icons.AutoMirrored.Filled.Article) {
-				app.config.userProfile?.let {
-					navigate(ScreenUserCard.Args(it.uid))
-				} ?: slot.tip.warning("请先登录")
-			}
-			Item(
-				text = "邮箱",
-				icon = Icons.Filled.Mail,
-				label = notification?.mailCount ?: 0
-			) {
-				app.config.userProfile?.let {
-					navigate<ScreenMail>()
-				} ?: slot.tip.warning("请先登录")
-			}
-			Item("徽章", Icons.Filled.MilitaryTech) { }
-		}
-	}
+            Item(
+                text = "签到",
+                icon = Icons.Filled.EventAvailable,
+                label = if (notification?.isSignin == false) 1 else 0
+            ) {
+                app.config.userProfile?.let {
+                    signinSheet.open(it)
+                } ?: slot.tip.warning("请先登录")
+            }
+            Item("主题", Icons.AutoMirrored.Filled.Article) {
+                app.config.userProfile?.let {
+                    navigate(ScreenUserCard.Args(it.uid))
+                } ?: slot.tip.warning("请先登录")
+            }
+            Item(
+                text = "邮箱",
+                icon = Icons.Filled.Mail,
+                label = notification?.mailCount ?: 0
+            ) {
+                app.config.userProfile?.let {
+                    navigate<ScreenMail>()
+                } ?: slot.tip.warning("请先登录")
+            }
+            Item("徽章", Icons.Filled.MilitaryTech) { }
+        }
+    }
 
-	@Composable
-	private fun PromotionContainer(
-		modifier: Modifier = Modifier,
-		shape: Shape = RectangleShape
-	) {
-		TipButtonContainer(
-			modifier = modifier,
-			shape = shape,
-			title = "推广"
-		) {
-			Item("水群", ExtraIcons.QQ) {
-				launch {
-					OS.ifPlatform(*Platform.Phone,
-						ifTrue = { if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ") },
-						ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup("0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E", "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R")) }
-					)
-				}
-			}
-			Item("店铺", ExtraIcons.Taobao) {
-				launch {
-					if (!OS.Application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
-				}
-			}
-		}
-	}
+    @Composable
+    private fun PromotionContainer(
+        modifier: Modifier = Modifier,
+        shape: Shape = RectangleShape
+    ) {
+        TipButtonContainer(
+            modifier = modifier,
+            shape = shape,
+            title = "推广"
+        ) {
+            Item("水群", ExtraIcons.QQ) {
+                launch {
+                    OS.ifPlatform(*Platform.Phone,
+                        ifTrue = { if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ") },
+                        ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup("0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E", "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R")) }
+                    )
+                }
+            }
+            Item("店铺", ExtraIcons.Taobao) {
+                launch {
+                    if (!OS.Application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                }
+            }
+        }
+    }
 
-	@Composable
-	private fun AdminContainer(
-		modifier: Modifier = Modifier,
-		shape: Shape = RectangleShape
-	) {
-		TipButtonContainer(
-			modifier = modifier,
-			shape = shape,
-			title = "超管空间"
-		) {
-			Item("活动", Icons.Filled.Link) {
-				navigate<ScreenActivityLink>()
-			}
-			Item("测试", Icons.Filled.BugReport) {
-				navigate<ScreenTest>()
-			}
-		}
-	}
+    @Composable
+    private fun AdminContainer(
+        modifier: Modifier = Modifier,
+        shape: Shape = RectangleShape
+    ) {
+        TipButtonContainer(
+            modifier = modifier,
+            shape = shape,
+            title = "超管空间"
+        ) {
+            Item("活动", Icons.Filled.Link) {
+                navigate<ScreenActivityLink>()
+            }
+            Item("测试", Icons.Filled.BugReport) {
+                navigate<ScreenTest>()
+            }
+        }
+    }
 
-	@Composable
-	private fun LoginBox(modifier: Modifier = Modifier) {
-		Column(modifier = modifier) {
-			Row(
-				modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
-				horizontalArrangement = Arrangement.End
-			) {
-				ActionScope.Right.Actions {
-					Action(Icons.Filled.Settings) {
-						navigate<ScreenSettings>()
-					}
-				}
-			}
-			Box(
-				modifier = Modifier.fillMaxWidth().weight(1f),
-				contentAlignment = Alignment.Center
-			) {
-				Column(
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-				) {
-					MiniIcon(
-						res = Res.drawable.img_not_login,
-						size = ThemeValue.Size.ExtraImage
-					)
-					RachelButton(
-						text = stringResource(Res.string.login),
-						onClick = { navigate<ScreenLogin>() }
-					)
-				}
-			}
-		}
-	}
+    @Composable
+    private fun LoginBox(modifier: Modifier = Modifier) {
+        Column(modifier = modifier) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+                horizontalArrangement = Arrangement.End
+            ) {
+                ActionScope.Right.Actions {
+                    Action(Icons.Filled.Settings) {
+                        navigate<ScreenSettings>()
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                ) {
+                    MiniIcon(
+                        res = Res.drawable.img_not_login,
+                        size = ThemeValue.Size.ExtraImage
+                    )
+                    RachelButton(
+                        text = stringResource(Res.string.login),
+                        onClick = { navigate<ScreenLogin>() }
+                    )
+                }
+            }
+        }
+    }
 
-	@Composable
-	private fun Portrait(userProfile: UserProfile) {
-		Column(
-			modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-		) {
-			UserProfileCard(
-				modifier = Modifier.fillMaxWidth(),
-				profile = userProfile,
-				onLevelClick = { levelSheet.open(userProfile) },
-				onFollowClick = { navigate(ScreenFollows.Args(it)) }
-			)
-			ToolContainer(modifier = Modifier.fillMaxWidth())
-			UserSpaceContainer(modifier = Modifier.fillMaxWidth())
-			PromotionContainer(modifier = Modifier.fillMaxWidth())
-			if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-				AdminContainer(modifier = Modifier.fillMaxWidth())
-			}
-			Space()
-		}
-	}
+    @Composable
+    private fun Portrait(userProfile: UserProfile) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        ) {
+            UserProfileCard(
+                modifier = Modifier.fillMaxWidth(),
+                profile = userProfile,
+                onLevelClick = { levelSheet.open(userProfile) },
+                onFollowClick = { navigate(ScreenFollows.Args(it)) }
+            )
+            ToolContainer(modifier = Modifier.fillMaxWidth())
+            UserSpaceContainer(modifier = Modifier.fillMaxWidth())
+            PromotionContainer(modifier = Modifier.fillMaxWidth())
+            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                AdminContainer(modifier = Modifier.fillMaxWidth())
+            }
+            Space()
+        }
+    }
 
-	@Composable
-	private fun Landscape(userProfile: UserProfile) {
-		Row(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
-			UserProfileCard(
-				profile = userProfile,
-				shape = MaterialTheme.shapes.large,
-				modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
-				onLevelClick = { levelSheet.open(userProfile) },
-				onFollowClick = { navigate(ScreenFollows.Args(it)) }
-			)
-			Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
-				ToolContainer(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
-					shape = MaterialTheme.shapes.large
-				)
-				UserSpaceContainer(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
-					shape = MaterialTheme.shapes.large
-				)
-				PromotionContainer(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
-					shape = MaterialTheme.shapes.large
-				)
-				if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-					AdminContainer(
-						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
-						shape = MaterialTheme.shapes.large
-					)
-				}
-				Space()
-			}
-		}
-	}
+    @Composable
+    private fun Landscape(userProfile: UserProfile) {
+        Row(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
+            UserProfileCard(
+                profile = userProfile,
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                onLevelClick = { levelSheet.open(userProfile) },
+                onFollowClick = { navigate(ScreenFollows.Args(it)) }
+            )
+            Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                ToolContainer(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    shape = MaterialTheme.shapes.large
+                )
+                UserSpaceContainer(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    shape = MaterialTheme.shapes.large
+                )
+                PromotionContainer(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    shape = MaterialTheme.shapes.large
+                )
+                if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                    AdminContainer(
+                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                        shape = MaterialTheme.shapes.large
+                    )
+                }
+                Space()
+            }
+        }
+    }
 
-	override suspend fun update() {
-		updateUserProfile()
-	}
+    override suspend fun update() {
+        updateUserProfile()
+    }
 
     @OptIn(ExperimentalAtomicApi::class)
     @Composable
-	override fun Content() {
-		app.config.userProfile?.let { userProfile ->
-			when (LocalDevice.current.type) {
-				Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
-				Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
-			}
-		} ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
-	}
+    override fun Content() {
+        app.config.userProfile?.let { userProfile ->
+            when (LocalDevice.current.type) {
+                Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
+                Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
+            }
+        } ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
+    }
 
-	private val scanSheet = object : FloatingSheet() {
-		override val maxHeightRatio: Float = 0.9f
-		override val initFullScreen: Boolean = true
+    private val scanSheet = object : FloatingSheet() {
+        override val maxHeightRatio: Float = 0.9f
+        override val initFullScreen: Boolean = true
 
-		@Composable
-		override fun Content() {
-			QrcodeScanner(
-				modifier = Modifier.fillMaxWidth(),
-				onResult = { result ->
-					try {
-						val uri = Uri.parse(result)!!
-						if (uri.scheme == Scheme.Rachel) deeplink(uri)
-					}
-					catch (_: Throwable) {
-						slot.tip.warning("不能识别此信息")
-					}
-					close()
-				}
-			)
-		}
-	}
+        @Composable
+        override fun Content() {
+            QrcodeScanner(
+                modifier = Modifier.fillMaxWidth(),
+                onResult = { result ->
+                    try {
+                        val uri = Uri.parse(result)!!
+                        if (uri.scheme == Scheme.Rachel) deeplink(uri)
+                    }
+                    catch (_: Throwable) {
+                        slot.tip.warning("不能识别此信息")
+                    }
+                    close()
+                }
+            )
+        }
+    }
 
-	private val userCardSheet = object : FloatingArgsSheet<UserProfile>() {
-		@Composable
-		override fun Content(args: UserProfile) {
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-			) {
-				WebImage(
-					uri = args.avatarPath,
-					key = app.config.cacheUserAvatar,
-					contentScale = ContentScale.Crop,
-					circle = true,
-					modifier = Modifier.size(ThemeValue.Size.LargeImage)
-						.shadow(ThemeValue.Shadow.Icon, CircleShape)
-				)
-				Text(
-					text = args.name,
-					style = MaterialTheme.typography.displaySmall,
-					color = MaterialTheme.colorScheme.primary
-				)
+    private val userCardSheet = object : FloatingArgsSheet<UserProfile>() {
+        @Composable
+        override fun Content(args: UserProfile) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            ) {
+                WebImage(
+                    uri = args.avatarPath,
+                    key = app.config.cacheUserAvatar,
+                    contentScale = ContentScale.Crop,
+                    circle = true,
+                    modifier = Modifier.size(ThemeValue.Size.LargeImage)
+                        .shadow(ThemeValue.Shadow.Icon, CircleShape)
+                )
+                Text(
+                    text = args.name,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
 
-				val primaryColor = MaterialTheme.colorScheme.primary
-				val secondaryColor = MaterialTheme.colorScheme.secondary
-				val logoPainter = painterResource(Res.drawable.img_logo)
-				val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${args.uid}") {
-					logo {
-						painter = logoPainter
-						padding = QrLogoPadding.Natural(1f)
-						shape = QrLogoShape.circle()
-						size = 0.2f
-					}
-					shapes {
-						ball = QrBallShape.circle()
-						darkPixel = QrPixelShape.roundCorners()
-						frame = QrFrameShape.roundCorners(0.25f)
-					}
-					colors {
-						dark = QrBrush.brush {
-							Brush.linearGradient(
-								0f to primaryColor.copy(alpha = 0.9f),
-								1f to secondaryColor.copy(0.9f),
-								end = Offset(it, it)
-							)
-						}
-						frame = QrBrush.solid(primaryColor)
-					}
-				}
-				MiniImage(
-					painter = qrcodePainter,
-					modifier = Modifier.size(ThemeValue.Size.ExtraImage)
-				)
-				Space()
-			}
-		}
-	}
+                val primaryColor = MaterialTheme.colorScheme.primary
+                val secondaryColor = MaterialTheme.colorScheme.secondary
+                val logoPainter = painterResource(Res.drawable.img_logo)
+                val qrcodePainter = rememberQrCodePainter(data = "rachel://yinlin.love/openProfile?uid=${args.uid}") {
+                    logo {
+                        painter = logoPainter
+                        padding = QrLogoPadding.Natural(1f)
+                        shape = QrLogoShape.circle()
+                        size = 0.2f
+                    }
+                    shapes {
+                        ball = QrBallShape.circle()
+                        darkPixel = QrPixelShape.roundCorners()
+                        frame = QrFrameShape.roundCorners(0.25f)
+                    }
+                    colors {
+                        dark = QrBrush.brush {
+                            Brush.linearGradient(
+                                0f to primaryColor.copy(alpha = 0.9f),
+                                1f to secondaryColor.copy(0.9f),
+                                end = Offset(it, it)
+                            )
+                        }
+                        frame = QrBrush.solid(primaryColor)
+                    }
+                }
+                MiniImage(
+                    painter = qrcodePainter,
+                    modifier = Modifier.size(ThemeValue.Size.ExtraImage)
+                )
+                Space()
+            }
+        }
+    }
 
-	private val signinSheet = object : FloatingArgsSheet<UserProfile>() {
-		var signinData by mutableStateOf(BooleanArray(8) { false })
-		var todayIndex by mutableIntStateOf(-1)
-		var todaySignin by mutableStateOf(true)
+    private val signinSheet = object : FloatingArgsSheet<UserProfile>() {
+        var signinData by mutableRefStateOf(BooleanArray(8) { false })
+        var todayIndex by mutableIntStateOf(-1)
+        var todaySignin by mutableStateOf(true)
 
-		override suspend fun initialize(args: UserProfile) {
-			signinData = BooleanArray(8) { false }
-			todayIndex = -1
-			todaySignin = true
-			val result = ClientAPI.request(
-				route = API.User.Profile.Signin,
-				data = app.config.userToken
-			)
-			if (result is Data.Success) {
-				with(result.data) {
-					todaySignin = status
-					todayIndex = index
-					signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
-				}
-				if (!todaySignin) app.config.userProfile = args.copy(
-					coin = args.coin + 1,
+        override suspend fun initialize(args: UserProfile) {
+            signinData = BooleanArray(8) { false }
+            todayIndex = -1
+            todaySignin = true
+            val result = ClientAPI.request(
+                route = API.User.Profile.Signin,
+                data = app.config.userToken
+            )
+            if (result is Data.Success) {
+                with(result.data) {
+                    todaySignin = status
+                    todayIndex = index
+                    signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
+                }
+                if (!todaySignin) app.config.userProfile = args.copy(
+                    coin = args.coin + 1,
                     exp = args.exp + 1,
-					notification = args.notification.copy(isSignin = true)
-				)
-			}
-		}
+                    notification = args.notification.copy(isSignin = true)
+                )
+            }
+        }
 
-		@Composable
-		override fun Content(args: UserProfile) {
-			val today = remember { DateEx.Today }
+        @Composable
+        override fun Content(args: UserProfile) {
+            val today = remember { DateEx.Today }
 
-			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
-			) {
-				Text(
-					text = "签到记录",
-					style = MaterialTheme.typography.titleLarge
-				)
-				Column(
-					modifier = Modifier.fillMaxWidth(),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
-				) {
-					repeat(2) { row ->
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
-						) {
-							repeat(4) { col ->
-								val index = row * 4 + col
-								Surface(
-									modifier = Modifier.weight(1f),
-									shape = MaterialTheme.shapes.medium,
-									tonalElevation = ThemeValue.Shadow.Tonal,
-									shadowElevation = ThemeValue.Shadow.Item,
-									border = if (index != todayIndex) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
-								) {
-									Column(
-										modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-										horizontalAlignment = Alignment.CenterHorizontally,
-										verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
-									) {
-										val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            ) {
+                Text(
+                    text = "签到记录",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                ) {
+                    repeat(2) { row ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+                        ) {
+                            repeat(4) { col ->
+                                val index = row * 4 + col
+                                Surface(
+                                    modifier = Modifier.weight(1f),
+                                    shape = MaterialTheme.shapes.medium,
+                                    tonalElevation = ThemeValue.Shadow.Tonal,
+                                    shadowElevation = ThemeValue.Shadow.Item,
+                                    border = if (index != todayIndex) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
+                                    ) {
+                                        val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
-										MiniIcon(
-											icon = if (signinData[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
-											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
-										)
-										Text(
-											text = "${date.month.number}月${date.day}日",
-											color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
-											maxLines = 1,
-											overflow = TextOverflow.Ellipsis
-										)
-									}
-								}
-							}
-						}
-					}
-				}
-				Text(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
-			}
-		}
-	}
+                                        MiniIcon(
+                                            icon = if (signinData[index]) Icons.Outlined.Check else Icons.Outlined.IndeterminateCheckBox,
+                                            color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = "${date.month.number}月${date.day}日",
+                                            color = if (index != todayIndex) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.primary,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Text(text = if (todaySignin) "今日已签到" else "签到成功! 经验+1, 银币+1")
+            }
+        }
+    }
 
-	private val levelSheet = object : FloatingArgsSheet<UserProfile>() {
-		@Composable
-		override fun Content(args: UserProfile) {
-			LazyColumn(modifier = Modifier.fillMaxWidth()) {
-				item(key = ItemKey("Profile")) {
-					UserProfileInfo(
-						profile = remember(args) { args.publicProfile },
-						owner = true,
-						modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
-					) { onLevelClick ->
-						Row(
-							horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-							verticalAlignment = Alignment.CenterVertically
-						) {
-							PortraitValue(
-								value = args.level.toString(),
-								title = "等级",
-								modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
-							)
-							PortraitValue(
-								value = args.exp.toString(),
-								title = "经验"
-							)
-						}
-					}
-				}
-				itemsIndexed(
-					items = UserLevel.levelTable,
-					key = { index, _ -> index }
-				) { index, item ->
-					LevelItem(
-						index = index,
-						item = item,
-						modifier = Modifier.fillMaxWidth()
-							.condition(index + 1 == app.config.userProfile?.level) {
-								border(
-									width = ThemeValue.Border.Small,
-									color = MaterialTheme.colorScheme.primary
-								)
-							}.clickable {}.padding(ThemeValue.Padding.Value)
-					)
-				}
-			}
-		}
-	}
+    private val levelSheet = object : FloatingArgsSheet<UserProfile>() {
+        @Composable
+        override fun Content(args: UserProfile) {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                item(key = ItemKey("Profile")) {
+                    UserProfileInfo(
+                        profile = remember(args) { args.publicProfile },
+                        owner = true,
+                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
+                    ) { onLevelClick ->
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            PortraitValue(
+                                value = args.level.toString(),
+                                title = "等级",
+                                modifier = Modifier.clickableNoRipple(onClick = onLevelClick)
+                            )
+                            PortraitValue(
+                                value = args.exp.toString(),
+                                title = "经验"
+                            )
+                        }
+                    }
+                }
+                itemsIndexed(
+                    items = UserLevel.levelTable,
+                    key = { index, _ -> index }
+                ) { index, item ->
+                    LevelItem(
+                        index = index,
+                        item = item,
+                        modifier = Modifier.fillMaxWidth()
+                            .condition(index + 1 == app.config.userProfile?.level) {
+                                border(
+                                    width = ThemeValue.Border.Small,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }.clickable {}.padding(ThemeValue.Padding.Value)
+                    )
+                }
+            }
+        }
+    }
 
-	@Composable
-	override fun Floating() {
-		scanSheet.Land()
-		userCardSheet.Land()
-		signinSheet.Land()
-		levelSheet.Land()
-	}
+    @Composable
+    override fun Floating() {
+        scanSheet.Land()
+        userCardSheet.Land()
+        signinSheet.Land()
+        levelSheet.Land()
+    }
 }
