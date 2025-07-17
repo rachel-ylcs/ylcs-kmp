@@ -2,6 +2,7 @@ package love.yinlin.ui.screen.world.single.rhyme
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -375,57 +378,73 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     @Composable
-    private fun GameScrimMask(modifier: Modifier) {
-        Box(modifier = modifier) {
-            val currentLockState = lockState
-            if (currentLockState !is GameLockState.Normal && state != GameState.Loading) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = RhymeConfig.LOCK_SCRIM_ALPHA))
-                        .clickableNoRipple { },
-                    contentAlignment = Alignment.Center
-                ) {
-                    when (currentLockState) {
-                        is GameLockState.Normal -> {}
-                        is GameLockState.PortraitLock -> GameMaskPortraitLock()
-                        is GameLockState.Pause -> GameMaskPause()
-                        is GameLockState.Resume -> GameMaskResume(currentLockState)
-                    }
+    private fun GameBackground() {
+        if (state is GameState.Playing) {
+            Box(modifier = Modifier.fillMaxSize())
+        }
+    }
+
+    @Composable
+    private fun GameCanvas() {
+        if (state is GameState.Playing) {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val scale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
+                Canvas(modifier = Modifier.fillMaxSize().pointerInput(scale) {
+                    detectDragGestures(
+                        orientationLock = null,
+                        shouldAwaitTouchSlop = { false },
+                        onDragStart = { _, change, _ ->
+                            stage.event(PointerEventType.Down, change.position / scale)
+                        },
+                        onDrag = { change, _ ->
+                            stage.event(PointerEventType.Move, change.position / scale)
+                        },
+                        onDragEnd = { change ->
+                            stage.event(PointerEventType.Up, change.position / scale)
+                        }
+                    )
+                }) {
+                    val scope = RhymeDrawScope(scope = this, scale = scale)
+                    with(stage) { scope.draw() }
                 }
             }
         }
     }
 
     @Composable
-    private fun GameOverlay(modifier: Modifier) {
-        Box(modifier = modifier) {
-            AnimationLayout(state = state) {
-                when (it) {
-                    is GameState.Loading -> GameOverlayLoading()
-                    is GameState.Start -> GameOverlayStart()
-                    is GameState.MusicLibrary -> GameOverlayMusicLibrary()
-                    is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
-                    is GameState.Playing -> GameOverlayPlaying()
-                    is GameState.Settling -> GameOverlaySettling()
+    private fun GameOverlay() {
+        AnimationLayout(
+            state = state,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            when (it) {
+                is GameState.Loading -> GameOverlayLoading()
+                is GameState.Start -> GameOverlayStart()
+                is GameState.MusicLibrary -> GameOverlayMusicLibrary()
+                is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
+                is GameState.Playing -> GameOverlayPlaying()
+                is GameState.Settling -> GameOverlaySettling()
+            }
+        }
+    }
+
+    @Composable
+    private fun GameScrimMask() {
+        val currentLockState = lockState
+        if (currentLockState !is GameLockState.Normal && state != GameState.Loading) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = RhymeConfig.LOCK_SCRIM_ALPHA))
+                    .clickableNoRipple { },
+                contentAlignment = Alignment.Center
+            ) {
+                when (currentLockState) {
+                    is GameLockState.Normal -> {}
+                    is GameLockState.PortraitLock -> GameMaskPortraitLock()
+                    is GameLockState.Pause -> GameMaskPause()
+                    is GameLockState.Resume -> GameMaskResume(currentLockState)
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun GameCanvas(modifier: Modifier) {
-        if (state is GameState.Playing) {
-            Canvas(modifier = modifier) {
-                val scope = RhymeDrawScope(scope = this, scale = size.width / 1920)
-                with(stage) { scope.draw() }
-            }
-        }
-    }
-
-    @Composable
-    private fun GameBackground(modifier: Modifier) {
-        if (state is GameState.Playing) {
-            Box(modifier = modifier)
         }
     }
 
@@ -497,14 +516,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 .fillMaxSize()
                 .background(Colors.Dark),
             content = {
-                // 遮罩层
-                GameScrimMask(modifier = Modifier.fillMaxSize().zIndex(4f))
-                // 状态层
-                GameOverlay(modifier = Modifier.fillMaxSize().zIndex(3f))
-                // 画布层
-                GameCanvas(modifier = Modifier.fillMaxSize().zIndex(2f))
-                // 背景层
-                GameBackground(modifier = Modifier.fillMaxSize().zIndex(1f))
+                GameBackground() // 背景层
+                GameCanvas() // 画布层
+                GameOverlay() // 状态层
+                GameScrimMask() // 遮罩层
             },
             measurePolicy = { measurables, constraints ->
                 val maxWidth = constraints.maxWidth

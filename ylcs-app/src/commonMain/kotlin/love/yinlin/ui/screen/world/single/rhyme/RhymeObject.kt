@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.world.single.rhyme
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -10,6 +9,19 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import love.yinlin.data.music.RhymeLyricsConfig
+
+// 手势操作事件
+@Stable
+internal enum class PointerEventType {
+    Down, Move, Up
+}
+
+@Stable
+internal data class PointerEvent(
+    val type: PointerEventType,
+    val startFrame: Int,
+    val position: Offset
+)
 
 // 游戏渲染
 @Stable
@@ -29,25 +41,61 @@ internal sealed interface RhymeObject {
     fun RhymeDrawScope.draw()
 }
 
-
-
-// 游戏舞台
+// 容器
 @Stable
-internal class RhymeStage : RhymeObject {
-    private var config: RhymeLyricsConfig? = null
+internal sealed interface RhymeContainer : RhymeObject {
+    fun clear()
+}
 
-    private val scene = mutableStateListOf<RhymeObject>()
-    private val notes = mutableStateListOf<RhymeObject>()
-    private val particles = mutableStateListOf<RhymeObject>()
-
-    private var frame: Int = 0
-
+// 场景
+@Stable
+internal class RhymeScene : RhymeContainer {
     override fun RhymeDrawScope.draw() {
 
     }
 
-    fun init(config: RhymeLyricsConfig) {
-        this.config = config
+    override fun clear() {
+
+    }
+}
+
+// 音符管理器
+@Stable
+internal class RhymeNotesManager : RhymeContainer {
+    override fun RhymeDrawScope.draw() {
+
+    }
+
+    override fun clear() {
+
+    }
+}
+
+// 粒子管理
+@Stable
+internal class RhymeParticlesManager : RhymeContainer {
+    override fun RhymeDrawScope.draw() {
+
+    }
+
+    override fun clear() {
+
+    }
+}
+
+// 游戏舞台
+@Stable
+internal class RhymeStage {
+    private var frame: Int = 0
+
+    private var config: RhymeLyricsConfig? = null
+
+    private val scene = RhymeScene()
+    private var notes = RhymeNotesManager()
+    private var particles = RhymeParticlesManager()
+
+    fun init(lyrics: RhymeLyricsConfig) {
+        config = lyrics
     }
 
     fun clear() {
@@ -60,5 +108,15 @@ internal class RhymeStage : RhymeObject {
 
     fun update(position: Long) {
         ++frame
+        // 处理手势事件
+        
+    }
+
+    fun event(type: PointerEventType, position: Offset) {
+        println(PointerEvent(type, frame, position))
+    }
+
+    fun RhymeDrawScope.draw() {
+
     }
 }
