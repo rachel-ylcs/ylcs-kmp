@@ -90,9 +90,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     }
 
     private fun monitorGamePosition(): Job = launch {
+        val delayDuration = (1000 / RhymeConfig.FPS).milliseconds
         while (true) {
             stage.update(musicPlayer.position)
-            delay(16.milliseconds)
+            delay(delayDuration)
         }
     }
 

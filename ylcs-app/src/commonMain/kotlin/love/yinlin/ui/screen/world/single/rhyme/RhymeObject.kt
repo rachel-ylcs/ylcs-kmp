@@ -25,9 +25,11 @@ internal data class RhymeDrawScope(
 
 // 游戏渲染实体
 @Stable
-internal interface RhymeObject {
+internal sealed interface RhymeObject {
     fun RhymeDrawScope.draw()
 }
+
+
 
 // 游戏舞台
 @Stable
