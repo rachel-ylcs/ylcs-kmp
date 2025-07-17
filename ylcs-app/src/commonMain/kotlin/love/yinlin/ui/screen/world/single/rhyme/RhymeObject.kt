@@ -38,7 +38,7 @@ internal class RhymeStage : RhymeObject {
     private val notes = mutableStateListOf<RhymeObject>()
     private val particles = mutableStateListOf<RhymeObject>()
 
-    private var frame: Long = 0L
+    private var frame: Int = 0
 
     override fun RhymeDrawScope.draw() {
 
@@ -50,7 +50,7 @@ internal class RhymeStage : RhymeObject {
 
     fun clear() {
         config = null
-        frame = 0L
+        frame = 0
         scene.clear()
         notes.clear()
         particles.clear()
