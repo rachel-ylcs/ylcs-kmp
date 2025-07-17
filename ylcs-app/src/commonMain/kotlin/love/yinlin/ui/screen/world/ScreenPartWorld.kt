@@ -52,7 +52,7 @@ import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
-import love.yinlin.ui.screen.world.single.ScreenRhyme
+import love.yinlin.ui.screen.world.single.rhyme.ScreenRhyme
 import kotlin.math.absoluteValue
 
 @Composable

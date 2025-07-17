@@ -16,7 +16,7 @@ import love.yinlin.ui.screen.music.loader.*
 import love.yinlin.ui.screen.settings.*
 import love.yinlin.ui.screen.world.*
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
-import love.yinlin.ui.screen.world.single.ScreenRhyme
+import love.yinlin.ui.screen.world.single.rhyme.ScreenRhyme
 
 fun ScreenRouteScope.screens() {
     // 主页
