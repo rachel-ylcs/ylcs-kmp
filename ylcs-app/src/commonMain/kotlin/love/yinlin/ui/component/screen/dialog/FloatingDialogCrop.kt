@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -341,7 +342,7 @@ fun CropImage(
 
         // Overlay
         if (imageSize != null) {
-            Canvas(modifier = Modifier.matchParentSize()) {
+            Canvas(modifier = Modifier.matchParentSize().clipToBounds()) {
                 val frameRect = state.frameRect
                 // Mask
                 drawIntoCanvas { canvas ->

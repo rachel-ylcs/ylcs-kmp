@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.decodeToImageBitmap
@@ -423,7 +424,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         if (state is GameState.Playing) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 val scale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
-                Canvas(modifier = Modifier.fillMaxSize().pointerInput(scale) {
+                Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(scale) {
                     detectDragGestures(
                         orientationLock = null,
                         shouldAwaitTouchSlop = { false },

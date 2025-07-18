@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -119,7 +120,7 @@ fun DockedColorPicker(
                 Offset(radius + cos(angle) * saturation * radius, radius + sin(angle) * saturation * radius)
             }
 
-            Canvas(modifier = Modifier.fillMaxSize()
+            Canvas(modifier = Modifier.fillMaxSize().clipToBounds()
                 .pointerInput(radius, initialColor, onColorChanged, onColorChangeFinished) {
                     detectDragGestures(onDragEnd = { onColorChangeFinished?.invoke(pickerColor) }) { change, _ ->
                         val validOffset = getValidOffset(change.position, radius)

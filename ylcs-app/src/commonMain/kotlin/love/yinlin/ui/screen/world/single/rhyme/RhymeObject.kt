@@ -8,7 +8,9 @@ import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
+import love.yinlin.extension.toRadian
 import love.yinlin.extension.translate
+import kotlin.math.tan
 
 // 手势操作事件
 @Stable
@@ -29,6 +31,28 @@ internal data class RhymeDrawScope(
     private val scope: DrawScope,
     private val scale: Float
 ) {
+    // 路径
+    @Stable
+    internal inner class RhymePath {
+        internal val path = Path()
+        fun moveTo(position: Offset): RhymePath {
+            path.moveTo(position.x * scale, position.y * scale)
+            return this
+        }
+        fun lineTo(position: Offset): RhymePath {
+            path.lineTo(position.x * scale, position.y * scale)
+            return this
+        }
+        fun addOval(position: Offset, size: Size): RhymePath {
+            path.addOval(Rect(position * scale, size * scale))
+            return this
+        }
+    }
+
+    fun drawLine(color: Color, start: Offset, end: Offset, width: Float, cap: StrokeCap = StrokeCap.Butt, alpha: Float = 1f) =
+        scope.drawLine(color, start * scale, end * scale, width * scale, cap, null, alpha)
+    fun drawLine(brush: Brush, start: Offset, end: Offset, width: Float, cap: StrokeCap = StrokeCap.Butt, alpha: Float = 1f) =
+        scope.drawLine(brush, start * scale, end * scale, width * scale, cap, null, alpha)
     fun drawRect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
         scope.drawRect(color, position * scale, size * scale, alpha, style)
     fun drawRect(brush: Brush, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
@@ -41,16 +65,21 @@ internal data class RhymeDrawScope(
         scope.drawArc(color, startAngle, sweepAngle, false, position * scale, size * scale, alpha, style)
     fun drawArc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
         scope.drawArc(brush, startAngle, sweepAngle, false, position * scale, size * scale, alpha, style)
-    fun drawCircleImage(image: ImageBitmap, radius: Float, center: Offset) {
-        scope.clipPath(Path().apply { addOval(Rect(center * scale, radius * scale)) }) {
-            drawImage(
-                image = image,
-                dstOffset = (center.translate(-radius, -radius) * scale).roundToIntOffset(),
-                dstSize = (Size(radius * 2, radius * 2) * scale).roundToIntSize(),
-                filterQuality = FilterQuality.High
-            )
-        }
+    fun drawPath(color: Color, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
+        scope.drawPath(path.path, color, alpha, style)
+    fun drawPath(brush: Brush, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
+        scope.drawPath(path.path, brush, alpha, style)
+    fun drawImage(image: ImageBitmap, position: Offset, size: Size) {
+        scope.drawImage(
+            image = image,
+            dstOffset = (position * scale).roundToIntOffset(),
+            dstSize = (size * scale).roundToIntSize(),
+            filterQuality = FilterQuality.High
+        )
     }
+
+    inline fun clipPath(path: RhymePath, block: RhymeDrawScope.() -> Unit) =
+        scope.clipPath(path.path) { block() }
 }
 
 // 游戏渲染实体
@@ -74,20 +103,26 @@ private class ProgressBoard(
     }
 
     override fun RhymeDrawScope.draw() {
-        val center = Offset(960f, 540f)
+        val center = Offset(960f, 360f)
+        val innerTopLeft = center.translate(-60f, -60f)
+        val outerTopLeft = center.translate(-64f, -64f)
+        val innerSize = Size(120f, 120f)
+        val outerSize = Size(128f, 128f)
         // 画封面
-        drawCircleImage(
-            image = record,
-            radius = 60f,
-            center = center
-        )
+        clipPath(RhymePath().addOval(innerTopLeft, innerSize)) {
+            drawImage(
+                image = record,
+                position = innerTopLeft,
+                size = innerSize
+            )
+        }
         // 画时长
         drawArc(
             color = Colors.White,
             startAngle = -90f,
             sweepAngle = 360f,
-            position = center.translate(-64f, -64f),
-            size = Size(128f, 128f),
+            position = outerTopLeft,
+            size = outerSize,
             style = Stroke(width = 4f, cap = StrokeCap.Round)
         )
         // 画进度
@@ -95,8 +130,8 @@ private class ProgressBoard(
             color = Colors.Steel4,
             startAngle = -90f,
             sweepAngle = 360f * progress,
-            position = center.translate(-64f, -64f),
-            size = Size(128f, 128f),
+            position = outerTopLeft,
+            size = outerSize,
             style = Stroke(width = 4f, cap = StrokeCap.Round)
         )
     }
@@ -108,13 +143,63 @@ private class Track : RhymeObject {
     // 当前按下轨道
     private val current: Int? by mutableStateOf(null)
 
+    private val trackWidth = 20f
+    private val tracks = listOf(
+        Offset(0f, 0f),
+        Offset(0f, 540f),
+        Offset(0f, 1080f),
+        Offset(640f, 1080f),
+        Offset(1280f, 1080f),
+        Offset(1920f, 1080f),
+        Offset(1920f, 540f),
+        Offset(1920f, 0f),
+    ).map { Offset(960f, 360f) to it }
+
+    private fun RhymeDrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
+        // 阴影
+        repeat(5) {
+            drawLine(
+                color = Colors.Steel3,
+                start = start,
+                end = end,
+                width = width * (1.15f + it * 0.15f),
+                cap = StrokeCap.Round,
+                alpha = 0.15f - (it * 0.03f)
+            )
+        }
+        // 光带
+        drawLine(
+            color = Colors.Steel4,
+            start = start,
+            end = end,
+            width = width,
+            cap = StrokeCap.Round,
+            alpha = 0.7f
+        )
+        // 高光
+        drawLine(
+            color = Colors.White,
+            start = start,
+            end = end,
+            width = width * 0.8f,
+            cap = StrokeCap.Round,
+            alpha = 0.8f
+        )
+    }
+
     override fun update(frame: Int, position: Long) {
-        // 画射线
-        
+
     }
 
     override fun RhymeDrawScope.draw() {
-
+        // 画轨道射线
+        for ((start, end) in tracks) {
+            drawTrackLine(
+                start = start,
+                end = end,
+                width = trackWidth
+            )
+        }
     }
 }
 
@@ -175,8 +260,8 @@ private class Scene(
     }
 
     override fun RhymeDrawScope.draw() {
-        with(progressBoard) { draw() }
         with(track) { draw() }
+        with(progressBoard) { draw() }
         with(lyricsBoard) { draw() }
         with(scoreBoard) { draw() }
         with(comboBoard) { draw() }
