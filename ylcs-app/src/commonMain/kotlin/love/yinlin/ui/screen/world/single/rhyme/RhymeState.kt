@@ -23,7 +23,7 @@ internal sealed interface GameState {
     @Stable
     data object Playing : GameState // 游戏中
     @Stable
-    data object Settling : GameState // 结算
+    data class Settling(val result: RhymeResult) : GameState // 结算
 }
 
 // 游戏锁状态

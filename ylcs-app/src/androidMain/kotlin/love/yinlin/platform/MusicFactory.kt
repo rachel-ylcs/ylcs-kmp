@@ -1,12 +1,15 @@
+@file:OptIn(UnstableApi::class)
 @file:JvmName("MusicFactoryAndroid")
 package love.yinlin.platform
 
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.compose.runtime.*
 import androidx.core.net.toUri
 import androidx.media3.common.*
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
@@ -291,7 +294,7 @@ actual class MusicPlayer {
     private var mIsPlaying by mutableStateOf(false)
     actual val isPlaying: Boolean get() = mIsPlaying
 
-    actual var position: Long get() = player?.currentPosition ?:  0L
+    actual var position: Long get() { return player?.currentPosition.let { if (it == null || it == C.TIME_UNSET) 0L else it } }
         set(value) {
             player?.let {
                 it.seekTo(value)
@@ -322,7 +325,7 @@ actual class MusicPlayer {
                     when (playbackState) {
                         Player.STATE_IDLE, Player.STATE_BUFFERING -> {}
                         Player.STATE_READY -> updateInfo()
-                        Player.STATE_ENDED -> stop()
+                        Player.STATE_ENDED -> innerStop()
                     }
                 }
 
@@ -333,7 +336,7 @@ actual class MusicPlayer {
 
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
-                    stop()
+                    innerStop()
                 }
             })
         }
@@ -359,8 +362,12 @@ actual class MusicPlayer {
         }
     }
 
-    actual fun stop() {
+    private fun innerStop() {
         player?.clearMediaItems()
+    }
+
+    actual fun stop() {
+        innerStop()
     }
 
     actual fun release() {

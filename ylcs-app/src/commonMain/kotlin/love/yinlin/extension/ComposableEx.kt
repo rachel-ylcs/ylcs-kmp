@@ -2,14 +2,21 @@ package love.yinlin.extension
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.compose.LifecycleStartEffect
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.jvm.JvmInline
+import kotlin.math.roundToInt
 
 // BaseValue
 
-fun Offset.translate(x: Float = 0f, y: Float = 0f) = copy(x = this.x + x, y = this.y + y)
+fun Offset.translate(x: Float = 0f, y: Float = 0f) = this.copy(x = this.x + x, y = this.y + y)
+fun Offset.roundToIntOffset() = IntOffset(x = this.x.roundToInt(), y = this.y.roundToInt())
+
+fun Size.translate(x: Float = 0f, y: Float = 0f) = this.copy(width = this.width + x, height = this.height + y)
 
 // State
 

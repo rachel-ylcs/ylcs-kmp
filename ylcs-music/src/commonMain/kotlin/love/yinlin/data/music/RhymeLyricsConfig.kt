@@ -55,5 +55,6 @@ data class RhymeLine(
 @Stable
 data class RhymeLyricsConfig(
     val id: String, // ID, 同 config 中的 ID
+    val duration: Long, // 时长
     val lyrics: List<RhymeLine>, // 歌词
 )

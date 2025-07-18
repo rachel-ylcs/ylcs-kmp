@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.decodeToImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -31,6 +32,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
@@ -62,6 +64,7 @@ import love.yinlin.ui.component.platform.rememberOrientationController
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.StrokeText
 import love.yinlin.ui.screen.music.audioPath
+import love.yinlin.ui.screen.music.recordPath
 import love.yinlin.ui.screen.music.rhymePath
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -94,20 +97,42 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
     private fun monitorGamePosition(): Job = launch {
         val delayDuration = (1000 / RhymeConfig.FPS).milliseconds
+        var lastPosition = 0L
         while (true) {
-            stage.update(musicPlayer.position)
+            val position = musicPlayer.position
+            if (position == 0L && lastPosition != 0L) break
+            lastPosition = position
+            stage.onUpdate(position)
             delay(delayDuration)
         }
+        completeGame()
     }
 
-    private fun startGame(info: MusicInfo) {
+    private fun startGame(info: MusicInfo, speed: Int) {
         launch {
-            val lyrics = Coroutines.io {
-                catchingNull { SystemFileSystem.source(info.rhymePath).buffered().readString().parseJsonValue<RhymeLyricsConfig>() }
+            val task1 = async {
+                Coroutines.io {
+                    catchingNull {
+                        SystemFileSystem.source(info.rhymePath).buffered().use {
+                            it.readString().parseJsonValue<RhymeLyricsConfig>()
+                        }
+                    }
+                }
             }
-            if (lyrics != null && canvasFrameJob == null) {
+            val task2 = async {
+                Coroutines.io {
+                    catchingNull {
+                        SystemFileSystem.source(info.recordPath).buffered().use {
+                            it.readByteArray().decodeToImageBitmap()
+                        }
+                    }
+                }
+            }
+            val lyrics = task1.await()
+            val record = task2.await()
+            if (lyrics != null && record != null && canvasFrameJob == null) {
                 musicPlayer.load(info.audioPath)
-                stage.init(lyrics)
+                stage.onInitialize(lyrics, record, speed)
                 canvasFrameJob = monitorGamePosition()
                 state = GameState.Playing
             }
@@ -118,8 +143,15 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         musicPlayer.stop()
         canvasFrameJob?.cancel()
         canvasFrameJob = null
-        stage.clear()
+        stage.onClear()
         state = GameState.Start
+    }
+
+    private fun completeGame() {
+        canvasFrameJob = null
+        val result = stage.onResult()
+        stage.onClear()
+        state = GameState.Settling(result)
     }
 
     private fun pauseGame(newState: GameLockState) {
@@ -254,7 +286,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameOverlayStart() {
         Box(modifier = Modifier.fillMaxSize()) {
             WebImage(
-                uri = Game.Rhyme.zPath,
+                uri = remember { Game.Rhyme.resPath("start") },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
@@ -355,7 +387,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) startGame(entry.musicInfo)
+                        if (entry.enabled) startGame(entry.musicInfo, 10)
                         else slot.tip.warning("此MOD不支持")
                     }
                 )
@@ -367,9 +399,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
 
     @Composable
     private fun GameOverlayPlaying() {
-        Box(modifier = Modifier.fillMaxSize()) {
 
-        }
     }
 
     @Composable
@@ -380,7 +410,11 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun GameBackground() {
         if (state is GameState.Playing) {
-            Box(modifier = Modifier.fillMaxSize())
+            WebImage(
+                uri = remember { Game.Rhyme.resPath("background") },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 
@@ -394,18 +428,18 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         orientationLock = null,
                         shouldAwaitTouchSlop = { false },
                         onDragStart = { _, change, _ ->
-                            stage.event(PointerEventType.Down, change.position / scale)
+                            stage.onPointerEvent(PointerEventType.Down, change.position / scale)
                         },
                         onDrag = { change, _ ->
-                            stage.event(PointerEventType.Move, change.position / scale)
+                            stage.onPointerEvent(PointerEventType.Move, change.position / scale)
                         },
                         onDragEnd = { change ->
-                            stage.event(PointerEventType.Up, change.position / scale)
+                            stage.onPointerEvent(PointerEventType.Up, change.position / scale)
                         }
                     )
                 }) {
                     val scope = RhymeDrawScope(scope = this, scale = scale)
-                    with(stage) { scope.draw() }
+                    with(stage) { scope.onDraw() }
                 }
             }
         }

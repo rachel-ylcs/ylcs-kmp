@@ -245,7 +245,7 @@ actual class MusicPlayer {
     private var mIsPlaying by mutableStateOf(false)
     actual val isPlaying: Boolean get() = mIsPlaying
 
-    actual var position: Long get() = controller?.mediaPlayer()?.status()?.time() ?: 0L
+    actual var position: Long get() { return controller?.mediaPlayer()?.status()?.time().let { if (it == null || it == -1L) 0L else it } }
         set(value) {
             controller?.mediaPlayer()?.let {
                 it.controls().setTime(value)
