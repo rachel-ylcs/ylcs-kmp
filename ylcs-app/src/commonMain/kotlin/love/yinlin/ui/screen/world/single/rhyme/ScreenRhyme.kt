@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
@@ -40,6 +41,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
+import love.yinlin.common.rachelFont
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
@@ -51,6 +53,8 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.MiniIcon
@@ -424,6 +428,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         if (state is GameState.Playing) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 val scale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
+                val textMeasurer = rememberTextMeasurer()
+                val font = rachelFont()
+                val textData = remember(textMeasurer, font) { RhymeDrawScope.RhymeTextData(font, textMeasurer) }
+
                 Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(scale) {
                     detectDragGestures(
                         orientationLock = null,
@@ -439,7 +447,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         }
                     )
                 }) {
-                    val scope = RhymeDrawScope(scope = this, scale = scale)
+                    val scope = RhymeDrawScope(scope = this, scale = scale, textData = textData)
                     with(stage) { scope.onDraw() }
                 }
             }

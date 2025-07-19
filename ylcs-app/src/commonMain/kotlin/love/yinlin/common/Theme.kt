@@ -216,7 +216,7 @@ private fun baseTextStyle(
 )
 
 @Composable
-private fun rachelFont(): Font = Font(Res.font.xwwk)
+fun rachelFont(): Font = Font(Res.font.xwwk)
 
 @Composable
 private fun rachelTextStyle(
