@@ -297,8 +297,8 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 
     override fun update(frame: Int, position: Long) {
         val lines = lyrics.lyrics
-        val nextLine = lines.getOrNull(currentIndex + 1) ?: return
-        if (position >= nextLine.start) {
+        val nextLine = lines.getOrNull(currentIndex + 1)
+        if (nextLine != null && position >= nextLine.start) {
             ++currentIndex
             val theme = nextLine.theme
             // 合并字符显示 (因为 plain text 内可能包含不是 Action 的空白字符)
