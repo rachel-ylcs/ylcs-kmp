@@ -10,8 +10,6 @@ import kotlinx.serialization.Serializable
 sealed interface RhymeAction {
     // 字符
     val ch: String
-    // 起始偏移 (起始时间 = 当前句的起始时间 + 偏移)
-    val start: Int
     // 终止偏移 (终止时间 = 当前句的终止时间 + 偏移)
     val end: Int
 
@@ -21,7 +19,6 @@ sealed interface RhymeAction {
     @SerialName("Note")
     data class Note(
         override val ch: String,
-        override val start: Int,
         override val end: Int,
         // 音阶
         // (低音 1 - 7 -> 15 - 21)
@@ -36,7 +33,6 @@ sealed interface RhymeAction {
     @SerialName("Slur")
     data class Slur(
         override val ch: String,
-        override val start: Int,
         override val end: Int,
         val scale: List<Byte>, // 连音阶组 (每个音阶均分字符总时长)
     ) : RhymeAction
@@ -50,7 +46,6 @@ data class RhymeLine(
     // 仅作显示, 所以允许包含空格或符号等, 但每个音符操作的字符只能是单个字符
     val text: String,
     val start: Long, // 起始时间
-    val end: Long, // 终止时间
     val theme: List<RhymeAction>, // 主旋律
     val chord: List<RhymeAction>? = null, // 和弦
 )

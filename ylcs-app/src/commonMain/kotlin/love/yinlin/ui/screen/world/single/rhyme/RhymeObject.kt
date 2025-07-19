@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastJoinToString
+import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
@@ -303,7 +304,9 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
             // 合并字符显示 (因为 plain text 内可能包含不是 Action 的空白字符)
             text = theme.fastJoinToString("") { it.ch }
             // 计算每一个字符需要的帧数
-            frameTable = theme.map { (it.end - it.start) * RhymeConfig.FPS / 1000 }
+            frameTable = theme.fastMapIndexed { i, action ->
+                (action.end - (theme.getOrNull(i - 1)?.end ?: 0)) * RhymeConfig.FPS / 1000
+            }
             // 修正此行的起始帧
             startFrame = frame - (position - nextLine.start).toInt() * RhymeConfig.FPS / 1000
         }
@@ -312,7 +315,8 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
             val totalLength = text.length // 总字符长
             var totalFrame = frame - startFrame // 距离行首帧数
             if (totalLength != theme.size || totalLength != frameTable.size) return@let
-            for ((i, action) in theme.withIndex()) {
+            for (i in theme.indices) {
+                val action = theme[i]
                 val costFrame = frameTable[i] // 此字符消耗帧数
                 if (totalFrame <= costFrame) { // 余数
                     currentLength += action.ch.length * totalFrame / costFrame.toFloat() // 根据帧数等比例计算字符长度

@@ -53,8 +53,6 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.MiniIcon
