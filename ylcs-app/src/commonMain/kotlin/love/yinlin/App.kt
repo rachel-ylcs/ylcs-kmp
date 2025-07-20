@@ -29,7 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.common.*
-import love.yinlin.extension.launchFlag
+import love.yinlin.extension.LaunchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.*
@@ -42,7 +42,7 @@ import love.yinlin.ui.screen.world.ScreenPartWorld
 
 @Stable
 abstract class ScreenPart(val model: AppModel) {
-	val firstLoad = launchFlag()
+	val firstLoad = LaunchFlag()
 
 	val slot: SubScreenSlot get() = model.slot
 

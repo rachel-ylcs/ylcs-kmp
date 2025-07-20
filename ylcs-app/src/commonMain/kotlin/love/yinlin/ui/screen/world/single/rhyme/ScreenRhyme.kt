@@ -45,9 +45,9 @@ import love.yinlin.common.rachelFont
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
+import love.yinlin.extension.LaunchFlag
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.launchFlag
 import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
@@ -85,7 +85,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private var canvasFrameJob: Job? = null
     private var resumePauseJob: Job? = null
 
-    private val orientationStarter = launchFlag()
+    private val orientationStarter = LaunchFlag()
 
     private fun onScreenOrientationChanged(type: Device.Type) {
         if (type == Device.Type.LANDSCAPE) {

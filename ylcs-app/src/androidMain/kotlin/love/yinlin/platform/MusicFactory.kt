@@ -15,6 +15,8 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -129,7 +131,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     private var updateProgressJob: Job? = null
-    private val updateProgressJobLock = Any()
+    private val updateProgressJobLock = SynchronizedObject()
 
     private fun updateDuration(player: Player) {
         val position = player.currentPosition

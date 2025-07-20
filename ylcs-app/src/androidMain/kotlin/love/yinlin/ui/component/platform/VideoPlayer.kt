@@ -20,6 +20,8 @@ import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
 import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
@@ -41,7 +43,7 @@ private class VideoPlayerState {
     var duration by mutableLongStateOf(0L)
 
     var updateProgressJob: Job? = null
-    val updateProgressJobLock = Any()
+    val updateProgressJobLock = SynchronizedObject()
 
     val listener = object : Player.Listener {
         override fun onIsPlayingChanged(value: Boolean) {

@@ -5,9 +5,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.compose.LifecycleStartEffect
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
-import kotlin.jvm.JvmInline
+import kotlinx.atomicfu.AtomicBoolean
+import kotlinx.atomicfu.atomic
 import kotlin.math.roundToInt
 
 // BaseValue
@@ -119,17 +118,12 @@ inline fun OffScreenEffect(crossinline block: (isForeground: Boolean) -> Unit) {
 
 // LaunchFlag
 
-@OptIn(ExperimentalAtomicApi::class)
-@JvmInline
-value class LaunchFlag(val value: AtomicBoolean = AtomicBoolean(false)) {
+class LaunchFlag(val value: AtomicBoolean = atomic(false)) {
 	inline operator fun invoke(update: () -> Unit = {}, init: () -> Unit) {
-		if (value.compareAndSet(expectedValue = false, newValue = true)) init()
+		if (value.compareAndSet(expect = false, update = true)) init()
 		else update()
 	}
 }
-
-@OptIn(ExperimentalAtomicApi::class)
-fun launchFlag(): LaunchFlag = LaunchFlag()
 
 // Composition Local
 

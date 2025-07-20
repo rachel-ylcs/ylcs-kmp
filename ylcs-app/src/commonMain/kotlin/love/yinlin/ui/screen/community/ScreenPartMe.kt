@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
@@ -64,8 +65,6 @@ import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.msg.activity.ScreenActivityLink
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @Composable
 private fun LevelItem(
@@ -106,8 +105,7 @@ private fun LevelItem(
 
 @Stable
 class ScreenPartMe(model: AppModel) : ScreenPart(model) {
-    @OptIn(ExperimentalAtomicApi::class)
-    private val isUpdateToken = AtomicBoolean(false)
+    private val isUpdateToken = atomic(false)
 
     fun cleanUserToken() {
         app.config.userShortToken = 0L
@@ -117,18 +115,17 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
         app.config.cacheUserWall = KVConfig.UPDATE
     }
 
-    @OptIn(ExperimentalAtomicApi::class)
     suspend fun updateUserToken() {
         val token = app.config.userToken
         val currentTime = DateEx.CurrentLong
         val duration = currentTime - app.config.userShortToken
         if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
-            isUpdateToken.compareAndSet(expectedValue = false, newValue = true)) {
+            isUpdateToken.compareAndSet(expect = false, update = true)) {
             val result = ClientAPI.request(
                 route = API.User.Account.UpdateToken,
                 data = token
             )
-            isUpdateToken.store(false)
+            isUpdateToken.value = false
             when (result) {
                 is Data.Success -> {
                     app.config.userShortToken = currentTime
@@ -143,10 +140,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
         }
     }
 
-    @OptIn(ExperimentalAtomicApi::class)
     suspend fun updateUserProfile() {
         val token = app.config.userToken
-        if (token.isNotEmpty() && !isUpdateToken.load()) {
+        if (token.isNotEmpty() && !isUpdateToken.value) {
             val result = ClientAPI.request(
                 route = API.User.Profile.GetProfile,
                 data = token
@@ -353,7 +349,6 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
         updateUserProfile()
     }
 
-    @OptIn(ExperimentalAtomicApi::class)
     @Composable
     override fun Content() {
         app.config.userProfile?.let { userProfile ->

@@ -114,6 +114,7 @@ kotlin {
                 // kotlinx
                 libs.kotlinx.coroutines, libs.kotlinx.datetime,
                 libs.kotlinx.io, libs.kotlinx.json,
+                libs.kotlinx.atomicfu,
                 // runtime
                 libs.runtime.shapes, libs.runtime.navigation,
                 libs.runtime.savedstate, libs.runtime.viewmodel,
@@ -227,7 +228,10 @@ kotlin {
 }
 
 configurations.all {
-    forceVersion(libs.jna.core, libs.jna.platform)
+    forceVersion(
+        libs.jna.core,
+        libs.jna.platform
+    )
 }
 
 composeCompiler {
