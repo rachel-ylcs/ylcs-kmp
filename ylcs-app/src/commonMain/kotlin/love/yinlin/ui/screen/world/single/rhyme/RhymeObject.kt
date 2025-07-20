@@ -113,7 +113,7 @@ internal data class RhymeDrawScope(
         scope.drawPath(path.path, color, alpha, style * scale)
     fun drawPath(brush: Brush, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
         scope.drawPath(path.path, brush, alpha, style * scale)
-    fun measureText(text: String, expectHeight: Float): RhymeMeasureResult {
+    fun measureText(text: String, expectHeight: Float, fill: Boolean = true): RhymeMeasureResult {
         val virtualHeight = expectHeight * scale
         val size = textData.measurer.measure(
             text = text,
@@ -127,9 +127,14 @@ internal data class RhymeDrawScope(
         val actualTextSize = virtualHeight * ratio
         return RhymeMeasureResult(textData.measurer.measure(
             text = text,
-            style = TextStyle(
+            style = if (fill) TextStyle(
                 fontSize = TextUnit(actualTextSize, TextUnitType.Sp),
                 fontFamily = FontFamily(textData.font)
+            ) else TextStyle(
+                brush = null,
+                fontSize = TextUnit(actualTextSize, TextUnitType.Sp),
+                fontFamily = FontFamily(textData.font),
+                shadow = null
             ),
             maxLines = 1
         ))
@@ -355,8 +360,8 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 @Stable
 private class ScoreBoard : RhymeObject {
     companion object {
-        // 动画帧数
-        private const val FPA: Byte = 20
+        // 动画帧数 (平均字符时长 250 毫秒)
+        private const val FPA: Byte = (250 * RhymeConfig.FPS / 1000).toByte()
         // 非数
         private const val ILLEGAL_NUMBER: Byte = -1
     }
@@ -426,30 +431,55 @@ private class ScoreBoard : RhymeObject {
 
         fun RhymeDrawScope.drawNumber(position: Offset, index: Int, height: Float) {
             val f = frame
-            val oldResult = measureText(oldNumber.toString(), height)
+            val oldResult = measureText(oldNumber.toString(), height, true)
+            val strokeOldResult = measureText(oldNumber.toString(), height, false)
             val numberWidth = oldResult.width
             val numberPosition = position.translate(x = index * numberWidth)
             if (f >= FPA) {
                 drawText(
                     result = oldResult,
                     position = numberPosition,
-                    color = Colors.Black
+                    color = Colors.Steel4
+                )
+                drawText(
+                    result = strokeOldResult,
+                    position = numberPosition,
+                    color = Colors.White,
+                    drawStyle = Stroke(width = 3f, join = StrokeJoin.Round)
                 )
             }
             else {
-                val newResult = measureText(newNumber.toString(), height)
+                val newResult = measureText(newNumber.toString(), height, true)
+                val strokeNewResult = measureText(newNumber.toString(), height, false)
                 val top = height * f / FPA
                 val bottom = height - top
+                val alpha = (f / FPA.toFloat()).coerceIn(0f, 1f)
                 drawText(
                     result = oldResult.clipHeight(bottom),
                     position = numberPosition,
-                    color = Colors.Black
+                    color = Colors.Steel4,
+                    alpha = 1 - alpha
+                )
+                drawText(
+                    result = strokeOldResult.clipHeight(bottom),
+                    position = numberPosition,
+                    color = Colors.White,
+                    drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
+                    alpha = 1 - alpha
                 )
                 clipRect(numberPosition.translate(y = bottom), Size(numberWidth, top)) {
                     drawText(
                         result = newResult,
                         position = numberPosition,
-                        color = Colors.Black
+                        color = Colors.Steel4,
+                        alpha = alpha
+                    )
+                    drawText(
+                        result = strokeNewResult,
+                        position = numberPosition,
+                        color = Colors.White,
+                        drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
+                        alpha = alpha
                     )
                 }
             }
@@ -462,46 +492,45 @@ private class ScoreBoard : RhymeObject {
         }
     }
 
-    private var number1 by mutableStateOf(ScoreNumber(oldNumber = 0))
-    private var number2 by mutableStateOf(ScoreNumber(oldNumber = 0))
-    private var number3 by mutableStateOf(ScoreNumber(oldNumber = 0))
-    private var number4 by mutableStateOf(ScoreNumber(oldNumber = 0))
-
+    private val numbers = Array(4) { mutableStateOf(ScoreNumber(oldNumber = 0)) }
     private val lock = SynchronizedObject()
 
     // 组合四个数位得分
-    private val score: Int get() = number1.actualNumber * 1000 + number2.actualNumber * 100 + number3.actualNumber * 10 + number4.actualNumber
+    private val score: Int get() {
+        var factor = 10000
+        return numbers.sumOf {
+            factor /= 10
+            it.value.actualNumber * factor
+        }
+    }
 
     // 增加得分
     fun addScore(value: Int) {
         synchronized(lock) {
-            val oldScore = score
-            val newScore = oldScore + value
+            var newScore = score + value
             if (value < 1 || newScore > 9999) return
-            number1.reset((newScore / 1000).toByte())?.let { number1 = it }
-            number2.reset(((newScore % 1000) / 100).toByte())?.let { number2 = it }
-            number3.reset(((newScore % 100) / 10).toByte())?.let { number3 = it }
-            number4.reset((newScore % 10).toByte())?.let { number4 = it }
+            for (index in numbers.size - 1 downTo 0) {
+                var number by numbers[index]
+                number.reset((newScore % 10).toByte())?.let { number = it }
+                newScore /= 10
+            }
         }
     }
 
     override fun update(frame: Int, position: Long) {
         synchronized(lock) {
-            number1.update()?.let { number1 = it }
-            number2.update()?.let { number2 = it }
-            number3.update()?.let { number3 = it }
-            number4.update()?.let { number4 = it }
+            numbers.forEach { number ->
+                number.value.update()?.let { number.value = it }
+            }
         }
     }
 
     override fun RhymeDrawScope.draw() {
         val position = Offset(620f, 80f)
         rotateRad(atan(288 / 768f), position) {
-            drawRect(Colors.Red4, position, Size(340f, 140f))
-            with(number1) { drawNumber(position, 0, 140f) }
-            with(number2) { drawNumber(position, 1, 140f) }
-            with(number3) { drawNumber(position, 2, 140f) }
-            with(number4) { drawNumber(position, 3, 140f) }
+            numbers.forEachIndexed { index, number ->
+                with(number.value) { drawNumber(position, index, 140f) }
+            }
         }
     }
 }
