@@ -4,23 +4,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.roundToIntSize
-import androidx.compose.ui.util.fastJoinToString
-import androidx.compose.ui.util.fastMapIndexed
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.util.*
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
 import love.yinlin.extension.translate
+import kotlin.jvm.JvmInline
+import kotlin.math.*
+import kotlin.random.Random
 
 // 手势操作事件
 @Stable
@@ -167,6 +165,9 @@ internal data class RhymeDrawScope(
 
     inline fun clipPath(path: RhymePath, block: RhymeDrawScope.() -> Unit) =
         scope.clipPath(path.path) { block() }
+
+    inline fun rotate(degree: Float, pivot: Offset, block: RhymeDrawScope.() -> Unit) = scope.rotate(degree, pivot * scale) { block() }
+    inline fun rotateRad(radian: Float, pivot: Offset, block: RhymeDrawScope.() -> Unit) = scope.rotateRad(radian, pivot * scale) { block() }
 }
 
 // 游戏渲染实体
@@ -353,12 +354,155 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 // 分数板
 @Stable
 private class ScoreBoard : RhymeObject {
-    override fun update(frame: Int, position: Long) {
+    companion object {
+        // 动画帧数
+        private const val FPA: Byte = 20
+        // 非数
+        private const val ILLEGAL_NUMBER: Byte = -1
+    }
 
+    @Stable
+    @JvmInline
+    private value class ScoreNumber(val value: Int) {
+        // 当前帧
+        val frame: Byte get() = (value ushr 24).toByte()
+        // 旧数字 (消失)
+        val oldNumber: Byte get() = ((value ushr 16) and 0xff).toByte()
+        // 新数字 (出现)
+        val newNumber: Byte get() = ((value ushr 8) and 0xff).toByte()
+        // 缓冲区下一个数字
+        val nextNumber: Byte get() = (value and 0xff).toByte()
+
+        // 实际值 (优先级: nextNumber > newNumber > oldNumber)
+        val actualNumber: Int get() {
+            val n1 = oldNumber
+            val n2 = newNumber
+            val n3 = nextNumber
+            return (if (n3 != ILLEGAL_NUMBER) n3 else if (n2 != ILLEGAL_NUMBER) n2 else n1).toInt()
+        }
+
+        constructor(frame: Byte = FPA, oldNumber: Byte, newNumber: Byte = ILLEGAL_NUMBER, nextNumber: Byte = ILLEGAL_NUMBER) : this(
+            value = (frame.toInt() shl 24) or ((oldNumber.toInt() and 0xff) shl 16) or ((newNumber.toInt() and 0xff) shl 8) or (nextNumber.toInt() and 0xff)
+        )
+
+        fun copy(frame: Byte = this.frame, oldNumber: Byte = this.oldNumber, newNumber: Byte = this.newNumber, nextNumber: Byte = this.nextNumber) =
+            ScoreNumber(frame = frame, oldNumber = oldNumber, newNumber = newNumber, nextNumber = nextNumber)
+
+        // 设置数位 (number in 1 .. 9)
+        fun reset(number: Byte): ScoreNumber? {
+            val n1 = oldNumber
+            val n2 = newNumber
+            val n3 = nextNumber
+            return if (n3 != ILLEGAL_NUMBER) { // 缓冲区有数字
+                // 如果正在替换的数字与新数字的相同, 则缓冲区不重要了直接清空
+                if (n2 == number) copy(nextNumber = ILLEGAL_NUMBER)
+                // 如果缓冲区数字与新数字不同, 则更新缓冲区
+                else if (n3 != number) copy(nextNumber = number)
+                else null
+            }
+            else if (n2 != ILLEGAL_NUMBER) { // 正在替换数字
+                // 如果正在替换数字和新数字不同则将新数字放入缓冲区
+                if (n2 != number) copy(nextNumber = number)
+                else null
+            }
+            else if (n1 != number) copy(newNumber = number, frame = 0) // 旧数字与新数字不同, 启动替换
+            else null
+        }
+
+        // 更新数位
+        fun update(): ScoreNumber? {
+            val f = frame
+            return if (f >= FPA - 1) { // 帧数到达峰值
+                val n2 = newNumber
+                val n3 = nextNumber
+                // 缓冲区有数字: 新数字替换成缓冲区数字 启动新数字 清空缓冲区 重置帧
+                if (n3 != ILLEGAL_NUMBER) copy(oldNumber = n2, newNumber = n3, nextNumber = ILLEGAL_NUMBER, frame = 0)
+                // 缓冲区无数字: 结束 清空新数字和缓冲区
+                else if (n2 != ILLEGAL_NUMBER) copy(oldNumber = n2, newNumber = ILLEGAL_NUMBER, nextNumber = ILLEGAL_NUMBER, frame = FPA)
+                else null
+            }
+            else copy(frame = (f + 1).toByte()) // 切换帧
+        }
+
+        fun RhymeDrawScope.drawNumber(position: Offset, index: Int, height: Float) {
+            val f = frame
+            val oldResult = measureText(oldNumber.toString(), height)
+            val numberWidth = oldResult.width
+            val numberPosition = position.translate(x = index * numberWidth)
+            if (f >= FPA) {
+                drawText(
+                    result = oldResult,
+                    position = numberPosition,
+                    color = Colors.Black
+                )
+            }
+            else {
+                val newResult = measureText(newNumber.toString(), height)
+                val top = height * f / FPA
+                val bottom = height - top
+                drawText(
+                    result = oldResult.clipHeight(bottom),
+                    position = numberPosition,
+                    color = Colors.Black
+                )
+                clipRect(numberPosition.translate(y = bottom), Size(numberWidth, top)) {
+                    drawText(
+                        result = newResult,
+                        position = numberPosition,
+                        color = Colors.Black
+                    )
+                }
+            }
+        }
+
+        override fun toString(): String {
+            val n1 = oldNumber
+            val n2 = newNumber
+            return "[$frame: ${if (n2 != ILLEGAL_NUMBER) "$n1 -> $n2" else n1} | $nextNumber]"
+        }
+    }
+
+    private var number1 by mutableStateOf(ScoreNumber(oldNumber = 0))
+    private var number2 by mutableStateOf(ScoreNumber(oldNumber = 0))
+    private var number3 by mutableStateOf(ScoreNumber(oldNumber = 0))
+    private var number4 by mutableStateOf(ScoreNumber(oldNumber = 0))
+
+    private val lock = SynchronizedObject()
+
+    // 组合四个数位得分
+    private val score: Int get() = number1.actualNumber * 1000 + number2.actualNumber * 100 + number3.actualNumber * 10 + number4.actualNumber
+
+    // 增加得分
+    fun addScore(value: Int) {
+        synchronized(lock) {
+            val oldScore = score
+            val newScore = oldScore + value
+            if (value < 1 || newScore > 9999) return
+            number1.reset((newScore / 1000).toByte())?.let { number1 = it }
+            number2.reset(((newScore % 1000) / 100).toByte())?.let { number2 = it }
+            number3.reset(((newScore % 100) / 10).toByte())?.let { number3 = it }
+            number4.reset((newScore % 10).toByte())?.let { number4 = it }
+        }
+    }
+
+    override fun update(frame: Int, position: Long) {
+        synchronized(lock) {
+            number1.update()?.let { number1 = it }
+            number2.update()?.let { number2 = it }
+            number3.update()?.let { number3 = it }
+            number4.update()?.let { number4 = it }
+        }
     }
 
     override fun RhymeDrawScope.draw() {
-
+        val position = Offset(620f, 80f)
+        rotateRad(atan(288 / 768f), position) {
+            drawRect(Colors.Red4, position, Size(340f, 140f))
+            with(number1) { drawNumber(position, 0, 140f) }
+            with(number2) { drawNumber(position, 1, 140f) }
+            with(number3) { drawNumber(position, 2, 140f) }
+            with(number4) { drawNumber(position, 3, 140f) }
+        }
     }
 }
 
@@ -380,11 +524,11 @@ private class Scene(
     lyrics: RhymeLyricsConfig,
     record: ImageBitmap
 ) : RhymeObject {
-    private val progressBoard = ProgressBoard(lyrics.duration, record)
-    private val track = Track()
-    private val lyricsBoard = LyricsBoard(lyrics)
-    private val scoreBoard = ScoreBoard()
-    private val comboBoard = ComboBoard()
+    val progressBoard = ProgressBoard(lyrics.duration, record)
+    val track = Track()
+    val lyricsBoard = LyricsBoard(lyrics)
+    val scoreBoard = ScoreBoard()
+    val comboBoard = ComboBoard()
 
     override fun update(frame: Int, position: Long) {
         lyricsBoard.update(frame, position)
@@ -459,7 +603,10 @@ internal class RhymeStage {
     }
 
     fun onPointerEvent(type: PointerEventType, position: Offset) {
-        println(PointerEvent(type, frame, position))
+        if (type == PointerEventType.Up) {
+            val score = Random.nextInt(1, 4)
+            scene?.scoreBoard?.addScore(score)
+        }
     }
 
     fun RhymeDrawScope.onDraw() {
