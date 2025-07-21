@@ -587,7 +587,7 @@ private class ScoreBoard : RhymeObject {
         val position = Offset(620f, 80f)
         rotateRad(atan(288 / 768f), position) {
             numbers.forEachIndexed { index, number ->
-                with(number.value) { drawNumber(position, index, 140f) }
+                number.value.apply { drawNumber(position, index, 140f) }
             }
         }
     }
@@ -633,38 +633,11 @@ private class Scene(
     override fun event(pointer: PointerData): Boolean = progressBoard.event(pointer) || track.event(pointer)
 
     override fun RhymeDrawScope.draw() {
-        with(lyricsBoard) { draw() }
-        with(scoreBoard) { draw() }
-        with(comboBoard) { draw() }
-        with(track) { draw() }
-        with(progressBoard) { draw() }
-    }
-}
-
-// 音符管理器
-@Stable
-private class NotesManager(
-    private val lyrics: RhymeLyricsConfig,
-    private val speed: Int
-) : RhymeObject {
-    override fun update(frame: Int, position: Long) {
-
-    }
-
-    override fun RhymeDrawScope.draw() {
-
-    }
-}
-
-// 粒子管理
-@Stable
-private class ParticlesManager : RhymeObject {
-    override fun update(frame: Int, position: Long) {
-
-    }
-
-    override fun RhymeDrawScope.draw() {
-
+        lyricsBoard.apply { draw() }
+        scoreBoard.apply { draw() }
+        comboBoard.apply { draw() }
+        track.apply { draw() }
+        progressBoard.apply { draw() }
     }
 }
 
@@ -672,33 +645,23 @@ private class ParticlesManager : RhymeObject {
 @Stable
 internal class RhymeStage {
     private var frame: Int = 0
-
-    private var pointers: MutableLongObjectMap<PointerData>? = null
-
     private var scene: Scene? = null
-    private var notes: NotesManager? = null
-    private var particles: ParticlesManager? = null
+    private var pointers: MutableLongObjectMap<PointerData>? = null
 
     fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap, speed: Int) {
         scene = Scene(lyrics, record)
-        notes = NotesManager(lyrics, speed)
-        particles = ParticlesManager()
         pointers = mutableLongObjectMapOf()
     }
 
     fun onClear() {
         frame = 0
         scene = null
-        notes = null
-        particles = null
         pointers = null
     }
 
     fun onUpdate(position: Long) {
         ++frame
         scene?.update(frame, position)
-        notes?.update(frame, position)
-        particles?.update(frame, position)
     }
 
     private fun onEvent(pointer: PointerData) {
@@ -742,8 +705,6 @@ internal class RhymeStage {
 
     fun RhymeDrawScope.onDraw() {
         scene?.apply { draw() }
-        notes?.apply { draw() }
-        particles?.apply { draw() }
     }
 
     fun onResult(): RhymeResult {
