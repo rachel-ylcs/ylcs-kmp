@@ -4,6 +4,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -18,20 +23,6 @@ import love.yinlin.extension.roundToIntOffset
 import love.yinlin.extension.translate
 import kotlin.jvm.JvmInline
 import kotlin.math.*
-import kotlin.random.Random
-
-// 手势操作事件
-@Stable
-internal enum class PointerEventType {
-    Down, Move, Up
-}
-
-@Stable
-internal data class PointerEvent(
-    val type: PointerEventType,
-    val startFrame: Int,
-    val position: Offset
-)
 
 private operator fun DrawStyle.times(scale: Float): DrawStyle = when (this) {
     is Fill -> Fill
@@ -538,6 +529,11 @@ private class ScoreBoard : RhymeObject {
 // 连击板
 @Stable
 private class ComboBoard : RhymeObject {
+    @Stable
+    private enum class ActionResult {
+        PERFECT, GOOD, MISS
+    }
+
     override fun update(frame: Int, position: Long) {
 
     }
@@ -603,6 +599,11 @@ private class ParticlesManager : RhymeObject {
     }
 }
 
+@Stable
+private class EventManager {
+    val pointers = mutableStateMapOf<PointerId, Offset>()
+}
+
 // 游戏舞台
 @Stable
 internal class RhymeStage {
@@ -610,11 +611,13 @@ internal class RhymeStage {
     private var scene: Scene? = null
     private var notes: NotesManager? = null
     private var particles: ParticlesManager? = null
+    private var events: EventManager? = null
 
     fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap, speed: Int) {
         scene = Scene(lyrics, record)
         notes = NotesManager(lyrics, speed)
         particles = ParticlesManager()
+        events = EventManager()
     }
 
     fun onClear() {
@@ -622,6 +625,7 @@ internal class RhymeStage {
         scene = null
         notes = null
         particles = null
+        events = null
     }
 
     fun onUpdate(position: Long) {
@@ -631,10 +635,38 @@ internal class RhymeStage {
         particles?.update(frame, position)
     }
 
-    fun onPointerEvent(type: PointerEventType, position: Offset) {
-        if (type == PointerEventType.Up) {
-            val score = Random.nextInt(1, 4)
-            scene?.scoreBoard?.addScore(score)
+    suspend fun PointerInputScope.onPointerEvent(scale: Float) {
+        events?.pointers?.let { pointers ->
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                    for (change in event.changes) {
+                        val id = change.id
+                        val position = change.position / scale
+                        when {
+                            change.changedToDown() -> {
+                                if (id !in pointers) {
+                                    pointers[id] = position
+                                    println("Down $id $position")
+                                }
+                            }
+                            change.changedToUp() -> {
+                                pointers.remove(id)?.let {
+                                    println("Up $id $position")
+                                }
+                            }
+                            else -> {
+                                pointers[id]?.let { previous ->
+                                    if (position != previous) {
+                                        pointers[id] = position
+                                        println("Move $id $position")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

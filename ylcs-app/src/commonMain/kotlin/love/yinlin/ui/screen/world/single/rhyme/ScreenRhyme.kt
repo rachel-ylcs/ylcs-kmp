@@ -2,7 +2,6 @@ package love.yinlin.ui.screen.world.single.rhyme
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -431,19 +430,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 val textData = remember(textMeasurer, font) { RhymeDrawScope.RhymeTextData(font, textMeasurer) }
 
                 Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(scale) {
-                    detectDragGestures(
-                        orientationLock = null,
-                        shouldAwaitTouchSlop = { false },
-                        onDragStart = { _, change, _ ->
-                            stage.onPointerEvent(PointerEventType.Down, change.position / scale)
-                        },
-                        onDrag = { change, _ ->
-                            stage.onPointerEvent(PointerEventType.Move, change.position / scale)
-                        },
-                        onDragEnd = { change ->
-                            stage.onPointerEvent(PointerEventType.Up, change.position / scale)
-                        }
-                    )
+                    with(stage) { onPointerEvent(scale) }
                 }) {
                     val scope = RhymeDrawScope(scope = this, scale = scale, textData = textData)
                     with(stage) { scope.onDraw() }
