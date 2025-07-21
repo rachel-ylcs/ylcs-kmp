@@ -430,7 +430,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 val textData = remember(textMeasurer, font) { RhymeDrawScope.RhymeTextData(font, textMeasurer) }
 
                 Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(scale) {
-                    with(stage) { onPointerEvent(scale) }
+                    with(stage) { detectPointer(scale) }
                 }) {
                     val scope = RhymeDrawScope(scope = this, scale = scale, textData = textData)
                     with(stage) { scope.onDraw() }
