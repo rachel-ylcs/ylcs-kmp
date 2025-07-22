@@ -326,15 +326,11 @@ actual class MusicPlayer {
     }
 
     actual fun play() {
-        player?.let {
-            if (!it.isPlaying) it.play()
-        }
+        player?.play()
     }
 
     actual fun pause() {
-        player?.let {
-            if (it.isPlaying) it.pause()
-        }
+        player?.pause()
     }
 
     private fun innerStop() {

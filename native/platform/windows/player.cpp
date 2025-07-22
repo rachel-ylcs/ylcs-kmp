@@ -16,7 +16,11 @@ static inline Playback::MediaPlayer& np_cast(jlong handle) { return reinterpret_
 
 extern "C" {
 	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_MusicPlayer_nativeCreatePlayer(JNIEnv* env, jobject) {
-		return reinterpret_cast<jlong>(new NativePlayer);
+		auto nativePlayer = new NativePlayer;
+		nativePlayer->player.MediaEnded([](Playback::MediaPlayer&& sender, auto&& args) {
+			sender.Source(nullptr);
+		});
+		return reinterpret_cast<jlong>(nativePlayer);
 	}
 
 	JNIEXPORT void JNICALL Java_love_yinlin_platform_MusicPlayer_nativeReleasePlayer(JNIEnv* env, jobject, jlong handle) {
@@ -28,26 +32,17 @@ extern "C" {
 
 	JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_MusicPlayer_nativeIsPlaying(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return JNI_FALSE;
-		try {
-			return np_cast(handle).PlaybackSession().PlaybackState() == Playback::MediaPlaybackState::Playing ? JNI_TRUE : JNI_FALSE;
-		}
-		catch (...) { return JNI_FALSE; }
+		return np_cast(handle).PlaybackSession().PlaybackState() == Playback::MediaPlaybackState::Playing ? JNI_TRUE : JNI_FALSE;
 	}
 
 	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_MusicPlayer_nativeGetPosition(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return 0LL;
-		try {
-			return np_cast(handle).PlaybackSession().Position().count() / 10000;
-		}
-		catch (...) { return 0LL; }
+		return np_cast(handle).PlaybackSession().Position().count() / 10000;
 	}
 
 	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_MusicPlayer_nativeGetDuration(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return 0LL;
-		try {
-			return np_cast(handle).PlaybackSession().NaturalDuration().count() / 10000;
-		}
-		catch (...) { return 0LL; }
+		return np_cast(handle).PlaybackSession().NaturalDuration().count() / 10000;
 	}
 
 	JNIEXPORT void JNICALL Java_love_yinlin_platform_MusicPlayer_nativeLoad(JNIEnv* env, jobject, jlong handle, jstring path) {
@@ -63,25 +58,19 @@ extern "C" {
 
 	JNIEXPORT void JNICALL Java_love_yinlin_platform_MusicPlayer_nativePlay(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return;
-		try {
-			np_cast(handle).Play();
-		}
-		catch (...) { }
+		auto& player = np_cast(handle);
+		if (player.PlaybackSession().PlaybackState() != Playback::MediaPlaybackState::Playing) player.Play();
 	}
 
 	JNIEXPORT void JNICALL Java_love_yinlin_platform_MusicPlayer_nativePause(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return;
-		try {
-			np_cast(handle).Pause();
-		}
-		catch (...) { }
+		auto& player = np_cast(handle);
+		if (player.PlaybackSession().PlaybackState() == Playback::MediaPlaybackState::Playing) player.Pause();
 	}
 
 	JNIEXPORT void JNICALL Java_love_yinlin_platform_MusicPlayer_nativeStop(JNIEnv* env, jobject, jlong handle) {
 		if (handle == 0LL) return;
-		try {
-			np_cast(handle).Source(nullptr);
-		}
-		catch (...) { }
+		auto& player = np_cast(handle);
+		np_cast(handle).Source(nullptr);
 	}
 }

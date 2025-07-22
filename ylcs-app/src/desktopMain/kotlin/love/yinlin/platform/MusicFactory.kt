@@ -270,11 +270,11 @@ actual class MusicPlayer {
     }
 
     actual fun play() {
-        if (!nativeIsPlaying(handle)) nativePlay(handle)
+        nativePlay(handle)
     }
 
     actual fun pause() {
-        if (nativeIsPlaying(handle)) nativePause(handle)
+        nativePause(handle)
     }
 
     actual fun stop() {
