@@ -238,70 +238,51 @@ class ActualMusicFactory : MusicFactory() {
 
 @Stable
 actual class MusicPlayer {
-    private var controller: AudioPlayerComponent? = null
+    external fun nativeCreatePlayer(): Long
+    external fun nativeReleasePlayer(handle: Long)
+    external fun nativeIsPlaying(handle: Long): Boolean
+    external fun nativeGetPosition(handle: Long): Long
+    external fun nativeGetDuration(handle: Long): Long
+    external fun nativeLoad(handle: Long, path: String)
+    external fun nativePlay(handle: Long)
+    external fun nativePause(handle: Long)
+    external fun nativeStop(handle: Long)
 
-    actual val isInit: Boolean get() = controller != null
+    private var handle: Long = 0L
 
-    private var mIsPlaying by mutableStateOf(false)
-    actual val isPlaying: Boolean get() = mIsPlaying
+    actual val isInit: Boolean get() = handle != 0L
 
-    actual var position: Long get() { return controller?.mediaPlayer()?.status()?.time().let { if (it == null || it == -1L) 0L else it } }
-        set(value) {
-            controller?.mediaPlayer()?.let {
-                it.controls().setTime(value)
-                if (!it.status().isPlaying) it.controls().play()
-            }
-        }
+    actual val isPlaying: Boolean get() = nativeIsPlaying(handle)
 
-    private var mDuration by mutableLongStateOf(0L)
-    actual val duration: Long get() = mDuration
+    actual val position: Long get() = nativeGetPosition(handle)
+
+    actual val duration: Long get() = nativeGetDuration(handle)
 
     actual suspend fun init() {
-        Coroutines.cpu {
-            catching {
-                val component = AudioPlayerComponent()
-                component.mediaPlayer().events().apply {
-                    addMediaEventListener(object : MediaEventAdapter() {
-                        override fun mediaDurationChanged(media: Media?, newDuration: Long) { mDuration = newDuration }
-                    })
-                    addMediaPlayerEventListener(object : MediaPlayerEventAdapter() {
-                        override fun playing(mediaPlayer: MediaPlayer?) { mIsPlaying = true }
-                        override fun paused(mediaPlayer: MediaPlayer?) { mIsPlaying = false }
-                        override fun stopped(mediaPlayer: MediaPlayer?) { stop() }
-                        override fun error(mediaPlayer: MediaPlayer?) { stop() }
-                    })
-                }
-                controller = component
-            }
-        }
+        handle = nativeCreatePlayer()
     }
 
     actual suspend fun load(path: Path) {
-        controller?.mediaPlayer()?.media()?.play(path.toString())
+        Coroutines.cpu {
+            nativeLoad(handle, path.toString())
+            nativePlay(handle)
+        }
     }
 
     actual fun play() {
-        controller?.mediaPlayer()?.let {
-            if (!it.status().isPlaying) it.controls().play()
-        }
+        if (!nativeIsPlaying(handle)) nativePlay(handle)
     }
 
     actual fun pause() {
-        controller?.mediaPlayer()?.let {
-            if (it.status().isPlaying) it.controls().pause()
-        }
+        if (nativeIsPlaying(handle)) nativePause(handle)
     }
 
     actual fun stop() {
-        mIsPlaying = false
-        mDuration = 0L
-        controller?.mediaPlayer()?.let {
-            it.controls().stop()
-            it.media().reset()
-        }
+        nativeStop(handle)
     }
 
     actual fun release() {
-        controller?.release()
+        nativeReleasePlayer(handle)
+        handle = 0L
     }
 }

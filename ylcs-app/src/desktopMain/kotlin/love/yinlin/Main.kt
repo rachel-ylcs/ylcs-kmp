@@ -35,7 +35,6 @@ import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Rectangle
 import kotlin.io.path.Path
-import kotlin.system.exitProcess
 
 private object LibraryLoader {
     init {
@@ -54,17 +53,8 @@ private object LibraryLoader {
     }
 }
 
-private external fun requestSingleInstance(): Boolean
-private external fun releaseSingleInstance()
-
 fun main() {
-    LibraryLoader.run {
-        if (!requestSingleInstance()) {
-            releaseSingleInstance()
-            exitProcess(0)
-        }
-        Runtime.getRuntime().addShutdownHook(Thread(::releaseSingleInstance))
-    }
+    LibraryLoader.run { singleInstance() }
 
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")

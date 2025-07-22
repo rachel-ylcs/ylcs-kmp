@@ -12,6 +12,19 @@ import java.awt.datatransfer.StringSelection
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.concurrent.thread
+import kotlin.system.exitProcess
+
+private external fun requestSingleInstance(): Boolean
+private external fun releaseSingleInstance()
+
+fun singleInstance() {
+    if (!requestSingleInstance()) {
+        releaseSingleInstance()
+        exitProcess(0)
+    }
+    Runtime.getRuntime().addShutdownHook(thread(start = false) { releaseSingleInstance() })
+}
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	osNetOpenUrl(uri.toString())

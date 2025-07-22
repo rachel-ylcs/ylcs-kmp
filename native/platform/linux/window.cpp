@@ -1,4 +1,7 @@
-#include "platform.h"
+#include "../../ylcs_jni.h"
 
-void ylcs_window_set_click_through(void *handle, bool enable) {
+extern "C" {
+    JNIEXPORT void JNICALL Java_love_yinlin_platform_ActualFloatingLyrics_modifyWindow(JNIEnv* env, jobject, jlong window, jboolean clickThrough) {
+        
+    }
 }

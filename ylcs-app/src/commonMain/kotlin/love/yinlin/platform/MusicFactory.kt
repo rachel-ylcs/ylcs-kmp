@@ -148,7 +148,7 @@ abstract class MusicFactory {
 expect class MusicPlayer() {
     val isInit: Boolean
     val isPlaying: Boolean
-    var position: Long
+    val position: Long
     val duration: Long
     suspend fun init()
     suspend fun load(path: Path)

@@ -24,3 +24,13 @@ void ylcs_single_instance_unlock() {
         appMessagePort = NULL;
     }
 }
+
+extern "C" {
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_MainKt_requestSingleInstance(JNIEnv* env, jobject) {
+        return (jboolean)ylcs_single_instance_try_lock();
+    }
+
+    JNIEXPORT void JNICALL Java_love_yinlin_MainKt_releaseSingleInstance(JNIEnv* env, jobject) {
+        ylcs_single_instance_unlock();
+    }
+}

@@ -289,51 +289,24 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
 
 @Stable
 actual class MusicPlayer {
-    private var player by mutableRefStateOf<ExoPlayer?>(null)
+    private var player: ExoPlayer? = null
 
     actual val isInit: Boolean get() = player != null
 
-    private var mIsPlaying by mutableStateOf(false)
-    actual val isPlaying: Boolean get() = mIsPlaying
+    actual val isPlaying: Boolean get() = player?.isPlaying == true
 
-    actual var position: Long get() { return player?.currentPosition.let { if (it == null || it == C.TIME_UNSET) 0L else it } }
-        set(value) {
-            player?.let {
-                it.seekTo(value)
-                if (!it.isPlaying) it.play()
-            }
-        }
+    actual val position: Long get() = player?.currentPosition.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
-    private var mDuration by mutableLongStateOf(0L)
-    actual val duration: Long get() = mDuration
+    actual val duration: Long get() = player?.duration.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
     actual suspend fun init() {
         player = FfmpegRenderersFactory.build(appNative.context, false).apply {
             repeatMode = Player.REPEAT_MODE_OFF
             shuffleModeEnabled = false
             addListener(object : Player.Listener {
-                private fun updateInfo() {
-                    val d = this@apply.duration
-                    mDuration = if (d == C.TIME_UNSET) 0L else d
-                }
-
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    super.onIsPlayingChanged(isPlaying)
-                    mIsPlaying = isPlaying
-                }
-
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     super.onPlaybackStateChanged(playbackState)
-                    when (playbackState) {
-                        Player.STATE_IDLE, Player.STATE_BUFFERING -> {}
-                        Player.STATE_READY -> updateInfo()
-                        Player.STATE_ENDED -> innerStop()
-                    }
-                }
-
-                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    super.onMediaItemTransition(mediaItem, reason)
-                    updateInfo()
+                    if (playbackState == Player.STATE_ENDED) innerStop()
                 }
 
                 override fun onPlayerError(error: PlaybackException) {

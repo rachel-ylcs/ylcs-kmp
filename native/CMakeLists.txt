@@ -31,14 +31,28 @@ find_package(JNI REQUIRED)
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(mmkv)
 add_subdirectory(nativefiledialog)
-add_subdirectory(platform)
+
+set(PLATFORM_DIR "")
+if(WIN32 OR CYGWIN)
+    set(PLATFORM_DIR "windows")
+elseif(APPLE)
+    set(PLATFORM_DIR "macos")
+elseif(LINUX)
+    set(PLATFORM_DIR "linux")
+else()
+    message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
+endif()
+
+file(GLOB_RECURSE PLATFORM_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/platform/${PLATFORM_DIR}/*"
+)
 
 add_library(ylcs_native SHARED
     ylcs_jni.h
     ylcs_jni.cpp
     ylcs_mmkv.cpp
     ylcs_nativefiledialog.cpp
-    ylcs_platform.cpp
+    ${PLATFORM_SRC}
 )
 
 target_include_directories(ylcs_native PRIVATE
@@ -50,13 +64,15 @@ target_link_libraries(ylcs_native
     ${JNI_LIBRARIES}
     mmkv
     nfd
-    platform
 )
+
+if(WIN32)
+    target_compile_definitions(ylcs_native PRIVATE UNICODE _UNICODE)
+endif()
 
 add_dependencies(ylcs_native
     mmkv
     nfd
-    platform
 )
 
 set_target_properties(ylcs_native PROPERTIES

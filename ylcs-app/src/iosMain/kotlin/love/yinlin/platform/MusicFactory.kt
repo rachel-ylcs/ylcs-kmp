@@ -348,7 +348,7 @@ actual class MusicPlayer {
     // TODO: iOS端待实现
     actual val isInit: Boolean = false
     actual val isPlaying: Boolean = false
-    actual var position: Long = 0L
+    actual val position: Long = 0L
     actual val duration: Long = 0L
     actual suspend fun init() {}
     actual suspend fun load(path: Path) {}

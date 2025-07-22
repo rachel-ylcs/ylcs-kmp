@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "../../ylcs_jni.h"
 
 #include <string>
 #include <stdio.h>
@@ -35,5 +35,15 @@ void ylcs_single_instance_unlock() {
         close(appLockFd);
         appLockFd = -1;
         unlink(LOCK_FILE_PATH);
+    }
+}
+
+extern "C" {
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_MainKt_requestSingleInstance(JNIEnv* env, jobject) {
+        return (jboolean)ylcs_single_instance_try_lock();
+    }
+
+    JNIEXPORT void JNICALL Java_love_yinlin_MainKt_releaseSingleInstance(JNIEnv* env, jobject) {
+        ylcs_single_instance_unlock();
     }
 }
