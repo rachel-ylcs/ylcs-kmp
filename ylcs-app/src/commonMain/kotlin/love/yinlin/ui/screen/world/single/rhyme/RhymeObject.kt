@@ -156,7 +156,7 @@ internal data class RhymeDrawScope(
     fun drawPath(brush: Brush, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
         scope.drawPath(path.path, brush, alpha, style * scale)
 
-    fun measureText(text: String, expectHeight: Float, fill: Boolean = true): RhymeMeasureResult {
+    fun measureText(text: String, expectHeight: Float): RhymeMeasureResult {
         val virtualHeight = expectHeight * scale
         val size = textData.measurer.measure(
             text = text,
@@ -170,16 +170,12 @@ internal data class RhymeDrawScope(
         val actualTextSize = virtualHeight * ratio
         return RhymeMeasureResult(textData.measurer.measure(
             text = text,
-            style = if (fill) TextStyle(
+            style = TextStyle(
                 fontSize = TextUnit(actualTextSize, TextUnitType.Sp),
                 fontFamily = FontFamily(textData.font)
-            ) else TextStyle(
-                brush = null,
-                fontSize = TextUnit(actualTextSize, TextUnitType.Sp),
-                fontFamily = FontFamily(textData.font),
-                shadow = null
             ),
-            maxLines = 1
+            maxLines = 1,
+            skipCache = true
         ))
     }
 
@@ -437,8 +433,8 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 @Stable
 private class ScoreBoard : RhymeObject {
     companion object {
-        // 动画帧数 (平均字符时长 250 毫秒)
-        private const val FPA: Byte = (250 * RhymeConfig.FPS / 1000).toByte()
+        // 动画帧数
+        private const val FPA: Byte = (500 * RhymeConfig.FPS / 1000).toByte()
         // 非数
         private const val ILLEGAL_NUMBER: Byte = -1
     }
@@ -508,8 +504,7 @@ private class ScoreBoard : RhymeObject {
 
         fun RhymeDrawScope.drawNumber(position: Offset, index: Int, height: Float) {
             val f = frame
-            val oldResult = measureText(oldNumber.toString(), height, true)
-            val strokeOldResult = measureText(oldNumber.toString(), height, false)
+            val oldResult = measureText(oldNumber.toString(), height)
             val numberWidth = oldResult.width
             val numberPosition = position.translate(x = index * numberWidth)
             if (f >= FPA) {
@@ -519,32 +514,34 @@ private class ScoreBoard : RhymeObject {
                     color = Colors.Steel4
                 )
                 drawText(
-                    result = strokeOldResult,
+                    result = oldResult,
                     position = numberPosition,
                     color = Colors.White,
                     drawStyle = Stroke(width = 3f, join = StrokeJoin.Round)
                 )
             }
             else {
-                val newResult = measureText(newNumber.toString(), height, true)
-                val strokeNewResult = measureText(newNumber.toString(), height, false)
-                val top = height * f / FPA
-                val bottom = height - top
+                val newResult = measureText(newNumber.toString(), height)
+                val gap = height / 8
+                val newHeight = height * f / FPA
+                val oldHeight = height - newHeight - gap
                 val alpha = (f / FPA.toFloat()).coerceIn(0f, 1f)
-                drawText(
-                    result = oldResult.clipHeight(bottom),
-                    position = numberPosition,
-                    color = Colors.Steel4,
-                    alpha = 1 - alpha
-                )
-                drawText(
-                    result = strokeOldResult.clipHeight(bottom),
-                    position = numberPosition,
-                    color = Colors.White,
-                    drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
-                    alpha = 1 - alpha
-                )
-                clipRect(numberPosition.translate(y = bottom), Size(numberWidth, top)) {
+                clipRect(numberPosition, Size(numberWidth, oldHeight)) {
+                    drawText(
+                        result = oldResult,
+                        position = numberPosition,
+                        color = Colors.Steel4,
+                        alpha = 1 - alpha
+                    )
+                    drawText(
+                        result = oldResult,
+                        position = numberPosition,
+                        color = Colors.White,
+                        drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
+                        alpha = 1 - alpha
+                    )
+                }
+                clipRect(numberPosition.translate(y = oldHeight + gap), Size(numberWidth, newHeight)) {
                     drawText(
                         result = newResult,
                         position = numberPosition,
@@ -552,7 +549,7 @@ private class ScoreBoard : RhymeObject {
                         alpha = alpha
                     )
                     drawText(
-                        result = strokeNewResult,
+                        result = newResult,
                         position = numberPosition,
                         color = Colors.White,
                         drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
