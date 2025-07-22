@@ -1,16 +1,12 @@
 package love.yinlin.ui.screen.world.single.rhyme
 
-import androidx.collection.MutableLongObjectMap
-import androidx.collection.mutableLongObjectMapOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.util.*
 import kotlinx.atomicfu.locks.SynchronizedObject
@@ -18,43 +14,18 @@ import kotlinx.atomicfu.locks.synchronized
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
-import love.yinlin.extension.translate
-import kotlin.jvm.JvmInline
-import kotlin.math.*
 import kotlin.random.Random
 
 private operator fun Rect.times(scale: Float): Rect = Rect(left * scale, top * scale, right * scale, bottom * scale)
 
-private operator fun DrawStyle.times(scale: Float): DrawStyle = when (this) {
-    is Fill -> Fill
-    is Stroke -> Stroke(
-        width = this.width * scale,
-        miter = this.miter * scale,
-        cap = this.cap,
-        join = this.join,
-        pathEffect = this.pathEffect
-    )
-}
-
-private operator fun Shadow.times(scale: Float): Shadow = this.copy(offset = this.offset * scale, blurRadius = this.blurRadius * scale)
-
 // 指针数据
-@Stable
-private data class PointerData(
-    val id: Long,
-    val start: Offset,
-    var move: Offset? = null,
-    var end: Offset? = null
-) {
-    val down: Boolean get() = move == null && end == null
-    val up: Boolean get() = end != null
-
-    override fun toString(): String = "[$id] ${
-        end?.let { "(${start.x}, ${start.y}) -> (${it.x}, ${it.y})" } ?:
-        move?.let { "(${start.x}, ${start.y}) | (${it.x}, ${it.y})" } ?:
-        "(${start.x}, ${start.y})"
-    }"
-}
+internal data class Pointer(
+    val startPosition: Offset,
+    val startTime: Long,
+    var position: Offset? = null,
+    var time: Long? = null,
+    var up: Boolean = false,
+)
 
 // 圆形矩形
 @Stable
@@ -70,167 +41,147 @@ private class CircleRect(private val rect: Rect) {
 
 private val Rect.circle get() = CircleRect(this)
 
-// 游戏渲染
+private fun DrawScope.drawLine(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) = this.drawLine(
+    color = color,
+    start = start,
+    end = end,
+    strokeWidth = style.width,
+    cap = style.cap,
+    pathEffect = style.pathEffect,
+    alpha = alpha
+)
+
+private fun DrawScope.drawLine(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) = this.drawLine(
+    brush = brush,
+    start = start,
+    end = end,
+    strokeWidth = style.width,
+    cap = style.cap,
+    pathEffect = style.pathEffect,
+    alpha = alpha
+)
+
+private fun DrawScope.drawRect(color: Color, rect: Rect, alpha: Float = 1f) = this.drawRect(
+    color = color,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    alpha = alpha
+)
+
+private fun DrawScope.drawRect(brush: Brush, rect: Rect, alpha: Float = 1f) = this.drawRect(
+    brush = brush,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    alpha = alpha
+)
+
+private fun DrawScope.drawArc(color: Color, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) = this.drawArc(
+    color = color,
+    startAngle = startAngle,
+    sweepAngle = sweepAngle,
+    useCenter = false,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    alpha = alpha,
+    style = style
+)
+
+private fun DrawScope.drawArc(brush: Brush, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) = this.drawArc(
+    brush = brush,
+    startAngle = startAngle,
+    sweepAngle = sweepAngle,
+    useCenter = false,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    alpha = alpha,
+    style = style
+)
+
+private fun DrawScope.drawImage(image: ImageBitmap, position: Offset, size: Size) = this.drawImage(
+    image = image,
+    dstOffset = position.roundToIntOffset(),
+    dstSize = size.roundToIntSize(),
+    filterQuality = FilterQuality.High
+)
+
+private fun DrawScope.drawImage(image: ImageBitmap, rect: Rect) = this.drawImage(
+    image = image,
+    position = rect.topLeft,
+    size=  rect.size
+)
+
+inline fun DrawScope.clipRect(position: Offset, size: Size, block: DrawScope.() -> Unit) = this.clipRect(
+    left = position.x,
+    top = position.y,
+    right = (position.x + size.width),
+    bottom = (position.y + size.height),
+    block = block
+)
+
+inline fun DrawScope.clipRect(rect: Rect, block: DrawScope.() -> Unit) = this.clipRect(rect.topLeft, rect.size, block)
+
 @Stable
-internal data class RhymeDrawScope(
-    private val scope: DrawScope,
-    private val scale: Float,
-    private val textData: RhymeTextData
+internal data class RhymeTextManager(
+    private val font: Font,
+    private val fontFamilyResolver: FontFamily.Resolver,
+    private val measurer: TextMeasurer
 ) {
-    @Stable
-    internal data class RhymeTextData(
-        val font: Font,
-        val measurer: TextMeasurer
-    )
-
-    @Stable
-    internal inner class RhymeMeasureResult(val result: TextLayoutResult) {
-        val width: Float get() = result.size.width.toFloat() / scale
-        val height: Float get() = result.size.height.toFloat() / scale
-
-        fun clipWidth(w: Float) = RhymeMeasureResult(result.copy(size = IntSize((w * scale).toInt(), result.size.height)))
-        fun clipHeight(h: Float) = RhymeMeasureResult(result.copy(size = IntSize(result.size.width, (h * scale).toInt())))
-    }
-
-    // 路径
-    @Stable
-    internal inner class RhymePath {
-        internal val path = Path()
-        fun moveTo(position: Offset): RhymePath {
-            path.moveTo(position.x * scale, position.y * scale)
-            return this
-        }
-        fun lineTo(position: Offset): RhymePath {
-            path.lineTo(position.x * scale, position.y * scale)
-            return this
-        }
-        fun addOval(rect: Rect): RhymePath {
-            path.addOval(rect * scale)
-            return this
-        }
-        fun addRect(rect: Rect): RhymePath {
-            path.addRect(rect * scale)
-            return this
-        }
-    }
-
-    fun drawLine(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
-        scope.drawLine(color, start * scale, end * scale, style.width * scale, style.cap, style.pathEffect, alpha)
-
-    fun drawLine(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
-        scope.drawLine(brush, start * scale, end * scale, style.width * scale, style.cap, style.pathEffect, alpha)
-
-    fun drawRect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawRect(color, position * scale, size * scale, alpha, style * scale)
-
-    fun drawRect(brush: Brush, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawRect(brush, position * scale, size * scale, alpha, style * scale)
-
-    fun drawRect(color: Color, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) =
-        drawRect(color, rect.topLeft, rect.size, alpha, style)
-
-    fun drawRect(brush: Brush, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) =
-        drawRect(brush, rect.topLeft, rect.size, alpha, style)
-
-    fun drawCircle(color: Color, radius: Float, center: Offset, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawCircle(color, radius * scale, center * scale, alpha, style * scale)
-
-    fun drawCircle(brush: Brush, radius: Float, center: Offset, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawCircle(brush, radius * scale, center * scale, alpha, style * scale)
-
-    fun drawArc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawArc(color, startAngle, sweepAngle, false, position * scale, size * scale, alpha, style * scale)
-
-    fun drawArc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawArc(brush, startAngle, sweepAngle, false, position * scale, size * scale, alpha, style * scale)
-
-    fun drawArc(color: Color, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) =
-        drawArc(color, startAngle, sweepAngle, rect.topLeft, rect.size, alpha, style)
-
-    fun drawArc(brush: Brush, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) =
-        drawArc(brush, startAngle, sweepAngle, rect.topLeft, rect.size, alpha, style)
-
-    fun drawPath(color: Color, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawPath(path.path, color, alpha, style * scale)
-
-    fun drawPath(brush: Brush, path: RhymePath, alpha: Float = 1f, style: DrawStyle = Fill) =
-        scope.drawPath(path.path, brush, alpha, style * scale)
-
-    fun measureText(text: String, expectHeight: Float): RhymeMeasureResult {
-        val virtualHeight = expectHeight * scale
-        val size = textData.measurer.measure(
-            text = text,
+    fun measureText(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): MultiParagraph {
+        val intrinsics = MultiParagraphIntrinsics(
+            annotatedString = AnnotatedString(text),
             style = TextStyle(
-                fontSize = TextUnit(virtualHeight, TextUnitType.Sp),
-                fontFamily = FontFamily(textData.font)
+                fontSize = TextUnit(height / 1.17f, TextUnitType.Sp),
+                fontWeight = fontWeight,
+                fontFamily = FontFamily(font)
             ),
-            maxLines = 1
-        ).size
-        val ratio = virtualHeight / size.height
-        val actualTextSize = virtualHeight * ratio
-        return RhymeMeasureResult(textData.measurer.measure(
-            text = text,
-            style = TextStyle(
-                fontSize = TextUnit(actualTextSize, TextUnitType.Sp),
-                fontFamily = FontFamily(textData.font)
-            ),
+            density = Density(1f),
+            fontFamilyResolver = fontFamilyResolver,
+            placeholders = emptyList()
+        )
+        return MultiParagraph(
+            intrinsics = intrinsics,
+            constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = height.toInt()),
             maxLines = 1,
-            skipCache = true
-        ))
-    }
-
-    fun drawText(
-        result: RhymeMeasureResult,
-        position: Offset,
-        color: Color,
-        alpha: Float = 1f,
-        shadow: Shadow? = null,
-        textDecoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
-    ) = scope.drawText(
-        textLayoutResult = result.result,
-        color = color,
-        topLeft = position * scale,
-        alpha = alpha,
-        shadow = shadow?.times(scale),
-        textDecoration = textDecoration,
-        drawStyle = drawStyle?.times(scale)
-    )
-
-    fun drawImage(image: ImageBitmap, position: Offset, size: Size) {
-        scope.drawImage(
-            image = image,
-            dstOffset = (position * scale).roundToIntOffset(),
-            dstSize = (size * scale).roundToIntSize(),
-            filterQuality = FilterQuality.High
+            overflow = TextOverflow.Clip
         )
     }
 
-    fun drawImage(image: ImageBitmap, rect: Rect) = drawImage(image, rect.topLeft, rect.size)
-
-    inline fun clipRect(position: Offset, size: Size, block: RhymeDrawScope.() -> Unit) =
-        scope.clipRect(position.x * scale, position.y * scale, (position.x + size.width) * scale, (position.y + size.height) * scale) { block() }
-
-    inline fun clipRect(rect: Rect, block: RhymeDrawScope.() -> Unit) = clipRect(rect.topLeft, rect.size, block)
-
-    inline fun clipPath(path: RhymePath, block: RhymeDrawScope.() -> Unit) =
-        scope.clipPath(path.path) { block() }
-
-    inline fun rotate(degree: Float, pivot: Offset, block: RhymeDrawScope.() -> Unit) = scope.rotate(degree, pivot * scale) { block() }
-    inline fun rotateRad(radian: Float, pivot: Offset, block: RhymeDrawScope.() -> Unit) = scope.rotateRad(radian, pivot * scale) { block() }
+    fun DrawScope.drawText(
+        content: MultiParagraph,
+        position: Offset,
+        color: Color,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
+    ) {
+        withTransform({
+            translate(left = position.x, top = position.y)
+            clipRect(left = 0f, top = 0f, right = content.width, bottom = content.height)
+        }) {
+            content.paint(
+                canvas = drawContext.canvas,
+                color = color,
+                shadow = shadow,
+                decoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
+    }
 }
 
 // 渲染实体
 @Stable
 private sealed interface RhymeObject {
-    fun update(frame: Int, position: Long)
-    fun RhymeDrawScope.draw()
+    fun update(position: Long)
+    fun DrawScope.draw(textManager: RhymeTextManager)
 }
 
 // 事件触发器
 @Stable
 private fun interface RhymeEvent {
-    fun event(pointer: PointerData): Boolean
+    fun event(pointer: Pointer): Boolean
 }
 
 // 进度板
@@ -246,21 +197,21 @@ private class ProgressBoard(
     // 游戏进度
     private var progress: Float by mutableFloatStateOf(0f)
 
-    override fun update(frame: Int, position: Long) {
+    override fun update(position: Long) {
         progress = if (duration == 0L) 0f else (position / duration.toFloat()).coerceIn(0f, 1f)
     }
 
-    override fun event(pointer: PointerData): Boolean {
-        if (pointer.up && pointer.start in recordRect.circle) {
+    override fun event(pointer: Pointer): Boolean {
+        if (pointer.up && pointer.startPosition in recordRect.circle) {
             println(pointer)
             return true
         }
         return false
     }
 
-    override fun RhymeDrawScope.draw() {
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
         // 画封面
-        clipPath(RhymePath().addOval(recordRect)) {
+        clipPath(Path().apply { addOval(recordRect) }) {
             drawImage(image = record, rect = recordRect)
         }
         // 画时长
@@ -303,7 +254,7 @@ private class Track(
     // 当前按下轨道
     private val current: Int? by mutableStateOf(null)
 
-    private fun RhymeDrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
+    private fun DrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
         // 阴影
         repeat(5) {
             drawLine(
@@ -332,16 +283,16 @@ private class Track(
         )
     }
 
-    override fun update(frame: Int, position: Long) {
+    override fun update(position: Long) {
 
     }
 
-    override fun event(pointer: PointerData): Boolean {
+    override fun event(pointer: Pointer): Boolean {
         if (pointer.up) scoreBoard.addScore(Random.nextInt(1, 4))
         return true
     }
 
-    override fun RhymeDrawScope.draw() {
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
         // 画轨道射线
         for ((start, end) in tracks) {
             drawTrackLine(
@@ -358,254 +309,80 @@ private class Track(
 private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
     private var currentIndex = -1
     private var text by mutableStateOf("")
-    private var frameTable by mutableStateOf(emptyList<Int>())
-    private var startFrame = 0
-    private var lastPosition = 0L
-    private var extraFrame = 0
     private var progress by mutableFloatStateOf(0f)
 
-    override fun update(frame: Int, position: Long) {
+    override fun update(position: Long) {
         val lines = lyrics.lyrics
         val nextLine = lines.getOrNull(currentIndex + 1)
         if (nextLine != null && position >= nextLine.start) {
             ++currentIndex
-            val theme = nextLine.theme
             // 合并字符显示 (因为 plain text 内可能包含不是 Action 的空白字符)
-            text = theme.fastJoinToString("") { it.ch }
-            // 计算每一个字符需要的帧数
-            frameTable = theme.fastMapIndexed { i, action ->
-                (action.end - (theme.getOrNull(i - 1)?.end ?: 0)) * RhymeConfig.FPS / 1000
-            }
-            // 修正此行的起始帧
-            startFrame = frame - (position - nextLine.start).toInt() * RhymeConfig.FPS / 1000
-            lastPosition = position
-            extraFrame = 0
-        }
-        lines.getOrNull(currentIndex)?.let { line ->
-            val theme = line.theme
-            var currentLength = 0f // 当前字符长
-            val totalLength = text.length // 总字符长
-            if (totalLength != theme.size || totalLength != frameTable.size) return@let
+            text = nextLine.theme.fastJoinToString("") { it.ch }
+        } else if (progress >= 1f) return // 优化句间停顿
 
-            // 修正行首帧
-            if (position != lastPosition) {
-                extraFrame = ((position - lastPosition) * RhymeConfig.FPS / 1000).toInt()
-                lastPosition = position
-            }
-            var totalFrame = frame - startFrame + extraFrame
+        val line = lines.getOrNull(currentIndex) ?: return
+        val theme = line.theme
+        var currentLength = 0f
+        val totalLength = text.length
+        if (theme.size != totalLength) return
 
-            for (i in theme.indices) {
-                val action = theme[i]
-                val costFrame = frameTable[i] // 此字符消耗帧数
-                if (totalFrame <= costFrame) { // 余数
-                    currentLength += action.ch.length * totalFrame / costFrame.toFloat() // 根据帧数等比例计算字符长度
-                    break
-                }
-                else { // 消耗
-                    currentLength += action.ch.length
-                    totalFrame -= costFrame
-                }
+        for (i in theme.indices) {
+            val action = theme[i]
+            val length = action.ch.length
+            if (position > line.start + action.end) currentLength += length
+            else {
+                val start = theme.getOrNull(i - 1)?.end ?: 0
+                currentLength += length * (position - line.start - start) / (action.end - start).toFloat()
+                break
             }
-            progress = currentLength / totalLength
         }
+        progress = (currentLength / totalLength).coerceIn(0f, 1f)
     }
 
-    override fun RhymeDrawScope.draw() {
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
         val line = text.ifEmpty { null } ?: return
-        val measureResult = measureText(line, 72f)
-        val textWidth = measureResult.width
-        val position = Offset(960 - textWidth / 2, 0f)
-        drawText(
-            result = measureResult,
-            position = position,
-            color = Colors.White,
-            shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
-        )
-        drawText(
-            result = measureResult.clipWidth(textWidth * progress),
-            position = position,
-            color = Colors.Green4
-        )
+        textManager.apply {
+            val textHeight = 72f
+            val content = measureText(line, textHeight)
+            val textWidth = content.width
+            val position = Offset(960 - textWidth / 2, 0f)
+            drawText(
+                content = content,
+                position = position,
+                color = Colors.White,
+                shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
+            )
+            clipRect(position, Size(textWidth * progress, textHeight)) {
+                drawText(
+                    content = content,
+                    position = position,
+                    color = Colors.Green4
+                )
+            }
+        }
     }
 }
 
 // 分数板
 @Stable
 private class ScoreBoard : RhymeObject {
-    companion object {
-        // 动画帧数
-        private const val FPA: Byte = (500 * RhymeConfig.FPS / 1000).toByte()
-        // 非数
-        private const val ILLEGAL_NUMBER: Byte = -1
-    }
-
-    @Stable
-    @JvmInline
-    private value class ScoreNumber(val value: Int) {
-        // 当前帧
-        val frame: Byte get() = (value ushr 24).toByte()
-        // 旧数字 (消失)
-        val oldNumber: Byte get() = ((value ushr 16) and 0xff).toByte()
-        // 新数字 (出现)
-        val newNumber: Byte get() = ((value ushr 8) and 0xff).toByte()
-        // 缓冲区下一个数字
-        val nextNumber: Byte get() = (value and 0xff).toByte()
-
-        // 实际值 (优先级: nextNumber > newNumber > oldNumber)
-        val actualNumber: Int get() {
-            val n1 = oldNumber
-            val n2 = newNumber
-            val n3 = nextNumber
-            return (if (n3 != ILLEGAL_NUMBER) n3 else if (n2 != ILLEGAL_NUMBER) n2 else n1).toInt()
-        }
-
-        constructor(frame: Byte = FPA, oldNumber: Byte, newNumber: Byte = ILLEGAL_NUMBER, nextNumber: Byte = ILLEGAL_NUMBER) : this(
-            value = (frame.toInt() shl 24) or ((oldNumber.toInt() and 0xff) shl 16) or ((newNumber.toInt() and 0xff) shl 8) or (nextNumber.toInt() and 0xff)
-        )
-
-        fun copy(frame: Byte = this.frame, oldNumber: Byte = this.oldNumber, newNumber: Byte = this.newNumber, nextNumber: Byte = this.nextNumber) =
-            ScoreNumber(frame = frame, oldNumber = oldNumber, newNumber = newNumber, nextNumber = nextNumber)
-
-        // 设置数位 (number in 1 .. 9)
-        fun reset(number: Byte): ScoreNumber? {
-            val n1 = oldNumber
-            val n2 = newNumber
-            val n3 = nextNumber
-            return if (n3 != ILLEGAL_NUMBER) { // 缓冲区有数字
-                // 如果正在替换的数字与新数字的相同, 则缓冲区不重要了直接清空
-                if (n2 == number) copy(nextNumber = ILLEGAL_NUMBER)
-                // 如果缓冲区数字与新数字不同, 则更新缓冲区
-                else if (n3 != number) copy(nextNumber = number)
-                else null
-            }
-            else if (n2 != ILLEGAL_NUMBER) { // 正在替换数字
-                // 如果正在替换数字和新数字不同则将新数字放入缓冲区
-                if (n2 != number) copy(nextNumber = number)
-                else null
-            }
-            else if (n1 != number) copy(newNumber = number, frame = 0) // 旧数字与新数字不同, 启动替换
-            else null
-        }
-
-        // 更新数位
-        fun update(): ScoreNumber? {
-            val f = frame
-            return if (f >= FPA - 1) { // 帧数到达峰值
-                val n2 = newNumber
-                val n3 = nextNumber
-                // 缓冲区有数字: 新数字替换成缓冲区数字 启动新数字 清空缓冲区 重置帧
-                if (n3 != ILLEGAL_NUMBER) copy(oldNumber = n2, newNumber = n3, nextNumber = ILLEGAL_NUMBER, frame = 0)
-                // 缓冲区无数字: 结束 清空新数字和缓冲区
-                else if (n2 != ILLEGAL_NUMBER) copy(oldNumber = n2, newNumber = ILLEGAL_NUMBER, nextNumber = ILLEGAL_NUMBER, frame = FPA)
-                else null
-            }
-            else copy(frame = (f + 1).toByte()) // 切换帧
-        }
-
-        fun RhymeDrawScope.drawNumber(position: Offset, index: Int, height: Float) {
-            val f = frame
-            val oldResult = measureText(oldNumber.toString(), height)
-            val numberWidth = oldResult.width
-            val numberPosition = position.translate(x = index * numberWidth)
-            if (f >= FPA) {
-                drawText(
-                    result = oldResult,
-                    position = numberPosition,
-                    color = Colors.Steel4
-                )
-                drawText(
-                    result = oldResult,
-                    position = numberPosition,
-                    color = Colors.White,
-                    drawStyle = Stroke(width = 3f, join = StrokeJoin.Round)
-                )
-            }
-            else {
-                val newResult = measureText(newNumber.toString(), height)
-                val gap = height / 8
-                val newHeight = height * f / FPA
-                val oldHeight = height - newHeight - gap
-                val alpha = (f / FPA.toFloat()).coerceIn(0f, 1f)
-                clipRect(numberPosition, Size(numberWidth, oldHeight)) {
-                    drawText(
-                        result = oldResult,
-                        position = numberPosition,
-                        color = Colors.Steel4,
-                        alpha = 1 - alpha
-                    )
-                    drawText(
-                        result = oldResult,
-                        position = numberPosition,
-                        color = Colors.White,
-                        drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
-                        alpha = 1 - alpha
-                    )
-                }
-                clipRect(numberPosition.translate(y = oldHeight + gap), Size(numberWidth, newHeight)) {
-                    drawText(
-                        result = newResult,
-                        position = numberPosition,
-                        color = Colors.Steel4,
-                        alpha = alpha
-                    )
-                    drawText(
-                        result = newResult,
-                        position = numberPosition,
-                        color = Colors.White,
-                        drawStyle = Stroke(width = 3f, join = StrokeJoin.Round),
-                        alpha = alpha
-                    )
-                }
-            }
-        }
-
-        override fun toString(): String {
-            val n1 = oldNumber
-            val n2 = newNumber
-            return "[$frame: ${if (n2 != ILLEGAL_NUMBER) "$n1 -> $n2" else n1} | $nextNumber]"
-        }
-    }
-
-    private val numbers = Array(4) { mutableStateOf(ScoreNumber(oldNumber = 0)) }
     private val lock = SynchronizedObject()
-
-    // 组合四个数位得分
-    private val score: Int get() {
-        var factor = 10000
-        return numbers.sumOf {
-            factor /= 10
-            it.value.actualNumber * factor
-        }
-    }
 
     // 增加得分
     fun addScore(value: Int) {
         synchronized(lock) {
-            var newScore = score + value
-            if (value < 1 || newScore > 9999) return
-            for (index in numbers.size - 1 downTo 0) {
-                var number by numbers[index]
-                number.reset((newScore % 10).toByte())?.let { number = it }
-                newScore /= 10
-            }
+
         }
     }
 
-    override fun update(frame: Int, position: Long) {
+    override fun update(position: Long) {
         synchronized(lock) {
-            numbers.forEach { number ->
-                number.value.update()?.let { number.value = it }
-            }
+
         }
     }
 
-    override fun RhymeDrawScope.draw() {
-        val position = Offset(620f, 80f)
-        rotateRad(atan(288 / 768f), position) {
-            numbers.forEachIndexed { index, number ->
-                number.value.apply { drawNumber(position, index, 140f) }
-            }
-        }
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
+
     }
 }
 
@@ -617,11 +394,11 @@ private class ComboBoard : RhymeObject {
         PERFECT, GOOD, MISS
     }
 
-    override fun update(frame: Int, position: Long) {
+    override fun update(position: Long) {
 
     }
 
-    override fun RhymeDrawScope.draw() {
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
 
     }
 }
@@ -638,89 +415,48 @@ private class Scene(
     val comboBoard = ComboBoard()
     val track = Track(scoreBoard, comboBoard)
 
-    override fun update(frame: Int, position: Long) {
-        lyricsBoard.update(frame, position)
-        scoreBoard.update(frame, position)
-        comboBoard.update(frame, position)
-        track.update(frame, position)
-        progressBoard.update(frame, position)
+    override fun update(position: Long) {
+        lyricsBoard.update(position)
+        scoreBoard.update(position)
+        comboBoard.update(position)
+        track.update(position)
+        progressBoard.update(position)
     }
 
-    override fun event(pointer: PointerData): Boolean = progressBoard.event(pointer) || track.event(pointer)
+    override fun event(pointer: Pointer): Boolean = progressBoard.event(pointer) || track.event(pointer)
 
-    override fun RhymeDrawScope.draw() {
-        lyricsBoard.apply { draw() }
-        scoreBoard.apply { draw() }
-        comboBoard.apply { draw() }
-        track.apply { draw() }
-        progressBoard.apply { draw() }
+    override fun DrawScope.draw(textManager: RhymeTextManager) {
+        lyricsBoard.apply { draw(textManager) }
+        scoreBoard.apply { draw(textManager) }
+        comboBoard.apply { draw(textManager) }
+        track.apply { draw(textManager) }
+        progressBoard.apply { draw(textManager) }
     }
 }
 
 // 游戏舞台
 @Stable
 internal class RhymeStage {
-    private var frame: Int = 0
     private var scene: Scene? = null
-    private var pointers: MutableLongObjectMap<PointerData>? = null
 
     fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap, speed: Int) {
         scene = Scene(lyrics, record)
-        pointers = mutableLongObjectMapOf()
     }
 
     fun onClear() {
-        frame = 0
         scene = null
-        pointers = null
     }
 
     fun onUpdate(position: Long) {
-        ++frame
-        scene?.update(frame, position)
+        scene?.update(position)
     }
 
-    private fun onEvent(pointer: PointerData) {
+    fun onEvent(pointer: Pointer) {
         scene?.event(pointer)
     }
 
-    suspend fun PointerInputScope.detectPointer(scale: Float) {
-        pointers?.let { pointerMap ->
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                    for (change in event.changes) {
-                        val id = change.id.value
-                        val position = change.position / scale
-                        when {
-                            change.changedToDown() -> {
-                                PointerData(id, position).let { data ->
-                                    pointerMap[id] = data
-                                    onEvent(data)
-                                }
-                            }
-                            change.changedToUp() -> {
-                                pointerMap[id]?.let { data ->
-                                    data.end = position
-                                    onEvent(data)
-                                    pointerMap -= id
-                                }
-                            }
-                            else -> {
-                                pointerMap[id]?.let { data ->
-                                    data.move = position
-                                    onEvent(data)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun RhymeDrawScope.onDraw() {
-        scene?.apply { draw() }
+    fun onDraw(scope: DrawScope, textManager: RhymeTextManager) {
+        scene?.apply { scope.draw(textManager) }
     }
 
     fun onResult(): RhymeResult {
