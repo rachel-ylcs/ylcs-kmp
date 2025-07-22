@@ -263,7 +263,7 @@ actual class MusicPlayer {
     }
 
     actual suspend fun load(path: Path) {
-        Coroutines.cpu {
+        Coroutines.io {
             nativeLoad(handle, path.toString())
             nativePlay(handle)
         }
