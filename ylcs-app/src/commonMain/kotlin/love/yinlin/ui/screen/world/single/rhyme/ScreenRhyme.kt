@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen.world.single.rhyme
 
+import androidx.collection.mutableLongObjectMapOf
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,16 +17,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.decodeToImageBitmap
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.changedToDown
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -424,16 +435,53 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameCanvas() {
         if (state is GameState.Playing) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val scale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
-                val textMeasurer = rememberTextMeasurer()
+                val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
+                val fontFamilyResolver = LocalFontFamilyResolver.current
+                val textMeasurer = remember(fontFamilyResolver) { TextMeasurer(fontFamilyResolver, Density(1f), LayoutDirection.Ltr) }
                 val font = rachelFont()
-                val textData = remember(textMeasurer, font) { RhymeDrawScope.RhymeTextData(font, textMeasurer) }
+                val textManager = remember(textMeasurer, font) { RhymeTextManager(font, fontFamilyResolver, textMeasurer) }
 
-                Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(scale) {
-                    with(stage) { detectPointer(scale) }
+                val pointers = remember { mutableLongObjectMapOf<Pointer>() }
+
+                Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(rhymeScale) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                            for (change in event.changes) {
+                                val id = change.id.value
+                                val position = change.position / rhymeScale
+                                val time = musicPlayer.position
+                                when {
+                                    change.changedToDown() -> {
+                                        Pointer(startPosition = position, startTime = time).let { pointer ->
+                                            pointers[id] = pointer
+                                            stage.onEvent(pointer)
+                                        }
+                                    }
+                                    change.changedToUp() -> {
+                                        pointers[id]?.let { pointer ->
+                                            pointer.position = position
+                                            pointer.time = time
+                                            pointer.up = true
+                                            stage.onEvent(pointer)
+                                            pointers -= id
+                                        }
+                                    }
+                                    else -> {
+                                        pointers[id]?.let { pointer ->
+                                            pointer.position = position
+                                            pointer.time = time
+                                            stage.onEvent(pointer)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }) {
-                    val scope = RhymeDrawScope(scope = this, scale = scale, textData = textData)
-                    with(stage) { scope.onDraw() }
+                    scale(scale = rhymeScale, pivot = Offset.Zero) {
+                        stage.onDraw(scope = this, textManager = textManager)
+                    }
                 }
             }
         }
