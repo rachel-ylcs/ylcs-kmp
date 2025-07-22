@@ -123,6 +123,15 @@ fun main() {
                                 start = ThemeValue.Padding.HorizontalExtraSpace
                             )
                         ) {
+                            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                                Action(
+                                    icon = Icons.Outlined.CleaningServices,
+                                    tip = "GC",
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                ) {
+                                    System.gc()
+                                }
+                            }
                             Action(
                                 icon = Icons.Outlined.RocketLaunch,
                                 tip = "加载更新包",
