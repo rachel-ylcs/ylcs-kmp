@@ -21,6 +21,7 @@ import love.yinlin.extension.roundToIntOffset
 import love.yinlin.extension.translate
 import kotlin.jvm.JvmInline
 import kotlin.math.*
+import kotlin.random.Random
 
 private operator fun Rect.times(scale: Float): Rect = Rect(left * scale, top * scale, right * scale, bottom * scale)
 
@@ -35,10 +36,7 @@ private operator fun DrawStyle.times(scale: Float): DrawStyle = when (this) {
     )
 }
 
-private operator fun Shadow.times(scale: Float): Shadow = this.copy(
-    offset = this.offset * scale,
-    blurRadius = this.blurRadius * scale
-)
+private operator fun Shadow.times(scale: Float): Shadow = this.copy(offset = this.offset * scale, blurRadius = this.blurRadius * scale)
 
 // 指针数据
 @Stable
@@ -48,6 +46,9 @@ private data class PointerData(
     var move: Offset? = null,
     var end: Offset? = null
 ) {
+    val down: Boolean get() = move == null && end == null
+    val up: Boolean get() = end != null
+
     override fun toString(): String = "[$id] ${
         end?.let { "(${start.x}, ${start.y}) -> (${it.x}, ${it.y})" } ?:
         move?.let { "(${start.x}, ${start.y}) | (${it.x}, ${it.y})" } ?:
@@ -254,7 +255,7 @@ private class ProgressBoard(
     }
 
     override fun event(pointer: PointerData): Boolean {
-        if (pointer.end != null && pointer.start in recordRect.circle) {
+        if (pointer.up && pointer.start in recordRect.circle) {
             println(pointer)
             return true
         }
@@ -287,7 +288,10 @@ private class ProgressBoard(
 
 // 轨道
 @Stable
-private class Track : RhymeObject, RhymeEvent {
+private class Track(
+    private val scoreBoard: ScoreBoard,
+    private val comboBoard: ComboBoard
+) : RhymeObject, RhymeEvent {
     private val trackWidth = 20f
     private val tracks = listOf(
         Offset(0f, 0f),
@@ -336,7 +340,10 @@ private class Track : RhymeObject, RhymeEvent {
 
     }
 
-    override fun event(pointer: PointerData): Boolean = false
+    override fun event(pointer: PointerData): Boolean {
+        if (pointer.up) scoreBoard.addScore(Random.nextInt(1, 4))
+        return true
+    }
 
     override fun RhymeDrawScope.draw() {
         // 画轨道射线
@@ -357,6 +364,8 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
     private var text by mutableStateOf("")
     private var frameTable by mutableStateOf(emptyList<Int>())
     private var startFrame = 0
+    private var lastPosition = 0L
+    private var extraFrame = 0
     private var progress by mutableFloatStateOf(0f)
 
     override fun update(frame: Int, position: Long) {
@@ -373,12 +382,22 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
             }
             // 修正此行的起始帧
             startFrame = frame - (position - nextLine.start).toInt() * RhymeConfig.FPS / 1000
+            lastPosition = position
+            extraFrame = 0
         }
-        lines.getOrNull(currentIndex)?.theme?.let { theme ->
+        lines.getOrNull(currentIndex)?.let { line ->
+            val theme = line.theme
             var currentLength = 0f // 当前字符长
             val totalLength = text.length // 总字符长
-            var totalFrame = frame - startFrame // 距离行首帧数
             if (totalLength != theme.size || totalLength != frameTable.size) return@let
+
+            // 修正行首帧
+            if (position != lastPosition) {
+                extraFrame = ((position - lastPosition) * RhymeConfig.FPS / 1000).toInt()
+                lastPosition = position
+            }
+            var totalFrame = frame - startFrame + extraFrame
+
             for (i in theme.indices) {
                 val action = theme[i]
                 val costFrame = frameTable[i] // 此字符消耗帧数
@@ -617,10 +636,10 @@ private class Scene(
     record: ImageBitmap
 ) : RhymeObject, RhymeEvent {
     val progressBoard = ProgressBoard(lyrics.duration, record)
-    val track = Track()
     val lyricsBoard = LyricsBoard(lyrics)
     val scoreBoard = ScoreBoard()
     val comboBoard = ComboBoard()
+    val track = Track(scoreBoard, comboBoard)
 
     override fun update(frame: Int, position: Long) {
         lyricsBoard.update(frame, position)
