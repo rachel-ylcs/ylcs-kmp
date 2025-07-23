@@ -2,6 +2,8 @@ package love.yinlin.ui.screen.world.single.rhyme
 
 import androidx.collection.lruCache
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
@@ -16,6 +18,8 @@ import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
 import love.yinlin.extension.translate
+import kotlin.jvm.JvmInline
+import kotlin.math.atan
 import kotlin.random.Random
 
 // 指针数据
@@ -72,6 +76,22 @@ private fun DrawScope.drawRect(brush: Brush, rect: Rect, alpha: Float = 1f) = th
     brush = brush,
     topLeft = rect.topLeft,
     size = rect.size,
+    alpha = alpha
+)
+
+private fun DrawScope.drawRoundRect(color: Color, rect: Rect, radius: Float, alpha: Float = 1f) = this.drawRoundRect(
+    color = color,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    cornerRadius = CornerRadius(radius, radius),
+    alpha = alpha
+)
+
+private fun DrawScope.drawRoundRect(brush: Brush, rect: Rect, radius: Float, alpha: Float = 1f) = this.drawRoundRect(
+    brush = brush,
+    topLeft = rect.topLeft,
+    size = rect.size,
+    cornerRadius = CornerRadius(radius, radius),
     alpha = alpha
 )
 
@@ -393,23 +413,128 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 // 分数板
 @Stable
 private class ScoreBoard : RhymeObject {
+    // 七段数码管
+    //     1
+    // 6 ▎ ━  ▎ 2
+    //   ▎ 7  ▎
+    //   ▎ ━  ▎
+    //   ▎    ▎
+    // 5 ▎ ━  ▎ 3
+    //     4
+    @Stable
+    @JvmInline
+    value class Symbol private constructor(val value: Int) {
+        companion object {
+            val NumberArray = byteArrayOf(
+                (1 + 2 + 4 + 8 + 16 + 32 + 0).toByte(),
+                (0 + 2 + 4 + 0 + 0 + 0 + 0).toByte(),
+                (1 + 2 + 0 + 8 + 16 + 0 + 64).toByte(),
+                (1 + 2 + 4 + 8 + 0 + 0 + 64).toByte(),
+                (0 + 2 + 4 + 0 + 0 + 32 + 64).toByte(),
+                (1 + 0 + 4 + 8 + 0 + 32 + 64).toByte(),
+                (1 + 0 + 4 + 8 + 16 + 32 + 64).toByte(),
+                (1 + 2 + 4 + 0 + 0 + 0 + 0).toByte(),
+                (1 + 2 + 4 + 8 + 16 + 32 + 64).toByte(),
+                (1 + 2 + 4 + 8 + 0 + 32 + 64).toByte()
+            )
+
+            fun fetchNumber(v: Byte): Int {
+                for (i in 0 .. 9) {
+                    if (NumberArray[i] == v) return i
+                }
+                return 0
+            }
+        }
+
+        constructor(v1: Byte, v2: Byte = 0, v3: Byte = 127) : this(((v1.toInt() and 0xff) shl 16) or ((v2.toInt() and 0xff) shl 8) or (v3.toInt() and 0xff))
+
+        val current: Byte get() = ((value shr 16) and 0xff).toByte()
+        val target: Byte get() = ((value shr 8) and 0xff).toByte()
+        val alpha: Byte get() = (value and 0xff).toByte()
+
+        val isPlaying: Boolean get() = target.toInt() != 0
+        val score: Int get() = fetchNumber(if (isPlaying) target else current)
+
+        fun copy(v1: Byte = current, v2: Byte = target, v3: Byte = alpha): Symbol = Symbol(v1, v2, v3)
+
+        override fun toString(): String = score.toString()
+
+        fun DrawScope.drawAlpha(v: Int, a: Float) {
+            if (v and 1 == 1) drawRoundRect(Colors.Red4, Rect(10f, 0f, 50f, 10f), 5f, a)
+            if (v and 2 == 2) drawRoundRect(Colors.Red4, Rect(50f, 10f, 60f, 50f), 5f, a)
+            if (v and 4 == 4) drawRoundRect(Colors.Red4, Rect(50f, 60f, 60f, 100f), 5f, a)
+            if (v and 8 == 8) drawRoundRect(Colors.Red4, Rect(10f, 100f, 50f, 110f), 5f, a)
+            if (v and 16 == 16) drawRoundRect(Colors.Red4, Rect(0f, 60f, 10f, 100f), 5f, a)
+            if (v and 32 == 32) drawRoundRect(Colors.Red4, Rect(0f, 10f, 10f, 50f), 5f, a)
+            if (v and 64 == 64) drawRoundRect(Colors.Red4, Rect(10f, 50f, 50f, 60f), 5f, a)
+        }
+    }
+
+    private val symbols = Array(4) {
+        mutableStateOf(Symbol(Symbol.NumberArray[0]))
+    }
+
     private val lock = SynchronizedObject()
+
+    // 组合四个数位得分
+    val score: Int get() {
+        var factor = 10000
+        return symbols.sumOf {
+            factor /= 10
+            it.value.score * factor
+        }
+    }
 
     // 增加得分
     fun addScore(value: Int) {
         synchronized(lock) {
-
+            var newScore = score + value
+            if (value < 1 || newScore > 9999) return
+            for (index in 3 downTo 0) {
+                var number by symbols[index]
+                val data = Symbol.NumberArray[newScore % 10]
+                if (number.isPlaying) {
+                    if (data != number.target) number = number.copy(v2 = data, v3 = number.alpha)
+                }
+                else {
+                    if (data != number.current) number = number.copy(v2 = data, v3 = 127)
+                }
+                newScore /= 10
+            }
         }
     }
 
     override fun update(position: Long) {
         synchronized(lock) {
-
+            symbols.forEach { symbol ->
+                var number by symbol
+                if (number.isPlaying) {
+                    val alpha = number.alpha
+                    number = if (alpha <= 0) number.copy(v1 = number.target, v2 = 0, v3 = 127)
+                        else number.copy(v3 = (alpha - 600 / RhymeConfig.FPS).toByte().coerceIn(0, 127))
+                }
+            }
         }
     }
 
     override fun DrawScope.draw(textManager: RhymeTextManager) {
-
+        val position = Offset(640f, 100f)
+        withTransform({
+            translate(position.x, position.y)
+            rotateRad(atan(288 / 768f), Offset.Zero)
+        }) {
+            var x = 0f
+            symbols.forEach { symbol ->
+                translate(left = x) {
+                    symbol.value.apply {
+                        val a = (alpha / 127f).coerceIn(0f, 1f)
+                        if (isPlaying) drawAlpha(target.toInt(), 1 - a)
+                        drawAlpha(current.toInt(), a)
+                    }
+                }
+                x += 70f
+            }
+        }
     }
 }
 
