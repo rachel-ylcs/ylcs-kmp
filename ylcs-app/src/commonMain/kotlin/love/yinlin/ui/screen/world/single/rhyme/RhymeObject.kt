@@ -15,6 +15,7 @@ import kotlinx.atomicfu.locks.synchronized
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
+import love.yinlin.extension.translate
 import kotlin.random.Random
 
 // 指针数据
@@ -106,8 +107,18 @@ private fun DrawScope.drawImage(image: ImageBitmap, position: Offset, size: Size
 private fun DrawScope.drawImage(image: ImageBitmap, rect: Rect) = this.drawImage(
     image = image,
     position = rect.topLeft,
-    size=  rect.size
+    size = rect.size
 )
+
+private fun DrawScope.drawCircleImage(image: ImageBitmap, position: Offset, size: Size) = this.drawCircleImage(image, Rect(position, size))
+
+private fun DrawScope.drawCircleImage(image: ImageBitmap, rect: Rect) = this.clipPath(Path().apply { addOval(rect) }) {
+    this.drawImage(
+        image = image,
+        position = rect.topLeft,
+        size = rect.size
+    )
+}
 
 inline fun DrawScope.clipRect(position: Offset, size: Size, block: DrawScope.() -> Unit) = this.clipRect(
     left = position.x,
@@ -204,13 +215,17 @@ private class ProgressBoard(
 ) : RhymeObject, RhymeEvent {
     // 封面
     private val progressWidth = 8f
-    private val recordRect = Rect(Offset(960f - 64f, 360f - 64f), Size(128f, 128f))
+    private val recordSize = 64f
+    private val recordCenter = Offset(960f, 360f)
+    private val recordRect = Rect(recordCenter.translate(-recordSize, -recordSize), Size(recordSize * 2, recordSize * 2))
+    private var recordAngle: Float = 0f
 
     // 游戏进度
     private var progress: Float by mutableFloatStateOf(0f)
 
     override fun update(position: Long) {
         progress = if (duration == 0L) 0f else (position / duration.toFloat()).coerceIn(0f, 1f)
+        recordAngle += 20 / RhymeConfig.FPS.toFloat()
     }
 
     override fun event(pointer: Pointer): Boolean {
@@ -223,8 +238,8 @@ private class ProgressBoard(
 
     override fun DrawScope.draw(textManager: RhymeTextManager) {
         // 画封面
-        clipPath(Path().apply { addOval(recordRect) }) {
-            drawImage(image = record, rect = recordRect)
+        rotate(recordAngle, recordCenter) {
+            drawCircleImage(image = record, rect = recordRect)
         }
         // 画时长
         drawArc(
