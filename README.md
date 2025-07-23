@@ -1,3 +1,5 @@
+![项目依赖结构](docs/pics/title.jpg)
+
 <div align="center">
     <h1>银临茶舍跨平台 App</h1>
     <p></p>

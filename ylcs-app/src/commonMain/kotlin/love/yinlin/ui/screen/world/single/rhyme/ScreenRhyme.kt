@@ -421,11 +421,11 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameBackground() {
         if (state is GameState.Playing) {
             ShaderBox(Shaders.GradientFlow, modifier = Modifier.fillMaxSize()) {
-//                WebImage(
-//                    uri = remember { Game.Rhyme.resPath("background") },
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier.fillMaxSize()
-//                )
+                WebImage(
+                    uri = remember { Game.Rhyme.resPath("background") },
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
