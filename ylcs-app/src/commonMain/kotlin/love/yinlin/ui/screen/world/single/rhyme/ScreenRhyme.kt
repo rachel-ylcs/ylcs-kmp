@@ -70,6 +70,8 @@ import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.ui.component.platform.Orientation
 import love.yinlin.ui.component.platform.rememberOrientationController
 import love.yinlin.ui.component.screen.CommonSubScreen
+import love.yinlin.ui.component.platform.ShaderBox
+import love.yinlin.ui.component.platform.Shaders
 import love.yinlin.ui.component.text.StrokeText
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
@@ -418,11 +420,13 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun GameBackground() {
         if (state is GameState.Playing) {
-            WebImage(
-                uri = remember { Game.Rhyme.resPath("background") },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            ShaderBox(Shaders.GradientFlow, modifier = Modifier.fillMaxSize()) {
+//                WebImage(
+//                    uri = remember { Game.Rhyme.resPath("background") },
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier.fillMaxSize()
+//                )
+            }
         }
     }
 
