@@ -1,5 +1,6 @@
 package love.yinlin.ui.screen.world.single.rhyme
 
+import androidx.collection.lruCache
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
@@ -15,8 +16,6 @@ import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.roundToIntOffset
 import kotlin.random.Random
-
-private operator fun Rect.times(scale: Float): Rect = Rect(left * scale, top * scale, right * scale, bottom * scale)
 
 // 指针数据
 internal data class Pointer(
@@ -123,10 +122,23 @@ inline fun DrawScope.clipRect(rect: Rect, block: DrawScope.() -> Unit) = this.cl
 @Stable
 internal data class RhymeTextManager(
     private val font: Font,
-    private val fontFamilyResolver: FontFamily.Resolver,
-    private val measurer: TextMeasurer
+    private val fontFamilyResolver: FontFamily.Resolver
 ) {
+    @Stable
+    private data class CacheKey(
+        val text: String,
+        val height: Float,
+        val fontWeight: FontWeight
+    )
+
+    private val lruCache = lruCache<CacheKey, MultiParagraph>(8)
+
     fun measureText(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): MultiParagraph {
+        // 查询缓存
+        val cacheKey = CacheKey(text, height, fontWeight)
+        val cacheResult = lruCache[cacheKey]
+        if (cacheResult != null) return cacheResult
+
         val intrinsics = MultiParagraphIntrinsics(
             annotatedString = AnnotatedString(text),
             style = TextStyle(
@@ -143,7 +155,7 @@ internal data class RhymeTextManager(
             constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = height.toInt()),
             maxLines = 1,
             overflow = TextOverflow.Clip
-        )
+        ).also { lruCache.put(cacheKey, it) }
     }
 
     fun DrawScope.drawText(

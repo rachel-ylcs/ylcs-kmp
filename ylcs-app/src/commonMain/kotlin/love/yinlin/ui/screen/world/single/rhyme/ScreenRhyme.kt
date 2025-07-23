@@ -29,14 +29,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -437,9 +432,8 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
                 val fontFamilyResolver = LocalFontFamilyResolver.current
-                val textMeasurer = remember(fontFamilyResolver) { TextMeasurer(fontFamilyResolver, Density(1f), LayoutDirection.Ltr) }
                 val font = rachelFont()
-                val textManager = remember(textMeasurer, font) { RhymeTextManager(font, fontFamilyResolver, textMeasurer) }
+                val textManager = remember(font, fontFamilyResolver) { RhymeTextManager(font, fontFamilyResolver) }
 
                 val pointers = remember { mutableLongObjectMapOf<Pointer>() }
 
