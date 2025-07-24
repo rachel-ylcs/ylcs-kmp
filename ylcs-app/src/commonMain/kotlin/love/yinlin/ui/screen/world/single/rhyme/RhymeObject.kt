@@ -460,16 +460,6 @@ private class ScoreBoard : RhymeObject {
         fun copy(v1: Byte = current, v2: Byte = target, v3: Byte = alpha): Symbol = Symbol(v1, v2, v3)
 
         override fun toString(): String = score.toString()
-
-        fun DrawScope.drawAlpha(v: Int, a: Float) {
-            if (v and 1 == 1) drawRoundRect(Colors.Red4, Rect(10f, 0f, 50f, 10f), 5f, a)
-            if (v and 2 == 2) drawRoundRect(Colors.Red4, Rect(50f, 10f, 60f, 50f), 5f, a)
-            if (v and 4 == 4) drawRoundRect(Colors.Red4, Rect(50f, 60f, 60f, 100f), 5f, a)
-            if (v and 8 == 8) drawRoundRect(Colors.Red4, Rect(10f, 100f, 50f, 110f), 5f, a)
-            if (v and 16 == 16) drawRoundRect(Colors.Red4, Rect(0f, 60f, 10f, 100f), 5f, a)
-            if (v and 32 == 32) drawRoundRect(Colors.Red4, Rect(0f, 10f, 10f, 50f), 5f, a)
-            if (v and 64 == 64) drawRoundRect(Colors.Red4, Rect(10f, 50f, 50f, 60f), 5f, a)
-        }
     }
 
     private val symbols = Array(4) {
@@ -519,6 +509,16 @@ private class ScoreBoard : RhymeObject {
         }
     }
 
+    private fun DrawScope.drawSymbol(mask: Int, v1: Int, v2: Int, a: Float, rect: Rect) {
+        val b1 = (v1 and mask) == mask
+        val b2 = (v2 and mask) == mask
+        if (b1) {
+            if (b2) drawRoundRect(Colors.Red4, rect, 5f, 1f)
+            else drawRoundRect(Colors.Red4, rect, 5f, a)
+        }
+        else if (b2) drawRoundRect(Colors.Red4, rect, 5f, 1 - a)
+    }
+
     override fun DrawScope.draw(textManager: RhymeTextManager) {
         val position = Offset(640f, 100f)
         withTransform({
@@ -530,8 +530,15 @@ private class ScoreBoard : RhymeObject {
                 translate(left = x) {
                     symbol.value.apply {
                         val a = (alpha / 127f).coerceIn(0f, 1f)
-                        if (isPlaying) drawAlpha(target.toInt(), 1 - a)
-                        drawAlpha(current.toInt(), a)
+                        val v1 = current.toInt()
+                        val v2 = target.toInt()
+                        drawSymbol(1, v1, v2, a, Rect(10f, 0f, 50f, 10f))
+                        drawSymbol(2, v1, v2, a, Rect(50f, 10f, 60f, 50f))
+                        drawSymbol(4, v1, v2, a, Rect(50f, 60f, 60f, 100f))
+                        drawSymbol(8, v1, v2, a, Rect(10f, 100f, 50f, 110f))
+                        drawSymbol(16, v1, v2, a, Rect(0f, 60f, 10f, 100f))
+                        drawSymbol(32, v1, v2, a, Rect(0f, 10f, 10f, 50f))
+                        drawSymbol(64, v1, v2, a, Rect(10f, 50f, 50f, 60f))
                     }
                 }
                 x += 70f
