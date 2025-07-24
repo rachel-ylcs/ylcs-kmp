@@ -2,8 +2,6 @@ package love.yinlin.ui.screen.world.single.rhyme
 
 import androidx.collection.lruCache
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
@@ -16,11 +14,11 @@ import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import love.yinlin.common.Colors
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.extension.roundToIntOffset
-import love.yinlin.extension.translate
-import kotlin.jvm.JvmInline
+import love.yinlin.extension.*
 import kotlin.math.atan
 import kotlin.random.Random
+
+private val Size.Companion.Game get() = Size(1920f, 1080f)
 
 // 指针数据
 internal data class Pointer(
@@ -31,125 +29,7 @@ internal data class Pointer(
     var up: Boolean = false,
 )
 
-// 圆形矩形
-@Stable
-private class CircleRect(private val rect: Rect) {
-    operator fun contains(point: Offset): Boolean {
-        val a = rect.width / 2
-        val b = rect.height / 2
-        val dx = point.x - rect.left - a
-        val dy = point.y - rect.top - b
-        return (dx * dx) / (a * a) + (dy * dy) / (b * b) <= 1f
-    }
-}
-
-private val Rect.circle get() = CircleRect(this)
-
-private fun DrawScope.drawLine(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) = this.drawLine(
-    color = color,
-    start = start,
-    end = end,
-    strokeWidth = style.width,
-    cap = style.cap,
-    pathEffect = style.pathEffect,
-    alpha = alpha
-)
-
-private fun DrawScope.drawLine(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) = this.drawLine(
-    brush = brush,
-    start = start,
-    end = end,
-    strokeWidth = style.width,
-    cap = style.cap,
-    pathEffect = style.pathEffect,
-    alpha = alpha
-)
-
-private fun DrawScope.drawRect(color: Color, rect: Rect, alpha: Float = 1f) = this.drawRect(
-    color = color,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    alpha = alpha
-)
-
-private fun DrawScope.drawRect(brush: Brush, rect: Rect, alpha: Float = 1f) = this.drawRect(
-    brush = brush,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    alpha = alpha
-)
-
-private fun DrawScope.drawRoundRect(color: Color, rect: Rect, radius: Float, alpha: Float = 1f) = this.drawRoundRect(
-    color = color,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    cornerRadius = CornerRadius(radius, radius),
-    alpha = alpha
-)
-
-private fun DrawScope.drawRoundRect(brush: Brush, rect: Rect, radius: Float, alpha: Float = 1f) = this.drawRoundRect(
-    brush = brush,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    cornerRadius = CornerRadius(radius, radius),
-    alpha = alpha
-)
-
-private fun DrawScope.drawArc(color: Color, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) = this.drawArc(
-    color = color,
-    startAngle = startAngle,
-    sweepAngle = sweepAngle,
-    useCenter = false,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    alpha = alpha,
-    style = style
-)
-
-private fun DrawScope.drawArc(brush: Brush, startAngle: Float, sweepAngle: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill) = this.drawArc(
-    brush = brush,
-    startAngle = startAngle,
-    sweepAngle = sweepAngle,
-    useCenter = false,
-    topLeft = rect.topLeft,
-    size = rect.size,
-    alpha = alpha,
-    style = style
-)
-
-private fun DrawScope.drawImage(image: ImageBitmap, position: Offset, size: Size) = this.drawImage(
-    image = image,
-    dstOffset = position.roundToIntOffset(),
-    dstSize = size.roundToIntSize(),
-    filterQuality = FilterQuality.High
-)
-
-private fun DrawScope.drawImage(image: ImageBitmap, rect: Rect) = this.drawImage(
-    image = image,
-    position = rect.topLeft,
-    size = rect.size
-)
-
-private fun DrawScope.drawCircleImage(image: ImageBitmap, position: Offset, size: Size) = this.drawCircleImage(image, Rect(position, size))
-
-private fun DrawScope.drawCircleImage(image: ImageBitmap, rect: Rect) = this.clipPath(Path().apply { addOval(rect) }) {
-    this.drawImage(
-        image = image,
-        position = rect.topLeft,
-        size = rect.size
-    )
-}
-
-inline fun DrawScope.clipRect(position: Offset, size: Size, block: DrawScope.() -> Unit) = this.clipRect(
-    left = position.x,
-    top = position.y,
-    right = (position.x + size.width),
-    bottom = (position.y + size.height),
-    block = block
-)
-
-inline fun DrawScope.clipRect(rect: Rect, block: DrawScope.() -> Unit) = this.clipRect(rect.topLeft, rect.size, block)
-
+// 文本绘制管理器
 @Stable
 internal data class RhymeTextManager(
     private val font: Font,
@@ -191,7 +71,7 @@ internal data class RhymeTextManager(
         ).also { lruCache.put(cacheKey, it) }
     }
 
-    fun DrawScope.drawText(
+    fun DrawScope.text(
         content: Paragraph,
         position: Offset,
         color: Color,
@@ -216,151 +96,226 @@ internal data class RhymeTextManager(
     }
 }
 
-// 渲染实体
+// 容器
 @Stable
-private sealed interface RhymeObject {
-    fun update(position: Long)
-    fun DrawScope.draw(textManager: RhymeTextManager)
+private sealed interface RhymeContainer {
+    fun contains(position: Offset, size: Size, point: Offset): Boolean
+
+    @Stable
+    interface Rectangle : RhymeContainer {
+        override fun contains(position: Offset, size: Size, point: Offset): Boolean {
+            val x = point.x
+            val y = point.y
+            val left = position.x
+            val top = position.y
+            return (x >= left) and (x < left + size.width) and (y >= top) and (y < top + size.height)
+        }
+    }
+
+    @Stable
+    interface Circle : RhymeContainer {
+        override fun contains(position: Offset, size: Size, point: Offset): Boolean {
+            val a = size.width / 2
+            val b = size.height / 2
+            val dx = point.x - position.x - a
+            val dy = point.y - position.y - b
+            return (dx * dx) / (a * a) + (dy * dy) / (b * b) <= 1f
+        }
+    }
 }
 
 // 事件触发器
 @Stable
 private fun interface RhymeEvent {
-    fun event(pointer: Pointer): Boolean
+    fun onEvent(pointer: Pointer): Boolean
+}
+
+// 渲染实体
+@Stable
+private sealed class RhymeObject : RhymeContainer {
+    abstract val position: Offset
+    abstract val size: Size
+    open val transform: (DrawTransform.() -> Unit)? = null
+
+    protected abstract fun DrawScope.onDraw(textManager: RhymeTextManager)
+
+    operator fun contains(point: Offset): Boolean = contains(position, size, point)
+
+    fun DrawScope.draw(textManager: RhymeTextManager) {
+        withTransform({
+            translate(left = position.x, top = position.y)
+            transform?.invoke(this)
+        }) {
+            onDraw(textManager)
+        }
+    }
+
+    fun DrawScope.line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
+        this.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha)
+
+    fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
+        this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha)
+
+    fun DrawScope.rect(color: Color, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+        this.drawRect(color = color, topLeft = position, size = size, alpha = alpha)
+
+    fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+        this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha)
+
+    fun DrawScope.roundRect(color: Color, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+        this.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha)
+
+    fun DrawScope.roundRect(brush: Brush, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+        this.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha)
+
+    fun DrawScope.arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawArc(color = color, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style)
+
+    fun DrawScope.arc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style)
+
+    fun DrawScope.image(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
+        this.drawImage(image = image, dstOffset = position.roundToIntOffset(), dstSize = size.roundToIntSize(), filterQuality = FilterQuality.High)
+
+    fun DrawScope.circleImage(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
+        this.clipPath(Path().apply { addOval(Rect(position, size)) }) { this.image(image = image, position = position, size = size) }
+
+    inline fun DrawScope.clip(position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, block: DrawScope.() -> Unit) =
+        this.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height), block = block)
+}
+
+// 动态实体
+@Stable
+private abstract class RhymeDynamic : RhymeObject() {
+    abstract fun onUpdate(position: Long)
 }
 
 // 进度板
 @Stable
 private class ProgressBoard(
+    center: Offset,
     private val duration: Long,
     private val record: ImageBitmap
-) : RhymeObject, RhymeEvent {
-    // 封面
-    private val progressWidth = 8f
-    private val recordSize = 64f
-    private val recordCenter = Offset(960f, 360f)
-    private val recordRect = Rect(recordCenter.translate(-recordSize, -recordSize), Size(recordSize * 2, recordSize * 2))
-    private var recordAngle: Float = 0f
+) : RhymeDynamic(), RhymeContainer.Circle, RhymeEvent {
+    private val stroke = 8f
+    private val radius = 64f
+    override val position: Offset = center.translate(-radius, -radius)
+    override val size: Size = Size(radius * 2, radius * 2)
 
+    // 封面旋转角
+    var angle: Float by mutableFloatStateOf(0f)
     // 游戏进度
-    private var progress: Float by mutableFloatStateOf(0f)
+    var progress: Float by mutableFloatStateOf(0f)
 
-    override fun update(position: Long) {
+    override fun onUpdate(position: Long) {
         progress = if (duration == 0L) 0f else (position / duration.toFloat()).coerceIn(0f, 1f)
-        recordAngle += 20 / RhymeConfig.FPS.toFloat()
+        angle += 20 / RhymeConfig.FPS.toFloat()
     }
 
-    override fun event(pointer: Pointer): Boolean {
-        if (pointer.up && pointer.startPosition in recordRect.circle) {
+    override fun onEvent(pointer: Pointer): Boolean {
+        if (pointer.up && pointer.startPosition in this) {
             println(pointer)
             return true
         }
         return false
     }
 
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         // 画封面
-        rotate(recordAngle, recordCenter) {
-            drawCircleImage(image = record, rect = recordRect)
-        }
+        rotate(angle, Offset(radius, radius)) { circleImage(record) }
         // 画时长
-        drawArc(
-            color = Colors.White,
-            startAngle = -90f,
-            sweepAngle = 360f,
-            rect = recordRect,
-            style = Stroke(width = progressWidth, cap = StrokeCap.Round)
-        )
+        arc(Colors.White, -90f, 360f, style = Stroke(width = stroke, cap = StrokeCap.Round))
         // 画进度
-        drawArc(
-            color = Colors.Green4,
-            startAngle = -90f,
-            sweepAngle = 360f * progress,
-            rect = recordRect,
-            style = Stroke(width = progressWidth, cap = StrokeCap.Round)
-        )
+        arc(Colors.Green4, -90f, 360f * progress, style = Stroke(width = stroke, cap = StrokeCap.Round))
     }
 }
 
-// 轨道
+// 音符板
 @Stable
-private class Track(
-    private val scoreBoard: ScoreBoard,
-    private val comboBoard: ComboBoard
-) : RhymeObject, RhymeEvent {
-    private val trackWidth = 20f
-    private val tracks = listOf(
-        Offset(0f, 0f),
-        Offset(0f, 540f),
-        Offset(0f, 1080f),
-        Offset(640f, 1080f),
-        Offset(1280f, 1080f),
-        Offset(1920f, 1080f),
-        Offset(1920f, 540f),
-        Offset(1920f, 0f),
-    ).map { Offset(960f, 360f) to it }
+private class NoteBoard(
+    center: Offset,
+    scoreBoard: ScoreBoard,
+    comboBoard: ComboBoard
+) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
+    @Stable
+    class Track(
+        center: Offset,
+        private val scoreBoard: ScoreBoard,
+        private val comboBoard: ComboBoard
+    ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
+        override val position: Offset = Offset.Zero
+        override val size: Size = Size.Game
 
-    // 当前按下轨道
-    private val current: Int? by mutableStateOf(null)
+        private val trackWidth = 20f
+        private val tracks = listOf(
+            Offset(0f, 0f),
+            Offset(0f, size.height / 2),
+            Offset(0f, size.height),
+            Offset(size.width / 3, size.height),
+            Offset(size.width * 2 / 3, size.height),
+            Offset(size.width, size.height),
+            Offset(size.width, size.height / 2),
+            Offset(size.width, 0f),
+        ).map { center to it }
 
-    private fun DrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
-        // 阴影
-        repeat(5) {
-            drawLine(
-                color = Colors.Steel3,
-                start = start,
-                end = end,
-                style = Stroke(width = width * (1.15f + it * 0.15f), cap = StrokeCap.Round),
-                alpha = 0.15f - (it * 0.03f)
-            )
+        private val current: Int? by mutableStateOf(null)
+
+        override fun onUpdate(position: Long) {
+
         }
-        // 光带
-        drawLine(
-            color = Colors.Steel4,
-            start = start,
-            end = end,
-            style = Stroke(width = width, cap = StrokeCap.Round),
-            alpha = 0.7f
-        )
-        // 高光
-        drawLine(
-            color = Colors.White,
-            start = start,
-            end = end,
-            style = Stroke(width = width * 0.8f, cap = StrokeCap.Round),
-            alpha = 0.8f
-        )
-    }
 
-    override fun update(position: Long) {
-
-    }
-
-    override fun event(pointer: Pointer): Boolean {
-        if (pointer.up) scoreBoard.addScore(Random.nextInt(1, 4))
-        return true
-    }
-
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
-        // 画轨道射线
-        for ((start, end) in tracks) {
-            drawTrackLine(
-                start = start,
-                end = end,
-                width = trackWidth
-            )
+        override fun onEvent(pointer: Pointer): Boolean {
+            if (pointer.up) scoreBoard.addScore(Random.nextInt(1, 4))
+            return true
         }
+
+        private fun DrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
+            // 阴影
+            repeat(5) {
+                line(Colors.Steel3, start, end, Stroke(width = width * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
+            }
+            // 光带
+            line(Colors.Steel4, start, end, Stroke(width = width, cap = StrokeCap.Round), 0.7f)
+            // 高光
+            line(Colors.White, start, end, Stroke(width = width * 0.8f, cap = StrokeCap.Round), 0.8f)
+        }
+
+        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            // 画轨道射线
+            for ((start, end) in tracks) drawTrackLine(start = start, end = end, width = trackWidth)
+        }
+    }
+
+    override val position: Offset = Offset.Zero
+    override val size: Size = Size.Game
+
+    private val track = Track(center, scoreBoard, comboBoard)
+
+    override fun onUpdate(position: Long) {
+        track.run { onUpdate(position) }
+    }
+
+    override fun onEvent(pointer: Pointer): Boolean = track.run { onEvent(pointer) }
+
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+        track.run { draw(textManager) }
     }
 }
 
 // 歌词板
 @Stable
-private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
+private class LyricsBoard(
+    private val lyrics: RhymeLyricsConfig
+) : RhymeDynamic(), RhymeContainer.Rectangle {
+    private val textHeight: Float = 72f
+    override val position: Offset = Offset.Zero
+    override val size: Size = Size(Size.Game.width, textHeight)
+
     private var currentIndex = -1
     private var text by mutableStateOf("")
     private var progress by mutableFloatStateOf(0f)
 
-    override fun update(position: Long) {
+    override fun onUpdate(position: Long) {
         val lines = lyrics.lyrics
         val nextLine = lines.getOrNull(currentIndex + 1)
         if (nextLine != null && position >= nextLine.start) {
@@ -388,23 +343,22 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
         progress = (currentLength / totalLength).coerceIn(0f, 1f)
     }
 
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         val line = text.ifEmpty { null } ?: return
-        textManager.apply {
-            val textHeight = 72f
+        textManager.run {
             val content = measureText(line, textHeight)
             val textWidth = content.width
-            val position = Offset(960 - textWidth / 2, 0f)
-            drawText(
+            val start = Offset((this@LyricsBoard.size.width - textWidth) / 2, 0f)
+            text(
                 content = content,
-                position = position,
+                position = start,
                 color = Colors.White,
                 shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
             )
-            clipRect(position, Size(textWidth * progress, textHeight)) {
-                drawText(
+            clip(start, Size(textWidth * progress, textHeight)) {
+                text(
                     content = content,
-                    position = position,
+                    position = start,
                     color = Colors.Green4
                 )
             }
@@ -414,19 +368,21 @@ private class LyricsBoard(private val lyrics: RhymeLyricsConfig) : RhymeObject {
 
 // 分数板
 @Stable
-private class ScoreBoard : RhymeObject {
-    // 七段数码管
-    //     1
-    // 6 ▎ ━  ▎ 2
-    //   ▎ 7  ▎
-    //   ▎ ━  ▎
-    //   ▎    ▎
-    // 5 ▎ ━  ▎ 3
-    //     4
+private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
-    @JvmInline
-    value class Symbol private constructor(val value: Int) {
+    private class ScoreNumber(p: Offset) : RhymeDynamic(), RhymeContainer.Rectangle {
+        // 七段数码管
+        //     1
+        // 6 ▎ ━  ▎ 2
+        //   ▎ 7  ▎
+        //   ▎ ━  ▎
+        //   ▎    ▎
+        // 5 ▎ ━  ▎ 3
+        //     4
         companion object {
+            const val WIDTH = 60f
+            const val HEIGHT = 110f
+            const val GAP = 10f
             val NumberArray = byteArrayOf(
                 (1 + 2 + 4 + 8 + 16 + 32 + 0).toByte(),
                 (0 + 2 + 4 + 0 + 0 + 0 + 0).toByte(),
@@ -440,30 +396,72 @@ private class ScoreBoard : RhymeObject {
                 (1 + 2 + 4 + 8 + 0 + 32 + 64).toByte()
             )
 
-            fun fetchNumber(v: Byte): Int {
+            private fun fetchNumber(v: Byte): Int {
                 for (i in 0 .. 9) {
                     if (NumberArray[i] == v) return i
                 }
                 return 0
             }
+
+            private fun encode(v1: Byte, v2: Byte = 0, v3: Byte = 127): Int = ((v1.toInt() and 0xff) shl 16) or ((v2.toInt() and 0xff) shl 8) or (v3.toInt() and 0xff)
         }
 
-        constructor(v1: Byte, v2: Byte = 0, v3: Byte = 127) : this(((v1.toInt() and 0xff) shl 16) or ((v2.toInt() and 0xff) shl 8) or (v3.toInt() and 0xff))
+        override val position: Offset = p
+        override val size: Size = Size(WIDTH, HEIGHT)
 
-        val current: Byte get() = ((value shr 16) and 0xff).toByte()
-        val target: Byte get() = ((value shr 8) and 0xff).toByte()
-        val alpha: Byte get() = (value and 0xff).toByte()
+        private var data by mutableIntStateOf(encode(NumberArray[0]))
 
+        val current: Byte get() = ((data shr 16) and 0xff).toByte()
+        val target: Byte get() = ((data shr 8) and 0xff).toByte()
+        val alpha: Byte get() = (data and 0xff).toByte()
         val isPlaying: Boolean get() = target.toInt() != 0
         val score: Int get() = fetchNumber(if (isPlaying) target else current)
 
-        fun copy(v1: Byte = current, v2: Byte = target, v3: Byte = alpha): Symbol = Symbol(v1, v2, v3)
+        fun reset(v1: Byte = current, v2: Byte = target, v3: Byte = alpha) {
+            data = encode(v1, v2, v3)
+        }
 
-        override fun toString(): String = score.toString()
+        override fun onUpdate(position: Long) {
+            val v2 = target
+            if (v2.toInt() != 0) {
+                val a = alpha
+                if (a <= 0) reset(v1 = v2, v2 = 0, v3 = 127)
+                else reset(v3 = (a - 600 / RhymeConfig.FPS).toByte().coerceIn(0, 127))
+            }
+        }
+
+        private fun DrawScope.drawSymbol(mask: Int, v1: Int, v2: Int, a: Float, rect: Rect) {
+            val b1 = (v1 and mask) == mask
+            val b2 = (v2 and mask) == mask
+            if (b1) {
+                if (b2) roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, 1f)
+                else roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, a)
+            }
+            else if (b2) roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, 1 - a)
+        }
+
+        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            val a = (alpha / 127f).coerceIn(0f, 1f)
+            val v1 = current.toInt()
+            val v2 = target.toInt()
+            drawSymbol(1, v1, v2, a, Rect(10f, 0f, 50f, 10f))
+            drawSymbol(2, v1, v2, a, Rect(50f, 10f, 60f, 50f))
+            drawSymbol(4, v1, v2, a, Rect(50f, 60f, 60f, 100f))
+            drawSymbol(8, v1, v2, a, Rect(10f, 100f, 50f, 110f))
+            drawSymbol(16, v1, v2, a, Rect(0f, 60f, 10f, 100f))
+            drawSymbol(32, v1, v2, a, Rect(0f, 10f, 10f, 50f))
+            drawSymbol(64, v1, v2, a, Rect(10f, 50f, 50f, 60f))
+        }
     }
 
-    private val symbols = Array(4) {
-        mutableStateOf(Symbol(Symbol.NumberArray[0]))
+    override val position: Offset = Offset(Size.Game.width / 3, 100f)
+    override val size: Size = Size(ScoreNumber.WIDTH * 4 + ScoreNumber.GAP * 3, ScoreNumber.HEIGHT)
+    override val transform: (DrawTransform.() -> Unit) = {
+        rotateRad(atan(288 / 768f), Offset.Zero)
+    }
+
+    private val numbers = Array(4) {
+        ScoreNumber(Offset(it * (ScoreNumber.WIDTH + ScoreNumber.GAP), 0f))
     }
 
     private val lock = SynchronizedObject()
@@ -471,9 +469,9 @@ private class ScoreBoard : RhymeObject {
     // 组合四个数位得分
     val score: Int get() {
         var factor = 10000
-        return symbols.sumOf {
+        return numbers.sumOf {
             factor /= 10
-            it.value.score * factor
+            it.score * factor
         }
     }
 
@@ -483,73 +481,36 @@ private class ScoreBoard : RhymeObject {
             var newScore = score + value
             if (value < 1 || newScore > 9999) return
             for (index in 3 downTo 0) {
-                var number by symbols[index]
-                val data = Symbol.NumberArray[newScore % 10]
+                val number = numbers[index]
+                val data = ScoreNumber.NumberArray[newScore % 10]
                 if (number.isPlaying) {
-                    if (data != number.target) number = number.copy(v2 = data, v3 = number.alpha)
+                    if (data != number.target) number.reset(v2 = data, v3 = number.alpha)
                 }
                 else {
-                    if (data != number.current) number = number.copy(v2 = data, v3 = 127)
+                    if (data != number.current) number.reset(v2 = data, v3 = 127)
                 }
                 newScore /= 10
             }
         }
     }
 
-    override fun update(position: Long) {
+    override fun onUpdate(position: Long) {
         synchronized(lock) {
-            symbols.forEach { symbol ->
-                var number by symbol
-                if (number.isPlaying) {
-                    val alpha = number.alpha
-                    number = if (alpha <= 0) number.copy(v1 = number.target, v2 = 0, v3 = 127)
-                        else number.copy(v3 = (alpha - 600 / RhymeConfig.FPS).toByte().coerceIn(0, 127))
-                }
-            }
+            for (number in numbers) number.onUpdate(position)
         }
     }
 
-    private fun DrawScope.drawSymbol(mask: Int, v1: Int, v2: Int, a: Float, rect: Rect) {
-        val b1 = (v1 and mask) == mask
-        val b2 = (v2 and mask) == mask
-        if (b1) {
-            if (b2) drawRoundRect(Colors.Red4, rect, 5f, 1f)
-            else drawRoundRect(Colors.Red4, rect, 5f, a)
-        }
-        else if (b2) drawRoundRect(Colors.Red4, rect, 5f, 1 - a)
-    }
-
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
-        val position = Offset(640f, 100f)
-        withTransform({
-            translate(position.x, position.y)
-            rotateRad(atan(288 / 768f), Offset.Zero)
-        }) {
-            var x = 0f
-            symbols.forEach { symbol ->
-                translate(left = x) {
-                    symbol.value.apply {
-                        val a = (alpha / 127f).coerceIn(0f, 1f)
-                        val v1 = current.toInt()
-                        val v2 = target.toInt()
-                        drawSymbol(1, v1, v2, a, Rect(10f, 0f, 50f, 10f))
-                        drawSymbol(2, v1, v2, a, Rect(50f, 10f, 60f, 50f))
-                        drawSymbol(4, v1, v2, a, Rect(50f, 60f, 60f, 100f))
-                        drawSymbol(8, v1, v2, a, Rect(10f, 100f, 50f, 110f))
-                        drawSymbol(16, v1, v2, a, Rect(0f, 60f, 10f, 100f))
-                        drawSymbol(32, v1, v2, a, Rect(0f, 10f, 10f, 50f))
-                        drawSymbol(64, v1, v2, a, Rect(10f, 50f, 50f, 60f))
-                    }
-                }
-                x += 70f
-            }
-        }
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+        for (number in numbers) number.run { draw(textManager) }
     }
 }
 
 // 连击板
 @Stable
-private class ComboBoard : RhymeObject {
+private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
+    override val position: Offset = Offset.Zero
+    override val size: Size = Size.Game
+
     @Stable
     private enum class ActionResult {
         PERFECT, GOOD, MISS
@@ -558,11 +519,11 @@ private class ComboBoard : RhymeObject {
     private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)
 
-    override fun update(position: Long) {
+    override fun onUpdate(position: Long) {
         
     }
 
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
 
     }
 }
@@ -572,29 +533,34 @@ private class ComboBoard : RhymeObject {
 private class Scene(
     lyrics: RhymeLyricsConfig,
     record: ImageBitmap
-) : RhymeObject, RhymeEvent {
-    val progressBoard = ProgressBoard(lyrics.duration, record)
+) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
+    override val position: Offset = Offset.Zero
+    override val size: Size = Size.Game
+
+    private val center: Offset = Offset(size.width / 2, 360f)
+
+    val progressBoard = ProgressBoard(center, lyrics.duration, record)
     val lyricsBoard = LyricsBoard(lyrics)
     val scoreBoard = ScoreBoard()
     val comboBoard = ComboBoard()
-    val track = Track(scoreBoard, comboBoard)
+    val noteBoard = NoteBoard(center, scoreBoard, comboBoard)
 
-    override fun update(position: Long) {
-        lyricsBoard.update(position)
-        scoreBoard.update(position)
-        comboBoard.update(position)
-        track.update(position)
-        progressBoard.update(position)
+    override fun onUpdate(position: Long) {
+        lyricsBoard.onUpdate(position)
+        scoreBoard.onUpdate(position)
+        comboBoard.onUpdate(position)
+        noteBoard.onUpdate(position)
+        progressBoard.onUpdate(position)
     }
 
-    override fun event(pointer: Pointer): Boolean = progressBoard.event(pointer) || track.event(pointer)
+    override fun onEvent(pointer: Pointer): Boolean = progressBoard.onEvent(pointer) || noteBoard.onEvent(pointer)
 
-    override fun DrawScope.draw(textManager: RhymeTextManager) {
-        lyricsBoard.apply { draw(textManager) }
-        scoreBoard.apply { draw(textManager) }
-        comboBoard.apply { draw(textManager) }
-        track.apply { draw(textManager) }
-        progressBoard.apply { draw(textManager) }
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+        lyricsBoard.run { draw(textManager) }
+        scoreBoard.run { draw(textManager) }
+        comboBoard.run { draw(textManager) }
+        noteBoard.run { draw(textManager) }
+        progressBoard.run { draw(textManager) }
     }
 }
 
@@ -612,15 +578,15 @@ internal class RhymeStage {
     }
 
     fun onUpdate(position: Long) {
-        scene?.update(position)
+        scene?.onUpdate(position)
     }
 
     fun onEvent(pointer: Pointer) {
-        scene?.event(pointer)
+        scene?.onEvent(pointer)
     }
 
     fun onDraw(scope: DrawScope, textManager: RhymeTextManager) {
-        scene?.apply { scope.draw(textManager) }
+        scene?.run { scope.draw(textManager) }
     }
 
     fun onResult(): RhymeResult {
