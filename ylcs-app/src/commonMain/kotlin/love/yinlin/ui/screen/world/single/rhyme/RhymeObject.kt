@@ -162,27 +162,29 @@ internal data class RhymeTextManager(
         val fontWeight: FontWeight
     )
 
-    private val lruCache = lruCache<CacheKey, MultiParagraph>(8)
+    private val lruCache = lruCache<CacheKey, Paragraph>(16)
 
-    fun measureText(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): MultiParagraph {
+    fun measureText(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
         // 查询缓存
         val cacheKey = CacheKey(text, height, fontWeight)
         val cacheResult = lruCache[cacheKey]
         if (cacheResult != null) return cacheResult
 
-        val intrinsics = MultiParagraphIntrinsics(
-            annotatedString = AnnotatedString(text),
+        val intrinsics = ParagraphIntrinsics(
+            text = text,
             style = TextStyle(
                 fontSize = TextUnit(height / 1.17f, TextUnitType.Sp),
                 fontWeight = fontWeight,
                 fontFamily = FontFamily(font)
             ),
+            annotations = emptyList(),
             density = Density(1f),
             fontFamilyResolver = fontFamilyResolver,
             placeholders = emptyList()
         )
-        return MultiParagraph(
-            intrinsics = intrinsics,
+
+        return Paragraph(
+            paragraphIntrinsics = intrinsics,
             constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = height.toInt()),
             maxLines = 1,
             overflow = TextOverflow.Clip
@@ -190,7 +192,7 @@ internal data class RhymeTextManager(
     }
 
     fun DrawScope.drawText(
-        content: MultiParagraph,
+        content: Paragraph,
         position: Offset,
         color: Color,
         shadow: Shadow? = null,
@@ -206,7 +208,7 @@ internal data class RhymeTextManager(
                 canvas = drawContext.canvas,
                 color = color,
                 shadow = shadow,
-                decoration = decoration,
+                textDecoration = decoration,
                 drawStyle = drawStyle,
                 blendMode = blendMode
             )
@@ -546,8 +548,11 @@ private class ComboBoard : RhymeObject {
         PERFECT, GOOD, MISS
     }
 
-    override fun update(position: Long) {
+    private var result by mutableStateOf<ActionResult?>(null)
+    private var combo by mutableIntStateOf(0)
 
+    override fun update(position: Long) {
+        
     }
 
     override fun DrawScope.draw(textManager: RhymeTextManager) {
