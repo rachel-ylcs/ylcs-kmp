@@ -1,10 +1,9 @@
 [versions]
 
 # Plugins #
-kotlin = "2.2.20-Beta1"
+kotlin = "2.2.20-Beta2"
 cmp = "1.9.0-beta01"
 agp = "8.11.0"
-atomicfu = "0.29.0"
 
 # Libs #
 
@@ -13,14 +12,14 @@ lifecycle = "2.9.1"
 material3 = "1.9.0-alpha04"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
-ktor = "3.2.2"
+ktor = "3.2.3"
 sketch = "4.3.1"
 mmkv = "2.2.2"
 lottie = "2.0.0-rc04"
 
 # Android
 cmp-android = "1.8.1"
-media3 = "1.8.0-rc01"
+media3 = "1.8.0-rc02"
 
 # iOS
 vlcKit = "3.6.1b1"
@@ -64,7 +63,7 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.29.0" }
 
 runtime-shapes = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha09" }
 runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-beta04" }
@@ -131,6 +130,6 @@ ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", 
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.18" }
-mysql-pool = { module = "com.zaxxer:HikariCP", version = "6.3.0" }
+mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.0" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "6.0.0" }
