@@ -19,7 +19,7 @@ lottie = "2.0.0-rc04"
 
 # Android
 cmp-android = "1.8.1"
-media3 = "1.8.0-rc02"
+media3 = "1.8.0"
 
 # iOS
 vlcKit = "3.6.1b1"
