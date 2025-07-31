@@ -29,6 +29,17 @@ internal data class Pointer(
     var up: Boolean = false,
 )
 
+private fun Path(positions: Array<Offset>): Path = Path().apply {
+    positions.firstOrNull()?.let { first ->
+        moveTo(first.x, first.y)
+        for (i in 1 ..< positions.size) {
+            val position = positions[i]
+            lineTo(position.x, position.y)
+        }
+        close()
+    }
+}
+
 // 文本绘制缓存
 @Stable
 internal class TextCache(maxSize: Int = 8) {
@@ -191,11 +202,23 @@ private sealed class RhymeObject : RhymeContainer {
     fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
         this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha)
 
-    fun DrawScope.rect(color: Color, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
-        this.drawRect(color = color, topLeft = position, size = size, alpha = alpha)
+    fun DrawScope.rect(color: Color, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawRect(color = color, topLeft = position, size = size, alpha = alpha, style = style)
 
-    fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
-        this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha)
+    fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style)
+
+    fun DrawScope.path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawPath(path = path, color = color, alpha = alpha, style = style)
+
+    fun DrawScope.path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawPath(path = path, brush = brush, alpha = alpha, style = style)
+
+    fun DrawScope.quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawPath(path = Path(area), color = color, alpha = alpha, style = style)
+
+    fun DrawScope.quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill) =
+        this.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style)
 
     fun DrawScope.roundRect(color: Color, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
         this.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha)
@@ -277,15 +300,21 @@ private class NoteBoard(
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
     @Stable
     class Track(
-        center: Offset,
+        private val trackCenter: Offset,
         private val scoreBoard: ScoreBoard,
         private val comboBoard: ComboBoard
     ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
+        companion object {
+            const val TRACK_STROKE = 20f
+            const val TIP_AREA_START = 0.8f
+            const val TIP_AREA_END = 0.9f
+            const val TIP_AREA_STROKE = TRACK_STROKE / 5
+        }
+
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
 
-        private val trackWidth = 20f
-        private val tracks = listOf(
+        private val tracks = arrayOf(
             Offset(0f, 0f),
             Offset(0f, size.height / 2),
             Offset(0f, size.height),
@@ -294,7 +323,17 @@ private class NoteBoard(
             Offset(size.width, size.height),
             Offset(size.width, size.height / 2),
             Offset(size.width, 0f),
-        ).map { center to it }
+        )
+        private val tipAreas = Path(arrayOf(
+            trackCenter.onLine(Offset(0f, size.height), TIP_AREA_START),
+            trackCenter.onLine(Offset(0f, 0f), TIP_AREA_START),
+            trackCenter.onLine(Offset(0f, 0f), TIP_AREA_END),
+            trackCenter.onLine(Offset(0f, size.height), TIP_AREA_END),
+            trackCenter.onLine(Offset(size.width, size.height), TIP_AREA_END),
+            trackCenter.onLine(Offset(size.width, 0f), TIP_AREA_END),
+            trackCenter.onLine(Offset(size.width, 0f), TIP_AREA_START),
+            trackCenter.onLine(Offset(size.width, size.height), TIP_AREA_START),
+        ))
 
         private val current: Int? by mutableStateOf(null)
 
@@ -314,20 +353,28 @@ private class NoteBoard(
             return true
         }
 
-        private fun DrawScope.drawTrackLine(start: Offset, end: Offset, width: Float) {
+        private fun DrawScope.drawTipAreas() {
+            // 画提示区域线
+            path(Colors.White, tipAreas, style = Stroke(width = TIP_AREA_STROKE))
+            // 提示区域内发光遮罩
+        }
+
+        private fun DrawScope.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
             // 阴影
             repeat(5) {
-                line(Colors.Steel3, start, end, Stroke(width = width * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
+                line(Colors.Steel3, start, end, Stroke(width = stroke * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
             }
             // 光带
-            line(Colors.Steel4, start, end, Stroke(width = width, cap = StrokeCap.Round), 0.7f)
+            line(Colors.Steel4, start, end, Stroke(width = stroke, cap = StrokeCap.Round), 0.7f)
             // 高光
-            line(Colors.White, start, end, Stroke(width = width * 0.8f, cap = StrokeCap.Round), 0.8f)
+            line(Colors.White, start, end, Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), 0.8f)
         }
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            // 画点击提示区域
+            drawTipAreas()
             // 画轨道射线
-            for ((start, end) in tracks) drawTrackLine(start = start, end = end, width = trackWidth)
+            for (pos in tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
         }
     }
 
@@ -417,7 +464,7 @@ private class LyricsBoard(
 @Stable
 private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
-    private class ScoreNumber(p: Offset) : RhymeDynamic(), RhymeContainer.Rectangle {
+    private class ScoreNumber(pos: Offset) : RhymeDynamic(), RhymeContainer.Rectangle {
         // 七段数码管
         //     1
         // 6 ▎ ━  ▎ 2
@@ -466,7 +513,7 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
             private fun encode(v1: Byte, v2: Byte = 0, v3: Byte = 127): Int = ((v1.toInt() and 0xff) shl 16) or ((v2.toInt() and 0xff) shl 8) or (v3.toInt() and 0xff)
         }
 
-        override val position: Offset = p
+        override val position: Offset = pos
         override val size: Size = Size(WIDTH, HEIGHT)
 
         private var data by mutableIntStateOf(encode(NumberArray[0]))
@@ -697,7 +744,7 @@ private class Scene(
 internal class RhymeStage {
     private var scene: Scene? = null
 
-    fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap, speed: Int) {
+    fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap) {
         scene = Scene(lyrics, record)
     }
 

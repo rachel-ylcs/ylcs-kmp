@@ -118,7 +118,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
         completeGame()
     }
 
-    private fun startGame(info: MusicInfo, speed: Int) {
+    private fun startGame(info: MusicInfo) {
         launch {
             val task1 = async {
                 Coroutines.io {
@@ -142,7 +142,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             val record = task2.await()
             if (lyrics != null && record != null && canvasFrameJob == null) {
                 musicPlayer.load(info.audioPath)
-                stage.onInitialize(lyrics, record, speed)
+                stage.onInitialize(lyrics, record)
                 canvasFrameJob = monitorGamePosition()
                 state = GameState.Playing
             }
@@ -397,7 +397,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) startGame(entry.musicInfo, 10)
+                        if (entry.enabled) startGame(entry.musicInfo)
                         else slot.tip.warning("此MOD不支持")
                     }
                 )

@@ -15,9 +15,12 @@ fun Float.toRadian() = this * 3.141592f / 180
 fun Float.toDegree() = this * 180 / 3.141592f
 
 fun Offset.translate(x: Float = 0f, y: Float = 0f) = this.copy(x = this.x + x, y = this.y + y)
+fun Offset.scale(dx: Float = 1f, dy: Float = 1f) = this.copy(x = this.x * dx, y = this.y * dy)
 fun Offset.roundToIntOffset() = IntOffset(x = this.x.roundToInt(), y = this.y.roundToInt())
+fun Offset.onLine(other: Offset, ratio: Float): Offset = Offset(x = this.x + (other.x - this.x) * ratio, y = this.y + (other.y - this.y) * ratio)
 
 fun Size.translate(x: Float = 0f, y: Float = 0f) = this.copy(width = this.width + x, height = this.height + y)
+fun Size.scale(dx: Float = 1f, dy: Float = 1f) = this.copy(width = this.width * dx, height = this.height * dy)
 
 // State
 
