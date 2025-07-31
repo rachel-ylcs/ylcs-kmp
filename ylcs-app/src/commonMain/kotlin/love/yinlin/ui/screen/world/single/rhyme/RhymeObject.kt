@@ -232,10 +232,13 @@ private class ProgressBoard(
     private val duration: Long,
     private val record: ImageBitmap
 ) : RhymeDynamic(), RhymeContainer.Circle, RhymeEvent {
-    private val stroke = 8f
-    private val radius = 64f
-    override val position: Offset = center.translate(-radius, -radius)
-    override val size: Size = Size(radius * 2, radius * 2)
+    companion object {
+        const val STROKE = 8f
+        const val RADIUS = 64f
+    }
+
+    override val position: Offset = center.translate(-RADIUS, -RADIUS)
+    override val size: Size = Size(RADIUS * 2, RADIUS * 2)
 
     // 封面旋转角
     var angle: Float by mutableFloatStateOf(0f)
@@ -257,11 +260,11 @@ private class ProgressBoard(
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         // 画封面
-        rotate(angle, Offset(radius, radius)) { circleImage(record) }
+        rotate(angle, Offset(RADIUS, RADIUS)) { circleImage(record) }
         // 画时长
-        arc(Colors.White, -90f, 360f, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        arc(Colors.White, -90f, 360f, style = Stroke(width = STROKE, cap = StrokeCap.Round))
         // 画进度
-        arc(Colors.Green4, -90f, 360f * progress, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        arc(Colors.Green4, -90f, 360f * progress, style = Stroke(width = STROKE, cap = StrokeCap.Round))
     }
 }
 
@@ -424,9 +427,12 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
         // 5 ▎ ━  ▎ 3
         //     4
         companion object {
-            const val WIDTH = 60f
-            const val HEIGHT = 110f
-            const val GAP = 10f
+            const val RECT_WIDTH = 32f
+            const val RECT_HEIGHT = 8f
+            const val RECT_RADIUS = RECT_HEIGHT / 2
+            const val WIDTH = 2 * RECT_HEIGHT + RECT_WIDTH
+            const val HEIGHT = 3 * RECT_HEIGHT + 2 * RECT_WIDTH
+
             val NumberArray = byteArrayOf(
                 (1 + 2 + 4 + 8 + 16 + 32 + 0).toByte(),
                 (0 + 2 + 4 + 0 + 0 + 0 + 0).toByte(),
@@ -438,6 +444,16 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
                 (1 + 2 + 4 + 0 + 0 + 0 + 0).toByte(),
                 (1 + 2 + 4 + 8 + 16 + 32 + 64).toByte(),
                 (1 + 2 + 4 + 8 + 0 + 32 + 64).toByte()
+            )
+
+            val Rects = arrayOf(
+                Rect(RECT_HEIGHT, 0f, RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT),
+                Rect(RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT, RECT_HEIGHT * 2 + RECT_WIDTH, RECT_HEIGHT + RECT_WIDTH),
+                Rect(RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT * 2 + RECT_WIDTH, RECT_HEIGHT * 2 + RECT_WIDTH, RECT_HEIGHT * 2 + RECT_WIDTH * 2),
+                Rect(RECT_HEIGHT, RECT_HEIGHT * 2 + RECT_WIDTH * 2, RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT * 3 + RECT_WIDTH * 2),
+                Rect(0f, RECT_HEIGHT * 2 + RECT_WIDTH, RECT_HEIGHT, RECT_HEIGHT * 2 + RECT_WIDTH * 2),
+                Rect(0f, RECT_HEIGHT, RECT_HEIGHT, RECT_HEIGHT + RECT_WIDTH),
+                Rect(RECT_HEIGHT, RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT + RECT_WIDTH, RECT_HEIGHT * 2 + RECT_WIDTH)
             )
 
             private fun fetchNumber(v: Byte): Int {
@@ -474,38 +490,37 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
             }
         }
 
-        private fun DrawScope.drawSymbol(mask: Int, v1: Int, v2: Int, a: Float, rect: Rect) {
-            val b1 = (v1 and mask) == mask
-            val b2 = (v2 and mask) == mask
-            if (b1) {
-                if (b2) roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, 1f)
-                else roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, a)
-            }
-            else if (b2) roundRect(Colors.Red4, 5f, rect.topLeft, rect.size, 1 - a)
-        }
-
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             val a = (alpha / 127f).coerceIn(0f, 1f)
             val v1 = current.toInt()
             val v2 = target.toInt()
-            drawSymbol(1, v1, v2, a, Rect(10f, 0f, 50f, 10f))
-            drawSymbol(2, v1, v2, a, Rect(50f, 10f, 60f, 50f))
-            drawSymbol(4, v1, v2, a, Rect(50f, 60f, 60f, 100f))
-            drawSymbol(8, v1, v2, a, Rect(10f, 100f, 50f, 110f))
-            drawSymbol(16, v1, v2, a, Rect(0f, 60f, 10f, 100f))
-            drawSymbol(32, v1, v2, a, Rect(0f, 10f, 10f, 50f))
-            drawSymbol(64, v1, v2, a, Rect(10f, 50f, 50f, 60f))
+            repeat(Rects.size) {
+                val mask = 1 shl it
+                val rect = Rects[it]
+                val b1 = (v1 and mask) == mask
+                val b2 = (v2 and mask) == mask
+                if (b1) {
+                    if (b2) roundRect(Colors.Red4, RECT_RADIUS, rect.topLeft, rect.size, 1f)
+                    else roundRect(Colors.Red4, RECT_RADIUS, rect.topLeft, rect.size, a)
+                }
+                else if (b2) roundRect(Colors.Red4, RECT_RADIUS, rect.topLeft, rect.size, 1 - a)
+            }
         }
     }
 
-    override val position: Offset = Offset(Size.Game.width / 3, 100f)
-    override val size: Size = Size(ScoreNumber.WIDTH * 4 + ScoreNumber.GAP * 3, ScoreNumber.HEIGHT)
+    companion object {
+        const val GAP = ScoreNumber.RECT_HEIGHT
+        const val WIDTH = ScoreNumber.WIDTH * 4 + GAP * 3
+    }
+
+    override val position: Offset = Offset(Size.Game.width / 2 - ProgressBoard.RADIUS / 2 - 50 - WIDTH, 100f)
+    override val size: Size = Size(WIDTH, ScoreNumber.HEIGHT)
     override val transform: (DrawTransform.() -> Unit) = {
         rotateRad(atan(288 / 768f), Offset.Zero)
     }
 
     private val numbers = Array(4) {
-        ScoreNumber(Offset(it * (ScoreNumber.WIDTH + ScoreNumber.GAP), 0f))
+        ScoreNumber(Offset(it * (ScoreNumber.WIDTH + GAP), 0f))
     }
 
     private val lock = SynchronizedObject()
@@ -566,7 +581,7 @@ private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
 
     private val textWidth = 270f
     private val textHeight: Float = 90f
-    override val position: Offset = Offset(Size.Game.width / 2 + 82, 100f)
+    override val position: Offset = Offset(Size.Game.width / 2 + ProgressBoard.RADIUS / 2 + 50, 100f)
     override val size: Size = Size(textWidth, textHeight)
     override val transform: (DrawTransform.() -> Unit) = {
         rotateRad(atan(-288 / 768f), Offset(textWidth, textHeight))
