@@ -29,12 +29,9 @@ internal data class Pointer(
     var up: Boolean = false,
 )
 
-// 文本绘制管理器
+// 文本绘制缓存
 @Stable
-internal data class RhymeTextManager(
-    private val font: Font,
-    private val fontFamilyResolver: FontFamily.Resolver
-) {
+internal class TextCache(maxSize: Int = 8) {
     @Stable
     private data class CacheKey(
         val text: String,
@@ -42,33 +39,47 @@ internal data class RhymeTextManager(
         val fontWeight: FontWeight
     )
 
-    private val lruCache = lruCache<CacheKey, Paragraph>(16)
+    private val lruCache = lruCache<CacheKey, Paragraph>(maxSize)
 
-    fun measureText(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
-        // 查询缓存
+    fun measureText(manager: RhymeTextManager, text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
         val cacheKey = CacheKey(text, height, fontWeight)
         val cacheResult = lruCache[cacheKey]
         if (cacheResult != null) return cacheResult
+        val newResult = manager.makeParagraph(text, height, fontWeight)
+        lruCache.put(cacheKey, newResult)
+        return newResult
+    }
+}
 
+// 文本绘制管理器
+@Stable
+internal class RhymeTextManager(
+    font: Font,
+    private val fontFamilyResolver: FontFamily.Resolver
+) {
+    private val fontFamily = FontFamily(font)
+    private val density = Density(1f)
+
+    fun makeParagraph(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
+        // 查询缓存
         val intrinsics = ParagraphIntrinsics(
             text = text,
             style = TextStyle(
                 fontSize = TextUnit(height / 1.17f, TextUnitType.Sp),
                 fontWeight = fontWeight,
-                fontFamily = FontFamily(font)
+                fontFamily = fontFamily
             ),
             annotations = emptyList(),
-            density = Density(1f),
+            density = density,
             fontFamilyResolver = fontFamilyResolver,
             placeholders = emptyList()
         )
-
         return Paragraph(
             paragraphIntrinsics = intrinsics,
             constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = height.toInt()),
             maxLines = 1,
             overflow = TextOverflow.Clip
-        ).also { lruCache.put(cacheKey, it) }
+        )
     }
 
     fun DrawScope.text(
@@ -87,6 +98,30 @@ internal data class RhymeTextManager(
             content.paint(
                 canvas = drawContext.canvas,
                 color = color,
+                shadow = shadow,
+                textDecoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
+    }
+
+    fun DrawScope.text(
+        content: Paragraph,
+        position: Offset,
+        brush: Brush,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
+    ) {
+        withTransform({
+            translate(left = position.x, top = position.y)
+            clipRect(left = 0f, top = 0f, right = content.width, bottom = content.height)
+        }) {
+            content.paint(
+                canvas = drawContext.canvas,
+                brush = brush,
                 shadow = shadow,
                 textDecoration = decoration,
                 drawStyle = drawStyle,
@@ -265,7 +300,14 @@ private class NoteBoard(
         }
 
         override fun onEvent(pointer: Pointer): Boolean {
-            if (pointer.up) scoreBoard.addScore(Random.nextInt(1, 4))
+            if (pointer.up) {
+                val score = comboBoard.updateAction(when (Random.nextInt(1, 4)) {
+                    1 -> ComboBoard.Action.PERFECT
+                    2 -> ComboBoard.Action.GOOD
+                    else -> ComboBoard.Action.MISS
+                })
+                scoreBoard.addScore(score)
+            }
             return true
         }
 
@@ -315,6 +357,8 @@ private class LyricsBoard(
     private var text by mutableStateOf("")
     private var progress by mutableFloatStateOf(0f)
 
+    private val textCache = TextCache(16)
+
     override fun onUpdate(position: Long) {
         val lines = lyrics.lyrics
         val nextLine = lines.getOrNull(currentIndex + 1)
@@ -345,10 +389,10 @@ private class LyricsBoard(
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         val line = text.ifEmpty { null } ?: return
+        val content = textCache.measureText(textManager, line, textHeight)
+        val textWidth = content.width
+        val start = Offset((this@LyricsBoard.size.width - textWidth) / 2, 0f)
         textManager.run {
-            val content = measureText(line, textHeight)
-            val textWidth = content.width
-            val start = Offset((this@LyricsBoard.size.width - textWidth) / 2, 0f)
             text(
                 content = content,
                 position = start,
@@ -508,23 +552,92 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
 // 连击板
 @Stable
 private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
-    override val position: Offset = Offset.Zero
-    override val size: Size = Size.Game
-
     @Stable
-    private enum class ActionResult {
-        PERFECT, GOOD, MISS
+    enum class Action(val score: Int, val title: String, val brush: Brush) {
+        MISS(0, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
+        GOOD(1, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
+        PERFECT(2, "PERFECT", Brush.verticalGradient(listOf(Colors.Yellow2, Colors.Green2)))
     }
 
-    private var result by mutableStateOf<ActionResult?>(null)
+    companion object {
+        const val FPA = RhymeConfig.FPS * 150 / 1000
+        const val COMBO_COUNT = 20
+    }
+
+    private val textWidth = 270f
+    private val textHeight: Float = 90f
+    override val position: Offset = Offset(Size.Game.width / 2 + 82, 100f)
+    override val size: Size = Size(textWidth, textHeight)
+    override val transform: (DrawTransform.() -> Unit) = {
+        rotateRad(atan(-288 / 768f), Offset(textWidth, textHeight))
+    }
+
+    private var action by mutableStateOf<Action?>(null)
     private var combo by mutableIntStateOf(0)
+    private var frame by mutableIntStateOf(0)
+
+    private val actionTextCache = TextCache()
+    private val comboTextCache = TextCache(16)
+
+    fun updateAction(newAction: Action): Int {
+        // 重置进度
+        action = newAction
+        frame = 0
+        // 计算得分
+        var score = newAction.score
+        if (newAction == Action.MISS) combo = 0 // 清空连击
+        else score += ++combo / COMBO_COUNT // 连击得分奖励
+        return score
+    }
 
     override fun onUpdate(position: Long) {
-        
+        // Animation: Enter | Wait | Exit
+        // Frame:      FPA  | FPA  | FPA
+        if (frame == FPA * 3) {
+            action = null
+            frame = 0
+        }
+        else ++frame
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-
+        action?.let { currentAction ->
+            //         { 1 - ((x - FPA) / FPA) ^ 2  , 0       <= x <= FPA
+            // f(x) =  { 1                          , FPA     <= x <= 2 * FPA
+            //         { ((x - 3 * FPA) / FPA) ^ 2  , 2 * FPA <= x <= 3 * FPA
+            val progress = when (val currentFrame = frame) {
+                in 0 .. FPA -> 1 - (currentFrame - FPA) * (currentFrame - FPA) / (FPA * FPA).toFloat()
+                in 2 * FPA .. 3 * FPA -> (currentFrame - 3 * FPA) * (currentFrame - 3 * FPA) / (FPA * FPA).toFloat()
+                else -> 1f
+            }.coerceIn(0f, 1f)
+            // 结果
+            val content = actionTextCache.measureText(textManager, currentAction.title, textHeight, FontWeight.Bold)
+            scale(progress, this@ComboBoard.size.center) {
+                textManager.run {
+                    text(
+                        content = content,
+                        position = Offset((textWidth - content.width) / 2, 0f),
+                        brush = currentAction.brush,
+                        shadow = Shadow(Colors.Dark, Offset(2f, 2f), 2f)
+                    )
+                }
+            }
+            // 连击
+            if (combo > 1) {
+                val content = comboTextCache.measureText(textManager, "+$combo", textHeight / 2, FontWeight.Bold)
+                val topLeft = Offset(textWidth - content.width, textHeight / 2)
+                scale(progress, topLeft.translate(content.width / 2, textHeight / 4)) {
+                    textManager.run {
+                        text(
+                            content = content,
+                            position = topLeft,
+                            color = Colors.White.copy(alpha = (progress * 2).coerceIn(0f, 1f)),
+                            shadow = Shadow(Colors.Dark, Offset(1f, 1f), 1f)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
