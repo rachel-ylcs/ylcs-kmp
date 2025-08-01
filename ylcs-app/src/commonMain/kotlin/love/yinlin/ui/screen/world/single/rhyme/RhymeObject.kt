@@ -13,6 +13,7 @@ import androidx.compose.ui.util.*
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import love.yinlin.common.Colors
+import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
 import kotlin.math.*
@@ -303,69 +304,12 @@ private class ProgressBoard(
 // 音符板
 @Stable
 private class NoteBoard(
+    lyrics: RhymeLyricsConfig,
     center: Offset,
     scoreBoard: ScoreBoard,
     comboBoard: ComboBoard
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
-    @Stable
-    private class Track(
-        private val trackCenter: Offset,
-        private val scoreBoard: ScoreBoard,
-        private val comboBoard: ComboBoard
-    ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
-        companion object {
-            const val TRACK_STROKE = 20f
-        }
-
-        override val position: Offset = Offset.Zero
-        override val size: Size = Size.Game
-
-        private val tracks = arrayOf(
-            Offset(0f, 0f),
-            Offset(0f, size.height / 2),
-            Offset(0f, size.height),
-            Offset(size.width / 3, size.height),
-            Offset(size.width * 2 / 3, size.height),
-            Offset(size.width, size.height),
-            Offset(size.width, size.height / 2),
-            Offset(size.width, 0f),
-        )
-
-        private val current: Int? by mutableStateOf(null)
-
-        override fun onUpdate(position: Long) {
-
-        }
-
-        override fun onEvent(pointer: Pointer): Boolean {
-            if (pointer.up) {
-                val score = comboBoard.updateAction(when (Random.nextInt(1, 4)) {
-                    1 -> ComboBoard.Action.PERFECT
-                    2 -> ComboBoard.Action.GOOD
-                    else -> ComboBoard.Action.MISS
-                })
-                scoreBoard.addScore(score)
-            }
-            return true
-        }
-
-        private fun DrawScope.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
-            // 阴影
-            repeat(5) {
-                line(Colors.Steel3, start, end, Stroke(width = stroke * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
-            }
-            // 光带
-            line(Colors.Steel4, start, end, Stroke(width = stroke, cap = StrokeCap.Round), 0.7f)
-            // 高光
-            line(Colors.White, start, end, Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), 0.8f)
-        }
-
-        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-            // 画轨道射线
-            for (pos in tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
-        }
-    }
-
+    // 提示区域
     @Stable
     private class TipArea(
         trackCenter: Offset
@@ -451,19 +395,161 @@ private class NoteBoard(
         }
     }
 
+    // 轨道
+    @Stable
+    private class Track(
+        private val trackCenter: Offset,
+        private val scoreBoard: ScoreBoard,
+        private val comboBoard: ComboBoard
+    ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
+        companion object {
+            const val TRACK_STROKE = 20f
+        }
+
+        override val position: Offset = Offset.Zero
+        override val size: Size = Size.Game
+
+        private val tracks = arrayOf(
+            Offset(0f, 0f),
+            Offset(0f, size.height / 2),
+            Offset(0f, size.height),
+            Offset(size.width / 3, size.height),
+            Offset(size.width * 2 / 3, size.height),
+            Offset(size.width, size.height),
+            Offset(size.width, size.height / 2),
+            Offset(size.width, 0f),
+        )
+
+        private val current: Int? by mutableStateOf(null)
+
+        override fun onUpdate(position: Long) {
+
+        }
+
+        override fun onEvent(pointer: Pointer): Boolean {
+            if (pointer.up) {
+                val score = comboBoard.updateAction(when (Random.nextInt(1, 4)) {
+                    1 -> ComboBoard.Action.PERFECT
+                    2 -> ComboBoard.Action.GOOD
+                    else -> ComboBoard.Action.MISS
+                })
+                scoreBoard.addScore(score)
+            }
+            return true
+        }
+
+        private fun DrawScope.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
+            // 阴影
+            repeat(5) {
+                line(Colors.Steel3, start, end, Stroke(width = stroke * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
+            }
+            // 光带
+            line(Colors.Steel4, start, end, Stroke(width = stroke, cap = StrokeCap.Round), 0.7f)
+            // 高光
+            line(Colors.White, start, end, Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), 0.8f)
+        }
+
+        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            // 画轨道射线
+            for (pos in tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
+        }
+    }
+
+    // 音符队列
+    @Stable
+    private class NoteQueue(
+        lyrics: RhymeLyricsConfig
+    ) : RhymeDynamic(), RhymeContainer.Rectangle {
+        companion object {
+            const val PERFECT_RATIO = 1.25f
+            const val GOOD_RATIO = 2f
+            const val MISS_RATIO = 4f
+        }
+
+        override val position: Offset = Offset.Zero
+        override val size: Size = Size.Game
+
+        //                                                  音符生命周期
+        // ------------------------------------------------------------------------------------------------------------
+        //    ↑          ↑             ↑              ↑                ↑              ↑             ↑             ↑
+        //   出现  可点击开始(MISS)  好开始(GOOD)  完美开始(PERFECT)  完美结束(PERFECT)  好结束(GOOD)  可点击结束(MISS)    消失
+        //                                                发声    收声
+        //                                                [ 提示区域 ]
+        // 字符的发声点和收声点的间隔恰好是经过提示区域, 中点对应轨道线 TIP_AREA_START 和 TIP_AREA_END 的中点
+        // 提示区域的PERFECT_RATIO倍邻域为完美
+        // 提示区域的GOOD_RATIO倍邻域为好
+        // 提示区域的MISS_RATIO倍邻域为错过
+        // 再往外的邻域不响应点击
+        @Stable
+        data class DynamicAction(
+            val action: RhymeAction, // 音符操作
+            val appearance: Long, // 出现刻
+            val missStartOffset: Int, // MISS 起始偏移
+            val goodStartOffset: Int, // GOOD 起始偏移
+            val perfectStartOffset: Int, // PERFECT 起始偏移
+            val perfectEndOffset: Int, // PERFECT 结束偏移
+            val goodEndOffset: Int, // GOOD 结束偏移
+            val missEndOffset: Int, // MISS 结束偏移
+            val dismissOffset: Int, // 消失偏移
+        )
+
+        // 预编译列表
+        private val prebuildList = buildList {
+            val baseRatio = (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START) / 2
+            val centerRatio = (TipArea.TIP_AREA_END + TipArea.TIP_AREA_START) / 2
+            lyrics.lyrics.fastForEach { line ->
+                val theme = line.theme
+                for (i in theme.indices) {
+                    val action = theme[i]
+                    val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
+                    val end = action.end + line.start
+                    val duration = ((end - start) / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toInt()
+                    val appearance = (start - duration * TipArea.TIP_AREA_START).toLong()
+                    add(DynamicAction(
+                        action = action,
+                        appearance = appearance,
+                        missStartOffset = ((centerRatio - baseRatio * MISS_RATIO) * duration).toInt().coerceIn(0, duration),
+                        goodStartOffset = ((centerRatio - baseRatio * GOOD_RATIO) * duration).toInt().coerceIn(0, duration),
+                        perfectStartOffset = ((centerRatio - baseRatio * PERFECT_RATIO) * duration).toInt().coerceIn(0, duration),
+                        perfectEndOffset = ((centerRatio + baseRatio * PERFECT_RATIO) * duration).toInt().coerceIn(0, duration),
+                        goodEndOffset = ((centerRatio + baseRatio * GOOD_RATIO) * duration).toInt().coerceIn(0, duration),
+                        missEndOffset = ((centerRatio + baseRatio * MISS_RATIO) * duration).toInt().coerceIn(0, duration),
+                        dismissOffset = duration
+                    ))
+                }
+            }
+        }
+
+        // 音符队列
+        private val queue = mutableStateListOf<DynamicAction>()
+
+        override fun onUpdate(position: Long) {
+
+        }
+
+        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+
+        }
+    }
+
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
-    private val track = Track(center, scoreBoard, comboBoard)
     private val tipArea = TipArea(center)
+    private val track = Track(center, scoreBoard, comboBoard)
+    private val noteQueue = NoteQueue(lyrics)
 
-    override fun onUpdate(position: Long) = track.run { onUpdate(position) }
+    override fun onUpdate(position: Long) {
+        track.run { onUpdate(position) }
+        noteQueue.run { onUpdate(position) }
+    }
 
     override fun onEvent(pointer: Pointer): Boolean = track.run { onEvent(pointer) }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         tipArea.run { draw(textManager) }
         track.run { draw(textManager) }
+        noteQueue.run { draw(textManager) }
     }
 }
 
@@ -787,11 +873,11 @@ private class Scene(
 
     private val center: Offset = Offset(size.width / 2, 360f)
 
-    val progressBoard = ProgressBoard(center, lyrics.duration, record)
     val lyricsBoard = LyricsBoard(lyrics)
     val scoreBoard = ScoreBoard()
     val comboBoard = ComboBoard()
-    val noteBoard = NoteBoard(center, scoreBoard, comboBoard)
+    val noteBoard = NoteBoard(lyrics, center, scoreBoard, comboBoard)
+    val progressBoard = ProgressBoard(center, lyrics.duration, record)
 
     override fun onUpdate(position: Long) {
         lyricsBoard.onUpdate(position)
