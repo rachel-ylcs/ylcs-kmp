@@ -26,7 +26,7 @@ kotlin {
                 compose.desktop.currentOs,
                 // kotlinx
                 libs.kotlinx.coroutines, libs.kotlinx.coroutines.swing,
-                libs.kotlinx.io, libs.kotlinx.json,
+                libs.kotlinx.io, libs.kotlinx.json, libs.kotlinx.datetime,
                 // runtime
                 libs.runtime.viewmodel, libs.runtime.lifecycle,
             )
