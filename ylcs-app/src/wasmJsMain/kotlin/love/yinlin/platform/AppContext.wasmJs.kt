@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.platform
 
 import com.github.panpf.sketch.PlatformContext
@@ -21,7 +22,7 @@ class ActualAppContext : AppContext() {
 
 	override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory()
 
-	override fun initialize() {
+    override fun initialize() {
 		super.initialize()
 		// 注册异常回调
 		window.onerror = { message, source, lineno, colno, error ->

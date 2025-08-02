@@ -1,4 +1,3 @@
-@file:JvmName("UriJvm")
 package love.yinlin.common
 
 fun java.net.URI.toUri(): Uri = Uri.parse(this.toString()) ?: Uri.Empty

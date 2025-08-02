@@ -1,5 +1,4 @@
 @file:OptIn(UnstableApi::class)
-@file:JvmName("MusicFactoryAndroid")
 package love.yinlin.platform
 
 import android.content.ComponentName

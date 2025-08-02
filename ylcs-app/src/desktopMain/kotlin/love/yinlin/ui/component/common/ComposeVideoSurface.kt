@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.platform
+package love.yinlin.ui.component.common
 
 import androidx.compose.runtime.State
 import androidx.compose.ui.graphics.ImageBitmap

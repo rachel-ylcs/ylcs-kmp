@@ -28,7 +28,7 @@ import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
-import love.yinlin.ui.component.AppTopBar
+import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Desktop

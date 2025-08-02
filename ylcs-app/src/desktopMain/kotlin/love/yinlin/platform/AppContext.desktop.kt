@@ -1,35 +1,38 @@
-@file:JvmName("AppContextAndroid")
 package love.yinlin.platform
 
-import android.app.Activity
-import android.content.Context
-import androidx.activity.result.ActivityResultRegistry
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.github.panpf.sketch.PlatformContext
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 
-class ActualAppContext(val context: Context) : AppContext() {
-	override val kv: KV = KV(context)
+class ActualAppContext : AppContext() {
+    var windowVisible by mutableStateOf(true)
 
-    var activity: Activity? = null
-	var activityResultRegistry: ActivityResultRegistry? = null
+	override val kv: KV = KV()
 
-	override fun initializeSketch(): Sketch = Sketch.Builder(context).apply {
+	override fun initializeSketch(): Sketch = Sketch.Builder(PlatformContext.INSTANCE).apply {
 		logger(level = Logger.Level.Error)
+		components {
+			addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
+		}
 		downloadCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 400 * 1024 * 1024
+				maxSize = 1024 * 1024 * 1024
 			)
 		}
 		resultCacheOptions {
 			DiskCache.Options(
 				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
-				maxSize = 400 * 1024 * 1024
+				maxSize = 1024 * 1024 * 1024
 			)
 		}
 		globalImageOptions(ImageOptions {
@@ -40,7 +43,7 @@ class ActualAppContext(val context: Context) : AppContext() {
 		})
 	}.build()
 
-	override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory(context)
+	override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory()
 
 	override fun initialize() {
 		super.initialize()
@@ -48,6 +51,8 @@ class ActualAppContext(val context: Context) : AppContext() {
 		Thread.setDefaultUncaughtExceptionHandler { _, e ->
 			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
 		}
+		// 创建悬浮歌词
+		appNative.musicFactory.floatingLyrics = ActualFloatingLyrics().apply { isAttached = true }
 	}
 }
 

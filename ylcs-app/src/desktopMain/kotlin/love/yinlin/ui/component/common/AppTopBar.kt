@@ -1,4 +1,4 @@
-package love.yinlin.ui.component
+package love.yinlin.ui.component.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

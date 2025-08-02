@@ -17,7 +17,7 @@ static inline Playback::MediaPlayer& np_cast(jlong handle) { return reinterpret_
 extern "C" {
 	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_MusicPlayer_nativeCreatePlayer(JNIEnv* env, jobject) {
 		auto nativePlayer = new NativePlayer;
-		nativePlayer->player.MediaEnded([](Playback::MediaPlayer&& sender, auto&& args) {
+		nativePlayer->player.MediaEnded([](Playback::MediaPlayer const& sender, auto&& args) {
 			sender.Source(nullptr);
 		});
 		return reinterpret_cast<jlong>(nativePlayer);

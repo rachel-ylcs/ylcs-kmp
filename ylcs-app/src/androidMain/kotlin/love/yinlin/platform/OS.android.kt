@@ -1,4 +1,3 @@
-@file:JvmName("OSAndroid")
 package love.yinlin.platform
 
 import android.content.ClipData

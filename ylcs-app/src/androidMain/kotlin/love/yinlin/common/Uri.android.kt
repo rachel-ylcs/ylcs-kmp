@@ -1,4 +1,3 @@
-@file:JvmName("UriAndroid")
 package love.yinlin.common
 
 fun android.net.Uri.toUri(): Uri = Uri.parse(this.toString()) ?: Uri.Empty

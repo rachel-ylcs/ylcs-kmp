@@ -1,4 +1,3 @@
-@file:JvmName("AndroidScreenFloatingLyrics")
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.background

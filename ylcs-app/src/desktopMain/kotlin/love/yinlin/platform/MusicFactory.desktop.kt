@@ -1,4 +1,3 @@
-@file:JvmName("MusicFactoryDesktop")
 package love.yinlin.platform
 
 import androidx.compose.runtime.*
@@ -238,15 +237,15 @@ class ActualMusicFactory : MusicFactory() {
 
 @Stable
 actual class MusicPlayer {
-    external fun nativeCreatePlayer(): Long
-    external fun nativeReleasePlayer(handle: Long)
-    external fun nativeIsPlaying(handle: Long): Boolean
-    external fun nativeGetPosition(handle: Long): Long
-    external fun nativeGetDuration(handle: Long): Long
-    external fun nativeLoad(handle: Long, path: String)
-    external fun nativePlay(handle: Long)
-    external fun nativePause(handle: Long)
-    external fun nativeStop(handle: Long)
+    private external fun nativeCreatePlayer(): Long
+    private external fun nativeReleasePlayer(handle: Long)
+    private external fun nativeIsPlaying(handle: Long): Boolean
+    private external fun nativeGetPosition(handle: Long): Long
+    private external fun nativeGetDuration(handle: Long): Long
+    private external fun nativeLoad(handle: Long, path: String)
+    private external fun nativePlay(handle: Long)
+    private external fun nativePause(handle: Long)
+    private external fun nativeStop(handle: Long)
 
     private var handle: Long = 0L
 

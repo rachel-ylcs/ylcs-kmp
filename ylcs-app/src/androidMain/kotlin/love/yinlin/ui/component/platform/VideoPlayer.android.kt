@@ -1,4 +1,3 @@
-@file:JvmName("AndroidVideoPlayer")
 package love.yinlin.ui.component.platform
 
 import androidx.annotation.OptIn

@@ -1,4 +1,3 @@
-@file:JvmName("DesktopVideoPlayer")
 package love.yinlin.ui.component.platform
 
 import androidx.compose.foundation.Image
@@ -17,6 +16,7 @@ import love.yinlin.common.Colors
 import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.rememberRefState
+import love.yinlin.ui.component.common.ComposeVideoSurface
 import love.yinlin.ui.component.image.ClickIcon
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory
 import uk.co.caprica.vlcj.media.Media

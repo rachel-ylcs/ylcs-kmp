@@ -1,4 +1,3 @@
-@file:JvmName("DesktopScreenFloatingLyrics")
 package love.yinlin.ui.screen.music
 
 import androidx.compose.foundation.layout.*
@@ -15,7 +14,6 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberRefState
-import love.yinlin.extension.rememberState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.OS

@@ -1,4 +1,3 @@
-@file:JvmName("OSCommon")
 package love.yinlin.platform
 
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import love.yinlin.common.Uri
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 import love.yinlin.ui.component.image.MiniIcon
-import kotlin.jvm.JvmName
 
 val UnsupportedPlatformText = "不支持的平台 $platform"
 

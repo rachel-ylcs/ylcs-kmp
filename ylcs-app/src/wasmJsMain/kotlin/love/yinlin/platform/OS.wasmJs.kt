@@ -9,6 +9,7 @@ actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	return true
 }
 
+@OptIn(ExperimentalWasmJsInterop::class)
 actual fun osApplicationCopyText(text: String): Boolean {
 	window.navigator.clipboard.writeText(text)
 	return true

@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.platform
 
 import kotlinx.browser.document

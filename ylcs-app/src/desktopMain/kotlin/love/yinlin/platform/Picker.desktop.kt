@@ -14,6 +14,10 @@ import java.io.File
 actual object Picker {
     var windowHandle: Long = 0L
 
+    private external fun openFileDialog(parent: Long, title: String, filterName: String, filter: String): String?
+    private external fun openMultipleFileDialog(parent: Long, maxNum: Int, title: String, filterName: String, filter: String): Array<String>
+    private external fun saveFileDialog(parent: Long, title: String, filename: String, ext: String, filterName: String): String?
+
     actual suspend fun pickPicture(): Source? = Coroutines.io {
         catchingNull {
             val path = openFileDialog(windowHandle, "选择一张图片", "图片", "*.jpg;*.png;*.webp")
@@ -72,7 +76,3 @@ actual object Picker {
         if (!result) SystemFileSystem.delete(origin as Path, false)
     }
 }
-
-private external fun openFileDialog(parent: Long, title: String, filterName: String, filter: String): String?
-private external fun openMultipleFileDialog(parent: Long, maxNum: Int, title: String, filterName: String, filter: String): Array<String>
-private external fun saveFileDialog(parent: Long, title: String, filename: String, ext: String, filterName: String): String?
