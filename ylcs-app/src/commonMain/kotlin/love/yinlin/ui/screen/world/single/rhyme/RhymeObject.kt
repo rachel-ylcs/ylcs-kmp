@@ -482,6 +482,7 @@ private class NoteBoard(
         // 再往外的邻域不响应点击
         @Stable
         data class DynamicAction(
+            val id: Int, // ID
             val action: RhymeAction, // 音符操作
             val appearance: Long, // 出现刻
             val missStartOffset: Int, // MISS 起始偏移
@@ -491,12 +492,16 @@ private class NoteBoard(
             val goodEndOffset: Int, // GOOD 结束偏移
             val missEndOffset: Int, // MISS 结束偏移
             val dismissOffset: Int, // 消失偏移
-        )
+        ) {
+            override fun equals(other: Any?): Boolean = this.id == (other as? DynamicAction)?.id
+            override fun hashCode(): Int = id
+        }
 
         // 预编译列表
         private val prebuildList = buildList {
             val baseRatio = (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START) / 2
             val centerRatio = (TipArea.TIP_AREA_END + TipArea.TIP_AREA_START) / 2
+            var id = 0
             lyrics.lyrics.fastForEach { line ->
                 val theme = line.theme
                 for (i in theme.indices) {
@@ -506,6 +511,7 @@ private class NoteBoard(
                     val duration = ((end - start) / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toInt()
                     val appearance = (start - duration * TipArea.TIP_AREA_START).toLong()
                     add(DynamicAction(
+                        id = id++,
                         action = action,
                         appearance = appearance,
                         missStartOffset = ((centerRatio - baseRatio * MISS_RATIO) * duration).toInt().coerceIn(0, duration),
@@ -518,13 +524,14 @@ private class NoteBoard(
                     ))
                 }
             }
-        }
+        }.toMutableList().apply { reverse() }
 
         // 音符队列
-        private val queue = mutableStateListOf<DynamicAction>()
+        private val queue = mutableStateSetOf<DynamicAction>()
 
         override fun onUpdate(position: Long) {
-
+            // 检查待删除的音符
+            // 检查新加入的音符
         }
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
