@@ -463,10 +463,6 @@ private class NoteBoard(
     ) : RhymeDynamic(), RhymeContainer.Rectangle {
         companion object {
             const val TRACK_DURATION = (125 / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toLong()
-            const val PERFECT_RATIO = 0.25f
-            const val GOOD_RATIO = 0.5f
-            const val BAD_RATIO = 1f
-            const val MISS_RATIO = 3f
         }
 
         @Stable
@@ -491,6 +487,13 @@ private class NoteBoard(
                 override val action: RhymeAction.Note, // 音符操作
                 start: Long, // 发声时间
             ) : DynamicAction() {
+                companion object {
+                    const val PERFECT_RATIO = 0.25f
+                    const val GOOD_RATIO = 0.5f
+                    const val BAD_RATIO = 1f
+                    const val MISS_RATIO = 3f
+                }
+
                 override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
                 val perfect by lazy { makeRange(PERFECT_RATIO) }
                 val good by lazy { makeRange(GOOD_RATIO) }
