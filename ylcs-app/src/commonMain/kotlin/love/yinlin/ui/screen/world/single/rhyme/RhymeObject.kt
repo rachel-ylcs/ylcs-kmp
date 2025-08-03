@@ -427,9 +427,10 @@ private class NoteBoard(
 
         override fun onEvent(pointer: Pointer): Boolean {
             if (pointer.up) {
-                val score = comboBoard.updateAction(when (Random.nextInt(1, 4)) {
-                    1 -> ComboBoard.Action.PERFECT
-                    2 -> ComboBoard.Action.GOOD
+                val score = comboBoard.updateAction(when (Random.nextInt(0, 4)) {
+                    0 -> ComboBoard.Action.PERFECT
+                    1 -> ComboBoard.Action.GOOD
+                    2 -> ComboBoard.Action.BAD
                     else -> ComboBoard.Action.MISS
                 })
                 scoreBoard.addScore(score)
@@ -461,49 +462,61 @@ private class NoteBoard(
         lyrics: RhymeLyricsConfig
     ) : RhymeDynamic(), RhymeContainer.Rectangle {
         companion object {
-            const val PERFECT_RATIO = 1.25f
-            const val GOOD_RATIO = 2f
-            const val MISS_RATIO = 4f
+            const val TRACK_DURATION = (125 / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toLong()
+            const val PERFECT_RATIO = 0.25f
+            const val GOOD_RATIO = 0.5f
+            const val BAD_RATIO = 1f
+            const val MISS_RATIO = 3f
+        }
 
-            const val NOTE_PADDING_RATIO = 0.9f
+        @Stable
+        sealed class DynamicAction() {
+            abstract val action: RhymeAction // 音符操作
+            abstract val appearance: Long // 出现刻
+
+            var current by mutableLongStateOf(0L) // 当前刻
+
+            //                                                  音符生命周期
+            // ------------------------------------------------------------------------------------------------------------
+            //    ↑          ↑             ↑              ↑                ↑              ↑             ↑             ↑
+            //   出现  可点击开始(MISS)  好开始(GOOD)  完美开始(PERFECT)  完美结束(PERFECT)  好结束(GOOD)  可点击结束(MISS)    消失
+            //                                                发声
+            // 字符的发声点是经过提示区域的开始
+            // 提示区域的 PERFECT_RATIO 倍邻域为完美
+            // 提示区域的 GOOD_RATIO 倍邻域为好
+            // 提示区域的 MISS_RATIO 倍邻域为错过
+            // 再往外的邻域不响应点击
+            @Stable
+            class Note(
+                override val action: RhymeAction.Note, // 音符操作
+                start: Long, // 发声时间
+            ) : DynamicAction() {
+                override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
+                val perfect by lazy { makeRange(PERFECT_RATIO) }
+                val good by lazy { makeRange(GOOD_RATIO) }
+                val bad by lazy { makeRange(BAD_RATIO) }
+                val miss by lazy { makeRange(MISS_RATIO) }
+
+                private fun makeRange(level: Float): LongRange {
+                    val ratio = (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START) * level
+                    val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END - ratio)).toLong().coerceAtLeast(0L)
+                    val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END + ratio)).toLong().coerceAtMost(TRACK_DURATION)
+                    return (appearance + startOffset) .. (appearance + endOffset)
+                }
+            }
+
+            @Stable
+            class Slur(
+                override val action: RhymeAction.Slur, // 音符操作
+                start: Long, // 发声时间
+                end: Long, // 收声时间
+            ) : DynamicAction() {
+                override val appearance: Long = start
+            }
         }
 
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
-
-        //                                                  音符生命周期
-        // ------------------------------------------------------------------------------------------------------------
-        //    ↑          ↑             ↑              ↑                ↑              ↑             ↑             ↑
-        //   出现  可点击开始(MISS)  好开始(GOOD)  完美开始(PERFECT)  完美结束(PERFECT)  好结束(GOOD)  可点击结束(MISS)    消失
-        //                                                发声    收声
-        //                                                [ 提示区域 ]
-        // 字符的发声点和收声点的间隔恰好是经过提示区域, 中点对应轨道线 TIP_AREA_START 和 TIP_AREA_END 的中点
-        // 提示区域的PERFECT_RATIO倍邻域为完美
-        // 提示区域的GOOD_RATIO倍邻域为好
-        // 提示区域的MISS_RATIO倍邻域为错过
-        // 再往外的邻域不响应点击
-        @Stable
-        data class DynamicAction(
-            val action: RhymeAction, // 音符操作
-            val appearance: Long, // 出现刻
-            val missStartOffset: Int, // MISS 起始偏移
-            val goodStartOffset: Int, // GOOD 起始偏移
-            val perfectStartOffset: Int, // PERFECT 起始偏移
-            val perfectEndOffset: Int, // PERFECT 结束偏移
-            val goodEndOffset: Int, // GOOD 结束偏移
-            val missEndOffset: Int, // MISS 结束偏移
-            val dismissOffset: Int, // 消失偏移
-            val id: Int, // ID (优化状态比较)
-        ) {
-            override fun equals(other: Any?): Boolean = (other as? DynamicAction)?.id == this.id
-            override fun hashCode(): Int = id.hashCode()
-        }
-
-        @Stable
-        data class DynamicActionWrapper(
-            val action: DynamicAction,
-            val offset: Int = 0, // 当前偏移
-        )
 
         private val textCache = TextCache()
 
@@ -513,52 +526,36 @@ private class NoteBoard(
         private var popIndex by mutableIntStateOf(0)
         // 预编译列表
         private val queue = buildList {
-            val baseRatio = (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START) / 2
-            val centerRatio = (TipArea.TIP_AREA_END + TipArea.TIP_AREA_START) / 2
-            var id = 0
             lyrics.lyrics.fastForEach { line ->
                 val theme = line.theme
                 for (i in theme.indices) {
                     val action = theme[i]
                     val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                     val end = action.end + line.start
-                    val duration = ((end - start) / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toInt()
-                    val appearance = (start - duration * TipArea.TIP_AREA_START).toLong()
-                    add(DynamicActionWrapper(DynamicAction(
-                        action = action,
-                        appearance = appearance,
-                        missStartOffset = ((centerRatio - baseRatio * MISS_RATIO) * duration).toInt().coerceIn(0, duration),
-                        goodStartOffset = ((centerRatio - baseRatio * GOOD_RATIO) * duration).toInt().coerceIn(0, duration),
-                        perfectStartOffset = ((centerRatio - baseRatio * PERFECT_RATIO) * duration).toInt().coerceIn(0, duration),
-                        perfectEndOffset = ((centerRatio + baseRatio * PERFECT_RATIO) * duration).toInt().coerceIn(0, duration),
-                        goodEndOffset = ((centerRatio + baseRatio * GOOD_RATIO) * duration).toInt().coerceIn(0, duration),
-                        missEndOffset = ((centerRatio + baseRatio * MISS_RATIO) * duration).toInt().coerceIn(0, duration),
-                        dismissOffset = duration,
-                        id = id++
-                    )))
+                    add(when (val action = theme[i]) {
+                        is RhymeAction.Note -> DynamicAction.Note(action = action, start = start)
+                        is RhymeAction.Slur -> DynamicAction.Slur(action = action, start = start, end = end)
+                    })
                 }
             }
-        }.toMutableStateList()
+        }
 
         override fun onUpdate(position: Long) {
             synchronized(lock) {
                 val index1 = popIndex
                 val index2 = pushIndex
                 // 音符消失
-                queue.getOrNull(index1)?.let { (action, _) ->
+                queue.getOrNull(index1)?.let {
                     // 到达消失刻
-                    if (position >= action.appearance + action.dismissOffset) ++popIndex
+                    if (position >= it.appearance + TRACK_DURATION) ++popIndex
                 }
                 // 音符出现
-                queue.getOrNull(index2)?.let { (action, _) ->
+                queue.getOrNull(index2)?.let {
                     // 到达出现刻
-                    if (position >= action.appearance) ++pushIndex
+                    if (position >= it.appearance) ++pushIndex
                 }
                 // 更新音符进度
-                for (i in index1 ..< index2) {
-                    val action = queue[i].action
-                    queue[i] = DynamicActionWrapper(action = action, offset = (position - action.appearance).toInt().coerceIn(0, action.dismissOffset))
-                }
+                for (i in index1 ..< index2) queue[i].current = position
             }
         }
 
@@ -579,7 +576,7 @@ private class NoteBoard(
             ))
             // 计算矩形中心坐标并缩放边距
             val rc = trackCenter.onLine(trackLeft.onCenter(trackRight), progress + (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START) / 2)
-            scale(scale = NOTE_PADDING_RATIO, pivot = rc) {
+            scale(scale = 0.9f, pivot = rc) {
                 path(
                     color = when (trackLevel) {
                         1 -> Colors.Purple2
@@ -590,7 +587,6 @@ private class NoteBoard(
                 )
             }
             // 文字测试
-            // TODO: 设计有问题, 时长较长的字即使先出现仍然会被后出现但时长较短的字超过, 导致局面混乱
             val content = textCache.measureText(textManager, action.ch, 50f)
             textManager.run { text(content, trackCenter.onLine(trackLeft, progress), Colors.White) }
         }
@@ -602,9 +598,9 @@ private class NoteBoard(
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 遍历已显示的音符队列
             for (i in popIndex ..< pushIndex) {
-                val (action, offset) = queue.getOrNull(i) ?: break
+                val action = queue.getOrNull(i) ?: break
                 // 计算进度百分比
-                val progress = (offset / action.dismissOffset.toFloat())
+                val progress = (action.current - action.appearance) / TRACK_DURATION.toFloat()
                 if (progress <= 0f || progress >= 1f) continue
                 when (val actualAction = action.action) {
                     is RhymeAction.Note -> drawNoteAction(textManager, actualAction, progress)
@@ -861,8 +857,9 @@ private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
     enum class Action(val score: Int, val title: String, val brush: Brush) {
         MISS(0, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
-        GOOD(1, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
-        PERFECT(2, "PERFECT", Brush.verticalGradient(listOf(Colors.Yellow2, Colors.Green2)))
+        BAD(1, "BAD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Red6))),
+        GOOD(2, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
+        PERFECT(3, "PERFECT", Brush.verticalGradient(listOf(Colors.Yellow2, Colors.Green2)))
     }
 
     companion object {
@@ -890,10 +887,9 @@ private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
         action = newAction
         frame = 0
         // 计算得分
-        var score = newAction.score
-        if (newAction == Action.MISS) combo = 0 // 清空连击
-        else score += ++combo / COMBO_COUNT // 连击得分奖励
-        return score
+        if (newAction == Action.MISS || newAction == Action.BAD) combo = 0 // 清空连击
+        else ++combo // 增加连击
+        return newAction.score + combo / COMBO_COUNT // 连击得分奖励
     }
 
     override fun onUpdate(position: Long) {

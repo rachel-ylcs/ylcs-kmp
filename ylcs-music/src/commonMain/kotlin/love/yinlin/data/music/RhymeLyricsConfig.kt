@@ -47,7 +47,6 @@ data class RhymeLine(
     val text: String,
     val start: Long, // 起始时间
     val theme: List<RhymeAction>, // 主旋律
-    val chord: List<RhymeAction>? = null, // 和弦
 )
 
 // 歌词
