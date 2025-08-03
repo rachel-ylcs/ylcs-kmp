@@ -87,7 +87,7 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 lottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "lottie" }
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
-tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.4" }
+tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.9" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
