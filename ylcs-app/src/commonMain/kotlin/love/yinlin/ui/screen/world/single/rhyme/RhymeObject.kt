@@ -40,6 +40,13 @@ private fun Path(positions: Array<Offset>): Path = Path().apply {
     }
 }
 
+// 图片资源集
+@Stable
+internal data class ImageSet(
+    val record: ImageBitmap,
+    val noteMap: ImageBitmap
+)
+
 // 文本绘制缓存
 @Stable
 internal class TextCache(maxSize: Int = 8) {
@@ -238,8 +245,25 @@ private sealed class RhymeObject : RhymeContainer {
     fun DrawScope.arc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
         this.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style)
 
-    fun DrawScope.image(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
-        this.drawImage(image = image, dstOffset = position.roundToIntOffset(), dstSize = size.roundToIntSize(), filterQuality = FilterQuality.High)
+    fun DrawScope.image(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+        this.drawImage(
+            image = image,
+            dstOffset = position.roundToIntOffset(),
+            dstSize = size.roundToIntSize(),
+            alpha = alpha,
+            filterQuality = FilterQuality.High
+        )
+
+    fun DrawScope.image(image: ImageBitmap, srcPosition: Offset, srcSize: Size, dstPosition: Offset, dstSize: Size, alpha: Float = 1f) =
+        this.drawImage(
+            image = image,
+            srcOffset = srcPosition.roundToIntOffset(),
+            srcSize = srcSize.roundToIntSize(),
+            dstOffset = dstPosition.roundToIntOffset(),
+            dstSize = dstSize.roundToIntSize(),
+            alpha = alpha,
+            filterQuality = FilterQuality.High
+        )
 
     fun DrawScope.circleImage(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
         this.clipPath(Path().apply { addOval(Rect(position, size)) }) { this.image(image = image, position = position, size = size) }
@@ -260,9 +284,9 @@ private abstract class RhymeDynamic : RhymeObject() {
 // 进度板
 @Stable
 private class ProgressBoard(
+    imageSet: ImageSet,
     center: Offset,
-    private val duration: Long,
-    private val record: ImageBitmap
+    private val duration: Long
 ) : RhymeDynamic(), RhymeContainer.Circle, RhymeEvent {
     companion object {
         const val STROKE = 8f
@@ -272,10 +296,11 @@ private class ProgressBoard(
     override val position: Offset = center.translate(-RADIUS, -RADIUS)
     override val size: Size = Size(RADIUS * 2, RADIUS * 2)
 
+    private val record = imageSet.record
     // 封面旋转角
-    var angle: Float by mutableFloatStateOf(0f)
+    private var angle: Float by mutableFloatStateOf(0f)
     // 游戏进度
-    var progress: Float by mutableFloatStateOf(0f)
+    private var progress: Float by mutableFloatStateOf(0f)
 
     override fun onUpdate(position: Long) {
         progress = if (duration == 0L) 0f else (position / duration.toFloat()).coerceIn(0f, 1f)
@@ -298,6 +323,7 @@ private class ProgressBoard(
 @Stable
 private class NoteBoard(
     lyrics: RhymeLyricsConfig,
+    imageSet: ImageSet,
     center: Offset,
     scoreBoard: ScoreBoard,
     comboBoard: ComboBoard
@@ -391,9 +417,9 @@ private class NoteBoard(
     // 轨道
     @Stable
     private class Track(
-        private val trackCenter: Offset,
         private val scoreBoard: ScoreBoard,
-        private val comboBoard: ComboBoard
+        private val comboBoard: ComboBoard,
+        private val trackCenter: Offset
     ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
         companion object {
             const val TRACK_STROKE = 20f
@@ -496,8 +522,9 @@ private class NoteBoard(
     // 音符队列
     @Stable
     private class NoteQueue(
-        private val trackCenter: Offset,
-        lyrics: RhymeLyricsConfig
+        lyrics: RhymeLyricsConfig,
+        imageSet: ImageSet,
+        private val trackCenter: Offset
     ) : RhymeDynamic(), RhymeContainer.Rectangle {
         companion object {
             const val TRACK_DURATION = (200 / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toLong()
@@ -564,7 +591,7 @@ private class NoteBoard(
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
 
-        private val textCache = TextCache()
+        private val noteMap = imageSet.noteMap
 
         private val lock = SynchronizedObject()
         // 双指针维护基列表
@@ -642,9 +669,6 @@ private class NoteBoard(
                     path = path
                 )
             }
-            // 文字测试
-            val content = textCache.measureText(textManager, action.ch, 50f)
-            textManager.run { text(content, trackCenter.onLine(trackLeft, progress), Colors.White) }
         }
 
         private fun DrawScope.drawSlurAction(action: RhymeAction.Slur, progress: Float) {
@@ -671,8 +695,8 @@ private class NoteBoard(
     override val size: Size = Size.Game
 
     private val tipArea = TipArea(center)
-    private val track = Track(center, scoreBoard, comboBoard)
-    private val noteQueue = NoteQueue(center, lyrics)
+    private val track = Track(scoreBoard, comboBoard, center)
+    private val noteQueue = NoteQueue(lyrics, imageSet, center)
 
     override fun onUpdate(position: Long) {
         track.run { onUpdate(position) }
@@ -1008,7 +1032,7 @@ private class ComboBoard(
 @Stable
 private class Scene(
     lyrics: RhymeLyricsConfig,
-    record: ImageBitmap
+    imageSet: ImageSet
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
@@ -1018,8 +1042,8 @@ private class Scene(
     val lyricsBoard = LyricsBoard(lyrics)
     val scoreBoard = ScoreBoard(atan(center.y / center.x))
     val comboBoard = ComboBoard(-atan(center.y / center.x))
-    val noteBoard = NoteBoard(lyrics, center, scoreBoard, comboBoard)
-    val progressBoard = ProgressBoard(center, lyrics.duration, record)
+    val noteBoard = NoteBoard(lyrics, imageSet, center, scoreBoard, comboBoard)
+    val progressBoard = ProgressBoard(imageSet, center, lyrics.duration)
 
     override fun onUpdate(position: Long) {
         lyricsBoard.onUpdate(position)
@@ -1045,8 +1069,8 @@ private class Scene(
 internal class RhymeStage {
     private var scene: Scene? = null
 
-    fun onInitialize(lyrics: RhymeLyricsConfig, record: ImageBitmap) {
-        scene = Scene(lyrics, record)
+    fun onInitialize(lyrics: RhymeLyricsConfig, imageSet: ImageSet) {
+        scene = Scene(lyrics, imageSet)
     }
 
     fun onClear() {

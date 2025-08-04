@@ -58,6 +58,8 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
+import love.yinlin.resources.Res
+import love.yinlin.resources.note_map
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.MiniIcon
@@ -76,6 +78,8 @@ import love.yinlin.ui.component.text.StrokeText
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
 import love.yinlin.ui.screen.music.rhymePath
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
@@ -132,9 +136,11 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             val task2 = async {
                 Coroutines.io {
                     catchingNull {
-                        SystemFileSystem.source(info.recordPath).buffered().use {
-                            it.readByteArray().decodeToImageBitmap()
-                        }
+                        val environment = getSystemResourceEnvironment()
+                        ImageSet(
+                            record = SystemFileSystem.source(info.recordPath).buffered().use { it.readByteArray().decodeToImageBitmap() },
+                            noteMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap()
+                        )
                     }
                 }
             }
