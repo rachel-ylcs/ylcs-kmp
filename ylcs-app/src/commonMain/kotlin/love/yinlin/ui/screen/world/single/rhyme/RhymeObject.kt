@@ -17,7 +17,6 @@ import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
 import kotlin.math.*
-import kotlin.random.Random
 
 private val Size.Companion.Game get() = Size(1920f, 1080f)
 
@@ -283,13 +282,7 @@ private class ProgressBoard(
         angle += 20 / RhymeConfig.FPS.toFloat()
     }
 
-    override fun onEvent(pointer: Pointer): Boolean {
-        if (pointer.up && pointer.startPosition in this) {
-            println(pointer)
-            return true
-        }
-        return false
-    }
+    override fun onEvent(pointer: Pointer): Boolean = pointer.up && pointer.startPosition in this
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         // 画封面
@@ -419,22 +412,59 @@ private class NoteBoard(
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
 
-        private val current: Int? by mutableStateOf(null)
+        private var currentTrack: Int? by mutableStateOf(null)
 
         override fun onUpdate(position: Long) {
 
         }
 
-        override fun onEvent(pointer: Pointer): Boolean {
-            if (pointer.up) {
-                val score = comboBoard.updateAction(when (Random.nextInt(0, 4)) {
-                    0 -> ComboBoard.Action.PERFECT
-                    1 -> ComboBoard.Action.GOOD
-                    2 -> ComboBoard.Action.BAD
-                    else -> ComboBoard.Action.MISS
-                })
-                scoreBoard.addScore(score)
+        private val trackSlopes = Tracks.map { trackCenter.slope(it) }
+        private val trackShapes = List(7) { Path(arrayOf(Tracks[it], Tracks[it + 1], trackCenter)) }
+
+        private fun calcTrack(pos: Offset): Int? {
+            val slope = trackCenter.slope(pos)
+            return if (pos.x > Size.Game.width / 2) {
+                if (slope >= trackSlopes[4]) 3
+                else if (slope >= trackSlopes[5]) 4
+                else if (slope >= trackSlopes[6]) 5
+                else if (slope >= trackSlopes[7]) 6
+                else null
             }
+            else {
+                if (slope >= trackSlopes[0]) null
+                else if (slope >= trackSlopes[1]) 0
+                else if (slope >= trackSlopes[2]) 1
+                else if (slope >= trackSlopes[3]) 2
+                else 3
+            }
+        }
+
+        override fun onEvent(pointer: Pointer): Boolean {
+            // 检查是否在范围内
+            val pos = pointer.position
+            if (pos == null) {
+                // 按下
+                calcTrack(pointer.startPosition)?.let { track ->
+                    currentTrack = track
+                }
+            }
+            else {
+                calcTrack(pos)?.let { track ->
+                    if (pointer.up) currentTrack = null // 抬起
+                    else { // 移动
+
+                    }
+                }
+            }
+//            if (pointer.up) {
+//                val score = comboBoard.updateAction(when (Random.nextInt(0, 4)) {
+//                    0 -> ComboBoard.Action.PERFECT
+//                    1 -> ComboBoard.Action.GOOD
+//                    2 -> ComboBoard.Action.BAD
+//                    else -> ComboBoard.Action.MISS
+//                })
+//                scoreBoard.addScore(score)
+//            }
             return true
         }
 
@@ -450,6 +480,14 @@ private class NoteBoard(
         }
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            // 画当前按下轨道高光
+            currentTrack?.let {
+                path(
+                    Colors.Steel3.copy(alpha = 0.2f),
+                    path = trackShapes[it],
+                    style = Fill
+                )
+            }
             // 画轨道射线
             for (pos in Tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
         }
@@ -462,21 +500,21 @@ private class NoteBoard(
         lyrics: RhymeLyricsConfig
     ) : RhymeDynamic(), RhymeContainer.Rectangle {
         companion object {
-            const val TRACK_DURATION = (125 / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toLong()
+            const val TRACK_DURATION = (200 / (TipArea.TIP_AREA_END - TipArea.TIP_AREA_START)).toLong()
         }
 
         @Stable
-        sealed class DynamicAction() {
-            abstract val action: RhymeAction // 音符操作
-            abstract val appearance: Long // 出现刻
+        sealed interface DynamicAction {
+            val action: RhymeAction // 音符操作
+            val appearance: Long // 出现刻
+            val startTrack: Int // 起始轨道
+            val endTrack: Int // 结束轨道
 
-            var current by mutableLongStateOf(0L) // 当前刻
-
-            //                                                  音符生命周期
-            // ------------------------------------------------------------------------------------------------------------
-            //    ↑          ↑             ↑              ↑                ↑              ↑             ↑             ↑
-            //   出现  可点击开始(MISS)  好开始(GOOD)  完美开始(PERFECT)  完美结束(PERFECT)  好结束(GOOD)  可点击结束(MISS)    消失
-            //                                                发声
+            //                            音符生命周期
+            // ------------------------------------------------------------------
+            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
+            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
+            //                               发声
             // 字符的发声点是经过提示区域的开始
             // 提示区域的 PERFECT_RATIO 倍邻域为完美
             // 提示区域的 GOOD_RATIO 倍邻域为好
@@ -486,7 +524,7 @@ private class NoteBoard(
             class Note(
                 override val action: RhymeAction.Note, // 音符操作
                 start: Long, // 发声时间
-            ) : DynamicAction() {
+            ) : DynamicAction {
                 companion object {
                     const val PERFECT_RATIO = 0.25f
                     const val GOOD_RATIO = 0.5f
@@ -495,6 +533,9 @@ private class NoteBoard(
                 }
 
                 override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
+                override val startTrack: Int = (action.scale - 1) % 7 + 1
+                override val endTrack: Int = startTrack
+
                 val perfect by lazy { makeRange(PERFECT_RATIO) }
                 val good by lazy { makeRange(GOOD_RATIO) }
                 val bad by lazy { makeRange(BAD_RATIO) }
@@ -513,8 +554,10 @@ private class NoteBoard(
                 override val action: RhymeAction.Slur, // 音符操作
                 start: Long, // 发声时间
                 end: Long, // 收声时间
-            ) : DynamicAction() {
+            ) : DynamicAction {
                 override val appearance: Long = start
+                override val startTrack: Int = (action.scale.first() - 1) % 7 + 1
+                override val endTrack: Int = (action.scale.last() - 1) % 7 + 1
             }
         }
 
@@ -524,11 +567,11 @@ private class NoteBoard(
         private val textCache = TextCache()
 
         private val lock = SynchronizedObject()
-        // 双指针维护双端队列
-        private var pushIndex by mutableIntStateOf(0)
-        private var popIndex by mutableIntStateOf(0)
+        // 双指针维护基列表
+        private var pushIndex = 0
+        private var popIndex = 0
         // 预编译列表
-        private val queue = buildList {
+        private val prebuildList = buildList {
             lyrics.lyrics.fastForEach { line ->
                 val theme = line.theme
                 for (i in theme.indices) {
@@ -542,23 +585,33 @@ private class NoteBoard(
                 }
             }
         }
+        // 在场音符集
+        private val actions = Array(7) { mutableStateSetOf<DynamicAction>() }
+        // 当前刻
+        private var current by mutableLongStateOf(0)
 
         override fun onUpdate(position: Long) {
             synchronized(lock) {
                 val index1 = popIndex
                 val index2 = pushIndex
                 // 音符消失
-                queue.getOrNull(index1)?.let {
+                prebuildList.getOrNull(index1)?.let { action ->
                     // 到达消失刻
-                    if (position >= it.appearance + TRACK_DURATION) ++popIndex
+                    if (position >= action.appearance + TRACK_DURATION) {
+                        ++popIndex
+                        actions.getOrNull(action.endTrack)?.remove(action)
+                    }
                 }
                 // 音符出现
-                queue.getOrNull(index2)?.let {
+                prebuildList.getOrNull(index2)?.let { action ->
                     // 到达出现刻
-                    if (position >= it.appearance) ++pushIndex
+                    if (position >= action.appearance) {
+                        ++pushIndex
+                        actions.getOrNull(action.startTrack)?.add(action)
+                    }
                 }
                 // 更新音符进度
-                for (i in index1 ..< index2) queue[i].current = position
+                current = position
             }
         }
 
@@ -600,14 +653,15 @@ private class NoteBoard(
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 遍历已显示的音符队列
-            for (i in popIndex ..< pushIndex) {
-                val action = queue.getOrNull(i) ?: break
-                // 计算进度百分比
-                val progress = (action.current - action.appearance) / TRACK_DURATION.toFloat()
-                if (progress <= 0f || progress >= 1f) continue
-                when (val actualAction = action.action) {
-                    is RhymeAction.Note -> drawNoteAction(textManager, actualAction, progress)
-                    is RhymeAction.Slur -> drawSlurAction(actualAction, progress)
+            for (actionSet in actions) {
+                for (action in actionSet) {
+                    // 计算进度百分比
+                    val progress = (current - action.appearance) / TRACK_DURATION.toFloat()
+                    if (progress <= 0f || progress >= 1f) continue
+                    when (val actualAction = action.action) {
+                        is RhymeAction.Note -> drawNoteAction(textManager, actualAction, progress)
+                        is RhymeAction.Slur -> drawSlurAction(actualAction, progress)
+                    }
                 }
             }
         }
@@ -702,7 +756,9 @@ private class LyricsBoard(
 
 // 分数板
 @Stable
-private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
+private class ScoreBoard(
+    rotate: Float
+) : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
     private class ScoreNumber(pos: Offset) : RhymeDynamic(), RhymeContainer.Rectangle {
         // 七段数码管
@@ -804,7 +860,7 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     override val position: Offset = Offset(Size.Game.width / 2 - ProgressBoard.RADIUS / 2 - 50 - WIDTH, 100f)
     override val size: Size = Size(WIDTH, ScoreNumber.HEIGHT)
     override val transform: (DrawTransform.() -> Unit) = {
-        rotateRad(atan(288 / 768f), Offset.Zero)
+        rotateRad(rotate, Offset.Zero)
     }
 
     private val numbers = Array(4) {
@@ -856,7 +912,9 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
 
 // 连击板
 @Stable
-private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
+private class ComboBoard(
+    rotate: Float
+) : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
     enum class Action(val score: Int, val title: String, val brush: Brush) {
         MISS(0, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
@@ -875,7 +933,7 @@ private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     override val position: Offset = Offset(Size.Game.width / 2 + ProgressBoard.RADIUS / 2 + 50, 100f)
     override val size: Size = Size(textWidth, textHeight)
     override val transform: (DrawTransform.() -> Unit) = {
-        rotateRad(atan(-288 / 768f), Offset(textWidth, textHeight))
+        rotateRad(rotate, Offset(textWidth, textHeight))
     }
 
     private var action by mutableStateOf<Action?>(null)
@@ -958,8 +1016,8 @@ private class Scene(
     private val center: Offset = Offset(size.width / 2, 360f)
 
     val lyricsBoard = LyricsBoard(lyrics)
-    val scoreBoard = ScoreBoard()
-    val comboBoard = ComboBoard()
+    val scoreBoard = ScoreBoard(atan(center.y / center.x))
+    val comboBoard = ComboBoard(-atan(center.y / center.x))
     val noteBoard = NoteBoard(lyrics, center, scoreBoard, comboBoard)
     val progressBoard = ProgressBoard(center, lyrics.duration, record)
 

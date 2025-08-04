@@ -19,6 +19,7 @@ fun Offset.scale(dx: Float = 1f, dy: Float = 1f) = this.copy(x = this.x * dx, y 
 fun Offset.roundToIntOffset() = IntOffset(x = this.x.roundToInt(), y = this.y.roundToInt())
 fun Offset.onLine(other: Offset, ratio: Float): Offset = Offset(x = this.x + (other.x - this.x) * ratio, y = this.y + (other.y - this.y) * ratio)
 fun Offset.onCenter(other: Offset): Offset = Offset(x = (this.x + other.x) / 2, y = (this.y + other.y) / 2)
+fun Offset.slope(other: Offset): Float = (other.x - this.x).let { if (it == 0f) Float.POSITIVE_INFINITY else (other.y - this.y) / it }
 fun Offset.distance(other: Offset): Float = (this - other).getDistance()
 
 fun Size.translate(x: Float = 0f, y: Float = 0f) = this.copy(width = this.width + x, height = this.height + y)
