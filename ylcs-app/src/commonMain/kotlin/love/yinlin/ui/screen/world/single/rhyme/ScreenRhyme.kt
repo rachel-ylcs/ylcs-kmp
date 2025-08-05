@@ -139,7 +139,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         val environment = getSystemResourceEnvironment()
                         ImageSet(
                             record = SystemFileSystem.source(info.recordPath).buffered().use { it.readByteArray().decodeToImageBitmap() },
-                            noteMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap()
+                            noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap()
                         )
                     }
                 }
@@ -147,8 +147,8 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             val lyrics = task1.await()
             val record = task2.await()
             if (lyrics != null && record != null && canvasFrameJob == null) {
-                musicPlayer.load(info.audioPath)
                 stage.onInitialize(lyrics, record)
+                musicPlayer.load(info.audioPath)
                 canvasFrameJob = monitorGamePosition()
                 state = GameState.Playing
             }
