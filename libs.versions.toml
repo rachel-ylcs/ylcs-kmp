@@ -82,7 +82,7 @@ sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources"
 sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
-sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0-beta04" }
+sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0-rc01" }
 
 lottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "lottie" }
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
@@ -132,4 +132,4 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.18" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.0" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "6.0.0" }
+redis = { module = "redis.clients:jedis", version = "6.1.0" }
