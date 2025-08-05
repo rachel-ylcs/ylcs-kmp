@@ -254,17 +254,6 @@ private sealed class RhymeObject : RhymeContainer {
             filterQuality = FilterQuality.High
         )
 
-    fun DrawScope.image(image: ImageBitmap, srcPosition: Offset, srcSize: Size, dstPosition: Offset, dstSize: Size, alpha: Float = 1f) =
-        this.drawImage(
-            image = image,
-            srcOffset = srcPosition.roundToIntOffset(),
-            srcSize = srcSize.roundToIntSize(),
-            dstOffset = dstPosition.roundToIntOffset(),
-            dstSize = dstSize.roundToIntSize(),
-            alpha = alpha,
-            filterQuality = FilterQuality.High
-        )
-
     fun DrawScope.circleImage(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
         this.clipPath(Path().apply { addOval(Rect(position, size)) }) { this.image(image = image, position = position, size = size) }
 
@@ -532,64 +521,6 @@ private class NoteBoard(
         }
 
         @Stable
-        private sealed interface DynamicAction {
-            val action: RhymeAction // 音符操作
-            val appearance: Long // 出现刻
-            val startTrack: Int // 起始轨道
-            val endTrack: Int // 结束轨道
-
-            //                            音符生命周期
-            // ------------------------------------------------------------------
-            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
-            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
-            //                               发声
-            // 字符的发声点是经过提示区域的开始
-            // 提示区域的 PERFECT_RATIO 倍邻域为完美
-            // 提示区域的 GOOD_RATIO 倍邻域为好
-            // 提示区域的 MISS_RATIO 倍邻域为错过
-            // 再往外的邻域不响应点击
-            @Stable
-            class Note(
-                override val action: RhymeAction.Note, // 音符操作
-                start: Long, // 发声时间
-            ) : DynamicAction {
-                companion object {
-                    const val PERFECT_RATIO = 0.25f
-                    const val GOOD_RATIO = 0.5f
-                    const val BAD_RATIO = 1f
-                    const val MISS_RATIO = 3f
-                }
-
-                override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
-                override val startTrack: Int = (action.scale - 1) % 7 + 1
-                override val endTrack: Int = startTrack
-
-                val perfect by lazy { makeRange(PERFECT_RATIO) }
-                val good by lazy { makeRange(GOOD_RATIO) }
-                val bad by lazy { makeRange(BAD_RATIO) }
-                val miss by lazy { makeRange(MISS_RATIO) }
-
-                private fun makeRange(result: Float): LongRange {
-                    val ratio = TipArea.TIP_AREA_RANGE * result
-                    val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END - ratio)).toLong().coerceAtLeast(0L)
-                    val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END + ratio)).toLong().coerceAtMost(TRACK_DURATION)
-                    return (appearance + startOffset) .. (appearance + endOffset)
-                }
-            }
-
-            @Stable
-            class Slur(
-                override val action: RhymeAction.Slur, // 音符操作
-                start: Long, // 发声时间
-                end: Long, // 收声时间
-            ) : DynamicAction {
-                override val appearance: Long = start
-                override val startTrack: Int = (action.scale.first() - 1) % 7 + 1
-                override val endTrack: Int = (action.scale.last() - 1) % 7 + 1
-            }
-        }
-
-        @Stable
         private class ActionImageMap(
             private val noteLayoutMap: ImageBitmap,
             private val trackCenter: Offset
@@ -657,17 +588,90 @@ private class NoteBoard(
                 )
             )
 
-            fun DrawScope.drawNoteAction(obj: RhymeObject, trackIndex: Int, trackLevel: Int, progress: Float) {
+            fun DrawScope.drawNoteAction(trackIndex: Int, trackLevel: Int, progress: Float) {
                 noteMap.getOrNull(trackIndex)?.let { actionImage ->
-                    obj.run {
-                        image(
-                            image = noteLayoutMap,
-                            srcPosition = actionImage.srcOffsets[trackLevel],
-                            srcSize = actionImage.srcSize,
-                            dstPosition = trackCenter.onLine(actionImage.dstOffset, progress),
-                            dstSize = actionImage.dstSize * progress
-                        )
-                    }
+                    drawImage(
+                        image = noteLayoutMap,
+                        srcOffset = actionImage.srcOffsets[trackLevel].roundToIntOffset(),
+                        srcSize = actionImage.srcSize.roundToIntSize(),
+                        dstOffset = trackCenter.onLine(actionImage.dstOffset, progress).roundToIntOffset(),
+                        dstSize = (actionImage.dstSize * progress).roundToIntSize(),
+                        alpha = 0.8f,
+                        filterQuality = FilterQuality.High
+                    )
+                }
+            }
+        }
+
+        @Stable
+        private sealed interface DynamicAction {
+            val action: RhymeAction // 音符操作
+            val appearance: Long // 出现刻
+            val startTrack: Int // 起始轨道
+            val endTrack: Int // 结束轨道
+
+            fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float)
+
+            //                            音符生命周期
+            // ------------------------------------------------------------------
+            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
+            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
+            //                               发声
+            // 字符的发声点是经过提示区域的开始
+            // 提示区域的 PERFECT_RATIO 倍邻域为完美
+            // 提示区域的 GOOD_RATIO 倍邻域为好
+            // 提示区域的 MISS_RATIO 倍邻域为错过
+            // 再往外的邻域不响应点击
+            @Stable
+            class Note(
+                override val action: RhymeAction.Note, // 音符操作
+                start: Long, // 发声时间
+            ) : DynamicAction {
+                companion object {
+                    const val PERFECT_RATIO = 0.25f
+                    const val GOOD_RATIO = 0.5f
+                    const val BAD_RATIO = 1f
+                    const val MISS_RATIO = 3f
+                }
+
+                override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
+                override val startTrack: Int = (action.scale - 1) % 7 + 1
+                override val endTrack: Int = startTrack
+
+                val perfect by lazy { makeRange(PERFECT_RATIO) }
+                val good by lazy { makeRange(GOOD_RATIO) }
+                val bad by lazy { makeRange(BAD_RATIO) }
+                val miss by lazy { makeRange(MISS_RATIO) }
+
+                private fun makeRange(result: Float): LongRange {
+                    val ratio = TipArea.TIP_AREA_RANGE * result
+                    val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END - ratio)).toLong().coerceAtLeast(0L)
+                    val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END + ratio)).toLong().coerceAtMost(TRACK_DURATION)
+                    return (appearance + startOffset) .. (appearance + endOffset)
+                }
+
+                override fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float) {
+                    // 计算轨道索引与等级
+                    val base = action.scale - 1
+                    val trackScale = base % 7 + 1
+                    val trackLevel = base / 7 + 1
+                    val trackIndex = (trackScale + 1) % 7
+                    actionImageMap.run { drawNoteAction(trackIndex, trackLevel, progress) }
+                }
+            }
+
+            @Stable
+            class Slur(
+                override val action: RhymeAction.Slur, // 音符操作
+                start: Long, // 发声时间
+                end: Long, // 收声时间
+            ) : DynamicAction {
+                override val appearance: Long = start
+                override val startTrack: Int = (action.scale.first() - 1) % 7 + 1
+                override val endTrack: Int = (action.scale.last() - 1) % 7 + 1
+
+                override fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float) {
+
                 }
             }
         }
@@ -726,19 +730,6 @@ private class NoteBoard(
             }
         }
 
-        private fun DrawScope.drawNoteAction(action: RhymeAction.Note, progress: Float) {
-            // 计算轨道索引与等级
-            val base = action.scale - 1
-            val trackScale = base % 7 + 1
-            val trackLevel = base / 7 + 1
-            val trackIndex = (trackScale + 1) % 7
-            actionImageMap.run { drawNoteAction(this@NoteQueue, trackIndex, trackLevel, progress) }
-        }
-
-        private fun DrawScope.drawSlurAction(action: RhymeAction.Slur, progress: Float) {
-
-        }
-
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 遍历已显示的音符队列
             for (actionSet in actions) {
@@ -746,10 +737,7 @@ private class NoteBoard(
                     // 计算进度百分比
                     val progress = (current - action.appearance) / TRACK_DURATION.toFloat()
                     if (progress <= 0f || progress >= 1f) continue
-                    when (val actualAction = action.action) {
-                        is RhymeAction.Note -> drawNoteAction(actualAction, progress)
-                        is RhymeAction.Slur -> drawSlurAction(actualAction, progress)
-                    }
+                    action.run { drawAction(actionImageMap, progress) }
                 }
             }
         }
