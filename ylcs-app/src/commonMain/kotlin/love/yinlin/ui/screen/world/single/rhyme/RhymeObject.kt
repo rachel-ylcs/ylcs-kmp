@@ -23,8 +23,11 @@ internal data class Pointer(
         const val LONG_PRESS_TIMEOUT = 500L
     }
 
+    val isDown: Boolean get() = endTime == null
+    val isUp: Boolean get() = endTime != null
     val isClick: Boolean get() = endTime?.let { it - startTime < LONG_PRESS_TIMEOUT } ?: false // 是否单击
     val isLongClick: Boolean get() = endTime?.let { it - startTime >= LONG_PRESS_TIMEOUT } ?: false // 是否长按
+    inline fun handle(down: () -> Unit, up: (isClick: Boolean, endTime: Long) -> Unit) = endTime?.let { up(it - startTime < LONG_PRESS_TIMEOUT, it) } ?: down()
 }
 
 internal fun Path(positions: Array<Offset>): Path = Path().apply {
