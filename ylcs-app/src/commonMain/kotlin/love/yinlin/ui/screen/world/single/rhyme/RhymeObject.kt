@@ -13,13 +13,19 @@ import love.yinlin.extension.*
 import kotlin.math.*
 
 // 指针数据
+@Stable
 internal data class Pointer(
-    val startPosition: Offset,
-    val startTime: Long,
-    var position: Offset? = null,
-    var time: Long? = null,
-    var up: Boolean = false,
-)
+    val position: Offset, // 按下位置
+    val startTime: Long, // 按下时间
+    val endTime: Long? = null, // 抬起时间
+) {
+    companion object {
+        const val LONG_PRESS_TIMEOUT = 500L
+    }
+
+    val isClick: Boolean get() = endTime?.let { it - startTime < LONG_PRESS_TIMEOUT } ?: false // 是否单击
+    val isLongClick: Boolean get() = endTime?.let { it - startTime >= LONG_PRESS_TIMEOUT } ?: false // 是否长按
+}
 
 internal fun Path(positions: Array<Offset>): Path = Path().apply {
     positions.firstOrNull()?.let { first ->

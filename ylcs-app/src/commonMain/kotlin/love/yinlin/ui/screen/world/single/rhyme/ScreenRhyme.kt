@@ -456,27 +456,12 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                                 val position = change.position / rhymeScale
                                 val time = musicPlayer.position
                                 when {
-                                    change.changedToDown() -> {
-                                        Pointer(startPosition = position, startTime = time).let { pointer ->
-                                            pointers[id] = pointer
-                                            stage.onEvent(pointer)
-                                        }
+                                    change.changedToDown() -> Pointer(position = position, startTime = time).let { pointer ->
+                                        pointers[id] = pointer
+                                        stage.onEvent(pointer)
                                     }
-                                    change.changedToUp() -> {
-                                        pointers[id]?.let { pointer ->
-                                            pointer.position = position
-                                            pointer.time = time
-                                            pointer.up = true
-                                            stage.onEvent(pointer)
-                                            pointers -= id
-                                        }
-                                    }
-                                    else -> {
-                                        pointers[id]?.let { pointer ->
-                                            pointer.position = position
-                                            pointer.time = time
-                                            stage.onEvent(pointer)
-                                        }
+                                    change.changedToUp() -> pointers.remove(id)?.let { pointer ->
+                                        stage.onEvent(pointer.copy(endTime = time))
                                     }
                                 }
                             }

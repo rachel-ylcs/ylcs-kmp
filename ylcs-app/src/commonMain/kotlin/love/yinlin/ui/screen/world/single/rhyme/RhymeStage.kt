@@ -55,15 +55,11 @@ private class ProgressBoard(
     }
 
     override fun onEvent(pointer: Pointer): Boolean {
-        val pos = pointer.position
-        return if (pos == null) pointer.startPosition in this
-        else {
-            if (pointer.up && pointer.startPosition in this) {
-                println("click the record")
-                true
-            }
-            else false
+        return if (pointer.position in this) {
+            if (pointer.isClick) println("click the record")
+            true
         }
+        else false
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
@@ -463,21 +459,21 @@ private class NoteBoard(
 
         override fun onEvent(pointer: Pointer): Boolean {
             // 检查是否在范围内
-            val pos = pointer.position
-            if (pos == null) {
-                // 按下
-                calcTrack(pointer.startPosition)?.let { trackIndex ->
-                    track.currentTrack = trackIndex
-                } ?: return false
-            }
-            else {
-                calcTrack(pos)?.let { trackIndex ->
-                    if (pointer.up) track.currentTrack = null // 抬起
-                    else { // 移动
-
-                    }
-                } ?: return false
-            }
+//            val pos = pointer.position
+//            if (pos == null) {
+//                // 按下
+//                calcTrack(pointer.startPosition)?.let { trackIndex ->
+//                    track.currentTrack = trackIndex
+//                } ?: return false
+//            }
+//            else {
+//                calcTrack(pos)?.let { trackIndex ->
+//                    if (pointer.up) track.currentTrack = null // 抬起
+//                    else { // 移动
+//
+//                    }
+//                } ?: return false
+//            }
 //            if (pointer.up) {
 //                val score = comboBoard.updateAction(when (Random.nextInt(0, 4)) {
 //                    0 -> ComboBoard.Action.PERFECT
