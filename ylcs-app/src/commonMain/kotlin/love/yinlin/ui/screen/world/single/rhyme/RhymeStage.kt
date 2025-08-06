@@ -54,13 +54,7 @@ private class ProgressBoard(
         angle += APF
     }
 
-    override fun onEvent(pointer: Pointer): Boolean {
-        return if (pointer.position in this) {
-            if (pointer.isClick) println("click the record")
-            true
-        }
-        else false
-    }
+    override fun onEvent(pointer: Pointer): Boolean = pointer.position in this
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         // 画封面
@@ -188,7 +182,16 @@ private class NoteBoard(
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
 
-        var currentTrack: Int? by mutableStateOf(null)
+        private var currentTrackMap: Byte by mutableStateOf(0)
+        fun getTrackMap(index: Int): Boolean = ((currentTrackMap.toInt() shr index) and 1) != 0
+        inline fun safeSetTrackMap(index: Int, value: Boolean, block: () -> Unit) {
+            val v = currentTrackMap.toInt()
+            if ((((v shr index) and 1) != 0) == !value) {
+                val mask = 1 shl index
+                currentTrackMap = if (value) (v or mask).toByte() else (v and mask.inv()).toByte()
+                block()
+            }
+        }
 
         private val trackShapes = List(7) { Path(arrayOf(Tracks[it], Tracks[it + 1], trackCenter)) }
 
@@ -205,12 +208,8 @@ private class NoteBoard(
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 画当前按下轨道高光
-            currentTrack?.let {
-                path(
-                    Colors.Steel3.copy(alpha = 0.2f),
-                    path = trackShapes[it],
-                    style = Fill
-                )
+            repeat(7) {
+                if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = trackShapes[it], style = Fill)
             }
             // 画轨道射线
             for (pos in Tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
@@ -222,10 +221,13 @@ private class NoteBoard(
     private class NoteQueue(
         lyrics: RhymeLyricsConfig,
         imageSet: ImageSet,
-        private val track: Track
+        private val track: Track,
+        private val scoreBoard: ScoreBoard,
+        private val comboBoard: ComboBoard
     ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
         companion object {
-            const val TRACK_DURATION = (150 / TipArea.TIP_AREA_RANGE).toLong()
+            const val ANIMATION_FRAME = 16
+            const val TRACK_DURATION = (200 / TipArea.TIP_AREA_RANGE).toLong()
         }
 
         @Stable
@@ -296,7 +298,7 @@ private class NoteBoard(
                 )
             )
 
-            fun DrawScope.drawNoteAction(trackIndex: Int, trackLevel: Int, progress: Float) {
+            fun DrawScope.drawNoteAction(trackIndex: Int, trackLevel: Int, progress: Float, alpha: Float) {
                 noteMap.getOrNull(trackIndex)?.let { actionImage ->
                     drawImage(
                         image = noteLayoutMap,
@@ -304,7 +306,7 @@ private class NoteBoard(
                         srcSize = actionImage.srcSize.roundToIntSize(),
                         dstOffset = trackCenter.onLine(actionImage.dstOffset, progress).roundToIntOffset(),
                         dstSize = (actionImage.dstSize * progress).roundToIntSize(),
-                        alpha = 0.8f,
+                        alpha = alpha,
                         filterQuality = FilterQuality.High
                     )
                 }
@@ -312,44 +314,49 @@ private class NoteBoard(
         }
 
         @Stable
-        private sealed interface DynamicAction {
-            val action: RhymeAction // 音符操作
-            val appearance: Long // 出现刻
-            val startTrack: Int // 起始轨道
-            val endTrack: Int // 结束轨道
-
-            fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float)
-
-            //                            音符生命周期
-            // ------------------------------------------------------------------
-            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
-            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
-            //                               发声
-            // 字符的发声点是经过提示区域的开始
-            // 提示区域的 PERFECT_RATIO 倍邻域为完美
-            // 提示区域的 GOOD_RATIO 倍邻域为好
-            // 提示区域的 MISS_RATIO 倍邻域为错过
-            // 再往外的邻域不响应点击
+        private sealed class DynamicAction(start: Long, end: Long) {
             @Stable
-            class Note(
-                override val action: RhymeAction.Note, // 音符操作
-                start: Long, // 发声时间
-            ) : DynamicAction {
+            sealed interface State {
+                @Stable
+                data object Normal : State
+                @Stable
+                data class Miss(val progress: Float) : State
+                @Stable
+                data object Completed : State
+            }
+
+            abstract val action: RhymeAction
+            abstract fun update(position: Long)
+            abstract fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long)
+            abstract fun checkTrackIndex(index: Int): Boolean
+            open fun onPointerDown(startTime: Long): ComboBoard.ActionResult? = null
+            open fun onPointerUp(isClick: Boolean, startTime: Long, endTime: Long): ComboBoard.ActionResult? = null
+            abstract fun onResult(result: ComboBoard.ActionResult)
+            open fun onDismiss() {}
+
+            val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toLong()
+            val dismiss: Long = appearance + TRACK_DURATION
+
+            var state: State by mutableStateOf(State.Normal)
+
+            @Stable
+            class Note(start: Long, end: Long, override val action: RhymeAction.Note) : DynamicAction(start, end) {
+                //                            单音生命周期
+                // ------------------------------------------------------------------
+                //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
+                //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
+                //                               发声
+                // 字符的发声点是经过提示区域的开始
+                // 提示区域的 PERFECT_RATIO 倍邻域为完美
+                // 提示区域的 GOOD_RATIO 倍邻域为好
+                // 提示区域的 MISS_RATIO 倍邻域为错过
+                // 再往外的邻域不响应点击
                 companion object {
-                    const val PERFECT_RATIO = 0.25f
-                    const val GOOD_RATIO = 0.5f
-                    const val BAD_RATIO = 1f
-                    const val MISS_RATIO = 3f
+                    private const val PERFECT_RATIO = 0.25f
+                    private const val GOOD_RATIO = 0.5f
+                    private const val BAD_RATIO = 1f
+                    private const val MISS_RATIO = 3f
                 }
-
-                override val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toInt()
-                override val startTrack: Int = (action.scale - 1) % 7 + 1
-                override val endTrack: Int = startTrack
-
-                val perfect by lazy { makeRange(PERFECT_RATIO) }
-                val good by lazy { makeRange(GOOD_RATIO) }
-                val bad by lazy { makeRange(BAD_RATIO) }
-                val miss by lazy { makeRange(MISS_RATIO) }
 
                 private fun makeRange(result: Float): LongRange {
                     val ratio = TipArea.TIP_AREA_RANGE * result
@@ -357,28 +364,85 @@ private class NoteBoard(
                     val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END + ratio)).toLong().coerceAtMost(TRACK_DURATION)
                     return (appearance + startOffset) .. (appearance + endOffset)
                 }
+                private val perfect by lazy { makeRange(PERFECT_RATIO) }
+                private val good by lazy { makeRange(GOOD_RATIO) }
+                private val bad by lazy { makeRange(BAD_RATIO) }
+                private val miss by lazy { makeRange(MISS_RATIO) }
 
-                override fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float) {
-                    // 计算轨道索引与等级
-                    val base = action.scale - 1
-                    val trackScale = base % 7 + 1
-                    val trackLevel = base / 7 + 1
-                    val trackIndex = (trackScale + 1) % 7
-                    actionImageMap.run { drawNoteAction(trackIndex, trackLevel, progress) }
+                private val trackIndex = ((action.scale - 1) % 7 + 2) % 7
+                private val trackLevel = (action.scale - 1) / 7 + 1
+
+                override fun update(position: Long) {
+                    (state as? State.Miss)?.progress?.let { progress ->
+                        if (progress > 0f) state = State.Miss(progress = (progress - 1f / ANIMATION_FRAME).coerceAtLeast(0f))
+                    }
+                }
+
+                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+                    val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
+                    val (level, alpha) = (state as? State.Miss)?.let { 0 to it.progress }
+                        ?: (trackLevel to (progress * 4).coerceAtMost(1f))
+                    actionImageMap.run {
+                        drawNoteAction(
+                            trackIndex = trackIndex,
+                            trackLevel = level,
+                            progress = progress,
+                            alpha = alpha
+                        )
+                    }
+                }
+
+                override fun checkTrackIndex(index: Int): Boolean = index == trackIndex
+
+                override fun onPointerDown(startTime: Long): ComboBoard.ActionResult? = when (startTime) {
+                    in perfect -> ComboBoard.ActionResult.PERFECT
+                    in good -> ComboBoard.ActionResult.GOOD
+                    in bad -> ComboBoard.ActionResult.BAD
+                    in miss -> ComboBoard.ActionResult.MISS
+                    else -> null
+                }
+
+                override fun onResult(result: ComboBoard.ActionResult) {
+                    if (state is State.Normal) {
+                        state = if (result == ComboBoard.ActionResult.MISS) State.Miss(1f) else State.Completed
+                    }
                 }
             }
 
             @Stable
-            class Slur(
-                override val action: RhymeAction.Slur, // 音符操作
-                start: Long, // 发声时间
-                end: Long, // 收声时间
-            ) : DynamicAction {
-                override val appearance: Long = start
-                override val startTrack: Int = (action.scale.first() - 1) % 7 + 1
-                override val endTrack: Int = (action.scale.last() - 1) % 7 + 1
+            class FixedSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction(start, end) {
+                private val trackIndex = ((action.scale.first() - 1) % 7 + 2) % 7
 
-                override fun DrawScope.drawAction(actionImageMap: ActionImageMap, progress: Float) {
+                override fun update(position: Long) {
+
+                }
+
+                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+
+                }
+
+                override fun checkTrackIndex(index: Int): Boolean = index == trackIndex
+
+                override fun onResult(result: ComboBoard.ActionResult) {
+
+                }
+            }
+
+            @Stable
+            class OffsetSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction(start, end) {
+                private val trackIndex = action.scale.map { ((it - 1) % 7 + 2) % 7 }
+
+                override fun update(position: Long) {
+
+                }
+
+                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+
+                }
+
+                override fun checkTrackIndex(index: Int): Boolean = index in trackIndex
+
+                override fun onResult(result: ComboBoard.ActionResult) {
 
                 }
             }
@@ -390,9 +454,11 @@ private class NoteBoard(
         private val actionImageMap = ActionImageMap(imageSet.noteLayoutMap, track.trackCenter)
 
         private val lock = SynchronizedObject()
+        // 当前刻
+        private var current by mutableLongStateOf(0)
         // 双指针维护基列表
-        private var pushIndex = 0
-        private var popIndex = 0
+        private var pushIndex by mutableIntStateOf(0)
+        private var popIndex by mutableIntStateOf(0)
         // 预编译列表
         private val prebuildList = buildList {
             lyrics.lyrics.fastForEach { line ->
@@ -401,47 +467,64 @@ private class NoteBoard(
                     val action = theme[i]
                     val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                     val end = action.end + line.start
-                    add(when (val action = theme[i]) {
-                        is RhymeAction.Note -> DynamicAction.Note(action = action, start = start)
-                        is RhymeAction.Slur -> DynamicAction.Slur(action = action, start = start, end = end)
+                    add(when (action) {
+                        is RhymeAction.Note -> DynamicAction.Note(start, end, action) // 单音
+                        is RhymeAction.Slur -> {
+                            val first = action.scale.firstOrNull()
+                            if (action.scale.all { it == first }) DynamicAction.FixedSlur(start, end, action) // 延音
+                            else DynamicAction.OffsetSlur(start, end, action) // 连音
+                        }
                     })
                 }
             }
         }
-        // 在场音符集
-        private val actions = Array(7) { mutableStateSetOf<DynamicAction>() }
-        // 当前刻
-        private var current by mutableLongStateOf(0)
 
-        override fun onUpdate(position: Long) {
-            synchronized(lock) {
-                val index1 = popIndex
-                val index2 = pushIndex
-                // 音符消失
-                prebuildList.getOrNull(index1)?.let { action ->
-                    // 到达消失刻
-                    if (position >= action.appearance + TRACK_DURATION) {
-                        ++popIndex
-                        actions.getOrNull(action.endTrack)?.remove(action)
-                    }
-                }
-                // 音符出现
-                prebuildList.getOrNull(index2)?.let { action ->
-                    // 到达出现刻
-                    if (position >= action.appearance) {
-                        ++pushIndex
-                        actions.getOrNull(action.startTrack)?.add(action)
-                    }
-                }
-                // 更新音符进度
-                current = position
+        private inline fun foreachAction(block: DynamicAction.() -> Boolean) {
+            for (i in popIndex ..< pushIndex) {
+                val dynAction = prebuildList[i]
+                if (!dynAction.block()) break
             }
         }
 
-        val trackSlopes = Track.Tracks.map { track.trackCenter.slope(it) }
-        private fun calcTrack(pos: Offset): Int? {
+        override fun onUpdate(position: Long) {
+            synchronized(lock) {
+                // 音符消失
+                prebuildList.getOrNull(popIndex)?.let { dynAction ->
+                    // 到达消失刻
+                    if (position >= dynAction.dismiss) {
+                        dynAction.onDismiss()
+                        ++popIndex
+                    }
+                }
+                // 音符出现
+                prebuildList.getOrNull(pushIndex)?.let { dynAction ->
+                    // 到达出现刻
+                    if (position >= dynAction.appearance) ++pushIndex
+                }
+                // 更新进度
+                current = position
+                // 更新音符
+                foreachAction {
+                    update(position)
+                    true
+                }
+            }
+        }
+
+        private val trackSlopes = Track.Tracks.map { track.trackCenter.slope(it) }
+
+        private fun DynamicAction.processResult(result: ComboBoard.ActionResult) {
+            // 更新连击和分数
+            val score = comboBoard.updateAction(result)
+            scoreBoard.addScore(score)
+            onResult(result)
+        }
+
+        override fun onEvent(pointer: Pointer): Boolean {
+            // 获取指针所在轨道
+            val pos = pointer.position
             val slope = track.trackCenter.slope(pos)
-            return if (pos.x > Size.Game.width / 2) {
+            val trackIndex = if (pos.x > Size.Game.width / 2) {
                 if (slope >= trackSlopes[4]) 3
                 else if (slope >= trackSlopes[5]) 4
                 else if (slope >= trackSlopes[6]) 5
@@ -455,46 +538,53 @@ private class NoteBoard(
                 else if (slope >= trackSlopes[3]) 2
                 else 3
             }
-        }
 
-        override fun onEvent(pointer: Pointer): Boolean {
-            // 检查是否在范围内
-//            val pos = pointer.position
-//            if (pos == null) {
-//                // 按下
-//                calcTrack(pointer.startPosition)?.let { trackIndex ->
-//                    track.currentTrack = trackIndex
-//                } ?: return false
-//            }
-//            else {
-//                calcTrack(pos)?.let { trackIndex ->
-//                    if (pointer.up) track.currentTrack = null // 抬起
-//                    else { // 移动
-//
-//                    }
-//                } ?: return false
-//            }
-//            if (pointer.up) {
-//                val score = comboBoard.updateAction(when (Random.nextInt(0, 4)) {
-//                    0 -> ComboBoard.Action.PERFECT
-//                    1 -> ComboBoard.Action.GOOD
-//                    2 -> ComboBoard.Action.BAD
-//                    else -> ComboBoard.Action.MISS
-//                })
-//                scoreBoard.addScore(score)
-//            }
-            return true
+            if (trackIndex != null) pointer.handle(
+                down = { // 按下
+                    // 防止多指按下同一个轨道
+                    track.safeSetTrackMap(trackIndex, true) {
+                        foreachAction {
+                            // 从队首遍历找到此轨道第一个正常音符
+                            if (checkTrackIndex(trackIndex) && state is DynamicAction.State.Normal) {
+                                onPointerDown(pointer.startTime)?.let { result ->
+                                    processResult(result)
+                                }
+                                false
+                            }
+                            else true // 非正常音符或非对应轨道继续查找
+                        }
+                        // 轨道上无音符, 空点击
+                    }
+                },
+                up = { isClick, endTime -> // 抬起
+                    track.safeSetTrackMap(trackIndex, false) {
+                        foreachAction {
+                            // 从队首遍历找到第一个在此轨道上的音符
+                            if (checkTrackIndex(trackIndex)) {
+                                // 如果此轨道上第一个音符的出现时间晚于此指针事件的按下时间说明之前的音符已经消失, 则丢弃抬起事件
+                                // 或者第一个音符非正常状态, 也不处理
+                                val startTime = pointer.startTime
+                                if (appearance < startTime && state is DynamicAction.State.Normal) {
+                                    onPointerUp(isClick, startTime, endTime)?.let { result ->
+                                        processResult(result)
+                                    }
+                                }
+                                false
+                            }
+                            else true
+                        }
+                        // 如果没找到也是因为之前的音符已经消失, 丢弃抬起事件
+                    }
+                }
+            )
+            return trackIndex != null
         }
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 遍历已显示的音符队列
-            for (actionSet in actions) {
-                for (action in actionSet) {
-                    // 计算进度百分比
-                    val progress = (current - action.appearance) / TRACK_DURATION.toFloat()
-                    if (progress <= 0f || progress >= 1f) continue
-                    action.run { drawAction(actionImageMap, progress) }
-                }
+            foreachAction {
+                draw(actionImageMap, current)
+                true
             }
         }
     }
@@ -504,7 +594,7 @@ private class NoteBoard(
 
     private val tipArea = TipArea(center)
     private val track = Track(center)
-    private val noteQueue = NoteQueue(lyrics, imageSet, track)
+    private val noteQueue = NoteQueue(lyrics, imageSet, track, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) = noteQueue.onUpdate(position)
 
@@ -745,7 +835,7 @@ private class ComboBoard(
     rotate: Float
 ) : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
-    enum class Action(val score: Int, val title: String, val brush: Brush) {
+    enum class ActionResult(val score: Int, val title: String, val brush: Brush) {
         MISS(0, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
         BAD(1, "BAD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Red6))),
         GOOD(2, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
@@ -765,35 +855,35 @@ private class ComboBoard(
         rotateRad(rotate, Offset(textWidth, textHeight))
     }
 
-    private var action by mutableStateOf<Action?>(null)
+    private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)
     private var frame by mutableIntStateOf(0)
 
     private val actionTextCache = TextCache()
     private val comboTextCache = TextCache(16)
 
-    fun updateAction(newAction: Action): Int {
+    fun updateAction(newResult: ActionResult): Int {
         // 重置进度
-        action = newAction
+        result = newResult
         frame = 0
         // 计算得分
-        if (newAction == Action.MISS || newAction == Action.BAD) combo = 0 // 清空连击
+        if (newResult == ActionResult.MISS || newResult == ActionResult.BAD) combo = 0 // 清空连击
         else ++combo // 增加连击
-        return newAction.score + combo / COMBO_COUNT // 连击得分奖励
+        return newResult.score + combo / COMBO_COUNT // 连击得分奖励
     }
 
     override fun onUpdate(position: Long) {
         // Animation: Enter | Wait | Exit
         // Frame:      FPA  | FPA  | FPA
         if (frame == FPA * 3) {
-            action = null
+            result = null
             frame = 0
         }
         else ++frame
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-        action?.let { currentAction ->
+        result?.let { currentResult ->
             //         { 1 - ((x - FPA) / FPA) ^ 2  , 0       <= x <= FPA
             // f(x) =  { 1                          , FPA     <= x <= 2 * FPA
             //         { ((x - 3 * FPA) / FPA) ^ 2  , 2 * FPA <= x <= 3 * FPA
@@ -803,13 +893,13 @@ private class ComboBoard(
                 else -> 1f
             }.coerceIn(0f, 1f)
             // 结果
-            val content = actionTextCache.measureText(textManager, currentAction.title, textHeight, FontWeight.Bold)
+            val content = actionTextCache.measureText(textManager, currentResult.title, textHeight, FontWeight.Bold)
             scale(progress, this@ComboBoard.size.center) {
                 textManager.run {
                     text(
                         content = content,
                         position = Offset((textWidth - content.width) / 2, 0f),
-                        brush = currentAction.brush,
+                        brush = currentResult.brush,
                         shadow = Shadow(Colors.Dark, Offset(2f, 2f), 2f)
                     )
                 }
