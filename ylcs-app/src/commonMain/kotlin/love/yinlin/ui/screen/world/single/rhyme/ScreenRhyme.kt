@@ -145,9 +145,9 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 }
             }
             val lyrics = task1.await()
-            val record = task2.await()
-            if (lyrics != null && record != null && canvasFrameJob == null) {
-                stage.onInitialize(lyrics, record)
+            val imageSet = task2.await()
+            if (lyrics != null && imageSet != null && canvasFrameJob == null) {
+                stage.onInitialize(lyrics, imageSet)
                 musicPlayer.load(info.audioPath)
                 canvasFrameJob = monitorGamePosition()
                 state = GameState.Playing

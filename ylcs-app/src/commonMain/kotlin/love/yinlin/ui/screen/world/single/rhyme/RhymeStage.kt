@@ -26,11 +26,19 @@ internal data class ImageSet(
     val noteLayoutMap: ImageBitmap
 )
 
+// 贴图数据
+@Stable
+private sealed interface DrawImageData {
+    val srcSize: Size
+    val srcOffsets: List<Offset>
+    val dstOffset: Offset
+    val dstSize: Size
+}
+
 // 进度板
 @Stable
 private class ProgressBoard(
     imageSet: ImageSet,
-    center: Offset,
     private val duration: Long
 ) : RhymeDynamic(), RhymeContainer.Circle, RhymeEvent {
     companion object {
@@ -40,7 +48,7 @@ private class ProgressBoard(
         const val APF = 360f / ROTATE_DURATION / RhymeConfig.FPS
     }
 
-    override val position: Offset = center.translate(-RADIUS, -RADIUS)
+    override val position: Offset = NoteBoard.Track.Center.translate(-RADIUS, -RADIUS)
     override val size: Size = Size(RADIUS * 2, RADIUS * 2)
 
     private val record = imageSet.record
@@ -71,15 +79,12 @@ private class ProgressBoard(
 private class NoteBoard(
     lyrics: RhymeLyricsConfig,
     imageSet: ImageSet,
-    center: Offset,
     scoreBoard: ScoreBoard,
     comboBoard: ComboBoard
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
     // 提示区域
     @Stable
-    private class TipArea(
-        trackCenter: Offset
-    ) : RhymeObject(), RhymeContainer.Rectangle {
+    private class TipArea : RhymeObject(), RhymeContainer.Rectangle {
         @Stable
         private class Area(pos1: Offset, pos2: Offset, pos3: Offset, pos4: Offset) {
             val path: Path = Path(arrayOf(pos1, pos2, pos3, pos4))
@@ -122,22 +127,22 @@ private class NoteBoard(
         override val size: Size = Size.Game
 
         private val points = arrayOf(
-            trackCenter.onLine(Offset(0f, 0f), TIP_AREA_START),
-            trackCenter.onLine(Offset(0f, 0f), TIP_AREA_END),
-            trackCenter.onLine(Offset(0f, size.height / 2), TIP_AREA_END),
-            trackCenter.onLine(Offset(0f, size.height / 2), TIP_AREA_START),
-            trackCenter.onLine(Offset(0f, size.height), TIP_AREA_START),
-            trackCenter.onLine(Offset(0f, size.height), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width / 3, size.height), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width / 3, size.height), TIP_AREA_START),
-            trackCenter.onLine(Offset(size.width * 2 / 3, size.height), TIP_AREA_START),
-            trackCenter.onLine(Offset(size.width * 2 / 3, size.height), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width, size.height), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width, size.height), TIP_AREA_START),
-            trackCenter.onLine(Offset(size.width, size.height / 2), TIP_AREA_START),
-            trackCenter.onLine(Offset(size.width, size.height / 2), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width, 0f), TIP_AREA_END),
-            trackCenter.onLine(Offset(size.width, 0f), TIP_AREA_START),
+            Track.Center.onLine(Offset(0f, 0f), TIP_AREA_START),
+            Track.Center.onLine(Offset(0f, 0f), TIP_AREA_END),
+            Track.Center.onLine(Offset(0f, size.height / 2), TIP_AREA_END),
+            Track.Center.onLine(Offset(0f, size.height / 2), TIP_AREA_START),
+            Track.Center.onLine(Offset(0f, size.height), TIP_AREA_START),
+            Track.Center.onLine(Offset(0f, size.height), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width / 3, size.height), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width / 3, size.height), TIP_AREA_START),
+            Track.Center.onLine(Offset(size.width * 2 / 3, size.height), TIP_AREA_START),
+            Track.Center.onLine(Offset(size.width * 2 / 3, size.height), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width, size.height), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width, size.height), TIP_AREA_START),
+            Track.Center.onLine(Offset(size.width, size.height / 2), TIP_AREA_START),
+            Track.Center.onLine(Offset(size.width, size.height / 2), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width, 0f), TIP_AREA_END),
+            Track.Center.onLine(Offset(size.width, 0f), TIP_AREA_START),
         )
         private val areas = arrayOf(
             Area(points[1], points[0], points[3], points[2]),
@@ -164,9 +169,10 @@ private class NoteBoard(
 
     // 轨道
     @Stable
-    private class Track(val trackCenter: Offset) : RhymeObject(), RhymeContainer.Rectangle {
+    class Track : RhymeObject(), RhymeContainer.Rectangle {
         companion object {
-            const val TRACK_STROKE = 20f
+            const val STROKE = 20f
+            val Center = Offset(Size.Game.width / 2, 360f)
             val Tracks = arrayOf(
                 Offset(0f, 0f),
                 Offset(0f, Size.Game.height / 2),
@@ -177,6 +183,23 @@ private class NoteBoard(
                 Offset(Size.Game.width, Size.Game.height / 2),
                 Offset(Size.Game.width, 0f),
             )
+            val Slopes = Tracks.map { Center.slope(it) }
+            val Shapes = List(7) { Path(arrayOf(Tracks[it], Tracks[it + 1], Center)) }
+
+            fun calcTrackIndex(pos: Offset): Int? {
+                val slope = Center.slope(pos)
+                if (pos.x > Center.x) {
+                    for (i in 3 .. 6) {
+                        if (slope >= Slopes[i + 1]) return i
+                    }
+                }
+                else {
+                    for (i in 3 downTo 0) {
+                        if (slope <= Slopes[i]) return i
+                    }
+                }
+                return null
+            }
         }
 
         override val position: Offset = Offset.Zero
@@ -193,8 +216,6 @@ private class NoteBoard(
             }
         }
 
-        private val trackShapes = List(7) { Path(arrayOf(Tracks[it], Tracks[it + 1], trackCenter)) }
-
         private fun DrawScope.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
             // 阴影
             repeat(5) {
@@ -209,10 +230,10 @@ private class NoteBoard(
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 画当前按下轨道高光
             repeat(7) {
-                if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = trackShapes[it], style = Fill)
+                if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = Shapes[it], style = Fill)
             }
             // 画轨道射线
-            for (pos in Tracks) drawTrackLine(start = trackCenter, end = pos, stroke = TRACK_STROKE)
+            for (pos in Tracks) drawTrackLine(start = Center, end = pos, stroke = STROKE)
         }
     }
 
@@ -220,7 +241,7 @@ private class NoteBoard(
     @Stable
     private class NoteQueue(
         lyrics: RhymeLyricsConfig,
-        imageSet: ImageSet,
+        private val imageSet: ImageSet,
         private val track: Track,
         private val scoreBoard: ScoreBoard,
         private val comboBoard: ComboBoard
@@ -228,89 +249,6 @@ private class NoteBoard(
         companion object {
             const val ANIMATION_FRAME = 16
             const val TRACK_DURATION = (200 / TipArea.TIP_AREA_RANGE).toLong()
-        }
-
-        @Stable
-        private class ActionImageMap(
-            private val noteLayoutMap: ImageBitmap,
-            private val trackCenter: Offset
-        ) {
-            @Stable
-            private sealed interface ActionImage {
-                val srcSize: Size
-                val srcOffsets: List<Offset>
-                val dstOffset: Offset
-                val dstSize: Size
-            }
-
-            @Stable
-            class Note(
-                srcOffset: Offset,
-                override val srcSize: Size,
-                override val dstOffset: Offset
-            ) : ActionImage {
-                override val srcOffsets = List(4) { srcOffset.translate(x = it * srcSize.width) }
-                override val dstSize: Size = srcSize
-            }
-
-            private val extraNoteWidth = trackCenter.x * TipArea.TIP_AREA_RANGE
-            private val extraNoteHeight = (Track.Tracks[2].y - trackCenter.y) * TipArea.TIP_AREA_RANGE
-            private val topNoteSize = Size(extraNoteWidth, Track.Tracks[1].y * (1 + TipArea.TIP_AREA_RANGE))
-            private val bottomNoteSize = Size(extraNoteWidth, Track.Tracks[1].y + extraNoteHeight)
-            private val leftRightNoteSize = Size(extraNoteWidth + Track.Tracks[3].x, extraNoteHeight)
-            private val centerNoteSize = Size(Track.Tracks[3].x * (1 + TipArea.TIP_AREA_RANGE), extraNoteHeight)
-
-            private val noteMap = arrayOf(
-                Note(
-                    srcOffset = Offset(topNoteSize.width * 0, centerNoteSize.height * 3),
-                    srcSize = topNoteSize,
-                    dstOffset = trackCenter.onLine(Track.Tracks[0], 1 + TipArea.TIP_AREA_RANGE)
-                ),
-                Note(
-                    srcOffset = Offset(topNoteSize.width * 4, centerNoteSize.height * 3),
-                    srcSize = bottomNoteSize,
-                    dstOffset = Track.Tracks[1].translate(x = -extraNoteWidth)
-                ),
-                Note(
-                    srcOffset = Offset(0f, centerNoteSize.height * 0),
-                    srcSize = leftRightNoteSize,
-                    dstOffset = Track.Tracks[2].translate(x = -extraNoteWidth)
-                ),
-                Note(
-                    srcOffset = Offset(0f, centerNoteSize.height * 1),
-                    srcSize = centerNoteSize,
-                    dstOffset = Track.Tracks[3].translate(x = -TipArea.TIP_AREA_RANGE * (trackCenter.x - Track.Tracks[3].x))
-                ),
-                Note(
-                    srcOffset = Offset(0f, centerNoteSize.height * 2),
-                    srcSize = leftRightNoteSize,
-                    dstOffset = Track.Tracks[4]
-                ),
-                Note(
-                    srcOffset = Offset(topNoteSize.width * 12, centerNoteSize.height * 3),
-                    srcSize = bottomNoteSize,
-                    dstOffset = Track.Tracks[6]
-                ),
-                Note(
-                    srcOffset = Offset(topNoteSize.width * 8, centerNoteSize.height * 3),
-                    srcSize = topNoteSize,
-                    dstOffset = Track.Tracks[7].translate(y = -TipArea.TIP_AREA_RANGE * trackCenter.y)
-                )
-            )
-
-            fun DrawScope.drawNoteAction(trackIndex: Int, trackLevel: Int, progress: Float, alpha: Float) {
-                noteMap.getOrNull(trackIndex)?.let { actionImage ->
-                    drawImage(
-                        image = noteLayoutMap,
-                        srcOffset = actionImage.srcOffsets[trackLevel].roundToIntOffset(),
-                        srcSize = actionImage.srcSize.roundToIntSize(),
-                        dstOffset = trackCenter.onLine(actionImage.dstOffset, progress).roundToIntOffset(),
-                        dstSize = (actionImage.dstSize * progress).roundToIntSize(),
-                        alpha = alpha,
-                        filterQuality = FilterQuality.High
-                    )
-                }
-            }
         }
 
         @Stable
@@ -327,7 +265,7 @@ private class NoteBoard(
 
             abstract val action: RhymeAction
             abstract fun update(position: Long)
-            abstract fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long)
+            abstract fun DrawScope.draw(imageSet: ImageSet, position: Long)
             abstract fun checkTrackIndex(index: Int): Boolean
             open fun onPointerDown(startTime: Long): ComboBoard.ActionResult? = null
             open fun onPointerUp(isClick: Boolean, startTime: Long, endTime: Long): ComboBoard.ActionResult? = null
@@ -341,6 +279,16 @@ private class NoteBoard(
 
             @Stable
             class Note(start: Long, end: Long, override val action: RhymeAction.Note) : DynamicAction(start, end) {
+                @Stable
+                private class DrawData(
+                    srcOffset: Offset,
+                    override val srcSize: Size,
+                    override val dstOffset: Offset
+                ) : DrawImageData {
+                    override val srcOffsets = List(4) { srcOffset.translate(x = it * srcSize.width) }
+                    override val dstSize: Size = srcSize
+                }
+
                 //                            单音生命周期
                 // ------------------------------------------------------------------
                 //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
@@ -349,6 +297,7 @@ private class NoteBoard(
                 // 字符的发声点是经过提示区域的开始
                 // 提示区域的 PERFECT_RATIO 倍邻域为完美
                 // 提示区域的 GOOD_RATIO 倍邻域为好
+                // 提示区域的 BAD_RATIO 倍邻域为差
                 // 提示区域的 MISS_RATIO 倍邻域为错过
                 // 再往外的邻域不响应点击
                 companion object {
@@ -356,18 +305,65 @@ private class NoteBoard(
                     private const val GOOD_RATIO = 0.5f
                     private const val BAD_RATIO = 1f
                     private const val MISS_RATIO = 3f
+
+                    private val ExtraNoteWidth = Track.Center.x * TipArea.TIP_AREA_RANGE
+                    private val ExtraNoteHeight = (Track.Tracks[2].y - Track.Center.y) * TipArea.TIP_AREA_RANGE
+                    private val TopNoteSize = Size(ExtraNoteWidth, Track.Tracks[1].y * (1 + TipArea.TIP_AREA_RANGE))
+                    private val BottomNoteSize = Size(ExtraNoteWidth, Track.Tracks[1].y + ExtraNoteHeight)
+                    private val LeftRightNoteSize = Size(ExtraNoteWidth + Track.Tracks[3].x, ExtraNoteHeight)
+                    private val CenterNoteSize = Size(Track.Tracks[3].x * (1 + TipArea.TIP_AREA_RANGE), ExtraNoteHeight)
+
+                    private val DrawMap = arrayOf(
+                        DrawData(
+                            srcOffset = Offset(TopNoteSize.width * 0, CenterNoteSize.height * 3),
+                            srcSize = TopNoteSize,
+                            dstOffset = Track.Center.onLine(Track.Tracks[0], 1 + TipArea.TIP_AREA_RANGE)
+                        ),
+                        DrawData(
+                            srcOffset = Offset(TopNoteSize.width * 4, CenterNoteSize.height * 3),
+                            srcSize = BottomNoteSize,
+                            dstOffset = Track.Tracks[1].translate(x = -ExtraNoteWidth)
+                        ),
+                        DrawData(
+                            srcOffset = Offset(0f, CenterNoteSize.height * 0),
+                            srcSize = LeftRightNoteSize,
+                            dstOffset = Track.Tracks[2].translate(x = -ExtraNoteWidth)
+                        ),
+                        DrawData(
+                            srcOffset = Offset(0f, CenterNoteSize.height * 1),
+                            srcSize = CenterNoteSize,
+                            dstOffset = Track.Tracks[3].translate(x = -TipArea.TIP_AREA_RANGE * (Track.Center.x - Track.Tracks[3].x))
+                        ),
+                        DrawData(
+                            srcOffset = Offset(0f, CenterNoteSize.height * 2),
+                            srcSize = LeftRightNoteSize,
+                            dstOffset = Track.Tracks[4]
+                        ),
+                        DrawData(
+                            srcOffset = Offset(TopNoteSize.width * 12, CenterNoteSize.height * 3),
+                            srcSize = BottomNoteSize,
+                            dstOffset = Track.Tracks[6]
+                        ),
+                        DrawData(
+                            srcOffset = Offset(TopNoteSize.width * 8, CenterNoteSize.height * 3),
+                            srcSize = TopNoteSize,
+                            dstOffset = Track.Tracks[7].translate(y = -TipArea.TIP_AREA_RANGE * Track.Center.y)
+                        )
+                    )
+
+                    // 计算点击结果所占区间
+                    private fun calcResultRange(appearance: Long, result: Float): LongRange {
+                        val ratio = TipArea.TIP_AREA_RANGE * result
+                        val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START - ratio)).toLong().coerceAtLeast(0L)
+                        val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START + ratio)).toLong().coerceAtMost(TRACK_DURATION)
+                        return (appearance + startOffset) .. (appearance + endOffset)
+                    }
                 }
 
-                private fun makeRange(result: Float): LongRange {
-                    val ratio = TipArea.TIP_AREA_RANGE * result
-                    val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END - ratio)).toLong().coerceAtLeast(0L)
-                    val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_END + ratio)).toLong().coerceAtMost(TRACK_DURATION)
-                    return (appearance + startOffset) .. (appearance + endOffset)
-                }
-                private val perfect by lazy { makeRange(PERFECT_RATIO) }
-                private val good by lazy { makeRange(GOOD_RATIO) }
-                private val bad by lazy { makeRange(BAD_RATIO) }
-                private val miss by lazy { makeRange(MISS_RATIO) }
+                private val perfect by lazy { calcResultRange(appearance, PERFECT_RATIO) }
+                private val good by lazy { calcResultRange(appearance, GOOD_RATIO) }
+                private val bad by lazy { calcResultRange(appearance, BAD_RATIO) }
+                private val miss by lazy { calcResultRange(appearance, MISS_RATIO) }
 
                 private val trackIndex = ((action.scale - 1) % 7 + 2) % 7
                 private val trackLevel = (action.scale - 1) / 7 + 1
@@ -378,16 +374,19 @@ private class NoteBoard(
                     }
                 }
 
-                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+                override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
                     val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
                     val (level, alpha) = (state as? State.Miss)?.let { 0 to it.progress }
                         ?: (trackLevel to (progress * 4).coerceAtMost(1f))
-                    actionImageMap.run {
-                        drawNoteAction(
-                            trackIndex = trackIndex,
-                            trackLevel = level,
-                            progress = progress,
-                            alpha = alpha
+                    DrawMap.getOrNull(trackIndex)?.let { drawData ->
+                        drawImage(
+                            image = imageSet.noteLayoutMap,
+                            srcOffset = drawData.srcOffsets[level].roundToIntOffset(),
+                            srcSize = drawData.srcSize.roundToIntSize(),
+                            dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset(),
+                            dstSize = (drawData.dstSize * progress).roundToIntSize(),
+                            alpha = alpha,
+                            filterQuality = FilterQuality.High
                         )
                     }
                 }
@@ -417,7 +416,7 @@ private class NoteBoard(
 
                 }
 
-                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+                override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
 
                 }
 
@@ -436,7 +435,7 @@ private class NoteBoard(
 
                 }
 
-                override fun DrawScope.draw(actionImageMap: ActionImageMap, position: Long) {
+                override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
 
                 }
 
@@ -450,8 +449,6 @@ private class NoteBoard(
 
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
-
-        private val actionImageMap = ActionImageMap(imageSet.noteLayoutMap, track.trackCenter)
 
         private val lock = SynchronizedObject()
         // 当前刻
@@ -511,8 +508,6 @@ private class NoteBoard(
             }
         }
 
-        private val trackSlopes = Track.Tracks.map { track.trackCenter.slope(it) }
-
         private fun DynamicAction.processResult(result: ComboBoard.ActionResult) {
             // 更新连击和分数
             val score = comboBoard.updateAction(result)
@@ -522,23 +517,7 @@ private class NoteBoard(
 
         override fun onEvent(pointer: Pointer): Boolean {
             // 获取指针所在轨道
-            val pos = pointer.position
-            val slope = track.trackCenter.slope(pos)
-            val trackIndex = if (pos.x > Size.Game.width / 2) {
-                if (slope >= trackSlopes[4]) 3
-                else if (slope >= trackSlopes[5]) 4
-                else if (slope >= trackSlopes[6]) 5
-                else if (slope >= trackSlopes[7]) 6
-                else null
-            }
-            else {
-                if (slope >= trackSlopes[0]) null
-                else if (slope >= trackSlopes[1]) 0
-                else if (slope >= trackSlopes[2]) 1
-                else if (slope >= trackSlopes[3]) 2
-                else 3
-            }
-
+            val trackIndex = Track.calcTrackIndex(pointer.position)
             if (trackIndex != null) pointer.handle(
                 down = { // 按下
                     // 防止多指按下同一个轨道
@@ -583,7 +562,7 @@ private class NoteBoard(
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
             // 遍历已显示的音符队列
             foreachAction {
-                draw(actionImageMap, current)
+                draw(imageSet, current)
                 true
             }
         }
@@ -592,8 +571,8 @@ private class NoteBoard(
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
-    private val tipArea = TipArea(center)
-    private val track = Track(center)
+    private val tipArea = TipArea()
+    private val track = Track()
     private val noteQueue = NoteQueue(lyrics, imageSet, track, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) = noteQueue.onUpdate(position)
@@ -675,9 +654,7 @@ private class LyricsBoard(
 
 // 分数板
 @Stable
-private class ScoreBoard(
-    rotate: Float
-) : RhymeDynamic(), RhymeContainer.Rectangle {
+private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
     private class ScoreNumber(pos: Offset) : RhymeDynamic(), RhymeContainer.Rectangle {
         // 七段数码管
@@ -774,12 +751,13 @@ private class ScoreBoard(
     companion object {
         const val GAP = ScoreNumber.RECT_HEIGHT
         const val WIDTH = ScoreNumber.WIDTH * 4 + GAP * 3
+        val RotateAngle = NoteBoard.Track.Center.let { atan2(it.y, it.x) }
     }
 
     override val position: Offset = Offset(Size.Game.width / 2 - ProgressBoard.RADIUS / 2 - 50 - WIDTH, 100f)
     override val size: Size = Size(WIDTH, ScoreNumber.HEIGHT)
     override val transform: (DrawTransform.() -> Unit) = {
-        rotateRad(rotate, Offset.Zero)
+        rotateRad(RotateAngle, Offset.Zero)
     }
 
     private val numbers = Array(4) {
@@ -831,9 +809,7 @@ private class ScoreBoard(
 
 // 连击板
 @Stable
-private class ComboBoard(
-    rotate: Float
-) : RhymeDynamic(), RhymeContainer.Rectangle {
+private class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
     enum class ActionResult(val score: Int, val title: String, val brush: Brush) {
         MISS(0, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
@@ -845,6 +821,7 @@ private class ComboBoard(
     companion object {
         const val FPA = RhymeConfig.FPS * 150 / 1000
         const val COMBO_COUNT = 20
+        val RotateAngle = NoteBoard.Track.Center.let { -atan2(it.y, it.x) }
     }
 
     private val textWidth = 270f
@@ -852,7 +829,7 @@ private class ComboBoard(
     override val position: Offset = Offset(Size.Game.width / 2 + ProgressBoard.RADIUS / 2 + 50, 100f)
     override val size: Size = Size(textWidth, textHeight)
     override val transform: (DrawTransform.() -> Unit) = {
-        rotateRad(rotate, Offset(textWidth, textHeight))
+        rotateRad(RotateAngle, Offset(textWidth, textHeight))
     }
 
     private var result by mutableStateOf<ActionResult?>(null)
@@ -932,13 +909,11 @@ private class Scene(
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
-    private val center: Offset = Offset(size.width / 2, 360f)
-
     val lyricsBoard = LyricsBoard(lyrics)
-    val scoreBoard = ScoreBoard(atan(center.y / center.x))
-    val comboBoard = ComboBoard(-atan(center.y / center.x))
-    val noteBoard = NoteBoard(lyrics, imageSet, center, scoreBoard, comboBoard)
-    val progressBoard = ProgressBoard(imageSet, center, lyrics.duration)
+    val scoreBoard = ScoreBoard()
+    val comboBoard = ComboBoard()
+    val noteBoard = NoteBoard(lyrics, imageSet, scoreBoard, comboBoard)
+    val progressBoard = ProgressBoard(imageSet, lyrics.duration)
 
     override fun onUpdate(position: Long) {
         lyricsBoard.onUpdate(position)
