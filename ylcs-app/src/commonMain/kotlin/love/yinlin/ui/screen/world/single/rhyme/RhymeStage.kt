@@ -265,7 +265,7 @@ private class NoteBoard(
             open fun onPointerDown(startTime: Long): ComboBoard.ActionResult? = null
             open fun onPointerUp(isClick: Boolean, startTime: Long, endTime: Long): ComboBoard.ActionResult? = null
             abstract fun onResult(result: ComboBoard.ActionResult)
-            open fun onDismiss() {}
+            open fun onDismiss(): ComboBoard.ActionResult? = null
 
             val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toLong()
             val dismiss: Long = appearance + TRACK_DURATION
@@ -416,6 +416,8 @@ private class NoteBoard(
                         stateFrame = 0
                     }
                 }
+
+                override fun onDismiss(): ComboBoard.ActionResult? = if (state == State.Normal) ComboBoard.ActionResult.MISS else null
             }
 
             @Stable
@@ -499,7 +501,11 @@ private class NoteBoard(
                 prebuildList.getOrNull(popIndex)?.let { dynAction ->
                     // 到达消失刻
                     if (position >= dynAction.dismiss) {
-                        dynAction.onDismiss()
+                        dynAction.onDismiss()?.let { result ->
+                            // 处理音符离开轨道事件
+                            val score = comboBoard.updateAction(result)
+                            scoreBoard.addScore(score)
+                        }
                         ++popIndex
                     }
                 }
