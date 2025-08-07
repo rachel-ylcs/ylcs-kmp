@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.ui.component.platform
 
 import androidx.compose.runtime.Composable

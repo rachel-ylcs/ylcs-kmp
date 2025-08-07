@@ -123,6 +123,7 @@ class Constants(project: Project) {
     val features = listOf(
         "-Xexpect-actual-classes",
         "-Xnested-type-aliases",
+        "-Xwasm-kclass-fqn"
     )
 
     // 排除资源
