@@ -254,13 +254,8 @@ private class NoteBoard(
         @Stable
         private sealed class DynamicAction(start: Long, end: Long) {
             @Stable
-            sealed interface State {
-                @Stable
-                data object Normal : State
-                @Stable
-                data class Miss(val progress: Float) : State
-                @Stable
-                data object Completed : State
+            enum class State {
+                Normal, Miss, Completed
             }
 
             abstract val action: RhymeAction
@@ -276,6 +271,7 @@ private class NoteBoard(
             val dismiss: Long = appearance + TRACK_DURATION
 
             var state: State by mutableStateOf(State.Normal)
+            var stateFrame: Int by mutableIntStateOf(0)
 
             @Stable
             class Note(start: Long, end: Long, override val action: RhymeAction.Note) : DynamicAction(start, end) {
@@ -369,25 +365,38 @@ private class NoteBoard(
                 private val trackLevel = (action.scale - 1) / 7 + 1
 
                 override fun update(position: Long) {
-                    (state as? State.Miss)?.progress?.let { progress ->
-                        if (progress > 0f) state = State.Miss(progress = (progress - 1f / ANIMATION_FRAME).coerceAtLeast(0f))
-                    }
+                    if (stateFrame < ANIMATION_FRAME) ++stateFrame
                 }
 
                 override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
-                    val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
-                    val (level, alpha) = (state as? State.Miss)?.let { 0 to it.progress }
-                        ?: (trackLevel to (progress * 4).coerceAtMost(1f))
                     DrawMap.getOrNull(trackIndex)?.let { drawData ->
+                        val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
+                        val alpha = (stateFrame / ANIMATION_FRAME.toFloat()).coerceIn(0f, 1f)
+                        val srcSize = drawData.srcSize.roundToIntSize()
+                        val dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset()
+                        val dstSize = (drawData.dstSize * progress).roundToIntSize()
+                        // 画当前音符
                         drawImage(
                             image = imageSet.noteLayoutMap,
-                            srcOffset = drawData.srcOffsets[level].roundToIntOffset(),
-                            srcSize = drawData.srcSize.roundToIntSize(),
-                            dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset(),
-                            dstSize = (drawData.dstSize * progress).roundToIntSize(),
-                            alpha = alpha,
+                            srcOffset = drawData.srcOffsets[trackLevel].roundToIntOffset(),
+                            srcSize = srcSize,
+                            dstOffset = dstOffset,
+                            dstSize = dstSize,
+                            alpha = if (state == State.Normal) alpha else (1 - alpha),
                             filterQuality = FilterQuality.High
                         )
+                        if (state == State.Miss) {
+                            // 画消失色音符
+                            drawImage(
+                                image = imageSet.noteLayoutMap,
+                                srcOffset = drawData.srcOffsets[0].roundToIntOffset(),
+                                srcSize = srcSize,
+                                dstOffset = dstOffset,
+                                dstSize = dstSize,
+                                alpha = alpha,
+                                filterQuality = FilterQuality.High
+                            )
+                        }
                     }
                 }
 
@@ -402,8 +411,9 @@ private class NoteBoard(
                 }
 
                 override fun onResult(result: ComboBoard.ActionResult) {
-                    if (state is State.Normal) {
-                        state = if (result == ComboBoard.ActionResult.MISS) State.Miss(1f) else State.Completed
+                    if (state == State.Normal) {
+                        state = if (result == ComboBoard.ActionResult.MISS) State.Miss else State.Completed
+                        stateFrame = 0
                     }
                 }
             }
@@ -524,7 +534,7 @@ private class NoteBoard(
                     track.safeSetTrackMap(trackIndex, true) {
                         foreachAction {
                             // 从队首遍历找到此轨道第一个正常音符
-                            if (checkTrackIndex(trackIndex) && state is DynamicAction.State.Normal) {
+                            if (checkTrackIndex(trackIndex) && state == DynamicAction.State.Normal) {
                                 onPointerDown(pointer.startTime)?.let { result ->
                                     processResult(result)
                                 }
@@ -543,7 +553,7 @@ private class NoteBoard(
                                 // 如果此轨道上第一个音符的出现时间晚于此指针事件的按下时间说明之前的音符已经消失, 则丢弃抬起事件
                                 // 或者第一个音符非正常状态, 也不处理
                                 val startTime = pointer.startTime
-                                if (appearance < startTime && state is DynamicAction.State.Normal) {
+                                if (appearance < startTime && state == DynamicAction.State.Normal) {
                                     onPointerUp(isClick, startTime, endTime)?.let { result ->
                                         processResult(result)
                                     }
