@@ -74,11 +74,51 @@ private class ProgressBoard(
     }
 }
 
+// MISS 环境
+@Stable
+private class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
+    companion object {
+        const val FPA = RhymeConfig.FPS * 2
+    }
+
+    override val position: Offset = Offset.Zero
+    override val size: Size = Size.Game
+
+    private val fullRadius = size.minDimension * 0.75f
+    private val corners = arrayOf(
+        NoteBoard.Track.Tracks[0], NoteBoard.Track.Tracks[2],
+        NoteBoard.Track.Tracks[5], NoteBoard.Track.Tracks[7],
+    )
+    var stateFrame: Int by mutableIntStateOf(0)
+
+    override fun onUpdate(position: Long) {
+        if (stateFrame > 0) --stateFrame
+    }
+
+    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+        val x = stateFrame / FPA.toFloat()
+        val progress = (0.3235f * x * x * x - 1.071f * x * x + 1.7475f * x).coerceIn(0f, 1f)
+        for (corner in corners) {
+            circle(
+                brush = Brush.radialGradient(
+                    colors = listOf(Colors.Red5, Color.Transparent),
+                    center = corner,
+                    radius = fullRadius * progress
+                ),
+                position = corner,
+                radius = fullRadius * progress,
+                alpha = progress * 0.75f
+            )
+        }
+    }
+}
+
 // 音符板
 @Stable
 private class NoteBoard(
     lyrics: RhymeLyricsConfig,
     imageSet: ImageSet,
+    missEnvironment: MissEnvironment,
     scoreBoard: ScoreBoard,
     comboBoard: ComboBoard
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
@@ -243,11 +283,12 @@ private class NoteBoard(
         lyrics: RhymeLyricsConfig,
         private val imageSet: ImageSet,
         private val track: Track,
+        private val missEnvironment: MissEnvironment,
         private val scoreBoard: ScoreBoard,
         private val comboBoard: ComboBoard
     ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
         companion object {
-            const val ANIMATION_FRAME = 16
+            const val FPA = (RhymeConfig.FPS / 3.75f).toInt()
             const val TRACK_DURATION = (200 / TipArea.TIP_AREA_RANGE).toLong()
         }
 
@@ -365,13 +406,13 @@ private class NoteBoard(
                 private val trackLevel = (action.scale - 1) / 7 + 1
 
                 override fun update(position: Long) {
-                    if (stateFrame < ANIMATION_FRAME) ++stateFrame
+                    if (stateFrame < FPA) ++stateFrame
                 }
 
                 override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
                     DrawMap.getOrNull(trackIndex)?.let { drawData ->
                         val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
-                        val alpha = (stateFrame / ANIMATION_FRAME.toFloat()).coerceIn(0f, 1f)
+                        val alpha = (stateFrame / FPA.toFloat()).coerceIn(0f, 1f)
                         val srcSize = drawData.srcSize.roundToIntSize()
                         val dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset()
                         val dstSize = (drawData.dstSize * progress).roundToIntSize()
@@ -495,17 +536,23 @@ private class NoteBoard(
             }
         }
 
+        private fun DynamicAction.processResult(result: ComboBoard.ActionResult) {
+            // 更新 MISS 环境
+            if (result == ComboBoard.ActionResult.MISS) missEnvironment.stateFrame = MissEnvironment.FPA
+            // 更新连击和分数
+            val score = comboBoard.updateAction(result)
+            scoreBoard.addScore(score)
+            onResult(result)
+        }
+
         override fun onUpdate(position: Long) {
             synchronized(lock) {
                 // 音符消失
                 prebuildList.getOrNull(popIndex)?.let { dynAction ->
                     // 到达消失刻
                     if (position >= dynAction.dismiss) {
-                        dynAction.onDismiss()?.let { result ->
-                            // 处理音符离开轨道事件
-                            val score = comboBoard.updateAction(result)
-                            scoreBoard.addScore(score)
-                        }
+                        // 处理音符离开轨道事件
+                        dynAction.onDismiss()?.let { result -> dynAction.processResult(result) }
                         ++popIndex
                     }
                 }
@@ -522,13 +569,6 @@ private class NoteBoard(
                     true
                 }
             }
-        }
-
-        private fun DynamicAction.processResult(result: ComboBoard.ActionResult) {
-            // 更新连击和分数
-            val score = comboBoard.updateAction(result)
-            scoreBoard.addScore(score)
-            onResult(result)
         }
 
         override fun onEvent(pointer: Pointer): Boolean {
@@ -587,9 +627,10 @@ private class NoteBoard(
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
+
     private val tipArea = TipArea()
     private val track = Track()
-    private val noteQueue = NoteQueue(lyrics, imageSet, track, scoreBoard, comboBoard)
+    private val noteQueue = NoteQueue(lyrics, imageSet, track, missEnvironment, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) = noteQueue.onUpdate(position)
 
@@ -682,6 +723,8 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
         // 5 ▎ ━  ▎ 3
         //     4
         companion object {
+            const val APF = 600 / RhymeConfig.FPS
+
             const val RECT_WIDTH = 32f
             const val RECT_HEIGHT = 8f
             const val RECT_RADIUS = RECT_HEIGHT / 2
@@ -742,7 +785,7 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
             if (v2.toInt() != 0) {
                 val a = alpha
                 if (a <= 0) reset(v1 = v2, v2 = 0, v3 = 127)
-                else reset(v3 = (a - 600 / RhymeConfig.FPS).toByte().coerceIn(0, 127))
+                else reset(v3 = (a - APF).toByte().coerceIn(0, 127))
             }
         }
 
@@ -925,11 +968,12 @@ private class Scene(
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
-    val lyricsBoard = LyricsBoard(lyrics)
-    val scoreBoard = ScoreBoard()
-    val comboBoard = ComboBoard()
-    val noteBoard = NoteBoard(lyrics, imageSet, scoreBoard, comboBoard)
-    val progressBoard = ProgressBoard(imageSet, lyrics.duration)
+    private val missEnvironment = MissEnvironment()
+    private val lyricsBoard = LyricsBoard(lyrics)
+    private val scoreBoard = ScoreBoard()
+    private val comboBoard = ComboBoard()
+    private val noteBoard = NoteBoard(lyrics, imageSet, missEnvironment, scoreBoard, comboBoard)
+    private val progressBoard = ProgressBoard(imageSet, lyrics.duration)
 
     override fun onUpdate(position: Long) {
         lyricsBoard.onUpdate(position)
@@ -937,11 +981,13 @@ private class Scene(
         comboBoard.onUpdate(position)
         noteBoard.onUpdate(position)
         progressBoard.onUpdate(position)
+        missEnvironment.onUpdate(position)
     }
 
     override fun onEvent(pointer: Pointer): Boolean = progressBoard.onEvent(pointer) || noteBoard.onEvent(pointer)
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+        missEnvironment.run { draw(textManager) }
         lyricsBoard.run { draw(textManager) }
         scoreBoard.run { draw(textManager) }
         comboBoard.run { draw(textManager) }

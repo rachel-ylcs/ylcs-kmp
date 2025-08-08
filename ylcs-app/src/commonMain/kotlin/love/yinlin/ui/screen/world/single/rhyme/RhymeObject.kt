@@ -197,59 +197,68 @@ internal sealed class RhymeObject : RhymeContainer {
         }
     }
 
-    fun DrawScope.line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
-        this.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha)
+    fun DrawScope.line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
 
-    fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f) =
-        this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha)
+    fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
 
-    fun DrawScope.circle(color: Color, position: Offset = center, radius: Float = max(size.width, size.height) / 2, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawCircle(color = color, radius = radius, center = position, alpha = alpha, style = style)
+    fun DrawScope.circle(color: Color, position: Offset = center, radius: Float = max(size.width, size.height) / 2, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawCircle(color = color, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.circle(brush: Brush, position: Offset = center, radius: Float = max(size.width, size.height) / 2, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawCircle(brush = brush, radius = radius, center = position, alpha = alpha, style = style)
+    fun DrawScope.circle(brush: Brush, position: Offset = center, radius: Float = max(size.width, size.height) / 2, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawCircle(brush = brush, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.rect(color: Color, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawRect(color = color, topLeft = position, size = size, alpha = alpha, style = style)
+    fun DrawScope.rect(color: Color, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawRect(color = color, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style)
+    fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawPath(path = path, color = color, alpha = alpha, style = style)
+    fun DrawScope.path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawPath(path = path, color = color, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawPath(path = path, brush = brush, alpha = alpha, style = style)
+    fun DrawScope.path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawPath(path = Path(area), color = color, alpha = alpha, style = style)
+    fun DrawScope.quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawPath(path = Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style)
+    fun DrawScope.quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.roundRect(color: Color, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
-        this.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha)
+    fun DrawScope.roundRect(color: Color, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, blendMode = blendMode)
 
-    fun DrawScope.roundRect(brush: Brush, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
-        this.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha)
+    fun DrawScope.roundRect(brush: Brush, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, blendMode = blendMode)
 
-    fun DrawScope.arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawArc(color = color, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style)
+    fun DrawScope.arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawArc(color = color, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.arc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill) =
-        this.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style)
+    fun DrawScope.arc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
 
-    fun DrawScope.image(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f) =
+    fun DrawScope.image(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
         this.drawImage(
             image = image,
             dstOffset = position.roundToIntOffset(),
             dstSize = size.roundToIntSize(),
             alpha = alpha,
-            filterQuality = FilterQuality.High
+            filterQuality = FilterQuality.High,
+            blendMode = blendMode
         )
 
-    fun DrawScope.circleImage(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size) =
-        this.clipPath(Path().apply { addOval(Rect(position, size)) }) { this.image(image = image, position = position, size = size) }
+    fun DrawScope.circleImage(image: ImageBitmap, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+        this.clipPath(Path().apply { addOval(Rect(position, size)) }) {
+            this.image(
+                image = image,
+                position = position,
+                size = size,
+                alpha = alpha,
+                blendMode = blendMode
+            )
+        }
 
     inline fun DrawScope.clip(position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, block: DrawScope.() -> Unit) =
         this.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height), block = block)
