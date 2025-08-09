@@ -77,6 +77,17 @@ private class ProgressBoard(
 // MISS 环境
 @Stable
 private class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
+    @Stable
+    private data class CornerData(
+        val radius: Float,
+        val brush: Brush
+    )
+    @Stable
+    private data class Corner(
+        val position: Offset,
+        val data: List<CornerData>
+    )
+
     companion object {
         const val FPA = RhymeConfig.FPS * 2
     }
@@ -88,7 +99,24 @@ private class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     private val corners = arrayOf(
         NoteBoard.Track.Tracks[0], NoteBoard.Track.Tracks[2],
         NoteBoard.Track.Tracks[5], NoteBoard.Track.Tracks[7],
-    )
+    ).map { position ->
+        Corner(
+            position = position,
+            data = (0 .. FPA).map {
+                val x = it / FPA.toFloat()
+                val progress = (0.3235f * x * x * x - 1.071f * x * x + 1.7475f * x).coerceIn(0f, 1f)
+                val radius = fullRadius * progress
+                CornerData(
+                    radius = radius,
+                    brush = Brush.radialGradient(
+                        colors = listOf(Colors.Red5.copy(alpha = progress * 0.75f), Colors.Transparent),
+                        center = position,
+                        radius = radius
+                    )
+                )
+            }
+        )
+    }
     var stateFrame: Int by mutableIntStateOf(0)
 
     override fun onUpdate(position: Long) {
@@ -96,19 +124,14 @@ private class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-        val x = stateFrame / FPA.toFloat()
-        val progress = (0.3235f * x * x * x - 1.071f * x * x + 1.7475f * x).coerceIn(0f, 1f)
         for (corner in corners) {
-            circle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Colors.Red5, Color.Transparent),
-                    center = corner,
-                    radius = fullRadius * progress
-                ),
-                position = corner,
-                radius = fullRadius * progress,
-                alpha = progress * 0.75f
-            )
+            corner.data.getOrNull(stateFrame)?.let { (radius, brush) ->
+                circle(
+                    brush = brush,
+                    position = corner.position,
+                    radius = radius
+                )
+            }
         }
     }
 }
