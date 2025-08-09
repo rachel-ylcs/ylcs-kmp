@@ -58,8 +58,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.note_map
+import love.yinlin.resources.*
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.ui.component.image.LoadingCircle
 import love.yinlin.ui.component.image.MiniIcon
@@ -139,7 +138,8 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                         val environment = getSystemResourceEnvironment()
                         ImageSet(
                             record = SystemFileSystem.source(info.recordPath).buffered().use { it.readByteArray().decodeToImageBitmap() },
-                            noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap()
+                            noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap(),
+                            clickAnimationNote = getDrawableResourceBytes(environment, Res.drawable.click_animation_note).decodeToImageBitmap(),
                         )
                     }
                 }

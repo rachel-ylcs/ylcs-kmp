@@ -23,7 +23,8 @@ private val Size.Companion.Game get() = Size(1920f, 1080f)
 @Stable
 internal data class ImageSet(
     val record: ImageBitmap,
-    val noteLayoutMap: ImageBitmap
+    val noteLayoutMap: ImageBitmap,
+    val clickAnimationNote: ImageBitmap,
 )
 
 // 贴图数据
@@ -149,7 +150,7 @@ private class NoteBoard(
     @Stable
     private class TipArea : RhymeObject(), RhymeContainer.Rectangle {
         @Stable
-        private class Area(pos1: Offset, pos2: Offset, pos3: Offset, pos4: Offset) {
+        class Area(pos1: Offset, pos2: Offset, pos3: Offset, pos4: Offset) {
             val path: Path = Path(arrayOf(pos1, pos2, pos3, pos4))
             private val colorStops1 = arrayOf(
                 0f to Colors.Steel3.copy(alpha = 0.8f),
@@ -177,6 +178,18 @@ private class NoteBoard(
             val brush2: Brush = Brush.horizontalGradient(*horizontalBrush, startX = endX, endX = startX)
             val brush3: Brush = Brush.verticalGradient(*verticalBrush, startY = startY, endY = endY)
             val brush4: Brush = Brush.verticalGradient(*verticalBrush, startY = endY, endY = startY)
+
+            val center = run {
+                // Cramer Rule
+                val a1 = pos1.y - pos3.y
+                val b1 = pos3.x - pos1.x
+                val c1 = pos1.x * pos3.y - pos3.x * pos1.y
+                val a2 = pos2.y - pos4.y
+                val b2 = pos4.x - pos2.x
+                val c2 = pos2.x * pos4.y - pos4.x * pos2.y
+                val d = a1 * b2 - a2 * b1
+                Offset((b1 * c2 - b2 * c1) / d, (a2 * c1 - a1 * c2) / d)
+            }
         }
 
         companion object {
@@ -207,7 +220,8 @@ private class NoteBoard(
             Track.Center.onLine(Offset(size.width, 0f), TIP_AREA_END),
             Track.Center.onLine(Offset(size.width, 0f), TIP_AREA_START),
         )
-        private val areas = arrayOf(
+
+        val areas = arrayOf(
             Area(points[1], points[0], points[3], points[2]),
             Area(points[2], points[3], points[4], points[5]),
             Area(points[4], points[7], points[6], points[5]),
@@ -647,15 +661,42 @@ private class NoteBoard(
         }
     }
 
+    // 交互特效
+    @Stable
+    private class PointerAnimation(
+        tipArea: TipArea
+    ) : RhymeDynamic(), RhymeContainer.Rectangle {
+        @Stable
+        private class TrackAnimation(private val center: Offset) {
+
+        }
+
+        private val animations = tipArea.areas.map { it.center }
+
+        override val position: Offset = Offset.Zero
+        override val size: Size = Size.Game
+
+        override fun onUpdate(position: Long) {
+
+        }
+
+        override fun DrawScope.onDraw(textManager: RhymeTextManager) {
+            
+        }
+    }
+
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
-
 
     private val tipArea = TipArea()
     private val track = Track()
     private val noteQueue = NoteQueue(lyrics, imageSet, track, missEnvironment, scoreBoard, comboBoard)
+    private val pointerAnimation = PointerAnimation(tipArea)
 
-    override fun onUpdate(position: Long) = noteQueue.onUpdate(position)
+    override fun onUpdate(position: Long) {
+        noteQueue.onUpdate(position)
+        pointerAnimation.onUpdate(position)
+    }
 
     override fun onEvent(pointer: Pointer): Boolean = noteQueue.onEvent(pointer)
 
@@ -663,6 +704,7 @@ private class NoteBoard(
         tipArea.run { draw(textManager) }
         track.run { draw(textManager) }
         noteQueue.run { draw(textManager) }
+        pointerAnimation.run { draw(textManager) }
     }
 }
 
