@@ -540,7 +540,6 @@ private class NoteBoard(
         override val position: Offset = Offset.Zero
         override val size: Size = Size.Game
 
-        private val lock = SynchronizedObject()
         // 当前刻
         private var current by mutableLongStateOf(0)
         // 双指针维护基列表
@@ -583,28 +582,26 @@ private class NoteBoard(
         }
 
         override fun onUpdate(position: Long) {
-            synchronized(lock) {
-                // 音符消失
-                prebuildList.getOrNull(popIndex)?.let { dynAction ->
-                    // 到达消失刻
-                    if (position >= dynAction.dismiss) {
-                        // 处理音符离开轨道事件
-                        dynAction.onDismiss()?.let { result -> dynAction.processResult(result) }
-                        ++popIndex
-                    }
+            // 音符消失
+            prebuildList.getOrNull(popIndex)?.let { dynAction ->
+                // 到达消失刻
+                if (position >= dynAction.dismiss) {
+                    // 处理音符离开轨道事件
+                    dynAction.onDismiss()?.let { result -> dynAction.processResult(result) }
+                    ++popIndex
                 }
-                // 音符出现
-                prebuildList.getOrNull(pushIndex)?.let { dynAction ->
-                    // 到达出现刻
-                    if (position >= dynAction.appearance) ++pushIndex
-                }
-                // 更新进度
-                current = position
-                // 更新音符
-                foreachAction {
-                    update(position)
-                    true
-                }
+            }
+            // 音符出现
+            prebuildList.getOrNull(pushIndex)?.let { dynAction ->
+                // 到达出现刻
+                if (position >= dynAction.appearance) ++pushIndex
+            }
+            // 更新进度
+            current = position
+            // 更新音符
+            foreachAction {
+                update(position)
+                true
             }
         }
 
@@ -681,7 +678,7 @@ private class NoteBoard(
         }
 
         override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-            
+
         }
     }
 
@@ -888,8 +885,6 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
         ScoreNumber(Offset(it * (ScoreNumber.WIDTH + GAP), 0f))
     }
 
-    private val lock = SynchronizedObject()
-
     // 组合四个数位得分
     val score: Int get() {
         var factor = 10000
@@ -901,27 +896,23 @@ private class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
 
     // 增加得分
     fun addScore(value: Int) {
-        synchronized(lock) {
-            var newScore = score + value
-            if (value < 1 || newScore > 9999) return
-            for (index in 3 downTo 0) {
-                val number = numbers[index]
-                val data = ScoreNumber.NumberArray[newScore % 10]
-                if (number.isPlaying) {
-                    if (data != number.target) number.reset(v2 = data, v3 = number.alpha)
-                }
-                else {
-                    if (data != number.current) number.reset(v2 = data, v3 = 127)
-                }
-                newScore /= 10
+        var newScore = score + value
+        if (value < 1 || newScore > 9999) return
+        for (index in 3 downTo 0) {
+            val number = numbers[index]
+            val data = ScoreNumber.NumberArray[newScore % 10]
+            if (number.isPlaying) {
+                if (data != number.target) number.reset(v2 = data, v3 = number.alpha)
             }
+            else {
+                if (data != number.current) number.reset(v2 = data, v3 = 127)
+            }
+            newScore /= 10
         }
     }
 
     override fun onUpdate(position: Long) {
-        synchronized(lock) {
-            for (number in numbers) number.onUpdate(position)
-        }
+        for (number in numbers) number.onUpdate(position)
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
@@ -1065,21 +1056,22 @@ private class Scene(
 @Stable
 internal class RhymeStage {
     private var scene: Scene? = null
+    private val lock = SynchronizedObject()
 
     fun onInitialize(lyrics: RhymeLyricsConfig, imageSet: ImageSet) {
-        scene = Scene(lyrics, imageSet)
+        synchronized(lock) { scene = Scene(lyrics, imageSet) }
     }
 
     fun onClear() {
-        scene = null
+        synchronized(lock) { scene = null }
     }
 
     fun onUpdate(position: Long) {
-        scene?.onUpdate(position)
+        synchronized(lock) { scene?.onUpdate(position) }
     }
 
     fun onEvent(pointer: Pointer) {
-        scene?.onEvent(pointer)
+        synchronized(lock) { scene?.onEvent(pointer) }
     }
 
     fun onDraw(scope: DrawScope, textManager: RhymeTextManager) {
