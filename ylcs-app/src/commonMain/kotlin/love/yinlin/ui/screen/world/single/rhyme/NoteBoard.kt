@@ -10,6 +10,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotateRad
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastForEach
 import love.yinlin.common.Colors
@@ -19,6 +22,7 @@ import love.yinlin.extension.onLine
 import love.yinlin.extension.roundToIntOffset
 import love.yinlin.extension.slope
 import love.yinlin.extension.translate
+import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
 
@@ -125,7 +129,7 @@ private class TipArea : RhymeObject(), RhymeContainer.Rectangle {
         val brush3: Brush = Brush.verticalGradient(*verticalBrush, startY = startY, endY = endY)
         val brush4: Brush = Brush.verticalGradient(*verticalBrush, startY = endY, endY = startY)
 
-        val center = run {
+        val center: Offset = run {
             // Cramer Rule
             val a1 = pos1.y - pos3.y
             val b1 = pos3.x - pos1.x
@@ -136,6 +140,7 @@ private class TipArea : RhymeObject(), RhymeContainer.Rectangle {
             val d = a1 * b2 - a2 * b1
             Offset((b1 * c2 - b2 * c1) / d, (a2 * c1 - a1 * c2) / d)
         }
+        val angle: Float = atan2(Track.Center.x - center.x, center.y - Track.Center.y)
     }
 
     companion object {
@@ -202,12 +207,11 @@ private class NoteQueue(
     private val comboBoard: ComboBoard
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
     companion object {
-        const val FPA = (RhymeConfig.FPS / 3.75f).toInt()
         const val TRACK_DURATION = (200 / TipArea.TIP_AREA_RANGE).toLong()
     }
 
     @Stable
-    private sealed class DynamicAction(start: Long, end: Long) {
+    sealed class DynamicAction(start: Long, end: Long) {
         @Stable
         enum class State {
             Normal, Miss, Completed
@@ -220,6 +224,8 @@ private class NoteQueue(
         open fun onPointerDown(queue: NoteQueue, startTime: Long) { }
         open fun onPointerUp(queue: NoteQueue, isClick: Boolean, startTime: Long, endTime: Long) { }
         open fun onDismiss(queue: NoteQueue) { }
+        open fun isFiniteAnimation(): Boolean = false
+        abstract fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int)
 
         val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toLong()
         val dismiss: Long = appearance + TRACK_DURATION
@@ -306,13 +312,13 @@ private class NoteQueue(
             private val trackLevel = (action.scale - 1) / 7 + 1
 
             override fun update(position: Long) {
-                if (stateFrame < FPA) ++stateFrame
+                if (stateFrame < RhymeConfig.FPA) ++stateFrame
             }
 
             override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
                 DrawMap.getOrNull(trackIndex)?.let { drawData ->
                     val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
-                    val alpha = (stateFrame / FPA.toFloat()).coerceIn(0f, 1f)
+                    val alpha = (stateFrame / RhymeConfig.FPA.toFloat()).coerceIn(0f, 1f)
                     val srcSize = drawData.srcSize.roundToIntSize()
                     val dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset()
                     val dstSize = (drawData.dstSize * progress).roundToIntSize()
@@ -362,6 +368,7 @@ private class NoteQueue(
                 if (result != null) {
                     state = if (result == ComboBoard.ActionResult.MISS) State.Miss else State.Completed
                     stateFrame = 0
+                    queue.animations.updateAnimation(trackIndex, this)
                     queue.updateResult(result)
                 }
             }
@@ -369,6 +376,16 @@ private class NoteQueue(
             override fun onDismiss(queue: NoteQueue) {
                 // 超出屏幕的音符将自动触发 MISS
                 if (state == State.Normal) queue.updateResult(ComboBoard.ActionResult.MISS)
+            }
+
+            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
+                drawImage(
+                    image = imageSet.clickAnimationNote,
+                    srcOffset = IntOffset(frame * 256, 0),
+                    srcSize = IntSize(256, 256),
+                    dstOffset = info.center.translate(x = -128f, y = -128f).roundToIntOffset(),
+                    dstSize = IntSize(256, 256)
+                )
             }
         }
 
@@ -385,6 +402,12 @@ private class NoteQueue(
             }
 
             override fun checkTrackIndex(index: Int): Boolean = index == trackIndex
+
+            override fun isFiniteAnimation(): Boolean = true
+
+            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
+
+            }
         }
 
         @Stable
@@ -400,6 +423,12 @@ private class NoteQueue(
             }
 
             override fun checkTrackIndex(index: Int): Boolean = index in trackIndex
+
+            override fun isFiniteAnimation(): Boolean = true
+
+            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
+
+            }
         }
     }
 
@@ -515,27 +544,62 @@ private class NoteQueue(
     }
 }
 
+@Stable
+private data class TrackAnimationInfo(
+    val trackIndex: Int,
+    val center: Offset,
+    val angle: Float
+)
+
 // 交互特效
 @Stable
 private class Animations(
+    private val imageSet: ImageSet,
     tipArea: TipArea
 ) : RhymeDynamic(), RhymeContainer.Rectangle {
     @Stable
-    private class TrackAnimation(private val center: Offset) {
-
+    private class TrackAnimation(val info: TrackAnimationInfo) {
+        var action by mutableStateOf<NoteQueue.DynamicAction?>(null)
+        var frame by mutableIntStateOf(0)
     }
-
-    private val animations = tipArea.areas.map { it.center }
 
     override val position: Offset = Offset.Zero
     override val size: Size = Size.Game
 
-    override fun onUpdate(position: Long) {
+    private val animations = tipArea.areas.mapIndexed { index, area ->
+        TrackAnimation(TrackAnimationInfo(
+            trackIndex = index,
+            center = area.center,
+            angle = area.angle
+        ))
+    }
 
+    fun updateAnimation(trackIndex: Int, action: NoteQueue.DynamicAction?) {
+        animations.getOrNull(trackIndex)?.let { animation ->
+            animation.action = action
+            animation.frame = 0
+        }
+    }
+
+    override fun onUpdate(position: Long) {
+        for (animation in animations) {
+            animation.action?.let { action ->
+                val frame = animation.frame
+                animation.frame = if (frame < RhymeConfig.FPA) frame + 1 else {
+                    // 非持续性动画播放完毕后将重置动画帧
+                    if (!action.isFiniteAnimation()) animation.action = null
+                    0
+                }
+            }
+        }
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-
+        for (animation in animations) {
+            rotateRad(animation.info.angle, animation.info.center) {
+                animation.action?.run { drawAnimation(imageSet, animation.info, animation.frame) }
+            }
+        }
     }
 }
 
@@ -553,7 +617,7 @@ internal class NoteBoard(
 
     private val tipArea = TipArea()
     private val track = Track()
-    private val animations = Animations(tipArea)
+    private val animations = Animations(imageSet, tipArea)
     private val noteQueue = NoteQueue(lyrics, imageSet, track, animations, missEnvironment, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) {

@@ -27,7 +27,7 @@ internal class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     }
 
     companion object {
-        const val FPA = RhymeConfig.FPS * 150 / 1000
+        const val FPA = RhymeConfig.FPA / 3
         const val COMBO_COUNT = 20
         val RotateAngle = Track.Center.let { -atan2(it.y, it.x) }
     }
