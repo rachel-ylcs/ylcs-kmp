@@ -300,20 +300,7 @@ private class NoteQueue(
                         dstOffset = Track.Tracks[7].translate(y = -TipArea.TIP_AREA_RANGE * Track.Center.y)
                     )
                 )
-
-                // 计算点击结果所占区间
-                private fun calcResultRange(appearance: Long, result: Float): LongRange {
-                    val ratio = TipArea.TIP_AREA_RANGE * result
-                    val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START - ratio)).toLong().coerceAtLeast(0L)
-                    val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START + ratio)).toLong().coerceAtMost(TRACK_DURATION)
-                    return (appearance + startOffset) .. (appearance + endOffset)
-                }
             }
-
-            private val perfect by lazy { calcResultRange(appearance, PERFECT_RATIO) }
-            private val good by lazy { calcResultRange(appearance, GOOD_RATIO) }
-            private val bad by lazy { calcResultRange(appearance, BAD_RATIO) }
-            private val miss by lazy { calcResultRange(appearance, MISS_RATIO) }
 
             private val trackIndex = ((action.scale - 1) % 7 + 2) % 7
             private val trackLevel = (action.scale - 1) / 7 + 1
@@ -356,12 +343,20 @@ private class NoteQueue(
 
             override fun checkTrackIndex(index: Int): Boolean = index == trackIndex
 
+            // 计算点击结果所占区间
+            private fun calcResultRange(result: Float): LongRange {
+                val ratio = TipArea.TIP_AREA_RANGE * result
+                val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START - ratio)).toLong().coerceAtLeast(0L)
+                val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START + ratio)).toLong().coerceAtMost(TRACK_DURATION)
+                return (appearance + startOffset) .. (appearance + endOffset)
+            }
+
             override fun onPointerDown(queue: NoteQueue, startTime: Long) {
                 val result = when (startTime) {
-                    in perfect -> ComboBoard.ActionResult.PERFECT
-                    in good -> ComboBoard.ActionResult.GOOD
-                    in bad -> ComboBoard.ActionResult.BAD
-                    in miss -> ComboBoard.ActionResult.MISS
+                    in calcResultRange(PERFECT_RATIO) -> ComboBoard.ActionResult.PERFECT
+                    in calcResultRange(GOOD_RATIO) -> ComboBoard.ActionResult.GOOD
+                    in calcResultRange(BAD_RATIO) -> ComboBoard.ActionResult.BAD
+                    in calcResultRange(MISS_RATIO) -> ComboBoard.ActionResult.MISS
                     else -> null
                 }
                 if (result != null) {
