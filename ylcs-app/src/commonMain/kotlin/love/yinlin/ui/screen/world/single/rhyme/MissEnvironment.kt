@@ -22,7 +22,7 @@ internal class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     )
 
     companion object {
-        const val FPA = RhymeConfig.FPS * 2
+        const val FPA = RhymeConfig.FPA * 4
     }
 
     override val position: Offset = Offset.Zero

@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastForEach
 import love.yinlin.common.Colors
+import love.yinlin.data.music.Chorus
 import love.yinlin.data.music.RhymeAction
+import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.onLine
 import love.yinlin.extension.roundToIntOffset
@@ -28,7 +30,9 @@ import kotlin.math.min
 
 // 轨道
 @Stable
-internal class Track : RhymeObject(), RhymeContainer.Rectangle {
+internal class Track(
+    private val chorus: List<Chorus>
+) : RhymeDynamic(), RhymeContainer.Rectangle {
     companion object {
         const val STROKE = 20f
         val Center = Offset(Size.Game.width / 2, 360f)
@@ -59,6 +63,8 @@ internal class Track : RhymeObject(), RhymeContainer.Rectangle {
             }
             return null
         }
+
+        const val FPA = RhymeConfig.FPA * 2
     }
 
     override val position: Offset = Offset.Zero
@@ -75,15 +81,77 @@ internal class Track : RhymeObject(), RhymeContainer.Rectangle {
         }
     }
 
+    private var chorusIndex = 0
+    private var chorusMode by mutableStateOf(false)
+    private var chorusFrame by mutableIntStateOf(0)
+    private var chorusProgress by mutableFloatStateOf(0f)
+
+    override fun onUpdate(position: Long) {
+        if (chorusMode) {
+            if (chorusFrame < FPA) chorusFrame++
+            else chorusFrame = 0
+        }
+        else {
+            if (chorusProgress > 0f) chorusProgress -= 1f / FPA
+        }
+        chorus.getOrNull(chorusIndex)?.let { chorus ->
+            if (position >= chorus.start) {
+                if (chorusMode) chorusProgress += 1000f / (chorus.end - chorus.start) / RhymeConfig.FPS
+                else {
+                    chorusMode = true
+                    chorusFrame = 0
+                    chorusProgress = 0f
+                }
+            }
+            if (position > chorus.end && chorusMode) {
+                chorusMode = false
+                chorusFrame = 0
+                ++chorusIndex
+            }
+        }
+    }
+
     private fun DrawScope.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
         // 阴影
+        val shadowBase = chorusFrame * (1 - chorusFrame / FPA.toFloat()) / FPA
+        val shadowWidth = 0.3f * shadowBase + 0.15f
+        val shadowAlpha = 0.5f * shadowBase + 0.15f
+        val shadowColor = if (chorusMode) Colors.Purple4 else Colors.Steel3
         repeat(5) {
-            line(Colors.Steel3, start, end, Stroke(width = stroke * (1.15f + it * 0.15f), cap = StrokeCap.Round), 0.15f - (it * 0.03f))
+            line(
+                color = shadowColor,
+                start = start,
+                end = end,
+                style = Stroke(width = stroke * (1.15f + it * shadowWidth), cap = StrokeCap.Round),
+                alpha = shadowAlpha - (it * 0.03f)
+            )
         }
         // 光带
-        line(Colors.Steel4, start, end, Stroke(width = stroke, cap = StrokeCap.Round), 0.7f)
+        line(
+            color = Colors.Steel4,
+            start = start,
+            end = end,
+            style = Stroke(width = stroke, cap = StrokeCap.Round),
+            alpha = 0.7f
+        )
         // 高光
-        line(Colors.White, start, end, Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), 0.8f)
+        line(
+            color = Colors.White,
+            start = start,
+            end = end,
+            style = Stroke(width = stroke * 0.8f, cap = StrokeCap.Round),
+            alpha = 0.8f
+        )
+        // 副歌模式进度
+        if (chorusProgress > 0f) {
+            line(
+                color = Colors.Steel4,
+                start = end,
+                end = end.onLine(start, chorusProgress),
+                style = Stroke(width = stroke * 0.5f, cap = StrokeCap.Round),
+                alpha = 0.8f
+            )
+        }
     }
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
@@ -198,7 +266,7 @@ private class TipArea : RhymeObject(), RhymeContainer.Rectangle {
 // 音符队列
 @Stable
 private class NoteQueue(
-    lyrics: RhymeLyricsConfig,
+    lyrics: List<RhymeLine>,
     private val imageSet: ImageSet,
     private val track: Track,
     private val animations: Animations,
@@ -444,7 +512,7 @@ private class NoteQueue(
 
     // 预编译列表
     private val prebuildList = buildList {
-        lyrics.lyrics.fastForEach { line ->
+        lyrics.fastForEach { line ->
             val theme = line.theme
             for (i in theme.indices) {
                 val action = theme[i]
@@ -616,11 +684,12 @@ internal class NoteBoard(
     override val size: Size = Size.Game
 
     private val tipArea = TipArea()
-    private val track = Track()
+    private val track = Track(lyrics.chorus)
     private val animations = Animations(imageSet, tipArea)
-    private val noteQueue = NoteQueue(lyrics, imageSet, track, animations, missEnvironment, scoreBoard, comboBoard)
+    private val noteQueue = NoteQueue(lyrics.lyrics, imageSet, track, animations, missEnvironment, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) {
+        track.onUpdate(position)
         noteQueue.onUpdate(position)
         animations.onUpdate(position)
     }
@@ -629,8 +698,8 @@ internal class NoteBoard(
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         tipArea.run { draw(textManager) }
-        track.run { draw(textManager) }
         noteQueue.run { draw(textManager) }
+        track.run { draw(textManager) }
         animations.run { draw(textManager) }
     }
 }

@@ -49,12 +49,20 @@ data class RhymeLine(
     val theme: List<RhymeAction>, // 主旋律
 )
 
+// 副歌段
+@Serializable
+@Stable
+data class Chorus(
+    val start: Long,
+    val end: Long
+)
+
 // 歌词
 @Serializable
 @Stable
 data class RhymeLyricsConfig(
     val id: String, // ID, 同 config 中的 ID
     val duration: Long, // 时长
-    val chorus: List<Long>, // 副歌点
+    val chorus: List<Chorus>, // 副歌点
     val lyrics: List<RhymeLine>, // 歌词
 )

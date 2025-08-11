@@ -10,6 +10,10 @@ import love.yinlin.ui.component.screen.CommonSubScreen
 class ScreenTest(model: AppModel) : CommonSubScreen(model) {
     override val title: String = "测试页"
 
+    override suspend fun initialize() {
+
+    }
+
     @Composable
     override fun SubContent(device: Device) {
 
