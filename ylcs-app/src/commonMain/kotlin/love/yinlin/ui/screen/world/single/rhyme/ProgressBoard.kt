@@ -23,7 +23,7 @@ internal class ProgressBoard(
         const val APF = 360f / ROTATE_DURATION / RhymeConfig.FPS
     }
 
-    override val position: Offset = NoteBoard.Track.Center.translate(-RADIUS, -RADIUS)
+    override val position: Offset = Track.Center.translate(-RADIUS, -RADIUS)
     override val size: Size = Size(RADIUS * 2, RADIUS * 2)
 
     private val record = imageSet.record

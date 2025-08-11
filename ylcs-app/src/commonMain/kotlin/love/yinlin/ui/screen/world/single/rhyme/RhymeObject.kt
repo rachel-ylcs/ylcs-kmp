@@ -15,6 +15,7 @@ import kotlin.math.*
 // 指针数据
 @Stable
 internal data class Pointer(
+    val id: Long,
     val position: Offset, // 按下位置
     val startTime: Long, // 按下时间
     val endTime: Long? = null, // 抬起时间

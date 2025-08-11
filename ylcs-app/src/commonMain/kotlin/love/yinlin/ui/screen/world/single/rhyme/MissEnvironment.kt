@@ -29,10 +29,7 @@ internal class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     override val size: Size = Size.Game
 
     private val fullRadius = size.minDimension * 0.75f
-    private val corners = arrayOf(
-        NoteBoard.Track.Tracks[0], NoteBoard.Track.Tracks[2],
-        NoteBoard.Track.Tracks[5], NoteBoard.Track.Tracks[7],
-    ).map { position ->
+    private val corners = arrayOf(Track.Tracks[0], Track.Tracks[2], Track.Tracks[5], Track.Tracks[7]).map { position ->
         Corner(
             position = position,
             data = (0 .. FPA).map {

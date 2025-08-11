@@ -456,7 +456,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                                 val position = change.position / rhymeScale
                                 val time = musicPlayer.position
                                 when {
-                                    change.changedToDown() -> Pointer(position = position, startTime = time).let { pointer ->
+                                    change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
                                         pointers[id] = pointer
                                         stage.onEvent(pointer)
                                     }
