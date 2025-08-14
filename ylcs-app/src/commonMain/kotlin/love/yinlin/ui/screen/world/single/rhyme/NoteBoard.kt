@@ -145,8 +145,8 @@ internal class Track(
         if (chorusProgress > 0f) {
             line(
                 color = Colors.Steel4,
-                start = end,
-                end = end.onLine(start, chorusProgress),
+                start = start,
+                end = start.onLine(end, chorusProgress),
                 style = Stroke(width = stroke * 0.5f, cap = StrokeCap.Round),
                 alpha = 0.8f
             )
