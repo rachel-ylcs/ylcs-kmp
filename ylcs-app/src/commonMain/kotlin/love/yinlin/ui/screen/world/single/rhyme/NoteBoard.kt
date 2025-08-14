@@ -287,8 +287,8 @@ private class NoteQueue(
         abstract fun update(position: Long)
         abstract fun DrawScope.draw(imageSet: ImageSet, position: Long)
         abstract fun checkTrackIndex(index: Int): Boolean
-        open fun onPointerDown(queue: NoteQueue, startTime: Long) { }
-        open fun onPointerUp(queue: NoteQueue, isClick: Boolean, startTime: Long, endTime: Long) { }
+        open fun onPointerDown(queue: NoteQueue, currentTrackIndex: Int, startTime: Long) { }
+        open fun onPointerUp(queue: NoteQueue, currentTrackIndex: Int, isClick: Boolean, startTime: Long, endTime: Long) { }
         open fun onDismiss(queue: NoteQueue) { }
         open fun isFiniteAnimation(): Boolean = false
         abstract fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int)
@@ -320,6 +320,7 @@ private class NoteQueue(
             // 提示区域的 MISS_RATIO 倍邻域为错过
             // 再往外的邻域不响应点击
             companion object {
+                private const val DURATION_BASE = 200L
                 private const val PERFECT_RATIO = 0.25f
                 private const val GOOD_RATIO = 0.5f
                 private const val BAD_RATIO = 1f
@@ -372,7 +373,7 @@ private class NoteQueue(
             }
 
             // 单音符时长与实际字符发音时长无关, 全部为固定值
-            override val duration: Long = (200 / TipArea.TIP_AREA_RANGE).toLong()
+            override val duration: Long = (DURATION_BASE / TipArea.TIP_AREA_RANGE).toLong()
             override val appearance: Long = start - (duration * TipArea.TIP_AREA_START).toLong()
 
             private val trackIndex = ((action.scale - 1) % 7 + 2) % 7
@@ -424,7 +425,7 @@ private class NoteQueue(
                 return (appearance + startOffset) .. (appearance + endOffset)
             }
 
-            override fun onPointerDown(queue: NoteQueue, startTime: Long) {
+            override fun onPointerDown(queue: NoteQueue, currentTrackIndex: Int, startTime: Long) {
                 val result = when (startTime) {
                     in calcResultRange(PERFECT_RATIO) -> ComboBoard.ActionResult.PERFECT
                     in calcResultRange(GOOD_RATIO) -> ComboBoard.ActionResult.GOOD
@@ -458,8 +459,19 @@ private class NoteQueue(
 
         @Stable
         class FixedSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction() {
-            override val duration: Long = 0L
-            override val appearance: Long = 0L
+            companion object {
+                private const val DURATION_BASE_RATIO = 5L
+                private const val LENGTH_RATIO = 0.7f
+                private const val HEADER_RATIO = 0.1f
+            }
+
+            // 延音生命周期
+            //    出现    ->    加首端    ->    加干路    ->    加尾端    ->    移动    ->    收干路    ->    收尾端    ->    消失
+            //                 +2/3d          +4/3d          +2/3d         +4/3d         +2/3d         +1/3d
+            //  appearance                                                               start          end
+            //                 0%-10%         0%-60%         0%-70%        20%-90%      20%-90%       70%-90%
+            override val duration: Long = (end - start) * DURATION_BASE_RATIO
+            override val appearance: Long = start - duration * (DURATION_BASE_RATIO - 1) / DURATION_BASE_RATIO
 
             private val trackIndex = ((action.scale.first() - 1) % 7 + 2) % 7
 
@@ -587,7 +599,7 @@ private class NoteQueue(
                     foreachAction {
                         // 从队首遍历找到此轨道第一个正常音符
                         if (checkTrackIndex(trackIndex) && state == DynamicAction.State.Normal) {
-                            onPointerDown(this@NoteQueue, pointer.startTime)
+                            onPointerDown(this@NoteQueue, trackIndex, pointer.startTime)
                             false
                         }
                         else true // 非正常音符或非对应轨道继续查找
@@ -599,7 +611,7 @@ private class NoteQueue(
                 track.safeSetTrackMap(trackIndex, false) {
                     pointerMap[pointer.id]?.apply {
                         if (state == DynamicAction.State.Normal) {
-                            onPointerUp(this@NoteQueue, isClick, pointer.startTime, endTime)
+                            onPointerUp(this@NoteQueue, trackIndex, isClick, pointer.startTime, endTime)
                         }
                     }
                 }
