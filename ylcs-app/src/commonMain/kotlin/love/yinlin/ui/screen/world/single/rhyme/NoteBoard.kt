@@ -273,18 +273,17 @@ private class NoteQueue(
     private val scoreBoard: ScoreBoard,
     private val comboBoard: ComboBoard
 ) : RhymeDynamic(), RhymeContainer.Rectangle, RhymeEvent {
-    companion object {
-        const val TRACK_DURATION = (200 / TipArea.TIP_AREA_RANGE).toLong()
-    }
-
     @Stable
-    sealed class DynamicAction(start: Long, end: Long) {
+    sealed class DynamicAction {
         @Stable
         enum class State {
             Normal, Miss, Completed
         }
 
         abstract val action: RhymeAction
+        abstract val duration: Long
+        abstract val appearance: Long
+
         abstract fun update(position: Long)
         abstract fun DrawScope.draw(imageSet: ImageSet, position: Long)
         abstract fun checkTrackIndex(index: Int): Boolean
@@ -294,14 +293,11 @@ private class NoteQueue(
         open fun isFiniteAnimation(): Boolean = false
         abstract fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int)
 
-        val appearance: Long = start - (TRACK_DURATION * TipArea.TIP_AREA_START).toLong()
-        val dismiss: Long = appearance + TRACK_DURATION
-
         var state: State by mutableStateOf(State.Normal)
         var stateFrame: Int by mutableIntStateOf(0)
 
         @Stable
-        class Note(start: Long, end: Long, override val action: RhymeAction.Note) : DynamicAction(start, end) {
+        class Note(start: Long, override val action: RhymeAction.Note) : DynamicAction() {
             @Stable
             private class DrawData(
                 srcOffset: Offset,
@@ -375,6 +371,10 @@ private class NoteQueue(
                 )
             }
 
+            // 单音符时长与实际字符发音时长无关, 全部为固定值
+            override val duration: Long = (200 / TipArea.TIP_AREA_RANGE).toLong()
+            override val appearance: Long = start - (duration * TipArea.TIP_AREA_START).toLong()
+
             private val trackIndex = ((action.scale - 1) % 7 + 2) % 7
             private val trackLevel = (action.scale - 1) / 7 + 1
 
@@ -384,7 +384,7 @@ private class NoteQueue(
 
             override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
                 DrawMap.getOrNull(trackIndex)?.let { drawData ->
-                    val progress = ((position - appearance) / TRACK_DURATION.toFloat()).coerceIn(0f, 1f)
+                    val progress = ((position - appearance) / duration.toFloat()).coerceIn(0f, 1f)
                     val alpha = (stateFrame / RhymeConfig.FPA.toFloat()).coerceIn(0f, 1f)
                     val srcSize = drawData.srcSize.roundToIntSize()
                     val dstOffset = Track.Center.onLine(drawData.dstOffset, progress).roundToIntOffset()
@@ -419,8 +419,8 @@ private class NoteQueue(
             // 计算点击结果所占区间
             private fun calcResultRange(result: Float): LongRange {
                 val ratio = TipArea.TIP_AREA_RANGE * result
-                val startOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START - ratio)).toLong().coerceAtLeast(0L)
-                val endOffset = (TRACK_DURATION * (TipArea.TIP_AREA_START + ratio)).toLong().coerceAtMost(TRACK_DURATION)
+                val startOffset = (duration * (TipArea.TIP_AREA_START - ratio)).toLong().coerceAtLeast(0L)
+                val endOffset = (duration * (TipArea.TIP_AREA_START + ratio)).toLong().coerceAtMost(duration)
                 return (appearance + startOffset) .. (appearance + endOffset)
             }
 
@@ -457,7 +457,10 @@ private class NoteQueue(
         }
 
         @Stable
-        class FixedSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction(start, end) {
+        class FixedSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction() {
+            override val duration: Long = 0L
+            override val appearance: Long = 0L
+
             private val trackIndex = ((action.scale.first() - 1) % 7 + 2) % 7
 
             override fun update(position: Long) {
@@ -478,7 +481,10 @@ private class NoteQueue(
         }
 
         @Stable
-        class OffsetSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction(start, end) {
+        class OffsetSlur(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction() {
+            override val duration: Long = 0L
+            override val appearance: Long = 0L
+
             private val trackIndex = action.scale.map { ((it - 1) % 7 + 2) % 7 }
 
             override fun update(position: Long) {
@@ -518,7 +524,7 @@ private class NoteQueue(
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                 val end = action.end + line.start
                 add(when (action) {
-                    is RhymeAction.Note -> DynamicAction.Note(start, end, action) // 单音
+                    is RhymeAction.Note -> DynamicAction.Note(start, action) // 单音
                     is RhymeAction.Slur -> {
                         val first = action.scale.firstOrNull()
                         if (action.scale.all { it == first }) DynamicAction.FixedSlur(start, end, action) // 延音
@@ -551,7 +557,7 @@ private class NoteQueue(
         // 音符消失
         prebuildList.getOrNull(popIndex)?.let { dynAction ->
             // 到达消失刻
-            if (position >= dynAction.dismiss) {
+            if (position >= dynAction.appearance + dynAction.duration) {
                 // 处理音符离开轨道事件
                 dynAction.onDismiss(this)
                 ++popIndex
