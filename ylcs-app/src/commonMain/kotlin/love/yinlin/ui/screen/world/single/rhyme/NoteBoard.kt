@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotateRad
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
@@ -451,8 +450,8 @@ private class NoteQueue(
                     image = imageSet.clickAnimationNote,
                     srcOffset = IntOffset(frame * 256, 0),
                     srcSize = IntSize(256, 256),
-                    dstOffset = info.center.translate(x = -128f, y = -128f).roundToIntOffset(),
-                    dstSize = IntSize(256, 256)
+                    dstOffset = info.center.translate(x = -275f, y = -275f).roundToIntOffset(),
+                    dstSize = IntSize(550, 550)
                 )
             }
         }
@@ -653,7 +652,7 @@ private class Animations(
         for (animation in animations) {
             animation.action?.let { action ->
                 val frame = animation.frame
-                animation.frame = if (frame < RhymeConfig.FPA) frame + 1 else {
+                animation.frame = if (frame < 16) frame + 1 else {
                     // 非持续性动画播放完毕后将重置动画帧
                     if (!action.isFiniteAnimation()) animation.action = null
                     0
@@ -664,9 +663,7 @@ private class Animations(
 
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         for (animation in animations) {
-            rotateRad(animation.info.angle, animation.info.center) {
-                animation.action?.run { drawAnimation(imageSet, animation.info, animation.frame) }
-            }
+            animation.action?.run { drawAnimation(imageSet, animation.info, animation.frame) }
         }
     }
 }
