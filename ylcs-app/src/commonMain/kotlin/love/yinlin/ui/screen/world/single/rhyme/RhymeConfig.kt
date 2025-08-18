@@ -1,7 +1,6 @@
 package love.yinlin.ui.screen.world.single.rhyme
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 
@@ -22,12 +21,3 @@ internal data class ImageSet(
     val noteLayoutMap: ImageBitmap,
     val clickAnimationNote: ImageBitmap,
 )
-
-// 贴图数据
-@Stable
-internal sealed interface DrawImageData {
-    val srcSize: Size
-    val srcOffsets: List<Offset>
-    val dstOffset: Offset
-    val dstSize: Size
-}

@@ -29,7 +29,7 @@ internal class ComboBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     companion object {
         const val FPA = RhymeConfig.FPA / 3
         const val COMBO_COUNT = 20
-        val RotateAngle = Track.Center.let { -atan2(it.y, it.x) }
+        val RotateAngle = Track.Start.let { -atan2(it.y, it.x) }
     }
 
     private val textWidth = 270f

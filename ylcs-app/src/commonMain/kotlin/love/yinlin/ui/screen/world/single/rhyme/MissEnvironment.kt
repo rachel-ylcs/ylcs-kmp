@@ -29,9 +29,9 @@ internal class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     override val size: Size = Size.Game
 
     private val fullRadius = size.minDimension * 0.75f
-    private val corners = arrayOf(Track.Tracks[0], Track.Tracks[2], Track.Tracks[5], Track.Tracks[7]).map { position ->
+    private val corners = arrayOf(Track.Tracks[0], Track.Tracks[2], Track.Tracks[5], Track.Tracks[7]).map { track ->
         Corner(
-            position = position,
+            position = track.end,
             data = (0 .. FPA).map {
                 val x = it / FPA.toFloat()
                 val progress = (0.3235f * x * x * x - 1.071f * x * x + 1.7475f * x).coerceIn(0f, 1f)
@@ -40,7 +40,7 @@ internal class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
                     radius = radius,
                     brush = Brush.radialGradient(
                         colors = listOf(Colors.Red5.copy(alpha = progress * 0.75f), Colors.Transparent),
-                        center = position,
+                        center = track.end,
                         radius = radius
                     )
                 )

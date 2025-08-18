@@ -111,7 +111,7 @@ internal class ScoreBoard : RhymeDynamic(), RhymeContainer.Rectangle {
     companion object {
         const val GAP = ScoreNumber.RECT_HEIGHT
         const val WIDTH = ScoreNumber.WIDTH * 4 + GAP * 3
-        val RotateAngle = Track.Center.let { atan2(it.y, it.x) }
+        val RotateAngle = Track.Start.let { atan2(it.y, it.x) }
     }
 
     override val position: Offset = Offset(Size.Game.width / 2 - ProgressBoard.RADIUS / 2 - 50 - WIDTH, 100f)
