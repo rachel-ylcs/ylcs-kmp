@@ -51,35 +51,28 @@ private class NoteQueue(
         var stateFrame: Int by mutableIntStateOf(0)
 
         @Stable
-        class Note(start: Long, override val action: RhymeAction.Note) : DynamicAction() {
+        abstract class BaseNote : DynamicAction() {
             @Stable
-            private class DrawData(
+            protected class DrawData(
                 srcOffset: Offset,
                 val srcSize: Size,
                 val dstOffset: Offset
             ) {
-                val srcOffsets = List(4) { srcOffset.translate(x = it * srcSize.width) }
-                val dstSize: Size = srcSize
+                private val srcOffsets = List(4) { srcOffset.translate(x = it * srcSize.width) }
+                private val dstSize: Size = srcSize
+
+                fun DrawScope.drawNote(imageSet: ImageSet, progress: Float, trackLevel: Int, alpha: Float) = drawImage(
+                    image = imageSet.noteLayoutMap,
+                    srcOffset = srcOffsets[trackLevel].roundToIntOffset(),
+                    srcSize = srcSize.roundToIntSize(),
+                    dstOffset = Track.Start.onLine(dstOffset, progress).roundToIntOffset(),
+                    dstSize = (dstSize * progress).roundToIntSize(),
+                    alpha = alpha,
+                    filterQuality = FilterQuality.High
+                )
             }
 
-            //                            单音生命周期
-            // ------------------------------------------------------------------
-            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
-            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
-            //                               发声
-            // 字符的发声点是经过提示区域的开始
-            // 提示区域的 PERFECT_RATIO 倍邻域为完美
-            // 提示区域的 GOOD_RATIO 倍邻域为好
-            // 提示区域的 BAD_RATIO 倍邻域为差
-            // 提示区域的 MISS_RATIO 倍邻域为错过
-            // 再往外的邻域不响应点击
             companion object {
-                private const val DURATION_BASE = 200L
-                private const val PERFECT_RATIO = 0.25f
-                private const val GOOD_RATIO = 0.5f
-                private const val BAD_RATIO = 1f
-                private const val MISS_RATIO = 3f
-
                 private val ExtraNoteWidth = Track.Start.x * TrackArea.TIP_RANGE
                 private val ExtraNoteHeight = (Track.Tracks[2].end.y - Track.Start.y) * TrackArea.TIP_RANGE
                 private val TopNoteSize = Size(ExtraNoteWidth, Track.Tracks[1].end.y * (1 + TrackArea.TIP_RANGE))
@@ -87,7 +80,7 @@ private class NoteQueue(
                 private val LeftRightNoteSize = Size(ExtraNoteWidth + Track.Tracks[3].end.x, ExtraNoteHeight)
                 private val CenterNoteSize = Size(Track.Tracks[3].end.x * (1 + TrackArea.TIP_RANGE), ExtraNoteHeight)
 
-                private val DrawMap = arrayOf(
+                val DrawMap = arrayOf(
                     DrawData(
                         srcOffset = Offset(TopNoteSize.width * 0, CenterNoteSize.height * 3),
                         srcSize = TopNoteSize,
@@ -125,6 +118,28 @@ private class NoteQueue(
                     )
                 )
             }
+        }
+
+        @Stable
+        class Note(start: Long, override val action: RhymeAction.Note) : BaseNote() {
+            //                            单音生命周期
+            // ------------------------------------------------------------------
+            //    ↑     ↑    ↑     ↑      ↑        ↑      ↑     ↑     ↑      ↑
+            //   出现  MISS  BAD  GOOD  PERFECT  PERFECT  GOOD  BAD  MISS    消失
+            //                               发声
+            // 字符的发声点是经过提示区域的开始
+            // 提示区域的 PERFECT_RATIO 倍邻域为完美
+            // 提示区域的 GOOD_RATIO 倍邻域为好
+            // 提示区域的 BAD_RATIO 倍邻域为差
+            // 提示区域的 MISS_RATIO 倍邻域为错过
+            // 再往外的邻域不响应点击
+            companion object {
+                private const val DURATION_BASE = 200L
+                private const val PERFECT_RATIO = 0.25f
+                private const val GOOD_RATIO = 0.5f
+                private const val BAD_RATIO = 1f
+                private const val MISS_RATIO = 3f
+            }
 
             // 单音符时长与实际字符发音时长无关, 全部为固定值
             override val duration: Long = (DURATION_BASE / TrackArea.TIP_RANGE).toLong()
@@ -138,42 +153,13 @@ private class NoteQueue(
             }
 
             override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
-                DrawMap.getOrNull(trackIndex)?.let { drawData ->
+                DrawMap.getOrNull(trackIndex)?.run {
                     val progress = ((position - appearance) / duration.toFloat()).coerceIn(0f, 1f)
                     val alpha = (stateFrame / RhymeConfig.FPA.toFloat()).coerceIn(0f, 1f)
-                    val srcSize = drawData.srcSize.roundToIntSize()
-                    val dstOffset = Track.Start.onLine(drawData.dstOffset, progress).roundToIntOffset()
-                    val dstSize = (drawData.dstSize * progress).roundToIntSize()
-                    // 画音符轨迹
-
                     // 画当前音符
-                    drawImage(
-                        image = imageSet.noteLayoutMap,
-                        srcOffset = drawData.srcOffsets[trackLevel].roundToIntOffset(),
-                        srcSize = srcSize,
-                        dstOffset = dstOffset,
-                        dstSize = dstSize,
-                        alpha = if (state == State.Normal) alpha else (1 - alpha),
-                        filterQuality = FilterQuality.High
-                    )
-                    if (state == State.Miss) {
-                        // 画消失色音符
-                        drawImage(
-                            image = imageSet.noteLayoutMap,
-                            srcOffset = drawData.srcOffsets[0].roundToIntOffset(),
-                            srcSize = srcSize,
-                            dstOffset = dstOffset,
-                            dstSize = dstSize,
-                            alpha = alpha,
-                            filterQuality = FilterQuality.High
-                        )
-                    }
-//                    val dstCenter = Track.Center.onLine(drawData.dstCenter, progress)
-//                    drawRect(
-//                        Colors.Red4,
-//                        topLeft = dstCenter.translate(-10f, -10f),
-//                        size = Size(20f, 20f)
-//                    )
+                    drawNote(imageSet, progress, trackLevel, if (state == State.Normal) alpha else (1 - alpha))
+                    // 画消失色音符
+                    if (state == State.Miss) drawNote(imageSet, progress, 0, alpha)
                 }
             }
 
@@ -397,8 +383,7 @@ private class NoteQueue(
 @Stable
 private data class TrackAnimationInfo(
     val trackIndex: Int,
-    val center: Offset,
-    val angle: Float
+    val center: Offset
 )
 
 // 交互特效
@@ -418,8 +403,7 @@ private class Animations(
     private val animations = TrackArea.Areas.mapIndexed { index, area ->
         TrackAnimation(TrackAnimationInfo(
             trackIndex = index,
-            center = area.tipCenter,
-            angle = area.angle
+            center = area.tipCenter
         ))
     }
 

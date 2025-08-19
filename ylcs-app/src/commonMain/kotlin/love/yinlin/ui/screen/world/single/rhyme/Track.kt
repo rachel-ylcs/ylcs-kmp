@@ -10,9 +10,10 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.common.Colors
 import love.yinlin.data.music.Chorus
+import love.yinlin.extension.cramerCenter
+import love.yinlin.extension.onCenter
 import love.yinlin.extension.onLine
 import love.yinlin.extension.slope
-import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
 
@@ -106,15 +107,17 @@ internal class TrackArea(
     }
 
     // 提示区域点集
-    private val tipPos1 = TipPoints[tipPosIndex1]
-    private val tipPos2 = TipPoints[tipPosIndex2]
-    private val tipPos3 = TipPoints[tipPosIndex3]
-    private val tipPos4 = TipPoints[tipPosIndex4]
+    val tipPos1 = TipPoints[tipPosIndex1]
+    val tipPos2 = TipPoints[tipPosIndex2]
+    val tipPos3 = TipPoints[tipPosIndex3]
+    val tipPos4 = TipPoints[tipPosIndex4]
     // 是否是垂直方向
     val isVertical = (tipPos3.y - tipPos1.y) > (tipPos3.x - tipPos1.x)
     val isHorizontal = !isVertical
     // 轨道形状
     val shape = Path(arrayOf(Track.Tracks[index].end, Track.Tracks[index + 1].end, Track.Start))
+    // 轨道末端中点
+    val endCenter = Track.Tracks[index].end.onCenter(Track.Tracks[index + 1].end)
     // 提示区域形状
     val tipShape = Path(arrayOf(tipPos1, tipPos2, tipPos3, tipPos4))
     // 提示区域画刷
@@ -147,19 +150,7 @@ internal class TrackArea(
         arrayOf(brush1, brush2, brush3, brush4)
     }
     // 提示区域中心
-    val tipCenter = run {
-        // Cramer Rule
-        val a1 = tipPos1.y - tipPos3.y
-        val b1 = tipPos3.x - tipPos1.x
-        val c1 = tipPos1.x * tipPos3.y - tipPos3.x * tipPos1.y
-        val a2 = tipPos2.y - tipPos4.y
-        val b2 = tipPos4.x - tipPos2.x
-        val c2 = tipPos2.x * tipPos4.y - tipPos4.x * tipPos2.y
-        val d = a1 * b2 - a2 * b1
-        Offset((b1 * c2 - b2 * c1) / d, (a2 * c1 - a1 * c2) / d)
-    }
-    // 角度
-    val angle = atan2(Track.Start.x - tipCenter.x, tipCenter.y - Track.Start.y)
+    val tipCenter = Offset.cramerCenter(tipPos1, tipPos2, tipPos3, tipPos4)
 }
 
 // 轨道
