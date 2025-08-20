@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.2.20-RC"
 cmp = "1.9.0-beta03"
-agp = "8.11.0"
+agp = "8.11.1"
 
 # Libs #
 
@@ -18,7 +18,7 @@ mmkv = "2.2.2"
 lottie = "2.0.0-rc04"
 
 # Android
-cmp-android = "1.8.1"
+cmp-android = "1.9.0"
 media3 = "1.8.0"
 
 # iOS
