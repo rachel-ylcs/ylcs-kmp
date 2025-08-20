@@ -38,6 +38,14 @@ MMKVPath_t crcPathWithPath(const MMKVPath_t &kvPath);
 MMKVRecoverStrategic onMMKVCRCCheckFail(const std::string &mmapID);
 MMKVRecoverStrategic onMMKVFileLengthError(const std::string &mmapID);
 
+#ifndef MMKV_WIN32
+constexpr auto SPECIAL_CHARACTER_DIRECTORY_NAME = "specialCharacter";
+constexpr auto CRC_SUFFIX = ".crc";
+#else
+constexpr auto SPECIAL_CHARACTER_DIRECTORY_NAME = L"specialCharacter";
+constexpr auto CRC_SUFFIX = L".crc";
+#endif
+
 template <typename T>
 void clearDictionary(T *dic) {
     if (!dic) {

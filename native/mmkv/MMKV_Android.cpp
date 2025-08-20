@@ -218,8 +218,9 @@ MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const stri
     }
     if (rootPath) {
         if (!isFileExist(*rootPath)) {
-            if (!mkPath(*rootPath)) {
-                return nullptr;
+            MMKVPath_t specialPath = (*rootPath) + MMKV_PATH_SLASH + SPECIAL_CHARACTER_DIRECTORY_NAME;
+            if (!isFileExist(specialPath)) {
+                mkPath(specialPath);
             }
         }
         MMKVInfo("prepare to load %s (id %s) from rootPath %s", mmapID.c_str(), mmapKey.c_str(), rootPath->c_str());

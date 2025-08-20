@@ -66,14 +66,6 @@ static unordered_map<MMKVPath_t, MMKVPath_t> g_realRootMap;
 static mmkv::ErrorHandler g_errorHandler;
 size_t mmkv::DEFAULT_MMAP_SIZE;
 
-#ifndef MMKV_WIN32
-constexpr auto SPECIAL_CHARACTER_DIRECTORY_NAME = "specialCharacter";
-constexpr auto CRC_SUFFIX = ".crc";
-#else
-constexpr auto SPECIAL_CHARACTER_DIRECTORY_NAME = L"specialCharacter";
-constexpr auto CRC_SUFFIX = L".crc";
-#endif
-
 MMKV_NAMESPACE_BEGIN
 
 static MMKVPath_t encodeFilePath(const string &mmapID, const MMKVPath_t &rootDir);
