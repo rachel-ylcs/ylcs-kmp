@@ -14,7 +14,7 @@ material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
 ktor = "3.2.3"
 sketch = "4.4.0-alpha01"
-mmkv = "2.2.2"
+mmkv = "2.2.3"
 lottie = "2.0.0-rc04"
 
 # Android
