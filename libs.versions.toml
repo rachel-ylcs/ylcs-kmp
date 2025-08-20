@@ -89,7 +89,7 @@ lottie-network = { module = "io.github.alexzhirkevich:compottie-network", versio
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.10" }
-tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "2.5.1" }
+tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
 # JVM

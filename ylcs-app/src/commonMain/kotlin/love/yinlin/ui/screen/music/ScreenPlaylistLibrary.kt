@@ -244,7 +244,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         ) {
             itemsIndexed(
                 items = library,
-                key = { index, item -> item.id }
+                key = { _, item -> item.id }
             ) { index, item ->
                 ReorderableItem(
                     state = reorderState,
