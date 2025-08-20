@@ -4,6 +4,7 @@
 #include <winrt/windows.storage.h>
 #include <winrt/windows.media.core.h>
 #include <winrt/windows.media.playback.h>
+#pragma comment(lib, "RuntimeObject.lib")
 
 using namespace winrt::Windows::Storage;
 using namespace winrt::Windows::Media;
