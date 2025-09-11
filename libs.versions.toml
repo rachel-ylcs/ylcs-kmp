@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.2.20-RC2"
+kotlin = "2.2.20"
 cmp = "1.10.0-alpha01"
 agp = "8.11.1"
 
@@ -18,7 +18,7 @@ mmkv = "2.2.3"
 lottie = "2.0.0"
 
 # Android
-cmp-android = "1.9.0"
+cmp-android = "1.9.1"
 media3 = "1.8.0"
 
 # iOS
