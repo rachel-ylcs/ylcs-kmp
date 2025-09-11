@@ -70,7 +70,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			slot.tip.error("昵称或密码不合规范")
 			return
 		}
-		val result1 = ClientAPI.request(
+		val result = ClientAPI.request(
 			route = API.User.Account.Login,
 			data = API.User.Account.Login.Request(
 				name = id,
@@ -78,14 +78,14 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 				platform = platform
 			)
 		)
-		when (result1) {
+		when (result) {
 			is Data.Success -> {
-				val token = result1.data
+				val token = result.data
 				app.config.userShortToken = DateEx.CurrentLong
 				app.config.userToken = token
 				pop()
 			}
-			is Data.Failure -> slot.tip.error(result1.message)
+			is Data.Failure -> slot.tip.error(result.message)
 		}
 	}
 
