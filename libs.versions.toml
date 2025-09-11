@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.2.20"
 cmp = "1.10.0-alpha01"
-agp = "8.11.1"
+agp = "8.12.1"
 
 # Libs #
 
