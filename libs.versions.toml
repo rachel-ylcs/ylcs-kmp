@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.2.20"
 cmp = "1.10.0-alpha01"
-agp = "8.12.1"
+agp = "8.12.3"
 
 # Libs #
 
@@ -14,11 +14,11 @@ material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
 ktor = "3.3.0"
 sketch = "4.4.0-alpha01"
-mmkv = "2.2.3"
-lottie = "2.0.0"
+mmkv = "2.2.4"
+lottie = "2.0.1"
 
 # Android
-cmp-android = "1.9.1"
+cmp-android = "1.9.2"
 media3 = "1.8.0"
 
 # iOS
@@ -63,10 +63,10 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.29.0" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.30.0-beta" }
 
 runtime-shapes = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha09" }
-runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0-rc01" }
+runtime-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0" }
 runtime-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0-alpha01" }
 runtime-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 runtime-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
@@ -96,7 +96,7 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.10.1" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.11.0" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
