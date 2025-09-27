@@ -28,4 +28,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "ylcs-kmp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-include("ylcs-app", "ylcs-server", "ylcs-shared", "ylcs-music", "ylcs-modManager")
+include(
+    "ylcs-core",
+    "ylcs-core-compose",
+    "ylcs-app", "ylcs-server", "ylcs-shared", "ylcs-music", "ylcs-modManager"
+)

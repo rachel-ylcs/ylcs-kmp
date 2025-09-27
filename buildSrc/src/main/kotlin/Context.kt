@@ -18,6 +18,12 @@ fun HasKotlinDependencies.useLib(vararg libs: Any) {
     }
 }
 
+fun HasKotlinDependencies.useApi(vararg libs: Any) {
+    dependencies {
+        for (lib in libs) api(lib)
+    }
+}
+
 fun KotlinSourceSet.useSourceSet(vararg parents: KotlinSourceSet) {
     for (parent in parents) dependsOn(parent)
 }

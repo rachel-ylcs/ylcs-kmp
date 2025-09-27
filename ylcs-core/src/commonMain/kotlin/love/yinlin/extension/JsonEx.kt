@@ -30,10 +30,13 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.iterator
 
 val Json = kotlinx.serialization.json.Json {
-	prettyPrint = false
-	ignoreUnknownKeys = true
+    prettyPrint = false
+    ignoreUnknownKeys = true
 }
 
 // Json fetch
@@ -85,43 +88,43 @@ fun <T> String?.parseJsonValue(deserializer: DeserializationStrategy<T>): T? = i
 // JsonConverter
 
 object JsonConverter {
-	val ByteArray = object : KSerializer<ByteArray> {
-		override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ByteArray", PrimitiveKind.STRING)
-		override fun serialize(encoder: Encoder, value: ByteArray) = encoder.encodeString(value.toHexString(HexFormat.UpperCase))
-		override fun deserialize(decoder: Decoder) = decoder.decodeString().hexToByteArray(HexFormat.UpperCase)
-	}
+    val ByteArray = object : KSerializer<ByteArray> {
+        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ByteArray", PrimitiveKind.STRING)
+        override fun serialize(encoder: Encoder, value: ByteArray) = encoder.encodeString(value.toHexString(HexFormat.UpperCase))
+        override fun deserialize(decoder: Decoder) = decoder.decodeString().hexToByteArray(HexFormat.UpperCase)
+    }
 }
 
 // Json DSL
 
 data class JsonArrayScope(val builder: JsonArrayBuilder) {
-	fun add(value: Nothing?) = builder.add(JsonNull)
-	fun add(value: Boolean) = builder.add(value.json)
-	fun add(value: Number) = builder.add(value.json)
-	fun add(value: String) = builder.add(value.json)
-	fun add(value: JsonElement) = builder.add(value)
+    fun add(value: Nothing?) = builder.add(JsonNull)
+    fun add(value: Boolean) = builder.add(value.json)
+    fun add(value: Number) = builder.add(value.json)
+    fun add(value: String) = builder.add(value.json)
+    fun add(value: JsonElement) = builder.add(value)
 
-	inline fun arr(init: JsonArrayScope.() -> Unit) = builder.add(makeArray(init))
-	inline fun obj(init: JsonObjectScope.() -> Unit) = builder.add(makeObject(init))
+    inline fun arr(init: JsonArrayScope.() -> Unit) = builder.add(makeArray(init))
+    inline fun obj(init: JsonObjectScope.() -> Unit) = builder.add(makeObject(init))
 
-	fun merge(arr: JsonArray) {
-		for (value in arr) builder.add(value)
-	}
+    fun merge(arr: JsonArray) {
+        for (value in arr) builder.add(value)
+    }
 }
 
 data class JsonObjectScope(val builder: JsonObjectBuilder) {
-	infix fun String.with(value: Nothing?) = builder.put(this, JsonNull)
-	infix fun String.with(value: Boolean) = builder.put(this, value.json)
-	infix fun String.with(value: Number) = builder.put(this, value.json)
-	infix fun String.with(value: String) = builder.put(this, value.json)
-	infix fun String.with(value: JsonElement) = builder.put(this, value)
+    infix fun String.with(value: Nothing?) = builder.put(this, JsonNull)
+    infix fun String.with(value: Boolean) = builder.put(this, value.json)
+    infix fun String.with(value: Number) = builder.put(this, value.json)
+    infix fun String.with(value: String) = builder.put(this, value.json)
+    infix fun String.with(value: JsonElement) = builder.put(this, value)
 
-	inline fun arr(key: String, init: JsonArrayScope.() -> Unit) = builder.put(key, makeArray(init))
-	inline fun obj(key: String, init: JsonObjectScope.() -> Unit) = builder.put(key, makeObject(init))
+    inline fun arr(key: String, init: JsonArrayScope.() -> Unit) = builder.put(key, makeArray(init))
+    inline fun obj(key: String, init: JsonObjectScope.() -> Unit) = builder.put(key, makeObject(init))
 
-	fun merge(obj: JsonObject) {
-		for ((key, value) in obj) builder.put(key, value)
-	}
+    fun merge(obj: JsonObject) {
+        for ((key, value) in obj) builder.put(key, value)
+    }
 }
 
 inline fun makeArray(init: JsonArrayScope.() -> Unit) = buildJsonArray { JsonArrayScope(this).init() }

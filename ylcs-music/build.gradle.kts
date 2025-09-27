@@ -34,6 +34,7 @@ kotlin {
     sourceSets {
         commonMain.configure {
             useLib(
+                projects.ylcsCore,
                 // project
                 projects.ylcsShared,
                 // compose

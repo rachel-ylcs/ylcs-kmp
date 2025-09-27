@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -33,14 +32,9 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir(C.root.shared.srcGenerated)
-            useLib(
-                // project
-                projects.ylcsCore,
+            useApi(
                 // compose
                 libs.compose.runtime,
-                libs.kotlinx.io,
-                libs.kotlinx.json
             )
         }
 
@@ -86,7 +80,7 @@ kotlin {
 }
 
 android {
-    namespace = "${C.app.packageName}.shared"
+    namespace = "${C.app.packageName}.core.compose"
     compileSdk = C.android.compileSdk
 
     defaultConfig {
@@ -97,52 +91,5 @@ android {
     compileOptions {
         sourceCompatibility = C.jvm.compatibility
         targetCompatibility = C.jvm.compatibility
-    }
-}
-
-afterEvaluate {
-    val generateConstants by tasks.registering {
-        val content = """
-            package love.yinlin
-            
-            import love.yinlin.platform.Platform
-            import love.yinlin.platform.platform
-            
-            // 由构建脚本自动生成，请勿手动修改
-            object Local {
-                const val DEVELOPMENT: Boolean = ${C.environment == BuildEnvironment.Dev}
-                
-                const val APP_NAME: String = "${C.app.name}"
-                const val NAME: String = "${C.app.displayName}"
-                const val VERSION: Int = ${C.app.version}
-                const val VERSION_NAME: String = "${C.app.versionName}"
-                
-                const val MAIN_HOST: String = "${C.host.mainHost}"
-                const val API_HOST: String = "${C.host.apiHost}"
-                @Suppress("HttpUrlsUsage")
-                val API_BASE_URL: String = run {
-                    if (platform == Platform.WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
-                }
-            }
-        """.trimIndent()
-        val constantsFile = C.root.shared.generatedLocalFile.let {
-            outputs.file(it)
-            it.asFile
-        }
-        outputs.upToDateWhen {
-            constantsFile.takeIf { it.exists() }?.readText() == content
-        }
-        doLast {
-            constantsFile.parentFile.mkdirs()
-            constantsFile.writeText(content, Charsets.UTF_8)
-        }
-    }
-
-    rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {
-        dependsOn(generateConstants)
-    }
-
-    tasks.matching { it.name.startsWith("compile") }.configureEach {
-        dependsOn(generateConstants)
     }
 }

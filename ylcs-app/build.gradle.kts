@@ -102,6 +102,8 @@ kotlin {
         val commonMain by getting {
             useLib(
                 // project
+                projects.ylcsCore,
+                projects.ylcsCoreCompose,
                 projects.ylcsShared,
                 projects.ylcsMusic,
                 // compose
