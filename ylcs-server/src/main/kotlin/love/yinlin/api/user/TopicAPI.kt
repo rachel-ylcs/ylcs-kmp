@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
@@ -16,9 +15,10 @@ import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
-import love.yinlin.throwExecuteSQL
-import love.yinlin.throwInsertSQLGeneratedKey
-import love.yinlin.values
+import love.yinlin.server.DB
+import love.yinlin.server.throwExecuteSQL
+import love.yinlin.server.throwInsertSQLGeneratedKey
+import love.yinlin.server.values
 
 fun Routing.topicAPI(implMap: ImplMap) {
 	api(API.User.Topic.GetTopics) { (uid, isTop, tid, num) ->

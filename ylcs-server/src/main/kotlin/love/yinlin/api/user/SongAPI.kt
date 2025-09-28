@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
@@ -11,7 +10,8 @@ import love.yinlin.api.successData
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.to
-import love.yinlin.values
+import love.yinlin.server.DB
+import love.yinlin.server.values
 
 fun Routing.songAPI(implMap: ImplMap){
     api(API.User.Song.GetSongs) { (sid, num) ->

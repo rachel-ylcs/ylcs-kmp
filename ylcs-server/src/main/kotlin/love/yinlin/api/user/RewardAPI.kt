@@ -1,10 +1,10 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.ImplMap
 import love.yinlin.api.successObject
 import love.yinlin.data.rachel.mail.Mail
+import love.yinlin.server.DB
 
 fun Routing.rewardAPI(implMap: ImplMap) {
     implMap[Mail.Filter.COIN_REWARD] = {

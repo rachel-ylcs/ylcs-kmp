@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.*
-import love.yinlin.DB
 import love.yinlin.api.*
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.user.game.manager
@@ -15,12 +14,13 @@ import love.yinlin.extension.Array
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
-import love.yinlin.querySQLSingle
-import love.yinlin.throwExecuteSQL
-import love.yinlin.throwInsertSQLGeneratedKey
-import love.yinlin.throwQuerySQLSingle
-import love.yinlin.updateSQL
-import love.yinlin.values
+import love.yinlin.server.DB
+import love.yinlin.server.querySQLSingle
+import love.yinlin.server.throwExecuteSQL
+import love.yinlin.server.throwInsertSQLGeneratedKey
+import love.yinlin.server.throwQuerySQLSingle
+import love.yinlin.server.updateSQL
+import love.yinlin.server.values
 
 fun Routing.gameAPI(implMap: ImplMap) {
     api(API.User.Game.CreateGame) { (token, title, type, reward, num, cost, info, question, answer) ->
@@ -60,7 +60,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
                 """, uid) == null) return@throwTransaction "无权限".failureData
             }
             val reward = result["reward"].Int
-            val useReward = (reward / result["num"].Int) * result["winner"].Array.size
+            val useReward = reward / result["num"].Int * result["winner"].Array.size
             val remainReward = reward - useReward
             it.throwExecuteSQL("UPDATE game SET isDeleted = 1 WHERE gid = ?", gid)
             if (remainReward in 1 .. reward) {

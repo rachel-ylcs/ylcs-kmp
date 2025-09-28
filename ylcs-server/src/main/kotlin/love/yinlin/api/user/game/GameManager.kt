@@ -1,12 +1,12 @@
 package love.yinlin.api.user.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.DB
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.*
 import love.yinlin.extension.toJsonString
-import love.yinlin.throwExecuteSQL
-import love.yinlin.updateSQL
+import love.yinlin.server.DB
+import love.yinlin.server.throwExecuteSQL
+import love.yinlin.server.updateSQL
 import java.sql.Connection
 
 internal val Game.manager: GameManager get() = when (this) {

@@ -1,15 +1,12 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.ServerRes
 import love.yinlin.api.api
 import love.yinlin.api.failureData
 import love.yinlin.api.successData
-import love.yinlin.copy
-import love.yinlin.currentTS
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -18,6 +15,9 @@ import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.DB
+import love.yinlin.server.copy
+import love.yinlin.server.currentTS
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -28,7 +28,7 @@ private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> 
 	val byteIndex = dayIndex / 8
 	val bitIndex = dayIndex % 8
 	val byteValue = this[byteIndex].toInt()
-	val isSignin = ((byteValue shr bitIndex) and 1) == 1
+	val isSignin = byteValue shr bitIndex and 1 == 1
 	return block(isSignin, byteValue, byteIndex, bitIndex)
 }
 

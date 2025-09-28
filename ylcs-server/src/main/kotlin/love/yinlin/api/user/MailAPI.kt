@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.APICode
 import love.yinlin.api.APIConfig.coercePageNum
@@ -15,6 +14,7 @@ import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.to
+import love.yinlin.server.DB
 
 fun Routing.mailAPI(implMap: ImplMap) {
 	api(API.User.Mail.GetMails) { (token, isProcessed, mid, num) ->

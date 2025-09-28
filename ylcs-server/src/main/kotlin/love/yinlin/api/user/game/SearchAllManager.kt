@@ -1,7 +1,6 @@
 package love.yinlin.api.user.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.SQLConverter
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -11,6 +10,7 @@ import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.SQLConverter
 
 // 词寻
 data object SearchAllManager : SpeedGameManager() {
@@ -55,7 +55,7 @@ data object SearchAllManager : SpeedGameManager() {
         val endTime = System.currentTimeMillis()
         val duration = ((endTime - startTime) / 1000).toInt()
         val saResult = verifyAnswer(details.answer, userAnswer, duration)
-        val isCompleted = (saResult.correctCount.toFloat() / saResult.totalCount) >= info.threshold && duration <= info.timeLimit
+        val isCompleted = saResult.correctCount.toFloat() / saResult.totalCount >= info.threshold && duration <= info.timeLimit
         return GameResult(
             isCompleted = isCompleted,
             reward = if (isCompleted) details.reward / details.num else 0,

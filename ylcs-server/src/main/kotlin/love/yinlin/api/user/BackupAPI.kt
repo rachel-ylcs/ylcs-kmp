@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
@@ -12,6 +11,7 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
 import love.yinlin.extension.toJsonString
+import love.yinlin.server.DB
 
 fun Routing.backupAPI(implMap: ImplMap) {
 	api(API.User.Backup.UploadPlaylist) { (token, playlist) ->

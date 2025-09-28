@@ -1,7 +1,6 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
@@ -13,9 +12,10 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.Long
 import love.yinlin.extension.Object
 import love.yinlin.extension.to
-import love.yinlin.throwExecuteSQL
-import love.yinlin.throwInsertSQLGeneratedKey
-import love.yinlin.values
+import love.yinlin.server.DB
+import love.yinlin.server.throwExecuteSQL
+import love.yinlin.server.throwInsertSQLGeneratedKey
+import love.yinlin.server.values
 
 fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
     val follow = querySQL("""

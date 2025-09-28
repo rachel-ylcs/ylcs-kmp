@@ -1,13 +1,13 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.DB
 import love.yinlin.api.API
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 import love.yinlin.api.failureData
 import love.yinlin.api.successData
-import love.yinlin.values
+import love.yinlin.server.DB
+import love.yinlin.server.values
 
 fun Routing.infoAPI(implMap: ImplMap) {
 	api(API.User.Info.SendFeedback) { (token, content) ->

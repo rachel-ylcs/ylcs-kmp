@@ -12,23 +12,8 @@ kotlin {
     sourceSets {
         main.configure {
             useLib(
-                // project
                 projects.ylcsCs,
-                // kotlinx
-                libs.kotlinx.json,
-                // ktor
-                libs.ktor.json,
-                libs.ktor.server,
-                libs.ktor.server.host,
-                libs.ktor.server.config,
-                libs.ktor.server.netty,
-                libs.ktor.server.negotiation,
-                libs.ktor.server.websockets,
-                // middleware
-                libs.logback,
-                libs.mysql,
-                libs.mysql.pool,
-                libs.redis,
+                projects.ylcsServerEngine,
             )
         }
     }
