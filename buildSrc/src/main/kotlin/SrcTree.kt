@@ -64,17 +64,13 @@ class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs
     val webOutput = root.outputs.dir("web")
 }
 
-class ModManagerNode(root: RootProjectNode) : Directory by root.dir("ylcs-modManager")
-
-class MusicNode(root: RootProjectNode) : Directory by root.dir("ylcs-music")
-
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-server") {
     val workspace = dir("build").dir("serverRun")
     val outputs = root.outputs
     val outputFile = outputs.file(c.server.outputName)
 }
 
-class SharedNode(root: RootProjectNode) : Directory by root.dir("ylcs-shared") {
+class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-cs") {
     private val build = dir("build")
     val srcGenerated = build.dir("generated").dir("kotlin")
     val generatedLocalFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
@@ -90,11 +86,9 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val native = NativeNode(this)
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
+    val cs = CSNode(this)
     val app = AppNode(this, c)
-    val modManager = ModManagerNode(this)
-    val music = MusicNode(this)
     val server = ServerNode(this, c)
-    val shared = SharedNode(this)
     val libsVersion = file("libs.version.toml")
     val license = file("LICENSE")
     val localProperties = file("local.properties")

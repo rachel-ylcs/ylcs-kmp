@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -34,11 +36,21 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                libs.kotlinx.atomicfu,
-                libs.kotlinx.coroutines,
-                libs.kotlinx.datetime,
-                libs.kotlinx.io,
-                libs.kotlinx.json,
+                projects.ylcsCore,
+                libs.compose.runtime,
+                libs.compose.foundation,
+                libs.compose.material3,
+                libs.compose.material3.icons,
+                libs.compose.material3.iconsExtended,
+                libs.compose.ui,
+                libs.compose.ui.backhandler,
+                libs.compose.components.resources,
+                libs.compose.components.uiToolingPreview,
+                libs.compose.graphics,
+                libs.compose.navigation,
+                libs.compose.savedstate,
+                libs.compose.viewmodel,
+                libs.compose.lifecycle,
             )
         }
 
@@ -46,19 +58,8 @@ kotlin {
             useSourceSet(commonMain)
         }
 
-        val nonWasmJsMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        androidMain.configure {
-            useSourceSet(nonWasmJsMain)
-            useApi(
-                libs.kotlinx.coroutines.android
-            )
-        }
-
         val iosMain = iosMain.get().apply {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
+            useSourceSet(nonAndroidMain)
         }
 
         buildList {
@@ -77,10 +78,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
-            useApi(
-                libs.kotlinx.coroutines.swing
-            )
+            useSourceSet(nonAndroidMain)
         }
 
         wasmJsMain.configure {
@@ -90,7 +88,7 @@ kotlin {
 }
 
 android {
-    namespace = "${C.app.packageName}.core"
+    namespace = "${C.app.packageName}.compose.core"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

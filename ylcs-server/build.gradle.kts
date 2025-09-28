@@ -13,7 +13,7 @@ kotlin {
         main.configure {
             useLib(
                 // project
-                projects.ylcsShared,
+                projects.ylcsCs,
                 // kotlinx
                 libs.kotlinx.json,
                 // ktor

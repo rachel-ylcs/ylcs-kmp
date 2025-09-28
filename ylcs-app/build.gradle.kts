@@ -102,38 +102,32 @@ kotlin {
         val commonMain by getting {
             useLib(
                 // project
-                projects.ylcsCore,
-                projects.ylcsCoreCompose,
-                projects.ylcsShared,
-                projects.ylcsMusic,
+                projects.ylcsComposeCore,
+                projects.ylcsCs,
+                projects.ylcsMod,
                 // compose
-                libs.compose.runtime, libs.compose.foundation,
-                libs.compose.material3, libs.compose.material3.icons,
-                libs.compose.material3.iconsExtended,
-                libs.compose.ui, libs.compose.ui.backhandler,
                 libs.compose.components.resources,
-                libs.compose.components.uiToolingPreview,
-                // kotlinx
-                libs.kotlinx.coroutines, libs.kotlinx.datetime,
-                libs.kotlinx.io, libs.kotlinx.json,
-                libs.kotlinx.atomicfu,
-                // runtime
-                libs.runtime.shapes, libs.runtime.navigation,
-                libs.runtime.savedstate, libs.runtime.viewmodel,
-                libs.runtime.lifecycle,
                 // ktor
-                libs.ktor.client, libs.ktor.client.negotiation,
-                libs.ktor.client.websockets, libs.ktor.json,
+                libs.ktor.client,
+                libs.ktor.client.negotiation,
+                libs.ktor.client.websockets,
+                libs.ktor.json,
                 // sketch
-                libs.sketch, libs.sketch.http,
+                libs.sketch,
+                libs.sketch.http,
                 libs.sketch.resources,
-                libs.sketch.gif, libs.sketch.webp,
-                libs.sketch.extensions.compose, libs.sketch.zoom,
+                libs.sketch.gif,
+                libs.sketch.webp,
+                libs.sketch.extensions.compose,
+                libs.sketch.zoom,
                 // lottie
-                libs.lottie, libs.lottie.network,
+                libs.lottie,
+                libs.lottie.network,
                 // tool
-                libs.tool.html, libs.tool.blur,
-                libs.tool.reorder, libs.tool.qrcode
+                libs.tool.html,
+                libs.tool.blur,
+                libs.tool.reorder,
+                libs.tool.qrcode
             )
         }
 
