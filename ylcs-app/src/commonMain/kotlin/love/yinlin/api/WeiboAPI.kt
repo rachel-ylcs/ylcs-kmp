@@ -4,6 +4,8 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
@@ -16,6 +18,7 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
+import love.yinlin.platform.safePost
 import love.yinlin.ui.component.text.RichContainer
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.buildRichString
@@ -29,6 +32,8 @@ object WeiboAPI {
 		ifTrue = { WEIBO_PROXY_HOST },
 		ifFalse = { WEIBO_SOURCE_HOST }
 	)
+
+	var subCookie: String? = null
 
 	private fun transferWeiboImageUrl(src: String): String = OS.ifPlatform(
         Platform.WebWasm,
@@ -219,10 +224,27 @@ object WeiboAPI {
 		)
 	}
 
+	suspend fun generateWeiboSubCookie(): String? {
+		val result = app.client.safePost(
+			url = "https://visitor.passport.weibo.cn/visitor/genvisitor2",
+			data = "cb=visitor_gray_callback",
+			headers = {
+				append(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
+			}
+		) { str: String ->
+			val json = str.substringAfter("(").substringBeforeLast(")").parseJson.Object
+			json.obj("data")["sub"].String
+		}
+		return (result as? Data.Success<String>)?.data
+	}
+
 	suspend fun getUserWeibo(
 		uid: String
 	): Data<List<Weibo>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.userDetails(uid)}"
+		url = "https://$WEIBO_HOST/${Container.userDetails(uid)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<Weibo>()
@@ -237,7 +259,10 @@ object WeiboAPI {
 	suspend fun getWeiboDetails(
 		id: String
 	): Data<List<WeiboComment>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.weiboDetails(id)}"
+		url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("data")
 		val items = mutableListOf<WeiboComment>()
@@ -248,7 +273,10 @@ object WeiboAPI {
 	suspend fun getWeiboUser(
 		uid: String
 	): Data<WeiboUser> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.userInfo(uid)}"
+		url = "https://$WEIBO_HOST/${Container.userInfo(uid)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].String
@@ -270,7 +298,10 @@ object WeiboAPI {
 	suspend fun getWeiboUserAlbum(
 		uid: String
 	): Data<List<WeiboAlbum>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.userAlbum(uid)}"
+		url = "https://$WEIBO_HOST/${Container.userAlbum(uid)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboAlbum>()
@@ -300,7 +331,10 @@ object WeiboAPI {
 		page: Int,
 		limit: Int
 	): Data<Pair<List<Picture>, Int>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}"
+		url = "https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val data = json.obj("data")
 		val cards = data.arr("cards")
@@ -321,7 +355,10 @@ object WeiboAPI {
 	suspend fun searchWeiboUser(
 		key: String
 	): Data<List<WeiboUserInfo>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.searchUser(key)}"
+		url = "https://$WEIBO_HOST/${Container.searchUser(key)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboUserInfo>()
@@ -347,7 +384,10 @@ object WeiboAPI {
 	suspend fun extractChaohua(
 		sinceId: Long
 	): Data<Pair<List<Weibo>, Long>> = app.client.safeGet(
-		"https://$WEIBO_HOST/${Container.chaohua(sinceId)}"
+		url = "https://$WEIBO_HOST/${Container.chaohua(sinceId)}",
+		headers = {
+			append(HttpHeaders.Cookie, "SUB=$subCookie")
+		}
 	) { json: JsonObject ->
 		val data = json.obj("data")
 		val newSinceId = data.obj("pageInfo")["since_id"].Long

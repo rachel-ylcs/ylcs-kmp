@@ -36,6 +36,10 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
             if (users.isEmpty()) state = BoxState.EMPTY
             else {
                 state = BoxState.LOADING
+
+                // 微博需要获取subCookie
+                if (WeiboAPI.subCookie == null) WeiboAPI.subCookie = WeiboAPI.generateWeiboSubCookie()
+
                 items.clear()
                 for (id in users) {
                     val result = WeiboAPI.getUserWeibo(id)
@@ -46,7 +50,10 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
                         gridState.scrollToItem(0)
                     }
                 }
-                if (state == BoxState.LOADING) state = BoxState.NETWORK_ERROR
+                if (state == BoxState.LOADING) {
+                    WeiboAPI.subCookie = null
+                    state = BoxState.NETWORK_ERROR
+                }
             }
         }
     }
