@@ -66,11 +66,11 @@ internal data class UpdateInfo(
 
 object About {
     internal val updateInfo = UpdateInfo(
-        platform = "Android/Windows/Linux/Web 先行发布\niOS/MacOS 晚上发布",
-        title = "银临茶舍将于此稳定版本起停止更新一段时间, 直到新概念音游开发完成后更新",
+        platform = "Android/Windows修复更新",
+        title = "本更新仅修复图集与微博部分, 大版本更新将与2025新巡演同步",
         force = false,
         maintenance = false,
-        date = LocalDate(2025, 6, 22),
+        date = LocalDate(2025, 10, 1),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
@@ -78,17 +78,9 @@ object About {
                 color = Colors.Steel4,
                 background = Colors.Steel2,
                 records = listOf(
-                    "1. 资讯接入银临抖音板块与视频下载",
-                    """
-2. 经验系统上线
-  [经验] 本次更新后与当前银币数同步
-  [等级] 仅与经验相关, 银币独立
-  [银币获取] 途径保持不变
-  [经验获取] 签到+1, 投币+N, 主题被三连+1, 游戏结算+N/2, 参与游戏+1, 福利/奖励等
-                    """.trimIndent(),
-                    "3. 所有点击图标均添加悬浮气泡文字提示, 可在设置中关闭",
-                    "4. 小游戏新增[你画我猜]",
-                    "5. 桌面端支持窗口置顶, 系统托盘图标",
+                    "预热1: 音游即将上线, 银临全曲集陆续支持...",
+                    "预热2: 在线曲库上线, 所有歌曲MOD采用在线下载, 按需更新资源包...",
+                    "预热3: 抽奖活动上线, 节日活动或福利抽奖均在APP中进行..."
                 )
             ),
             UpdateRecordGroup(
@@ -96,18 +88,7 @@ object About {
                 icon = Icons.Outlined.Speed,
                 color = Colors.Pink4,
                 background = Colors.Pink2,
-                records = listOf(
-                    "1. 所有图片加载将显示进度圈和状态遮罩",
-                    "2. 更新字体以支持更多字符",
-                    "3. 重构滑块条UI",
-                    "4. 点击歌曲封面跳转到详情页",
-                    """
-5. 小游戏优化
-  [答题] 选择题或填空题完成后自动跳转下一题, 正确率最小限制调整为0.6
-  [寻花令] 输入框自动获取焦点
-  [歌词对战] 断线后可重新回到大厅, 如有未做的题提交前提示, 显示答案的字数要求
-                    """.trimIndent(),
-                )
+                records = listOf()
             ),
             UpdateRecordGroup(
                 type = "修复",
@@ -115,10 +96,8 @@ object About {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复网页端无法进入在线歌词对战",
-                    "2. 修复美图页过长标题被遮挡",
-                    "3. 修复微博超话页下载视频或图片不显示进度框",
-                    "4. 修复单曲循环时播放完毕歌词不滚动到初始状态"
+                    "1. 修复图集下载异常的问题",
+                    "2. 修复微博和超话加载异常的问题"
                 )
             )
         )
@@ -149,10 +128,8 @@ object About {
             Contributor("圈圈临", 2)
         )),
         ContributorGroup("数据", Icons.Outlined.Token, Colors.Purple4, listOf(
-            Contributor("鲤鱼焙梨", 13),
             Contributor("海屿悼词", 9),
-            Contributor("冰临", 17),
-            Contributor("银小临", 16)
+            Contributor("桑檀", 1768),
         )),
         ContributorGroup("开发", Icons.Outlined.Code, Colors.Green4, listOf(
             Contributor("焦骨", 10),
