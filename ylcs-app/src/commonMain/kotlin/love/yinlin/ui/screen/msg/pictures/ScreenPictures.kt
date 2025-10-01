@@ -86,9 +86,10 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -109,7 +110,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                     )
                 }
                 SplitLayout(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth(),
                     left = {
                         Text(
                             text = "${album.ts ?: ""}  ${album.location ?: ""}",
@@ -191,7 +192,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
             ) {
                 PhotoAlbumLayout(
                     album = it,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue)
                 )
             }
         }
