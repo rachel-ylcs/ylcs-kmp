@@ -9,7 +9,7 @@ import love.yinlin.extension.to
 import love.yinlin.server.DB
 
 fun Routing.photoAPI(implMap: ImplMap) {
-    api(API.Common.Photo.SearchPhotoAlbums) { (keyword, aid, ts, num) ->
+    api(API.Common.Photo.SearchPhotoAlbums) { (keyword, ts, aid, num) ->
         val photos = if (keyword == null) DB.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo

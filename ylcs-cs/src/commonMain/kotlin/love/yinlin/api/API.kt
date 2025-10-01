@@ -26,7 +26,7 @@ object API : APINode(null, "") {
 		object Photo : APINode(this, "photo") {
 			object SearchPhotoAlbums : APIPost<SearchPhotoAlbums.Request, PhotoAlbumList>(this, "searchPhotoAlbums") {
 				@Serializable
-				data class Request(val keyword: String? = null, val aid: Int = Int.MAX_VALUE, val ts: String = "2099-12-31", val num: Int = APIConfig.MIN_PAGE_NUM)
+				data class Request(val keyword: String? = null, val ts: String = "2099-12-31", val aid: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
 			}
 		}
 	}

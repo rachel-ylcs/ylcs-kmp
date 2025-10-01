@@ -39,10 +39,10 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private var keyword: String? = null
-    private val page = object : PaginationArgs<PhotoAlbum, Int, Int, String>(Int.MAX_VALUE, "2099-12-31") {
+    private val page = object : PaginationArgs<PhotoAlbum, Int, String, Int>("2099-12-31", Int.MAX_VALUE) {
         override fun distinctValue(item: PhotoAlbum): Int = item.aid
-        override fun offset(item: PhotoAlbum): Int = item.aid
-        override fun arg1(item: PhotoAlbum): String = item.ts ?: "1970-01-01"
+        override fun offset(item: PhotoAlbum): String = item.ts
+        override fun arg1(item: PhotoAlbum): Int = item.aid
     }
 
     private val listState = LazyListState()
@@ -68,8 +68,8 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
             route = API.Common.Photo.SearchPhotoAlbums,
             data = API.Common.Photo.SearchPhotoAlbums.Request(
                 keyword = keyword,
-                aid = page.offset,
-                ts = page.arg1,
+                ts = page.offset,
+                aid = page.arg1,
                 num = page.pageNum,
             )
         )
@@ -113,7 +113,7 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth(),
                     left = {
                         Text(
-                            text = "${album.ts ?: ""}  ${album.location ?: ""}",
+                            text = "${album.ts}  ${album.location ?: ""}",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

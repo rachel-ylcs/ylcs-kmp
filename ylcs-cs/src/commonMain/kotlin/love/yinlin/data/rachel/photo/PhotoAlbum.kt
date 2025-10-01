@@ -11,7 +11,7 @@ data class PhotoAlbum(
     val aid: Int, // ID
     val name: String, // 名称
     val title: String, // 标题
-    val ts: String?, // 时间
+    val ts: String, // 时间
     val location: String?, // 地点
     val author: String?, // 作者
     val keyword: List<String>, // 关键字
