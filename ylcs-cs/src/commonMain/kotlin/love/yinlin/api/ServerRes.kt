@@ -23,6 +23,13 @@ object ServerRes : ResNode("public") {
         fun res(id: Int, key: String) = ResNode(this, "game$id$key.webp")
     }
 
+    object Photo : ResNode(this, "photo") {
+        fun pic(classification: String, index: Int, thumb: Boolean) = ResNode(
+            parent = ResNode(this, classification),
+            name = "$index${if (thumb) ".thumb" else ""}.webp"
+        )
+    }
+
     object Song : ResNode(this, "song") {
         fun song(sid: Int) = ResNode(this, "${sid}.webp")
     }
@@ -41,5 +48,4 @@ object ServerRes : ResNode("public") {
 
     val Server = ResNode(this, "server.json")
     val Update = ResNode(this, "update.json")
-    val Photo = ResNode(this, "photo.json")
 }

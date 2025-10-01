@@ -12,6 +12,7 @@ import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.data.rachel.photo.PhotoAlbumList
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
@@ -21,6 +22,15 @@ import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
 
 object API : APINode(null, "") {
+	object Common : APINode(this, "common") {
+		object Photo : APINode(this, "photo") {
+			object SearchPhotoAlbums : APIPost<SearchPhotoAlbums.Request, PhotoAlbumList>(this, "searchPhotoAlbums") {
+				@Serializable
+				data class Request(val keyword: String? = null, val aid: Int = Int.MAX_VALUE, val ts: String = "2099-12-31", val num: Int = APIConfig.MIN_PAGE_NUM)
+			}
+		}
+	}
+
 	object User : APINode(this, "user") {
 		object Account : APINode(this, "account") {
 			object GetInviters : APIPostResponse<List<String>>(this, "getInviters")

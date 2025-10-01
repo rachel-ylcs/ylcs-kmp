@@ -1,10 +1,7 @@
 package love.yinlin.ui.screen.msg.pictures
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.EmojiObjects
@@ -12,188 +9,140 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.util.fastAll
-import androidx.compose.ui.util.fastMap
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
 import love.yinlin.AppModel
+import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
-import love.yinlin.extension.String
-import love.yinlin.extension.catchingNull
-import love.yinlin.extension.mutableRefStateOf
-import love.yinlin.platform.Coroutines
-import love.yinlin.resources.Res
-import love.yinlin.resources.img_photo_album
-import love.yinlin.ui.component.container.Breadcrumb
-import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.node.condition
+import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable
-private sealed class PhotoItem(val name: String) {
-    override fun toString(): String = name
-
-    @Stable
-    class File(name: String) : PhotoItem(name) {
-        val thumb: String = "https://img.picgo.net/$name.md.webp"
-        val source: String = "https://img.picgo.net/$name.webp"
-    }
-
-    @Stable
-    class Folder (name: String, val items: List<PhotoItem>) : PhotoItem(name)
-
-    companion object {
-        val Home: Folder = Folder("相册", emptyList())
-
-        fun parseJson(name: String, json: JsonObject): Folder {
-            val items = mutableListOf<PhotoItem>()
-            val folder = Folder(name, items)
-            for ((key, value) in json) {
-                items += when (value) {
-                    is JsonObject -> parseJson(key, value)
-                    is JsonArray -> Folder(key, value.fastMap { File(it.String) })
-                    else -> error("")
-                }
-            }
-            return folder
-        }
-    }
-}
-
-@Stable
 class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
-    private var photos by mutableRefStateOf(PhotoItem.Home)
-    private var stack = mutableStateListOf(photos)
     private var state by mutableStateOf(BoxState.EMPTY)
-    private val listState = LazyListState()
-    private val current by derivedStateOf { stack.last() }
 
-    private suspend fun loadPhotos() {
+    private var keyword: String? = null
+    private val page = object : PaginationArgs<PhotoAlbum, Int, Int, String>(Int.MAX_VALUE, "2099-12-31") {
+        override fun distinctValue(item: PhotoAlbum): Int = item.aid
+        override fun offset(item: PhotoAlbum): Int = item.aid
+        override fun arg1(item: PhotoAlbum): String = item.ts ?: "1970-01-01"
+    }
+
+    private val listState = LazyListState()
+
+    private suspend fun requestNewPhotos() {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
-            val result = ClientAPI.request<JsonObject>(route = ServerRes.Photo)
-            val data = Coroutines.cpu { catchingNull { PhotoItem.parseJson("相册", (result as Data.Success).data) } }
-            if (data != null) {
-                photos = data
-                stack.clear()
-                stack += photos
-                state = BoxState.CONTENT
-            }
-            else state = BoxState.NETWORK_ERROR
+            val result = ClientAPI.request(
+                route = API.Common.Photo.SearchPhotoAlbums,
+                data = API.Common.Photo.SearchPhotoAlbums.Request(
+                    keyword = keyword,
+                    num = page.pageNum
+                )
+            )
+            state = if (result is Data.Success) {
+                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+            } else BoxState.NETWORK_ERROR
         }
     }
 
-    private fun searchFolderItem(virtualStack: MutableList<PhotoItem.Folder>, index: Int, folder: PhotoItem.Folder, key: String): Int? {
-        if (folder.name.contains(key, true)) return index
-        else {
-            for ((i, item) in folder.items.withIndex()) {
-                if (item is PhotoItem.Folder) {
-                    virtualStack.add(item)
-                    val fetchIndex = searchFolderItem(virtualStack, i, item, key)
-                    if (fetchIndex != null) return fetchIndex
-                    virtualStack.removeLast()
-                }
-                else return null
-            }
-            return null
-        }
-    }
-
-    private suspend fun searchFolder(key: String) {
-        val virtualStack = mutableListOf(photos)
-        val result = Coroutines.cpu { searchFolderItem(virtualStack, 0, photos, key) }
-        if (result != null) {
-            stack.clear()
-            val isAlbum = virtualStack.last().items.all { it is PhotoItem.File }
-            if (isAlbum) virtualStack.removeLast()
-            for (step in virtualStack) stack += step
-            if (isAlbum) listState.animateScrollToItem(result)
-        }
-        else slot.tip.warning("未找到相关图集")
+    private suspend fun requestMorePhotos() {
+        val result = ClientAPI.request(
+            route = API.Common.Photo.SearchPhotoAlbums,
+            data = API.Common.Photo.SearchPhotoAlbums.Request(
+                keyword = keyword,
+                aid = page.offset,
+                ts = page.arg1,
+                num = page.pageNum,
+            )
+        )
+        if (result is Data.Success) page.moreData(result.data)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun PhotoList(
-        folder: PhotoItem.Folder,
-        modifier: Modifier = Modifier,
-        onAlbumClick: (PhotoItem.Folder, Int) -> Unit,
-        onEnterFolder: (PhotoItem.Folder) -> Unit,
+    private fun PhotoAlbumLayout(
+        album: PhotoAlbum,
+        modifier: Modifier = Modifier
     ) {
-        LazyColumn(
-            state = listState,
-            contentPadding = ThemeValue.Padding.EqualValue,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-            modifier = modifier
-        ) {
-            items(
-                items = folder.items,
-                key = { it.name }
-            ) { item ->
-                if (item is PhotoItem.Folder) {
-                    val isAlbum = remember(item) { item.items.isNotEmpty() && item.items.fastAll { it is PhotoItem.File } }
-                    if (isAlbum) {
-                        HorizontalMultiBrowseCarousel(
-                            state = rememberCarouselState { item.items.size },
-                            preferredItemWidth = ThemeValue.Size.CellWidth,
-                            itemSpacing = ThemeValue.Padding.HorizontalSpace,
-                            modifier = Modifier.fillMaxWidth().clipToBounds()
-                        ) { index ->
-                            WebImage(
-                                uri = (item.items[index] as PhotoItem.File).thumb,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.width(ThemeValue.Size.CellWidth)
-                                    .aspectRatio(0.66667f)
-                                    .maskClip(MaterialTheme.shapes.large),
-                                onClick = { onAlbumClick(item, index) }
-                            )
-                        }
-                    }
-                    else {
-                        MiniImage(
-                            res = Res.drawable.img_photo_album,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier.width(ThemeValue.Size.CellWidth)
-                                .aspectRatio(0.66667f)
-                                .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.large)
-                                .clip(MaterialTheme.shapes.large)
-                                .clickable { onEnterFolder(item) },
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+        if (album.picNum in 1 .. PhotoAlbum.MAX_NUM) {
+            Column(
+                modifier = modifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = item.name,
+                        text = album.title,
                         style = MaterialTheme.typography.titleMedium,
-                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.condition(isAlbum, ifTrue = { fillMaxWidth() }, ifFalse = { width(ThemeValue.Size.CellWidth) })
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = album.picNum.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                SplitLayout(
+                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    left = {
+                        Text(
+                            text = "${album.ts ?: ""}  ${album.location ?: ""}",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    right = {
+                        Text(
+                            text = album.author ?: "",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                )
+                HorizontalMultiBrowseCarousel(
+                    state = rememberCarouselState { album.picNum },
+                    preferredItemWidth = ThemeValue.Size.CellWidth,
+                    itemSpacing = ThemeValue.Padding.HorizontalSpace,
+                    modifier = Modifier.fillMaxWidth().clipToBounds()
+                ) { index ->
+                    WebImage(
+                        uri = album.thumbPath(index),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                            .aspectRatio(0.66667f)
+                            .maskClip(MaterialTheme.shapes.large),
+                        onClick = {
+                            val pics = List(album.picNum) {
+                                Picture(album.thumbPath(it), album.picPath(it))
+                            }
+                            navigate(ScreenImagePreview.Args(pics, index))
+                        }
                     )
                 }
             }
@@ -201,14 +150,6 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     }
 
     override val title: String = "美图"
-
-    override fun onBack() {
-        if (stack.size > 1) {
-            stack.removeLastOrNull()
-            listState.requestScrollToItem(0)
-        }
-        else pop()
-    }
 
     @Composable
     override fun ActionScope.RightActions() {
@@ -220,13 +161,16 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
         }
 
         ActionSuspend(Icons.Outlined.Search, "搜索") {
-            val result = searchDialog.openSuspend()
-            if (result != null) searchFolder(result)
+            searchDialog.openSuspend()?.let { result ->
+                keyword = result
+                requestNewPhotos()
+            }
         }
     }
 
     override suspend fun initialize() {
-        loadPhotos()
+        keyword = null
+        requestNewPhotos()
     }
 
     @Composable
@@ -235,35 +179,19 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    tonalElevation = ThemeValue.Shadow.Tonal,
-                    shadowElevation = ThemeValue.Shadow.Surface
-                ) {
-                    Breadcrumb(
-                        items = stack,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            stack.removeRange(it + 1, stack.size)
-                            listState.requestScrollToItem(0)
-                        }
-                    )
-                }
-                PhotoList(
-                    folder = current,
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    onAlbumClick = { folder, index ->
-                        val pics = folder.items.fastMap {
-                            val file = it as PhotoItem.File
-                            Picture(file.thumb, file.source)
-                        }
-                        navigate(ScreenImagePreview.Args(pics, index))
-                    },
-                    onEnterFolder = {
-                        stack += it
-                        listState.requestScrollToItem(0)
-                    }
+            PaginationColumn(
+                items = page.items,
+                key = { it.aid },
+                state = listState,
+                canRefresh = false,
+                canLoading = page.canLoading,
+                onLoading = { requestMorePhotos() },
+                itemDivider = ThemeValue.Padding.Value,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                PhotoAlbumLayout(
+                    album = it,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -274,13 +202,16 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
     override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
 
     override suspend fun onFabClick() {
-        if (isScrollTop) launch { loadPhotos() }
+        if (isScrollTop) launch {
+            keyword = null
+            requestNewPhotos()
+        }
         else listState.animateScrollToItem(0)
     }
 
     private val searchDialog = FloatingDialogInput(
-        hint = "分类名",
-        maxLength = 32
+        hint = "关键字/地点/作者",
+        maxLength = 16
     )
 
     @Composable
