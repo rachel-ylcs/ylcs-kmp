@@ -43,6 +43,7 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.*
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniImage
@@ -168,7 +169,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private suspend fun sessionLoop() {
         try {
             session?.close()
-            val newSession = app.socketsClient.webSocketSession {
+            val newSession = NetClient.sockets.webSocketSession {
                 method = HttpMethod.Get
                 url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
             }

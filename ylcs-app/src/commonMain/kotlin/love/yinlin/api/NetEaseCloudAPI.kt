@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.lyrics.LyricsLrc
@@ -19,7 +20,7 @@ object NetEaseCloudAPI {
         fun mp3(id: String) = "song/media/outer/url?id=${id}"
     }
 
-    suspend fun requestMusicId(url: String): Data<String> = app.client.safeGet(url) { body: ByteArray ->
+    suspend fun requestMusicId(url: String): Data<String> = NetClient.common.safeGet(url) { body: ByteArray ->
         "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(body.decodeToString())!!.groupValues[1]
     }
 
@@ -33,7 +34,7 @@ object NetEaseCloudAPI {
         lyrics = ""
     )
 
-    private suspend fun requestLyrics(id: String): Data<String> = app.client.safeGet(
+    private suspend fun requestLyrics(id: String): Data<String> = NetClient.common.safeGet(
         url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
     ) { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
@@ -41,7 +42,7 @@ object NetEaseCloudAPI {
     }
 
     suspend fun requestMusic(id: String): Data<PlatformMusicInfo> {
-        val result1 = app.client.safeGet(
+        val result1 = NetClient.common.safeGet(
             url = "https://$NETEASECLOUD_HOST/${Container.detail(id)}"
         ) { json: JsonObject ->
             getCloudMusic(json.arr("songs")[0].Object)
@@ -56,7 +57,7 @@ object NetEaseCloudAPI {
     }
 
     suspend fun requestPlaylist(id: String): Data<List<PlatformMusicInfo>> {
-        val result1 = app.client.safeGet(
+        val result1 = NetClient.common.safeGet(
             url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
         ) { json: JsonObject ->
             json.obj("result").arr("tracks").fastMap {

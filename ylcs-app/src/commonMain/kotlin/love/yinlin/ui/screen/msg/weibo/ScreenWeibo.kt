@@ -94,7 +94,7 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
                                             val filename = url.filenameOrRandom(".webp")
                                             Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                 val result = sink.use {
-                                                    val result = app.fileClient.safeDownload(
+                                                    val result = NetClient.file.safeDownload(
                                                         url = url,
                                                         sink = it,
                                                         isCancel = { false },

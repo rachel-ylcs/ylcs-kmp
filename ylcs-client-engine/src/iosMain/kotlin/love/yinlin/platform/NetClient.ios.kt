@@ -1,8 +1,9 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
-import io.ktor.client.*
-import io.ktor.client.engine.darwin.*
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.darwin.Darwin
+import io.ktor.client.engine.darwin.DarwinClientEngineConfig
 
 actual object NetClient {
     private fun HttpClientConfig<DarwinClientEngineConfig>.useEngine() {
@@ -16,21 +17,18 @@ actual object NetClient {
         }
     }
 
-    @Stable
     actual val common: HttpClient by lazy { HttpClient(Darwin) {
         useEngine()
         useJson()
         useCommonTimeout()
     } }
 
-    @Stable
     actual val file: HttpClient by lazy { HttpClient(Darwin) {
         useEngine()
         useJson()
         useFileTimeout()
     } }
 
-    @Stable
     actual val sockets: HttpClient by lazy { HttpClient(Darwin) {
         useWebSockets()
     } }

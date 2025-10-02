@@ -14,6 +14,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
@@ -225,7 +226,7 @@ object WeiboAPI {
 	}
 
 	suspend fun generateWeiboSubCookie(): String? {
-		val result = app.client.safePost(
+		val result = NetClient.common.safePost(
 			url = "https://visitor.passport.weibo.cn/visitor/genvisitor2",
 			data = "cb=visitor_gray_callback",
 			headers = {
@@ -240,7 +241,7 @@ object WeiboAPI {
 
 	suspend fun getUserWeibo(
 		uid: String
-	): Data<List<Weibo>> = app.client.safeGet(
+	): Data<List<Weibo>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userDetails(uid)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -258,7 +259,7 @@ object WeiboAPI {
 
 	suspend fun getWeiboDetails(
 		id: String
-	): Data<List<WeiboComment>> = app.client.safeGet(
+	): Data<List<WeiboComment>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -272,7 +273,7 @@ object WeiboAPI {
 
 	suspend fun getWeiboUser(
 		uid: String
-	): Data<WeiboUser> = app.client.safeGet(
+	): Data<WeiboUser> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userInfo(uid)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -297,7 +298,7 @@ object WeiboAPI {
 
 	suspend fun getWeiboUserAlbum(
 		uid: String
-	): Data<List<WeiboAlbum>> = app.client.safeGet(
+	): Data<List<WeiboAlbum>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userAlbum(uid)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -330,7 +331,7 @@ object WeiboAPI {
 		containerId: String,
 		page: Int,
 		limit: Int
-	): Data<Pair<List<Picture>, Int>> = app.client.safeGet(
+	): Data<Pair<List<Picture>, Int>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -354,7 +355,7 @@ object WeiboAPI {
 
 	suspend fun searchWeiboUser(
 		key: String
-	): Data<List<WeiboUserInfo>> = app.client.safeGet(
+	): Data<List<WeiboUserInfo>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.searchUser(key)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")
@@ -383,7 +384,7 @@ object WeiboAPI {
 
 	suspend fun extractChaohua(
 		sinceId: Long
-	): Data<Pair<List<Weibo>, Long>> = app.client.safeGet(
+	): Data<Pair<List<Weibo>, Long>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.chaohua(sinceId)}",
 		headers = {
 			append(HttpHeaders.Cookie, "SUB=$subCookie")

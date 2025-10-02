@@ -35,6 +35,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.Platform
@@ -197,7 +198,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
                             val filename = url.filenameOrRandom(".webp")
                             Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                 val result = sink.use {
-                                    val result = app.fileClient.safeDownload(
+                                    val result = NetClient.file.safeDownload(
                                         url = url,
                                         sink = it,
                                         isCancel = { false },

@@ -16,6 +16,7 @@ import love.yinlin.extension.obj
 import love.yinlin.extension.parseJson
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.lyrics.LyricsLrc
@@ -33,11 +34,11 @@ object QQMusicAPI {
         return arr
     }
 
-    suspend fun requestMusicId(url: String): Data<String> = app.client.safeGet(url) { body: ByteArray ->
+    suspend fun requestMusicId(url: String): Data<String> = NetClient.common.safeGet(url) { body: ByteArray ->
         "\"mid\":\\s*\"([^\"]*)".toRegex().find(body.decodeToString())!!.groupValues[1]
     }
 
-    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> = app.client.safeGet(buildUrl {
+    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> = NetClient.common.safeGet(buildUrl {
         obj("req_0") {
             "module" with "music.pf_song_detail_svr"
             "method" with "get_song_detail_yqq"
@@ -75,7 +76,7 @@ object QQMusicAPI {
     }
 
     suspend fun requestPlaylist(id: String): Data<List<PlatformMusicInfo>> {
-        val result1 = app.client.safeGet(buildUrl {
+        val result1 = NetClient.common.safeGet(buildUrl {
             obj("req_0") {
                 "module" with "music.srfDissInfo.aiDissInfo"
                 "method" with "uniform_get_Dissinfo"

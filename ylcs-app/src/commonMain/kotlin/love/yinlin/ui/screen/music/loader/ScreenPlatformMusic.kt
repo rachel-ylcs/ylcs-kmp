@@ -35,6 +35,7 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
@@ -195,7 +196,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                 for (item in items) {
                     // 1. 下载音频
                     val audioFile = OS.Storage.createTempFile { sink ->
-                        app.fileClient.safeDownload(
+                        NetClient.file.safeDownload(
                             url = item.audioUrl,
                             sink = sink,
                             isCancel = { false },
@@ -205,7 +206,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                     }
                     // 2. 下载封面
                     val recordFile = OS.Storage.createTempFile { sink ->
-                        app.fileClient.safeDownload(
+                        NetClient.file.safeDownload(
                             url = item.pic,
                             sink = sink,
                             isCancel = { false },

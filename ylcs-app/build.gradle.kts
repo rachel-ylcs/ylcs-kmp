@@ -103,15 +103,11 @@ kotlin {
             useLib(
                 // project
                 projects.ylcsComposeCore,
+                projects.ylcsClientEngine,
                 projects.ylcsCs,
                 projects.ylcsMod,
                 // compose
                 libs.compose.components.resources,
-                // ktor
-                libs.ktor.client,
-                libs.ktor.client.negotiation,
-                libs.ktor.client.websockets,
-                libs.ktor.json,
                 // sketch
                 libs.sketch,
                 libs.sketch.http,
@@ -150,8 +146,6 @@ kotlin {
         val jvmMain by creating {
             useSourceSet(nonWasmJsMain)
             useLib(
-                // ktor
-                libs.ktor.okhttp,
                 // local
                 fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar")))
             )
@@ -163,14 +157,15 @@ kotlin {
                 // compose
                 compose.preview,
                 libs.compose.activity,
-                // kotlinx
-                libs.kotlinx.coroutines.android,
                 // media3
-                libs.media3.ui, libs.media3.session, libs.media3.player,
+                libs.media3.ui,
+                libs.media3.session,
+                libs.media3.player,
                 // mmkv
                 libs.mmkv.android,
                 // scan
-                libs.scan.android, libs.scan.camera.android,
+                libs.scan.android,
+                libs.scan.camera.android,
                 // local
                 fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar")))
             )
@@ -181,8 +176,6 @@ kotlin {
             useLib(
                 // compose
                 compose.desktop.currentOs,
-                // kotlinx
-                libs.kotlinx.coroutines.swing,
                 // vlcj
                 libs.vlcj,
                 // local
@@ -192,10 +185,6 @@ kotlin {
 
         val iosMain = iosMain.get().apply {
             useSourceSet(appleMain, nonDesktopMain)
-            useLib(
-                // ktor
-                libs.ktor.apple
-            )
         }
 
         buildList {
@@ -215,10 +204,6 @@ kotlin {
 
         wasmJsMain.configure {
             useSourceSet(nonAndroidMain, nonDesktopMain)
-            useLib(
-                // ktor
-                libs.ktor.js
-            )
         }
     }
 }

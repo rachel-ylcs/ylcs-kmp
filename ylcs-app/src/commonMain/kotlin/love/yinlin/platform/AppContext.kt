@@ -3,7 +3,6 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
-import io.ktor.client.HttpClient
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Resource
@@ -18,11 +17,6 @@ abstract class AppContext {
 	abstract val kv: KV
 	lateinit var config: KVConfig
 	lateinit var musicFactory: MusicFactory
-
-	// HttpClient
-	val client: HttpClient by lazy { NetClient.common }
-	val fileClient: HttpClient by lazy { NetClient.file }
-	val socketsClient: HttpClient by lazy { NetClient.sockets }
 
 	// 初始化部分
 
