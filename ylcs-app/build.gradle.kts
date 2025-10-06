@@ -30,8 +30,10 @@ kotlin {
             }
         }
     }.forEach {
-        it.compilations.getByName("main") {
-            val nskeyvalueobserving by cinterops.creating
+        if (C.platform == BuildPlatform.Mac) {
+            it.compilations.getByName("main") {
+                val nskeyvalueobserving by cinterops.creating
+            }
         }
     }
 
@@ -47,23 +49,26 @@ kotlin {
             isStatic = true
         }
 
-        pod("YLCSCore") {
-            moduleName = "YLCSCore"
-            extraOpts += listOf("-compiler-option", "-fmodules")
-            source = path(C.root.iosApp.core.asFile)
+        if (C.platform == BuildPlatform.Mac) {
+            pod("YLCSCore") {
+                moduleName = "YLCSCore"
+                extraOpts += listOf("-compiler-option", "-fmodules")
+                source = path(C.root.iosApp.core.asFile)
+            }
+            pod("MMKV") {
+                version = libs.versions.mmkv.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
+            }
+            pod("MobileVLCKit") {
+                version = libs.versions.vlcKit.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
+            }
+            pod("SGQRCode") {
+                version = libs.versions.sgQrcode.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
+            }
         }
-        pod("MMKV") {
-            version = libs.versions.mmkv.get()
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-        pod("MobileVLCKit") {
-            version = libs.versions.vlcKit.get()
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
-        pod("SGQRCode") {
-            version = libs.versions.sgQrcode.get()
-            extraOpts += listOf("-compiler-option", "-fmodules")
-        }
+
         podfile = C.root.iosApp.podfile.asFile
 
         xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
