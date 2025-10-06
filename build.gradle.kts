@@ -11,4 +11,4 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
 }
 
-println("currentTaskName = $currentTaskName")
+println("[currentTaskName] $currentTaskName")
