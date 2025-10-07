@@ -188,7 +188,7 @@ class Constants(project: Project) {
     val modManager = ModManagerConfig(
         name = "ModManager",
         displayName = "银临茶舍Mod管理器",
-        mainClass = "${app.packageName}.mod.ModManagerKt"
+        mainClass = "${app.packageName}.ModManagerKt"
     )
 
     // 混淆配置

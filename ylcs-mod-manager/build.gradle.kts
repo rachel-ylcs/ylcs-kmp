@@ -17,11 +17,10 @@ kotlin {
     sourceSets {
         jvmMain.configure {
             useLib(
-                // project
                 projects.ylcsComposeCore,
                 projects.ylcsMod,
-                // compose
                 libs.compose.components.resources,
+                compose.desktop.currentOs,
             )
         }
     }

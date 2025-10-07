@@ -179,11 +179,8 @@ kotlin {
         val desktopMain by getting {
             useSourceSet(nonAndroidMain, jvmMain)
             useLib(
-                // compose
                 compose.desktop.currentOs,
-                // vlcj
                 libs.vlcj,
-                // local
                 fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
             )
         }
