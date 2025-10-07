@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.2.20"
+kotlin = "2.3.0-Beta1"
 cmp = "1.10.0-alpha01"
 agp = "8.12.0-alpha07"
 
@@ -27,6 +27,7 @@ sgQrcode = "4.1.0"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
+#noinspection NewerVersionAvailable
 gradleKotlinDsl = { id = "org.gradle.kotlin.kotlin-dsl", version = "5.2.0" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -114,8 +115,8 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 
-jna-core = { module = "net.java.dev.jna:jna", version = "5.17.0" }
-jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.17.0" }
+jna-core = { module = "net.java.dev.jna:jna", version = "5.18.1" }
+jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.18.1" }
 vlcj = { module = "uk.co.caprica:vlcj", version = "4.11.0" }
 
 # Web
@@ -129,7 +130,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.18" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.19" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "6.2.0" }
