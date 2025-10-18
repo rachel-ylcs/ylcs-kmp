@@ -87,8 +87,8 @@ object AN {
 	private const val TOKEN_SECRET_KEY = "token_secret_key"
 	private const val KEY_ALGORITHM = "AES"
 
-	private val AES_KEY: SecretKey = Redis.use {
-		val keyString = it.get(TOKEN_SECRET_KEY)
+	private val AES_KEY: SecretKey = run {
+		val keyString = Redis[TOKEN_SECRET_KEY]
 		if (keyString != null) {
 			val bis = ByteArrayInputStream(Base64.getDecoder().decode(keyString))
 			val ois = ObjectInputStream(bis)
@@ -105,7 +105,7 @@ object AN {
 			oos.writeObject(secretKey)
 			oos.flush()
 			oos.close()
-			it.set(TOKEN_SECRET_KEY, Base64.getEncoder().encodeToString(bos.toByteArray()))
+			Redis[TOKEN_SECRET_KEY] = Base64.getEncoder().encodeToString(bos.toByteArray())
 			secretKey
 		}
 	}
@@ -116,9 +116,7 @@ object AN {
 		cipher.init(Cipher.ENCRYPT_MODE, AES_KEY)
 		val encryptedBytes = cipher.doFinal(token.bytes)
 		val tokenString = Base64.getEncoder().encodeToString(encryptedBytes)
-		Redis.use {
-			it.setex(token.key, 30 * 24 * 60 * 60, tokenString)
-		}
+		Redis.setex(token.key, tokenString, 30 * 24 * 60 * 60L)
 		return tokenString
 	}
 
@@ -134,7 +132,7 @@ object AN {
 	fun throwExpireToken(tokenString: String): Int {
 		val token = parseToken(tokenString)
 		// keyToken 可能是 null 或 已经失效的 token
-		val saveTokenString = Redis.use { it.get(token.key) }
+		val saveTokenString = Redis[token.key]
 		return if (saveTokenString == tokenString) token.uid
 			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
 			else throw TokenExpireError(token.uid)
@@ -151,7 +149,7 @@ object AN {
 		if (!mutex.tryLock()) error("请求过多")
 
 		try {
-			val saveTokenString = Redis.use { it.get(token.key) }
+			val saveTokenString = Redis[token.key]
 
 			val debugInfo = """
 				[regression] 登录信息失效
@@ -173,17 +171,15 @@ object AN {
 
 	fun removeToken(tokenString: String) {
 		val token = parseToken(tokenString)
-		val saveTokenString = Redis.use { it.get(token.key) }
-		if (saveTokenString == tokenString) Redis.use { it.del(token.key) }
+		val saveTokenString = Redis[token.key]
+		if (saveTokenString == tokenString) Redis.remove(token.key)
 			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
 			else throw TokenExpireError(token.uid)
 	}
 
 	fun removeAllTokens(uid: Int) {
 		if (uid > 0) {
-			for (tokenString in Token.keys(uid)) {
-				Redis.use { it.del(tokenString) }
-			}
+			for (tokenString in Token.keys(uid)) Redis.remove(tokenString)
 		}
 	}
 }

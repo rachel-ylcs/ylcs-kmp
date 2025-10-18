@@ -1,23 +1,27 @@
 package love.yinlin.server
 
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.JedisPool
-import redis.clients.jedis.JedisPoolConfig
-import java.time.Duration
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig
+import redis.clients.jedis.Connection
+import redis.clients.jedis.DefaultJedisClientConfig
+import redis.clients.jedis.JedisPooled
 
 object Redis {
-    class RedisConnection(val jedis: Jedis) : AutoCloseable {
-        override fun close() { jedis.close() }
-    }
+    private val dataSource = JedisPooled.builder()
+        .hostAndPort(Config.Redis.HOST, Config.Redis.PORT)
+        .clientConfig(DefaultJedisClientConfig.builder()
+            .password(Config.Redis.PASSWORD)
+            .timeoutMillis(3000)
+            .build()
+        ).poolConfig(GenericObjectPoolConfig<Connection>().apply {
+            maxTotal = 20
+            maxIdle = 20
+            minIdle = 5
+        })
+        .build()
 
-    val dataSource = JedisPool(JedisPoolConfig().apply {
-        maxTotal = 20
-        maxIdle = 20
-        minIdle = 5
-        setMaxWait(Duration.ofMillis(3000))
-    }, Config.Redis.HOST, Config.Redis.PORT, 3000, Config.Redis.PASSWORD)
-
-    inline fun <R> use(block: (Jedis) -> R): R = RedisConnection(dataSource.resource).use { block(it.jedis) }
-
+    operator fun set(key: String, value: String) { dataSource.set(key, value) }
+    fun setex(key: String, value: String, seconds: Long) { dataSource.setex(key, seconds, value) }
+    operator fun get(key: String): String? = dataSource.get(key)
+    fun remove(key: String) { dataSource.del(key) }
     fun close() = dataSource.close()
 }
