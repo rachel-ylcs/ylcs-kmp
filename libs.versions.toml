@@ -2,23 +2,23 @@
 
 # Plugins #
 kotlin = "2.3.0-Beta1"
-cmp = "1.10.0-alpha01"
-agp = "8.12.0-alpha07"
+cmp = "1.10.0-alpha02"
+agp = "8.12.3"
 
 # Libs #
 
 # Common
-lifecycle = "2.10.0-alpha01"
-material3 = "1.10.0-alpha01"
+lifecycle = "2.10.0-alpha02"
+material3 = "1.10.0-alpha02"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
-ktor = "3.3.0"
+ktor = "3.3.1"
 sketch = "4.4.0-alpha01"
 mmkv = "2.2.4"
-lottie = "2.0.1"
+lottie = "2.0.2"
 
 # Android
-cmp-android = "1.9.2"
+cmp-android = "1.9.3"
 media3 = "1.8.0"
 
 # iOS
@@ -61,8 +61,8 @@ compose-material3 = { module = "org.jetbrains.compose.material3:material3", vers
 compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material3-icon-old" }
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 compose-graphics = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha09" }
-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.0" }
-compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0-alpha01" }
+compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.1" }
+compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0-alpha02" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
@@ -133,4 +133,4 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.19" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "6.2.0" }
+redis = { module = "redis.clients:jedis", version = "7.0.0" }
