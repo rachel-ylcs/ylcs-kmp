@@ -1,20 +1,23 @@
 ![项目依赖结构](docs/pics/title.jpg)
 
-<div align="center">
+<div style="text-align:center">
     <h1>银临茶舍跨平台 App</h1>
-    <p></p>
+    <h5></h5>
     <div>
-        <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android"/>
-        <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple"/>
-        <img src="https://img.shields.io/badge/Platform-Windows-blue.svg?logo=esotericsoftware"/>
-        <img src="https://img.shields.io/badge/Platform-Linux-red.svg?logo=linux"/>
-        <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript"/>
-        <img src="https://img.shields.io/badge/Platform-Server-orange.svg?logo=openjdk"/>
+        <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-Windows-blue.svg?logo=esotericsoftware" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-Linux-red.svg?logo=linux" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-WASM%20%2F%20JS-yellow.svg?logo=javascript" alt=""/>
+        <img src="https://img.shields.io/badge/Platform-Server-orange.svg?logo=openjdk" alt=""/>
     </div>
+    <h5></h5>
     <div>
-        <img src="https://img.shields.io/github/v/tag/rachel-ylcs/ylcs-kmp"/>
-        <img src="https://img.shields.io/github/v/release/rachel-ylcs/ylcs-kmp"/>
-        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg"/>
+        <img src="https://img.shields.io/github/v/tag/rachel-ylcs/ylcs-kmp" alt=""/>
+        <img src="https://img.shields.io/github/v/release/rachel-ylcs/ylcs-kmp" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg" alt=""/>
+        <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/main.yml/badge.svg" alt=""/>
+        <img src="https://img.shields.io/badge/QQ%E4%BA%A4%E6%B5%81%E7%BE%A4-828049503-red.svg" alt=""/>
     </div>
 </div>
 
@@ -22,116 +25,95 @@
 >
 >  集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503
 
-## 跨平台特性
+## 模块表
 
-| 名称      | 平台  | 运行环境   |
-|---------|-----|--------|
-| Android | 安卓  | Native |
-| iOS     | 苹果  | Native |
-| Windows | 桌面  | JVM    |
-| Linux   | 桌面  | JVM    |
-| macOS   | 桌面  | JVM    |
-| Web     | 网页  | Wasm   |
-| Server  | 服务器 | JVM    |
-
-1. 各端 UI 共享，逻辑共享，资源共享，数据共享。
-2. 桌面、网页、平板横屏适配、安卓、苹果竖屏适配。
-3. 桌面、安卓、网页 Wasm 代码混淆，高性能低体积。
-4. 服务端与客户端共享数据格式、序列化库、网络库
+|    Module     |    Artifact     |   Description    | Android | iOS | Windows |  Linux  | macOS | Web/Wasm |
+|:-------------:|:---------------:|:----------------:|:-------:|:---:|:-------:|:-------:|:-----:|:--------:|
+|  `ylcs-core`  |                 |                  |         |     |         |         |       |          |
+|               |     `base`      |  language core   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               | `compose-base`  |   compose core   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               |    `cs-base`    |     C/S core     |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+| `ylcs-module` |                 |                  |         |     |         |         |       |          |
+|               | `client-engine` |  client engine   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               | `server-engine` |  server engine   |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
+|  `ylcs-app`   |                 |                  |         |     |         |         |       |          |
+|               |      `cs`       |    C/S bridge    |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               |      `mod`      |     song MOD     |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               |      `app`      |  rachel client   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
+|               |    `server`     |  rachel server   |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
+|               |  `mod-manager`  | song MOD mangaer |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
 
 ## 源代码集依赖
 
 ![项目依赖结构](docs/pics/structure.png)
 
-## 工程目录
-
-发布目录 `outputs`
-
-### `compose UI multiplatform`
-
-源代码目录 `ylcs-app`
-
-1. androidMain
-   - 运行：`IDEA - Android App`
-   - 发布签名安装包：`ylcs-app:androidPublish`
-2. iosMain
-   - 进入iosApp目录，运行：`pod install`
-   - Xcode打开`iosApp/iosApp.xcworkspace`，运行App
-   - 发布签名安装包
-3. desktopMain
-   - 运行(Debug)：`ylcs-app:desktopRunDebug`
-   - 运行(Release)：`ylcs-app:desktopRunRelease`
-   - 检查模块完整性: `ylcs-app:desktopCheckModules`
-   - 发布可执行文件：`ylcs-app:desktopPublish`
-4. wasmJsMain
-   - 浏览器运行：`ylcs-app:webRun`
-   - 发布网页：`ylcs-app:webPublish`
-
-### `iosApp`
-
-源代码目录 `iosApp`, `ylcs-app/iosMain`
-
-### `kotlin logic multiplatform`
-
-### `server`
-
-源代码目录 `ylcs-server`
-
-- 运行： `IDEA - Ktor`
-- 发布可执行文件：`ylcs-server:serverPublish`
-
-### `shared`
-
-共享数据与代码目录 `ylcs-shared`
-
-### `music`
-
-MOD核心实现 `ylcs-music`
-
-### `modManager`
-
-MOD管理器(桌面版) `ylcs-modManager`
-
 ## 部署
 
-### 编译与运行环境
+### 环境
 
-- IntelliJ IDEA 2025.1
-- Xcode 16.3
-- gradle 8.13-all
+#### Common
+- gradle 8.14.3-all
 - JDK 21
-- Clion 2025.1
-- Windows(可编译Android/Windows/Web/Server)
-- macOS(可编译Android/iOS/macOS/Web/Server)
-- Linux(可编译Android/Linux/Web/Server)
+#### Android
+- IntelliJ IDEA 2025.3
+#### iOS
+- Xcode 16.3
+#### Windows
+- MSVC v145
+- Windows 10 / 11 SDK
+#### Linux
+- g++ 13
+#### Server
+- JDK 21
 
-### Common
+### 编译
 
-git clone 本仓库，Gradle 同步，下载依赖，构建。
+#### Common
 
-### Android
+git clone 源代码，Gradle 同步，等待下载依赖，完成构建。
 
-直接运行或发布。
+所有模块输出均在 `output` 目录中。
 
-### IOS
+#### Android
 
-首先进入 iosApp 目录，执行 `pod install` 安装依赖。
+所属模块： `ylcs-app:app`
 
-然后使用 Xcode 直接运行或发布。
+- 运行：`AndroidRun`
+- 发布签名安装包：`androidPublish`
 
-### Desktop
+#### IOS
 
-需要先进入 native 目录，执行 `build.bat`(Windows) 或 `build.sh`(Linux/macOS) 脚本，会自动生成动态链接库文件到 native/libs 目录。
+所属模块： `ylcs-app:app`
 
-打包时会自动将动态链接库复制到输出目录。
+首先进入 iosApp 目录，执行 `pod install` 安装依赖。 然后使用 Xcode 直接运行或发布。
 
-### Web
+#### Desktop
 
-直接运行或发布
+先进入 native 目录，执行 `build.bat`(Windows) 或 `build.sh`(Linux/macOS) 脚本，会自动生成动态链接库文件到 native/libs 目录。
 
-### Server
+所属模块： `ylcs-app:app`
+
+- 运行(Debug)：`desktopRunDebug`
+- 运行(Release)：`desktopRunRelease`
+- 输出依赖树：`dependencies`
+- 检查模块完整性：`desktopCheckModules`
+- 发布可执行文件：`desktopPublish`
+
+#### Web
+
+所属模块： `ylcs-app:app`
+
+- 浏览器运行：`webRun`
+- 发布网页：`webPublish`
+
+#### Server
 
 构建后运行会自动部署，将初始目录复制到当前目录下，可以直接运行或发布。
+
+所属模块： `ylcs-app:server`
+
+- 运行： `ServerDebug`
+- 发布可执行文件：`serverPublish`
 
 #### 分离环境
 
@@ -158,31 +140,31 @@ Redis 和 MySQL 配置可在 `resources` 中的 `config.properties` 配置
 ```kotlin
 // 示例
 object ServerRes : ResNode("public") {
-	object Activity : ResNode(this, "activity") {
-		fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
-	}
+    object Activity : ResNode(this, "activity") {
+        fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+    }
 
-	object Assets : ResNode(this, "assets") {
-		val DefaultAvatar = ResNode(this, "default_avatar.webp")
+    object Assets : ResNode(this, "assets") {
+        val DefaultAvatar = ResNode(this, "default_avatar.webp")
 
-		val DefaultWall = ResNode(this, "default_wall.webp")
-	}
+        val DefaultWall = ResNode(this, "default_wall.webp")
+    }
 
-	object Users : ResNode(this, "users") {
-		class User(uid: Int) : ResNode(this, "$uid") {
-			val avatar = ResNode(this, "avatar.webp")
+    object Users : ResNode(this, "users") {
+        class User(uid: Int) : ResNode(this, "$uid") {
+            val avatar = ResNode(this, "avatar.webp")
 
-			val wall = ResNode(this, "wall.webp")
+            val wall = ResNode(this, "wall.webp")
 
-			inner class Pics : ResNode(this, "pics") {
-				fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
-			}
-		}
-	}
+            inner class Pics : ResNode(this, "pics") {
+                fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+            }
+        }
+    }
 
-	val Server = ResNode(this, "server.json")
-	val Update = ResNode(this, "update.json")
-	val Photo = ResNode(this, "photo.json")
+    val Server = ResNode(this, "server.json")
+    val Update = ResNode(this, "update.json")
+    val Photo = ResNode(this, "photo.json")
 }
 
 ```
@@ -210,41 +192,41 @@ C/S 接口的定义与数据模型在客户端（Android / iOS / Desktop / Web�
 ```kotlin
 
 object API : APINode(null, "") {
-	object User : APINode(this, "user") {
-		object Profile : APINode(this, "profile") {
-			object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
+    object User : APINode(this, "user") {
+        object Profile : APINode(this, "profile") {
+            object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
 
-			object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
+            object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
 
-			object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
-				@Serializable
-				data class Request(val token: String, val name: String)
-			}
+            object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
+                @Serializable
+                data class Request(val token: String, val name: String)
+            }
 
-			object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
-				@Serializable
-				data class Files(val avatar: APIFile)
-			}
+            object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
+                @Serializable
+                data class Files(val avatar: APIFile)
+            }
 
-			object Signin : APIPostRequest<String>(this, "signin")
-		}
+            object Signin : APIPostRequest<String>(this, "signin")
+        }
 
-		object Topic : APINode(this, "topic") {
-			object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
-				@Serializable
-				data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
-			}
+        object Topic : APINode(this, "topic") {
+            object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
+                @Serializable
+                data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
+            }
 
-			object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
-				@Serializable
-				data class Request(val token: String, val title: String, val content: String, val section: Int)
-				@Serializable
-				data class Files(val pics: APIFiles)
-				@Serializable
-				data class Response(val tid: Int, val pic: String?)
-			}
-		}
-	}
+            object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
+                @Serializable
+                data class Request(val token: String, val title: String, val content: String, val section: Int)
+                @Serializable
+                data class Files(val pics: APIFiles)
+                @Serializable
+                data class Response(val tid: Int, val pic: String?)
+            }
+        }
+    }
 }
 
 ```
@@ -274,21 +256,21 @@ object API : APINode(null, "") {
 ```kotlin
 
 api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
-     VN.throwEmpty(title, content)
-     VN.throwSection(section)
-     val ngp = NineGridProcessor(pics)
-     val uid = AN.throwExpireToken(token)
-     val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
-     if (!UserPrivilege.topic(privilege) ||
-         (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
-         return@api "无权限".failedData
-     val tid = DB.throwInsertSQLGeneratedKey("""
+    VN.throwEmpty(title, content)
+    VN.throwSection(section)
+    val ngp = NineGridProcessor(pics)
+    val uid = AN.throwExpireToken(token)
+    val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
+    if (!UserPrivilege.topic(privilege) ||
+        (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
+        return@api "无权限".failedData
+    val tid = DB.throwInsertSQLGeneratedKey("""
          INSERT INTO topic(uid, title, content, pics, section, rawSection) VALUES(?, ?, ?, ?, ?, ?)
      """, uid, title, content, ngp.jsonString, section, section).toInt()
-     // 复制主题图片
-     val userPics = ServerRes.Users.User(uid).Pics()
-     val pic = ngp.copy { userPics.pic(it) }
-     Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "发表成功")
+    // 复制主题图片
+    val userPics = ServerRes.Users.User(uid).Pics()
+    val pic = ngp.copy { userPics.pic(it) }
+    Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "发表成功")
 }
 
 ```
@@ -304,11 +286,11 @@ api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
 ```kotlin
 
 val result = ClientAPI.request(
-   route = API.User.Mail.GetMails,
-   data = API.User.Mail.GetMails.Request(
-       token = config.userToken,
-       offset = offset
-   )
+    route = API.User.Mail.GetMails,
+    data = API.User.Mail.GetMails.Request(
+        token = config.userToken,
+        offset = offset
+    )
 )
 
 ```
@@ -342,4 +324,30 @@ MOD 管理器是方便桌面客户端创建, 解析, 预览 MOD 的简易工具
 
 ## 许可
 
-`银临茶舍KMP` 是在 MIT 许可下许可的开源软件。
+`银临茶舍KMP` 是在 MIT 许可下许可的开源软件，查看[LICENSE](LICENSE)获取更多信息。
+
+## 致谢
+
+按作者首字母排序。
+
+|  Type   |     Author      |                                    Name                                     |
+|:-------:|:---------------:|:---------------------------------------------------------------------------:|
+| Library | alexzhirkevich  |          [compottie](https://github.com/alexzhirkevich/compottie)           |
+| Library | alexzhirkevich  |              [qrose](https://github.com/alexzhirkevich/qrose)               |
+| Library | brettwooldridge |           [HikariCP](https://github.com/brettwooldridge/HikariCP)           |
+| Library |    Calvin-LL    |           [reorderable](https://github.com/Calvin-LL/Reorderable)           |
+| Library |     caprica     |                   [vlcj](https://github.com/caprica/vlcj)                   |
+| Library |   chrisbanes    |                 [haze](https://github.com/chrisbanes/haze)                  |
+| Library |    fleeksoft    |                 [ksoup](https://github.com/fleeksoft/ksoup)                 |
+| Library |     Google      |                 [media3](https://github.com/androidx/media)                 |
+| Library |    jenly1314    |            [zxing-lite](https://github.com/jenly1314/ZXingLite)             |
+| Library |    jenly1314    |           [camera-scan](https://github.com/jenly1314/CameraScan)            |
+| Library |    Jetbrains    |                [kotlin](https://github.com/JetBrains/kotlin)                |
+| Library |    Jetbrains    | [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) |
+| Library |    Jetbrains    |                   [ktor](https://github.com/ktorio/ktor)                    |
+| Library |      mysql      |                       [mysql](https://dev.mysql.com)                        |
+| Library |      panpf      |                  [sketch](https://github.com/panpf/sketch)                  |
+| Library |     qos-ch      |                [logback](https://github.com/qos-ch/logback)                 |
+| Library |      redis      |                   [jedis](https://github.com/redis/jedis)                   |
+| Library |     Tencent     |                   [MMKV](https://github.com/Tencent/MMKV)                   |
+| Library |     Tencent     |                 [libpag](https://github.com/Tencent/libpag)                 |
