@@ -15,10 +15,6 @@ class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("c
     val androidKey = file("androidKey.jks")
 }
 
-class DesignAENode(root: RootProjectNode) : Directory by root.dir("design-AE")
-
-class DesignPSNode(root: RootProjectNode) : Directory by root.dir("design-PS")
-
 class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")
 
 class IosAppNode(root: RootProjectNode) : Directory by root.dir("iosApp") {
@@ -79,8 +75,6 @@ class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-cs") {
 class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val buildSrc = BuildSrcNode(this)
     val config = ConfigNode(this, c)
-    val designAE = DesignAENode(this)
-    val designPS = DesignPSNode(this)
     val docs = DocsNode(this)
     val iosApp = IosAppNode(this)
     val native = NativeNode(this)
