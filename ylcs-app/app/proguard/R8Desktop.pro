@@ -1,4 +1,4 @@
--printmapping desktop-mapping.txt
+-printmapping ../build/desktop-mapping.txt
 
 # ----------------------------------------- JNA ----------------------------------------------- #
 
