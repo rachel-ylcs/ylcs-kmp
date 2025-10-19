@@ -23,7 +23,7 @@ kotlin {
         }
     }
 
-    jvm("desktop") {
+    jvm {
         C.jvmTarget(this)
     }
 
@@ -41,14 +41,17 @@ kotlin {
     sourceSets {
         commonMain.configure {
             useApi(
-                projects.ylcsCore
+                projects.ylcsCore.base,
+            )
+            useLib(
+                libs.compose.runtime
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.cs.core"
+    namespace = "${C.app.packageName}.mod"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

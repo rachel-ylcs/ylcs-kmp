@@ -42,7 +42,7 @@ kotlin {
         commonMain.configure {
             kotlin.srcDir(C.root.cs.srcGenerated)
             useApi(
-                projects.ylcsCsCore,
+                projects.ylcsCore.csBase,
             )
             useLib(
                 libs.compose.runtime,

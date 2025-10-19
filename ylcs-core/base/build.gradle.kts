@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import kotlin.apply
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -42,18 +41,38 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCsCore,
-                libs.ktor.client,
-                libs.ktor.client.negotiation,
-                libs.ktor.client.websockets,
-                libs.ktor.json,
+                libs.kotlinx.atomicfu,
+                libs.kotlinx.coroutines,
+                libs.kotlinx.datetime,
+                libs.kotlinx.io,
+                libs.kotlinx.json,
             )
         }
 
-        val iosMain = iosMain.get().apply {
+        val nonAndroidMain by creating {
             useSourceSet(commonMain)
-            useLib(
-                libs.ktor.apple,
+        }
+
+        val nonWasmJsMain by creating {
+            useSourceSet(commonMain)
+        }
+
+        val appleMain = appleMain.get().apply {
+            useSourceSet(nonAndroidMain, nonWasmJsMain)
+        }
+
+        val jvmMain by creating {
+            useSourceSet(nonWasmJsMain)
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(appleMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(jvmMain)
+            useApi(
+                libs.kotlinx.coroutines.android
             )
         }
 
@@ -72,37 +91,27 @@ kotlin {
             }
         }
 
-        val jvmMain by creating {
-            useSourceSet(commonMain)
-            if (C.platform != BuildPlatform.Mac) {
-                useLib(
-                    libs.ktor.okhttp,
-                )
+        val desktopMain by getting {
+            useSourceSet(nonAndroidMain, jvmMain)
+            if (C.platform == BuildPlatform.Mac) {
+                useSourceSet(appleMain)
             }
-            useLib(
-
+            useApi(
+                libs.kotlinx.coroutines.swing
             )
         }
 
-        androidMain.configure {
-            useSourceSet(jvmMain)
-        }
-
-        val desktopMain by getting {
-            useSourceSet(jvmMain)
-        }
-
         wasmJsMain.configure {
-            useSourceSet(commonMain)
-            useLib(
-                libs.ktor.js,
+            useSourceSet(nonAndroidMain)
+            useApi(
+                libs.kotlinx.broswer
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.client.engine"
+    namespace = "${C.app.packageName}.core.base"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

@@ -1,10 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import kotlin.apply
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -43,30 +42,19 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore,
-                libs.compose.runtime,
-                libs.compose.foundation,
-                libs.compose.material3,
-                libs.compose.material3.icons,
-                libs.compose.material3.iconsExtended,
-                libs.compose.ui,
-                libs.compose.ui.backhandler,
-                libs.compose.components.resources,
-                libs.compose.components.uiToolingPreview,
-                libs.compose.navigation,
-                libs.compose.navigation.event,
-                libs.compose.savedstate,
-                libs.compose.viewmodel,
-                libs.compose.lifecycle,
+                projects.ylcsCore.csBase,
+                libs.ktor.client,
+                libs.ktor.client.negotiation,
+                libs.ktor.client.websockets,
+                libs.ktor.json,
             )
         }
 
-        val nonAndroidMain by creating {
-            useSourceSet(commonMain)
-        }
-
         val iosMain = iosMain.get().apply {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(commonMain)
+            useLib(
+                libs.ktor.apple,
+            )
         }
 
         buildList {
@@ -84,18 +72,37 @@ kotlin {
             }
         }
 
+        val jvmMain by creating {
+            useSourceSet(commonMain)
+            if (C.platform != BuildPlatform.Mac) {
+                useLib(
+                    libs.ktor.okhttp,
+                )
+            }
+            useLib(
+
+            )
+        }
+
+        androidMain.configure {
+            useSourceSet(jvmMain)
+        }
+
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(jvmMain)
         }
 
         wasmJsMain.configure {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(commonMain)
+            useLib(
+                libs.ktor.js,
+            )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.compose.core"
+    namespace = "${C.app.packageName}.module.client.engine"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

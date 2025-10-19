@@ -107,10 +107,10 @@ kotlin {
         val commonMain by getting {
             useLib(
                 // project
-                projects.ylcsComposeCore,
-                projects.ylcsClientEngine,
-                projects.ylcsCs,
-                projects.ylcsMod,
+                projects.ylcsCore.composeBase,
+                projects.ylcsModule.clientEngine,
+                projects.ylcsApp.cs,
+                projects.ylcsApp.mod,
                 // compose
                 libs.compose.components.resources,
                 // sketch

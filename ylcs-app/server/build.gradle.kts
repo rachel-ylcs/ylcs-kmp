@@ -12,8 +12,8 @@ kotlin {
     sourceSets {
         main.configure {
             useLib(
-                projects.ylcsCs,
-                projects.ylcsServerEngine,
+                projects.ylcsApp.cs,
+                projects.ylcsModule.serverEngine,
             )
         }
     }

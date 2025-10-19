@@ -32,7 +32,12 @@ class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 
 class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
 
-class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app") {
+class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("cs") {
+    private val build = dir("build")
+    val srcGenerated = build.dir("generated").dir("kotlin")
+    val generatedLocalFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
+}
+class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("app") {
     private val proguard = dir("proguard")
     val commonR8Rule = proguard.file("R8Common.pro")
     val androidR8Rule = proguard.file("R8Android.pro")
@@ -60,16 +65,10 @@ class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs
     val webOutput = root.outputs.dir("web")
 }
 
-class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-server") {
+class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
     val workspace = dir("build").dir("serverRun")
     val outputs = root.outputs
     val outputFile = outputs.file(c.server.outputName)
-}
-
-class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-cs") {
-    private val build = dir("build")
-    val srcGenerated = build.dir("generated").dir("kotlin")
-    val generatedLocalFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
 }
 
 class RootProjectNode(root: Directory, c: Constants) : Directory by root {

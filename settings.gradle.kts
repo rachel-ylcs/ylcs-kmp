@@ -34,23 +34,23 @@ include(
 
     /* -----------------  [1] 核心模块  ----------------- */
 
-    "ylcs-core", // 语言核心
-    "ylcs-compose-core", // compose核心
-    "ylcs-cs-core", // C/S核心
+    "ylcs-core:base", // 语言核心
+    "ylcs-core:compose-base", // compose核心
+    "ylcs-core:cs-base", // C/S核心
 
     /* -----------------  [2] 功能模块  ----------------- */
 
-    "ylcs-client-engine",
-    "ylcs-server-engine",
+    "ylcs-module:client-engine",
+    "ylcs-module:server-engine",
 
     /* -----------------  [3] 结构模块  ----------------- */
 
-    "ylcs-mod", // MOD
-    "ylcs-cs", // C/S共享
+    "ylcs-app:mod", // MOD
+    "ylcs-app:cs", // C/S共享
 
     /* -----------------  [4] 程序模块  ----------------- */
 
-    "ylcs-app", // 跨平台APP
-    "ylcs-server", // 服务端
-    "ylcs-mod-manager", // MOD管理器
+    "ylcs-app:app", // 跨平台APP
+    "ylcs-app:server", // 服务端
+    "ylcs-app:mod-manager", // MOD管理器
 )
