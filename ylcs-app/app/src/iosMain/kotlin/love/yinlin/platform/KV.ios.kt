@@ -3,8 +3,8 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import cocoapods.MMKV.MMKV
 import kotlinx.cinterop.ExperimentalForeignApi
-import love.yinlin.common.toByteArray
-import love.yinlin.common.toNSData
+import love.yinlin.extension.toByteArray
+import love.yinlin.extension.toNSData
 
 @Stable
 @OptIn(ExperimentalForeignApi::class)

@@ -140,10 +140,6 @@ kotlin {
             useSourceSet(commonMain)
         }
 
-        val appleMain = appleMain.get().apply {
-            useSourceSet(nonAndroidMain)
-        }
-
         val jvmMain by creating {
             useSourceSet(commonMain)
             useLib(
@@ -173,7 +169,7 @@ kotlin {
         }
 
         val iosMain = iosMain.get().apply {
-            useSourceSet(appleMain, nonDesktopMain)
+            useSourceSet(nonAndroidMain, nonDesktopMain)
         }
 
         buildList {
@@ -193,10 +189,6 @@ kotlin {
 
         val desktopMain by getting {
             useSourceSet(nonAndroidMain, jvmMain)
-            if (C.platform == BuildPlatform.Mac) {
-                useSourceSet(appleMain)
-            }
-
             useLib(
                 compose.desktop.currentOs,
                 libs.vlcj,

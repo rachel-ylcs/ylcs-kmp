@@ -1,4 +1,4 @@
-package love.yinlin.common
+package love.yinlin.extension
 
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi

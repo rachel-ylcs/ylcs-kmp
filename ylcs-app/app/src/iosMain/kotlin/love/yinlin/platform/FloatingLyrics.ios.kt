@@ -21,7 +21,7 @@ import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
-import love.yinlin.common.toNSData
+import love.yinlin.extension.toNSData
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*
 import platform.AVKit.*
