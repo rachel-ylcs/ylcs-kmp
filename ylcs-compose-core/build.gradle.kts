@@ -53,7 +53,6 @@ kotlin {
                 libs.compose.ui.backhandler,
                 libs.compose.components.resources,
                 libs.compose.components.uiToolingPreview,
-                libs.compose.graphics,
                 libs.compose.navigation,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>银临茶舍</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.json" />
+    <script type="application/javascript" src="ylcs-app.js"></script>
+    <script id="loading-script" type="application/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        for (let childNode of node.childNodes) {
+                            if (childNode.nodeName === "CANVAS") {
+                                const loadingDiv = document.getElementById("loading");
+                                loadingDiv && loadingDiv.remove();
+                                const loadingScript = document.getElementById("loading-script");
+                                loadingScript && loadingScript.remove();
+                                observer.disconnect();
+                                break;
+                            }
+                        }
+                    });
+                });
+            });
+            observer.observe(document.body, { childList: true });
+        });
+    </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .place-content-center {
+            place-content: center;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .gap-0\.5 {
+            gap: 0.5em;
+        }
+
+        .h-full {
+            height: 100vh;
+        }
+
+        .color-primary {
+            color: #4682b4;
+        }
+
+        .size-4em {
+            width: 4em;
+            height: 4em;
+        }
+
+        .text-2em {
+            font-size: 2em;
+        }
+
+        .text-1em {
+            font-size: 1em;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .container {
+            height: 100vh;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+<div id="loading" class="grid place-content-center h-full color-primary">
+    <div class="flex-col items-center">
+        <svg class="size-4em" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-dasharray="16" stroke-dashoffset="16"
+                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.97 0 9 4.03 9 9">
+                <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.2s" values="16;0" />
+                <animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate"
+                                  values="0 12 12;360 12 12" />
+            </path>
+        </svg>
+
+        <div class="flex items-center gap-0.5">
+            <img class="size-4em" src="favicon.ico" alt="银临茶舍 Logo" />
+            <p class="text-2em font-bold">银临茶舍</p>
+        </div>
+
+        <p class="text-1em">首次加载时间较长，请耐心等待...</p>
+    </div>
+</div>
+</body>
+
+</html>

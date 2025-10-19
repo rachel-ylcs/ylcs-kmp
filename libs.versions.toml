@@ -58,7 +58,6 @@ compose-components-uiToolingPreview = { module = "org.jetbrains.compose.componen
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material3-icon-old" }
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
-compose-graphics = { module = "org.jetbrains.androidx.graphics:graphics-shapes", version = "1.0.0-alpha09" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.1" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0-alpha02" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
