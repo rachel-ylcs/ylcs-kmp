@@ -54,6 +54,7 @@ kotlin {
                 libs.compose.components.resources,
                 libs.compose.components.uiToolingPreview,
                 libs.compose.navigation,
+                libs.compose.navigation.event,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
