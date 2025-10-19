@@ -27,21 +27,22 @@
 
 ## 模块表
 
-|    Module     |    Artifact     |   Description    | Android | iOS | Windows |  Linux  | macOS | Web/Wasm |
-|:-------------:|:---------------:|:----------------:|:-------:|:---:|:-------:|:-------:|:-----:|:--------:|
-|  `ylcs-core`  |                 |                  |         |     |         |         |       |          |
-|               |     `base`      |  language core   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               | `compose-base`  |   compose core   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               |    `cs-base`    |     C/S core     |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-| `ylcs-module` |                 |                  |         |     |         |         |       |          |
-|               | `client-engine` |  client engine   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               | `server-engine` |  server engine   |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
-|  `ylcs-app`   |                 |                  |         |     |         |         |       |          |
-|               |      `cs`       |    C/S bridge    |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               |      `mod`      |     song MOD     |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               |      `app`      |  rachel client   |    ✅    |  ✅  |    ✅    |    ✅    |   ✅   |    ✅     |
-|               |    `server`     |  rachel server   |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
-|               |  `mod-manager`  | song MOD mangaer |    ❌    |  ❌  |    ✅    |    ✅    |   ✅   |    ❌     |
+|    Module     |    Artifact     |   Description    | Android | iOS | Windows | Linux | macOS | Web/Wasm |
+|:-------------:|:---------------:|:----------------:|:-------:|:---:|:-------:|:-----:|:-----:|:--------:|
+|  `ylcs-core`  |                 |                  |         |     |         |       |       |          |
+|               |     `base`      |  language core   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               | `compose-base`  |   compose core   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               |    `cs-base`    |     C/S core     |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+| `ylcs-module` |                 |                  |         |     |         |       |       |          |
+|               | `client-engine` |  client engine   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               | `server-engine` |  server engine   |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
+|  `ylcs-app`   |                 |                  |         |     |         |       |       |          |
+|               |      `cs`       |    C/S bridge    |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               |      `mod`      |     song MOD     |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               |      `app`      |  rachel client   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               |    `server`     |  rachel server   |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
+|               |  `mod-manager`  | song MOD mangaer |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
+|  `ylcs-test`  |                 | test and feature |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 
 ## 源代码集依赖
 

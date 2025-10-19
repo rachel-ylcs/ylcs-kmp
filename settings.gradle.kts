@@ -53,4 +53,8 @@ include(
     "ylcs-app:app", // 跨平台APP
     "ylcs-app:server", // 服务端
     "ylcs-app:mod-manager", // MOD管理器
+
+    /* -----------------  [5] 测试模块  ----------------- */
+
+    "ylcs-test:nav3",
 )
