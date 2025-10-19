@@ -65,7 +65,7 @@ class ScreenImportMusic(model: AppModel, private val args: Args) : SubScreen<Scr
     }
 
     private suspend fun loadModFile() {
-        OS.ifPlatform(
+        Platform.use(
             Platform.WebWasm,
             ifTrue = {
                 slot.tip.warning(UnsupportedPlatformText)

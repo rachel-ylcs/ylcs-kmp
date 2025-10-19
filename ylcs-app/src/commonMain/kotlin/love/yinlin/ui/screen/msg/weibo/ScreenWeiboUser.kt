@@ -187,7 +187,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
     }
 
     private fun onPicturesDownload(pics: List<Picture>) {
-        OS.ifPlatform(
+        Platform.use(
             *Platform.Phone,
             ifTrue = {
                 launch {

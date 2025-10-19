@@ -37,7 +37,6 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.data.ItemKey
 import love.yinlin.extension.rememberState
 import love.yinlin.extension.replaceAll
-import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.math.abs
@@ -502,7 +501,7 @@ fun <T> PaginationColumn(
     itemDivider: PaddingValues? = null,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-    OS.ifPlatform(
+    Platform.use(
         *Platform.Phone,
         ifTrue = {
             SwipePaginationLayout(
@@ -567,7 +566,7 @@ fun <T> PaginationGrid(
     header: (@Composable LazyGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-    OS.ifPlatform(
+    Platform.use(
         *Platform.Phone,
         ifTrue = {
             SwipePaginationLayout(
@@ -633,7 +632,7 @@ fun <T> PaginationStaggeredGrid(
     header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-    OS.ifPlatform(
+    Platform.use(
         *Platform.Phone,
         ifTrue = {
             SwipePaginationLayout(

@@ -3,6 +3,8 @@ package love.yinlin.common
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.common.uri.Scheme
+import love.yinlin.common.uri.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.platform.app

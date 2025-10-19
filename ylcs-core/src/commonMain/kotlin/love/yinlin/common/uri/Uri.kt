@@ -1,41 +1,7 @@
-package love.yinlin.common
+package love.yinlin.common.uri
 
-import androidx.compose.runtime.Stable
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import love.yinlin.platform.OS
-import love.yinlin.platform.Platform
 
-@Serializable(Scheme.Serializer::class)
-data class Scheme(val name: String) {
-    companion object {
-        val Http = Scheme("http")
-        val Https = Scheme("https")
-        val File = Scheme("file")
-        val Content = Scheme("content")
-        val Package = Scheme("scheme")
-        val Rachel = Scheme("rachel")
-        val NetEaseCloud = Scheme("nec")
-        val QQMusic = Scheme("qm")
-        val Taobao = Scheme("taobao")
-        val QQ = Scheme("mqqapi")
-    }
-
-    override fun toString(): String = name
-
-    object Serializer : KSerializer<Scheme> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Scheme", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: Scheme) = encoder.encodeString(value.name)
-        override fun deserialize(decoder: Decoder): Scheme = Scheme(decoder.decodeString())
-    }
-}
-
-@Stable
 @Serializable
 data class Uri(
     val scheme: Scheme,
@@ -46,7 +12,7 @@ data class Uri(
 ) {
     fun encode(): String = encodeUri(toString())
 
-    val params: Map<String, String> get() {
+    val params: Map<String, String> by lazy {
         val map = mutableMapOf<String, String>()
         val items = query?.split('&') ?: emptyList()
         for (item in items) {
@@ -54,7 +20,7 @@ data class Uri(
             val value = item.substringAfter('=')
             if (item.contains('=') && key.isNotEmpty()) map[key] = value
         }
-        return map
+        map
     }
 
     override fun toString(): String = buildString {
@@ -224,43 +190,4 @@ data class Uri(
             return builder.toString()
         }
     }
-}
-
-object UriGenerator {
-    fun qq(id: String): Uri = Uri(
-        scheme = Scheme.QQ,
-        host = "card",
-        path = "/show_pslcard",
-        query = "src_type=internal&version=1&uin=$id&card_type=person&source=qrcode"
-    )
-
-    fun qqGroup(id: String) = Uri(
-        scheme = Scheme.QQ,
-        host = "card",
-        path = "/show_pslcard",
-        query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
-    )
-
-    fun qqGroup(k: String, authKey: String) = Uri(
-        scheme = Scheme.Https,
-        host = "qm.qq.com",
-        path = "/cgi-bin/qm/qr",
-        query = "k=$k&authKey=$authKey"
-    )
-
-    fun taobao(shopId: String): Uri = OS.ifPlatform(
-        *Platform.Phone,
-        ifTrue = { Uri(
-            scheme = Scheme.Taobao,
-            host = "shop.m.taobao.com",
-            path = "/shop/shop_index.htm",
-            query = "shop_id=$shopId"
-        ) },
-        ifFalse = {
-            Uri(
-                scheme = Scheme.Https,
-                host = "shop$shopId.taobao.com"
-            )
-        }
-    )
 }

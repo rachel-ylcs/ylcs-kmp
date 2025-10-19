@@ -27,6 +27,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
+import love.yinlin.common.uri.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo

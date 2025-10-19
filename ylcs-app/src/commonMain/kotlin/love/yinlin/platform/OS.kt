@@ -14,7 +14,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.ThemeValue
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 import love.yinlin.ui.component.image.MiniIcon
@@ -42,18 +42,6 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 
 @Stable
 object OS {
-	fun platform(vararg filter: Platform): Boolean = filter.contains(platform)
-
-	fun notPlatform(vararg filter: Platform): Boolean = !filter.contains(platform)
-
-	inline fun ifPlatform(vararg filter: Platform, block: () -> Unit) = if (platform(*filter)) block() else Unit
-
-	inline fun <T> ifPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (platform(*filter)) ifTrue() else ifFalse()
-
-	inline fun ifNotPlatform(vararg filter: Platform, block: () -> Unit) = if (notPlatform(*filter)) block() else Unit
-
-	inline fun <T> ifNotPlatform(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (notPlatform(*filter)) ifTrue() else ifFalse()
-
 	@Stable
 	object Application {
 		suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)

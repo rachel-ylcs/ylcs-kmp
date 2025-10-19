@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import kotlinx.browser.window
 import kotlinx.io.files.Path
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
 	osNetOpenUrl(uri.toString())

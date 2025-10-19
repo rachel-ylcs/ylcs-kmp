@@ -83,7 +83,7 @@ class ScreenWeibo(model: AppModel) : CommonSubScreen(model) {
                     items = items,
                     modifier = Modifier.fillMaxSize(),
                     onPicturesDownload = { pics ->
-                        OS.ifPlatform(
+                        Platform.use(
                             *Platform.Phone,
                             ifTrue = {
                                 launch {

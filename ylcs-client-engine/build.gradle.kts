@@ -12,6 +12,7 @@ kotlin {
 
     androidTarget {
         C.jvmTarget(this)
+        publishLibraryVariants("release")
     }
 
     iosArm64()
@@ -29,7 +30,13 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        binaries.executable()
+        binaries.library()
     }
 
     sourceSets {
@@ -67,8 +74,13 @@ kotlin {
 
         val jvmMain by creating {
             useSourceSet(commonMain)
+            if (C.platform != BuildPlatform.Mac) {
+                useLib(
+                    libs.ktor.okhttp,
+                )
+            }
             useLib(
-                libs.ktor.okhttp,
+
             )
         }
 

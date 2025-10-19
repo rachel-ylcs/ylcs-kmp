@@ -11,6 +11,7 @@ kotlin {
 
     androidTarget {
         C.jvmTarget(this)
+        publishLibraryVariants("release")
     }
 
     iosArm64()
@@ -28,7 +29,13 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        binaries.executable()
+        binaries.library()
     }
 
     sourceSets {

@@ -28,14 +28,10 @@ class ScreenWebpage(model: AppModel, args: Args) : SubScreen<ScreenWebpage.Args>
 
 	companion object {
 		inline fun gotoWebPage(arg: String, onNavigate: (Args) -> Unit) {
-			OS.ifPlatform(
+			Platform.use(
 				*Platform.Desktop,
-				ifTrue = {
-					OS.Net.openUrl(arg)
-				},
-				ifFalse = {
-					onNavigate(Args(arg))
-				}
+				ifTrue = { OS.Net.openUrl(arg) },
+				ifFalse = { onNavigate(Args(arg)) }
 			)
 		}
 		fun ScreenPart.gotoWebPage(arg: String) = gotoWebPage(arg) { navigate(it) }

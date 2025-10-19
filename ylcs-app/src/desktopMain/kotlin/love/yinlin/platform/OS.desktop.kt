@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import kotlinx.io.files.Path
 import love.yinlin.Local
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 import love.yinlin.extension.catching
 import net.harawata.appdirs.AppDirsFactory
 import java.awt.Desktop

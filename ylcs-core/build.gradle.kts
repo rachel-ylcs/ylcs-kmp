@@ -11,6 +11,7 @@ kotlin {
 
     androidTarget {
         C.jvmTarget(this)
+        publishLibraryVariants("release")
     }
 
     iosArm64()
@@ -28,7 +29,13 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        binaries.executable()
+        binaries.library()
     }
 
     sourceSets {
@@ -50,15 +57,23 @@ kotlin {
             useSourceSet(commonMain)
         }
 
-        androidMain.configure {
+        val appleMain = appleMain.get().apply {
+            useSourceSet(nonAndroidMain, nonWasmJsMain)
+        }
+
+        val jvmMain by creating {
             useSourceSet(nonWasmJsMain)
-            useApi(
-                libs.kotlinx.coroutines.android
-            )
         }
 
         val iosMain = iosMain.get().apply {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
+            useSourceSet(appleMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(jvmMain)
+            useApi(
+                libs.kotlinx.coroutines.android
+            )
         }
 
         buildList {
@@ -77,7 +92,10 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
+            useSourceSet(nonAndroidMain, jvmMain)
+            if (C.platform == BuildPlatform.Mac) {
+                useSourceSet(appleMain)
+            }
             useApi(
                 libs.kotlinx.coroutines.swing
             )
@@ -85,6 +103,9 @@ kotlin {
 
         wasmJsMain.configure {
             useSourceSet(nonAndroidMain)
+            useApi(
+                libs.kotlinx.broswer
+            )
         }
     }
 }

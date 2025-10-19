@@ -1,7 +1,19 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
-    alias(libs.plugins.gradleKotlinDsl)
+    `kotlin-dsl`
 }
 
 dependencies {
-    implementation(libs.kotlin.gradle.plugin.api)
+    implementation(libs.gradle.plugin.kotlin)
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = JavaVersion.VERSION_21.toString()
+    targetCompatibility = JavaVersion.VERSION_21.toString()
+}
+
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions.jvmTarget = JvmTarget.JVM_21
 }

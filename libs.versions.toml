@@ -27,8 +27,6 @@ sgQrcode = "4.1.0"
 
 [plugins]
 gradleApplication = { id = "org.gradle.application" }
-#noinspection NewerVersionAvailable
-gradleKotlinDsl = { id = "org.gradle.kotlin.kotlin-dsl", version = "5.2.0" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
@@ -43,7 +41,7 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 [libraries]
 
 # Gradle
-kotlin-gradle-plugin-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
+gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
@@ -70,6 +68,7 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
+kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.30.0-beta" }
 
 ktor-client = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

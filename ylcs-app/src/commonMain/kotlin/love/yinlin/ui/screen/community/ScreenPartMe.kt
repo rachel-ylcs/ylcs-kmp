@@ -37,6 +37,9 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.common.uri.Scheme
+import love.yinlin.common.uri.Uri
+import love.yinlin.common.uri.UriGenerator
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.RequestError
@@ -222,7 +225,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
         ) {
             Item("水群", ExtraIcons.QQ) {
                 launch {
-                    OS.ifPlatform(*Platform.Phone,
+                    Platform.use(*Platform.Phone,
                         ifTrue = { if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning("未安装QQ") },
                         ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup("0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E", "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R")) }
                     )

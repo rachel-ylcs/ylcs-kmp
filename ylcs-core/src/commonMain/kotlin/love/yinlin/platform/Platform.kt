@@ -24,6 +24,12 @@ enum class Platform {
             WebWasm.ordinal -> WebWasm
             else -> null
         }
+
+        fun has(vararg filter: Platform): Boolean = platform in filter
+        fun hasNot(vararg filter: Platform): Boolean = platform !in filter
+        inline fun use(vararg filter: Platform, block: () -> Unit) = if (platform in filter) block() else Unit
+        inline fun <T> use(vararg filter: Platform, ifTrue: () -> T, ifFalse: () -> T): T = if (platform in filter) ifTrue() else ifFalse()
+        inline fun useNot(vararg filter: Platform, block: () -> Unit) = if (platform !in filter) block() else Unit
     }
 }
 

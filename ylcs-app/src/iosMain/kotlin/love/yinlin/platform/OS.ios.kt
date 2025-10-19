@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 import love.yinlin.common.toNSUrl
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingDefault

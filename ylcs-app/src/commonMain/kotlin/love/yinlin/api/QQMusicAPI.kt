@@ -3,7 +3,7 @@ package love.yinlin.api
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.JsonObjectScope
@@ -17,7 +17,6 @@ import love.yinlin.extension.parseJson
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.app
 import love.yinlin.platform.safeGet
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import kotlin.io.encoding.Base64

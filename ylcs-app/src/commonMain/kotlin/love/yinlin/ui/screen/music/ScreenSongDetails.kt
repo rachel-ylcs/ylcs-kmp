@@ -31,6 +31,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.common.uri.UriGenerator
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
@@ -384,7 +385,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             launch {
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
                 else {
-                    val result = OS.ifPlatform(*Platform.Phone,
+                    val result = Platform.use(*Platform.Phone,
                         ifTrue = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.id)) },
                         ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
                     )

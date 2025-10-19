@@ -29,6 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.common.*
+import love.yinlin.common.uri.Uri
 import love.yinlin.extension.LaunchFlag
 import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.FABAction

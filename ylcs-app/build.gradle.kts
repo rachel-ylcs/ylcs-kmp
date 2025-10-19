@@ -136,20 +136,16 @@ kotlin {
             useSourceSet(commonMain)
         }
 
-        val nonWasmJsMain by creating {
-            useSourceSet(commonMain)
-        }
-
         val nonDesktopMain by creating {
             useSourceSet(commonMain)
         }
 
         val appleMain = appleMain.get().apply {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
+            useSourceSet(nonAndroidMain)
         }
 
         val jvmMain by creating {
-            useSourceSet(nonWasmJsMain)
+            useSourceSet(commonMain)
             useLib(
                 // local
                 fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar")))
@@ -176,15 +172,6 @@ kotlin {
             )
         }
 
-        val desktopMain by getting {
-            useSourceSet(nonAndroidMain, jvmMain)
-            useLib(
-                compose.desktop.currentOs,
-                libs.vlcj,
-                fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
-            )
-        }
-
         val iosMain = iosMain.get().apply {
             useSourceSet(appleMain, nonDesktopMain)
         }
@@ -202,6 +189,19 @@ kotlin {
             it.configure {
                 useSourceSet(iosMain)
             }
+        }
+
+        val desktopMain by getting {
+            useSourceSet(nonAndroidMain, jvmMain)
+            if (C.platform == BuildPlatform.Mac) {
+                useSourceSet(appleMain)
+            }
+
+            useLib(
+                compose.desktop.currentOs,
+                libs.vlcj,
+                fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
+            )
         }
 
         wasmJsMain.configure {

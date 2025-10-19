@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.AppModel
 import love.yinlin.common.LocalImmersivePadding
-import love.yinlin.common.Uri
+import love.yinlin.common.uri.Uri
 import love.yinlin.common.rememberImmersivePadding
 import love.yinlin.extension.getNavType
 import love.yinlin.ui.component.screen.*

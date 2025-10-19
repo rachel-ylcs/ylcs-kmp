@@ -64,7 +64,7 @@ fun main() {
         initialize()
     }
 
-    OS.ifPlatform(Platform.MacOS) {
+    Platform.use(Platform.MacOS) {
         Desktop.getDesktop().setOpenURIHandler { event ->
             DeepLinkHandler.onOpenUri(event.uri.toUri())
         }
@@ -98,7 +98,7 @@ fun main() {
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
                 // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                OS.ifPlatform(Platform.Windows) {
+                Platform.use(Platform.Windows) {
                     val screenBounds = window.graphicsConfiguration.bounds
                     val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
                     window.maximizedBounds = Rectangle(

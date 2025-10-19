@@ -16,7 +16,6 @@ import love.yinlin.common.ThemeValue
 import love.yinlin.extension.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.DockedColorPicker
@@ -26,7 +25,7 @@ import love.yinlin.ui.component.layout.SplitLayout
 
 // ignoresMouseEvents on macOS is buggy, see https://stackoverflow.com/questions/29441015
 private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
-    OS.ifPlatform(Platform.MacOS, block = {
+    Platform.use(Platform.MacOS) {
         if (floatingLyrics.isAttached) {
             floatingLyrics.isAttached = false
             Coroutines.startMain {
@@ -34,7 +33,7 @@ private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
                 floatingLyrics.isAttached = true
             }
         }
-    })
+    }
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {

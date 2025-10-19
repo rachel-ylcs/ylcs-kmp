@@ -103,7 +103,7 @@ class ScreenChaohua(model: AppModel) : CommonSubScreen(model) {
                         weibo = weibo,
                         modifier = Modifier.fillMaxWidth(),
                         onPicturesDownload = { pics ->
-                            OS.ifPlatform(
+                            Platform.use(
                                 *Platform.Phone,
                                 ifTrue = {
                                     launch {
