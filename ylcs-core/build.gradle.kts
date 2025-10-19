@@ -92,10 +92,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain, jvmMain)
-            if (C.platform == BuildPlatform.Mac) {
-                useSourceSet(appleMain)
-            }
+            useSourceSet(nonAndroidMain, jvmMain, appleMain)
             useApi(
                 libs.kotlinx.coroutines.swing
             )
