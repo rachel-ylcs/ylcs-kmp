@@ -27,7 +27,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:androidPublish
+        run: ./gradlew ylcs-app:app:androidPublish
 
       - name: Rename
         run: |
@@ -59,7 +59,7 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:generateDummyFramework
+          ./gradlew ylcs-app:app:generateDummyFramework
           # xcodebuild build -workspace ./iosApp/iosApp.xcworkspace -scheme iosApp
           xcodebuild archive -workspace ./iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
           # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./iosApp/ExportOptions.plist
@@ -100,7 +100,7 @@ jobs:
         run: |
           cd native && ./build.bat
           cd ..
-          ./gradlew ylcs-app:desktopPublish
+          ./gradlew ylcs-app:app:desktopPublish
 
       - name: Compress
         run: |
@@ -140,7 +140,7 @@ jobs:
         run: |
           cd native && ./build.sh
           cd ..
-          ./gradlew ylcs-app:desktopPublish
+          ./gradlew ylcs-app:app:desktopPublish
 
       - name: Compress
         run: |
@@ -174,7 +174,7 @@ jobs:
         run: |
           cd native && ./build.sh
           cd ..
-          ./gradlew ylcs-app:desktopPublish
+          ./gradlew ylcs-app:app:desktopPublish
 
       - name: Compress
         run: |
@@ -205,7 +205,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:webPublish
+        run: ./gradlew ylcs-app:app:webPublish
 
       - name: Compress
         run: |
@@ -236,7 +236,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-server:serverPublish
+        run: ./gradlew ylcs-app:server:serverPublish
 
       - name: Compress
         run: |

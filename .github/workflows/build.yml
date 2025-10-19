@@ -7,16 +7,14 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
-      - 'design-PS/**'
-      - 'design-AE/**'
+      - 'design/**'
   pull_request:
     branches:
       - main
     paths-ignore:
       - '**.md'
       - 'docs/**'
-      - 'design-PS/**'
-      - 'design-AE/**'
+      - 'design/**'
 
 jobs:
   changes:
@@ -42,47 +40,48 @@ jobs:
             common: &common
               - 'gradle/**'
               - 'buildSrc/**'
-              - 'ylcs-shared/**'
+              - 'ylcs-core/**'
+              - 'ylcs-app/cs/**'
               - 'gradle.properties'
               - 'settings.gradle.kts'
               - 'build.gradle.kts'
               - 'libs.versions.toml'
             client: &client
               - *common
-              - 'ylcs-music/**'
+              - 'ylcs-app/mod/**'
               - 'ylcs-app/libs/**'
-              - 'ylcs-app/proguard/R8Common.pro'
-              - 'ylcs-app/src/commonMain/**'
-              - 'ylcs-app/build.gradle.kts'
+              - 'ylcs-app/app/proguard/R8Common.pro'
+              - 'ylcs-app/app/src/commonMain/**'
+              - 'ylcs-app/app/build.gradle.kts'
             android:
               - *client
-              - 'ylcs-app/proguard/R8Android.pro'
-              - 'ylcs-app/src/jvmMain/**'
-              - 'ylcs-app/src/nonDesktopMain/**'
-              - 'ylcs-app/src/androidMain/**'
+              - 'ylcs-app/app/proguard/R8Android.pro'
+              - 'ylcs-app/app/src/jvmMain/**'
+              - 'ylcs-app/app/src/nonDesktopMain/**'
+              - 'ylcs-app/app/src/androidMain/**'
             ios:
               - *client
               - 'iosApp/**'
-              - 'ylcs-app/src/nativeInterop/**'
-              - 'ylcs-app/src/appleMain/**'
-              - 'ylcs-app/src/nonAndroidMain/**'
-              - 'ylcs-app/src/nonDesktopMain/**'
-              - 'ylcs-app/src/iosMain/**'
+              - 'ylcs-app/src/app/nativeInterop/**'
+              - 'ylcs-app/src/app/appleMain/**'
+              - 'ylcs-app/src/app/nonAndroidMain/**'
+              - 'ylcs-app/src/app/nonDesktopMain/**'
+              - 'ylcs-app/src/app/iosMain/**'
             desktop:
               - *client
               - 'native/**'
-              - 'ylcs-app/proguard/R8Desktop.pro'
-              - 'ylcs-app/src/jvmMain/**'
-              - 'ylcs-app/src/nonAndroidMain/**'
-              - 'ylcs-app/src/desktopMain/**'
+              - 'ylcs-app/app/proguard/R8Desktop.pro'
+              - 'ylcs-app/app/src/jvmMain/**'
+              - 'ylcs-app/app/src/nonAndroidMain/**'
+              - 'ylcs-app/app/src/desktopMain/**'
             web:
               - *client
-              - 'ylcs-app/src/nonAndroidMain/**'
-              - 'ylcs-app/src/nonDesktopMain/**'
-              - 'ylcs-app/src/wasmJsMain/**'
+              - 'ylcs-app/app/src/nonAndroidMain/**'
+              - 'ylcs-app/app/src/nonDesktopMain/**'
+              - 'ylcs-app/app/src/wasmJsMain/**'
             server:
               - *common
-              - 'ylcs-server/**'
+              - 'ylcs-app/server/**'
 
   build-android:
     name: Build Android
@@ -107,7 +106,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build Android
-        run: ./gradlew ylcs-app:assembleDebug
+        run: ./gradlew ylcs-app:app:assembleDebug
 
   build-ios:
     name: Build iOS
@@ -129,7 +128,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build iOS
-        run: ./gradlew ylcs-app:linkPodDebugFrameworkIosArm64
+        run: ./gradlew ylcs-app:app:linkPodDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop
@@ -176,7 +175,7 @@ jobs:
           cd native && ./build.sh
 
       - name: Build Desktop
-        run: ./gradlew ylcs-app:desktopJar
+        run: ./gradlew ylcs-app:app:desktopRunDebug
 
   build-web:
     name: Build Web
@@ -198,7 +197,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build Web
-        run: ./gradlew ylcs-app:wasmJsJar
+        run: ./gradlew ylcs-app:app:webRun
 
   build-server:
     name: Build Server
@@ -220,4 +219,4 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build Server
-        run: ./gradlew ylcs-server:build
+        run: ./gradlew ylcs-app:server:build
