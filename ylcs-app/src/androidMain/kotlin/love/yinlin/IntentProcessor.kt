@@ -5,7 +5,7 @@ import android.os.Build
 import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.uri.Scheme
 import love.yinlin.common.uri.Uri
-import love.yinlin.common.toUri
+import love.yinlin.common.uri.toUri
 import love.yinlin.extension.catching
 
 object IntentProcessor {

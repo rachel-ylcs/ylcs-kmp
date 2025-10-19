@@ -1,7 +1,6 @@
-package love.yinlin.common
+package love.yinlin.common.uri
 
 import kotlinx.io.files.Path
-import love.yinlin.common.uri.Uri
 import platform.Foundation.NSURL
 
 fun NSURL.toUri(): Uri = Uri.parse(this.absoluteString ?: "") ?: Uri.Empty

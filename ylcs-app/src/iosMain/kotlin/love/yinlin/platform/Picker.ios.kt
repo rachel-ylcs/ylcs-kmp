@@ -9,7 +9,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import love.yinlin.common.toNSData
-import love.yinlin.common.toPath
+import love.yinlin.common.uri.toPath
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import platform.darwin.*

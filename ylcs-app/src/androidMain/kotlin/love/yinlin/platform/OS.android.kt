@@ -8,7 +8,7 @@ import com.github.panpf.sketch.SingletonSketch
 import kotlinx.io.files.Path
 import androidx.core.net.toUri
 import love.yinlin.common.uri.Uri
-import love.yinlin.common.toAndroidUri
+import love.yinlin.common.uri.toAndroidUri
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingDefault
 

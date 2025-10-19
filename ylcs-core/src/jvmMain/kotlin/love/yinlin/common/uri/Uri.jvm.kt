@@ -1,6 +1,5 @@
-package love.yinlin.common
+package love.yinlin.common.uri
 
-import love.yinlin.common.uri.Uri
 import java.net.URI
 
 fun URI.toUri(): Uri = Uri.parse(this.toString()) ?: Uri.Empty

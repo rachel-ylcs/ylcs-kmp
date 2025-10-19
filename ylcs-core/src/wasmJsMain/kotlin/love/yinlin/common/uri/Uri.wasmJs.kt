@@ -1,6 +1,6 @@
-package love.yinlin.common
+package love.yinlin.common.uri
 
-import love.yinlin.common.uri.Uri
+import org.w3c.dom.url.URL
 
-fun org.w3c.dom.url.URL.toUri(): Uri = Uri.parse(this.toString()) ?: Uri.Empty
-fun Uri.toJsUri(): org.w3c.dom.url.URL = org.w3c.dom.url.URL(this.toString())
+fun URL.toUri(): Uri = Uri.parse(this.toString()) ?: Uri.Empty
+fun Uri.toJsUri(): URL = URL(this.toString())
