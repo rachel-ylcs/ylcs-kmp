@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberFalse
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon

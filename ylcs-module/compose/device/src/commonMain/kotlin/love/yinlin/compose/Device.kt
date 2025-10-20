@@ -1,10 +1,9 @@
-package love.yinlin.common
+package love.yinlin.compose
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
-import love.yinlin.compose.localComposition
 
 @Stable
 @Serializable

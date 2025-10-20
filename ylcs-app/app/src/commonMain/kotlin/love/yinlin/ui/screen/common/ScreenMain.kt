@@ -19,11 +19,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.common.rememberImmersivePadding
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox

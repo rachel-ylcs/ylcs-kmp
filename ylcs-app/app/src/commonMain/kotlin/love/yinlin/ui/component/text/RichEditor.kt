@@ -20,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.ui.component.container.TabBar

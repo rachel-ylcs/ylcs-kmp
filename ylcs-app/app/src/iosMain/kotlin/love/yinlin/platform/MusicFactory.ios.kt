@@ -12,7 +12,7 @@ import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
-import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.compose.mutableRefStateOf
 import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath

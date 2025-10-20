@@ -19,8 +19,8 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.autoreleasepool
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
 import love.yinlin.extension.toNSData
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*

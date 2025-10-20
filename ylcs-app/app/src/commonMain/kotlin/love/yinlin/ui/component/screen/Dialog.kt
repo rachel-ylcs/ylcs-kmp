@@ -24,10 +24,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.component.node.clickableNoRipple

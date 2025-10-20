@@ -33,12 +33,9 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank

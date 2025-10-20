@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
 import org.jetbrains.compose.resources.Font

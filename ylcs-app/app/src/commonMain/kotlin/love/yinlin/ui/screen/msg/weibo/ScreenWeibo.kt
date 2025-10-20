@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.Device
-import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom

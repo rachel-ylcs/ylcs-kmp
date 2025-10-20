@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.platform.appNative
 import love.yinlin.ui.CustomUI
 

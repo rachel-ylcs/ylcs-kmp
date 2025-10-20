@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberRefState
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider

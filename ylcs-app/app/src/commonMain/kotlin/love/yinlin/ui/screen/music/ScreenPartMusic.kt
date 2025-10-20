@@ -41,6 +41,9 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.rememberOffScreenState

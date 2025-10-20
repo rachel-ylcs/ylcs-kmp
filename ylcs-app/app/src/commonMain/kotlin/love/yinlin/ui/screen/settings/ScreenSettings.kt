@@ -30,6 +30,8 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.rememberState
 import love.yinlin.data.Data

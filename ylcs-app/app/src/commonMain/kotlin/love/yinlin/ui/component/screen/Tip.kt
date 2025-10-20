@@ -17,11 +17,11 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeColor
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.node.clickableNoRipple
 

@@ -21,10 +21,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberValueState
 import love.yinlin.platform.app
 import kotlin.math.roundToInt

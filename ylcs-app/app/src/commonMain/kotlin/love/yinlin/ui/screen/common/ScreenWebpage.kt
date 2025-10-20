@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.ScreenPart
-import love.yinlin.common.Device
-import love.yinlin.common.LocalImmersivePadding
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.ui.component.platform.WebPage

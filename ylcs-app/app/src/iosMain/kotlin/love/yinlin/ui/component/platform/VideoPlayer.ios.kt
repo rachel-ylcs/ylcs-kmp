@@ -11,9 +11,9 @@ import androidx.compose.ui.zIndex
 import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.common.Colors
-import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberFalse
-import love.yinlin.extension.rememberRefState
+import love.yinlin.compose.OffScreenEffect
+import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.rememberRefState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI

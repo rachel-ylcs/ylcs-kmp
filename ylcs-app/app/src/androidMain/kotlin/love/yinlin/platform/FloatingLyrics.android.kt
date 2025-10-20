@@ -24,9 +24,9 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
 import love.yinlin.common.uri.Scheme
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
 import love.yinlin.extension.catching
 import java.util.UUID
 

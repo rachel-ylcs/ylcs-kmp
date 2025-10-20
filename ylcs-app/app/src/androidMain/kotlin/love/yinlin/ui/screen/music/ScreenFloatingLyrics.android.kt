@@ -15,11 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.OffScreenEffect
-import love.yinlin.extension.rememberRefState
+import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app

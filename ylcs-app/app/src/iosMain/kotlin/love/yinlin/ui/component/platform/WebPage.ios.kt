@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.cinterop.ObjCSignatureOverride
-import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.compose.mutableRefStateOf
 import platform.Foundation.NSError
 import platform.WebKit.WKNavigation
 import platform.WebKit.WKNavigationDelegateProtocol

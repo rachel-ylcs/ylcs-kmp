@@ -1,4 +1,4 @@
-package love.yinlin.common
+package love.yinlin.compose
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,8 +14,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import love.yinlin.compose.localComposition
-import love.yinlin.compose.rememberRefState
 
 @Stable
 data class ImmersivePadding(

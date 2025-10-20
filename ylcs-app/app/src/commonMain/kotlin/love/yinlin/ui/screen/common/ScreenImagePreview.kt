@@ -20,9 +20,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Device
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines

@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.mutableRefStateOf
-import love.yinlin.extension.rememberState
+import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.rememberState
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.platform.appNative

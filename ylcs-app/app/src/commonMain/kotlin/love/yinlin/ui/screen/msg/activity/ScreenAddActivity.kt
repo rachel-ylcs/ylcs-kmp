@@ -9,7 +9,7 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Device
+import love.yinlin.compose.Device
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity

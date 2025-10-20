@@ -15,8 +15,8 @@ import androidx.compose.ui.draw.clipToBounds
 import kotlinx.coroutines.delay
 import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberFalse
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.extension.timeString

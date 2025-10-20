@@ -43,13 +43,10 @@ import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import love.yinlin.AppModel
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.rachelFont
-import love.yinlin.compose.LaunchFlag
-import love.yinlin.compose.OffScreenEffect
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game

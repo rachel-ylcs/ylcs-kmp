@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import love.yinlin.DeviceWrapper
 import love.yinlin.common.Colors
-import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
 import love.yinlin.ui.component.node.condition
 
 @Stable

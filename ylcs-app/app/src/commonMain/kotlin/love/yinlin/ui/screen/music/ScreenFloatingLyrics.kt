@@ -11,8 +11,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
-import love.yinlin.common.Device
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
 import love.yinlin.ui.component.screen.CommonSubScreen
 
 @Composable

@@ -40,6 +40,9 @@ import love.yinlin.common.*
 import love.yinlin.common.uri.Scheme
 import love.yinlin.common.uri.Uri
 import love.yinlin.common.uri.UriGenerator
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey

@@ -32,6 +32,8 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
 import love.yinlin.common.uri.UriGenerator
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment

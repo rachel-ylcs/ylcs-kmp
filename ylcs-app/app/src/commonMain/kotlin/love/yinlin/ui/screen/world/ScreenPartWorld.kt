@@ -40,6 +40,8 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.common.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType

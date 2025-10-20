@@ -14,11 +14,8 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
-import love.yinlin.common.Device
-import love.yinlin.common.LocalDevice
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.common.rememberImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitActionLayout

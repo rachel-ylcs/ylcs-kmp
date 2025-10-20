@@ -6,7 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.Device
+import love.yinlin.compose.Device
 import love.yinlin.ui.component.platform.VideoPlayer
 import love.yinlin.ui.component.screen.SubScreen
 

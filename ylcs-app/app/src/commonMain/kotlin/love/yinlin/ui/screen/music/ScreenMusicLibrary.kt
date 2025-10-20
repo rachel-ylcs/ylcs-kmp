@@ -21,10 +21,10 @@ import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
-import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
