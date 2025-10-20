@@ -1,7 +1,7 @@
 ![项目依赖结构](docs/pics/title.jpg)
 
-<div style="text-align:center">
-    <h1>银临茶舍跨平台 App</h1>
+<div>
+    <h1 align="center">银临茶舍跨平台 App</h1>
     <h5></h5>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt=""/>
@@ -19,6 +19,7 @@
         <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/main.yml/badge.svg" alt=""/>
         <img src="https://img.shields.io/badge/QQ%E4%BA%A4%E6%B5%81%E7%BE%A4-828049503-red.svg" alt=""/>
     </div>
+    <h5></h5>
 </div>
 
 > [!IMPORTANT]
