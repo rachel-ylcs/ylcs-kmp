@@ -13,7 +13,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberRefState
+import love.yinlin.compose.rememberRefState
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform

@@ -3,7 +3,7 @@ package love.yinlin.ui.component.common
 import androidx.compose.runtime.State
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
-import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.compose.mutableRefStateOf
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType

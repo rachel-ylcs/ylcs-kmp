@@ -18,10 +18,10 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid

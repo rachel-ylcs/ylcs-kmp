@@ -34,6 +34,8 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.rememberDerivedState
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -43,8 +45,6 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
-import love.yinlin.extension.mutableRefStateOf
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon

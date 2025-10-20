@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
+import love.yinlin.compose.rememberFalse
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
 import love.yinlin.ui.component.image.MiniIcon

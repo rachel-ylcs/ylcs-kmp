@@ -47,13 +47,13 @@ import love.yinlin.common.Device
 import love.yinlin.common.ThemeStyle
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.rachelFont
+import love.yinlin.compose.LaunchFlag
+import love.yinlin.compose.OffScreenEffect
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
-import love.yinlin.extension.LaunchFlag
-import love.yinlin.extension.OffScreenEffect
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer

@@ -28,12 +28,12 @@ import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
 import love.yinlin.common.uri.Uri
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient

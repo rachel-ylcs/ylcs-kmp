@@ -21,10 +21,10 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.rememberDerivedState
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.extension.rememberDerivedState
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.layout.BoxState

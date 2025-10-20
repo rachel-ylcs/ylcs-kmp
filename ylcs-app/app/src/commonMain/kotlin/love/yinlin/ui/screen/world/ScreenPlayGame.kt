@@ -22,12 +22,12 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_state_loading

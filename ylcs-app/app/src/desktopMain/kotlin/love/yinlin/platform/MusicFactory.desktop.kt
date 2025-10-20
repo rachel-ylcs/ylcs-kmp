@@ -2,10 +2,10 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.replaceAll
 import love.yinlin.ui.screen.music.audioPath
 import uk.co.caprica.vlcj.media.Media

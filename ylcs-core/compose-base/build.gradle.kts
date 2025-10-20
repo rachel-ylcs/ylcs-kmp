@@ -54,10 +54,16 @@ kotlin {
                 libs.compose.components.resources,
                 libs.compose.components.uiToolingPreview,
                 libs.compose.navigation,
-                libs.compose.navigation.event,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
+            )
+        }
+
+        androidMain.configure {
+            useApi(
+                compose.preview,
+                libs.compose.activity,
             )
         }
 
@@ -86,12 +92,21 @@ kotlin {
 
         val desktopMain by getting {
             useSourceSet(nonAndroidMain)
+            useApi(
+                compose.desktop.currentOs,
+            )
         }
 
         wasmJsMain.configure {
             useSourceSet(nonAndroidMain)
         }
     }
+}
+
+dependencies {
+    implementation(libs.compose.ui.graphics.android)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.android)
 }
 
 android {

@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
+import love.yinlin.compose.rememberFalse
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.LoadingAnimation
 

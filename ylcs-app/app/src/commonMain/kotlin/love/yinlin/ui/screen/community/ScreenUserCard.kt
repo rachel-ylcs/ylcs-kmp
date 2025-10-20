@@ -29,11 +29,11 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.image.WebImage

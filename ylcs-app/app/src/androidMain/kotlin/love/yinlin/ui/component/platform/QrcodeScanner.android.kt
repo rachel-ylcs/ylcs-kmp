@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.zxing.Result
 import com.king.camera.scan.BaseCameraScan
 import com.king.view.viewfinderview.ViewfinderView
 import com.king.zxing.DecodeConfig
@@ -37,7 +38,7 @@ import java.util.*
 private class QrCodeScannerState {
     val previewView = mutableRefStateOf<PreviewView?>(null)
     val viewFinderView = mutableRefStateOf<ViewfinderView?>(null)
-    var cameraScan by mutableRefStateOf<BaseCameraScan<com.google.zxing.Result>?>(null)
+    var cameraScan by mutableRefStateOf<BaseCameraScan<Result>?>(null)
 }
 
 @Composable

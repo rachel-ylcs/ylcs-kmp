@@ -9,12 +9,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastForEach
+import love.yinlin.compose.onLine
+import love.yinlin.compose.roundToIntOffset
+import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.extension.onLine
-import love.yinlin.extension.roundToIntOffset
-import love.yinlin.extension.translate
 
 // 音符队列
 @Stable

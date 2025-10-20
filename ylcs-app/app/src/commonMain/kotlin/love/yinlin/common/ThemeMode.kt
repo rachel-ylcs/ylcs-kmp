@@ -2,7 +2,7 @@ package love.yinlin.common
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.extension.localComposition
+import love.yinlin.compose.localComposition
 
 @Stable
 @Serializable

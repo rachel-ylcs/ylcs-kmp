@@ -9,11 +9,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.common.Colors
+import love.yinlin.compose.cramerCenter
+import love.yinlin.compose.onCenter
+import love.yinlin.compose.onLine
+import love.yinlin.compose.slope
 import love.yinlin.data.music.Chorus
-import love.yinlin.extension.cramerCenter
-import love.yinlin.extension.onCenter
-import love.yinlin.extension.onLine
-import love.yinlin.extension.slope
 import kotlin.math.max
 import kotlin.math.min
 

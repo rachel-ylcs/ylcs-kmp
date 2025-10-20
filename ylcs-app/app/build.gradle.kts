@@ -151,9 +151,6 @@ kotlin {
         androidMain.configure {
             useSourceSet(jvmMain, nonDesktopMain)
             useLib(
-                // compose
-                compose.preview,
-                libs.compose.activity,
                 // media3
                 libs.media3.ui,
                 libs.media3.session,
@@ -190,7 +187,6 @@ kotlin {
         val desktopMain by getting {
             useSourceSet(nonAndroidMain, jvmMain)
             useLib(
-                compose.desktop.currentOs,
                 libs.vlcj,
                 fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
             )
@@ -217,12 +213,6 @@ composeCompiler {
 
 compose.resources {
     packageOfResClass = "${C.app.packageName}.resources"
-}
-
-dependencies {
-    implementation(libs.compose.ui.graphics.android)
-    debugImplementation(libs.compose.ui.tooling)
-    debugImplementation(libs.compose.ui.android)
 }
 
 android {

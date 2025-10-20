@@ -22,8 +22,8 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.ThemeValue
 import love.yinlin.common.uri.toUri
+import love.yinlin.compose.rememberFalse
 import love.yinlin.data.MimeType
-import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name

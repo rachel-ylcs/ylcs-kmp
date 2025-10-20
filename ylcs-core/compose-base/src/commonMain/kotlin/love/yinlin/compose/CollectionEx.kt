@@ -1,4 +1,4 @@
-package love.yinlin.extension
+package love.yinlin.compose
 
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 

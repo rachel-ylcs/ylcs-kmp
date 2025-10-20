@@ -25,10 +25,9 @@ import com.github.panpf.sketch.size
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberRefState
-import love.yinlin.extension.rememberState
-import love.yinlin.extension.translate
+import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.rememberRefState
+import love.yinlin.compose.translate
 import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.image.WebImage

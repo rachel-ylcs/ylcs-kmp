@@ -17,7 +17,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.serialization.Serializable
-import love.yinlin.extension.mutableRefStateOf
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.ui.component.image.ClickIcon
 
 @Stable

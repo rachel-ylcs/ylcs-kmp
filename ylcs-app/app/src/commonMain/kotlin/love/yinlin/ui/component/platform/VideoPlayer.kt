@@ -17,7 +17,7 @@ import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
+import love.yinlin.compose.rememberFalse
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.extension.timeString
 import love.yinlin.platform.app

@@ -25,7 +25,7 @@ import love.yinlin.common.Device
 import love.yinlin.common.LocalDevice
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberValueState
+import love.yinlin.compose.rememberValueState
 import love.yinlin.platform.app
 import kotlin.math.roundToInt
 

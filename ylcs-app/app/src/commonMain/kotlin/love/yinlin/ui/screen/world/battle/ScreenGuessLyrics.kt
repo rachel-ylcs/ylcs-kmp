@@ -40,6 +40,8 @@ import love.yinlin.common.Device
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.rememberValueState
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.*

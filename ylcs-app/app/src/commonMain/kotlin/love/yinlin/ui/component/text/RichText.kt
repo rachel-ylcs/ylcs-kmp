@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
 import love.yinlin.common.Colors
+import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
 import love.yinlin.platform.ImageQuality

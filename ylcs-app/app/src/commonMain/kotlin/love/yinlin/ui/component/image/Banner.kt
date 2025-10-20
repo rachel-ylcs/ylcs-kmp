@@ -17,8 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.delay
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberDerivedState
-import love.yinlin.extension.rememberOffScreenState
+import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.rememberOffScreenState
 
 @Composable
 private fun BannerIndicator(

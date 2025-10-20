@@ -44,7 +44,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
+import love.yinlin.compose.rememberFalse
 import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.app

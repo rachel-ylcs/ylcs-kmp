@@ -20,10 +20,10 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.rememberFalse
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.rememberFalse
 import love.yinlin.platform.app
 import love.yinlin.platform.platform
 import love.yinlin.resources.Res

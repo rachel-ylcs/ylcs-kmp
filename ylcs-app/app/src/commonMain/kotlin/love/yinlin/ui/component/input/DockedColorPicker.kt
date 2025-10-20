@@ -17,7 +17,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import love.yinlin.common.Colors
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberState
+import love.yinlin.compose.rememberState
 import love.yinlin.ui.component.layout.Space
 import kotlin.math.*
 

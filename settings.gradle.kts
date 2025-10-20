@@ -16,7 +16,6 @@ dependencyResolutionManagement {
         maven("https://maven.aliyun.com/repository/google")
         google()
         maven("https://jitpack.io")
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
     }
 
     versionCatalogs {
@@ -42,6 +41,8 @@ include(
 
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
+    "ylcs-module:compose:device",
+    "ylcs-module:compose:theme",
 
     /* -----------------  [3] 结构模块  ----------------- */
 
@@ -55,6 +56,4 @@ include(
     "ylcs-app:mod-manager", // MOD管理器
 
     /* -----------------  [5] 测试模块  ----------------- */
-
-    "ylcs-test:nav3",
 )

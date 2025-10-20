@@ -21,8 +21,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import love.yinlin.common.ThemeValue
-import love.yinlin.extension.rememberFalse
-import love.yinlin.extension.rememberFloatState
+import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.rememberFloatState
 
 @Composable
 fun ProgressSlider(

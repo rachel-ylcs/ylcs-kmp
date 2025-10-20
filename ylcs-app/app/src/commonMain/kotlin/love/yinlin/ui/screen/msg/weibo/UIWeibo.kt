@@ -24,11 +24,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.localComposition
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.localComposition
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid

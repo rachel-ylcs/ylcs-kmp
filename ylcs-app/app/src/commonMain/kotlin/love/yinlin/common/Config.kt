@@ -25,7 +25,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toJsonString
-import love.yinlin.extension.toMutableStateMap
+import love.yinlin.compose.toMutableStateMap
 import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.KV
 import love.yinlin.platform.getJson

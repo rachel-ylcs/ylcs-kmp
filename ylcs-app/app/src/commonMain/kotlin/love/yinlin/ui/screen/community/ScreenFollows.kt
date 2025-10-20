@@ -24,12 +24,12 @@ import love.yinlin.api.ServerRes
 import love.yinlin.common.Device
 import love.yinlin.common.LocalImmersivePadding
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.image.WebImage

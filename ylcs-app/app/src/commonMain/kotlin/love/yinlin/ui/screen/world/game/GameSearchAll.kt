@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.common.ThemeValue
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -35,7 +36,6 @@ import love.yinlin.data.rachel.game.info.SAInfo
 import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.mutableRefStateOf
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
