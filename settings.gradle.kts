@@ -42,6 +42,7 @@ include(
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
     "ylcs-module:compose:app",
+    "ylcs-module:compose:screen",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
 
