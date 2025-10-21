@@ -35,10 +35,12 @@
 |               |  `compose-base`  |                 compose core                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 |               |    `cs-base`     |                   C/S core                   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 | `ylcs-module` |                  |                                              |         |     |         |       |       |          |
-|               | `client-engine`  |                client engine                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `server-engine`  |                server engine                 |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
+|               |  `compose:app`   |     fast and easy compose app framework      |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               | `compose:screen` |     screen page, floating and navigation     |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 |               | `compose:device` | adaptive device layout and immersive padding |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 |               | `compose:theme`  |           custom theme definition            |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               | `client-engine`  |                client engine                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|               | `server-engine`  |                server engine                 |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
 |  `ylcs-app`   |                  |                                              |         |     |         |       |       |          |
 |               |       `cs`       |                  C/S bridge                  |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
 |               |      `mod`       |                   song MOD                   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
