@@ -175,7 +175,7 @@ jobs:
           cd native && ./build.sh
 
       - name: Build Desktop
-        run: ./gradlew ylcs-app:app:desktopRunDebug
+        run: ./gradlew ylcs-app:app:desktopJar
 
   build-web:
     name: Build Web
@@ -197,7 +197,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build Web
-        run: ./gradlew ylcs-app:app:webRun
+        run: ./gradlew ylcs-app:app:wasmJsJar
 
   build-server:
     name: Build Server
