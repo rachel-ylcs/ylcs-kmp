@@ -17,10 +17,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
@@ -155,7 +152,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -176,7 +173,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			)
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.End),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.End),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				Text(
@@ -214,7 +211,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -297,7 +294,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			TextInput(
 				modifier = Modifier.fillMaxWidth(),
@@ -354,13 +351,13 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxSize()
-				.padding(ThemeValue.Padding.EqualValue),
+				.padding(CustomTheme.padding.equalValue),
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			MiniIcon(
 				res = Res.drawable.img_logo,
-				size = ThemeValue.Size.LargeImage
+				size = CustomTheme.size.largeImage
 			)
 			ContentBox(modifier = Modifier.fillMaxWidth().weight(1f))
 		}
@@ -372,8 +369,8 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			modifier = Modifier
 				.padding(LocalImmersivePadding.current)
 				.fillMaxSize()
-				.padding(ThemeValue.Padding.EqualValue),
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+				.padding(CustomTheme.padding.equalValue),
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Box(
@@ -382,7 +379,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 			) {
 				MiniIcon(
 					res = Res.drawable.img_logo,
-					size = ThemeValue.Size.LargeImage
+					size = CustomTheme.size.largeImage
 				)
 			}
 			Box(

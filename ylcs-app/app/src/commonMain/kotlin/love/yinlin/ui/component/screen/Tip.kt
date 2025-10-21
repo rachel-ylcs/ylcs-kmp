@@ -17,11 +17,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import love.yinlin.common.ThemeColor
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.node.clickableNoRipple
 
@@ -65,13 +61,13 @@ open class Tip(private val scope: CoroutineScope) {
             val color = when (type) {
                 Type.INFO -> MaterialTheme.colorScheme.secondaryContainer
                 Type.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
-                Type.WARNING -> ThemeColor.warning
+                Type.WARNING -> CustomTheme.colorScheme.warning
                 Type.ERROR -> MaterialTheme.colorScheme.error
             }
             val contentColor = when (type) {
                 Type.INFO -> MaterialTheme.colorScheme.onSecondaryContainer
                 Type.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
-                Type.WARNING -> ThemeColor.onWarning
+                Type.WARNING -> CustomTheme.colorScheme.onWarning
                 Type.ERROR -> MaterialTheme.colorScheme.onError
             }
             val tipPadding = PaddingValues(when (LocalDevice.current.size) {
@@ -86,8 +82,8 @@ open class Tip(private val scope: CoroutineScope) {
                     .background(color = color, shape = MaterialTheme.shapes.extraLarge)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     MiniIcon(

@@ -42,10 +42,6 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import love.yinlin.AppModel
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeStyle
-import love.yinlin.common.ThemeValue
-import love.yinlin.common.rachelFont
 import love.yinlin.compose.*
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
@@ -202,18 +198,18 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameMaskPortraitLock() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 2)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 LoadingCircle(
-                    size = ThemeValue.Size.Image * 1.25f,
+                    size = CustomTheme.size.image * 1.25f,
                     color = Colors.White,
                     modifier = Modifier.zIndex(1f)
                 )
                 MiniIcon(
                     icon = Icons.Outlined.Lock,
                     color = Colors.White,
-                    size = ThemeValue.Size.Image,
+                    size = CustomTheme.size.image,
                     modifier = Modifier.zIndex(2f)
                 )
             }
@@ -232,15 +228,15 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
     private fun GameMaskPause() {
         Column(
             modifier = Modifier
-                .padding(ThemeValue.Padding.HorizontalExtraSpace * 2)
-                .shadow(ThemeValue.Shadow.Surface, MaterialTheme.shapes.extraLarge)
+                .padding(CustomTheme.padding.horizontalExtraSpace * 2)
+                .shadow(CustomTheme.shadow.surface, MaterialTheme.shapes.extraLarge)
                 .background(Colors.Gray8, MaterialTheme.shapes.extraLarge)
                 .padding(
-                    horizontal = ThemeValue.Padding.HorizontalExtraSpace * 4,
-                    vertical = ThemeValue.Padding.VerticalExtraSpace * 2
+                    horizontal = CustomTheme.padding.horizontalExtraSpace * 4,
+                    vertical = CustomTheme.padding.verticalExtraSpace * 2
                 ),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 4)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 4)
         ) {
             Text(
                 text = "暂停中",
@@ -250,7 +246,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 overflow = TextOverflow.Clip
             )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RhymeButton(
@@ -277,7 +273,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             color = Colors.Steel4,
             strokeColor = Colors.White,
             fontStyle = FontStyle.Italic,
-            style = ThemeStyle.RhymeDisplay.copy(
+            style = CustomTheme.typography.rhymeDisplay.copy(
                 brush = Brush.linearGradient(listOf(Colors.Steel4, Colors.Blue4, Colors.Purple4))
             ),
             maxLines = 1,
@@ -304,13 +300,13 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
             SplitLayout(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue).zIndex(2f),
-                horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace,
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue).zIndex(2f),
+                horizontalArrangement = CustomTheme.padding.horizontalExtraSpace,
                 verticalAlignment = Alignment.CenterVertically,
                 left = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.Start),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.Start),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RhymeButton(
@@ -322,7 +318,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
                 right = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.End),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.End),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RhymeButton(
@@ -342,7 +338,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             onBack = ::onBack,
             action = {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Switch(
@@ -369,10 +365,10 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             }
             else {
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(ThemeValue.Size.LargeImage),
-                    contentPadding = PaddingValues(horizontal = ThemeValue.Padding.EqualSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    columns = GridCells.Adaptive(CustomTheme.size.largeImage),
+                    contentPadding = PaddingValues(horizontal = CustomTheme.padding.equalSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
@@ -439,7 +435,7 @@ class ScreenRhyme(model: AppModel) : CommonSubScreen(model) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
                 val fontFamilyResolver = LocalFontFamilyResolver.current
-                val font = rachelFont()
+                val font = mainFont()
                 val textManager = remember(font, fontFamilyResolver) { RhymeTextManager(font, fontFamilyResolver) }
 
                 val pointers = remember { mutableLongObjectMapOf<Pointer>() }

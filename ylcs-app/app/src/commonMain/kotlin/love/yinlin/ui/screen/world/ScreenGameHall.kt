@@ -18,10 +18,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -108,16 +105,16 @@ class ScreenGameHall(model: AppModel, val args: Args) : SubScreen<ScreenGameHall
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
-                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = StaggeredGridCells.Adaptive(CustomTheme.size.cardWidth),
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewGames(false) },
                 onLoading = { requestMoreGames() },
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalItemSpacing = CustomTheme.padding.equalSpace
             ) {
                 GameItem(
                     game = it,

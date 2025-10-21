@@ -22,9 +22,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
@@ -73,7 +71,7 @@ private fun MusicCard(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
         color = if (musicInfo.selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
-        shadowElevation = ThemeValue.Shadow.MiniSurface,
+        shadowElevation = CustomTheme.shadow.miniSurface,
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -92,8 +90,8 @@ private fun MusicCard(
                 )
             }
             Column(
-                modifier = Modifier.weight(1f).fillMaxHeight().padding(ThemeValue.Padding.ExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                modifier = Modifier.weight(1f).fillMaxHeight().padding(CustomTheme.padding.extraValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 Text(
                     text = musicInfo.name,
@@ -301,10 +299,10 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         if (library.isEmpty()) EmptyBox()
         else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                columns = GridCells.Adaptive(CustomTheme.size.cellWidth),
+                contentPadding = CustomTheme.padding.equalValue,
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
                 itemsIndexed(
@@ -367,8 +365,8 @@ class ScreenMusicLibrary(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Icon(index: Int) {
             val item = ImportMusicItem.entries[index]
-            if (item.isImage) MiniImage(icon = item.icon, size = ThemeValue.Size.MediumIcon)
-            else MiniIcon(icon = item.icon, size = ThemeValue.Size.MediumIcon)
+            if (item.isImage) MiniImage(icon = item.icon, size = CustomTheme.size.mediumIcon)
+            else MiniIcon(icon = item.icon, size = CustomTheme.size.mediumIcon)
         }
     }
 

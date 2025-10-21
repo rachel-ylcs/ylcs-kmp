@@ -11,7 +11,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.platform.app
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,8 +26,8 @@ fun BallonTip(
             PlainTooltip(
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 containerColor = MaterialTheme.colorScheme.background,
-                tonalElevation = ThemeValue.Shadow.Tonal,
-                shadowElevation = ThemeValue.Shadow.MiniSurface
+                tonalElevation = CustomTheme.shadow.tonal,
+                shadowElevation = CustomTheme.shadow.miniSurface
             ) {
                 Text(
                     text = text,
@@ -70,8 +70,8 @@ fun BallonTip(
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
                     actionContentColor = MaterialTheme.colorScheme.primary
                 ),
-                tonalElevation = ThemeValue.Shadow.Tonal,
-                shadowElevation = ThemeValue.Shadow.MiniSurface
+                tonalElevation = CustomTheme.shadow.tonal,
+                shadowElevation = CustomTheme.shadow.miniSurface
             )
         },
         state = rememberTooltipState(),

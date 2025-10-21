@@ -20,15 +20,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberFalse
-import love.yinlin.compose.rememberFloatState
+import love.yinlin.compose.*
 
 @Composable
 fun ProgressSlider(
     value: Float,
     modifier: Modifier = Modifier,
-    height: Dp = ThemeValue.Size.SliderHeight,
+    height: Dp = CustomTheme.size.sliderHeight,
     trackColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     activeColor: Color = MaterialTheme.colorScheme.primaryContainer,
     trackShape: Shape = MaterialTheme.shapes.medium,
@@ -129,7 +127,7 @@ fun CylinderSlider(
         }
 
         Box(modifier = Modifier.height(IntrinsicSize.Min)
-            .border(ThemeValue.Border.Small, borderColor, CircleShape)
+            .border(CustomTheme.border.small, borderColor, CircleShape)
             .clip(CircleShape)
             .background(backgroundColor)
             .pointerInput(enabled, maxWidth, onValueChanged) {
@@ -157,9 +155,9 @@ fun CylinderSlider(
                 Box(modifier = Modifier.fillMaxWidth(percent).fillMaxHeight().background(color = activeColor.copy(alpha = 0.75f), shape = CircleShape))
             }
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue).zIndex(2f),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue).zIndex(2f),
                 horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.CenterVertically)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace, Alignment.CenterVertically)
             ) {
                 content(percent)
             }

@@ -15,9 +15,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
@@ -105,9 +103,9 @@ internal fun ActivityInfoLayout(
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
-        .padding(ThemeValue.Padding.EqualValue)
+        .padding(CustomTheme.padding.equalValue)
         .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
     ) {
         TextInput(
             state = input.title,
@@ -178,7 +176,7 @@ internal fun ActivityInfoLayout(
         ImageAdder(
             maxNum = 9,
             pics = input.pics,
-            size = ThemeValue.Size.MicroCellWidth,
+            size = CustomTheme.size.microCellWidth,
             modifier = Modifier.fillMaxWidth(),
             onAdd = { scope.launch { input.pickPictures(onPicsAdd) } },
             onDelete = { onPicsDelete(it) },

@@ -14,10 +14,7 @@ import androidx.compose.ui.Modifier
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.Weibo
@@ -55,12 +52,12 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
             if (subComments.isNotEmpty()) {
                 Surface(
                     modifier = Modifier.fillMaxWidth().padding(
-                        top = ThemeValue.Padding.VerticalSpace,
-                        start = ThemeValue.Padding.HorizontalExtraSpace * 1.5f
+                        top = CustomTheme.padding.verticalSpace,
+                        start = CustomTheme.padding.horizontalExtraSpace * 1.5f
                     ),
-                    tonalElevation = ThemeValue.Shadow.Tonal
+                    tonalElevation = CustomTheme.shadow.tonal
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)) {
                         for (subComment in subComments) {
                             WeiboUserBar(
                                 info = subComment.info,
@@ -92,12 +89,12 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(horizontal = ThemeValue.Padding.EqualExtraSpace),
+                .padding(horizontal = CustomTheme.padding.equalExtraSpace),
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             item(key = ItemKey("WeiboLayout")) {
-                Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+                Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
                 WeiboLayout(
                     weibo = weibo,
                     onPicturesDownload = null,
@@ -106,7 +103,7 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
             }
             comments?.let { weiboComments ->
                 item(key = ItemKey("HorizontalDivider")) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalExtraSpace))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace))
                 }
                 items(
                     items = weiboComments,
@@ -124,17 +121,17 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(horizontal = ThemeValue.Padding.EqualExtraSpace)
+                .padding(horizontal = CustomTheme.padding.equalExtraSpace)
         ) {
-            Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+            Column(modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
                 WeiboLayout(
                     weibo = weibo,
                     onPicturesDownload = null,
                     onVideoDownload = null
                 )
             }
-            VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace))
+            VerticalDivider(modifier = Modifier.padding(horizontal = CustomTheme.padding.horizontalExtraSpace))
             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
                 val weiboComments = comments
                 if (weiboComments == null) LoadingBox()
@@ -146,10 +143,10 @@ class ScreenWeiboDetails(model: AppModel) : CommonSubScreen(model) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         state = listState,
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                     ) {
                         item(key = ItemKey("Space")) {
-                            Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalSpace))
+                            Spacer(modifier = Modifier.height(CustomTheme.padding.verticalSpace))
                         }
                         items(
                             items = weiboComments,

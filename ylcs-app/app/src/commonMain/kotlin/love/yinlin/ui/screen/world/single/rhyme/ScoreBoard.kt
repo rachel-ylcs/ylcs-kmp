@@ -7,7 +7,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.rotateRad
-import love.yinlin.common.Colors
+import love.yinlin.compose.*
 import kotlin.math.atan2
 
 // 分数板

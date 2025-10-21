@@ -23,8 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.localComposition
+import love.yinlin.compose.*
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -57,9 +56,9 @@ private fun WeiboIconValue(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally)
     ) {
-        MiniIcon(icon = icon, size = ThemeValue.Size.MicroIcon)
+        MiniIcon(icon = icon, size = CustomTheme.size.microIcon)
         Text(text = text)
     }
 }
@@ -74,7 +73,7 @@ fun WeiboDataBar(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
     ) {
         WeiboIconValue(
             icon = Icons.Filled.ThumbUp,
@@ -104,7 +103,7 @@ fun WeiboUserBar(
     Row(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
     ) {
         Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
             WebImage(
@@ -118,7 +117,7 @@ fun WeiboUserBar(
         }
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -130,7 +129,7 @@ fun WeiboUserBar(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
             ) {
                 Text(
                     text = time,
@@ -164,7 +163,7 @@ fun WeiboLayout(
         time = weibo.timeString,
         location = weibo.location
     )
-    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+    Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
     RichText(
         text = weibo.text,
         modifier = Modifier.fillMaxWidth(),
@@ -173,7 +172,7 @@ fun WeiboLayout(
         onTopicClick = { processor.onWeiboTopicClick(it) },
         onAtClick = { processor.onWeiboAtClick(it) }
     )
-    Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+    Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
     if (weibo.pictures.isNotEmpty()) {
         NineGrid(
             pics = weibo.pictures,
@@ -181,7 +180,7 @@ fun WeiboLayout(
             onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
             onVideoClick = { processor.onWeiboVideoClick(it) }
         )
-        Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+        Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
         if (onVideoDownload != null && onPicturesDownload != null) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -203,7 +202,7 @@ fun WeiboLayout(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(ThemeValue.Padding.VerticalExtraSpace))
+        Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
     }
     WeiboDataBar(
         like = weibo.likeNum,
@@ -224,11 +223,11 @@ fun WeiboCard(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        shadowElevation = ThemeValue.Shadow.Surface
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         Column(modifier = Modifier.fillMaxWidth().clickable {
             processor.onWeiboClick(weibo)
-        }.padding(ThemeValue.Padding.EqualValue)) {
+        }.padding(CustomTheme.padding.equalValue)) {
             WeiboLayout(
                 weibo = weibo,
                 onPicturesDownload = onPicturesDownload,
@@ -248,12 +247,12 @@ fun WeiboGrid(
 ) {
     bindPauseLoadWhenScrolling(state)
     LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+        columns = StaggeredGridCells.Adaptive(CustomTheme.size.cardWidth),
         modifier = modifier,
         state = state,
-        contentPadding = ThemeValue.Padding.EqualValue,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-        verticalItemSpacing = ThemeValue.Padding.EqualSpace
+        contentPadding = CustomTheme.padding.equalValue,
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+        verticalItemSpacing = CustomTheme.padding.equalSpace
     ) {
         items(
             items = items,

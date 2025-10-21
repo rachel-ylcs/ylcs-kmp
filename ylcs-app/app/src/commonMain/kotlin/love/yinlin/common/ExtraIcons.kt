@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
+import love.yinlin.compose.Colors
 
 object ExtraIcons {
     val IOS: ImageVector by lazy {
@@ -641,7 +642,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFF96F5FF)),
+            fill = SolidColor(Colors(0xFF96F5FF)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -659,7 +660,7 @@ object ExtraIcons {
             curveToRelative(-164.0f, 0.0f, -307.9f, 86.2f, -388.9f, 215.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -690,7 +691,7 @@ object ExtraIcons {
             curveToRelative(-145.5f, 3.8f, -277.9f, 77.5f, -357.9f, 199.5f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFBFFFCE)),
+            fill = SolidColor(Colors(0xFFBFFFCE)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -705,7 +706,7 @@ object ExtraIcons {
             horizontalLineToRelative(528.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -730,7 +731,7 @@ object ExtraIcons {
             lineToRelative(-118.9f, 212.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFEFF73)),
+            fill = SolidColor(Colors(0xFFFEFF73)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -748,7 +749,7 @@ object ExtraIcons {
             horizontalLineToRelative(-284.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -777,7 +778,7 @@ object ExtraIcons {
             horizontalLineToRelative(-250.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFFCC5E)),
+            fill = SolidColor(Colors(0xFFFFCC5E)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -794,7 +795,7 @@ object ExtraIcons {
             lineToRelative(-0.7f, -5.3f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -822,7 +823,7 @@ object ExtraIcons {
             lineToRelative(-133.3f, 222.3f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFF9EAF)),
+            fill = SolidColor(Colors(0xFFFF9EAF)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -836,7 +837,7 @@ object ExtraIcons {
             lineToRelative(147.6f, -246.1f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -859,7 +860,7 @@ object ExtraIcons {
             lineTo(139.6f, 758.4f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFEABDFF)),
+            fill = SolidColor(Colors(0xFFEABDFF)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -875,7 +876,7 @@ object ExtraIcons {
             lineTo(127.5f, 292.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -901,7 +902,7 @@ object ExtraIcons {
             curveToRelative(0.0f, 68.5f, 15.2f, 133.9f, 45.2f, 194.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -920,7 +921,7 @@ object ExtraIcons {
             curveToRelative(0.0f, -158.1f, -81.5f, -297.1f, -204.7f, -377.3f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -937,7 +938,7 @@ object ExtraIcons {
             horizontalLineToRelative(284.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -952,7 +953,7 @@ object ExtraIcons {
             lineToRelative(-90.3f, 188.6f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -967,7 +968,7 @@ object ExtraIcons {
             lineToRelative(-23.1f, 48.7f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -983,7 +984,7 @@ object ExtraIcons {
             horizontalLineTo(392.1f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -999,7 +1000,7 @@ object ExtraIcons {
             lineToRelative(-258.8f, 465.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF6E6E96)),
+            fill = SolidColor(Colors(0xFF6E6E96)),
             stroke = null,
             fillAlpha = 0.15f,
             strokeAlpha = 0.15f,
@@ -1025,7 +1026,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFE71F19)),
+            fill = SolidColor(Colors(0xFFE71F19)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1056,7 +1057,7 @@ object ExtraIcons {
             curveToRelative(0.0f, 103.8f, -128.0f, 187.8f, -285.7f, 187.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFF5AA15)),
+            fill = SolidColor(Colors(0xFFF5AA15)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1079,7 +1080,7 @@ object ExtraIcons {
             lineToRelative(0.0f, 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFF5AA15)),
+            fill = SolidColor(Colors(0xFFF5AA15)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1101,7 +1102,7 @@ object ExtraIcons {
             curveToRelative(-0.1f, -146.6f, -120.3f, -265.8f, -268.0f, -265.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFF5AA15)),
+            fill = SolidColor(Colors(0xFFF5AA15)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1138,7 +1139,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFF1296db)),
+            fill = SolidColor(Colors(0xFF1296db)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1192,7 +1193,7 @@ object ExtraIcons {
             viewportWidth = 1024f,
             viewportHeight = 1024f
         ).path(
-            fill = SolidColor(Colors.from(0xFF111111)),
+            fill = SolidColor(Colors(0xFF111111)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1212,7 +1213,7 @@ object ExtraIcons {
             quadToRelative(0.0f, -184.3f, 184.3f, -184.3f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFF4040)),
+            fill = SolidColor(Colors(0xFFFF4040)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1236,7 +1237,7 @@ object ExtraIcons {
             curveToRelative(-131.7f, 0.0f, -231.1f, -106.6f, -231.1f, -247.9f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF00F5FF)),
+            fill = SolidColor(Colors(0xFF00F5FF)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -1260,7 +1261,7 @@ object ExtraIcons {
             curveToRelative(-131.7f, 0.0f, -231.1f, -106.6f, -231.1f, -247.9f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFFFFFF)),
+            fill = SolidColor(Colors(0xFFFFFFFF)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2144,7 +2145,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFF8C913)),
+            fill = SolidColor(Colors(0xFFF8C913)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2157,7 +2158,7 @@ object ExtraIcons {
             arcToRelative(469.3f, 469.3f, 0.0f, isMoreThanHalf = false, isPositiveArc = false, -469.3f, 464.6f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF02B053)),
+            fill = SolidColor(Colors(0xFF02B053)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2200,7 +2201,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFEA3E3C)),
+            fill = SolidColor(Colors(0xFFEA3E3C)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2279,7 +2280,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFF3D8BFA)),
+            fill = SolidColor(Colors(0xFF3D8BFA)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2304,7 +2305,7 @@ object ExtraIcons {
             reflectiveCurveToRelative(-137.8f, 307.2f, -307.2f, 307.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF3D8BFA)),
+            fill = SolidColor(Colors(0xFF3D8BFA)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2471,7 +2472,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFE64A19)),
+            fill = SolidColor(Colors(0xFFE64A19)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2486,7 +2487,7 @@ object ExtraIcons {
             lineTo(337.2f, 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFF754C)),
+            fill = SolidColor(Colors(0xFFFF754C)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2501,7 +2502,7 @@ object ExtraIcons {
             horizontalLineTo(686.9f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFC93D18)),
+            fill = SolidColor(Colors(0xFFC93D18)),
             stroke = null, strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
             strokeLineJoin = StrokeJoin.Miter,
@@ -2520,7 +2521,7 @@ object ExtraIcons {
             lineToRelative(-28.9f, -54.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFFBA57)),
+            fill = SolidColor(Colors(0xFFFFBA57)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2534,7 +2535,7 @@ object ExtraIcons {
             arcToRelative(299.7f, 299.7f, 0.0f, isMoreThanHalf = true, isPositiveArc = false, dx1 = -599.4f, dy1 = 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFFE082)),
+            fill = SolidColor(Colors(0xFFFFE082)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2573,7 +2574,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFE64A19)),
+            fill = SolidColor(Colors(0xFFE64A19)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2588,7 +2589,7 @@ object ExtraIcons {
             lineTo(337.2f, 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFF754C)),
+            fill = SolidColor(Colors(0xFFFF754C)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2603,7 +2604,7 @@ object ExtraIcons {
             horizontalLineTo(686.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFC93D18)),
+            fill = SolidColor(Colors(0xFFC93D18)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2623,7 +2624,7 @@ object ExtraIcons {
             lineToRelative(-28.9f, -54.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFF9FA8DA)),
+            fill = SolidColor(Colors(0xFF9FA8DA)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2637,7 +2638,7 @@ object ExtraIcons {
             arcToRelative(299.7f, 299.7f, 0.0f, isMoreThanHalf = true, isPositiveArc = false, dx1 = -599.4f, dy1 = 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFC5CAE9)),
+            fill = SolidColor(Colors(0xFFC5CAE9)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2651,7 +2652,7 @@ object ExtraIcons {
             horizontalLineToRelative(-50.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFC5CAE9)),
+            fill = SolidColor(Colors(0xFFC5CAE9)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2690,7 +2691,7 @@ object ExtraIcons {
             viewportWidth = 1024.0f,
             viewportHeight = 1024.0f
         ).path(
-            fill = SolidColor(Colors.from(0xFFE64A19)),
+            fill = SolidColor(Colors(0xFFE64A19)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2705,7 +2706,7 @@ object ExtraIcons {
             lineTo(337.2f, 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFFF754C)),
+            fill = SolidColor(Colors(0xFFFF754C)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2720,7 +2721,7 @@ object ExtraIcons {
             horizontalLineTo(686.8f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFC93D18)),
+            fill = SolidColor(Colors(0xFFC93D18)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2740,7 +2741,7 @@ object ExtraIcons {
             lineToRelative(-28.9f, -54.2f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFAF8A77)),
+            fill = SolidColor(Colors(0xFFAF8A77)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2754,7 +2755,7 @@ object ExtraIcons {
             arcToRelative(299.7f, 299.7f, 0.0f, isMoreThanHalf = true, isPositiveArc = false, dx1 = -599.4f, dy1 = 0.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFCEB1A1)),
+            fill = SolidColor(Colors(0xFFCEB1A1)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,
@@ -2783,7 +2784,7 @@ object ExtraIcons {
             horizontalLineToRelative(-50.0f)
             close()
         }.path(
-            fill = SolidColor(Colors.from(0xFFCEB1A1)),
+            fill = SolidColor(Colors(0xFFCEB1A1)),
             stroke = null,
             strokeLineWidth = 0.0f,
             strokeLineCap = StrokeCap.Butt,

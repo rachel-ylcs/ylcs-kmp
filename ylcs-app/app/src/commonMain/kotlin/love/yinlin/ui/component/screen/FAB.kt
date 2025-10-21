@@ -19,9 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.node.clickableNoRipple
@@ -41,7 +39,7 @@ private fun FABIcon(
 ) {
     Box(
         modifier = Modifier
-            .size(ThemeValue.Size.FAB)
+            .size(CustomTheme.size.fab)
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.primaryContainer),
@@ -63,7 +61,7 @@ private fun FABIcon(
     BallonTip(text = tip) {
         Box(
             modifier = Modifier
-                .size(ThemeValue.Size.FAB)
+                .size(CustomTheme.size.fab)
                 .clip(CircleShape)
                 .clickable(onClick = onClick)
                 .background(MaterialTheme.colorScheme.primaryContainer),
@@ -84,7 +82,7 @@ private fun FABMainIcon(
     onClick: suspend () -> Unit
 ) {
     Box(modifier = modifier) {
-        Box(modifier = Modifier.padding(bottom = ThemeValue.Shadow.Icon).shadow(ThemeValue.Shadow.Icon, CircleShape)) {
+        Box(modifier = Modifier.padding(bottom = CustomTheme.shadow.icon).shadow(CustomTheme.shadow.icon, CircleShape)) {
             val scope = rememberCoroutineScope()
 
             FABIcon(icon = icon) {
@@ -112,7 +110,7 @@ fun FABLayout(
         if (menus.isEmpty()) {
             FABMainIcon(
                 icon = icon,
-                modifier = Modifier.padding(ThemeValue.Padding.FAB),
+                modifier = Modifier.padding(CustomTheme.padding.fabSpace),
                 onClick = onClick
             )
         }
@@ -139,9 +137,9 @@ fun FABLayout(
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Column(
-                    modifier = Modifier.padding(ThemeValue.Padding.FAB).verticalScroll(rememberScrollState()),
+                    modifier = Modifier.padding(CustomTheme.padding.fabSpace).verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.FAB / 2)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.fabSpace / 2)
                 ) {
                     menus.forEachIndexed { index, action ->
                         val delay = (menus.size - 1 - index) * duration / menus.size

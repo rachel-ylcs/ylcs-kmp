@@ -22,9 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.LocalDate
 import love.yinlin.Local
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeColor
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.input.RachelText
@@ -154,13 +152,13 @@ internal fun ContributorList(
                 Row(
                     modifier = Modifier.weight(1f)
                         .background(contributorGroup.color.copy(alpha = 0.7f))
-                        .padding(ThemeValue.Padding.Value),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.CenterHorizontally),
+                        .padding(CustomTheme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     MiniIcon(
                         icon = contributorGroup.icon,
-                        size = ThemeValue.Size.MicroIcon
+                        size = CustomTheme.size.microIcon
                     )
                     Text(
                         text = contributorGroup.title,
@@ -170,8 +168,8 @@ internal fun ContributorList(
                         overflow = TextOverflow.Clip
                     )
                 }
-                Column(modifier = Modifier.padding(vertical = ThemeValue.Border.Small / 2).weight(2f).border(
-                    width = ThemeValue.Border.Small,
+                Column(modifier = Modifier.padding(vertical = CustomTheme.border.small / 2).weight(2f).border(
+                    width = CustomTheme.border.small,
                     color = contributorGroup.color.copy(0.7f)
                 )) {
                     for (contributor in contributorGroup.names) {
@@ -180,7 +178,7 @@ internal fun ContributorList(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                                 .clickable { onClick(contributor) }
-                                .padding(ThemeValue.Padding.ExtraValue),
+                                .padding(CustomTheme.padding.extraValue),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -198,7 +196,7 @@ internal fun UpdateInfoLayout(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace),
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace),
     ) {
         Text(
             text = "${Local.NAME} ${Local.VERSION_NAME} 更新日志",
@@ -211,7 +209,7 @@ internal fun UpdateInfoLayout(
         Space()
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (updateInfo.force) BoxText(text = "强制更新", color = MaterialTheme.colorScheme.primary)
@@ -232,7 +230,7 @@ internal fun UpdateInfoLayout(
         updateInfo.title?.let { title ->
             Text(
                 text = title,
-                color = ThemeColor.warning,
+                color = CustomTheme.colorScheme.warning,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -244,25 +242,25 @@ internal fun UpdateInfoLayout(
                     color = group.background.copy(alpha = 0.2f)
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
                     ) {
                         RachelText(
                             text = group.type,
                             icon = group.icon,
                             color = group.color,
                             style = MaterialTheme.typography.labelMedium,
-                            padding = ThemeValue.Padding.ZeroValue
+                            padding = CustomTheme.padding.zeroValue
                         )
                         Space()
                         for (record in group.records) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Box(modifier = Modifier
-                                    .size(ThemeValue.Size.dotHeight)
+                                    .size(CustomTheme.size.dotHeight)
                                     .clip(CircleShape)
                                     .background(MaterialTheme.colorScheme.onSurface)
                                 )

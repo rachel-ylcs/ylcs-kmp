@@ -14,11 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
-import love.yinlin.common.Colors
 import love.yinlin.common.Resource
-import love.yinlin.common.ThemeStyle
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.ui.component.node.condition
 import love.yinlin.ui.component.layout.ActionScope
@@ -95,8 +92,8 @@ private fun CalendarHeader(
     val currentDate by rememberDerivedState { indexShadowDate(state.settledPage) }
 
     Row(
-        modifier = modifier.padding(start = ThemeValue.Padding.HorizontalExtraSpace, end = ThemeValue.Padding.HorizontalSpace),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+        modifier = modifier.padding(start = CustomTheme.padding.horizontalExtraSpace, end = CustomTheme.padding.horizontalSpace),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -189,7 +186,7 @@ private fun CalendarDayGrid(
                                 Text(
                                     text = text,
                                     color = color,
-                                    style = ThemeStyle.bodyExtraSmall,
+                                    style = CustomTheme.typography.bodyExtraSmall,
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
                                     overflow = TextOverflow.Clip
@@ -213,11 +210,11 @@ fun Calendar(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
     ) {
         CalendarHeader(
             state = state,
-            modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace),
+            modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalExtraSpace),
             actions = actions
         )
         CalendarWeekGrid(

@@ -19,11 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
@@ -61,9 +57,9 @@ private fun NavigationIcon(
 		modifier = Modifier
 			.clip(MaterialTheme.shapes.medium)
 			.clickable(onClick = onClick)
-			.padding(ThemeValue.Padding.Value),
+			.padding(CustomTheme.padding.value),
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+		verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 	) {
 		MiniIcon(res = if (isSelected) tabItem.iconActive else tabItem.iconNormal)
 		Text(
@@ -84,13 +80,13 @@ private fun PortraitNavigation(
 ) {
 	Surface(
 		modifier = modifier,
-		tonalElevation = ThemeValue.Shadow.Tonal,
-		shadowElevation = ThemeValue.Shadow.Surface
+		tonalElevation = CustomTheme.shadow.tonal,
+		shadowElevation = CustomTheme.shadow.surface
 	) {
 		EqualRow(modifier = Modifier
 			.padding(LocalImmersivePadding.current)
 			.fillMaxWidth()
-			.padding(ThemeValue.Padding.LittleSpace)) {
+			.padding(CustomTheme.padding.littleSpace)) {
 			for (index in TabItem.entries.indices) {
 				EqualItem {
 					NavigationIcon(
@@ -112,13 +108,13 @@ private fun LandscapeNavigation(
 ) {
 	Surface(
 		modifier = modifier,
-		tonalElevation = ThemeValue.Shadow.Tonal,
-		shadowElevation = ThemeValue.Shadow.Surface
+		tonalElevation = CustomTheme.shadow.tonal,
+		shadowElevation = CustomTheme.shadow.surface
 	) {
 		Column(
 			modifier = Modifier
 				.fillMaxHeight()
-				.padding(ThemeValue.Padding.LittleSpace)
+				.padding(CustomTheme.padding.littleSpace)
 				.verticalScroll(rememberScrollState()),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.SpaceEvenly

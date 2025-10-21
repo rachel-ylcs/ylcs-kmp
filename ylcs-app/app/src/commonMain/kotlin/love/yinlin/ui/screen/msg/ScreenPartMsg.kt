@@ -125,7 +125,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
                 Surface(
                     modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
                     shape = shape,
-                    shadowElevation = ThemeValue.Shadow.Surface
+                    shadowElevation = CustomTheme.shadow.surface
                 ) {
                     WebImage(
                         uri = pic.picPath ?: "",
@@ -143,13 +143,13 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.large,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(ThemeValue.Padding.Value)
+                    .padding(CustomTheme.padding.value)
                     .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconText(
@@ -198,7 +198,7 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Calendar(
                 state = calendarState,
@@ -236,10 +236,10 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
 
         Surface(
             modifier = modifier,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             SplitLayout(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraSpace),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraSpace),
                 aspectRatio = 0.5f,
                 left = {
                     Text(
@@ -284,14 +284,14 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
                 BannerLayout(
                     gap = 0f,
                     shape = RectangleShape,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = ThemeValue.Padding.VerticalSpace)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = CustomTheme.padding.verticalSpace)
                 )
             }
             item(key = ItemKey("Section")) {
-                SectionLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+                SectionLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
             }
             item(key = ItemKey("Calendar")) {
-                CalendarLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)) {
+                CalendarLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)) {
                     ToolBarLayout()
                 }
             }
@@ -316,13 +316,13 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
         Column(modifier = Modifier.fillMaxSize()) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 Row(
                     modifier = Modifier
                         .padding(LocalImmersivePadding.current.withoutBottom)
                         .fillMaxWidth()
-                        .padding(vertical = ThemeValue.Padding.VerticalSpace),
+                        .padding(vertical = CustomTheme.padding.verticalSpace),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     ActionScope.Right.Actions {
@@ -338,11 +338,11 @@ class ScreenPartMsg(model: AppModel) : ScreenPart(model) {
                     BannerLayout(
                         gap = 0.3f,
                         shape = MaterialTheme.shapes.large,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalExtraSpace)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalExtraSpace)
                     )
                 }
                 item(key = ItemKey("Section")) {
-                    SectionLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+                    SectionLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
                 }
                 items(
                     items = activities,

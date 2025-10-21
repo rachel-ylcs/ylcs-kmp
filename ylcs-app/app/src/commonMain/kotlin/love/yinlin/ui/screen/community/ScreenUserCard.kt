@@ -26,10 +26,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
@@ -155,7 +152,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.large,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(modifier = Modifier.fillMaxWidth()
                 .heightIn(min = cardWidth * 0.777777f)
@@ -170,8 +167,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
                 }
                 if (topic.isTop) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
@@ -181,26 +178,26 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
                     text = topic.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)
                 )
                 Spacer(Modifier.weight(1f))
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RachelText(
                         text = topic.commentNum.toString(),
                         icon = Icons.AutoMirrored.Outlined.Comment,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                     RachelText(
                         text = topic.coinNum.toString(),
                         icon = Icons.Outlined.Paid,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -220,7 +217,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
             modifier = modifier
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace, Alignment.End),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val status = profile.status
@@ -256,13 +253,13 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.tid },
-                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                columns = StaggeredGridCells.Adaptive(CustomTheme.size.cellWidth),
                 state = listState,
                 canRefresh = false,
                 canLoading = page.canLoading,
                 onLoading = { requestMoreTopics() },
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-                verticalItemSpacing = ThemeValue.Padding.EqualSpace,
+                verticalItemSpacing = CustomTheme.padding.equalSpace,
                 header = {
                     UserProfileCardLayout(
                         profile = profile,
@@ -272,8 +269,8 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
             ) {  topic ->
                 TopicCard(
                     topic = topic,
-                    cardWidth = ThemeValue.Size.CellWidth,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.EqualSpace / 2)
+                    cardWidth = CustomTheme.size.cellWidth,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.equalSpace / 2)
                 )
             }
         }
@@ -291,7 +288,7 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
             UserProfileCardLayout(
                 profile = profile,
                 shape = MaterialTheme.shapes.large,
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).padding(ThemeValue.Padding.EqualExtraValue)
+                modifier = Modifier.width(CustomTheme.size.panelWidth).padding(CustomTheme.padding.equalExtraValue)
             )
             if (profile.status.canShowTopics) {
                 bindPauseLoadWhenScrolling(listState)
@@ -299,19 +296,19 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },
-                    columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                    columns = StaggeredGridCells.Adaptive(CustomTheme.size.cellWidth),
                     state = listState,
                     canRefresh = false,
                     canLoading = page.canLoading,
                     onLoading = { requestMoreTopics() },
                     modifier = Modifier.weight(1f).fillMaxHeight(),
-                    contentPadding = ThemeValue.Padding.EqualValue,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                    contentPadding = CustomTheme.padding.equalValue,
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                    verticalItemSpacing = CustomTheme.padding.equalSpace
                 ) {  topic ->
                     TopicCard(
                         topic = topic,
-                        cardWidth = ThemeValue.Size.CellWidth,
+                        cardWidth = CustomTheme.size.cellWidth,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpRect
-import love.yinlin.common.Colors
+import love.yinlin.compose.*
 
 fun Modifier.fadingEdges(
     edges: DpRect,

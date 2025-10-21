@@ -42,9 +42,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.ui.component.node.condition
 import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.app
@@ -58,7 +56,7 @@ import org.jetbrains.compose.resources.painterResource
 fun MiniIcon(
 	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	modifier: Modifier = Modifier
 ) {
 	Box(
@@ -66,7 +64,7 @@ fun MiniIcon(
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
 			imageVector = icon,
 			contentDescription = null,
 			tint = color,
@@ -91,7 +89,7 @@ fun colorfulImageVector(
 @Composable
 fun ColorfulIcon(
 	icon: ColorfulImageVector,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
     gap: Float = 1.5f,
 	onClick: (() -> Unit)? = null
 ) {
@@ -103,7 +101,7 @@ fun ColorfulIcon(
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon * gap).size(size),
+			modifier = Modifier.padding(CustomTheme.padding.innerIconSpace * gap).size(size),
 			imageVector = icon.icon,
 			contentDescription = null,
 			tint = icon.color,
@@ -115,7 +113,7 @@ fun ColorfulIcon(
 fun ClickIcon(
 	icon: ImageVector,
 	color: Color = MaterialTheme.colorScheme.onSurface,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	indication: Boolean = true,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
@@ -139,7 +137,7 @@ fun ClickIcon(
     icon: ImageVector,
     tip: String,
     color: Color = MaterialTheme.colorScheme.onSurface,
-    size: Dp = ThemeValue.Size.Icon,
+    size: Dp = CustomTheme.size.icon,
     indication: Boolean = true,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
@@ -151,12 +149,12 @@ fun ClickIcon(
 @Composable
 fun LoadingCircle(
 	modifier: Modifier = Modifier,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 ) {
 	Box(modifier = modifier) {
 		CircularProgressIndicator(
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
 			color = color
 		)
 	}
@@ -166,7 +164,7 @@ fun LoadingCircle(
 fun StaticLoadingIcon(
 	isLoading: Boolean,
 	icon: ImageVector,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier
@@ -191,7 +189,7 @@ fun StaticLoadingIcon(
 @Composable
 fun LoadingIcon(
 	icon: ImageVector,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	color: Color = MaterialTheme.colorScheme.onSurface,
 	enabled: Boolean = true,
 	modifier: Modifier = Modifier,
@@ -229,7 +227,7 @@ fun LoadingIcon(
 fun LoadingIcon(
     icon: ImageVector,
     tip: String,
-    size: Dp = ThemeValue.Size.Icon,
+    size: Dp = CustomTheme.size.icon,
     color: Color = MaterialTheme.colorScheme.onSurface,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
@@ -241,7 +239,7 @@ fun LoadingIcon(
 @Composable
 fun MiniIcon(
 	res: DrawableResource,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	modifier: Modifier = Modifier
 ) {
 	Box(
@@ -249,7 +247,7 @@ fun MiniIcon(
 		contentAlignment = Alignment.Center
 	) {
 		Image(
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size),
+			modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
 			painter = painterResource(res),
 			contentDescription = null
 		)
@@ -259,7 +257,7 @@ fun MiniIcon(
 @Composable
 fun ClickIcon(
 	res: DrawableResource,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) = MiniIcon(
@@ -274,7 +272,7 @@ fun ClickIcon(
 fun ClickIcon(
     res: DrawableResource,
     tip: String,
-    size: Dp = ThemeValue.Size.Icon,
+    size: Dp = CustomTheme.size.icon,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -285,7 +283,7 @@ fun ClickIcon(
 fun IconText(
 	icon: ImageVector,
 	text: String,
-	size: Dp = ThemeValue.Size.ExtraIcon,
+	size: Dp = CustomTheme.size.extraIcon,
 	shape: Shape = MaterialTheme.shapes.large,
 	onClick: () -> Unit
 ) {
@@ -293,9 +291,9 @@ fun IconText(
 		modifier = Modifier
 			.clip(shape)
 			.clickable(onClick = onClick)
-			.padding(ThemeValue.Padding.EqualValue),
+			.padding(CustomTheme.padding.equalValue),
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+		verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 	) {
 		Image(
 			painter = rememberVectorPainter(icon),
@@ -312,7 +310,7 @@ fun IconText(
 @Composable
 fun MiniImage(
 	icon: ImageVector,
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	modifier: Modifier = Modifier
 ) {
 	Box(
@@ -322,7 +320,7 @@ fun MiniImage(
 		Image(
 			painter = rememberVectorPainter(icon),
 			contentDescription = null,
-			modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(size)
+			modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size)
 		)
 	}
 }
@@ -463,7 +461,7 @@ private class WebImageIndicator(
 @Composable
 private fun rememberWebImageIndicator(): WebImageIndicator {
 	val density = LocalDensity.current
-	val size = ThemeValue.Size.MediumInput
+	val size = CustomTheme.size.mediumInput
 	val color = MaterialTheme.colorScheme.primaryContainer
 	val imagePainter = painterResource(Res.drawable.placeholder_pic)
 	val image = remember(imagePainter) {

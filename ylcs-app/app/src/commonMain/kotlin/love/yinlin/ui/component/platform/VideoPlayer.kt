@@ -13,11 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import kotlinx.coroutines.delay
-import love.yinlin.common.Colors
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.extension.timeString
 import love.yinlin.platform.app
@@ -51,7 +48,7 @@ private fun VideoPlayerControlBar(
         )
     ) {
         Row(
-            modifier = modifier.background(Colors.Dark.copy(alpha = 0.5f)).padding(ThemeValue.Padding.Value),
+            modifier = modifier.background(Colors.Dark.copy(alpha = 0.5f)).padding(CustomTheme.padding.value),
             verticalAlignment = Alignment.CenterVertically,
             content = content
         )
@@ -116,12 +113,12 @@ fun VideoPlayerControls(
                 text = remember(position) { position.timeString },
                 color = Colors.White
             )
-            Space(ThemeValue.Padding.HorizontalSpace / 2)
+            Space(CustomTheme.padding.horizontalSpace / 2)
             Text(
                 text = "/",
                 color = Colors.White
             )
-            Space(ThemeValue.Padding.HorizontalSpace / 2)
+            Space(CustomTheme.padding.horizontalSpace / 2)
             Text(
                 text = remember(duration) { duration.timeString },
                 color = Colors.White

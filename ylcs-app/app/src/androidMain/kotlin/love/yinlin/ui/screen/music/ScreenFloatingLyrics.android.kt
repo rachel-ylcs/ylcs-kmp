@@ -14,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
@@ -60,9 +58,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
-        .padding(ThemeValue.Padding.EqualExtraValue)
+        .padding(CustomTheme.padding.equalExtraValue)
         .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
         RowLayout("悬浮歌词模式") {
             Switch(
@@ -76,7 +74,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 modifier = Modifier.padding(
                     start = this.maxWidth * androidConfig.left.coerceIn(0f, 1f),
                     end = this.maxWidth * (1 - androidConfig.right).coerceIn(0f, 1f),
-                    top = ThemeValue.Padding.VerticalExtraSpace * 4f * androidConfig.top
+                    top = CustomTheme.padding.verticalExtraSpace * 4f * androidConfig.top
                 ).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
@@ -85,11 +83,11 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * androidConfig.textSize
                     ),
-                    color = Colors.from(androidConfig.textColor),
+                    color = Colors(androidConfig.textColor),
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.background(color = Colors.from(androidConfig.backgroundColor)).padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.background(color = Colors(androidConfig.backgroundColor)).padding(CustomTheme.padding.value)
                 )
             }
         }
@@ -99,7 +97,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 value = androidConfig.leftProgress,
                 onValueChange = { androidConfig = androidConfig.copyLeft(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
 
@@ -108,7 +106,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 value = androidConfig.rightProgress,
                 onValueChange = { androidConfig = androidConfig.copyRight(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
 
@@ -117,7 +115,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 value = androidConfig.topProgress,
                 onValueChange = { androidConfig = androidConfig.copyTop(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
 
@@ -126,30 +124,30 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 value = androidConfig.textSizeProgress,
                 onValueChange = { androidConfig = androidConfig.copyTextSize(it) },
                 onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
 
         SplitLayout(
-            modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-            horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace * 2,
+            modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+            horizontalArrangement = CustomTheme.padding.horizontalExtraSpace * 2,
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors.from(app.config.floatingLyricsAndroidConfig.textColor),
+                        initialColor = Colors(app.config.floatingLyricsAndroidConfig.textColor),
                         onColorChanged = { androidConfig = androidConfig.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                        modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
             },
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors.from(app.config.floatingLyricsAndroidConfig.backgroundColor),
+                        initialColor = Colors(app.config.floatingLyricsAndroidConfig.backgroundColor),
                         onColorChanged = { androidConfig = androidConfig.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
-                        modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
             }

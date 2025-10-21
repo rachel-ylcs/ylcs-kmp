@@ -25,8 +25,7 @@ import love.yinlin.AppModel
 import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
@@ -166,7 +165,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.large,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(modifier = Modifier.fillMaxWidth()
                 .heightIn(min = cardWidth * 0.777777f)
@@ -183,12 +182,12 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                     text = topic.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)
                 )
                 Spacer(Modifier.weight(1f))
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(ThemeValue.Padding.Value),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(CustomTheme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
@@ -203,7 +202,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                     }
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
                         Text(
                             text = topic.name,
@@ -215,21 +214,21 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RachelText(
                                 text = topic.commentNum.toString(),
                                 icon = Icons.AutoMirrored.Outlined.Comment,
                                 style = MaterialTheme.typography.bodySmall,
-                                padding = ThemeValue.Padding.ZeroValue,
+                                padding = CustomTheme.padding.zeroValue,
                                 modifier = Modifier.weight(1f)
                             )
                             RachelText(
                                 text = topic.coinNum.toString(),
                                 icon = Icons.Outlined.Paid,
                                 style = MaterialTheme.typography.bodySmall,
-                                padding = ThemeValue.Padding.ZeroValue,
+                                padding = CustomTheme.padding.zeroValue,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -250,7 +249,7 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 TabBar(
                     currentPage = currentPage,
@@ -271,20 +270,20 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },
-                    columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                    columns = StaggeredGridCells.Adaptive(CustomTheme.size.cellWidth),
                     state = gridState,
                     canRefresh = true,
                     canLoading = page.canLoading,
                     onRefresh = { requestNewData(false) },
                     onLoading = { requestMoreData() },
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = ThemeValue.Padding.EqualValue,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                    verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                    contentPadding = CustomTheme.padding.equalValue,
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                    verticalItemSpacing = CustomTheme.padding.equalSpace
                 ) { topic ->
                     TopicCard(
                         topic = topic,
-                        cardWidth = ThemeValue.Size.CellWidth,
+                        cardWidth = CustomTheme.size.cellWidth,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

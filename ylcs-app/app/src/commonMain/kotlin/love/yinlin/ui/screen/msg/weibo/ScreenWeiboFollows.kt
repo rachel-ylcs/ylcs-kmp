@@ -26,10 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
@@ -55,12 +52,12 @@ private fun WeiboUserItem(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+        modifier = modifier.clickable(onClick = onClick).padding(CustomTheme.padding.value),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
     ) {
         if (user.avatar.isEmpty()) {
-            LoadingCircle(size = ThemeValue.Size.MicroImage)
+            LoadingCircle(size = CustomTheme.size.microImage)
         }
         else {
             WebImage(
@@ -68,7 +65,7 @@ private fun WeiboUserItem(
                 key = remember { DateEx.TodayString },
                 contentScale = ContentScale.Crop,
                 circle = true,
-                modifier = Modifier.size(ThemeValue.Size.MicroImage)
+                modifier = Modifier.size(CustomTheme.size.microImage)
             )
         }
         Text(
@@ -144,7 +141,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -167,9 +164,9 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
             val state = rememberTextInputState()
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Text(text = "微博关注数据迁移")
                 TextInput(

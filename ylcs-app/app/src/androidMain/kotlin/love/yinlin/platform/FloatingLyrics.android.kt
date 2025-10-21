@@ -19,15 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import love.yinlin.DeviceWrapper
-import love.yinlin.common.Colors
 import love.yinlin.common.uri.Scheme
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
+import love.yinlin.compose.*
 import love.yinlin.extension.catching
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
 import java.util.UUID
 
 @Stable
@@ -37,7 +37,15 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         setViewTreeSavedStateRegistryOwner(activity)
         setViewTreeViewModelStoreOwner(activity)
         setContent {
-            ContentWrapper()
+            App(
+                deviceFactory = { maxWidth, _ -> Device(maxWidth) },
+                themeMode = app.config.themeMode,
+                fontScale = 1f,
+                mainFontResource = Res.font.xwwk,
+                modifier = Modifier.fillMaxWidth()
+            ) { maxWidth, _ ->
+                Content(maxWidth)
+            }
         }
     }
 
@@ -88,28 +96,15 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     }
 
     @Composable
-    private fun ContentWrapper() {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            DeviceWrapper(
-                device = remember(this.maxWidth) { Device(this.maxWidth) },
-                themeMode = app.config.themeMode,
-                fontScale = 1f
-            ) {
-                Content()
-            }
-        }
-    }
-
-    @Composable
-    fun BoxWithConstraintsScope.Content() {
+    private fun Content(maxWidth: Dp) {
         currentLyrics?.let { lyrics ->
             val config = app.config.floatingLyricsAndroidConfig
 
             Box(
                 modifier = Modifier.padding(
-                    start = this.maxWidth * config.left.coerceIn(0f, 1f),
-                    end = this.maxWidth * (1 - config.right).coerceIn(0f, 1f),
-                    top = ThemeValue.Padding.VerticalExtraSpace * 4f * config.top
+                    start = maxWidth * config.left.coerceIn(0f, 1f),
+                    end = maxWidth * (1 - config.right).coerceIn(0f, 1f),
+                    top = CustomTheme.padding.verticalExtraSpace * 4f * config.top
                 ).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
@@ -118,13 +113,13 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                     ),
-                    color = Colors.from(config.textColor),
+                    color = Colors(config.textColor),
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.wrapContentSize(unbounded = true)
-                        .background(color = Colors.from(config.backgroundColor))
-                        .padding(ThemeValue.Padding.Value)
+                        .background(color = Colors(config.backgroundColor))
+                        .padding(CustomTheme.padding.value)
                 )
             }
         }

@@ -10,9 +10,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.ui.component.input.RachelButton
@@ -43,10 +41,10 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier
                         .padding(LocalImmersivePadding.current)
                         .fillMaxSize()
-                        .padding(ThemeValue.Padding.Value)
+                        .padding(CustomTheme.padding.value)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace),
                 ) {
                     WebPage(
                         state = webPageState,

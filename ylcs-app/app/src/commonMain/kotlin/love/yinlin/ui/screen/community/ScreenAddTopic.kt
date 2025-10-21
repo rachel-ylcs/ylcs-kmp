@@ -16,9 +16,7 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserProfile
@@ -169,9 +167,9 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current)
                     .fillMaxSize()
-                    .padding(ThemeValue.Padding.EqualValue)
+                    .padding(CustomTheme.padding.equalValue)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 TextInput(
                     state = input.title,
@@ -206,7 +204,7 @@ class ScreenAddTopic(model: AppModel) : CommonSubScreen(model) {
                 ImageAdder(
                     maxNum = 9,
                     pics = input.pics,
-                    size = ThemeValue.Size.MicroCellWidth,
+                    size = CustomTheme.size.microCellWidth,
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },
                     onDelete = { deletePic(it) },

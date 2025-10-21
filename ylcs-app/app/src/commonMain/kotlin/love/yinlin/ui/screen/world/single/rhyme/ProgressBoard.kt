@@ -7,8 +7,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import love.yinlin.common.Colors
-import love.yinlin.compose.translate
+import love.yinlin.compose.*
 
 // 进度板
 @Stable

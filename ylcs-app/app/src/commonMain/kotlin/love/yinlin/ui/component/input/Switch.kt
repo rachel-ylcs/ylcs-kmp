@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.ui.component.node.clickableNoRipple
 import love.yinlin.platform.app
 
@@ -23,7 +23,7 @@ fun Switch(
     enabled: Boolean = true,
     duration: Int = app.config.animationSpeed / 2
 ) {
-    val width = ThemeValue.Size.SmallInput
+    val width = CustomTheme.size.smallInput
     Box(modifier = Modifier
         .size(width, width / 2)
         .clip(RoundedCornerShape(50))

@@ -5,7 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
-import love.yinlin.common.Colors
+import love.yinlin.compose.*
 import java.awt.Component
 
 @Composable

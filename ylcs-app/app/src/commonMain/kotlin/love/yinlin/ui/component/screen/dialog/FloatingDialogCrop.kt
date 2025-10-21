@@ -23,11 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
 import kotlinx.serialization.Serializable
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberDerivedState
-import love.yinlin.compose.rememberRefState
-import love.yinlin.compose.translate
+import love.yinlin.compose.*
 import love.yinlin.platform.CropResult
 import love.yinlin.platform.ImageQuality
 import love.yinlin.ui.component.image.WebImage
@@ -398,7 +394,7 @@ class FloatingDialogCrop : FloatingDialog<CropResult>() {
     override fun Wrapper(block: @Composable (() -> Unit)) {
         super.Wrapper {
             Column(
-                modifier = Modifier.width(ThemeValue.Size.DialogWidth).background(Colors.Black),
+                modifier = Modifier.width(CustomTheme.size.dialogWidth).background(Colors.Black),
                 horizontalAlignment = Alignment.End
             ) {
                 CropImage(
@@ -410,7 +406,7 @@ class FloatingDialogCrop : FloatingDialog<CropResult>() {
                 RachelButton(
                     text = "裁剪",
                     color = Colors.White,
-                    modifier = Modifier.padding(ThemeValue.Padding.EqualValue),
+                    modifier = Modifier.padding(CustomTheme.padding.equalValue),
                     onClick = {
                         continuation?.resume(cropState.result)
                     }

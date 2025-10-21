@@ -23,9 +23,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberValueState
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
@@ -83,7 +81,7 @@ private fun TopPager(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ClickIcon(
@@ -149,9 +147,9 @@ fun ColumnScope.AnswerQuestionCardQuestionAnswer(game: GameDetailsWithName) {
         )
         Column(
             modifier = Modifier.fillMaxWidth().weight(1f)
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             when (question) {
                 is AQQuestion.Choice -> {
@@ -437,11 +435,11 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
         )
         Column(
             modifier = Modifier.fillMaxWidth()
-                .height(ThemeValue.Size.CardWidth)
-                .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.primary)
-                .padding(ThemeValue.Padding.EqualValue),
+                .height(CustomTheme.size.cardWidth)
+                .border(width = CustomTheme.border.small, color = MaterialTheme.colorScheme.primary)
+                .padding(CustomTheme.padding.equalValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             val item = questions.getOrNull(currentIndex)
 
@@ -459,10 +457,10 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth().weight(1f)
-                        .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.secondary)
-                        .padding(ThemeValue.Padding.EqualValue)
+                        .border(width = CustomTheme.border.small, color = MaterialTheme.colorScheme.secondary)
+                        .padding(CustomTheme.padding.equalValue)
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     when (item) {
                         is QuestionItem.Choice -> {
@@ -578,7 +576,7 @@ class AnswerQuestionCreateGameState(val slot: SubScreenSlot) : CreateGameState {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (item != null) {
@@ -680,11 +678,11 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
         preflight?.let { (_, questions) ->
             Column(
                 modifier = Modifier.fillMaxWidth()
-                    .height(ThemeValue.Size.CardWidth)
-                    .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.primary)
-                    .padding(ThemeValue.Padding.EqualValue),
+                    .height(CustomTheme.size.cardWidth)
+                    .border(width = CustomTheme.border.small, color = MaterialTheme.colorScheme.primary)
+                    .padding(CustomTheme.padding.equalValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 val question = questions.getOrNull(currentIndex)
                 val answer = answers.getOrNull(currentIndex)
@@ -703,9 +701,9 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                     )
                     Column(
                         modifier = Modifier.fillMaxWidth().weight(1f)
-                            .padding(ThemeValue.Padding.EqualValue)
+                            .padding(CustomTheme.padding.equalValue)
                             .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
                         when (question) {
                             is AQQuestion.Choice -> {

@@ -23,10 +23,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberDerivedState
-import love.yinlin.compose.rememberState
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.info.PaintPath
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.node.condition
@@ -80,7 +77,7 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
 private inline fun PaintCanvasTool(content: @Composable RowScope.() -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(ThemeValue.Padding.Value)
+            .padding(CustomTheme.padding.value)
             .horizontalScroll(rememberScrollState()),
         content = content
     )
@@ -151,7 +148,7 @@ fun PaintCanvas(
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
-        Column(modifier = Modifier.fillMaxWidth().border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)) {
+        Column(modifier = Modifier.fillMaxWidth().border(CustomTheme.border.medium, MaterialTheme.colorScheme.primary)) {
             if (enabled) {
                 PaintCanvasTool {
                     val canRemove by rememberDerivedState { state.paths.isNotEmpty() }
@@ -171,7 +168,7 @@ fun PaintCanvas(
                             color = color,
                             onClick = { state.color = color },
                             modifier = Modifier.condition(state.color == color) {
-                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                                border(CustomTheme.border.small, MaterialTheme.colorScheme.primary, CircleShape)
                             }
                         )
                     }
@@ -183,7 +180,7 @@ fun PaintCanvas(
                             color = color,
                             onClick = { state.color = color },
                             modifier = Modifier.condition(state.color == color) {
-                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                                border(CustomTheme.border.small, MaterialTheme.colorScheme.primary, CircleShape)
                             }
                         )
                     }
@@ -194,7 +191,7 @@ fun PaintCanvas(
                             icon = icon,
                             onClick = { state.width = width },
                             modifier = Modifier.condition(state.width == width) {
-                                border(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary, CircleShape)
+                                border(CustomTheme.border.small, MaterialTheme.colorScheme.primary, CircleShape)
                             }
                         )
                     }

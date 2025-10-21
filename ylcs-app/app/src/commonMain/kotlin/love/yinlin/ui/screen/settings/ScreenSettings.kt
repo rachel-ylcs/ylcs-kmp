@@ -30,10 +30,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberDerivedState
-import love.yinlin.compose.rememberState
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -255,8 +252,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
             if (userProfile == null) {
                 ItemExpander(
                     title = "登录",
-                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Login, background = ThemeColor.warning),
-                    color = ThemeColor.warning,
+                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Login, background = CustomTheme.colorScheme.warning),
+                    color = CustomTheme.colorScheme.warning,
                     hasDivider = false,
                     onClick = {
                         pop()
@@ -274,8 +271,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                         key = app.config.cacheUserAvatar,
                         contentScale = ContentScale.Crop,
                         circle = true,
-                        modifier = Modifier.size(ThemeValue.Size.Image)
-                            .shadow(ThemeValue.Shadow.Icon, CircleShape)
+                        modifier = Modifier.size(CustomTheme.size.image)
+                            .shadow(CustomTheme.shadow.icon, CircleShape)
                     )
                 }
                 ItemText(
@@ -296,8 +293,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                     WebImage(
                         uri = userProfile.wallPath,
                         key = app.config.cacheUserWall,
-                        modifier = Modifier.width(ThemeValue.Size.LargeImage).aspectRatio(1.77778f)
-                            .shadow(ThemeValue.Shadow.Icon)
+                        modifier = Modifier.width(CustomTheme.size.largeImage).aspectRatio(1.77778f)
+                            .shadow(CustomTheme.shadow.icon)
                     )
                 }
                 ItemText(
@@ -311,13 +308,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                 )
                 ItemExpanderSuspend(
                     title = "重置默认图片",
-                    icon = colorfulImageVector(icon = ExtraIcons.ResetPicture, background = ThemeColor.warning),
+                    icon = colorfulImageVector(icon = ExtraIcons.ResetPicture, background = CustomTheme.colorScheme.warning),
                     onClick = { resetPicture() }
                 )
                 ItemExpanderSuspend(
                     title = "退出登录",
-                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Logout, background = ThemeColor.warning),
-                    color = ThemeColor.warning,
+                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Logout, background = CustomTheme.colorScheme.warning),
+                    color = CustomTheme.colorScheme.warning,
                     hasDivider = false,
                     onClick = { logoff() }
                 )
@@ -348,8 +345,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                     onSelected = { app.config.themeMode = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
                 ) {
                     for (themeMode in ThemeMode.entries) {
                         this.Item(themeMode, themeMode.toString())
@@ -368,8 +365,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                     onSelected = { app.config.animationSpeed = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
                 ) {
                     repeat(animationSpeedValue.size) {
                         this.Item(animationSpeedValue[it], animationSpeedString[it])
@@ -388,8 +385,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                     onSelected = { app.config.fontScale = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
                 ) {
                     repeat(fontScaleValue.size) {
                         this.Item(fontScaleValue[it], fontScaleString[it])
@@ -478,13 +475,13 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
         ) {
             AccountSettings(
                 userProfile = userProfile,
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
             )
             PreferencesSettings(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
             )
             ApplicationSettings(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
             )
         }
     }
@@ -492,23 +489,23 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun Landscape(userProfile: UserProfile?) {
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(ThemeValue.Size.PanelWidth),
+            columns = StaggeredGridCells.Adaptive(CustomTheme.size.panelWidth),
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
             item(key = ItemKey("AccountSettings")) {
                 AccountSettings(
                     userProfile = userProfile,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                 )
             }
             item(key = ItemKey("PreferencesSettings")) {
                 PreferencesSettings(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                 )
             }
             item(key = ItemKey("ApplicationSettings")) {
                 ApplicationSettings(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                 )
             }
         }
@@ -527,7 +524,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
         override fun Content() {
             val text = remember { app.kv.get(AppContext.CRASH_KEY, "无崩溃日志") }
             Box(modifier = Modifier.fillMaxWidth()
-                .padding(ThemeValue.Padding.SheetValue)
+                .padding(CustomTheme.padding.sheetValue)
                 .verticalScroll(rememberScrollState())
             ) {
                 SelectionContainer {
@@ -546,9 +543,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
             val state = rememberTextInputState()
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 LoadingIcon(
                     icon = Icons.Outlined.Check,
@@ -571,7 +568,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Content() {
             Box(modifier = Modifier.fillMaxWidth()
-                .padding(ThemeValue.Padding.SheetValue)
+                .padding(CustomTheme.padding.sheetValue)
                 .verticalScroll(rememberScrollState())
             ) {
                 SelectionContainer {
@@ -589,14 +586,14 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
         override fun Content() {
             Column(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(ThemeValue.Padding.EqualExtraValue)
+                    .padding(CustomTheme.padding.equalExtraValue)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2f)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 2f)
             ) {
                 MiniImage(
                     res = Res.drawable.img_logo,
-                    modifier = Modifier.size(ThemeValue.Size.MediumImage).clip(CircleShape)
+                    modifier = Modifier.size(CustomTheme.size.mediumImage).clip(CircleShape)
                 )
                 Text(
                     text = Local.NAME,
@@ -620,8 +617,8 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                 )
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     MiniIcon(icon = Icons.Outlined.Android)
                     MiniIcon(icon = ExtraIcons.IOS)
@@ -690,9 +687,9 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
             val canSubmit by rememberDerivedState { oldPassword.ok && newPassword1.ok && newPassword2.ok }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 LoadingRachelButton(
                     text = "提交",

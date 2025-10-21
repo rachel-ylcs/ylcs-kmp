@@ -24,10 +24,7 @@ import androidx.compose.ui.util.fastMap
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -74,8 +71,8 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
         modifier = modifier.combinedClickable(
             onClick = onClick,
             onLongClick = onLongClick
-        ).padding(ThemeValue.Padding.Value),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        ).padding(CustomTheme.padding.value),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -239,7 +236,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
         }
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+            columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
             state = gridState,
             modifier = modifier,
         ) {
@@ -345,10 +342,10 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
             val state = rememberTextInputState()
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.SheetValue),
+                modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.sheetValue),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "本地歌单", modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))
+                Text(text = "本地歌单", modifier = Modifier.padding(vertical = CustomTheme.padding.verticalSpace))
                 TextInput(
                     state = state,
                     hint = "本地歌单(JSON格式)",
@@ -395,9 +392,9 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     )
                 }
                 HorizontalDivider()
-                Text(text = "云歌单", modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace))
+                Text(text = "云歌单", modifier = Modifier.padding(vertical = CustomTheme.padding.verticalSpace))
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

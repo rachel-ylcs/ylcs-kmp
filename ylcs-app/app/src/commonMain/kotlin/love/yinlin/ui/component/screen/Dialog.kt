@@ -24,10 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
 import love.yinlin.ui.component.node.clickableNoRipple
@@ -124,12 +121,12 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
             }
 
             Column(
-                modifier = Modifier.width(ThemeValue.Size.DialogWidth)
+                modifier = Modifier.width(CustomTheme.size.dialogWidth)
                     .clickableNoRipple { if (dismissOnClickOutside) close() }
                     .padding(bottom = rachelWidth),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OffsetLayout(y = rachelWidth / 15.5f + ThemeValue.Padding.VerticalExtraSpace / 5) {
+                OffsetLayout(y = rachelWidth / 15.5f + CustomTheme.padding.verticalExtraSpace / 5) {
                     MiniIcon(
                         res = Res.drawable.img_dialog_rachel,
                         size = rachelWidth,
@@ -142,12 +139,12 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(
-                            top = ThemeValue.Padding.VerticalExtraSpace * 2,
-                            bottom = ThemeValue.Padding.VerticalExtraSpace,
-                            start = ThemeValue.Padding.HorizontalExtraSpace,
-                            end = ThemeValue.Padding.HorizontalExtraSpace
+                            top = CustomTheme.padding.verticalExtraSpace * 2,
+                            bottom = CustomTheme.padding.verticalExtraSpace,
+                            start = CustomTheme.padding.horizontalExtraSpace,
+                            end = CustomTheme.padding.horizontalExtraSpace
                         ),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                     ) {
                         title?.let {
                             Text(
@@ -156,7 +153,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
                                 color = MaterialTheme.colorScheme.primary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
                             )
                         }
 
@@ -170,7 +167,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
                         actions?.let {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End)
+                                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End)
                             ) {
                                 it()
                             }
@@ -324,14 +321,14 @@ abstract class FloatingDialogChoice(
         super.Wrapper {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 repeat(num) { index ->
                     Row(
                         modifier = Modifier.fillMaxWidth().clickable {
                             continuation?.resume(index)
-                        }.padding(ThemeValue.Padding.Value),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                        }.padding(CustomTheme.padding.value),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(index)
@@ -376,7 +373,7 @@ abstract class ListDialogChoice(title: String? = null) : FloatingDialogChoice(ti
     override fun Icon(index: Int) {
         MiniIcon(
             icon = remember(index) { iconFactory(index) },
-            size = ThemeValue.Size.MediumIcon
+            size = CustomTheme.size.mediumIcon
         )
     }
 }
@@ -426,17 +423,17 @@ open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
         super.Wrapper {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 LinearProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier.fillMaxWidth().height(ThemeValue.Size.ProgressHeight),
-                    gapSize = ThemeValue.Padding.ZeroSpace,
+                    modifier = Modifier.fillMaxWidth().height(CustomTheme.size.progressHeight),
+                    gapSize = CustomTheme.padding.zeroSpace,
                     drawStopIndicator = {}
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -473,8 +470,8 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
         super.Wrapper {
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
-                shadowElevation = ThemeValue.Shadow.Surface,
-                modifier = Modifier.size(ThemeValue.Size.DialogWidth)
+                shadowElevation = CustomTheme.shadow.surface,
+                modifier = Modifier.size(CustomTheme.size.dialogWidth)
             ) {
                 LoadingBox()
             }

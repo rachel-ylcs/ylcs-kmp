@@ -13,11 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberRefState
+import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
@@ -32,9 +28,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
-        .padding(ThemeValue.Padding.EqualExtraValue)
+        .padding(CustomTheme.padding.equalExtraValue)
         .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
         RowLayout("悬浮歌词模式") {
             Switch(
@@ -66,11 +62,11 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * iosConfig.textSize
                     ),
-                    color = Colors.from(iosConfig.textColor),
+                    color = Colors(iosConfig.textColor),
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.background(color = Colors.from(iosConfig.backgroundColor)).padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.background(color = Colors(iosConfig.backgroundColor)).padding(CustomTheme.padding.value)
                 )
             }
         }
@@ -80,30 +76,30 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 value = iosConfig.textSizeProgress,
                 onValueChange = { iosConfig = iosConfig.copyTextSize(it) },
                 onValueChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
 
         SplitLayout(
-            modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-            horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace * 2,
+            modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+            horizontalArrangement = CustomTheme.padding.horizontalExtraSpace * 2,
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors.from(app.config.floatingLyricsIOSConfig.textColor),
+                        initialColor = Colors(app.config.floatingLyricsIOSConfig.textColor),
                         onColorChanged = { iosConfig = iosConfig.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
-                        modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
             },
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors.from(app.config.floatingLyricsIOSConfig.backgroundColor),
+                        initialColor = Colors(app.config.floatingLyricsIOSConfig.backgroundColor),
                         onColorChanged = { iosConfig = iosConfig.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
-                        modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                        modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
             }

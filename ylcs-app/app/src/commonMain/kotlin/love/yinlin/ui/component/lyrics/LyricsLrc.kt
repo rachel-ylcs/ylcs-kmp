@@ -33,9 +33,7 @@ import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.extension.catching
 import love.yinlin.extension.timeString
 import love.yinlin.ui.component.layout.fadingEdges
@@ -209,9 +207,9 @@ class LyricsLrc : LyricsEngine {
                 state = listState,
                 modifier = Modifier.fillMaxSize().fadingEdges(
                     edges = DpRect(
-                        left = ThemeValue.Padding.ZeroSpace,
+                        left = CustomTheme.padding.zeroSpace,
                         top = maxHeight * 3 / 7,
-                        right = ThemeValue.Padding.ZeroSpace,
+                        right = CustomTheme.padding.zeroSpace,
                         bottom = maxHeight * 3 / 7
                     )
                 )

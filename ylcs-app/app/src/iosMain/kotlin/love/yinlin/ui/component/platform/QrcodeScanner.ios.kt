@@ -13,11 +13,8 @@ import cocoapods.SGQRCode.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
 import love.yinlin.common.colorWithHex
-import love.yinlin.compose.rememberFalse
-import love.yinlin.compose.rememberRefState
+import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
@@ -127,7 +124,7 @@ actual fun QrcodeScanner(
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(ThemeValue.Padding.VerticalExtraSpace * 4)
+                .padding(CustomTheme.padding.verticalExtraSpace * 4)
                 .zIndex(2f),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
@@ -138,7 +135,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.MediumIcon,
+                size = CustomTheme.size.mediumIcon,
                 onClick = {
                     scope.launch {
                         Coroutines.io {
@@ -164,7 +161,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.MediumIcon,
+                size = CustomTheme.size.mediumIcon,
                 onClick = {
                     if (flashEnabled) SGTorch.turnOffTorch()
                     else SGTorch.turnOnTorch()

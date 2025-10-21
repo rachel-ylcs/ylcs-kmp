@@ -89,7 +89,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 Status.Preparing -> {
                     SecondaryLoadingButton(
                         text = "开始",
-                        modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace),
+                        modifier = Modifier.padding(CustomTheme.padding.verticalSpace),
                         onClick = { preflight() }
                     )
                 }
@@ -98,13 +98,13 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.extraLarge,
-                            shadowElevation = ThemeValue.Shadow.Surface
+                            shadowElevation = CustomTheme.shadow.surface
                         ) {
                             Column(
                                 modifier = Modifier.fillMaxWidth()
-                                    .padding(ThemeValue.Padding.EqualExtraValue)
+                                    .padding(CustomTheme.padding.equalExtraValue)
                                     .verticalScroll(rememberScrollState()),
-                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                             ) {
                                 with(state) { Content() }
                             }
@@ -116,27 +116,27 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.extraLarge,
-                            shadowElevation = ThemeValue.Shadow.Surface
+                            shadowElevation = CustomTheme.shadow.surface
                         ) {
                             Column(
                                 modifier = Modifier.fillMaxWidth()
-                                    .padding(ThemeValue.Padding.EqualExtraValue)
+                                    .padding(CustomTheme.padding.equalExtraValue)
                                     .verticalScroll(rememberScrollState()),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     MiniIcon(
                                         res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
-                                        size = ThemeValue.Size.LargeImage
+                                        size = CustomTheme.size.largeImage
                                     )
                                     Column(
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
+                                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 1.5f)
                                     ) {
                                         Text(
                                             text = if (result.isCompleted) "成功" else "失败",
@@ -158,7 +158,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                                 Space()
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
@@ -177,9 +177,9 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     @Composable
     private fun Portrait(details: GamePublicDetailsWithName) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.EqualExtraValue),
+            modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             GameItem(
                 game = details,
@@ -194,13 +194,13 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
     private fun Landscape(details: GamePublicDetailsWithName) {
         Row(
             modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
         ) {
             Column(
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
-                    .padding(ThemeValue.Padding.EqualExtraValue),
+                modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight()
+                    .padding(CustomTheme.padding.equalExtraValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 GameItem(
                     game = details,
@@ -209,10 +209,10 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                 )
             }
             Column(
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
-                    .padding(ThemeValue.Padding.EqualExtraValue),
+                modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight()
+                    .padding(CustomTheme.padding.equalExtraValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 GameLayout(modifier = Modifier.fillMaxWidth())
             }

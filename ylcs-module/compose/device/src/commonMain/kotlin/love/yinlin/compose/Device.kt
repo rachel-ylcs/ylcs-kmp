@@ -1,6 +1,7 @@
 package love.yinlin.compose
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
@@ -13,10 +14,27 @@ class Device private constructor(
 ) {
     @Stable
     @Serializable
-    enum class Size { SMALL, MEDIUM, LARGE; }
+    enum class Size {
+        SMALL, MEDIUM, LARGE;
+
+        fun select(small: Number, medium: Number, large: Number): Dp = when (this) {
+            SMALL -> small
+            MEDIUM -> medium
+            LARGE -> large
+        }.toDouble().dp
+
+        fun select(small: TextStyle, medium: TextStyle, large: TextStyle): TextStyle = when (this) {
+            SMALL -> small
+            MEDIUM -> medium
+            LARGE -> large
+        }
+    }
+
     @Stable
     @Serializable
-    enum class Type { PORTRAIT, LANDSCAPE, SQUARE; }
+    enum class Type {
+        PORTRAIT, LANDSCAPE, SQUARE;
+    }
 
     constructor(width: Dp) : this(
         size = when {

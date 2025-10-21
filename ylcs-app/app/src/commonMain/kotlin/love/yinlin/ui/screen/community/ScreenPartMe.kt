@@ -40,10 +40,7 @@ import love.yinlin.common.*
 import love.yinlin.common.uri.Scheme
 import love.yinlin.common.uri.Uri
 import love.yinlin.common.uri.UriGenerator
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.RequestError
@@ -82,7 +79,7 @@ private fun LevelItem(
     val level = index + 1
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(level.toString())
@@ -99,7 +96,7 @@ private fun LevelItem(
             )
         }
         Box(
-            modifier = Modifier.offset(y = -ThemeValue.Padding.LittleSpace),
+            modifier = Modifier.offset(y = -CustomTheme.padding.littleSpace),
             contentAlignment = Alignment.Center
         ) {
             UserLabel(
@@ -266,7 +263,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
     private fun LoginBox(modifier: Modifier = Modifier) {
         Column(modifier = modifier) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = ThemeValue.Padding.VerticalSpace),
+                modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace),
                 horizontalArrangement = Arrangement.End
             ) {
                 ActionScope.Right.Actions {
@@ -281,11 +278,11 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                 ) {
                     MiniIcon(
                         res = Res.drawable.img_not_login,
-                        size = ThemeValue.Size.ExtraImage
+                        size = CustomTheme.size.extraImage
                     )
                     RachelButton(
                         text = stringResource(Res.string.login),
@@ -300,7 +297,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
     private fun Portrait(userProfile: UserProfile) {
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             UserProfileCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -324,26 +321,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
             UserProfileCard(
                 profile = userProfile,
                 shape = MaterialTheme.shapes.large,
-                modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                modifier = Modifier.weight(1f).padding(CustomTheme.padding.equalExtraValue),
                 onLevelClick = { levelSheet.open(userProfile) },
                 onFollowClick = { navigate(ScreenFollows.Args(it)) }
             )
             Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
                 ToolContainer(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                     shape = MaterialTheme.shapes.large
                 )
                 UserSpaceContainer(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                     shape = MaterialTheme.shapes.large
                 )
                 PromotionContainer(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                     shape = MaterialTheme.shapes.large
                 )
                 if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
                     AdminContainer(
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                         shape = MaterialTheme.shapes.large
                     )
                 }
@@ -392,17 +389,17 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
         @Composable
         override fun Content(args: UserProfile) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 WebImage(
                     uri = args.avatarPath,
                     key = app.config.cacheUserAvatar,
                     contentScale = ContentScale.Crop,
                     circle = true,
-                    modifier = Modifier.size(ThemeValue.Size.LargeImage)
-                        .shadow(ThemeValue.Shadow.Icon, CircleShape)
+                    modifier = Modifier.size(CustomTheme.size.largeImage)
+                        .shadow(CustomTheme.shadow.icon, CircleShape)
                 )
                 Text(
                     text = args.name,
@@ -438,7 +435,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
                 }
                 MiniImage(
                     painter = qrcodePainter,
-                    modifier = Modifier.size(ThemeValue.Size.ExtraImage)
+                    modifier = Modifier.size(CustomTheme.size.extraImage)
                 )
                 Space()
             }
@@ -477,9 +474,9 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
             val today = remember { DateEx.Today }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 Text(
                     text = "签到记录",
@@ -487,26 +484,26 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
                 )
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     repeat(2) { row ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
                         ) {
                             repeat(4) { col ->
                                 val index = row * 4 + col
                                 Surface(
                                     modifier = Modifier.weight(1f),
                                     shape = MaterialTheme.shapes.medium,
-                                    tonalElevation = ThemeValue.Shadow.Tonal,
-                                    shadowElevation = ThemeValue.Shadow.Item,
-                                    border = if (index != todayIndex) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
+                                    tonalElevation = CustomTheme.shadow.tonal,
+                                    shadowElevation = CustomTheme.shadow.item,
+                                    border = if (index != todayIndex) null else BorderStroke(CustomTheme.border.small, MaterialTheme.colorScheme.primary)
                                 ) {
                                     Column(
-                                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
+                                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace, Alignment.CenterVertically)
                                     ) {
                                         val date = today.minus(todayIndex - index, DateTimeUnit.DAY)
 
@@ -539,10 +536,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
                     UserProfileInfo(
                         profile = remember(args) { args.publicProfile },
                         owner = true,
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue)
                     ) { onLevelClick ->
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             PortraitValue(
@@ -567,10 +564,10 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
                         modifier = Modifier.fillMaxWidth()
                             .condition(index + 1 == app.config.userProfile?.level) {
                                 border(
-                                    width = ThemeValue.Border.Small,
+                                    width = CustomTheme.border.small,
                                     color = MaterialTheme.colorScheme.primary
                                 )
-                            }.clickable {}.padding(ThemeValue.Padding.Value)
+                            }.clickable {}.padding(CustomTheme.padding.value)
                     )
                 }
             }

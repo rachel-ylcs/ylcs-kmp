@@ -22,9 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
@@ -86,11 +84,11 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -128,14 +126,14 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                 )
                 HorizontalMultiBrowseCarousel(
                     state = rememberCarouselState { album.picNum },
-                    preferredItemWidth = ThemeValue.Size.CellWidth,
-                    itemSpacing = ThemeValue.Padding.HorizontalSpace,
+                    preferredItemWidth = CustomTheme.size.cellWidth,
+                    itemSpacing = CustomTheme.padding.horizontalSpace,
                     modifier = Modifier.fillMaxWidth().clipToBounds()
                 ) { index ->
                     WebImage(
                         uri = album.thumbPath(index),
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.width(ThemeValue.Size.CellWidth)
+                        modifier = Modifier.width(CustomTheme.size.cellWidth)
                             .aspectRatio(0.66667f)
                             .maskClip(MaterialTheme.shapes.large),
                         onClick = {
@@ -187,12 +185,12 @@ class ScreenPictures(model: AppModel) : CommonSubScreen(model) {
                 canRefresh = false,
                 canLoading = page.canLoading,
                 onLoading = { requestMorePhotos() },
-                itemDivider = ThemeValue.Padding.Value,
+                itemDivider = CustomTheme.padding.value,
                 modifier = Modifier.fillMaxSize()
             ) {
                 PhotoAlbumLayout(
                     album = it,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue)
                 )
             }
         }

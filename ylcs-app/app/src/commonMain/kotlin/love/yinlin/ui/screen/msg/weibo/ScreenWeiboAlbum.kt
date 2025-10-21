@@ -16,9 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.ui.component.image.ClickIcon
@@ -96,8 +94,8 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(ThemeValue.Padding.Value),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+                .padding(CustomTheme.padding.value),
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
         ) {
             val data = caches[current]
             StatefulBox(
@@ -105,9 +103,9 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 if (data != null) LazyVerticalGrid(
-                    columns = GridCells.Adaptive(ThemeValue.Size.MicroCellWidth),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+                    columns = GridCells.Adaptive(CustomTheme.size.microCellWidth),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     itemsIndexed(
@@ -125,7 +123,7 @@ class ScreenWeiboAlbum(model: AppModel, private val args: Args) : SubScreen<Scre
             if (data != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ClickIcon(

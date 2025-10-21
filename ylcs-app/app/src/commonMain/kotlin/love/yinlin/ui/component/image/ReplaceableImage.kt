@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 
 @Composable
 fun ReplaceableImage(
@@ -49,7 +49,7 @@ fun ReplaceableImage(
                 ClickIcon(
                     icon = Icons.Outlined.Cancel,
                     color = MaterialTheme.colorScheme.error,
-                    size = ThemeValue.Size.MediumIcon,
+                    size = CustomTheme.size.mediumIcon,
                     modifier = Modifier.align(Alignment.TopEnd).zIndex(2f),
                     onClick = onDelete
                 )

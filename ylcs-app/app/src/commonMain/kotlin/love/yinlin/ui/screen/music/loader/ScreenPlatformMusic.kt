@@ -28,9 +28,7 @@ import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
 import love.yinlin.common.uri.Uri
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
@@ -61,7 +59,7 @@ private fun PlatformMusicInfoCard(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        shadowElevation = ThemeValue.Shadow.Surface
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         WebImage(
             uri = info.pic,
@@ -71,9 +69,9 @@ private fun PlatformMusicInfoCard(
         )
         Column(
             modifier = Modifier.fillMaxSize()
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
                 .zIndex(2f),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             RachelText(
                 text = info.name,
@@ -315,8 +313,8 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(ThemeValue.Padding.EqualValue),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                .padding(CustomTheme.padding.equalValue),
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().selectableGroup(),
@@ -338,10 +336,10 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                 modifier = Modifier.fillMaxWidth()
             )
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 items(

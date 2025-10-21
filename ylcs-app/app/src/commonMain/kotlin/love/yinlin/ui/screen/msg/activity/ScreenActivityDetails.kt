@@ -20,11 +20,8 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
 import love.yinlin.common.uri.Uri
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
@@ -55,7 +52,7 @@ private fun ActivityDetailsLayout(
 
 	Surface(
 		modifier = modifier,
-		shadowElevation = ThemeValue.Shadow.Surface
+		shadowElevation = CustomTheme.shadow.surface
 	) {
 		Column(modifier = Modifier.fillMaxWidth()) {
 			if (picPath == null) {
@@ -71,8 +68,8 @@ private fun ActivityDetailsLayout(
 				)
 			}
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
+				verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 			) {
 				Text(
 					text = activity.title ?: "未知活动",
@@ -130,17 +127,17 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 
 		Column(
 			modifier = modifier,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
 			) {
 				activity.showstart?.let { showstart ->
 					ClickIcon(
 						res = Res.drawable.img_showstart,
                         tip = "打开秀动",
-						size = ThemeValue.Size.MediumIcon,
+						size = CustomTheme.size.mediumIcon,
 						onClick = {
 							launch {
 								val uri = Uri.parse(showstart)
@@ -154,7 +151,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 					ClickIcon(
 						res = Res.drawable.img_damai,
                         tip = "打开大麦",
-						size = ThemeValue.Size.MediumIcon,
+						size = CustomTheme.size.mediumIcon,
 						onClick = { gotoWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}") }
 					)
 				}
@@ -162,7 +159,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 					ClickIcon(
 						res = Res.drawable.img_maoyan,
                         tip = "打开猫眼",
-						size = ThemeValue.Size.MediumIcon,
+						size = CustomTheme.size.mediumIcon,
 						onClick = { gotoWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}") }
 					)
 				}
@@ -170,7 +167,7 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 					ClickIcon(
 						icon = Icons.Outlined.Link,
                         tip = "打开链接",
-						size = ThemeValue.Size.MediumIcon,
+						size = CustomTheme.size.mediumIcon,
 						onClick = { gotoWebPage(link) }
 					)
 				}
@@ -195,9 +192,9 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 		Column(modifier = Modifier
 			.padding(LocalImmersivePadding.current)
 			.fillMaxSize()
-			.padding(ThemeValue.Padding.EqualValue)
+			.padding(CustomTheme.padding.equalValue)
 			.verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 		) {
 			ActivityDetailsLayout(
 				activity = activity,
@@ -215,13 +212,13 @@ class ScreenActivityDetails(model: AppModel, private val args: Args) : SubScreen
 		Row(modifier = Modifier
 			.padding(LocalImmersivePadding.current)
 			.fillMaxSize()
-			.padding(ThemeValue.Padding.EqualValue)
+			.padding(CustomTheme.padding.equalValue)
 		) {
 			ActivityDetailsLayout(
 				activity = activity,
 				modifier = Modifier.weight(2f)
 			)
-			VerticalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalSpace))
+			VerticalDivider(modifier = Modifier.padding(horizontal = CustomTheme.padding.horizontalSpace))
 			ActivityPictureLayout(
 				activity = activity,
 				modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())

@@ -18,8 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 
 @Stable
 class SingleSelectorScope<T>(
@@ -36,16 +35,16 @@ class SingleSelectorScope<T>(
                 .clip(MaterialTheme.shapes.small)
                 .clickable(enabled = enabled) { if (!selected) onSelected(item) }
                 .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else Colors.Transparent)
-                .border(width = ThemeValue.Border.Small, color = MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
-                .padding(ThemeValue.Padding.Value),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace / 2),
+                .border(width = CustomTheme.border.small, color = MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.small)
+                .padding(CustomTheme.padding.value),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace / 2),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (hasIcon && item == current) {
                 Icon(
                     imageVector = Icons.Filled.Done,
                     tint = if (enabled) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                    modifier = Modifier.size(ThemeValue.Size.MicroIcon * 0.8f),
+                    modifier = Modifier.size(CustomTheme.size.microIcon * 0.8f),
                     contentDescription = null
                 )
             }
@@ -68,8 +67,8 @@ fun <T> SingleSelector(
     onSelected: (T) -> Unit,
     style: TextStyle = LocalTextStyle.current,
     hasIcon: Boolean = true,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
-    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
+    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
     maxLines: Int = Int.MAX_VALUE,
     modifier: Modifier = Modifier,
     content: @Composable SingleSelectorScope<T>.() -> Unit

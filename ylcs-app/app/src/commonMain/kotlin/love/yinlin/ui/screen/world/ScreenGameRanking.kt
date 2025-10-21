@@ -34,7 +34,6 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
@@ -73,8 +72,8 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
                 modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
                     .clip(MaterialTheme.shapes.extraLarge)
                     .clickable(onClick = onClick)
-                    .padding(ThemeValue.Padding.Value),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    .padding(CustomTheme.padding.value),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 when (index) {
@@ -82,7 +81,7 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
                     2 -> MiniImage(icon = ExtraIcons.Rank2)
                     3 -> MiniImage(icon = ExtraIcons.Rank3)
                     else -> Box(
-                        modifier = Modifier.padding(ThemeValue.Padding.InnerIcon).size(ThemeValue.Size.Icon),
+                        modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(CustomTheme.size.icon),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -146,25 +145,25 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
             )
 
             Surface(
-                modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue)
-                    .widthIn(max = ThemeValue.Size.PanelWidth)
+                modifier = Modifier.padding(CustomTheme.padding.equalExtraValue)
+                    .widthIn(max = CustomTheme.size.panelWidth)
                     .fillMaxWidth()
                     .zIndex(2f),
                 shape = MaterialTheme.shapes.extraLarge,
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(ThemeValue.Padding.EqualExtraValue)
+                        .padding(CustomTheme.padding.equalExtraValue)
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                 ) {
                     Text(
                         text = "排行榜",
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(vertical = ThemeValue.Padding.VerticalSpace)
+                        modifier = Modifier.padding(vertical = CustomTheme.padding.verticalSpace)
                     )
                     if (items.isNotEmpty()) {
                         items.fastForEachIndexed { index, item ->
@@ -179,7 +178,7 @@ class ScreenGameRanking(model: AppModel, val args: Args) : SubScreen<ScreenGameR
                         }
                     }
                     else {
-                        Box(modifier = Modifier.size(ThemeValue.Size.CardWidth)) {
+                        Box(modifier = Modifier.size(CustomTheme.size.cardWidth)) {
                             EmptyBox()
                         }
                     }

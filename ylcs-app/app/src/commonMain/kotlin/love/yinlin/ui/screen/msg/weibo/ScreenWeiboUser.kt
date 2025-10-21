@@ -22,10 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.common.Picture
@@ -55,25 +52,25 @@ private fun UserInfoCard(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(ThemeValue.Padding.ExtraValue),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+        modifier = modifier.padding(CustomTheme.padding.extraValue),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
     ) {
-        OffsetLayout(y = -ThemeValue.Size.MediumImage / 3) {
+        OffsetLayout(y = -CustomTheme.size.mediumImage / 3) {
             WebImage(
                 uri = user.info.avatar,
                 key = remember { DateEx.TodayString },
                 contentScale = ContentScale.Crop,
                 circle = true,
-                modifier = Modifier.size(ThemeValue.Size.MediumImage)
+                modifier = Modifier.size(CustomTheme.size.mediumImage)
             )
         }
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -93,7 +90,7 @@ private fun UserInfoCard(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
             ) {
                 Text(
                     text = "关注 ${user.followNum}",
@@ -120,16 +117,16 @@ private fun UserAlbumItem(
 ) {
     Row(
         modifier = modifier.clickable(onClick = onAlbumClick),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         WebImage(
             uri = album.pic,
-            modifier = Modifier.size(ThemeValue.Size.Image)
+            modifier = Modifier.size(CustomTheme.size.image)
         )
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Text(
                 text = album.title,
@@ -138,7 +135,7 @@ private fun UserAlbumItem(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -251,7 +248,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
                     onFollowClick = { onFollowClick(user, it) },
                     modifier = Modifier.fillMaxWidth()
                 )
-                HorizontalDivider(modifier = Modifier.padding(ThemeValue.Padding.EqualValue))
+                HorizontalDivider(modifier = Modifier.padding(CustomTheme.padding.equalValue))
             }
             if (albums != null) {
                 items(
@@ -261,7 +258,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
                     UserAlbumItem(
                         album = it,
                         onAlbumClick = { onAlbumClick(it) },
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                     )
                 }
             }
@@ -272,7 +269,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                 )
             }
             items(
@@ -281,7 +278,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
             ) { weibo ->
                 WeiboCard(
                     weibo = weibo,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
                     onPicturesDownload = ::onPicturesDownload,
                     onVideoDownload = ::onVideoDownload
                 )
@@ -296,8 +293,8 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
     ) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Surface(
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight(),
-                shadowElevation = ThemeValue.Shadow.Surface
+                modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight(),
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     WebImage(
@@ -313,15 +310,15 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
                         onFollowClick = { onFollowClick(user, it) },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = ThemeValue.Padding.HorizontalSpace))
-                    Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(vertical = ThemeValue.Padding.VerticalSpace)) {
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = CustomTheme.padding.horizontalSpace))
+                    Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(vertical = CustomTheme.padding.verticalSpace)) {
                         if (albums == null) SimpleLoadingBox()
                         else {
                             if (albums.isEmpty()) SimpleEmptyBox()
                             else LazyColumn(
                                 modifier = Modifier.fillMaxWidth(),
-                                contentPadding = ThemeValue.Padding.EqualValue,
-                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                                contentPadding = CustomTheme.padding.equalValue,
+                                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                             ) {
                                 items(
                                     items = albums,
@@ -341,7 +338,7 @@ class ScreenWeiboUser(model: AppModel, private val args: Args) : SubScreen<Scree
             Space()
             Surface(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 StatefulBox(
                     state = state,

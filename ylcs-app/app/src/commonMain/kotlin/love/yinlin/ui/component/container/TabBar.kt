@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.ui.component.image.MiniIcon
 import kotlin.jvm.JvmName
 
@@ -32,13 +32,13 @@ private fun <T> TabBar(
     PrimaryScrollableTabRow(
         modifier = modifier,
         selectedTabIndex = currentPage,
-        edgePadding = ThemeValue.Padding.ZeroSpace,
+        edgePadding = CustomTheme.padding.zeroSpace,
         indicator = {
             if (currentPage < items.size) {
                 TabRowDefaults.PrimaryIndicator(
                     Modifier.tabIndicatorOffset(currentPage, matchContentSize = false),
                     width = Dp.Unspecified,
-                    height = ThemeValue.Size.Little
+                    height = CustomTheme.size.little
                 )
             }
         },
@@ -54,7 +54,7 @@ private fun <T> TabBar(
                     onLongClick = {
                         if (currentPage == index) onLongClick?.invoke(index)
                     }
-                ).padding(ThemeValue.Padding.EqualSpace),
+                ).padding(CustomTheme.padding.equalSpace),
                 contentAlignment = Alignment.Center
             ) {
                 content(isSelected, item)
@@ -80,12 +80,12 @@ fun TabBar(
         modifier = modifier
     ) { isSelected, (title, icon) ->
         Row(
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             MiniIcon(
                 icon = icon,
-                size = ThemeValue.Size.MicroIcon,
+                size = CustomTheme.size.microIcon,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
             )
             Text(

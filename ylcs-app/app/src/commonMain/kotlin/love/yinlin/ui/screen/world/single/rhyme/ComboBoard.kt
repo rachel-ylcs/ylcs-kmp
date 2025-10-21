@@ -11,8 +11,7 @@ import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.rotateRad
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.text.font.FontWeight
-import love.yinlin.common.Colors
-import love.yinlin.compose.translate
+import love.yinlin.compose.*
 import kotlin.math.atan2
 
 // 连击板

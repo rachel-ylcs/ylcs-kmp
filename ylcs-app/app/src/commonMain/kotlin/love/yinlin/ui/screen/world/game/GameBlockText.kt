@@ -25,11 +25,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberState
-import love.yinlin.compose.rememberValueState
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -129,7 +125,7 @@ private fun CharacterBlock(
                 data[index].decode { ch, hide ->
                     Box(
                         modifier = Modifier
-                            .widthIn(max = ThemeValue.Size.PanelWidth)
+                            .widthIn(max = CustomTheme.size.panelWidth)
                             .fillMaxWidth()
                             .aspectRatio(1f)
                             .background(when {
@@ -141,7 +137,7 @@ private fun CharacterBlock(
                                 else if (ch != BTConfig.CHAR_EMPTY && ch != BTConfig.CHAR_BLOCK && hide) {
                                     if (openIndex != -1) -1 else index
                                 } else -1
-                            }.padding(ThemeValue.Padding.LittleSpace * 16f / blockSize),
+                            }.padding(CustomTheme.padding.littleSpace * 16f / blockSize),
                         contentAlignment = Alignment.Center
                     ) {
                         if (ch != BTConfig.CHAR_EMPTY && ch != BTConfig.CHAR_BLOCK) {
@@ -164,11 +160,11 @@ private fun CharacterBlock(
             Surface(
                 modifier = Modifier.zIndex(2f),
                 shape = MaterialTheme.shapes.large,
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 Row(
-                    modifier = Modifier.padding(ThemeValue.Padding.ExtraValue),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    modifier = Modifier.padding(CustomTheme.padding.extraValue),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val textChanged: suspend (Boolean, Int, Char) -> Unit =
@@ -202,7 +198,7 @@ private fun CharacterBlock(
 
                     LoadingIcon(
                         icon = Icons.Outlined.VisibilityOff,
-                        size = ThemeValue.Size.MediumIcon,
+                        size = CustomTheme.size.mediumIcon,
                         onClick = {
                             textChanged(true, openIndex, data[openIndex].ch)
                             openIndex = -1
@@ -211,7 +207,7 @@ private fun CharacterBlock(
                     if (writeMode) {
                         LoadingIcon(
                             icon = Icons.Outlined.Visibility,
-                            size = ThemeValue.Size.MediumIcon,
+                            size = CustomTheme.size.mediumIcon,
                             onClick = {
                                 textChanged(false, openIndex, data[openIndex].ch)
                                 openIndex = -1
@@ -220,7 +216,7 @@ private fun CharacterBlock(
                     }
                     ClickIcon(
                         icon = Icons.Outlined.Square,
-                        size = ThemeValue.Size.MediumIcon,
+                        size = CustomTheme.size.mediumIcon,
                         onClick = {
                             onCharacterChanged(openIndex, if (writeMode) BlockCharacter.Empty else BlockCharacter.Blank)
                             openIndex = -1

@@ -6,7 +6,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.util.fastJoinToString
-import love.yinlin.common.Colors
+import love.yinlin.compose.*
 import love.yinlin.data.music.RhymeLyricsConfig
 import kotlin.text.ifEmpty
 

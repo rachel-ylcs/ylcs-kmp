@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
@@ -51,7 +51,7 @@ internal fun UserBar(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
     ) {
         Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
             WebImage(
@@ -65,7 +65,7 @@ internal fun UserBar(
         }
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Text(
                 text = name,
@@ -94,8 +94,8 @@ internal fun BoxText(
     onClick: (() -> Unit)? = null
 ) {
     Box(
-        modifier = Modifier.padding(ThemeValue.Padding.VerticalSpace / 2)
-            .border(ThemeValue.Border.Small, color = color)
+        modifier = Modifier.padding(CustomTheme.padding.verticalSpace / 2)
+            .border(CustomTheme.border.small, color = color)
             .condition(onClick != null) { clickable { onClick?.invoke() } },
         contentAlignment = Alignment.Center
     ) {
@@ -103,7 +103,7 @@ internal fun BoxText(
             text = text,
             style = MaterialTheme.typography.labelMedium,
             color = color,
-            modifier = Modifier.padding(ThemeValue.Padding.LittleValue)
+            modifier = Modifier.padding(CustomTheme.padding.littleValue)
         )
     }
 }
@@ -117,7 +117,7 @@ internal fun PortraitValue(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
     ) {
         Text(
             text = value,
@@ -138,7 +138,7 @@ internal fun UserProfileInfo(
     Box(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
@@ -147,12 +147,12 @@ internal fun UserProfileInfo(
                     key = if (owner) app.config.cacheUserAvatar else remember { DateEx.TodayString },
                     contentScale = ContentScale.Crop,
                     circle = true,
-                    modifier = Modifier.matchParentSize().shadow(ThemeValue.Shadow.Icon, CircleShape)
+                    modifier = Modifier.matchParentSize().shadow(CustomTheme.shadow.icon, CircleShape)
                 )
             }
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
             ) {
                 Text(
                     text = profile.name,
@@ -184,7 +184,7 @@ internal fun UserProfileCard(
     Surface(
         modifier = modifier,
         shape = shape,
-        shadowElevation = ThemeValue.Shadow.Surface
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             WebImage(
@@ -193,8 +193,8 @@ internal fun UserProfileCard(
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
             )
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 1.5f)
             ) {
                 UserProfileInfo(
                     profile = remember(profile) { profile.publicProfile },
@@ -257,7 +257,7 @@ internal fun UserPublicProfileCard(
     Surface(
         modifier = modifier,
         shape = shape,
-        shadowElevation = ThemeValue.Shadow.Surface
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             WebImage(
@@ -266,8 +266,8 @@ internal fun UserPublicProfileCard(
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
             )
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 1.5f)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 1.5f)
             ) {
                 UserProfileInfo(
                     profile = profile,
@@ -316,8 +316,8 @@ data class TipButtonScope(private val equalRowScope: EqualRowScope) {
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.medium)
                     .clickable(onClick = onClick)
-                    .padding(ThemeValue.Padding.Value),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace),
+                    .padding(CustomTheme.padding.value),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box {
@@ -372,11 +372,11 @@ internal fun TipButtonContainer(
     Surface(
         modifier = modifier,
         shape = shape,
-        shadowElevation = ThemeValue.Shadow.Surface
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Text(
                 text = title,

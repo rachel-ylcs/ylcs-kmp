@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.image.MiniIcon
@@ -38,7 +38,7 @@ enum class BoxState {
 
 @Composable
 fun LoadingAnimation(
-	size: Dp = ThemeValue.Size.Icon,
+	size: Dp = CustomTheme.size.icon,
 	color: Color = MaterialTheme.colorScheme.primary,
 	duration: Int = app.config.animationSpeed,
 	num: Int = 3,
@@ -52,7 +52,7 @@ fun LoadingAnimation(
 		))
 	}
 
-	Canvas(modifier = modifier.padding(ThemeValue.Padding.InnerIcon).size(size)) {
+	Canvas(modifier = modifier.padding(CustomTheme.padding.innerIconSpace).size(size)) {
 		values.forEachIndexed { index, state ->
 			val width = (size / 5).toPx()
 			val spacing = (this.size.width - (num * width)) / 2
@@ -89,15 +89,15 @@ fun LoadingBox(
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_loading,
-				size = ThemeValue.Size.ExtraImage
+				size = CustomTheme.size.extraImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 			) {
 				LoadingAnimation()
 				Text(
@@ -115,12 +115,12 @@ fun SimpleEmptyBox(
     color: Color = LocalContentColor.current
 ) {
 	Box(
-		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
+		modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.extraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 		) {
 			MiniIcon(
                 icon = Icons.Filled.Error,
@@ -140,20 +140,20 @@ fun EmptyBox(
     color: Color = LocalContentColor.current
 ) {
 	Box(
-		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
+		modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.extraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_empty,
-				size = ThemeValue.Size.ExtraImage
+				size = CustomTheme.size.extraImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 			) {
 				MiniIcon(
                     icon = Icons.Filled.Error,
@@ -174,20 +174,20 @@ fun NetWorkErrorBox(
     retry: (suspend CoroutineScope.() -> Unit)? = null
 ) {
 	Box(
-		modifier = Modifier.fillMaxSize().padding(ThemeValue.Padding.ExtraValue),
+		modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.extraValue),
 		contentAlignment = Alignment.Center
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 		) {
 			MiniIcon(
 				res = Res.drawable.img_state_network_error,
-				size = ThemeValue.Size.ExtraImage
+				size = CustomTheme.size.extraImage
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 			) {
 				MiniIcon(
 					icon = Icons.Filled.WifiOff,

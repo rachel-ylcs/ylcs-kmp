@@ -16,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.delay
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberDerivedState
-import love.yinlin.compose.rememberOffScreenState
+import love.yinlin.compose.*
 
 @Composable
 private fun BannerIndicator(
@@ -57,7 +55,7 @@ fun <T> Banner(
 		Column(
 			modifier = Modifier.fillMaxWidth(),
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 		) {
 			HorizontalPager(
 				state = state,

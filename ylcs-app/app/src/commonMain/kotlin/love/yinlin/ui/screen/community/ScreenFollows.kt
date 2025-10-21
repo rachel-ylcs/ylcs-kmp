@@ -21,10 +21,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -66,16 +63,16 @@ private fun FollowItemLayout(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+        modifier = modifier.clickable(onClick = onClick).padding(CustomTheme.padding.value),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
     ) {
         WebImage(
             uri = item.avatarPath,
             key = remember { DateEx.TodayString },
             contentScale = ContentScale.Crop,
             circle = true,
-            modifier = Modifier.size(ThemeValue.Size.MicroImage)
+            modifier = Modifier.size(CustomTheme.size.microImage)
         )
         Text(
             text = item.name,
@@ -250,7 +247,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 TabBar(
                     currentPage = tab.ordinal,
@@ -270,7 +267,7 @@ class ScreenFollows(model: AppModel, args: Args) : SubScreen<ScreenFollows.Args>
                     PaginationGrid(
                         items = items,
                         key = { it.fid },
-                        columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                        columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
                         state = gridState,
                         canRefresh = true,
                         canLoading = page.canLoading,

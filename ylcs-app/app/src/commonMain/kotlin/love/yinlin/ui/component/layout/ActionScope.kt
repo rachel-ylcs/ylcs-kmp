@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.image.LoadingIcon
 import love.yinlin.ui.component.screen.BallonTip
@@ -30,13 +30,13 @@ sealed class ActionScope(private val ltr: Boolean) {
         enabled: Boolean = true,
         onClick: () -> Unit
 	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
+		val padding = if (ltr) CustomTheme.padding.horizontalSpace else CustomTheme.padding.zeroSpace
 
         ClickIcon(
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -59,13 +59,13 @@ sealed class ActionScope(private val ltr: Boolean) {
         enabled: Boolean = true,
         onClick: suspend CoroutineScope.() -> Unit
 	) {
-		val padding = if (ltr) ThemeValue.Padding.HorizontalSpace else ThemeValue.Padding.ZeroSpace
+		val padding = if (ltr) CustomTheme.padding.horizontalSpace else CustomTheme.padding.zeroSpace
 
         LoadingIcon(
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = ThemeValue.Padding.HorizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}

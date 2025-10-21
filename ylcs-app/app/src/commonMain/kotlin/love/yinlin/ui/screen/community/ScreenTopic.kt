@@ -31,11 +31,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -68,13 +64,13 @@ private fun CoinLayout(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        tonalElevation = ThemeValue.Shadow.Tonal,
-        shadowElevation = ThemeValue.Shadow.Surface
+        tonalElevation = CustomTheme.shadow.tonal,
+        shadowElevation = CustomTheme.shadow.surface
     ) {
         Column(
-            modifier = Modifier.clickable{ onClick(num) }.padding(ThemeValue.Padding.EqualValue),
+            modifier = Modifier.clickable{ onClick(num) }.padding(CustomTheme.padding.equalValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Row (
                 modifier = Modifier.fillMaxWidth().weight(1f),
@@ -88,7 +84,7 @@ private fun CoinLayout(
                             2 -> MaterialTheme.colorScheme.secondary
                             else -> MaterialTheme.colorScheme.primary
                         },
-                        size = ThemeValue.Size.MediumIcon * (1 - num / 20f)
+                        size = CustomTheme.size.mediumIcon * (1 - num / 20f)
                     )
                 }
             }
@@ -126,16 +122,16 @@ private fun AtUserItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.Value),
+        modifier = modifier.clickable(onClick = onClick).padding(CustomTheme.padding.value),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
     ) {
         WebImage(
             uri = info.avatarPath,
             key = remember { DateEx.TodayString },
             contentScale = ContentScale.Crop,
             circle = true,
-            modifier = Modifier.size(ThemeValue.Size.MicroImage)
+            modifier = Modifier.size(CustomTheme.size.microImage)
         )
         Text(
             text = info.name,
@@ -178,7 +174,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
             }
 
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.CellWidth),
+                columns = GridCells.Adaptive(CustomTheme.size.cellWidth),
                 modifier = modifier
             ) {
                 items(
@@ -493,7 +489,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
 
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             UserBar(
                 avatar = topic.avatarPath,
@@ -531,7 +527,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
     private fun CommentBar(comment: Comment, modifier: Modifier = Modifier) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
                 avatar = comment.avatarPath,
@@ -542,7 +538,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                 onAvatarClick = { onAvatarClick(comment.uid) }
             )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (comment.isTop) BoxText(text = "置顶", color = MaterialTheme.colorScheme.primary)
@@ -553,8 +549,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                 modifier = Modifier.fillMaxWidth()
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = ThemeValue.Padding.VerticalSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
+                modifier = Modifier.fillMaxWidth().padding(top = CustomTheme.padding.verticalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (comment.subCommentNum > 0) {
@@ -564,7 +560,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.clickable { subCommentSheet.open(comment) }
-                                .padding(ThemeValue.Padding.LittleValue)
+                                .padding(CustomTheme.padding.littleValue)
                         )
                     }
                 }
@@ -573,7 +569,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.clickable { currentSendComment = comment }
-                        .padding(ThemeValue.Padding.LittleValue)
+                        .padding(CustomTheme.padding.littleValue)
                 )
                 app.config.userProfile?.let { user ->
                     if (user.canUpdateCommentTop(topic.uid)) {
@@ -582,7 +578,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.clickable {
                                 launch { onChangeCommentIsTop(comment.cid, !comment.isTop) }
-                            }.padding(ThemeValue.Padding.LittleValue)
+                            }.padding(CustomTheme.padding.littleValue)
                         )
                     }
                     if (user.canDeleteComment(topic.uid, comment.uid)) {
@@ -591,7 +587,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.clickable {
                                 launch { onDeleteComment(comment.cid) }
-                            }.padding(ThemeValue.Padding.LittleValue)
+                            }.padding(CustomTheme.padding.littleValue)
                         )
                     }
                 }
@@ -608,7 +604,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
     ) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
                 avatar = subComment.avatarPath,
@@ -622,8 +618,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                 }
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = ThemeValue.Padding.VerticalSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                modifier = Modifier.fillMaxWidth().padding(top = CustomTheme.padding.verticalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
@@ -632,7 +628,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                     if (user.canDeleteComment(topic.uid, subComment.uid)) {
                         Row(
                             modifier = Modifier.weight(1f),
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -641,7 +637,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                                 style = MaterialTheme.typography.labelMedium,
                                 modifier = Modifier.clickable {
                                     launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
-                                }.padding(ThemeValue.Padding.LittleValue)
+                                }.padding(CustomTheme.padding.littleValue)
                             )
                         }
                     }
@@ -659,7 +655,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             SplitActionLayout(
                 modifier = Modifier.fillMaxWidth(),
@@ -712,20 +708,20 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
             header = {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    tonalElevation = ThemeValue.Shadow.Tonal
+                    tonalElevation = CustomTheme.shadow.tonal
                 ) {
                     TopicLayout(
                         details = details,
-                        modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue)
+                        modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
                     )
                 }
-                HorizontalDivider(modifier = Modifier.padding(bottom = ThemeValue.Padding.VerticalSpace))
+                HorizontalDivider(modifier = Modifier.padding(bottom = CustomTheme.padding.verticalSpace))
             },
-            itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace)
+            itemDivider = PaddingValues(vertical = CustomTheme.padding.verticalSpace)
         ) {
             CommentBar(
                 comment = it,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace)
             )
         }
     }
@@ -736,13 +732,13 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
             Surface(
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current.withoutEnd)
-                    .width(ThemeValue.Size.PanelWidth)
+                    .width(CustomTheme.size.panelWidth)
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState()),
-                tonalElevation = ThemeValue.Shadow.Tonal
+                tonalElevation = CustomTheme.shadow.tonal
             ) {
                 TopicLayout(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
                     details = details
                 )
             }
@@ -757,12 +753,12 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                 canRefresh = false,
                 canLoading = pageComments.canLoading,
                 onLoading = { requestMoreComments() },
-                itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
+                itemDivider = PaddingValues(vertical = CustomTheme.padding.verticalSpace),
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current.withoutStart)
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(ThemeValue.Padding.Value)
+                    .padding(CustomTheme.padding.value)
             ) {
                 CommentBar(
                     comment = it,
@@ -817,7 +813,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
             BottomLayout(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
             )
         }
     }
@@ -868,8 +864,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                         num = page.pageNum
                     )?.let { page.moreData(it) }
                 },
-                itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalExtraSpace),
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
+                itemDivider = PaddingValues(vertical = CustomTheme.padding.verticalExtraSpace),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue)
             ) { subComment ->
                 SubCommentBar(
                     subComment = subComment,
@@ -892,8 +888,8 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
         @Composable
         override fun Content() {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Text(
                     text = "银币: ${app.config.userProfile?.coin ?: 0}",
@@ -903,7 +899,7 @@ class ScreenTopic(model: AppModel, args: Args) : SubScreen<ScreenTopic.Args>(mod
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     repeat(3) {

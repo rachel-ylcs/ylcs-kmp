@@ -14,7 +14,6 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.*
 import love.yinlin.ui.component.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
@@ -49,14 +48,14 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
             title?.let { titleString ->
                 Surface(
                     modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-                    tonalElevation = ThemeValue.Shadow.Tonal,
-                    shadowElevation = ThemeValue.Shadow.Surface
+                    tonalElevation = CustomTheme.shadow.tonal,
+                    shadowElevation = CustomTheme.shadow.surface
                 ) {
                     Box(
                         modifier = Modifier
                             .padding(immersivePadding.withoutBottom)
                             .fillMaxWidth()
-                            .padding(vertical = ThemeValue.Padding.VerticalSpace),
+                            .padding(vertical = CustomTheme.padding.verticalSpace),
                         contentAlignment = Alignment.Center
                     ) {
                         Box(
@@ -74,7 +73,7 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
                             modifier = Modifier.fillMaxWidth().zIndex(1f),
                             left = {
                                 ClickIcon(
-                                    modifier = Modifier.padding(start = ThemeValue.Padding.HorizontalSpace),
+                                    modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace),
                                     icon = Icons.AutoMirrored.Outlined.ArrowBack,
                                     onClick = ::onBack
                                 )
@@ -96,8 +95,8 @@ abstract class SubScreen<A>(model: AppModel) : Screen<A>(model) {
             }
             Surface(
                 modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-                tonalElevation = ThemeValue.Shadow.Tonal,
-                shadowElevation = ThemeValue.Shadow.Surface
+                tonalElevation = CustomTheme.shadow.tonal,
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 CompositionLocalProvider(
                     LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop)

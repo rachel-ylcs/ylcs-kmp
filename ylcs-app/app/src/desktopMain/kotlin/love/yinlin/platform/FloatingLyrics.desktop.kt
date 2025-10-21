@@ -18,10 +18,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import love.yinlin.DeviceWrapper
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
+import love.yinlin.compose.*
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
 import love.yinlin.ui.component.node.condition
 
 @Stable
@@ -80,31 +79,29 @@ class ActualFloatingLyrics : FloatingLyrics() {
 
                 currentLyrics?.let { lyrics ->
                     DragArea(enabled = floatingLyrics.canMove) {
-                        BoxWithConstraints(
+                        App(
+                            deviceFactory = { maxWidth, _ -> Device(maxWidth) },
+                            themeMode = app.config.themeMode,
+                            fontScale = 1f,
+                            mainFontResource = Res.font.xwwk,
                             modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            DeviceWrapper(
-                                device = remember(this.maxWidth) { Device(this.maxWidth) },
-                                themeMode = app.config.themeMode,
-                                fontScale = 1f
+                            alignment = Alignment.Center
+                        ) { _, _ ->
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = lyrics,
-                                        style = MaterialTheme.typography.displayMedium.copy(
-                                            fontSize = MaterialTheme.typography.displayLarge.fontSize * config.textSize
-                                        ),
-                                        color = Colors.from(config.textColor),
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
-                                    )
-                                }
+                                Text(
+                                    text = lyrics,
+                                    style = MaterialTheme.typography.displayMedium.copy(
+                                        fontSize = MaterialTheme.typography.displayLarge.fontSize * config.textSize
+                                    ),
+                                    color = Colors(config.textColor),
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
+                                )
                             }
                         }
                     }

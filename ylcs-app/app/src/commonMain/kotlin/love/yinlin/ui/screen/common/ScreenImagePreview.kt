@@ -20,9 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
@@ -72,7 +70,7 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		Row(
 			modifier = modifier,
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
 		) {
 			Checkbox(
 				checked = preview.isSource,
@@ -117,10 +115,10 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 		Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
 			val state = rememberLazyListState(current)
 			LazyColumn(
-				modifier = Modifier.width(ThemeValue.Size.LargeImage).fillMaxHeight(),
+				modifier = Modifier.width(CustomTheme.size.largeImage).fillMaxHeight(),
 				state = state,
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 			) {
 				itemsIndexed(items = previews) { index, item ->
 					WebImage(
@@ -128,13 +126,13 @@ class ScreenImagePreview(model: AppModel, args: Args) : SubScreen<ScreenImagePre
 						contentScale = ContentScale.Crop,
 						modifier = Modifier.fillMaxWidth().aspectRatio(1f)
 							.condition(index == current) {
-								border(ThemeValue.Border.Medium, MaterialTheme.colorScheme.primary)
+								border(CustomTheme.border.medium, MaterialTheme.colorScheme.primary)
 							},
 						onClick = { current = index }
 					)
 				}
 			}
-			VerticalDivider(modifier = Modifier.padding(end = ThemeValue.Padding.HorizontalSpace))
+			VerticalDivider(modifier = Modifier.padding(end = CustomTheme.padding.horizontalSpace))
 			Column(
 				modifier = Modifier.weight(1f).fillMaxHeight(),
 				horizontalAlignment = Alignment.CenterHorizontally

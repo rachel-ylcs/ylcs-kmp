@@ -11,10 +11,12 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,6 +42,7 @@ import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 import love.yinlin.ui.screen.music.ScreenPartMusic
 import love.yinlin.ui.screen.world.ScreenPartWorld
+import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class ScreenPart(val model: AppModel) {
@@ -93,7 +96,7 @@ class AppModel(
 }
 
 @Composable
-fun App(
+fun AppUI(
 	navController: NavHostController = rememberNavController(),
 	modifier: Modifier = Modifier.fillMaxSize()
 ) {
@@ -134,50 +137,5 @@ fun App(
 		with(ScreenRouteScope(this, appModel)) {
 			screens()
 		}
-	}
-}
-
-@Composable
-fun DeviceWrapper(
-	device: Device,
-	themeMode: ThemeMode,
-	fontScale: Float,
-	content: @Composable () -> Unit
-) {
-	val isDarkMode = when (themeMode) {
-        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-	}
-
-	CompositionLocalProvider(
-		LocalDevice provides device,
-		LocalDarkMode provides isDarkMode
-	) {
-		MaterialTheme(
-			colorScheme = rachelColorScheme(isDarkMode),
-			shapes = rachelShapes(device),
-			typography = rachelTypography(device)
-		) {
-			CompositionLocalProvider(
-				LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-				LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-				LocalDensity provides Density(LocalDensity.current.density, fontScale)
-			) {
-				content()
-			}
-		}
-	}
-}
-
-@Composable
-fun AppWrapper(content: @Composable () -> Unit) {
-	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-		DeviceWrapper(
-			device = remember(maxWidth, maxHeight) { Device(maxWidth, maxHeight) },
-			themeMode = app.config.themeMode,
-			fontScale = app.config.fontScale,
-			content = content
-		)
 	}
 }

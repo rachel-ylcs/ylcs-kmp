@@ -20,8 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.data.common.Picture
 
 @Composable
@@ -29,7 +28,7 @@ fun ImageAdder(
     maxNum: Int,
     pics: List<Picture>,
     size: Dp,
-    space: Dp = ThemeValue.Padding.EqualSpace,
+    space: Dp = CustomTheme.padding.equalSpace,
     modifier: Modifier = Modifier,
     onAdd: () -> Unit,
     onDelete: (Int) -> Unit,

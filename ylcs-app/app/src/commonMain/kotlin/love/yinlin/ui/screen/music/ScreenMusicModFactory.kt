@@ -25,9 +25,7 @@ import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
@@ -48,19 +46,19 @@ private fun SongCard(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick).padding(ThemeValue.Padding.ExtraValue),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+        modifier = modifier.clickable(onClick = onClick).padding(CustomTheme.padding.extraValue),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
         verticalAlignment = Alignment.CenterVertically
     ) {
         WebImage(
             uri = remember(song) { song.recordPath },
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(ThemeValue.Size.Image).clip(MaterialTheme.shapes.large)
+            modifier = Modifier.size(CustomTheme.size.image).clip(MaterialTheme.shapes.large)
         )
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Text(
                 text = song.name,
@@ -73,7 +71,7 @@ private fun SongCard(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -86,14 +84,14 @@ private fun SongCard(
                     MiniIcon(
                         icon = Icons.Outlined.GifBox,
                         color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                        size = ThemeValue.Size.MicroIcon
+                        size = CustomTheme.size.microIcon
                     )
                 }
                 if (song.video) {
                     MiniIcon(
                         icon = Icons.Outlined.MusicVideo,
                         color = if (status) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-                        size = ThemeValue.Size.MicroIcon
+                        size = CustomTheme.size.microIcon
                     )
                 }
             }
@@ -182,7 +180,7 @@ class ScreenMusicModFactory(model: AppModel) : CommonSubScreen(model) {
             PaginationGrid(
                 items = pageSongs.items,
                 key = { it.sid },
-                columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
                 state = gridState,
                 canRefresh = true,
                 canLoading = pageSongs.canLoading,

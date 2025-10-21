@@ -40,8 +40,7 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.ScreenPart
 import love.yinlin.common.*
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
@@ -68,7 +67,7 @@ private fun GameCard(
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+		verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 	) {
 		WebImage(
 			uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
@@ -79,7 +78,7 @@ private fun GameCard(
 			onClick = onClick
 		)
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace),
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Text(
@@ -104,9 +103,9 @@ private fun GameCard(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(
-					start = ThemeValue.Padding.EqualExtraSpace,
-					end = ThemeValue.Padding.EqualExtraSpace,
-					bottom = ThemeValue.Padding.EqualExtraSpace
+					start = CustomTheme.padding.equalExtraSpace,
+					end = CustomTheme.padding.equalExtraSpace,
+					bottom = CustomTheme.padding.equalExtraSpace
 				)
 				.verticalScroll(rememberScrollState())
 		)
@@ -180,7 +179,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	private fun ButtonLayout(game: Game, modifier: Modifier = Modifier) {
 		Row(
 			modifier = modifier,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			when (game) {
@@ -223,12 +222,12 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				isLandscape = false
 			)
 
-			val padding = (maxWidth - ThemeValue.Size.CardWidth) / 2
+			val padding = (maxWidth - CustomTheme.size.cardWidth) / 2
 
 			HorizontalPager(
 				state = pagerState,
 				verticalAlignment = Alignment.Bottom,
-				pageSize = PageSize.Fixed(ThemeValue.Size.CardWidth),
+				pageSize = PageSize.Fixed(CustomTheme.size.cardWidth),
 				beyondViewportPageCount = Game.entries.size,
 				pageSpacing = padding / 2,
 				contentPadding = PaddingValues(horizontal = padding),
@@ -248,9 +247,9 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 						.aspectRatio(0.66667f)
 						.scale(scaleX = 1f, scaleY = lerp(1f, 0.9f, pageOffset.absoluteValue.coerceIn(0f, 1f)))
 						.clip(CircleShape)
-						.condition(offset == 0) { border(width = ThemeValue.Border.Large, color = MaterialTheme.colorScheme.primary, shape = CircleShape) }
+						.condition(offset == 0) { border(width = CustomTheme.border.large, color = MaterialTheme.colorScheme.primary, shape = CircleShape) }
 						.background(MaterialTheme.colorScheme.background)
-						.padding(ThemeValue.Padding.CardValue),
+						.padding(CustomTheme.padding.cardValue),
 					onClick = { onGameClick(game) }
 				) {
 					ButtonLayout(game = game, modifier = Modifier.fillMaxWidth())
@@ -279,7 +278,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 				val game = Game.entries[currentPage]
 
 				Box(
-					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
+					modifier = Modifier.size(CustomTheme.size.extraIcon * 1.5f),
 					contentAlignment = Alignment.Center
 				) {
 					if (currentPage > 0) {
@@ -289,7 +288,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 								color = MaterialTheme.colorScheme.onTertiaryContainer,
 								background = MaterialTheme.colorScheme.tertiaryContainer
 							),
-							size = ThemeValue.Size.ExtraIcon,
+							size = CustomTheme.size.extraIcon,
 							onClick = {
 								pagerState.requestScrollToPage(currentPage - 1)
 							}
@@ -301,24 +300,24 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 					game = game,
 					isLandscape = true,
 					modifier = Modifier
-						.width(ThemeValue.Size.CardWidth)
+						.width(CustomTheme.size.cardWidth)
 						.aspectRatio(0.66667f)
 						.clip(CircleShape)
-						.border(width = ThemeValue.Border.Large, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+						.border(width = CustomTheme.border.large, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
 						.shadow(
-							elevation = ThemeValue.Shadow.Card,
+							elevation = CustomTheme.shadow.card,
 							shape = CircleShape,
 							clip = false
 						)
 						.background(MaterialTheme.colorScheme.surface)
-						.padding(ThemeValue.Padding.CardValue),
+						.padding(CustomTheme.padding.cardValue),
 					onClick = { onGameClick(game) }
 				) {
 					ButtonLayout(game = game, modifier = Modifier.fillMaxWidth())
 				}
 
 				Box(
-					modifier = Modifier.size(ThemeValue.Size.ExtraIcon * 1.5f),
+					modifier = Modifier.size(CustomTheme.size.extraIcon * 1.5f),
 					contentAlignment = Alignment.Center
 				) {
 					if (currentPage < pagerState.pageCount - 1) {
@@ -328,7 +327,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 								color = MaterialTheme.colorScheme.onTertiaryContainer,
 								background = MaterialTheme.colorScheme.tertiaryContainer
 							),
-							size = ThemeValue.Size.ExtraIcon,
+							size = CustomTheme.size.extraIcon,
 							onClick = {
 								pagerState.requestScrollToPage(currentPage + 1)
 							}

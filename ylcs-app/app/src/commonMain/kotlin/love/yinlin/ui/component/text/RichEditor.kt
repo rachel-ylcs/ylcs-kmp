@@ -20,9 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.ui.component.container.TabBar
@@ -149,10 +147,10 @@ open class RichEditorState {
             }
 
             LazyVerticalGrid(
-                columns = GridCells.FixedSize(ThemeValue.Size.Icon),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                columns = GridCells.FixedSize(CustomTheme.size.icon),
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
                 items(
@@ -180,11 +178,11 @@ open class RichEditorState {
         val link = remember { TextInputState() }
         Column(
             modifier = modifier.verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextInput(
@@ -216,11 +214,11 @@ open class RichEditorState {
         Column(
             modifier = modifier.verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextInput(
@@ -282,7 +280,7 @@ open class RichEditorState {
             when (currentPage) {
                 RichEditorPage.CONTENT -> {
                     Box(modifier = Modifier.fillMaxSize()
-                        .border(width = ThemeValue.Border.Medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
+                        .border(width = CustomTheme.border.medium, color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.extraSmall)
                         .padding(OutlinedTextFieldDefaults.contentPadding())
                     ) {
                         RichText(
@@ -314,7 +312,7 @@ open class RichEditorState {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             PreviewText(modifier = Modifier.fillMaxWidth().aspectRatio(2f))
             InputLayout(
@@ -337,7 +335,7 @@ open class RichEditorState {
     ) {
         Row(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             InputLayout(
@@ -394,9 +392,9 @@ open class RichEditorState {
         Surface(modifier = modifier) {
             if (enablePreview) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
                         if (useEmoji) {

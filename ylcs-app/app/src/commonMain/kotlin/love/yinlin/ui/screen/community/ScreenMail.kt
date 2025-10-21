@@ -25,9 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
@@ -136,18 +134,18 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
     ) {
         Surface(
             modifier = modifier,
-            shadowElevation = ThemeValue.Shadow.Surface,
-            border = if (mail.processed) null else BorderStroke(ThemeValue.Border.Small, MaterialTheme.colorScheme.primary)
+            shadowElevation = CustomTheme.shadow.surface,
+            border = if (mail.processed) null else BorderStroke(CustomTheme.border.small, MaterialTheme.colorScheme.primary)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().clickable{ mailDetailsSheet.open(mail) }
-                    .padding(ThemeValue.Padding.EqualValue),
+                    .padding(CustomTheme.padding.equalValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     BoxText(
@@ -201,15 +199,15 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
             PaginationGrid(
                 items = page.items,
                 key = { it.mid },
-                columns = GridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewMails(false) },
                 onLoading = { requestMoreMails() },
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace)
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace)
             ) {
                 MailItem(
                     mail = it,
@@ -232,8 +230,8 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Content(args: Mail) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Text(
                     text = args.title,
@@ -245,7 +243,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (args.withYes) RachelButton(

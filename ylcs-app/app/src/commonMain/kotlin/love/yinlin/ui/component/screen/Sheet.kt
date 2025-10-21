@@ -21,11 +21,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberValueState
+import love.yinlin.compose.*
 import love.yinlin.platform.app
 import kotlin.math.roundToInt
 
@@ -74,11 +70,11 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
             ) {
                 // DragHandler
                 Surface(
-                    modifier = Modifier.padding(vertical = ThemeValue.Padding.EqualExtraSpace).align(Alignment.CenterHorizontally),
+                    modifier = Modifier.padding(vertical = CustomTheme.padding.equalExtraSpace).align(Alignment.CenterHorizontally),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                     shape = MaterialTheme.shapes.extraLarge
                 ) {
-                    Box(Modifier.size(width = ThemeValue.Size.MediumIcon, height = ThemeValue.Size.MediumIcon / 8))
+                    Box(Modifier.size(width = CustomTheme.size.mediumIcon, height = CustomTheme.size.mediumIcon / 8))
                 }
                 // Content
                 block()
@@ -133,11 +129,11 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current.withoutStart).fillMaxSize()) {
             // DragHandler
             Surface(
-                modifier = Modifier.padding(horizontal = ThemeValue.Padding.EqualExtraSpace).align(Alignment.CenterVertically),
+                modifier = Modifier.padding(horizontal = CustomTheme.padding.equalExtraSpace).align(Alignment.CenterVertically),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
-                Box(Modifier.size(width = ThemeValue.Size.MediumIcon / 8, height = ThemeValue.Size.MediumIcon))
+                Box(Modifier.size(width = CustomTheme.size.mediumIcon / 8, height = CustomTheme.size.mediumIcon))
             }
             // Content
             block()
@@ -146,7 +142,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
 
     @Composable
     private fun LandscapeWrapper(block: @Composable () -> Unit) {
-        val maxWidth = ThemeValue.Size.SheetWidth
+        val maxWidth = CustomTheme.size.sheetWidth
         val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
         var offset by rememberValueState(0)
         val animatedOffset by animateIntAsState(targetValue = offset)
@@ -155,7 +151,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
         val onStop = { if (offset > widthPx / 2) close() else offset = 0 }
 
         Surface(
-            shadowElevation = ThemeValue.Shadow.Surface,
+            shadowElevation = CustomTheme.shadow.surface,
             shape = MaterialTheme.shapes.extraLarge.copy(topEnd = CornerSize(0), bottomEnd = CornerSize(0)),
             modifier = Modifier.width(maxWidth).fillMaxHeight()
                 .offset { IntOffset(x = animatedOffset, y = 0) }

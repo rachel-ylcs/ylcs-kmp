@@ -20,10 +20,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
@@ -174,9 +171,9 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             TextInput(
                 state = input.id,
@@ -237,7 +234,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             Text(text = "封面 & 背景", style = MaterialTheme.typography.titleMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ReplaceableImage(
@@ -265,7 +262,7 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -275,8 +272,8 @@ class ScreenCreateMusic(model: AppModel) : CommonSubScreen(model) {
                     readOnly = true,
                     trailingIcon = {
                         Row(
-                            modifier = Modifier.padding(end = ThemeValue.Padding.HorizontalSpace),
-                            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                            modifier = Modifier.padding(end = CustomTheme.padding.horizontalSpace),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             ClickIcon(

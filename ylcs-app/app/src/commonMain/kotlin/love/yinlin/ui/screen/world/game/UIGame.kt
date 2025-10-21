@@ -26,7 +26,7 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.Local
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
@@ -151,7 +151,7 @@ fun <T : Number> GameSlider(
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -188,17 +188,17 @@ fun GameItem(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
-        shadowElevation = ThemeValue.Shadow.Surface,
+        shadowElevation = CustomTheme.shadow.surface,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(ThemeValue.Padding.ExtraValue),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                .padding(CustomTheme.padding.extraValue),
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WebImage(
@@ -206,11 +206,11 @@ fun GameItem(
                     key = Local.VERSION,
                     contentScale = ContentScale.Crop,
                     circle = true,
-                    modifier = Modifier.size(ThemeValue.Size.MediumImage)
+                    modifier = Modifier.size(CustomTheme.size.mediumImage)
                 )
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     RachelText(text = game.name, icon = Icons.Outlined.AccountCircle)
                     RachelText(text = game.ts, icon = Icons.Outlined.Timer)

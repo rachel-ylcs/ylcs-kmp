@@ -13,8 +13,8 @@ import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.common.ThemeValue
 import love.yinlin.common.uri.Uri
+import love.yinlin.compose.CustomTheme
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 import love.yinlin.ui.component.image.MiniIcon
@@ -30,11 +30,11 @@ fun UnsupportedComponent(modifier: Modifier = Modifier) {
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace, Alignment.CenterVertically)
+		verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace, Alignment.CenterVertically)
 	) {
 		MiniIcon(
 			icon = Icons.Filled.NotificationImportant,
-			size = ThemeValue.Size.Image
+			size = CustomTheme.size.image
 		)
 		Text(text = UnsupportedPlatformText)
 	}

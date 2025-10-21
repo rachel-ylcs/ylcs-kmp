@@ -19,11 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.DouyinAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberIntState
+import love.yinlin.compose.*
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
@@ -71,7 +67,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.large,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             var videoIndex by rememberIntState(item) { item.videoUrl.lastIndex }
 
@@ -92,7 +88,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     color = if (item.isTop) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     maxLines = 5,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)
                 )
                 Text(
                     text = item.createTime,
@@ -100,49 +96,49 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value)
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RachelText(
                         text = item.likeNum.toString(),
                         icon = Icons.Outlined.Favorite,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                     RachelText(
                         text = item.commentNum.toString(),
                         icon = Icons.AutoMirrored.Outlined.Comment,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RachelText(
                         text = item.collectNum.toString(),
                         icon = Icons.Outlined.Star,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                     RachelText(
                         text = item.shareNum.toString(),
                         icon = Icons.Outlined.Share,
                         style = MaterialTheme.typography.bodySmall,
-                        padding = ThemeValue.Padding.ZeroValue,
+                        padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -150,7 +146,7 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                         color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.weight(1f).clickable {
                             videoIndex = (videoIndex + 1) % item.videoUrl.size
-                        }.padding(ThemeValue.Padding.LittleValue)
+                        }.padding(CustomTheme.padding.littleValue)
                     )
                     ClickIcon(
                         icon = Icons.Outlined.Download,
@@ -194,14 +190,14 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
             PaginationStaggeredGrid(
                 items = items,
                 key = { it.id },
-                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CellWidth),
+                columns = StaggeredGridCells.Adaptive(CustomTheme.size.cellWidth),
                 state = gridState,
                 canRefresh = false,
                 canLoading = false,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalItemSpacing = CustomTheme.padding.equalSpace
             ) {
                 DouyinCard(
                     item = it,

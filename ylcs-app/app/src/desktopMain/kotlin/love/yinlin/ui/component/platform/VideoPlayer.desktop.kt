@@ -12,10 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
-import love.yinlin.common.Colors
-import love.yinlin.compose.OffScreenEffect
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberRefState
+import love.yinlin.compose.*
 import love.yinlin.ui.component.common.ComposeVideoSurface
 import love.yinlin.ui.component.image.ClickIcon
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory

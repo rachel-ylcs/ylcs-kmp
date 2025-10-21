@@ -28,9 +28,7 @@ import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.*
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
@@ -161,10 +159,10 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 val album = remember { TextInputState(musicInfo?.album ?: "") }
 
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     LoadingRachelButton(
                         text = "修改",
@@ -240,7 +238,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             @Composable
             override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
                 Box(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "暂未开放")
@@ -317,20 +315,20 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
             Surface(
                 modifier = modifier,
                 shape = MaterialTheme.shapes.extraLarge,
-                shadowElevation = ThemeValue.Shadow.Surface
+                shadowElevation = CustomTheme.shadow.surface
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(
                             modifier = Modifier.weight(5f),
-                            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                         ) {
                             RachelText(
                                 text = info.name,
@@ -382,11 +380,11 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -418,9 +416,9 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     @Composable
     private fun MusicResourceCard(item: ResourceItem) {
         Box(
-            modifier = Modifier.width(ThemeValue.Size.CellWidth)
+            modifier = Modifier.width(CustomTheme.size.cellWidth)
                 .shadow(
-                    elevation = ThemeValue.Shadow.Surface,
+                    elevation = CustomTheme.shadow.surface,
                     shape = MaterialTheme.shapes.extraLarge
                 )
                 .background(
@@ -428,16 +426,16 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     shape = MaterialTheme.shapes.extraLarge
                 )
                 .clickable {}
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     MiniIcon(
@@ -468,7 +466,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End)
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End)
                 ) {
                     if (item.onDelete.enabled) {
                         LoadingIcon(
@@ -513,14 +511,14 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalSpace),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -536,8 +534,8 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     )
                 }
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace, Alignment.CenterHorizontally),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     for (resource in resources) {
@@ -551,21 +549,21 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
     @Composable
     private fun Portrait() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().verticalScroll(rememberScrollState())) {
-            MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
-            MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
-            MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
+            MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
+            MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
+            MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
         }
     }
 
     @Composable
     private fun Landscape() {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            Column(modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
-                MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
+            Column(modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                MusicMetadataLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
+                MusicLyricsLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
             }
             Box(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue))
+                MusicResourceLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue))
             }
         }
     }

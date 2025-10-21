@@ -15,9 +15,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberState
+import love.yinlin.compose.*
 import love.yinlin.ui.component.layout.Space
 import kotlin.math.*
 
@@ -151,7 +149,7 @@ fun DockedColorPicker(
                 drawCircle(Color.LightGray, radius = radius / 4f, center = pickerLocation, style = Stroke(1f))
             }
         }
-        Space(size = ThemeValue.Padding.VerticalExtraSpace)
+        Space(size = CustomTheme.padding.verticalExtraSpace)
         ProgressSlider(
             value = pickerColor.alpha,
             modifier = Modifier.fillMaxWidth(),

@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.common.Colors
+import love.yinlin.compose.*
 
 @Stable
 abstract class FloatingLyrics {

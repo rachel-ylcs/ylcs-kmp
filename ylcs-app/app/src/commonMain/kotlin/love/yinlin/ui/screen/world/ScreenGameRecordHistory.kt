@@ -21,10 +21,8 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
@@ -93,17 +91,17 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
         Surface(
             modifier = modifier,
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface,
+            shadowElevation = CustomTheme.shadow.surface,
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
                     .clickable(onClick = onClick)
-                    .padding(ThemeValue.Padding.EqualExtraValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                    .padding(CustomTheme.padding.equalExtraValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WebImage(
@@ -111,11 +109,11 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                         key = Local.VERSION,
                         contentScale = ContentScale.Crop,
                         circle = true,
-                        modifier = Modifier.size(ThemeValue.Size.MediumImage)
+                        modifier = Modifier.size(CustomTheme.size.mediumImage)
                     )
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
                         RachelText(text = record.name, icon = Icons.Outlined.AccountCircle)
                         RachelText(text = record.ts, icon = Icons.Outlined.Timer)
@@ -145,16 +143,16 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.rid },
-                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = StaggeredGridCells.Adaptive(CustomTheme.size.cardWidth),
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewGameRecords(false) },
                 onLoading = { requestMoreGameRecords() },
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalItemSpacing = CustomTheme.padding.equalSpace
             ) {
                 GameRecordItem(
                     record = it,
@@ -178,8 +176,8 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Content(args: GameRecordWithName) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 val (answers, results) = remember(args) {
                     catchingDefault({ makeArray { } to emptyList() }) {
@@ -196,12 +194,12 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                 if (results.isEmpty()) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         MiniIcon(
                             res = Res.drawable.img_not_login,
-                            size = ThemeValue.Size.MediumImage
+                            size = CustomTheme.size.mediumImage
                         )
                         Text(
                             text = "无数据",
@@ -215,19 +213,19 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                 else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
                         items(answers.size) { index ->
                             val answer = answers[index]
                             val result = results[index]
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 MiniIcon(
                                     res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
-                                    size = ThemeValue.Size.MediumImage
+                                    size = CustomTheme.size.mediumImage
                                 )
                                 Text(
                                     text = if (result.isCompleted) "成功" else "失败",
@@ -240,7 +238,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                             Space()
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+                                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
@@ -250,7 +248,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                             ) {
                                 GameRecordCard(
                                     type = args.type,

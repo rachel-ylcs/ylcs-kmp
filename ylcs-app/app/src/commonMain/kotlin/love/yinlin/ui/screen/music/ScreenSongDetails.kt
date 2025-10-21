@@ -32,8 +32,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
 import love.yinlin.common.uri.UriGenerator
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
@@ -163,20 +162,20 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     ) {
         Surface(
             modifier = modifier,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
                         modifier = Modifier.weight(5f),
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
                         RachelText(
                             text = song.name,
@@ -240,7 +239,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
     ) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
                 avatar = comment.avatarPath,
@@ -257,8 +256,8 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = ThemeValue.Padding.VerticalSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.End),
+                modifier = Modifier.fillMaxWidth().padding(top = CustomTheme.padding.verticalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 app.config.userProfile?.let { user ->
@@ -268,7 +267,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.clickable {
                                 launch { onDeleteComment(comment.cid) }
-                            }.padding(ThemeValue.Padding.LittleValue)
+                            }.padding(CustomTheme.padding.littleValue)
                         )
                     }
                 }
@@ -317,13 +316,13 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                     song = song,
                     modifier = Modifier.fillMaxWidth()
                 )
-                HorizontalDivider(modifier = Modifier.padding(bottom = ThemeValue.Padding.VerticalSpace))
+                HorizontalDivider(modifier = Modifier.padding(bottom = CustomTheme.padding.verticalSpace))
             },
-            itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace)
+            itemDivider = PaddingValues(vertical = CustomTheme.padding.verticalSpace)
         ) {
             SongCommentLayout(
                 comment = it,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalSpace)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace)
             )
         }
     }
@@ -337,7 +336,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 song = song,
                 modifier = Modifier
                     .padding(immersivePadding.withoutEnd)
-                    .width(ThemeValue.Size.PanelWidth)
+                    .width(CustomTheme.size.panelWidth)
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState())
             )
@@ -350,12 +349,12 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                 canRefresh = false,
                 canLoading = pageComments.canLoading,
                 onLoading = { requestMoreComments() },
-                itemDivider = PaddingValues(vertical = ThemeValue.Padding.VerticalSpace),
+                itemDivider = PaddingValues(vertical = CustomTheme.padding.verticalSpace),
                 modifier = Modifier
                     .padding(immersivePadding.withoutStart)
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(ThemeValue.Padding.Value)
+                    .padding(CustomTheme.padding.value)
             ) {
                 SongCommentLayout(
                     comment = it,
@@ -403,7 +402,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             BottomLayout(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualValue))
+                .padding(CustomTheme.padding.equalValue))
         }
     }
 
@@ -426,10 +425,10 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             }
 
             Box(modifier = Modifier.padding(
-                horizontal = ThemeValue.Padding.HorizontalExtraSpace * 2,
-                vertical = ThemeValue.Padding.VerticalExtraSpace * 2
+                horizontal = CustomTheme.padding.horizontalExtraSpace * 2,
+                vertical = CustomTheme.padding.verticalExtraSpace * 2
             ).fillMaxSize().shadow(
-                elevation = ThemeValue.Shadow.Surface * 2,
+                elevation = CustomTheme.shadow.surface * 2,
                 shape = MaterialTheme.shapes.extraLarge,
                 ambientColor = Colors.Steel5,
                 spotColor = Colors.Steel6
@@ -439,10 +438,10 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
             )) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace, Alignment.Bottom)
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace, Alignment.Bottom)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().weight(1f).padding(ThemeValue.Padding.ExtraValue),
+                        modifier = Modifier.fillMaxWidth().weight(1f).padding(CustomTheme.padding.extraValue),
                         horizontalArrangement = Arrangement.End
                     ) {
                         ColorfulIcon(
@@ -463,7 +462,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         color = Colors.Ghost,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
                     )
                     Text(
                         text = args.song.singer,
@@ -471,7 +470,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         color = Colors.Ghost,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -497,7 +496,7 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                                         frame = QrBrush.solid(Colors.Dark)
                                     }
                                 },
-                                modifier = Modifier.padding(ThemeValue.Padding.EqualExtraSpace)
+                                modifier = Modifier.padding(CustomTheme.padding.equalExtraSpace)
                                     .fillMaxSize().clip(MaterialTheme.shapes.small)
                             )
                         }

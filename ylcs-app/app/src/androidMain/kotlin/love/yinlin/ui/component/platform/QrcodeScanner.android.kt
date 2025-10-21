@@ -22,10 +22,7 @@ import com.king.zxing.analyze.QRCodeAnalyzer
 import com.king.zxing.util.CodeUtils
 import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberState
+import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.platform.appNative
@@ -97,7 +94,7 @@ actual fun QrcodeScanner(
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(ThemeValue.Padding.VerticalExtraSpace * 4)
+                .padding(CustomTheme.padding.verticalExtraSpace * 4)
                 .zIndex(3f),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
@@ -108,7 +105,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.MediumIcon,
+                size = CustomTheme.size.mediumIcon,
                 onClick = {
                     scope.launch {
                         Coroutines.io {
@@ -130,7 +127,7 @@ actual fun QrcodeScanner(
                     color = Colors.White,
                     background = Colors.Dark
                 ),
-                size = ThemeValue.Size.MediumIcon,
+                size = CustomTheme.size.mediumIcon,
                 onClick = {
                     state.cameraScan?.let { cameraScan ->
                         if (cameraScan.isTorchEnabled) cameraScan.enableTorch(false)

@@ -25,8 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
-import love.yinlin.common.Colors
-import love.yinlin.compose.rememberOffScreenState
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
 import love.yinlin.platform.ImageQuality
@@ -392,7 +391,7 @@ class RichString : RichContainer(RICH_TYPE_ROOT) {
 						RICH_TYPE_STYLE -> {
 							container.style(
 								textSize = obj[RICH_ARG_TEXT_SIZE]?.Int?.sp,
-								color = obj[RICH_ARG_COLOR]?.Int?.let { Colors.from(it) },
+								color = obj[RICH_ARG_COLOR]?.Int?.let { Colors(it) },
 								bold = obj[RICH_ARG_BOLD]?.Boolean == true,
 								italic = obj[RICH_ARG_ITALIC]?.Boolean == true,
 								underline = obj[RICH_ARG_UNDERLINE]?.Boolean == true,

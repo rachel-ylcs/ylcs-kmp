@@ -2,7 +2,6 @@ package love.yinlin.platform
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +16,10 @@ import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.autoreleasepool
-import love.yinlin.DeviceWrapper
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
+import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*
 import platform.AVKit.*
@@ -39,7 +37,15 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
             width = CGRectGetWidth(pipView.frame).toInt(),
             height = CGRectGetHeight(pipView.frame).toInt(),
             content = {
-                ContentWrapper()
+                App(
+                    deviceFactory = { maxWidth, _ -> Device(maxWidth) },
+                    themeMode = app.config.themeMode,
+                    fontScale = 1f,
+                    mainFontResource = Res.font.xwwk,
+                    modifier = Modifier.fillMaxSize()
+                ) { _, _ ->
+                    Content()
+                }
             }
         )
     }
@@ -100,20 +106,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
     }
 
     @Composable
-    private fun ContentWrapper() {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            DeviceWrapper(
-                device = remember(this.maxWidth) { Device(this.maxWidth) },
-                themeMode = app.config.themeMode,
-                fontScale = 1f
-            ) {
-                Content()
-            }
-        }
-    }
-
-    @Composable
-    fun Content() {
+    private fun Content() {
         val config = app.config.floatingLyricsIOSConfig
         currentLyrics?.let { lyrics ->
             Box(
@@ -125,11 +118,11 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
                     ),
-                    color = Colors.from(config.textColor),
+                    color = Colors(config.textColor),
                     textAlign = TextAlign.Center,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.background(color = Colors.from(config.backgroundColor)).padding(ThemeValue.Padding.Value)
+                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
                 )
             }
         }

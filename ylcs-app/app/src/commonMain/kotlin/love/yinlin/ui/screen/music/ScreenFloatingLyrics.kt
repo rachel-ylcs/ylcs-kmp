@@ -11,8 +11,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
+import love.yinlin.compose.*
 import love.yinlin.ui.component.screen.CommonSubScreen
 
 @Composable
@@ -35,7 +34,7 @@ internal fun RowLayout(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace * 2),
+        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace * 2),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = title)
@@ -56,7 +55,7 @@ internal fun ColumnLayout(
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace * 2)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 2)
     ) {
         Text(text = title)
         content()

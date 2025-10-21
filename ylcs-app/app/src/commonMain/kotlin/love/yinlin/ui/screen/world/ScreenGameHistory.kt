@@ -18,9 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.platform.app
@@ -106,16 +104,16 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
-                columns = StaggeredGridCells.Adaptive(ThemeValue.Size.CardWidth),
+                columns = StaggeredGridCells.Adaptive(CustomTheme.size.cardWidth),
                 state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewGames(false) },
                 onLoading = { requestMoreGames() },
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                verticalItemSpacing = ThemeValue.Padding.EqualSpace
+                contentPadding = CustomTheme.padding.equalValue,
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                verticalItemSpacing = CustomTheme.padding.equalSpace
             ) {
                 GameItem(
                     game = remember(it) { it.toPublic(name) },
@@ -150,8 +148,8 @@ class ScreenGameHistory(model: AppModel) : CommonSubScreen(model) {
         @Composable
         override fun Content(args: GameDetailsWithName) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 GameCardQuestionAnswer(args)
             }

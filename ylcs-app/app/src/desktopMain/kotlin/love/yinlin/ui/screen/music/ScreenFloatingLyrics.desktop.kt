@@ -9,8 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
-import love.yinlin.common.Colors
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
@@ -40,9 +38,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
-        .padding(ThemeValue.Padding.EqualExtraValue)
+        .padding(CustomTheme.padding.equalExtraValue)
         .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
         (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
             DisposableEffect(Unit) {
@@ -70,30 +68,30 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                     value = desktopConfig.textSizeProgress,
                     onValueChange = { desktopConfig = desktopConfig.copyTextSize(it) },
                     onValueChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalExtraSpace)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
                 )
             }
 
             SplitLayout(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-                horizontalArrangement = ThemeValue.Padding.HorizontalExtraSpace * 2,
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+                horizontalArrangement = CustomTheme.padding.horizontalExtraSpace * 2,
                 left = {
                     ColumnLayout("字体颜色") {
                         DockedColorPicker(
-                            initialColor = Colors.from(app.config.floatingLyricsDesktopConfig.textColor),
+                            initialColor = Colors(app.config.floatingLyricsDesktopConfig.textColor),
                             onColorChanged = { desktopConfig = desktopConfig.copy(textColor = it.value) },
                             onColorChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
-                            modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                            modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                         )
                     }
                 },
                 right = {
                     ColumnLayout("背景颜色") {
                         DockedColorPicker(
-                            initialColor = Colors.from(app.config.floatingLyricsDesktopConfig.backgroundColor),
+                            initialColor = Colors(app.config.floatingLyricsDesktopConfig.backgroundColor),
                             onColorChanged = { desktopConfig = desktopConfig.copy(backgroundColor = it.value) },
                             onColorChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
-                            modifier = Modifier.widthIn(max = ThemeValue.Size.CellWidth).fillMaxWidth()
+                            modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                         )
                     }
                 }

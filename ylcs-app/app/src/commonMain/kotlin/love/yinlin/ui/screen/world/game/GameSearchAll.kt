@@ -24,8 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -259,7 +258,7 @@ class SearchAllPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                 text = remember(time) { time.timeString },
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.VerticalSpace)
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.verticalSpace)
             )
             TextInput(
                 state = inputState,

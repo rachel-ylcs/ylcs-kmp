@@ -19,8 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.launch
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.ui.component.image.ColorfulIcon
 import love.yinlin.ui.component.image.ColorfulImageVector
 import love.yinlin.ui.component.image.MiniIcon
@@ -30,7 +29,7 @@ import love.yinlin.ui.component.layout.Space
 
 object SettingsScope {
 	@Composable
-	private fun ItemDivider(x: Dp = ThemeValue.Padding.ZeroSpace) {
+	private fun ItemDivider(x: Dp = CustomTheme.padding.zeroSpace) {
 		HorizontalDivider(modifier = Modifier.padding(horizontal = x))
 	}
 
@@ -45,11 +44,11 @@ object SettingsScope {
 		content: @Composable () -> Unit
 	) {
 		Row(
-			modifier = Modifier.heightIn(min = ThemeValue.Padding.VerticalExtraSpace * 6)
+			modifier = Modifier.heightIn(min = CustomTheme.padding.verticalExtraSpace * 6)
 				.fillMaxWidth()
 				.clickable(enabled = enabled, onClick = onClick)
-				.padding(ThemeValue.Padding.ExtraValue),
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+				.padding(CustomTheme.padding.extraValue),
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			if (icon != null) ColorfulIcon(icon = icon)
@@ -146,7 +145,7 @@ object SettingsScope {
 			onClick = onClick
 		) {
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				if (text != null) {
@@ -191,7 +190,7 @@ object SettingsScope {
 			}
 		) {
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				if (text != null) {
@@ -224,12 +223,12 @@ fun SettingsLayout(
 	Surface(
 		modifier = modifier,
 		shape = MaterialTheme.shapes.large,
-		shadowElevation = ThemeValue.Shadow.Surface
+		shadowElevation = CustomTheme.shadow.surface
 	) {
 		Column(modifier = Modifier.fillMaxWidth()) {
 			Row(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-				horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+				modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				MiniIcon(

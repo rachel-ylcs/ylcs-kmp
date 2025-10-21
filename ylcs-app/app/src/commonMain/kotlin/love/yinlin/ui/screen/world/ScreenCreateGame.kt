@@ -19,10 +19,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.ThemeValue
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
@@ -98,9 +95,9 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
         Column(
             modifier = Modifier.padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(ThemeValue.Padding.EqualValue)
+                .padding(CustomTheme.padding.equalValue)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             ArgsLayout()
             with(state) { this@Column.Content() }
@@ -111,21 +108,21 @@ class ScreenCreateGame(model: AppModel, val args: Args) : SubScreen<ScreenCreate
     private fun Landscape() {
         Row(
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace)
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
         ) {
             Column(
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
-                    .padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight()
+                    .padding(CustomTheme.padding.equalValue)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 ArgsLayout()
             }
             Column(
-                modifier = Modifier.width(ThemeValue.Size.PanelWidth).fillMaxHeight()
-                    .padding(ThemeValue.Padding.EqualValue)
+                modifier = Modifier.width(CustomTheme.size.panelWidth).fillMaxHeight()
+                    .padding(CustomTheme.padding.equalValue)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 with(state) { this@Column.Content() }
             }

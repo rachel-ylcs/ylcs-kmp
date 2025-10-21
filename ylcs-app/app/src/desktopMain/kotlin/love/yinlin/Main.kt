@@ -20,14 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import kotlinx.coroutines.launch
 import love.yinlin.common.DeepLinkHandler
-import love.yinlin.common.ThemeValue
 import love.yinlin.common.uri.toUri
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.*
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
+import love.yinlin.resources.xwwk
 import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -112,15 +112,21 @@ fun main() {
             }
 
             // Content
-            AppWrapper {
+            App(
+                deviceFactory = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
+                themeMode = app.config.themeMode,
+                fontScale = app.config.fontScale,
+                mainFontResource = Res.font.xwwk,
+                modifier = Modifier.fillMaxSize()
+            ) { _, _ ->
                 Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                     WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                         AppTopBar(modifier = Modifier.fillMaxWidth()
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .padding(
-                                top = ThemeValue.Padding.VerticalExtraSpace,
-                                bottom = ThemeValue.Padding.VerticalExtraSpace,
-                                start = ThemeValue.Padding.HorizontalExtraSpace
+                                top = CustomTheme.padding.verticalExtraSpace,
+                                bottom = CustomTheme.padding.verticalExtraSpace,
+                                start = CustomTheme.padding.horizontalExtraSpace
                             )
                         ) {
                             if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
@@ -175,7 +181,7 @@ fun main() {
                             }
                         }
                     }
-                    App(modifier = Modifier.fillMaxWidth().weight(1f))
+                    AppUI(modifier = Modifier.fillMaxWidth().weight(1f))
                 }
             }
         }

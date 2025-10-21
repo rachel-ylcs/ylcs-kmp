@@ -37,7 +37,6 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.ThemeValue
 import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
@@ -68,9 +67,9 @@ private fun UserItem(
         Column(
             modifier = Modifier.fillMaxWidth()
                 .condition(onClick != null) { clickable { onClick?.invoke() } }
-                .padding(ThemeValue.Padding.EqualExtraValue),
+                .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             WebImage(
                 uri = info.avatarPath,
@@ -99,23 +98,23 @@ private fun GameResultUserItem(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
         WebImage(
             uri = result.player.avatarPath,
             key = remember { DateEx.TodayString },
             circle = true,
-            modifier = Modifier.size(ThemeValue.Size.MediumImage)
+            modifier = Modifier.size(CustomTheme.size.mediumImage)
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isWinner) {
                 MiniImage(
                     icon = ExtraIcons.Rank1,
-                    size = ThemeValue.Size.MicroIcon
+                    size = CustomTheme.size.microIcon
                 )
             }
             Text(
@@ -291,10 +290,10 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
         if (players.isEmpty()) EmptyBox()
         else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(ThemeValue.Size.LargeImage),
-                contentPadding = ThemeValue.Padding.EqualValue,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.EqualSpace),
+                columns = GridCells.Adaptive(CustomTheme.size.largeImage),
+                contentPadding = CustomTheme.padding.equalValue,
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -318,15 +317,15 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun InviteLoadingLayout(status: Status.InviteLoading) {
         Column(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualExtraValue),
+                .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            UserItem(info = status.info, modifier = Modifier.width(CustomTheme.size.largeImage))
+            Space(CustomTheme.padding.verticalExtraSpace)
             Text(
                 text = "等待对方回应",
                 style = MaterialTheme.typography.bodyLarge,
@@ -335,7 +334,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            Space(CustomTheme.padding.verticalExtraSpace)
             Text(
                 text = remember(status) { status.time.timeString },
                 style = MaterialTheme.typography.displayMedium,
@@ -351,15 +350,15 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun InvitedLoadingLayout(status: Status.InvitedLoading) {
         Column(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualExtraValue),
+                .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            UserItem(info = status.info, modifier = Modifier.width(CustomTheme.size.largeImage))
+            Space(CustomTheme.padding.verticalExtraSpace)
             Text(
                 text = "是否接受对战",
                 style = MaterialTheme.typography.bodyLarge,
@@ -368,7 +367,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            Space(CustomTheme.padding.verticalExtraSpace)
             Text(
                 text = remember(status) { status.time.timeString },
                 style = MaterialTheme.typography.displayMedium,
@@ -377,10 +376,10 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            Space(CustomTheme.padding.verticalExtraSpace)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 PrimaryLoadingButton(
@@ -401,22 +400,22 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun PreparingLayout(status: Status.Preparing) {
         Column(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualExtraValue),
+                .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             SplitLayout(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = ThemeValue.Padding.HorizontalSpace,
+                horizontalArrangement = CustomTheme.padding.horizontalSpace,
                 verticalAlignment = Alignment.CenterVertically,
                 left = {
-                    UserItem(info = status.info1, modifier = Modifier.width(ThemeValue.Size.LargeImage))
+                    UserItem(info = status.info1, modifier = Modifier.width(CustomTheme.size.largeImage))
                 },
                 right = {
-                    UserItem(info = status.info2, modifier = Modifier.width(ThemeValue.Size.LargeImage))
+                    UserItem(info = status.info2, modifier = Modifier.width(CustomTheme.size.largeImage))
                 }
             )
             Text(
@@ -450,7 +449,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
 
         Row(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalSpace),
+            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ClickIcon(
@@ -513,22 +512,22 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun GameLayout(status: Status.Playing) {
         Surface(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(ThemeValue.Padding.EqualExtraValue)
+                    .padding(CustomTheme.padding.equalExtraValue)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -537,7 +536,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     ) {
                         UserItem(
                             info = status.info1,
-                            modifier = Modifier.width(ThemeValue.Size.LargeImage)
+                            modifier = Modifier.width(CustomTheme.size.largeImage)
                         ) {
                             Text(
                                 text = "${status.count1} / ${LyricsSockets.QUESTION_COUNT}",
@@ -547,7 +546,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                     ) {
                         Text(
                             text = remember(status) { status.time.timeString },
@@ -575,7 +574,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                     ) {
                         UserItem(
                             info = status.info2,
-                            modifier = Modifier.width(ThemeValue.Size.LargeImage)
+                            modifier = Modifier.width(CustomTheme.size.largeImage)
                         ) {
                             Text(
                                 text = "${status.count2} / ${LyricsSockets.QUESTION_COUNT}",
@@ -596,15 +595,15 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun WaitingLayout(status: Status.Waiting) {
         Column(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth()
-                .padding(ThemeValue.Padding.EqualExtraValue),
+                .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
-            UserItem(info = status.info, modifier = Modifier.width(ThemeValue.Size.LargeImage))
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            UserItem(info = status.info, modifier = Modifier.width(CustomTheme.size.largeImage))
+            Space(CustomTheme.padding.verticalExtraSpace)
             Text(
                 text = "等待对方完成...",
                 style = MaterialTheme.typography.bodyLarge,
@@ -613,7 +612,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
-            Space(ThemeValue.Padding.VerticalExtraSpace)
+            Space(CustomTheme.padding.verticalExtraSpace)
         }
     }
 
@@ -621,16 +620,16 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     private fun SettlingLayout(status: Status.Settling) {
         Surface(
             modifier = Modifier
-                .padding(ThemeValue.Padding.EqualExtraValue)
-                .widthIn(max = ThemeValue.Size.PanelWidth)
+                .padding(CustomTheme.padding.equalExtraValue)
+                .widthIn(max = CustomTheme.size.panelWidth)
                 .fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
-            shadowElevation = ThemeValue.Shadow.Surface
+            shadowElevation = CustomTheme.shadow.surface
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.EqualExtraValue),
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -645,12 +644,12 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
 
                     GameResultUserItem(
                         result = status.result1,
-                        modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                        modifier = Modifier.weight(1f).padding(CustomTheme.padding.equalExtraValue),
                         isWinner = win
                     )
                     GameResultUserItem(
                         result = status.result2,
-                        modifier = Modifier.weight(1f).padding(ThemeValue.Padding.EqualExtraValue),
+                        modifier = Modifier.weight(1f).padding(CustomTheme.padding.equalExtraValue),
                         isWinner = !win
                     )
                 }

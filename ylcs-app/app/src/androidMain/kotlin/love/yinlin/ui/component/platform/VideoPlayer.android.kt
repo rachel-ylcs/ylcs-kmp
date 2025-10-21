@@ -23,11 +23,8 @@ import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import love.yinlin.common.Colors
 import love.yinlin.common.FfmpegRenderersFactory
-import love.yinlin.compose.OffScreenEffect
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberRefState
+import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app

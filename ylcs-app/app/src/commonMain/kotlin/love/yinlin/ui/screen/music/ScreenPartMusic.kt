@@ -41,14 +41,7 @@ import love.yinlin.ScreenPart
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberDerivedState
-import love.yinlin.compose.rememberOffScreenState
-import love.yinlin.compose.rememberRefState
-import love.yinlin.compose.rememberValueState
+import love.yinlin.compose.*
 import love.yinlin.data.Data.Failure
 import love.yinlin.data.Data.Success
 import love.yinlin.data.music.MusicInfo
@@ -84,8 +77,8 @@ private fun PlayingMusicStatusCard(
 	SplitLayout(
 		modifier = modifier.clickable {
 			if (!isCurrent) onClick()
-		}.padding(ThemeValue.Padding.ExtraValue),
-		horizontalArrangement = ThemeValue.Padding.HorizontalSpace,
+		}.padding(CustomTheme.padding.extraValue),
+		horizontalArrangement = CustomTheme.padding.horizontalSpace,
 		aspectRatio = 2f,
 		left = {
 			Text(
@@ -277,17 +270,17 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		val musicInfo = factory.currentMusic
 		Row(
 			modifier = modifier,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 		) {
 			MusicRecordLayout(
-				offset = -ThemeValue.Size.LargeImage / 2,
+				offset = -CustomTheme.size.largeImage / 2,
 				musicInfo = musicInfo,
-				modifier = Modifier.size(ThemeValue.Size.LargeImage)
-					.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
+				modifier = Modifier.size(CustomTheme.size.largeImage)
+					.shadow(elevation = CustomTheme.shadow.icon, clip = false, shape = CircleShape)
 			)
 			Column(
 				modifier = Modifier.weight(1f),
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 			) {
 				Text(
 					text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
@@ -315,7 +308,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalExtraSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 		) {
 			Text(
 				text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
@@ -344,7 +337,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	) {
 		Row(
 			modifier = modifier,
-			horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace)
+			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
 		) {
 			Text(
 				text = remember(currentTime) { currentTime.timeString },
@@ -374,16 +367,16 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						horizontalBias = hotpot / duration.toFloat() * 2 - 1,
 						verticalBias = 0f
 					))
-					.width((ThemeValue.Size.ProgressHeight + ThemeValue.Size.Little) * 2)
-					.height(ThemeValue.Size.ProgressHeight * 2)
+					.width((CustomTheme.size.progressHeight + CustomTheme.size.little) * 2)
+					.height(CustomTheme.size.progressHeight * 2)
 					.clickableNoRipple {
 						launch {
 							factory.seekTo(hotpot)
 							if (!factory.isPlaying) factory.play()
 						}
 					}
-					.padding(horizontal = ThemeValue.Padding.LittleSpace)
-					.shadow(elevation = ThemeValue.Shadow.Item, shape = CircleShape)
+					.padding(horizontal = CustomTheme.padding.littleSpace)
+					.shadow(elevation = CustomTheme.shadow.item, shape = CircleShape)
 					.background(
 						color = Colors.White.copy(alpha = 0.8f),
 						shape = CircleShape
@@ -402,7 +395,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	) {
 		ProgressSlider(
 			value = if (duration == 0L) 0f else currentTime / duration.toFloat(),
-			height = ThemeValue.Size.ProgressHeight,
+			height = CustomTheme.size.progressHeight,
 			showThumb = false,
 			onValueChangeFinished = {
 				launch {
@@ -426,7 +419,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 	private fun MusicProgressLayout(modifier: Modifier = Modifier) {
 		Column(
 			modifier = modifier,
-			verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.LittleSpace)
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
 		) {
 			MusicProgressText(
 				currentTime = currentDebounceTime,
@@ -438,7 +431,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				currentTime = currentDebounceTime,
 				duration = factory.currentDuration,
 				chorus = factory.currentMusic?.chorus,
-				modifier = Modifier.fillMaxWidth().height(ThemeValue.Size.ProgressHeight * 2)
+				modifier = Modifier.fillMaxWidth().height(CustomTheme.size.progressHeight * 2)
 			)
 		}
 	}
@@ -596,28 +589,28 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			) {
 				ToolLayout(modifier = Modifier
 					.fillMaxWidth()
-					.padding(ThemeValue.Padding.EqualValue)
+					.padding(CustomTheme.padding.equalValue)
 					.clip(MaterialTheme.shapes.large)
 					.hazeBlur(15.dp)
-					.padding(ThemeValue.Padding.Value)
+					.padding(CustomTheme.padding.value)
 				)
 				LyricsLayout(modifier = Modifier
 					.padding(
-						start = ThemeValue.Padding.HorizontalSpace,
-						end = ThemeValue.Padding.HorizontalSpace,
-						bottom = ThemeValue.Size.LargeImage / 2
+						start = CustomTheme.padding.horizontalSpace,
+						end = CustomTheme.padding.horizontalSpace,
+						bottom = CustomTheme.size.largeImage / 2
 					)
 					.fillMaxWidth()
 					.weight(1f)
 				)
 				Column(modifier = Modifier.fillMaxWidth()
 					.hazeBlur(10.dp)
-					.padding(ThemeValue.Padding.EqualValue)
+					.padding(CustomTheme.padding.equalValue)
 				) {
-					PortraitMusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-					MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-					MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-					MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+					PortraitMusicInfoLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+					MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+					MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+					MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
 				}
 			}
 		}
@@ -639,38 +632,38 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					modifier = Modifier.fillMaxSize()
 						.padding(immersivePadding.withoutEnd)
 						.zIndex(2f),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+					verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 				) {
 					ToolLayout(modifier = Modifier
 						.fillMaxWidth()
-						.padding(ThemeValue.Padding.EqualValue)
+						.padding(CustomTheme.padding.equalValue)
 						.clip(MaterialTheme.shapes.large)
 						.hazeBlur(30.dp)
-						.padding(ThemeValue.Padding.Value)
+						.padding(CustomTheme.padding.value)
 					)
 					Box(
-						modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue)
+						modifier = Modifier.padding(CustomTheme.padding.equalExtraValue)
 							.fillMaxWidth().weight(1f),
 						contentAlignment = Alignment.Center
 					) {
 						val musicInfo = factory.currentMusic
 						if (musicInfo != null) {
 							MusicRecordLayout(
-								offset = ThemeValue.Padding.ZeroSpace,
+								offset = CustomTheme.padding.zeroSpace,
 								musicInfo = musicInfo,
 								modifier = Modifier.fillMaxHeight().aspectRatio(1f)
-									.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
+									.shadow(elevation = CustomTheme.shadow.icon, clip = false, shape = CircleShape)
 							)
 						}
 					}
 					Column(modifier = Modifier
 						.fillMaxWidth()
 						.hazeBlur(20.dp)
-						.padding(ThemeValue.Padding.ExtraValue)
+						.padding(CustomTheme.padding.extraValue)
 					) {
-						MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-						MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-						MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+						MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+						MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+						MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
 					}
 				}
 			}
@@ -703,27 +696,27 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 					modifier = Modifier.fillMaxSize()
 						.padding(immersivePadding.withoutEnd)
 						.zIndex(2f),
-					verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+					verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 				) {
 					ToolLayout(modifier = Modifier
 						.fillMaxWidth()
-						.padding(ThemeValue.Padding.EqualValue)
+						.padding(CustomTheme.padding.equalValue)
 						.clip(MaterialTheme.shapes.large)
 						.hazeBlur(30.dp)
-						.padding(ThemeValue.Padding.Value)
+						.padding(CustomTheme.padding.value)
 					)
 					Box(
-						modifier = Modifier.padding(ThemeValue.Padding.EqualExtraValue)
+						modifier = Modifier.padding(CustomTheme.padding.equalExtraValue)
 							.fillMaxWidth().weight(1f),
 						contentAlignment = Alignment.Center
 					) {
 						val musicInfo = factory.currentMusic
 						if (musicInfo != null) {
 							MusicRecordLayout(
-								offset = ThemeValue.Padding.ZeroSpace,
+								offset = CustomTheme.padding.zeroSpace,
 								musicInfo = musicInfo,
 								modifier = Modifier.fillMaxHeight().aspectRatio(1f)
-									.shadow(elevation = ThemeValue.Shadow.Icon, clip = false, shape = CircleShape)
+									.shadow(elevation = CustomTheme.shadow.icon, clip = false, shape = CircleShape)
 							)
 						}
 					}
@@ -732,20 +725,20 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 							.fillMaxWidth()
 							.height(IntrinsicSize.Min)
 							.hazeBlur(20.dp)
-							.padding(ThemeValue.Padding.ExtraValue),
-						horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+							.padding(CustomTheme.padding.extraValue),
+						horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						Box(
-							modifier = Modifier.width(ThemeValue.Size.CellWidth * 0.8f).fillMaxHeight(),
+							modifier = Modifier.width(CustomTheme.size.cellWidth * 0.8f).fillMaxHeight(),
 							contentAlignment = Alignment.Center
 						) {
 							LandscapeMusicInfoLayout(modifier = Modifier.fillMaxWidth())
 						}
 						Column(modifier = Modifier.weight(1f)) {
-							MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-							MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
-							MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.Value))
+							MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+							MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
+							MusicToolLayout(modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value))
 						}
 					}
 				}
@@ -821,8 +814,8 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 			Column(modifier = Modifier.fillMaxWidth()) {
 				Row(
-					modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.ExtraValue),
-					horizontalArrangement = Arrangement.spacedBy(ThemeValue.Padding.HorizontalExtraSpace),
+					modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+					horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
@@ -871,12 +864,12 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 			val state = rememberTimePickerState(is24Hour = true)
 
 			Column(
-				modifier = Modifier.fillMaxWidth().padding(ThemeValue.Padding.SheetValue),
+				modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(ThemeValue.Padding.VerticalSpace)
+				verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 			) {
 				SplitLayout(
-					modifier = Modifier.fillMaxWidth().padding(horizontal = ThemeValue.Padding.HorizontalSpace),
+					modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace),
 					left = {
 						Text(
 							text = "睡眠模式",

@@ -8,13 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import love.yinlin.common.ThemeValue
+import love.yinlin.compose.*
 
 @Composable
 fun SplitLayout(
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
-    horizontalArrangement: Dp = ThemeValue.Padding.HorizontalSpace,
+    horizontalArrangement: Dp = CustomTheme.padding.horizontalSpace,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     left: @Composable BoxScope.() -> Unit = {},
     right: @Composable BoxScope.() -> Unit = {}
@@ -41,7 +41,7 @@ fun SplitLayout(
 fun SplitActionLayout(
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
-    horizontalArrangement: Dp = ThemeValue.Padding.HorizontalSpace,
+    horizontalArrangement: Dp = CustomTheme.padding.horizontalSpace,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     left: @Composable ActionScope.() -> Unit = {},
     right: @Composable ActionScope.() -> Unit = {}
