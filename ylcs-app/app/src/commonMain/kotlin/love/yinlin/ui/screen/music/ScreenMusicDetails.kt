@@ -29,26 +29,27 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.common.*
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResource
 import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.*
 import love.yinlin.platform.*
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.image.LocalFileImage
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.LoadingRachelButton
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.compose.ui.input.LoadingClickText
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusicDetails.Args>(model) {
@@ -152,11 +153,11 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
         data object Config : ModifyStrategy() {
             @Composable
             override fun ScreenMusicDetails.ModifyLayout(item: ResourceItem) {
-                val name = remember { TextInputState(musicInfo?.name ?: "") }
-                val singer = remember { TextInputState(musicInfo?.singer ?: "") }
-                val lyricist = remember { TextInputState(musicInfo?.lyricist ?: "") }
-                val composer = remember { TextInputState(musicInfo?.composer ?: "") }
-                val album = remember { TextInputState(musicInfo?.album ?: "") }
+                val name = rememberTextInputState(init = musicInfo?.name ?: "")
+                val singer = rememberTextInputState(init = musicInfo?.singer ?: "")
+                val lyricist = rememberTextInputState(init = musicInfo?.lyricist ?: "")
+                val composer = rememberTextInputState(init = musicInfo?.composer ?: "")
+                val album = rememberTextInputState(init = musicInfo?.album ?: "")
 
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.sheetValue)
@@ -164,7 +165,7 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "修改",
                         icon = Icons.Outlined.Check,
                         enabled = name.ok && singer.ok && lyricist.ok && composer.ok && album.ok,
@@ -330,17 +331,17 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                             modifier = Modifier.weight(5f),
                             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                         ) {
-                            RachelText(
+                            NormalText(
                                 text = info.name,
                                 style = MaterialTheme.typography.labelLarge,
                                 icon = Icons.Outlined.MusicNote,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            RachelText(
+                            NormalText(
                                 text = "ID: ${info.id}",
                                 icon = Icons.Outlined.Badge
                             )
-                            RachelText(
+                            NormalText(
                                 text = "来源: ${info.author}",
                                 icon = Icons.Outlined.Person
                             )
@@ -352,19 +353,19 @@ class ScreenMusicDetails(model: AppModel, val args: Args) : SubScreen<ScreenMusi
                             modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
                         )
                     }
-                    RachelText(
+                    NormalText(
                         text = "演唱: ${info.singer}",
                         icon = ExtraIcons.Artist
                     )
-                    RachelText(
+                    NormalText(
                         text = "作词: ${info.lyricist}",
                         icon = Icons.Outlined.Lyrics
                     )
-                    RachelText(
+                    NormalText(
                         text = "作曲: ${info.composer}",
                         icon = Icons.Outlined.Lyrics
                     )
-                    RachelText(
+                    NormalText(
                         text = "专辑: ${info.album}",
                         icon = Icons.Outlined.Album
                     )

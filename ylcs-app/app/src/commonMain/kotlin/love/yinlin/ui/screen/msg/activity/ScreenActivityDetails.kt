@@ -32,9 +32,9 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.img_damai
 import love.yinlin.resources.img_maoyan
 import love.yinlin.resources.img_showstart
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.ui.component.image.NineGrid
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen

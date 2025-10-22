@@ -9,6 +9,7 @@ import com.github.panpf.sketch.util.Logger
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
 import platform.Foundation.NSSetUncaughtExceptionHandler

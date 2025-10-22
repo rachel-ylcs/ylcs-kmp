@@ -33,9 +33,9 @@ import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.input.CylinderSlider
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.BoxText
 
@@ -212,25 +212,25 @@ fun GameItem(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                 ) {
-                    RachelText(text = game.name, icon = Icons.Outlined.AccountCircle)
-                    RachelText(text = game.ts, icon = Icons.Outlined.Timer)
+                    NormalText(text = game.name, icon = Icons.Outlined.AccountCircle)
+                    NormalText(text = game.ts, icon = Icons.Outlined.Timer)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        RachelText(
+                        NormalText(
                             text = game.reward.toString(),
                             icon = Icons.Outlined.Diamond,
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.labelMedium
                         )
-                        RachelText(
+                        NormalText(
                             text = game.num.toString(),
                             icon = Icons.Outlined.FormatListNumbered,
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.labelMedium
                         )
-                        RachelText(
+                        NormalText(
                             text = game.cost.toString(),
                             icon = Icons.Outlined.Paid,
                             color = MaterialTheme.colorScheme.tertiary,
@@ -245,7 +245,7 @@ fun GameItem(
             )
             GameCardInfo(game)
             if (game.winner.isNotEmpty()) {
-                RachelText(text = "赢家", icon = Icons.Outlined.MilitaryTech)
+                NormalText(text = "赢家", icon = Icons.Outlined.MilitaryTech)
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     game.winner.fastForEach { winner ->
                         BoxText(text = winner, color = MaterialTheme.colorScheme.primary)

@@ -14,7 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
 import love.yinlin.ui.component.common.ComposeVideoSurface
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter

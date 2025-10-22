@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Space
 import org.jetbrains.compose.resources.stringResource

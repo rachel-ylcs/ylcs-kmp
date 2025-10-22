@@ -32,9 +32,9 @@ import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
@@ -186,14 +186,14 @@ class ScreenUserCard(model: AppModel, private val args: Args) : SubScreen<Screen
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RachelText(
+                    NormalText(
                         text = topic.commentNum.toString(),
                         icon = Icons.AutoMirrored.Outlined.Comment,
                         style = MaterialTheme.typography.bodySmall,
                         padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
-                    RachelText(
+                    NormalText(
                         text = topic.coinNum.toString(),
                         icon = Icons.Outlined.Paid,
                         style = MaterialTheme.typography.bodySmall,

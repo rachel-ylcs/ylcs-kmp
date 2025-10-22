@@ -9,12 +9,12 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.platform.app
+import love.yinlin.compose.LocalAnimationSpeed
 
 @Composable
 fun <S> AnimationLayout(
     state: S,
-    duration: Int = app.config.animationSpeed,
+    duration: Int = LocalAnimationSpeed.current,
     modifier: Modifier = Modifier,
     content: @Composable (AnimatedContentScope.(S) -> Unit)
 ) {

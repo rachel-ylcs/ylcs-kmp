@@ -25,10 +25,10 @@ import love.yinlin.data.common.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.ZoomWebImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 

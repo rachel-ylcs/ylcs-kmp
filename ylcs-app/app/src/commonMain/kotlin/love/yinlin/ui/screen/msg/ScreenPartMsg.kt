@@ -43,8 +43,8 @@ import love.yinlin.platform.*
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
-import love.yinlin.ui.component.image.IconText
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.IconText
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitLayout
 import love.yinlin.ui.screen.common.ScreenImagePreview

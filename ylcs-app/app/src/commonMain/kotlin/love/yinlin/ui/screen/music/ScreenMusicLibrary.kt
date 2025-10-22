@@ -35,9 +35,9 @@ import love.yinlin.mod.ModFactory
 import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.LocalFileImage
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.MiniImage
+import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.*

@@ -41,10 +41,13 @@ include(
 
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
-    "ylcs-module:compose:app",
-    "ylcs-module:compose:screen",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
+    "ylcs-module:compose:screen",
+    "ylcs-module:compose:ui",
+    "ylcs-module:compose:app",
+    "ylcs-module:compose:component-all",
+    "ylcs-module:compose:component:url-image",
 
     /* -----------------  [3] 结构模块  ----------------- */
 

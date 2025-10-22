@@ -21,7 +21,6 @@ import love.yinlin.AppModel
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
@@ -32,11 +31,11 @@ import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_state_loading
 import love.yinlin.resources.img_state_network_error
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.input.SecondaryButton
-import love.yinlin.ui.component.input.SecondaryLoadingButton
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.NormalText
+import love.yinlin.compose.ui.input.SecondaryButton
+import love.yinlin.compose.ui.input.LoadingSecondaryButton
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
@@ -87,7 +86,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
         ) {
             when (status) {
                 Status.Preparing -> {
-                    SecondaryLoadingButton(
+                    LoadingSecondaryButton(
                         text = "开始",
                         modifier = Modifier.padding(CustomTheme.padding.verticalSpace),
                         onClick = { preflight() }
@@ -161,8 +160,8 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
-                                    RachelText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
+                                    NormalText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
+                                    NormalText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
                                 }
                                 Space()
                                 with(state) { Settlement() }

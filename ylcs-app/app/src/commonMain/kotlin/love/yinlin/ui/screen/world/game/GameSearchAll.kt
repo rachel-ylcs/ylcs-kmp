@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -38,9 +40,7 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.screen.SubScreenSlot
 import love.yinlin.ui.screen.community.BoxText
 
@@ -50,11 +50,11 @@ fun ColumnScope.SearchAllCardInfo(game: GamePublicDetailsWithName) {
         catchingNull { game.info.to<SAInfo>() }
     }
     if (info != null) {
-        RachelText(
+        NormalText(
             text = remember(info) { "准确率: ${(info.threshold * 100).toInt()}%" },
             icon = Icons.Outlined.Flaky
         )
-        RachelText(
+        NormalText(
             text = remember(info) { "时间限制: ${(info.timeLimit * 1000).toLong().timeString}" },
             icon = Icons.Outlined.Alarm
         )

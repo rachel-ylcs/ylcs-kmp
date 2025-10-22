@@ -108,19 +108,11 @@ kotlin {
             useLib(
                 // project
                 projects.ylcsModule.compose.app,
+                projects.ylcsModule.compose.componentAll,
                 projects.ylcsModule.clientEngine,
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
-                // compose
                 libs.compose.components.resources,
-                // sketch
-                libs.sketch,
-                libs.sketch.http,
-                libs.sketch.resources,
-                libs.sketch.gif,
-                libs.sketch.webp,
-                libs.sketch.extensions.compose,
-                libs.sketch.zoom,
                 // lottie
                 libs.lottie,
                 libs.lottie.network,

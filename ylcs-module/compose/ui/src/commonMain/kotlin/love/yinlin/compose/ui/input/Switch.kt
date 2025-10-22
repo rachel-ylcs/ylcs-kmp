@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.input
+package love.yinlin.compose.ui.input
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -13,15 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import love.yinlin.compose.*
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.platform.app
+import love.yinlin.compose.ui.node.clickableNoRipple
 
 @Composable
 fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit = {},
     enabled: Boolean = true,
-    duration: Int = app.config.animationSpeed / 2
+    duration: Int = LocalAnimationSpeed.current / 2
 ) {
     val width = CustomTheme.size.smallInput
     Box(modifier = Modifier

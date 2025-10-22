@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.*
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.node.clickableNoRipple
+import love.yinlin.compose.ui.image.MiniIcon
 
 @Stable
 data class TreeScope(

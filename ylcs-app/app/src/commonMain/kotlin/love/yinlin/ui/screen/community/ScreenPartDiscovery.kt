@@ -30,8 +30,8 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.input.NormalText
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -217,14 +217,14 @@ class ScreenPartDiscovery(model: AppModel) : ScreenPart(model) {
                             horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            RachelText(
+                            NormalText(
                                 text = topic.commentNum.toString(),
                                 icon = Icons.AutoMirrored.Outlined.Comment,
                                 style = MaterialTheme.typography.bodySmall,
                                 padding = CustomTheme.padding.zeroValue,
                                 modifier = Modifier.weight(1f)
                             )
-                            RachelText(
+                            NormalText(
                                 text = topic.coinNum.toString(),
                                 icon = Icons.Outlined.Paid,
                                 style = MaterialTheme.typography.bodySmall,

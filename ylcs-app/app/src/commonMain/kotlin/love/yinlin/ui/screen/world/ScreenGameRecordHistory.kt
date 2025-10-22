@@ -35,9 +35,9 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.img_not_login
 import love.yinlin.resources.img_state_loading
 import love.yinlin.resources.img_state_network_error
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingArgsSheet
@@ -115,8 +115,8 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
-                        RachelText(text = record.name, icon = Icons.Outlined.AccountCircle)
-                        RachelText(text = record.ts, icon = Icons.Outlined.Timer)
+                        NormalText(text = record.name, icon = Icons.Outlined.AccountCircle)
+                        NormalText(text = record.ts, icon = Icons.Outlined.Timer)
                     }
                 }
 
@@ -241,8 +241,8 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                RachelText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
-                                RachelText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
+                                NormalText(text = result.reward.toString(), icon = Icons.Outlined.Diamond)
+                                NormalText(text = result.rank.toString(), icon = Icons.Outlined.FormatListNumbered)
                             }
                             Space()
                             Column(

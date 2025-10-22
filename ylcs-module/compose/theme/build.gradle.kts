@@ -44,6 +44,7 @@ kotlin {
         val commonMain by getting {
             useApi(
                 projects.ylcsCore.composeBase,
+                libs.compose.components.resources,
             )
         }
     }

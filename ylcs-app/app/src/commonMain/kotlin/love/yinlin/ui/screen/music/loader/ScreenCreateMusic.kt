@@ -21,19 +21,20 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import love.yinlin.AppModel
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.*
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.music.*
 
 @Stable

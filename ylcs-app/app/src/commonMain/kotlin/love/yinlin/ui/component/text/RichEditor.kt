@@ -24,9 +24,12 @@ import love.yinlin.compose.*
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
+import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.ActionScope
 
 @Stable
@@ -174,8 +177,8 @@ open class RichEditorState {
 
     @Composable
     protected open fun LinkLayout(modifier: Modifier) {
-        val title = remember { TextInputState() }
-        val link = remember { TextInputState() }
+        val title = rememberTextInputState()
+        val link = rememberTextInputState()
         Column(
             modifier = modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
@@ -191,7 +194,7 @@ open class RichEditorState {
                     maxLength = 16,
                     modifier = Modifier.weight(1f)
                 )
-                RachelButton(
+                ClickText(
                     text = "插入",
                     icon = Icons.Outlined.InsertLink,
                     enabled = title.ok && link.ok,
@@ -209,8 +212,8 @@ open class RichEditorState {
 
     @Composable
     protected open fun TopicLayout(modifier: Modifier) {
-        val title = remember { TextInputState() }
-        val topic = remember { TextInputState() }
+        val title = rememberTextInputState()
+        val topic = rememberTextInputState()
         Column(
             modifier = modifier.verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.End,
@@ -227,7 +230,7 @@ open class RichEditorState {
                     maxLength = 16,
                     modifier = Modifier.weight(1f)
                 )
-                RachelButton(
+                ClickText(
                     text = "插入",
                     icon = Icons.Outlined.Tag,
                     enabled = title.ok && topic.ok,

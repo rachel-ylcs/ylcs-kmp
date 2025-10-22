@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.*
-import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.ui.screen.music.recordPath
 
 @Composable

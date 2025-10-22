@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -12,7 +12,6 @@ import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import love.yinlin.compose.*
-import love.yinlin.platform.app
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +35,7 @@ fun BallonTip(
             }
         },
         state = rememberTooltipState(),
-        enableUserInput = app.config.enabledTip,
+        enableUserInput = localBalloonTipEnabled.current,
         content = content
     )
 }
@@ -75,7 +74,9 @@ fun BallonTip(
             )
         },
         state = rememberTooltipState(),
-        enableUserInput = app.config.enabledTip,
+        enableUserInput = localBalloonTipEnabled.current,
         content = content
     )
 }
+
+val localBalloonTipEnabled = localComposition { true }

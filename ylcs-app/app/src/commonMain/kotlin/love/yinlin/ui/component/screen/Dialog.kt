@@ -21,38 +21,37 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.compose.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.platform.app
+import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.resources.*
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.text.InputType
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.layout.OffsetLayout
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import org.jetbrains.compose.resources.stringResource
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
 @Stable
-abstract class FloatingDialog<R>() : Floating<Unit>() {
+abstract class FloatingDialog<R> : Floating<Unit>() {
     override fun alignment(device: Device): Alignment = Alignment.Center
-    override fun enter(device: Device): EnterTransition = scaleIn(
-        animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)) +
-            fadeIn(tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)
-            )
-    override fun exit(device: Device): ExitTransition = scaleOut(
-        animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)) +
-            fadeOut(tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing)
-            )
+    override fun enter(device: Device, animationSpeed: Int): EnterTransition = scaleIn(
+        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    ) + fadeIn(
+        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    )
+    override fun exit(device: Device, animationSpeed: Int): ExitTransition = scaleOut(
+        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    ) + fadeOut(
+        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    )
     override val zIndex: Float = Z_INDEX_DIALOG
 
     protected var continuation: CancellableContinuation<R?>? = null
@@ -94,7 +93,7 @@ abstract class FloatingDialog<R>() : Floating<Unit>() {
 }
 
 @Stable
-abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
+abstract class FloatingBaseDialog<R> : FloatingDialog<R>() {
     open val scrollable: Boolean get() = true
     abstract val title: String?
     open val actions: @Composable (RowScope.() -> Unit)? = null
@@ -102,40 +101,13 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
     @Composable
     override fun Wrapper(block: @Composable () -> Unit) {
         super.Wrapper {
-            val sizeType = LocalDevice.current.size
-
-            val rachelWidth = when (sizeType) {
-                Device.Size.SMALL -> 140.dp
-                Device.Size.MEDIUM -> 150.dp
-                Device.Size.LARGE -> 160.dp
-            }
-            val minContentHeight = when (sizeType) {
-                Device.Size.SMALL -> 50.dp
-                Device.Size.MEDIUM -> 45.dp
-                Device.Size.LARGE -> 40.dp
-            }
-            val maxContentHeight = when (sizeType) {
-                Device.Size.SMALL -> 260.dp
-                Device.Size.MEDIUM -> 280.dp
-                Device.Size.LARGE -> 300.dp
-            }
-
-            Column(
-                modifier = Modifier.width(CustomTheme.size.dialogWidth)
-                    .clickableNoRipple { if (dismissOnClickOutside) close() }
-                    .padding(bottom = rachelWidth),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.fillMaxSize().clickableNoRipple { if (dismissOnClickOutside) close() },
+                contentAlignment = Alignment.Center
             ) {
-                OffsetLayout(y = rachelWidth / 15.5f + CustomTheme.padding.verticalExtraSpace / 5) {
-                    MiniIcon(
-                        res = Res.drawable.img_dialog_rachel,
-                        size = rachelWidth,
-                        modifier = Modifier.clickableNoRipple { }
-                    )
-                }
                 Surface(
                     shape = MaterialTheme.shapes.extraLarge,
-                    modifier = Modifier.fillMaxWidth().clickableNoRipple { }
+                    modifier = Modifier.width(CustomTheme.size.dialogWidth).clickableNoRipple { }
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(
@@ -158,7 +130,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
                         }
 
                         Box(modifier = Modifier
-                            .heightIn(min = minContentHeight, max = maxContentHeight)
+                            .heightIn(min = CustomTheme.size.minDialogContentHeight, max = CustomTheme.size.maxDialogContentHeight)
                             .fillMaxWidth()
                             .verticalScroll(enabled = scrollable, state = rememberScrollState())
                         ) {
@@ -183,7 +155,7 @@ abstract class FloatingRachelDialog<R>() : FloatingDialog<R>() {
 open class FloatingDialogInfo(
     title: String = "提示",
     content: String = ""
-) : FloatingRachelDialog<Unit>() {
+) : FloatingBaseDialog<Unit>() {
     override var title: String? by mutableStateOf(title)
         protected set
     var content: String by mutableStateOf(content)
@@ -211,18 +183,18 @@ open class FloatingDialogInfo(
 open class FloatingDialogConfirm(
     title: String = "确认",
     content: String = ""
-) : FloatingRachelDialog<Unit>() {
+) : FloatingBaseDialog<Unit>() {
     override var title: String? by mutableStateOf(title)
         protected set
     var content: String by mutableStateOf(content)
         protected set
 
     override val actions: @Composable (RowScope.() -> Unit)? = {
-        RachelButton(
+        ClickText(
             text = stringResource(Res.string.dialog_yes),
             onClick = { continuation?.resume(Unit) }
         )
-        RachelButton(
+        ClickText(
             text = stringResource(Res.string.dialog_no),
             onClick = { close() }
         )
@@ -254,7 +226,7 @@ open class FloatingDialogInput(
     val maxLines: Int = 1,
     val minLines: Int = maxLines,
     val clearButton: Boolean = maxLines == 1
-) : FloatingRachelDialog<String>() {
+) : FloatingBaseDialog<String>() {
     final override val scrollable: Boolean = false
 
     override val title: String? = null
@@ -262,12 +234,12 @@ open class FloatingDialogInput(
     private val textInputState = TextInputState()
 
     override val actions: @Composable (RowScope.() -> Unit)? = {
-        RachelButton(
+        ClickText(
             text = stringResource(Res.string.dialog_ok),
             enabled = textInputState.ok,
             onClick = { continuation?.resume(textInputState.text) }
         )
-        RachelButton(
+        ClickText(
             text = stringResource(Res.string.dialog_cancel),
             onClick = { close() }
         )
@@ -307,7 +279,7 @@ open class FloatingDialogInput(
 @Stable
 abstract class FloatingDialogChoice(
     override val title: String? = null
-) : FloatingRachelDialog<Int>() {
+) : FloatingBaseDialog<Int>() {
     abstract val num: Int
     @Composable
     abstract fun Name(index: Int)
@@ -392,7 +364,7 @@ open class FloatingDialogDynamicChoice(title: String? = null) : ListDialogChoice
 }
 
 @Stable
-open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
+open class FloatingDialogProgress : FloatingBaseDialog<Unit>() {
     var current by mutableStateOf("0")
     var total by mutableStateOf("0")
     var progress by mutableFloatStateOf(0f)
@@ -404,7 +376,7 @@ open class FloatingDialogProgress : FloatingRachelDialog<Unit>() {
     override val title: String? = "下载中..."
 
     override val actions: @Composable (RowScope.() -> Unit)? = {
-        RachelButton(
+        ClickText(
             text = stringResource(Res.string.dialog_cancel),
             enabled = isOpen,
             onClick = { close() }

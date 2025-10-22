@@ -37,14 +37,14 @@ import love.yinlin.data.rachel.game.info.AQUserAnswer
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.SimpleEmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.FloatingDialogInput
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.to
 
@@ -111,7 +111,7 @@ fun ColumnScope.AnswerQuestionCardInfo(game: GamePublicDetailsWithName) {
         catchingNull { game.info.to<AQInfo>() }
     }
     if (info != null) {
-        RachelText(
+        NormalText(
             text = remember(info) { "准确率: ${(info.threshold * 100).toInt()}%" },
             icon = Icons.Outlined.Flaky
         )
@@ -771,7 +771,7 @@ class AnswerQuestionPlayGameState(val slot: SubScreenSlot) : PlayGameState {
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Space()
-                                val inputState = remember(currentIndex) { TextInputState() }
+                                val inputState = rememberTextInputState(currentIndex)
                                 val focusRequester = remember { FocusRequester() }
                                 LaunchedEffect(currentIndex) {
                                     focusRequester.requestFocus()

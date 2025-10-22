@@ -29,7 +29,7 @@ import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Pagination

@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalTime::class)
 package love.yinlin.extension
 
 import kotlinx.datetime.LocalDate
@@ -17,7 +16,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.jvm.JvmInline
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlin.time.ExperimentalTime
 
 object DateEx {
     @JvmInline

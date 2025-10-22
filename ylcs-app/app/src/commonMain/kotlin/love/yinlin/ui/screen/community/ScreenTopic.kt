@@ -43,9 +43,9 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.component.text.RichEditor

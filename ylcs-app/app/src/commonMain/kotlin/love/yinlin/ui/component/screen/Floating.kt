@@ -25,8 +25,7 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.compose.*
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.platform.app
+import love.yinlin.compose.ui.node.clickableNoRipple
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Stable
@@ -40,8 +39,8 @@ abstract class Floating<A : Any> {
     }
 
     protected abstract fun alignment(device: Device): Alignment // 对齐方式
-    protected abstract fun enter(device: Device): EnterTransition // 开始动画
-    protected abstract fun exit(device: Device): ExitTransition // 结束动画
+    protected abstract fun enter(device: Device, animationSpeed: Int): EnterTransition // 开始动画
+    protected abstract fun exit(device: Device, animationSpeed: Int): ExitTransition // 结束动画
     protected open val scrim: Float = 0.4f // 遮罩透明度
     protected open val zIndex: Float = Z_INDEX_COMMON // 高度
     protected open val dismissOnBackPress: Boolean = true // 返回键结束
@@ -68,15 +67,17 @@ abstract class Floating<A : Any> {
         visible: Boolean,
         content: @Composable () -> Unit
     ) {
+        val device = LocalDevice.current
+        val animationSpeed = LocalAnimationSpeed.current
+
         val alpha by animateFloatAsState(
             targetValue = if (visible) (1 - scrim) else 0f,
             animationSpec = tween(
-                durationMillis = app.config.animationSpeed,
+                durationMillis = animationSpeed,
                 easing = LinearOutSlowInEasing
             )
         )
 
-        val device = LocalDevice.current
         Box(modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
             .zIndex(zIndex)
@@ -87,8 +88,8 @@ abstract class Floating<A : Any> {
         ) {
             AnimatedVisibility(
                 visible = visible,
-                enter = remember(device) { enter(device) },
-                exit = remember(device) { exit(device) }
+                enter = remember(device) { enter(device, animationSpeed) },
+                exit = remember(device) { exit(device, animationSpeed) }
             ) {
                 Box(modifier = Modifier.clickableNoRipple { }) {
                     content()
@@ -100,11 +101,13 @@ abstract class Floating<A : Any> {
     @Composable
     fun Land(block: @Composable (args: A) -> Unit) {
         state?.let { args ->
+            val animationSpeed = LocalAnimationSpeed.current
+
             LaunchedEffect(Unit) { visible = true }
 
             LaunchedEffect(visible) {
                 if (!visible) {
-                    delay(app.config.animationSpeed.toLong())
+                    delay(animationSpeed.toLong())
                     hide()
                 }
             }
@@ -114,7 +117,7 @@ abstract class Floating<A : Any> {
             }
 
             AnimatedFloatingContent(visible = visible) {
-                Wrapper {
+                 Wrapper {
                     block(args)
                 }
 

@@ -28,7 +28,7 @@ import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 
 @Stable
 private class VideoPlayerState {

@@ -43,18 +43,18 @@ import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.PrimaryLoadingButton
-import love.yinlin.ui.component.input.SecondaryLoadingButton
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.LoadingPrimaryButton
+import love.yinlin.compose.ui.input.LoadingSecondaryButton
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.SplitLayout
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.condition
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 
 @Composable
 private fun UserItem(
@@ -382,12 +382,12 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                PrimaryLoadingButton(
+                LoadingPrimaryButton(
                     text = "接受",
                     icon = Icons.Outlined.CheckCircle,
                     onClick = { onInviteResult(status.info, true) }
                 )
-                SecondaryLoadingButton(
+                LoadingSecondaryButton(
                     text = "拒绝",
                     icon = Icons.Outlined.Cancel,
                     onClick = { onInviteResult(status.info, false) }
@@ -444,7 +444,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
     ) {
         var index: Int by rememberValueState(0)
 
-        val inputState = remember(index) { TextInputState() }
+        val inputState = rememberTextInputState(index)
         val focusRequester = remember { FocusRequester() }
 
         Row(
@@ -555,7 +555,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        PrimaryLoadingButton(
+                        LoadingPrimaryButton(
                             text = "提交",
                             icon = Icons.Outlined.Check,
                             onClick = {
@@ -653,7 +653,7 @@ class ScreenGuessLyrics(model: AppModel, val args: Args) : SubScreen<ScreenGuess
                         isWinner = !win
                     )
                 }
-                PrimaryLoadingButton(
+                LoadingPrimaryButton(
                     text = "返回大厅",
                     icon = Icons.AutoMirrored.Outlined.Reply,
                     onClick = {

@@ -17,7 +17,7 @@ import love.yinlin.common.uri.Uri
 import love.yinlin.compose.CustomTheme
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniIcon
 
 val UnsupportedPlatformText = "不支持的平台 $platform"
 

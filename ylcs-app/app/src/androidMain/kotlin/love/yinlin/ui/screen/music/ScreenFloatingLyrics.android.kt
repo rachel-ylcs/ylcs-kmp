@@ -20,7 +20,7 @@ import love.yinlin.platform.FloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
-import love.yinlin.ui.component.input.Switch
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
 private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyrics) {

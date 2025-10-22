@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.text
+package love.yinlin.compose.ui.text
 
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,7 +18,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 
 @Stable
 @Serializable
@@ -47,7 +47,7 @@ class TextInputState(str: String = "") {
 }
 
 @Composable
-fun rememberTextInputState(vararg keys: Any?) = remember(*keys) { TextInputState() }
+fun rememberTextInputState(vararg keys: Any?, init: String = "") = remember(*keys) { TextInputState(init) }
 
 @Composable
 fun TextInput(

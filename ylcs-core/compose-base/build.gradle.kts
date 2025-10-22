@@ -46,17 +46,10 @@ kotlin {
                 projects.ylcsCore.base,
                 libs.compose.runtime,
                 libs.compose.foundation,
-                libs.compose.material3,
-                libs.compose.material3.icons,
-                libs.compose.material3.iconsExtended,
-                libs.compose.ui,
-                libs.compose.ui.backhandler,
-                libs.compose.components.resources,
-                libs.compose.components.uiToolingPreview,
-                libs.compose.navigation,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
+                libs.compose.components.uiToolingPreview,
             )
         }
 

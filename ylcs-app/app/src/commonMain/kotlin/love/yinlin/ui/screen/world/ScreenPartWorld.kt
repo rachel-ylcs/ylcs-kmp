@@ -45,11 +45,11 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.ColorfulIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.colorfulImageVector
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.ColorfulIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
@@ -139,7 +139,7 @@ class ScreenPartWorld(model: AppModel) : ScreenPart(model) {
 	) {
 		Crossfade(
 			targetState = pagerState.currentPage,
-			animationSpec = tween(durationMillis = app.config.animationSpeed),
+			animationSpec = tween(durationMillis = LocalAnimationSpeed.current),
 			modifier = modifier
 		) { currentPage ->
 			val background = MaterialTheme.colorScheme.background

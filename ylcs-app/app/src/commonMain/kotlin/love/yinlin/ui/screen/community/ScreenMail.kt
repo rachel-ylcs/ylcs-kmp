@@ -30,7 +30,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
@@ -246,14 +246,14 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (args.withYes) RachelButton(
+                    if (args.withYes) ClickText(
                         text = "接受",
                         icon = Icons.Outlined.CheckCircle,
                         onClick = {
                             launch { onProcessMail("接受此邮件结果?", args.mid, true) }
                         }
                     )
-                    if (args.withNo) RachelButton(
+                    if (args.withNo) ClickText(
                         text = "拒绝",
                         icon = Icons.Outlined.Cancel,
                         color = MaterialTheme.colorScheme.error,
@@ -261,7 +261,7 @@ class ScreenMail(model: AppModel) : CommonSubScreen(model) {
                             launch { onProcessMail("拒绝此邮件结果?", args.mid, false) }
                         }
                     )
-                    if (args.processed) RachelButton(
+                    if (args.processed) ClickText(
                         text = "删除",
                         icon = Icons.Outlined.Delete,
                         color = MaterialTheme.colorScheme.secondary,

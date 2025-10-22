@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.compose.*
 import love.yinlin.resources.*
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow

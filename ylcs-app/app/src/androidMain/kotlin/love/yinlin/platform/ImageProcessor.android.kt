@@ -7,6 +7,7 @@ import kotlinx.io.Source
 import kotlinx.io.asInputStream
 import kotlinx.io.asOutputStream
 import androidx.core.graphics.scale
+import love.yinlin.compose.data.ImageQuality
 
 actual typealias ImageOwner = Bitmap
 

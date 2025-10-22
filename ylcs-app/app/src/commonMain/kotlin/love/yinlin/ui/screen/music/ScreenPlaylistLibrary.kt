@@ -32,16 +32,16 @@ import love.yinlin.extension.*
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.container.Tree
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.input.LoadingRachelButton
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogChoice
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.rememberTextInputState
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -357,7 +357,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "导出",
                         icon = Icons.Outlined.Upload,
                         onClick = {
@@ -369,7 +369,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                             }
                         }
                     )
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "导入",
                         icon = Icons.Outlined.Download,
                         enabled = state.ok,
@@ -398,7 +398,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "云备份",
                         icon = Icons.Outlined.CloudUpload,
                         onClick = {
@@ -420,7 +420,7 @@ class ScreenPlaylistLibrary(model: AppModel) : CommonSubScreen(model) {
                             }
                         }
                     )
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "云恢复",
                         icon = Icons.Outlined.CloudDownload,
                         onClick = {

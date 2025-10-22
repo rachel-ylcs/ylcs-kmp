@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.data.common.Picture
 
 @Composable

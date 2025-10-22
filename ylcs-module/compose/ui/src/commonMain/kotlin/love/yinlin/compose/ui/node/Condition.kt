@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.node
+package love.yinlin.compose.ui.node
 
 import androidx.compose.ui.Modifier
 

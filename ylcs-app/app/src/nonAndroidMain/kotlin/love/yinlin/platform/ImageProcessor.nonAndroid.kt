@@ -3,6 +3,7 @@ package love.yinlin.platform
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
+import love.yinlin.compose.data.ImageQuality
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
 

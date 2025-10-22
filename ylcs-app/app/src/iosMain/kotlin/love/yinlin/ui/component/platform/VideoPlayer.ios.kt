@@ -14,7 +14,7 @@ import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSNotification
 import platform.Foundation.NSURL

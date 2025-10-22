@@ -14,8 +14,6 @@ data class ModeColor(
 
 infix fun Color.and(other: Color): ModeColor = ModeColor(this, other)
 
-fun Boolean.select(ifTrue: Color, ifFalse: Color): Color = if (this) ifTrue else ifFalse
-
 @Stable
 data class ColorSystem(
     val primary: ModeColor,

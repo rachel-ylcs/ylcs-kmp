@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import love.yinlin.compose.*
-import love.yinlin.platform.app
 import kotlin.math.roundToInt
 
 @Suppress("DuplicatedCode")
@@ -33,24 +32,24 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
     }
 
-    override fun enter(device: Device): EnterTransition = when (device.type) {
+    override fun enter(device: Device, animationSpeed: Int): EnterTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideInVertically(
-            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
-            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
 
-    override fun exit(device: Device): ExitTransition = when (device.type) {
+    override fun exit(device: Device, animationSpeed: Int): ExitTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideOutVertically(
-            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
-            animationSpec = tween(durationMillis = app.config.animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
     }

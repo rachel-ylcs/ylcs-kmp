@@ -34,10 +34,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.api.APIConfig
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.animation.LoadingAnimation
 import love.yinlin.data.ItemKey
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.Platform
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniIcon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 

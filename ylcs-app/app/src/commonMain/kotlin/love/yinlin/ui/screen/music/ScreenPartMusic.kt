@@ -54,13 +54,13 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.img_music_record
 import love.yinlin.resources.no_audio_source
 import love.yinlin.resources.unknown_singer
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.LocalFileImage
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.ui.component.input.ProgressSlider
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenVideo
 import org.jetbrains.compose.resources.painterResource
@@ -878,7 +878,7 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 						)
 					},
 					right = {
-						RachelButton(
+						ClickText(
 							text = if (sleepJob == null) "启动" else "停止",
 							icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
 							onClick = {

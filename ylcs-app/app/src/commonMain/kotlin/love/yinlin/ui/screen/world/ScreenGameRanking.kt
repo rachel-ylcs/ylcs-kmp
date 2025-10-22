@@ -38,8 +38,8 @@ import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
-import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.community.ScreenUserCard

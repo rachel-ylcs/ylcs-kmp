@@ -16,7 +16,7 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
-import love.yinlin.ui.component.input.Switch
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.ui.component.layout.SplitLayout
 
 // ignoresMouseEvents on macOS is buggy, see https://stackoverflow.com/questions/29441015

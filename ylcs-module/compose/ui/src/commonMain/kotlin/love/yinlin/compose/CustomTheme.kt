@@ -1,13 +1,48 @@
 package love.yinlin.compose
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Stable
+data class ModeShape(
+    val small: Number,
+    val medium: Number,
+    val large: Number,
+)
+
+@Stable
+data class ModeText(
+    val isBold: Boolean,
+    val small: Number,
+    val medium: Number,
+    val large: Number,
+) {
+    fun small(font: Font): TextStyle = basicTextStyle(font, small.toDouble().sp, isBold)
+    fun medium(font: Font): TextStyle = basicTextStyle(font, medium.toDouble().sp, isBold)
+    fun large(font: Font): TextStyle = basicTextStyle(font, large.toDouble().sp, isBold)
+
+    val style: TextStyle @Composable get() = mainFont().let { font ->
+        when (LocalDevice.current.size) {
+            Device.Size.SMALL -> small(font)
+            Device.Size.MEDIUM -> medium(font)
+            Device.Size.LARGE -> large(font)
+        }
+    }
+}
+
+val Number.shape: CornerBasedShape get() = RoundedCornerShape(this.toDouble().dp)
+
+fun Boolean.select(ifTrue: Color, ifFalse: Color): Color = if (this) ifTrue else ifFalse
 
 @Stable
 interface BaseCustomTypography {
@@ -52,6 +87,8 @@ interface BaseCustomSize {
     val cellWidth: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(150, 180, 200)
     val cardWidth: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(300, 320, 350)
     val dialogWidth: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(300, 400, 500)
+    val minDialogContentHeight: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(50, 45, 40)
+    val maxDialogContentHeight: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(260, 280, 300)
     val sheetWidth: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(360, 400, 450)
     val panelWidth: Dp @Composable @ReadOnlyComposable get() = LocalDevice.current.size.select(360, 380, 400)
 }

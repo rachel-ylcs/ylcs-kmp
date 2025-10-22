@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.text
+package love.yinlin.compose.ui.text
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.LocalTextStyle

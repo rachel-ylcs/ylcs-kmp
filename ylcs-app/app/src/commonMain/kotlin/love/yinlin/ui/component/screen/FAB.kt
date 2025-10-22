@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
-import love.yinlin.platform.app
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.floating.BallonTip
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.node.clickableNoRipple
+import love.yinlin.compose.ui.node.condition
 
 @Stable
 data class FABAction(
@@ -116,7 +116,7 @@ fun FABLayout(
         }
         else {
             var expanded by rememberFalse()
-            val duration = app.config.animationSpeed
+            val duration = LocalAnimationSpeed.current
             val alpha by animateFloatAsState(
                 targetValue = if (expanded) 0.6f else 0f,
                 animationSpec = tween(

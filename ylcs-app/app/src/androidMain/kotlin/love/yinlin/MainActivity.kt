@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowInsetsControllerCompat
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.app
 import love.yinlin.platform.appNative
@@ -40,7 +41,11 @@ class MainActivity : ComponentActivity() {
                 themeMode = app.config.themeMode,
                 fontScale = app.config.fontScale,
                 mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                localProvider = arrayOf(
+                    LocalAnimationSpeed provides app.config.animationSpeed,
+                    localBalloonTipEnabled provides app.config.enabledTip
+                ),
             ) { _, _ ->
                 val isDarkMode = LocalDarkMode.current
                 LaunchedEffect(isDarkMode) {

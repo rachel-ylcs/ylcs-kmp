@@ -37,8 +37,8 @@ import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.jvm.JvmInline

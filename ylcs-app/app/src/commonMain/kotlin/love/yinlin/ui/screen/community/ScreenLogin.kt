@@ -26,13 +26,13 @@ import love.yinlin.platform.platform
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.animation.AnimationLayout
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.PrimaryLoadingButton
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.text.InputType
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
+import love.yinlin.compose.ui.input.LoadingPrimaryButton
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
@@ -197,7 +197,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					}
 				)
 			}
-			PrimaryLoadingButton(
+			LoadingPrimaryButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "登录",
 				enabled = canLogin,
@@ -280,7 +280,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					loginPwd.text = ""
 				}
 			)
-			PrimaryLoadingButton(
+			LoadingPrimaryButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "注册",
 				enabled = canRegister,
@@ -322,7 +322,7 @@ class ScreenLogin(model: AppModel) : CommonSubScreen(model) {
 					loginPwd.text = ""
 				}
 			)
-			PrimaryLoadingButton(
+			LoadingPrimaryButton(
 				modifier = Modifier.fillMaxWidth(),
 				text = "提交申请",
 				enabled = canForgotPassword,

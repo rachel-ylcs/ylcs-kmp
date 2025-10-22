@@ -31,13 +31,13 @@ import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.clickableNoRipple
+import love.yinlin.compose.ui.node.condition
 import kotlin.math.max
 
 @Composable

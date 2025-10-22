@@ -16,6 +16,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
@@ -24,8 +27,6 @@ import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.input.DockedDatePicker
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 internal class ActivityInputState(initActivity: Activity? = null) {

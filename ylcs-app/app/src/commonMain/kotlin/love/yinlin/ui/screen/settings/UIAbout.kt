@@ -24,8 +24,8 @@ import kotlinx.datetime.LocalDate
 import love.yinlin.Local
 import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.screen.community.BoxText
 
@@ -245,7 +245,7 @@ internal fun UpdateInfoLayout(
                         modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
                         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
                     ) {
-                        RachelText(
+                        NormalText(
                             text = group.type,
                             icon = group.icon,
                             color = group.color,

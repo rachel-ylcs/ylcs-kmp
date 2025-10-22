@@ -18,8 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.*
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.node.clickableNoRipple
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.node.clickableNoRipple
 
 @Stable
 open class Tip(private val scope: CoroutineScope) {

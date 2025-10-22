@@ -25,8 +25,8 @@ import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import love.yinlin.compose.*
 import love.yinlin.data.rachel.game.info.PaintPath
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.node.condition
 
 private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {

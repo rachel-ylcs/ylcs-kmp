@@ -33,23 +33,27 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
 import love.yinlin.common.uri.UriGenerator
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ui.image.ColorfulIcon
+import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.ImageQuality
 import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.*
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationColumn
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.community.UserBar
 
 @Stable
@@ -177,21 +181,21 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         modifier = Modifier.weight(5f),
                         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
                     ) {
-                        RachelText(
+                        NormalText(
                             text = song.name,
                             style = MaterialTheme.typography.labelLarge,
                             icon = Icons.Outlined.MusicNote,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        RachelText(
+                        NormalText(
                             text = "编号: ${song.sid}",
                             icon = Icons.Outlined.Loyalty
                         )
-                        RachelText(
+                        NormalText(
                             text = "ID: ${song.id}",
                             icon = Icons.Outlined.Badge
                         )
-                        RachelText(
+                        NormalText(
                             text = "版本: ${song.version}",
                             icon = ExtraIcons.Artist
                         )
@@ -202,28 +206,28 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                         modifier = Modifier.weight(3f).aspectRatio(1f).clip(MaterialTheme.shapes.large)
                     )
                 }
-                RachelText(
+                NormalText(
                     text = "演唱: ${song.singer}",
                     icon = ExtraIcons.Artist
                 )
-                RachelText(
+                NormalText(
                     text = "作词: ${song.lyricist}",
                     icon = Icons.Outlined.Lyrics
                 )
-                RachelText(
+                NormalText(
                     text = "作曲: ${song.composer}",
                     icon = Icons.Outlined.Lyrics
                 )
-                RachelText(
+                NormalText(
                     text = "专辑: ${song.album}",
                     icon = Icons.Outlined.Album
                 )
-                RachelText(
+                NormalText(
                     text = "动画: ${if (song.bgd) "已收录" else "未收录"}",
                     color = if (song.bgd) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     icon = Icons.Outlined.GifBox
                 )
-                RachelText(
+                NormalText(
                     text = "视频: ${if (song.video) "已收录" else "未收录"}",
                     color = if (song.video) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                     icon = Icons.Outlined.MusicVideo
@@ -482,7 +486,12 @@ class ScreenSongDetails(model: AppModel, val args: Args) : SubScreen<ScreenSongD
                             quality = ImageQuality.Full,
                             modifier = Modifier.fillMaxWidth(fraction = 0.65f)
                                 .aspectRatio(1f)
-                                .clip(MaterialTheme.shapes.extraLarge.copy(topStart = CornerSize(0), bottomEnd = CornerSize(0)))
+                                .clip(
+                                    MaterialTheme.shapes.extraLarge.copy(
+                                        topStart = CornerSize(0),
+                                        bottomEnd = CornerSize(0)
+                                    )
+                                )
                         )
                         Box(modifier = Modifier.background(Colors.Ghost).weight(1f).aspectRatio(1f)) {
                             MiniImage(

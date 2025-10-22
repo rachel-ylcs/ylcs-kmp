@@ -17,7 +17,7 @@ import kotlinx.datetime.*
 import love.yinlin.common.Resource
 import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.layout.ActionScope
 
 private val lunarFestivalTable = mapOf(

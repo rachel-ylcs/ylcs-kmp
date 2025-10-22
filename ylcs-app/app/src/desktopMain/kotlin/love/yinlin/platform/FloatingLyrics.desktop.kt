@@ -19,9 +19,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.condition
 
 @Stable
 class ActualFloatingLyrics : FloatingLyrics() {
@@ -85,7 +86,11 @@ class ActualFloatingLyrics : FloatingLyrics() {
                             fontScale = 1f,
                             mainFontResource = Res.font.xwwk,
                             modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) },
-                            alignment = Alignment.Center
+                            alignment = Alignment.Center,
+                            localProvider = arrayOf(
+                                LocalAnimationSpeed provides app.config.animationSpeed,
+                                localBalloonTipEnabled provides app.config.enabledTip
+                            ),
                         ) { _, _ ->
                             Box(
                                 modifier = Modifier.fillMaxWidth(),

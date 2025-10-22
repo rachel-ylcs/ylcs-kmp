@@ -20,11 +20,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
-import love.yinlin.ui.component.image.ColorfulIcon
-import love.yinlin.ui.component.image.ColorfulImageVector
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.StaticLoadingIcon
-import love.yinlin.ui.component.input.Switch
+import love.yinlin.compose.ui.image.ColorfulIcon
+import love.yinlin.compose.ui.image.ColorfulImageVector
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.StaticLoadingIcon
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.ui.component.layout.Space
 
 object SettingsScope {

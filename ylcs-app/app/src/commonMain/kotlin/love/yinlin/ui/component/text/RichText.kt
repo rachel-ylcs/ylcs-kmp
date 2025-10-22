@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.sp
 import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
-import love.yinlin.platform.ImageQuality
-import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
 
 // RichString DSL
 

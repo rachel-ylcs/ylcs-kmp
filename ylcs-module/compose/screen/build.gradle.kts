@@ -43,14 +43,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore.composeBase,
+                projects.ylcsModule.compose.ui,
+                libs.compose.ui.backhandler,
+                libs.compose.navigation,
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.compose.scren"
+    namespace = "${C.app.packageName}.module.compose.screen"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

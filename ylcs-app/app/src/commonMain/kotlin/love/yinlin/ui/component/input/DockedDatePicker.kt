@@ -18,7 +18,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import love.yinlin.compose.*
 import love.yinlin.extension.*
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.ui.component.layout.ExpandableLayout
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.AppModel
 import love.yinlin.compose.*
-import love.yinlin.ui.component.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.SplitActionLayout
 import love.yinlin.ui.screen.Screen

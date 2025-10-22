@@ -22,7 +22,7 @@ import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.LoadingIcon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid

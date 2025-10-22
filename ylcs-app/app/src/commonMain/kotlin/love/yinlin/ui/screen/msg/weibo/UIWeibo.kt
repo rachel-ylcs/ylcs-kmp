@@ -28,10 +28,10 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.MiniIcon
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.text.RichText
 
 @Stable

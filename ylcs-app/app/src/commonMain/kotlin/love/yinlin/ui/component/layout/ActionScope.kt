@@ -12,9 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.*
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.LoadingIcon
-import love.yinlin.ui.component.screen.BallonTip
+import love.yinlin.compose.ui.floating.BallonTip
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.LoadingIcon
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {

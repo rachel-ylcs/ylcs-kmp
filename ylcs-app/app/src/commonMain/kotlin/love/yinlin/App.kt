@@ -4,24 +4,15 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 import androidx.navigation.compose.NavHost
@@ -33,7 +24,6 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.common.uri.Uri
 import love.yinlin.compose.*
-import love.yinlin.platform.app
 import love.yinlin.ui.component.screen.FABAction
 import love.yinlin.ui.screen.*
 import love.yinlin.ui.screen.common.ScreenMain
@@ -42,7 +32,6 @@ import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg
 import love.yinlin.ui.screen.music.ScreenPartMusic
 import love.yinlin.ui.screen.world.ScreenPartWorld
-import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class ScreenPart(val model: AppModel) {
@@ -97,10 +86,11 @@ class AppModel(
 
 @Composable
 fun AppUI(
-	navController: NavHostController = rememberNavController(),
 	modifier: Modifier = Modifier.fillMaxSize()
 ) {
+	val navController = rememberNavController()
 	val appModel: AppModel = viewModel { AppModel(navController) }
+	val animationSpeed = LocalAnimationSpeed.current
 
 	DisposableEffect(Unit) {
 		DeepLinkHandler.listener = { uri ->
@@ -119,7 +109,7 @@ fun AppUI(
 			slideIntoContainer(
 				towards = AnimatedContentTransitionScope.SlideDirection.Start,
 				animationSpec = tween(
-					durationMillis = app.config.animationSpeed,
+					durationMillis = animationSpeed,
 					easing = FastOutSlowInEasing
 				)
 			)
@@ -128,7 +118,7 @@ fun AppUI(
 			slideOutOfContainer(
 				towards = AnimatedContentTransitionScope.SlideDirection.End,
 				animationSpec = tween(
-					durationMillis = app.config.animationSpeed,
+					durationMillis = animationSpeed,
 					easing = FastOutSlowInEasing
 				)
 			)

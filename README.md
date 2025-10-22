@@ -28,26 +28,30 @@
 
 ## 模块表
 
-|    Module     |     Artifact     |                 Description                  | Android | iOS | Windows | Linux | macOS | Web/Wasm |
-|:-------------:|:----------------:|:--------------------------------------------:|:-------:|:---:|:-------:|:-----:|:-----:|:--------:|
-|  `ylcs-core`  |                  |                                              |         |     |         |       |       |          |
-|               |      `base`      |                language core                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               |  `compose-base`  |                 compose core                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               |    `cs-base`     |                   C/S core                   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-| `ylcs-module` |                  |                                              |         |     |         |       |       |          |
-|               |  `compose:app`   |     fast and easy compose app framework      |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `compose:screen` |     screen page, floating and navigation     |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `compose:device` | adaptive device layout and immersive padding |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `compose:theme`  |           custom theme definition            |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `client-engine`  |                client engine                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               | `server-engine`  |                server engine                 |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
-|  `ylcs-app`   |                  |                                              |         |     |         |       |       |          |
-|               |       `cs`       |                  C/S bridge                  |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               |      `mod`       |                   song MOD                   |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               |      `app`       |                rachel client                 |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
-|               |     `server`     |                rachel server                 |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
-|               |  `mod-manager`   |               song MOD mangaer               |    ❌    |  ❌  |    ✅    |   ✅   |   ✅   |    ❌     |
-|  `ylcs-test`  |                  |               test and feature               |    ✅    |  ✅  |    ✅    |   ✅   |   ✅   |    ✅     |
+|      M0       |       M1        |          M2           |                 Description                  | Multiplatform |
+|:-------------:|:---------------:|:---------------------:|:--------------------------------------------:|:-------------:|
+|  `ylcs-core`  |                 |                       |                                              |               |
+|               |     `base`      |                       |                language core                 |       ✅       |
+|               | `compose-base`  |                       |                 compose core                 |       ✅       |
+|               |    `cs-base`    |                       |                   C/S core                   |       ✅       |
+| `ylcs-module` |                 |                       |                                              |               |
+|               |    `compose`    |                       |                                              |               |
+|               |                 |         `app`         |     fast and easy compose app framework      |       ✅       |
+|               |                 |       `screen`        |     screen page, floating and navigation     |       ✅       |
+|               |                 |       `device`        | adaptive device layout and immersive padding |       ✅       |
+|               |                 |        `theme`        |        app theme resources definition        |       ✅       |
+|               |                 |         `ui`          | custom theme and basic component definition  |       ✅       |
+|               |                 |    `component-all`    |           merge all component libs           |       ✅       |
+|               |                 | `component:url-image` |        web or local file image loader        |       ✅       |
+|               | `client-engine` |                       |                client engine                 |       ✅       |
+|               | `server-engine` |                       |                server engine                 |       ❌       |
+|  `ylcs-app`   |                 |                       |                                              |               |
+|               |                 |         `cs`          |                  C/S bridge                  |       ✅       |
+|               |                 |         `mod`         |                   song MOD                   |       ✅       |
+|               |                 |         `app`         |                rachel client                 |       ✅       |
+|               |                 |       `server`        |                rachel server                 |       ❌       |
+|               |                 |     `mod-manager`     |               song MOD mangaer               |       ❌       |
+|  `ylcs-test`  |                 |                       |               test and feature               |       ✅       |
 
 ## 源代码集依赖
 

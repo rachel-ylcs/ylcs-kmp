@@ -25,6 +25,7 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.common.uri.Scheme
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.extension.catching
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
@@ -42,7 +43,11 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
                 themeMode = app.config.themeMode,
                 fontScale = 1f,
                 mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                localProvider = arrayOf(
+                    LocalAnimationSpeed provides app.config.animationSpeed,
+                    localBalloonTipEnabled provides app.config.enabledTip
+                ),
             ) { maxWidth, _ ->
                 Content(maxWidth)
             }

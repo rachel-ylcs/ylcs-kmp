@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.AppModel
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.animation.LoadingAnimation
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.MimeType
@@ -28,7 +29,6 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.LoadingAnimation
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult

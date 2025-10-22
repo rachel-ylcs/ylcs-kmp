@@ -31,6 +31,15 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.compose.ui.text.InputType
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -39,19 +48,15 @@ import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.*
 import love.yinlin.resources.*
-import love.yinlin.ui.component.image.*
-import love.yinlin.ui.component.input.LoadingRachelButton
-import love.yinlin.ui.component.input.SecondaryButton
+import love.yinlin.compose.ui.input.LoadingClickText
+import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.ui.component.input.SingleSelector
-import love.yinlin.ui.component.input.TertiaryButton
+import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
-import love.yinlin.ui.component.text.InputType
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.rememberTextInputState
 import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.community.ScreenUserCard
 import org.jetbrains.compose.resources.getString
@@ -252,7 +257,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
             if (userProfile == null) {
                 ItemExpander(
                     title = "登录",
-                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Login, background = CustomTheme.colorScheme.warning),
+                    icon = colorfulImageVector(
+                        icon = Icons.AutoMirrored.Outlined.Login,
+                        background = CustomTheme.colorScheme.warning
+                    ),
                     color = CustomTheme.colorScheme.warning,
                     hasDivider = false,
                     onClick = {
@@ -308,12 +316,18 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                 )
                 ItemExpanderSuspend(
                     title = "重置默认图片",
-                    icon = colorfulImageVector(icon = ExtraIcons.ResetPicture, background = CustomTheme.colorScheme.warning),
+                    icon = colorfulImageVector(
+                        icon = ExtraIcons.ResetPicture,
+                        background = CustomTheme.colorScheme.warning
+                    ),
                     onClick = { resetPicture() }
                 )
                 ItemExpanderSuspend(
                     title = "退出登录",
-                    icon = colorfulImageVector(icon = Icons.AutoMirrored.Outlined.Logout, background = CustomTheme.colorScheme.warning),
+                    icon = colorfulImageVector(
+                        icon = Icons.AutoMirrored.Outlined.Logout,
+                        background = CustomTheme.colorScheme.warning
+                    ),
                     color = CustomTheme.colorScheme.warning,
                     hasDivider = false,
                     onClick = { logoff() }
@@ -356,12 +370,15 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
             Item(
                 title = "动画速度",
-                icon = colorfulImageVector(icon = Icons.Outlined.Animation, background = MaterialTheme.colorScheme.primaryContainer)
+                icon = colorfulImageVector(
+                    icon = Icons.Outlined.Animation,
+                    background = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 val animationSpeedValue = remember { intArrayOf(600, 400, 200) }
                 val animationSpeedString = remember { arrayOf("慢", "标准", "快") }
                 SingleSelector(
-                    current = app.config.animationSpeed,
+                    current = LocalAnimationSpeed.current,
                     onSelected = { app.config.animationSpeed = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
@@ -376,7 +393,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
             Item(
                 title = "字体大小",
-                icon = colorfulImageVector(icon = Icons.Outlined.FormatSize, background = MaterialTheme.colorScheme.primaryContainer)
+                icon = colorfulImageVector(
+                    icon = Icons.Outlined.FormatSize,
+                    background = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
                 val fontScaleValue = remember { floatArrayOf(0.83333f, 1f, 1.2f) }
                 val fontScaleString = remember { arrayOf("小", "标准", "大") }
@@ -396,7 +416,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
             ItemSwitch(
                 title = "音频焦点",
-                icon = colorfulImageVector(icon = Icons.Outlined.MusicNote, background = MaterialTheme.colorScheme.primaryContainer),
+                icon = colorfulImageVector(
+                    icon = Icons.Outlined.MusicNote,
+                    background = MaterialTheme.colorScheme.primaryContainer
+                ),
                 checked = app.config.audioFocus,
                 onCheckedChange = {
                     app.config.audioFocus = it
@@ -406,7 +429,10 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
 
             ItemSwitch(
                 title = "悬浮提示",
-                icon = colorfulImageVector(icon = Icons.Outlined.Lightbulb, background = MaterialTheme.colorScheme.primaryContainer),
+                icon = colorfulImageVector(
+                    icon = Icons.Outlined.Lightbulb,
+                    background = MaterialTheme.colorScheme.primaryContainer
+                ),
                 hasDivider = false,
                 checked = app.config.enabledTip,
                 onCheckedChange = {
@@ -691,7 +717,7 @@ class ScreenSettings(model: AppModel) : CommonSubScreen(model) {
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
-                LoadingRachelButton(
+                LoadingClickText(
                     text = "提交",
                     icon = Icons.Outlined.Check,
                     enabled = canSubmit,

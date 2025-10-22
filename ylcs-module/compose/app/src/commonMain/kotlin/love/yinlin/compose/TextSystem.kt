@@ -1,31 +1,8 @@
 package love.yinlin.compose
 
 import androidx.compose.material3.Typography
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.unit.sp
-
-@Stable
-data class ModeText(
-    val isBold: Boolean,
-    val small: Number,
-    val medium: Number,
-    val large: Number,
-) {
-    fun small(font: Font): TextStyle = basicTextStyle(font, small.toDouble().sp, isBold)
-    fun medium(font: Font): TextStyle = basicTextStyle(font, medium.toDouble().sp, isBold)
-    fun large(font: Font): TextStyle = basicTextStyle(font, large.toDouble().sp, isBold)
-
-    val style: TextStyle @Composable get() = mainFont().let { font ->
-        when (LocalDevice.current.size) {
-            Device.Size.SMALL -> small(font)
-            Device.Size.MEDIUM -> medium(font)
-            Device.Size.LARGE -> large(font)
-        }
-    }
-}
 
 @Stable
 data class TextSystem(

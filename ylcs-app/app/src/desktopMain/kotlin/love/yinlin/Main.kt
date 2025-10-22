@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.uri.toUri
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -117,7 +118,11 @@ fun main() {
                 themeMode = app.config.themeMode,
                 fontScale = app.config.fontScale,
                 mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                localProvider = arrayOf(
+                    LocalAnimationSpeed provides app.config.animationSpeed,
+                    localBalloonTipEnabled provides app.config.enabledTip
+                ),
             ) { _, _ ->
                 Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                     WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {

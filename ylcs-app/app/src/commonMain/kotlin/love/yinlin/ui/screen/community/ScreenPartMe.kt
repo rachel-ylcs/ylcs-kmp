@@ -52,15 +52,15 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.common.UserLabel
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.MiniImage
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelButton
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.ClickText
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.node.clickableNoRipple
-import love.yinlin.ui.component.node.condition
+import love.yinlin.compose.ui.node.clickableNoRipple
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.platform.QrcodeScanner
 import love.yinlin.ui.component.screen.FloatingArgsSheet
 import love.yinlin.ui.component.screen.FloatingSheet
@@ -87,7 +87,7 @@ private fun LevelItem(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            RachelText(
+            NormalText(
                 text = remember(item) {
                     if (item.second != Int.MAX_VALUE) "${item.first} ~ ${item.second}"
                     else "> ${item.first}"
@@ -284,7 +284,7 @@ class ScreenPartMe(model: AppModel) : ScreenPart(model) {
                         res = Res.drawable.img_not_login,
                         size = CustomTheme.size.extraImage
                     )
-                    RachelButton(
+                    ClickText(
                         text = stringResource(Res.string.login),
                         onClick = { navigate<ScreenLogin>() }
                     )

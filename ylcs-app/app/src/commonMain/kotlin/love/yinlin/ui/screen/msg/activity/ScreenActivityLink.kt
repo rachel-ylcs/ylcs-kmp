@@ -11,16 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.AppModel
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedComponent
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.platform.WebPage
 import love.yinlin.ui.component.platform.WebPageLoadingState.Finished
 import love.yinlin.ui.component.platform.WebPageSettings
 import love.yinlin.ui.component.platform.WebPageState
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 
 @Stable
 class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
@@ -58,14 +58,14 @@ class ScreenActivityLink(model: AppModel) : CommonSubScreen(model) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                        RachelButton(
+                        ClickText(
                             text = "加载",
                             enabled = showstartInput.ok,
                             onClick = {
                                 webPageState.url = "https://wap.showstart.com/pages/activity/detail/detail?activityId=${showstartInput.text}"
                             }
                         )
-                        RachelButton(
+                        ClickText(
                             text = "提取",
                             enabled = webPageState.loadingState is Finished,
                             onClick = {

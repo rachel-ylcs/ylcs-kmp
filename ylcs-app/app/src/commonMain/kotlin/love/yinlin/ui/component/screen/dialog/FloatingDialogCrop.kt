@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.platform.CropResult
-import love.yinlin.platform.ImageQuality
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.image.rememberWebImageState
-import love.yinlin.ui.component.input.RachelButton
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.image.rememberWebImageState
+import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.screen.FloatingDialog
 import kotlin.coroutines.resume
 import kotlin.math.max
@@ -403,7 +403,7 @@ class FloatingDialogCrop : FloatingDialog<CropResult>() {
                     state = cropState,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                 )
-                RachelButton(
+                ClickText(
                     text = "裁剪",
                     color = Colors.White,
                     modifier = Modifier.padding(CustomTheme.padding.equalValue),

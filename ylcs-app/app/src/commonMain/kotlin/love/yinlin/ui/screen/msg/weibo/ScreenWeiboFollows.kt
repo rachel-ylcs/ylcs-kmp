@@ -33,17 +33,17 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.LoadingCircle
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.LoadingRachelButton
+import love.yinlin.compose.ui.image.LoadingCircle
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.FloatingDialogInput
 import love.yinlin.ui.component.screen.FloatingSheet
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.rememberTextInputState
 
 @Composable
 private fun WeiboUserItem(
@@ -180,7 +180,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "导入(叠加)",
                         icon = Icons.Outlined.Download,
                         enabled = state.ok,
@@ -198,7 +198,7 @@ class ScreenWeiboFollows(model: AppModel) : CommonSubScreen(model) {
                             }
                         }
                     )
-                    LoadingRachelButton(
+                    LoadingClickText(
                         text = "导出",
                         icon = Icons.Outlined.Upload,
                         onClick = {

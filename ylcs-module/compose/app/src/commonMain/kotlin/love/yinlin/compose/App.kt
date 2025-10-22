@@ -7,6 +7,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ fun App(
     customTheme: BaseCustomTheme = LocalCustomTheme.current,
     modifier: Modifier,
     alignment: Alignment = Alignment.TopStart,
+    localProvider: Array<ProvidedValue<*>> = emptyArray(),
     content: @Composable (maxWidth: Dp, maxHeight: Dp) -> Unit
 ) {
     BoxWithConstraints(
@@ -69,7 +71,8 @@ fun App(
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground,
                     LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-                    LocalDensity provides Density(LocalDensity.current.density, fontScale)
+                    LocalDensity provides Density(LocalDensity.current.density, fontScale),
+                    *localProvider
                 ) {
                     content(maxWidth, maxHeight)
                 }

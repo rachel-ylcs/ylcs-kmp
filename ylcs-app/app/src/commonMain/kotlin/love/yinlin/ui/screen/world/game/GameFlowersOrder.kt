@@ -23,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
@@ -36,10 +38,8 @@ import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.to
 
@@ -74,7 +74,7 @@ fun ColumnScope.FlowersOrderCardInfo(game: GamePublicDetailsWithName) {
         catchingNull { game.info.to<FOInfo>() }
     }
     if (info != null) {
-        RachelText(
+        NormalText(
             text = "重试次数: ${info.tryCount}",
             icon = Icons.Outlined.RestartAlt
         )
@@ -91,7 +91,7 @@ fun ColumnScope.FlowersOrderCardQuestionAnswer(game: GameDetailsWithName) {
             text = "答案",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        RachelText(
+        NormalText(
             text = answer,
             icon = Icons.Outlined.Lightbulb,
             color = MaterialTheme.colorScheme.primary

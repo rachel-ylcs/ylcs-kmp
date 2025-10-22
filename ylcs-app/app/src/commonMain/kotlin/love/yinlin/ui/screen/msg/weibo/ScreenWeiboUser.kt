@@ -38,8 +38,8 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog

@@ -17,6 +17,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
 
 @Composable
 fun ReplaceableImage(

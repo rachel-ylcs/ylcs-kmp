@@ -27,9 +27,9 @@ import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
-import love.yinlin.ui.component.image.ClickIcon
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.layout.StatefulBox
@@ -102,14 +102,14 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RachelText(
+                    NormalText(
                         text = item.likeNum.toString(),
                         icon = Icons.Outlined.Favorite,
                         style = MaterialTheme.typography.bodySmall,
                         padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
-                    RachelText(
+                    NormalText(
                         text = item.commentNum.toString(),
                         icon = Icons.AutoMirrored.Outlined.Comment,
                         style = MaterialTheme.typography.bodySmall,
@@ -121,14 +121,14 @@ class ScreenDouyin(model: AppModel) : CommonSubScreen(model) {
                     modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RachelText(
+                    NormalText(
                         text = item.collectNum.toString(),
                         icon = Icons.Outlined.Star,
                         style = MaterialTheme.typography.bodySmall,
                         padding = CustomTheme.padding.zeroValue,
                         modifier = Modifier.weight(1f)
                     )
-                    RachelText(
+                    NormalText(
                         text = item.shareNum.toString(),
                         icon = Icons.Outlined.Share,
                         style = MaterialTheme.typography.bodySmall,

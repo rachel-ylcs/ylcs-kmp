@@ -15,6 +15,8 @@ import androidx.compose.ui.focus.focusRequester
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
@@ -27,9 +29,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.ui.component.container.PaintCanvas
 import love.yinlin.ui.component.container.PaintCanvasState
-import love.yinlin.ui.component.input.RachelText
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.screen.SubScreenSlot
 
 @Composable
@@ -45,7 +45,7 @@ fun ColumnScope.PictionaryQuestionAnswer(game: GameDetailsWithName) {
             text = "答案",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        RachelText(
+        NormalText(
             text = answer,
             icon = Icons.Outlined.Lightbulb,
             color = MaterialTheme.colorScheme.primary
@@ -68,7 +68,7 @@ fun ColumnScope.PictionaryRecordCard(answer: JsonElement, info: JsonElement) {
             text = "我的答案",
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        RachelText(
+        NormalText(
             text = data,
             icon = Icons.Outlined.Lightbulb
         )

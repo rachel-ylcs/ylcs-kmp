@@ -29,8 +29,8 @@ import love.yinlin.compose.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
-import love.yinlin.ui.component.image.MiniIcon
-import love.yinlin.ui.component.image.WebImage
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.Pagination

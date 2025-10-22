@@ -41,14 +41,14 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.resources.Res
-import love.yinlin.ui.component.image.WebImage
-import love.yinlin.ui.component.input.RachelRadioButton
-import love.yinlin.ui.component.input.RachelText
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
+import love.yinlin.compose.ui.input.Radio
+import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.ActionScope
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.SubScreen
-import love.yinlin.ui.component.text.TextInput
-import love.yinlin.ui.component.text.TextInputState
 import love.yinlin.ui.screen.music.*
 
 @Composable
@@ -73,21 +73,21 @@ private fun PlatformMusicInfoCard(
                 .zIndex(2f),
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
-            RachelText(
+            NormalText(
                 text = info.name,
                 style = MaterialTheme.typography.labelLarge,
                 icon = Icons.Outlined.MusicNote,
                 color = MaterialTheme.colorScheme.primary
             )
-            RachelText(
+            NormalText(
                 text = "ID: ${info.id}",
                 icon = Icons.Outlined.Badge
             )
-            RachelText(
+            NormalText(
                 text = "演唱: ${info.singer}",
                 icon = ExtraIcons.Artist
             )
-            RachelText(
+            NormalText(
                 text = "时长: ${info.time}",
                 icon = Icons.Outlined.Schedule
             )
@@ -322,7 +322,7 @@ class ScreenPlatformMusic(model: AppModel, args: Args) : SubScreen<ScreenPlatfor
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 PlatformMusicType.entries.fastForEach {
-                    RachelRadioButton(
+                    Radio(
                         checked = platformType == it,
                         text = it.description,
                         enabled = items.isEmpty(),

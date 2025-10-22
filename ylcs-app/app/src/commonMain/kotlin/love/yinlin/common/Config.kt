@@ -16,6 +16,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
+import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.ThemeMode
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
@@ -307,7 +308,7 @@ class KVConfig(private val kv: KV) {
 	// 主题模式
 	var themeMode: ThemeMode by enumState(ThemeMode.SYSTEM)
 	// 动画速度
-	var animationSpeed: Int by intState(400)
+	var animationSpeed: Int by intState(DefaultAnimationSpeed)
 	// 字体大小
 	var fontScale: Float by floatState(1f, "20250518")
     // 悬浮提示

@@ -1,19 +1,7 @@
 package love.yinlin.compose
 
-import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.unit.dp
-
-@Stable
-data class ModeShape(
-    val small: Number,
-    val medium: Number,
-    val large: Number,
-)
-
-private val Number.shape: CornerBasedShape get() = RoundedCornerShape(this.toDouble().dp)
 
 @Stable
 data class ShapeSystem(
