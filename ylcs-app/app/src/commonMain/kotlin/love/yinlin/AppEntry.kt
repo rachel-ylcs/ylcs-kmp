@@ -12,36 +12,9 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
 import love.yinlin.screen.common.ScreenMain
 
-//@Stable
-//abstract class ScreenPart(val model: AppModel) {
-//	val firstLoad = LaunchFlag()
-//
-//	val slot: SubScreenSlot get() = model.slot
-//
-//	fun launch(block: suspend CoroutineScope.() -> Unit): Job = model.launch(block = block)
-//	inline fun <reified A : Any> navigate(route: A, options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate(route, options, extras)
-//	inline fun <reified T : Screen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = model.navigate<T>(options, extras)
-//	fun deeplink(uri: Uri) = model.deeplink.process(uri)
-//
-//	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
-//
-//	open suspend fun initialize() {}
-//	open suspend fun update() {}
-//
-//	@Composable
-//	abstract fun Content()
-//
-//	open val fabIcon: ImageVector? get() = null
-//	open val fabCanExpand: Boolean get() = false
-//	open val fabMenus: Array<FABAction> = emptyArray()
-//	open suspend fun onFabClick() {}
-//
-//	@Composable
-//	open fun Floating() {}
-//}
+// ScreenMain
 
 // val deeplink = DeepLink(this)
-
 
 //	DisposableEffect(Unit) {
 //		DeepLinkHandler.listener = { uri ->

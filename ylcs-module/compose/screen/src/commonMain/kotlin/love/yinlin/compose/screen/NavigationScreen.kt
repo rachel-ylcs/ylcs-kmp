@@ -1,35 +1,52 @@
 package love.yinlin.compose.screen
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.ui.floating.FABAction
 
 @Stable
 abstract class NavigationScreen<A, E>(manager: ScreenManager) : BasicScreen<A>(manager) {
     abstract val pages: List<E>
     abstract val subs: List<SubScreen>
 
-    private var pageIndex by mutableIntStateOf(0)
+    var pageIndex by mutableIntStateOf(0)
 
     @Composable
-    protected abstract fun Wrapper(device: Device, page: E, content: @Composable (Device) -> Unit)
-
-    @Composable
-    protected abstract fun Content(device: Device, page: E)
+    protected abstract fun Wrapper(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit)
 
     @Composable
     override fun BasicContent() {
-        val device = LocalDevice.current
-        Wrapper(device, pages[pageIndex]) {
+        Wrapper(LocalDevice.current, pageIndex) { device, modifier ->
             AnimatedContent(targetState = pageIndex) { index ->
-                Content(device, pages[index])
+                Box(modifier = modifier) {
+                    subs[index].Content(device)
+                }
+            }
+
+            LaunchedEffect(pageIndex) {
+                val subScreen = subs[pageIndex]
+                subScreen.firstLoad(
+                    update = { launch { subScreen.initialize(true) } },
+                    init = { launch { subScreen.initialize(false) } }
+                )
             }
         }
     }
 
-    var current: E get() = pages[pageIndex]
-        set(value) { pageIndex = pages.indexOf(value) }
+    override val fabIcon: ImageVector? get() = subs[pageIndex].fabIcon
+    override val fabCanExpand: Boolean get() = subs[pageIndex].fabCanExpand
+    override val fabMenus: Array<FABAction> get() = subs[pageIndex].fabMenus
+    override suspend fun onFabClick() = subs[pageIndex].onFabClick()
+
+    @Composable
+    override fun Floating() {
+        subs[pageIndex].Floating()
+    }
 }
 
 typealias CommonNavigationScreen<E> = NavigationScreen<Unit, E>

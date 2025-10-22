@@ -16,11 +16,17 @@ import kotlinx.serialization.Serializable
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.screen.CommonNavigationScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.resources.*
+import love.yinlin.screen.account.SubScreenMe
+import love.yinlin.screen.community.SubScreenDiscovery
+import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.screen.music.SubScreenMusic
+import love.yinlin.screen.world.SubScreenWorld
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
 import org.jetbrains.compose.resources.DrawableResource
@@ -130,16 +136,59 @@ private fun LandscapeNavigation(
 class ScreenMain(manager: ScreenManager) : CommonNavigationScreen<TabItem>(manager) {
     override val pages: List<TabItem> = TabItem.entries
     override val subs: List<SubScreen> = listOf(
-
+        SubScreenMsg(this),
+        SubScreenWorld(this),
+        SubScreenMusic(this),
+        SubScreenDiscovery(this),
+        SubScreenMe(this)
     )
 
     @Composable
-    override fun Wrapper(device: Device, page: TabItem, content: @Composable (Device) -> Unit) {
-        content(device)
+    private fun Portrait(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutBottom) {
+                content(device, Modifier.fillMaxWidth().weight(1f))
+            }
+            CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutTop) {
+                PortraitNavigation(
+                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    currentPage = index,
+                    onNavigate = { pageIndex = it }
+                )
+            }
+        }
     }
 
     @Composable
-    override fun Content(device: Device, page: TabItem) {
-        Text(text = stringResource(page.title))
+    private fun Landscape(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutEnd) {
+                LandscapeNavigation(
+                    modifier = Modifier.fillMaxHeight(),
+                    currentPage = index,
+                    onNavigate = { pageIndex = it }
+                )
+            }
+            CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutStart) {
+                content(device, Modifier.weight(1f).fillMaxHeight())
+            }
+        }
+    }
+
+    @Composable
+    override fun Wrapper(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+        val immersivePadding = rememberImmersivePadding()
+        CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+            when (device.type) {
+                Device.Type.PORTRAIT -> Portrait(device, index, content)
+                Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(device, index, content)
+            }
+        }
     }
 }
