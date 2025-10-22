@@ -46,6 +46,7 @@ kotlin {
                 projects.ylcsModule.compose.ui,
                 libs.compose.ui.backhandler,
                 libs.compose.navigation,
+                libs.compose.navigation.event,
                 libs.compose.components.resources,
             )
         }

@@ -84,6 +84,8 @@ abstract class BasicScreen<A>(val manager: ScreenManager) : ViewModel() {
     inline fun <reified T : BasicScreen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate<T>(options, extras)
     fun pop() = manager.pop()
     fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
+
+    // 深层链接
 }
 
 typealias CommonBasicScreen = BasicScreen<Unit>

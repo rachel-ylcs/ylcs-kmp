@@ -19,7 +19,7 @@ import org.jetbrains.compose.resources.FontResource
 
 @Composable
 fun App(
-    deviceFactory: (maxWidth: Dp, maxHeight: Dp) -> Device,
+    deviceFactory: (maxWidth: Dp, maxHeight: Dp) -> Device = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
     themeMode: ThemeMode,
     fontScale: Float,
     mainFontResource: FontResource,

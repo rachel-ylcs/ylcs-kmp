@@ -7,7 +7,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
 import love.yinlin.extension.replaceAll
-import love.yinlin.ui.screen.music.audioPath
+// import love.yinlin.ui.screen.music.audioPath
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.media.MediaRef
@@ -131,9 +131,9 @@ class ActualMusicFactory : MusicFactory() {
     private fun MediaPlayer.innerGotoIndex(index: Int, playing: Boolean = true) {
         if (index in 0 ..< musicList.size) {
             currentIndex = index
-            val uri = musicList[currentIndex].audioPath.toString()
-            if (playing) media().play(uri)
-            else media().prepare(uri)
+            // val uri = musicList[currentIndex].audioPath.toString()
+            //if (playing) media().play(uri)
+            // else media().prepare(uri)
         }
         else innerStop()
     }
