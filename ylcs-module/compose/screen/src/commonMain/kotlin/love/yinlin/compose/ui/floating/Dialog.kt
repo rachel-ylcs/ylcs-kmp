@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -27,13 +27,14 @@ import love.yinlin.compose.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.node.clickableNoRipple
-import love.yinlin.resources.*
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.text.InputType
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.layout.LoadingBox
+import love.yinlin.compose.ui.layout.LoadingBox
+import love.yinlin.compose.screen.resources.Res
+import love.yinlin.compose.screen.resources.*
 import org.jetbrains.compose.resources.stringResource
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume

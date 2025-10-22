@@ -45,8 +45,8 @@ import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
 import love.yinlin.compose.ui.image.IconText
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.SplitLayout
+import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenVideo
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage

@@ -35,8 +35,8 @@ import love.yinlin.resources.img_showstart
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage

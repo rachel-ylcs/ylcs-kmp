@@ -17,18 +17,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import love.yinlin.AppEntry
 import love.yinlin.common.uri.Scheme
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.extension.catching
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 import java.util.UUID
 
 @Stable
@@ -38,18 +38,13 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
         setViewTreeSavedStateRegistryOwner(activity)
         setViewTreeViewModelStoreOwner(activity)
         setContent {
-            App(
-                deviceFactory = { maxWidth, _ -> Device(maxWidth) },
-                themeMode = app.config.themeMode,
-                fontScale = 1f,
-                mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxWidth(),
-                localProvider = arrayOf(
-                    LocalAnimationSpeed provides app.config.animationSpeed,
-                    localBalloonTipEnabled provides app.config.enabledTip
-                ),
-            ) { maxWidth, _ ->
-                Content(maxWidth)
+            AppEntry(
+                fill = false,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
+                    Content(maxWidth)
+                }
             }
         }
     }

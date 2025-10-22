@@ -21,8 +21,8 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.common.ScreenImagePreview
 

@@ -55,6 +55,11 @@ kotlin {
     }
 }
 
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "${C.app.packageName}.compose.ui.resources"
+}
+
 android {
     namespace = "${C.app.packageName}.module.compose.ui"
     compileSdk = C.android.compileSdk

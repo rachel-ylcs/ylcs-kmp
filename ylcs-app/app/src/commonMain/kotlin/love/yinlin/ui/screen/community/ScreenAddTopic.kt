@@ -18,6 +18,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.Data
@@ -34,8 +35,7 @@ import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.input.SingleSelector
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.RichEditor
 import love.yinlin.ui.component.text.RichEditorState

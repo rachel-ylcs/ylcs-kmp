@@ -46,7 +46,7 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.Radio
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.music.*

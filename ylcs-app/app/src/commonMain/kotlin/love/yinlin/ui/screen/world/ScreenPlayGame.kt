@@ -28,15 +28,12 @@ import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
-import love.yinlin.resources.img_state_loading
-import love.yinlin.resources.img_state_network_error
-import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.LoadingSecondaryButton
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.StatusBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.screen.world.game.GameItem
@@ -129,10 +126,7 @@ class ScreenPlayGame(model: AppModel) : CommonSubScreen(model) {
                                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    MiniIcon(
-                                        res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
-                                        size = CustomTheme.size.largeImage
-                                    )
+                                    StatusBox(ok = result.isCompleted, size = CustomTheme.size.largeImage)
                                     Column(
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 1.5f)

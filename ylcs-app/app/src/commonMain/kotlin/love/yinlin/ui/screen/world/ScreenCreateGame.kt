@@ -26,7 +26,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.platform.app
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.world.game.GameSlider
 import love.yinlin.ui.screen.world.game.cast

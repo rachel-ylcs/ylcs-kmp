@@ -48,9 +48,9 @@ import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.LoadingPrimaryButton
 import love.yinlin.compose.ui.input.LoadingSecondaryButton
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.layout.SplitLayout
+import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState

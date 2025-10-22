@@ -24,10 +24,10 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.world.game.GameItem
 

@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.layout
+package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

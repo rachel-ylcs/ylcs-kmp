@@ -30,7 +30,7 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 
 @Stable
 private object RichEditorParser {

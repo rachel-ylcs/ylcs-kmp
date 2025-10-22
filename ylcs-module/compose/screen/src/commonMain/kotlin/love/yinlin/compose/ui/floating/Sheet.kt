@@ -1,9 +1,10 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
@@ -97,7 +98,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
                 .onSizeChanged { height = it.height }
                 .draggable(
                     state = rememberDraggableState(onDelta),
-                    orientation = androidx.compose.foundation.gestures.Orientation.Vertical,
+                    orientation = Orientation.Vertical,
                     onDragStopped = { onStop() }
                 )
                 .nestedScroll(connection = remember { object : NestedScrollConnection {
@@ -156,7 +157,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
                 .offset { IntOffset(x = animatedOffset, y = 0) }
                 .draggable(
                     state = rememberDraggableState(onDelta),
-                    orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                    orientation = Orientation.Horizontal,
                     onDragStopped = { onStop() }
                 )
                 .nestedScroll(connection = remember { object : NestedScrollConnection {

@@ -54,8 +54,8 @@ import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingDialogInput
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.screen.community.ScreenLogin
 import love.yinlin.ui.screen.community.ScreenUserCard

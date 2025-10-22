@@ -58,12 +58,12 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.platform.QrcodeScanner
-import love.yinlin.ui.component.screen.FloatingArgsSheet
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.ui.screen.common.ScreenTest
 import love.yinlin.ui.screen.settings.ScreenSettings
 import love.yinlin.ui.screen.msg.activity.ScreenActivityLink

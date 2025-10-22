@@ -31,16 +31,16 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.to
 import love.yinlin.platform.app
-import love.yinlin.resources.Res
 import love.yinlin.resources.img_not_login
-import love.yinlin.resources.img_state_loading
-import love.yinlin.resources.img_state_network_error
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
+import love.yinlin.compose.ui.layout.StatusBox
 import love.yinlin.ui.screen.world.game.GameRecordCard
 
 @Stable
@@ -198,7 +198,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         MiniIcon(
-                            res = Res.drawable.img_not_login,
+                            res = love.yinlin.resources.Res.drawable.img_not_login,
                             size = CustomTheme.size.mediumImage
                         )
                         Text(
@@ -223,10 +223,7 @@ class ScreenGameRecordHistory(model: AppModel) : CommonSubScreen(model) {
                                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                MiniIcon(
-                                    res = if (result.isCompleted) Res.drawable.img_state_loading else Res.drawable.img_state_network_error,
-                                    size = CustomTheme.size.mediumImage
-                                )
+                                StatusBox(ok = result.isCompleted, size = CustomTheme.size.mediumImage)
                                 Text(
                                     text = if (result.isCompleted) "成功" else "失败",
                                     style = MaterialTheme.typography.displayMedium,

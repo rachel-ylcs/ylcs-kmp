@@ -4,9 +4,8 @@ import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
-import love.yinlin.ui.component.screen.FloatingDialogProgress
+import love.yinlin.compose.ui.floating.FloatingDialogProgress
 
 @Stable
 class FloatingDownloadDialog : FloatingDialogProgress() {

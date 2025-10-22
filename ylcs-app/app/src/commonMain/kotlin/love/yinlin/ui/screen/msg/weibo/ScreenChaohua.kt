@@ -16,13 +16,13 @@ import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 

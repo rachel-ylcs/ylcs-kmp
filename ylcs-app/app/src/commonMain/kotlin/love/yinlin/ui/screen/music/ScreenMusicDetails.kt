@@ -44,10 +44,10 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
-import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 

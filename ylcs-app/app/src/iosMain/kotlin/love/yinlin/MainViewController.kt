@@ -1,19 +1,13 @@
 package love.yinlin
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.delay
-import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.platform.appNative
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 import platform.UIKit.UIViewController
 
 lateinit var controller: UIViewController
@@ -41,18 +35,8 @@ fun MainViewController(): UIViewController {
             }
         }
     ) {
-        App(
-            deviceFactory = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
-            themeMode = app.config.themeMode,
-            fontScale = app.config.fontScale,
-            mainFontResource = Res.font.xwwk,
-            modifier = Modifier.fillMaxSize(),
-            localProvider = arrayOf(
-                LocalAnimationSpeed provides app.config.animationSpeed,
-                localBalloonTipEnabled provides app.config.enabledTip
-            ),
-        ) { _, _ ->
-            AppUI()
+        AppEntry {
+            ScreenEntry()
         }
     }.apply {
         controller = this

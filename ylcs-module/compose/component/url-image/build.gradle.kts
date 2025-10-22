@@ -58,6 +58,11 @@ kotlin {
     }
 }
 
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "${C.app.packageName}.compose.component.url_image.resources"
+}
+
 android {
     namespace = "${C.app.packageName}.module.compose.component.url_image"
     compileSdk = C.android.compileSdk

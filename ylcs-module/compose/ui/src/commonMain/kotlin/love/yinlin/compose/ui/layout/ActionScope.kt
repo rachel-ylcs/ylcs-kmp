@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.layout
+package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.compose.*
+import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.ui.floating.BallonTip
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.LoadingIcon
@@ -36,7 +36,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+            modifier = Modifier.Companion.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -65,7 +65,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+            modifier = Modifier.Companion.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -86,13 +86,13 @@ sealed class ActionScope(private val ltr: Boolean) {
 
     @Composable
     fun ActionLayout(
-        modifier: Modifier = Modifier,
+        modifier: Modifier = Modifier.Companion,
         block: @Composable ActionScope.() -> Unit
     ) {
         Row(
             modifier = modifier,
             horizontalArrangement = if (ltr) Arrangement.Start else Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Companion.CenterVertically
         ) {
             Actions(block)
         }

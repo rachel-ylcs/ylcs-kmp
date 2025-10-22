@@ -50,7 +50,7 @@ import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.ui.component.screen.FABAction
+import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.ui.screen.community.BoxText
 import love.yinlin.ui.screen.world.battle.ScreenGuessLyrics
 import love.yinlin.ui.screen.world.single.rhyme.ScreenRhyme

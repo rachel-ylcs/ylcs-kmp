@@ -35,12 +35,12 @@ import com.github.panpf.sketch.request.pauseLoadWhenScrolling
 import com.github.panpf.sketch.state.ColorPainterStateImage
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.LocalAnimationSpeed
+import love.yinlin.compose.component.url_image.resources.Res
+import love.yinlin.compose.component.url_image.resources.placeholder_pic
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.roundToIntOffset
 import love.yinlin.compose.ui.node.condition
 import org.jetbrains.compose.resources.imageResource
-import ylcs_kmp.ylcs_module.compose.component.url_image.generated.resources.Res
-import ylcs_kmp.ylcs_module.compose.component.url_image.generated.resources.placeholder_pic
 
 @Composable
 internal fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = remember(uri, key) {

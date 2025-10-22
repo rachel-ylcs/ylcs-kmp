@@ -39,7 +39,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.jvm.JvmInline
 import kotlin.math.min

@@ -29,7 +29,7 @@ import love.yinlin.platform.CropResult
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.rememberWebImageState
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.screen.FloatingDialog
+import love.yinlin.compose.ui.floating.FloatingDialog
 import kotlin.coroutines.resume
 import kotlin.math.max
 import kotlin.math.min

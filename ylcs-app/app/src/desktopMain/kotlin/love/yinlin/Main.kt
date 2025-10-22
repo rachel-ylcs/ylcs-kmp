@@ -22,13 +22,11 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.uri.toUri
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
-import love.yinlin.resources.xwwk
 import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -113,17 +111,7 @@ fun main() {
             }
 
             // Content
-            App(
-                deviceFactory = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
-                themeMode = app.config.themeMode,
-                fontScale = app.config.fontScale,
-                mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxSize(),
-                localProvider = arrayOf(
-                    LocalAnimationSpeed provides app.config.animationSpeed,
-                    localBalloonTipEnabled provides app.config.enabledTip
-                ),
-            ) { _, _ ->
+            AppEntry {
                 Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                     WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                         AppTopBar(modifier = Modifier.fillMaxWidth()
@@ -186,7 +174,7 @@ fun main() {
                             }
                         }
                     }
-                    AppUI(modifier = Modifier.fillMaxWidth().weight(1f))
+                    ScreenEntry(modifier = Modifier.fillMaxWidth().weight(1f))
                 }
             }
         }

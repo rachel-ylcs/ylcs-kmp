@@ -30,8 +30,8 @@ import love.yinlin.extension.DateEx
 import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid

@@ -46,9 +46,15 @@ kotlin {
                 projects.ylcsModule.compose.ui,
                 libs.compose.ui.backhandler,
                 libs.compose.navigation,
+                libs.compose.components.resources,
             )
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "${C.app.packageName}.compose.screen.resources"
 }
 
 android {

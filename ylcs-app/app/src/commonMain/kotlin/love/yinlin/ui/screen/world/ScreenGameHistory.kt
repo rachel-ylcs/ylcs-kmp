@@ -23,12 +23,12 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.screen.world.game.GameCardQuestionAnswer
 import love.yinlin.ui.screen.world.game.GameItem
 

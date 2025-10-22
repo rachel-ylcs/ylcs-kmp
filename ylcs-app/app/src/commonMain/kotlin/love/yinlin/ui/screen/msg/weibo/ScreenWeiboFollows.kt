@@ -38,12 +38,12 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.compose.ui.input.LoadingClickText
-import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.StatefulBox
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingDialogInput
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 
 @Composable
 private fun WeiboUserItem(

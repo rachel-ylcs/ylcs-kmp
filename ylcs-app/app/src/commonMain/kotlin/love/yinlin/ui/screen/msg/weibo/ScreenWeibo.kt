@@ -14,13 +14,13 @@ import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.BoxState
-import love.yinlin.ui.component.layout.StatefulBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 

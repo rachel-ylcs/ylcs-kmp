@@ -29,7 +29,11 @@ import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.SplitLayout
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.screen.common.ScreenImagePreview
 
 @Stable

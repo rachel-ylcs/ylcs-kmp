@@ -5,17 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.core.view.WindowInsetsControllerCompat
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.app
 import love.yinlin.platform.appNative
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,22 +30,12 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            App(
-                deviceFactory = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
-                themeMode = app.config.themeMode,
-                fontScale = app.config.fontScale,
-                mainFontResource = Res.font.xwwk,
-                modifier = Modifier.fillMaxSize(),
-                localProvider = arrayOf(
-                    LocalAnimationSpeed provides app.config.animationSpeed,
-                    localBalloonTipEnabled provides app.config.enabledTip
-                ),
-            ) { _, _ ->
+            AppEntry {
                 val isDarkMode = LocalDarkMode.current
                 LaunchedEffect(isDarkMode) {
                     WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isDarkMode
                 }
-                AppUI()
+                ScreenEntry()
             }
         }
     }

@@ -57,9 +57,9 @@ import love.yinlin.compose.ui.image.LoadingCircle
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Switch
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.LoadingBox
-import love.yinlin.ui.component.layout.SplitLayout
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.LoadingBox
+import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.ui.component.platform.Orientation

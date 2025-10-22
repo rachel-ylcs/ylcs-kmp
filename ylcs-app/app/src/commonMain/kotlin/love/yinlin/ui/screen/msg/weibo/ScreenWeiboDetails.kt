@@ -15,12 +15,12 @@ import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.AppModel
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.ui.component.layout.EmptyBox
-import love.yinlin.ui.component.layout.LoadingBox
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.text.RichText

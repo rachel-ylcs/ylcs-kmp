@@ -31,12 +31,12 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.layout.EmptyBox
 
 @Composable
 private fun SongCard(

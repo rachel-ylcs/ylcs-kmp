@@ -35,7 +35,7 @@ import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.ui.component.screen.SubScreen

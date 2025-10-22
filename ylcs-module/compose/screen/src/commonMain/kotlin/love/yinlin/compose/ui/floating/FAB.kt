@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.BallonTip
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition

@@ -12,7 +12,7 @@ import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Space
 import org.jetbrains.compose.resources.stringResource
 

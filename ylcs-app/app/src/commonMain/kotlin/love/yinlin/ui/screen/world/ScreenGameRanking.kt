@@ -40,7 +40,7 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.community.ScreenUserCard
 

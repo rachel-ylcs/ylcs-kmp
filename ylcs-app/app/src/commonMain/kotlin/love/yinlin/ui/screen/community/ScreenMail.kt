@@ -31,12 +31,12 @@ import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 import love.yinlin.ui.screen.common.ScreenWebpage.Companion.gotoWebPage

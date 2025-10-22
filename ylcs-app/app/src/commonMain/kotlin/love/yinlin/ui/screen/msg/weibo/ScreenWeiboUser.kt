@@ -40,6 +40,11 @@ import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.LoadingBox
+import love.yinlin.compose.ui.layout.SimpleEmptyBox
+import love.yinlin.compose.ui.layout.SimpleLoadingBox
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog

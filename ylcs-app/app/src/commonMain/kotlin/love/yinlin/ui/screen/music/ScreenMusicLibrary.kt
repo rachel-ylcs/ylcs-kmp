@@ -23,6 +23,10 @@ import kotlinx.io.files.SystemFileSystem
 import love.yinlin.AppModel
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FloatingDialogChoice
+import love.yinlin.compose.ui.floating.FloatingDialogDynamicChoice
+import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
@@ -38,8 +42,8 @@ import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.*
 import love.yinlin.ui.screen.music.loader.ScreenCreateMusic
 import love.yinlin.ui.screen.music.loader.ScreenImportMusic

@@ -42,9 +42,9 @@ import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.SimpleEmptyBox
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.screen.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.layout.SimpleEmptyBox
 import love.yinlin.ui.screen.SubScreenSlot
 import kotlin.to
 

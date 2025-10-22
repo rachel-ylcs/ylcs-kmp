@@ -27,7 +27,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.ZoomWebImage
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog

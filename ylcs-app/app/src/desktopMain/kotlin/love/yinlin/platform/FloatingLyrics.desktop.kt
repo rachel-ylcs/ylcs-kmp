@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -18,10 +20,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import love.yinlin.AppEntry
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 import love.yinlin.compose.ui.node.condition
 
 @Stable
@@ -80,22 +80,11 @@ class ActualFloatingLyrics : FloatingLyrics() {
 
                 currentLyrics?.let { lyrics ->
                     DragArea(enabled = floatingLyrics.canMove) {
-                        App(
-                            deviceFactory = { maxWidth, _ -> Device(maxWidth) },
-                            themeMode = app.config.themeMode,
-                            fontScale = 1f,
-                            mainFontResource = Res.font.xwwk,
-                            modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) },
-                            alignment = Alignment.Center,
-                            localProvider = arrayOf(
-                                LocalAnimationSpeed provides app.config.animationSpeed,
-                                localBalloonTipEnabled provides app.config.enabledTip
-                            ),
-                        ) { _, _ ->
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
+                        AppEntry(
+                            fill = false,
+                            modifier = Modifier.fillMaxSize().condition(floatingLyrics.canMove) { background(Colors.Black.copy(alpha = 0.3f)) }
+                        ) {
+                            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
                                 Text(
                                     text = lyrics,
                                     style = MaterialTheme.typography.displayMedium.copy(
@@ -105,7 +94,9 @@ class ActualFloatingLyrics : FloatingLyrics() {
                                     textAlign = TextAlign.Center,
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
+                                    modifier = Modifier.background(color = Colors(config.backgroundColor))
+                                        .padding(CustomTheme.padding.value)
+                                        .align(Alignment.Center)
                                 )
                             }
                         }

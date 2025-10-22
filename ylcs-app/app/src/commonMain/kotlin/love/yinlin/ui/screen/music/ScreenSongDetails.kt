@@ -49,10 +49,10 @@ import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationColumn
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.ui.component.screen.SubScreen
 import love.yinlin.ui.screen.community.UserBar
 

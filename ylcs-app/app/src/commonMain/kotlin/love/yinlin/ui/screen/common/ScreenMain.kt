@@ -22,10 +22,10 @@ import love.yinlin.AppModel
 import love.yinlin.compose.*
 import love.yinlin.resources.*
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.ui.component.layout.EmptyBox
 import love.yinlin.ui.component.layout.EqualItem
 import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.component.screen.FABLayout
+import love.yinlin.compose.ui.floating.FABLayout
+import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.ui.screen.Screen
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource

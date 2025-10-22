@@ -32,12 +32,12 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.BoxState
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.screen.FABAction
+import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 
 @Stable
 @Serializable

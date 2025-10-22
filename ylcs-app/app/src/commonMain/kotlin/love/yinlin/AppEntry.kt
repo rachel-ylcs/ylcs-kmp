@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -24,9 +26,15 @@ import kotlinx.coroutines.launch
 import love.yinlin.common.*
 import love.yinlin.common.uri.Uri
 import love.yinlin.compose.*
-import love.yinlin.ui.component.screen.FABAction
+import love.yinlin.compose.screen.AppScreen
+import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.ui.floating.localBalloonTipEnabled
+import love.yinlin.platform.app
+import love.yinlin.resources.Res
+import love.yinlin.resources.xwwk
+import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.screen.common.ScreenMain
 import love.yinlin.ui.screen.*
-import love.yinlin.ui.screen.common.ScreenMain
 import love.yinlin.ui.screen.community.ScreenPartDiscovery
 import love.yinlin.ui.screen.community.ScreenPartMe
 import love.yinlin.ui.screen.msg.ScreenPartMsg
@@ -84,48 +92,75 @@ class AppModel(
 	}
 }
 
+//@Composable
+//fun AppUI(
+//	modifier: Modifier = Modifier.fillMaxSize()
+//) {
+//	val navController = rememberNavController()
+//	val appModel: AppModel = viewModel { AppModel(navController) }
+//	val animationSpeed = LocalAnimationSpeed.current
+//
+//	DisposableEffect(Unit) {
+//		DeepLinkHandler.listener = { uri ->
+//			appModel.deeplink.process(uri)
+//		}
+//		onDispose {
+//			DeepLinkHandler.listener = null
+//		}
+//	}
+//
+//	NavHost(
+//		modifier = modifier.background(MaterialTheme.colorScheme.background),
+//		navController = navController,
+//		startDestination = route<ScreenMain>(),
+//		enterTransition = {
+//			slideIntoContainer(
+//				towards = AnimatedContentTransitionScope.SlideDirection.Start,
+//				animationSpec = tween(
+//					durationMillis = animationSpeed,
+//					easing = FastOutSlowInEasing
+//				)
+//			)
+//		},
+//		exitTransition = {
+//			slideOutOfContainer(
+//				towards = AnimatedContentTransitionScope.SlideDirection.End,
+//				animationSpec = tween(
+//					durationMillis = animationSpeed,
+//					easing = FastOutSlowInEasing
+//				)
+//			)
+//		}
+//	) {
+//		with(ScreenRouteScope(this, appModel)) {
+//			screens()
+//		}
+//	}
+//}
+
 @Composable
-fun AppUI(
-	modifier: Modifier = Modifier.fillMaxSize()
+fun AppEntry(
+	fill: Boolean = true,
+	modifier: Modifier = Modifier.fillMaxSize(),
+	content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
-	val navController = rememberNavController()
-	val appModel: AppModel = viewModel { AppModel(navController) }
-	val animationSpeed = LocalAnimationSpeed.current
+	App(
+		deviceFactory = { maxWidth, maxHeight -> if (fill) Device(maxWidth, maxHeight) else Device(maxWidth) },
+		themeMode = app.config.themeMode,
+		fontScale = app.config.fontScale,
+		mainFontResource = Res.font.xwwk,
+		modifier = modifier,
+		localProvider = arrayOf(
+			LocalAnimationSpeed provides app.config.animationSpeed,
+			localBalloonTipEnabled provides app.config.enabledTip
+		),
+		content = content
+	)
+}
 
-	DisposableEffect(Unit) {
-		DeepLinkHandler.listener = { uri ->
-			appModel.deeplink.process(uri)
-		}
-		onDispose {
-			DeepLinkHandler.listener = null
-		}
-	}
-
-	NavHost(
-		modifier = modifier.background(MaterialTheme.colorScheme.background),
-		navController = navController,
-		startDestination = route<ScreenMain>(),
-		enterTransition = {
-			slideIntoContainer(
-				towards = AnimatedContentTransitionScope.SlideDirection.Start,
-				animationSpec = tween(
-					durationMillis = animationSpeed,
-					easing = FastOutSlowInEasing
-				)
-			)
-		},
-		exitTransition = {
-			slideOutOfContainer(
-				towards = AnimatedContentTransitionScope.SlideDirection.End,
-				animationSpec = tween(
-					durationMillis = animationSpeed,
-					easing = FastOutSlowInEasing
-				)
-			)
-		}
-	) {
-		with(ScreenRouteScope(this, appModel)) {
-			screens()
-		}
+@Composable
+fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
+	AppScreen<ScreenMain>(modifier = modifier) {
+		screen(::ScreenMain)
 	}
 }

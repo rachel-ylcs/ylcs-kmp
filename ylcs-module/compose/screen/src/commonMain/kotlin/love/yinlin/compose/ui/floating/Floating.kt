@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -10,14 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -78,12 +71,14 @@ abstract class Floating<A : Any> {
             )
         )
 
-        Box(modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
-            .zIndex(zIndex)
-            .clickableNoRipple {
-                if (dismissOnClickOutside) close()
-            },
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = alpha))
+                .zIndex(zIndex)
+                .clickableNoRipple {
+                    if (dismissOnClickOutside) close()
+                },
             contentAlignment = remember(device) { alignment(device) }
         ) {
             AnimatedVisibility(

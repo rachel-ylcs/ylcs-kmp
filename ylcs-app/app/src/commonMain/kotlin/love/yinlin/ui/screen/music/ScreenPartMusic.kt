@@ -61,7 +61,9 @@ import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.compose.ui.node.clickableNoRipple
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.compose.ui.layout.SplitActionLayout
+import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.ui.screen.common.ScreenVideo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -74,31 +76,31 @@ private fun PlayingMusicStatusCard(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier
 ) {
-	SplitLayout(
-		modifier = modifier.clickable {
-			if (!isCurrent) onClick()
-		}.padding(CustomTheme.padding.extraValue),
-		horizontalArrangement = CustomTheme.padding.horizontalSpace,
-		aspectRatio = 2f,
-		left = {
-			Text(
-				text = musicInfo.name,
-				style = MaterialTheme.typography.labelMedium,
-				color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-				maxLines = 1,
-				overflow = TextOverflow.MiddleEllipsis
-			)
-		},
-		right = {
-			Text(
-				text = musicInfo.singer,
-				style = MaterialTheme.typography.bodySmall,
-				maxLines = 1,
-				overflow = TextOverflow.MiddleEllipsis,
-				color = MaterialTheme.colorScheme.onSurfaceVariant,
-			)
-		}
-	)
+    SplitLayout(
+        modifier = modifier.clickable {
+            if (!isCurrent) onClick()
+        }.padding(CustomTheme.padding.extraValue),
+        horizontalArrangement = CustomTheme.padding.horizontalSpace,
+        aspectRatio = 2f,
+        left = {
+            Text(
+                text = musicInfo.name,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis
+            )
+        },
+        right = {
+            Text(
+                text = musicInfo.singer,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    )
 }
 
 @Stable
@@ -161,44 +163,44 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 
 	@Composable
 	private fun ToolLayout(modifier: Modifier = Modifier) {
-		SplitActionLayout(
-			modifier = modifier,
-			left = {
-				Action(
-					icon = Icons.Outlined.LibraryMusic,
+        SplitActionLayout(
+            modifier = modifier,
+            left = {
+                Action(
+                    icon = Icons.Outlined.LibraryMusic,
                     tip = "曲库",
-					color = Colors.White
-				) {
-					if (app.musicFactory.isInit) navigate<ScreenMusicLibrary>()
-					else slot.tip.warning("播放器尚未初始化")
-				}
-				Action(
-					icon = Icons.AutoMirrored.Outlined.QueueMusic,
+                    color = Colors.White
+                ) {
+                    if (app.musicFactory.isInit) navigate<ScreenMusicLibrary>()
+                    else slot.tip.warning("播放器尚未初始化")
+                }
+                Action(
+                    icon = Icons.AutoMirrored.Outlined.QueueMusic,
                     tip = "歌单",
-					color = Colors.White
-				) {
-					if (app.musicFactory.isInit) navigate<ScreenPlaylistLibrary>()
-					else slot.tip.warning("播放器尚未初始化")
-				}
-				Action(
-					icon = Icons.Outlined.Lyrics,
+                    color = Colors.White
+                ) {
+                    if (app.musicFactory.isInit) navigate<ScreenPlaylistLibrary>()
+                    else slot.tip.warning("播放器尚未初始化")
+                }
+                Action(
+                    icon = Icons.Outlined.Lyrics,
                     tip = "歌词",
-					color = Colors.White
-				) {
-					if (app.musicFactory.isInit) navigate<ScreenFloatingLyrics>()
-					else slot.tip.warning("播放器尚未初始化")
-				}
-			},
-			right = {
-				Action(
-					icon = Icons.Outlined.AlarmOn,
+                    color = Colors.White
+                ) {
+                    if (app.musicFactory.isInit) navigate<ScreenFloatingLyrics>()
+                    else slot.tip.warning("播放器尚未初始化")
+                }
+            },
+            right = {
+                Action(
+                    icon = Icons.Outlined.AlarmOn,
                     tip = "睡眠模式",
-					color = Colors.White
-				) {
-					sleepModeSheet.open()
-				}
-			}
-		)
+                    color = Colors.White
+                ) {
+                    sleepModeSheet.open()
+                }
+            }
+        )
 	}
 
 	@Composable
@@ -869,32 +871,30 @@ class ScreenPartMusic(model: AppModel) : ScreenPart(model) {
 				verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
 			) {
 				SplitLayout(
-					modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace),
-					left = {
-						Text(
-							text = "睡眠模式",
-							style = MaterialTheme.typography.titleLarge,
-							color = MaterialTheme.colorScheme.primary
-						)
-					},
-					right = {
-						ClickText(
-							text = if (sleepJob == null) "启动" else "停止",
-							icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
-							onClick = {
-								if (factory.isReady) {
-									if (sleepJob == null) {
-										val time = state.hour * 3600 + state.minute * 60
-										if (time > 0) startSleepMode(time)
-										else slot.tip.warning("未设定时间")
-									}
-									else exitSleepMode()
-								}
-								else slot.tip.warning("播放器未开启")
-							}
-						)
-					}
-				)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalSpace),
+                    left = {
+                        Text(
+                            text = "睡眠模式",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    right = {
+                        ClickText(
+                            text = if (sleepJob == null) "启动" else "停止",
+                            icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
+                            onClick = {
+                                if (factory.isReady) {
+                                    if (sleepJob == null) {
+                                        val time = state.hour * 3600 + state.minute * 60
+                                        if (time > 0) startSleepMode(time)
+                                        else slot.tip.warning("未设定时间")
+                                    } else exitSleepMode()
+                                } else slot.tip.warning("播放器未开启")
+                            }
+                        )
+                    }
+                )
 				if (sleepJob == null) {
 					TimeInput(
 						state = state,

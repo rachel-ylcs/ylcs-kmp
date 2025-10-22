@@ -1,13 +1,14 @@
-package love.yinlin.ui.component.screen
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material.icons.outlined.Lightbulb
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,13 +71,16 @@ open class Tip(private val scope: CoroutineScope) {
                 Type.WARNING -> CustomTheme.colorScheme.onWarning
                 Type.ERROR -> MaterialTheme.colorScheme.onError
             }
-            val tipPadding = PaddingValues(when (LocalDevice.current.size) {
-                Device.Size.SMALL -> 40.dp
-                Device.Size.MEDIUM -> 50.dp
-                Device.Size.LARGE -> 60.dp
-            })
+            val tipPadding = PaddingValues(
+                when (LocalDevice.current.size) {
+                    Device.Size.SMALL -> 40.dp
+                    Device.Size.MEDIUM -> 50.dp
+                    Device.Size.LARGE -> 60.dp
+                }
+            )
             Box(
-                modifier = Modifier.padding(tipPadding)
+                modifier = Modifier
+                    .padding(tipPadding)
                     .fillMaxWidth()
                     .clickableNoRipple { }
                     .background(color = color, shape = MaterialTheme.shapes.extraLarge)

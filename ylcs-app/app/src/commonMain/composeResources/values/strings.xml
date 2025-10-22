@@ -73,9 +73,4 @@ App 不需要任何文件存储读写权限，所有数据和文件均存储在 
 
     <string name="weibo_user_list_like">微博关注</string>
     <string name="weibo_user_list_search">搜索结果</string>
-
-    <string name="dialog_ok">确定</string>
-    <string name="dialog_cancel">取消</string>
-    <string name="dialog_yes">是</string>
-    <string name="dialog_no">否</string>
 </resources>

@@ -18,7 +18,7 @@ import love.yinlin.common.Resource
 import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.ui.component.layout.ActionScope
+import love.yinlin.compose.ui.layout.ActionScope
 
 private val lunarFestivalTable = mapOf(
     101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",

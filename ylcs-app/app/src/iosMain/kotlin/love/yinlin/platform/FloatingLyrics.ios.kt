@@ -10,17 +10,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.autoreleasepool
+import love.yinlin.AppEntry
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.extension.toNSData
-import love.yinlin.resources.Res
-import love.yinlin.resources.xwwk
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*
 import platform.AVKit.*
@@ -38,18 +38,10 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
             width = CGRectGetWidth(pipView.frame).toInt(),
             height = CGRectGetHeight(pipView.frame).toInt(),
             content = {
-                App(
-                    deviceFactory = { maxWidth, _ -> Device(maxWidth) },
-                    themeMode = app.config.themeMode,
-                    fontScale = 1f,
-                    mainFontResource = Res.font.xwwk,
-                    modifier = Modifier.fillMaxSize(),
-                    localProvider = arrayOf(
-                        LocalAnimationSpeed provides app.config.animationSpeed,
-                        localBalloonTipEnabled provides app.config.enabledTip
-                    ),
-                ) { _, _ ->
-                    Content()
+                AppEntry(fill = false) {
+                    CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
+                        Content()
+                    }
                 }
             }
         )

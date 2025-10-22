@@ -2,6 +2,7 @@ package love.yinlin.compose
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -27,13 +28,12 @@ fun App(
     textSystem: TextSystem = DefaultTextSystem,
     customTheme: BaseCustomTheme = LocalCustomTheme.current,
     modifier: Modifier,
-    alignment: Alignment = Alignment.TopStart,
     localProvider: Array<ProvidedValue<*>> = emptyArray(),
-    content: @Composable (maxWidth: Dp, maxHeight: Dp) -> Unit
+    content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
     BoxWithConstraints(
         modifier = modifier,
-        contentAlignment = alignment
+        contentAlignment = Alignment.Center
     ) {
         val device = remember(maxWidth, maxHeight, deviceFactory) { deviceFactory(maxWidth, maxHeight) }
 
@@ -74,7 +74,7 @@ fun App(
                     LocalDensity provides Density(LocalDensity.current.density, fontScale),
                     *localProvider
                 ) {
-                    content(maxWidth, maxHeight)
+                    content()
                 }
             }
         }

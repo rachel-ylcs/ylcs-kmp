@@ -30,9 +30,9 @@ import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.BoxState
+import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.layout.StatefulBox
 import love.yinlin.ui.component.platform.HeadlessBrowser
 import love.yinlin.ui.component.screen.CommonSubScreen
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog

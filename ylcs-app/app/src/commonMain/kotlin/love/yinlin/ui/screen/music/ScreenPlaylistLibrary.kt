@@ -36,12 +36,12 @@ import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.compose.ui.input.LoadingClickText
-import love.yinlin.ui.component.layout.ActionScope
-import love.yinlin.ui.component.layout.EmptyBox
+import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.screen.CommonSubScreen
-import love.yinlin.ui.component.screen.FloatingDialogChoice
-import love.yinlin.ui.component.screen.FloatingDialogInput
-import love.yinlin.ui.component.screen.FloatingSheet
+import love.yinlin.compose.ui.floating.FloatingDialogChoice
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.compose.ui.layout.EmptyBox
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
