@@ -46,6 +46,9 @@
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
 |               |                 |    `component-all`    |           merge all component libs           | ✅ |
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
+|               |    `startup`    |                       |                                              |   |
+|               |                 |        `base`         |     common application startup services      | ✅ |
+|               |      `os`       |                       |    system platform related implementation    | ✅ |
 |               | `client-engine` |                       |                client engine                 | ✅ |
 |               | `server-engine` |                       |                server engine                 | ❌ |
 |  `ylcs-app`   |                 |                       |                                              |   |

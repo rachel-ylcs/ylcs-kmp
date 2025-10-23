@@ -45,7 +45,6 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
-import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.ui.component.image.NineGrid
@@ -53,6 +52,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.SplitActionLayout
+import love.yinlin.compose.ui.layout.UnsupportedComponent
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage

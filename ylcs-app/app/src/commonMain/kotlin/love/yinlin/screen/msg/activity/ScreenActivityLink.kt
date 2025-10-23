@@ -15,8 +15,8 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedComponent
 import love.yinlin.compose.ui.input.ClickText
+import love.yinlin.compose.ui.layout.UnsupportedComponent
 import love.yinlin.ui.component.platform.WebPage
 import love.yinlin.ui.component.platform.WebPageLoadingState.Finished
 import love.yinlin.ui.component.platform.WebPageSettings

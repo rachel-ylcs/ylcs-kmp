@@ -39,6 +39,7 @@ include(
 
     /* -----------------  [2] 功能模块  ----------------- */
 
+    "ylcs-module:os",
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
     "ylcs-module:compose:device",
@@ -49,6 +50,7 @@ include(
     "ylcs-module:compose:app",
     "ylcs-module:compose:component-all",
     "ylcs-module:compose:component:url-image",
+    "ylcs-module:compose:startup:base",
 
     /* -----------------  [3] 结构模块  ----------------- */
 

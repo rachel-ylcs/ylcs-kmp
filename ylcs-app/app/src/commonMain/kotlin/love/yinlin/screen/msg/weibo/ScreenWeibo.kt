@@ -22,6 +22,7 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.UnsupportedPlatformText
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog

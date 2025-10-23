@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.platform.UnsupportedComponent
+import love.yinlin.compose.ui.layout.UnsupportedComponent
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {

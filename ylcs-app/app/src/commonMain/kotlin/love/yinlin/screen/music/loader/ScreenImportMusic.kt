@@ -27,6 +27,7 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.UnsupportedPlatformText
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.DragFlag
 import love.yinlin.ui.component.platform.DropResult

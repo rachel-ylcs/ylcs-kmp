@@ -137,7 +137,7 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 		screen(::ScreenActivityLink)
 
 		// 社区
-	    screen(::ScreenUserCard)
+		screen(::ScreenUserCard)
 		screen(::ScreenTopic, type<Topic>())
 		screen(::ScreenAddTopic)
 		screen(::ScreenFollows)

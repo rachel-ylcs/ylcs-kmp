@@ -90,9 +90,9 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = unsupportedPlatform()
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = null
 
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = unsupportedPlatform()
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = null
 
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()

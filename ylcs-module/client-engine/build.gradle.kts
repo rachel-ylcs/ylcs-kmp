@@ -102,7 +102,7 @@ kotlin {
 }
 
 android {
-    namespace = "${C.app.packageName}.module.client.engine"
+    namespace = "${C.app.packageName}.module.client_engine"
     compileSdk = C.android.compileSdk
 
     defaultConfig {
