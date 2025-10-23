@@ -1,4 +1,4 @@
-package love.yinlin.compose.ui.layout
+package love.yinlin.platform
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,16 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.platform.platform
-
-val UnsupportedPlatformText = "不支持的平台 $platform"
-
-open class UnsupportedPlatformException : Exception(UnsupportedPlatformText)
-
-fun unsupportedPlatform(): Nothing = throw UnsupportedPlatformException()
 
 @Composable
-fun UnsupportedComponent(modifier: Modifier = Modifier) {
+fun UnsupportedPlatformComponent(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,

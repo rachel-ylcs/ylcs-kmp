@@ -13,7 +13,7 @@ import platform.UIKit.UIViewController
 lateinit var controller: UIViewController
 
 fun MainViewController(): UIViewController {
-    appContext = AppContext(PlatformContext)
+    appContext = AppContext(PlatformContext, Local.APP_NAME)
     ActualAppContext().apply {
         app = this
         initialize()

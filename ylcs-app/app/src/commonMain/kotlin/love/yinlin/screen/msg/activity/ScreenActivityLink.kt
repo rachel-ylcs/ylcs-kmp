@@ -16,7 +16,7 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.compose.ui.layout.UnsupportedComponent
+import love.yinlin.platform.UnsupportedPlatformComponent
 import love.yinlin.ui.component.platform.WebPage
 import love.yinlin.ui.component.platform.WebPageLoadingState.Finished
 import love.yinlin.ui.component.platform.WebPageSettings
@@ -34,7 +34,7 @@ class ScreenActivityLink(manager: ScreenManager) : CommonScreen(manager) {
         Platform.use(
             Platform.WebWasm, *Platform.Desktop,
             ifTrue = {
-                UnsupportedComponent(modifier = Modifier.fillMaxSize())
+                UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
             },
             ifFalse = {
                 Column(

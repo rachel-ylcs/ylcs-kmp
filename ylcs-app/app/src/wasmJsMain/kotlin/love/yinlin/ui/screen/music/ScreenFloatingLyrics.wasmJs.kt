@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.Device
-import love.yinlin.compose.ui.layout.UnsupportedComponent
+import love.yinlin.platform.UnsupportedPlatformComponent
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    UnsupportedComponent(modifier = Modifier.fillMaxSize())
+    UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
 }

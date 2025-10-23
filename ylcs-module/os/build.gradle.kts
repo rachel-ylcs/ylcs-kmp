@@ -46,16 +46,8 @@ kotlin {
             )
         }
 
-        val nonAndroidMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        androidMain.configure {
-            useSourceSet(commonMain)
-        }
-
         val iosMain = iosMain.get().apply {
-            useSourceSet(commonMain, nonAndroidMain)
+            useSourceSet(commonMain)
         }
 
         buildList {
@@ -71,14 +63,6 @@ kotlin {
             it.configure {
                 useSourceSet(iosMain)
             }
-        }
-
-        val desktopMain by getting {
-            useSourceSet(nonAndroidMain)
-        }
-
-        wasmJsMain.configure {
-            useSourceSet(nonAndroidMain)
         }
     }
 }

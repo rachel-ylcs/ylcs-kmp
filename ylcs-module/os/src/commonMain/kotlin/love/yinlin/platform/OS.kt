@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
@@ -9,21 +8,19 @@ import love.yinlin.common.uri.Uri
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 
-@Stable
-object OS {
-    @Stable
-    object Application {
+data object OS {
+    data object Application {
         suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
         fun copyText(text: String): Boolean = osApplicationCopyText(text)
     }
 
-    @Stable
-    object Net {
-        fun openUrl(url: String) = osNetOpenUrl(url)
+    data object Net {
+        fun openUrl(url: String) {
+            Uri.parse(url)?.let { osNetOpenUrl(it) }
+        }
     }
 
-    @Stable
-    object Storage {
+    data object Storage {
         val dataPath: Path by lazy { osStorageDataPath }
 
         val musicPath: Path by lazy { Path(dataPath, "music") }
@@ -55,7 +52,7 @@ internal expect fun osApplicationCopyText(text: String): Boolean
 
 // ------------  Net
 
-internal expect fun osNetOpenUrl(url: String)
+internal expect fun osNetOpenUrl(uri: Uri)
 
 // ------------  Storage
 

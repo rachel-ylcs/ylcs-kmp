@@ -1,14 +1,13 @@
 package love.yinlin.platform
 
 import kotlinx.io.files.Path
-import love.yinlin.Local
+import love.yinlin.appContext
 import love.yinlin.common.uri.Uri
+import love.yinlin.common.uri.toJvmUri
 import love.yinlin.extension.catching
-import net.harawata.appdirs.AppDirsFactory
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.concurrent.thread
@@ -26,7 +25,7 @@ fun singleInstance() {
 }
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
-	osNetOpenUrl(uri.toString())
+	osNetOpenUrl(uri)
 	return true
 }
 
@@ -37,19 +36,36 @@ actual fun osApplicationCopyText(text: String): Boolean {
 	return true
 }
 
-actual fun osNetOpenUrl(url: String) = catching {
+actual fun osNetOpenUrl(uri: Uri) = catching {
 	val desktop = Desktop.getDesktop()
 	if (desktop.isSupported(Desktop.Action.BROWSE)) {
-		desktop.browse(URI(url))
+		desktop.browse(uri.toJvmUri())
 	}
 }
 
-val osAppPath: Path get() {
+val osAppPath: Path by lazy {
 	val workingDir = Path(System.getProperty("user.dir"))
-	return if (Files.isWritable(Paths.get(workingDir.toString()))) workingDir
-		else Path(AppDirsFactory.getInstance().getUserDataDir(Local.APP_NAME, null, null, true))
+	val homeDir = Path(System.getProperty("user.home"))
+	val appName = appContext.appName
+	if (Files.isWritable(Paths.get(workingDir.toString()))) workingDir else {
+		when (platform) {
+			Platform.Windows -> System.getenv("APPDATA")?.let { Path(it, appName) } ?: workingDir
+			Platform.Linux -> Path(System.getenv("XDG_DATA_HOME")?.let { Path(it) } ?: Path(homeDir, ".local", "share"), appName)
+			Platform.MacOS -> Path(homeDir, "Library", "Application Support", appName)
+			else -> workingDir
+		}
+	}
 }
 
-actual val osStorageDataPath: Path get() = Path(osAppPath, "data")
+actual val osStorageDataPath: Path by lazy { Path(osAppPath, "data") }
 
-actual val osStorageCachePath: Path get() = Path(System.getProperty("java.io.tmpdir"), Local.APP_NAME)
+actual val osStorageCachePath: Path by lazy { Path(System.getProperty("java.io.tmpdir"), appContext.appName) }
+
+actual val osStorageCacheSize: Long get() {
+	// TODO:
+	return 0L
+}
+
+actual fun osStorageClearCache() {
+
+}

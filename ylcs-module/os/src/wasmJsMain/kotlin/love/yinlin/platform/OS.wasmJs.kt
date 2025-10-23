@@ -3,10 +3,9 @@ package love.yinlin.platform
 import kotlinx.browser.window
 import kotlinx.io.files.Path
 import love.yinlin.common.uri.Uri
-import love.yinlin.compose.ui.layout.unsupportedPlatform
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean {
-	osNetOpenUrl(uri.toString())
+	osNetOpenUrl(uri)
 	return true
 }
 
@@ -18,10 +17,19 @@ actual fun osApplicationCopyText(text: String): Boolean {
 
 fun osApplicationIsStandalone() = window.matchMedia("(display-mode: standalone)").matches
 
-actual fun osNetOpenUrl(url: String) {
-	window.open(url, "_blank")
+actual fun osNetOpenUrl(uri: Uri) {
+	window.open(uri.toString(), "_blank")
 }
 
 actual val osStorageDataPath: Path get() = unsupportedPlatform()
 
 actual val osStorageCachePath: Path get() = unsupportedPlatform()
+
+actual val osStorageCacheSize: Long get() {
+	// TODO:
+	return 0L
+}
+
+actual fun osStorageClearCache() {
+
+}

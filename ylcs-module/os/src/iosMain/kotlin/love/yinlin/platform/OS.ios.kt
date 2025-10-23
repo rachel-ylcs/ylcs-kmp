@@ -12,8 +12,8 @@ import platform.UIKit.UIPasteboard
 
 actual suspend fun osApplicationStartAppIntent(uri: Uri): Boolean = catchingDefault(false) {
     val application = UIApplication.sharedApplication
-    val url = uri.toNSUrl()
-    require(application.canOpenURL(url))
+    val url = uri.toNSUrl()!!
+    application.canOpenURL(url)
     application.openURL(url)
 }
 
@@ -22,13 +22,11 @@ actual fun osApplicationCopyText(text: String): Boolean {
     return true
 }
 
-actual fun osNetOpenUrl(url: String) = catching {
-    NSURL.URLWithString(url)?.let {
-        UIApplication.sharedApplication.openURL(it)
-    }
+actual fun osNetOpenUrl(uri: Uri) = catching {
+    UIApplication.sharedApplication.openURL(uri.toNSUrl()!!)
 }
 
-fun osStorageSearchPath(directory: NSSearchPathDirectory): Path {
+private fun osStorageSearchPath(directory: NSSearchPathDirectory): Path {
     val paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
     return Path(paths[0]!! as String)
 }
@@ -39,15 +37,21 @@ actual val osStorageCachePath: Path get() = osStorageSearchPath(NSCachesDirector
 
 val osStorageTempPath: Path get() = Path(NSTemporaryDirectory())
 
+actual val osStorageCacheSize: Long get() {
+    // TODO:
+    return 0L
+}
+
+actual fun osStorageClearCache() {
+
+}
+
 @OptIn(ExperimentalForeignApi::class)
 fun copyToTempDir(url: NSURL?): NSURL? {
-    if (url == null)
-        return null
+    if (url == null) return null
     val fileManager = NSFileManager.defaultManager
-    val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(url.lastPathComponent)
-        ?: return null
-    val tempUrl = NSURL.fileURLWithPathComponents(tempPath)
-        ?: return null
+    val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(url.lastPathComponent) ?: return null
+    val tempUrl = NSURL.fileURLWithPathComponents(tempPath) ?: return null
     fileManager.removeItemAtURL(tempUrl, null)
     return if (fileManager.copyItemAtURL(url, tempUrl, null)) tempUrl else null
 }

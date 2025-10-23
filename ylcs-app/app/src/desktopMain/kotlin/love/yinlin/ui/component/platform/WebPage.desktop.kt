@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.compose.ui.layout.UnsupportedComponent
+import love.yinlin.platform.UnsupportedPlatformComponent
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
@@ -25,7 +25,7 @@ actual fun WebPage(
 	state: WebPageState,
 	modifier: Modifier
 ) {
-	UnsupportedComponent(modifier = modifier)
+	UnsupportedPlatformComponent(modifier = modifier)
 }
 
 @Stable

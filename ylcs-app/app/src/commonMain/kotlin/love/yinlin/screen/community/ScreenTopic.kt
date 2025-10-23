@@ -52,7 +52,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.SplitActionLayout
-import love.yinlin.compose.ui.layout.UnsupportedComponent
+import love.yinlin.platform.UnsupportedPlatformComponent
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
@@ -201,7 +201,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
 
         @Composable
         override fun ImageLayout(modifier: Modifier) {
-            UnsupportedComponent(modifier = modifier)
+            UnsupportedPlatformComponent(modifier = modifier)
         }
     }
 

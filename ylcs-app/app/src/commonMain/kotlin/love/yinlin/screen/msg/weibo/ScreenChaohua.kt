@@ -19,7 +19,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.compose.ui.layout.UnsupportedPlatformText
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
