@@ -15,13 +15,14 @@ import love.yinlin.compose.LocalAnimationSpeed
 @Composable
 inline fun <reified Main : BasicScreen<Unit>> AppScreen(
 	modifier: Modifier = Modifier,
+	deeplink: DeepLink,
 	crossinline screens: ScreenBuilder.() -> Unit
 ) {
 	val navController = rememberNavController()
 	val screenManager = remember(navController) { ScreenManager(navController) }
 	val animationSpeed = LocalAnimationSpeed.current
 
-	// TODO: 深层链接
+	DeepLink.Register(deeplink, screenManager)
 
 	NavHost(
 		navController = navController,

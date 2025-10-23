@@ -19,9 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import kotlinx.coroutines.launch
-import love.yinlin.common.DeepLinkHandler
 import love.yinlin.common.uri.toUri
 import love.yinlin.compose.*
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -65,7 +65,7 @@ fun main() {
 
     Platform.use(Platform.MacOS) {
         Desktop.getDesktop().setOpenURIHandler { event ->
-            DeepLinkHandler.onOpenUri(event.uri.toUri())
+            DeepLink.openUri(event.uri.toUri())
         }
     }
 

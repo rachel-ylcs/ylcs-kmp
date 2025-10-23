@@ -4,26 +4,67 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import love.yinlin.common.uri.Scheme
+import love.yinlin.common.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.AppScreen
+import love.yinlin.compose.screen.DeepLink
+import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
 import love.yinlin.screen.common.ScreenMain
 
-// ScreenMain
+data object AppDeepLink : DeepLink {
+	private fun schemeContent(manager: ScreenManager, uri: Uri) {
+//		if (!app.musicFactory.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
+//		else manager.topScreen.slot.tip.warning("请先停止播放器")
+	}
 
-// val deeplink = DeepLink(this)
+	private fun schemeRachel(manager: ScreenManager, uri: Uri) {
+		when (uri.path) {
+			"/openProfile" -> {
+				uri.params["uid"]?.toIntOrNull()?.let { uid ->
+//					manager.navigate(ScreenUserCard.Args(uid))
+				}
+			}
+			"/openSong" -> {
+				uri.params["id"]?.let { id ->
+//					model.launch {
+//						val result = ClientAPI.request(
+//							route = API.User.Song.GetSong,
+//							data = id
+//						)
+//						if (result is Data.Success) model.navigate(ScreenSongDetails.Args(result.data))
+//					}
+				}
+			}
+		}
+	}
 
-//	DisposableEffect(Unit) {
-//		DeepLinkHandler.listener = { uri ->
-//			appModel.deeplink.process(uri)
-//		}
-//		onDispose {
-//			DeepLinkHandler.listener = null
-//		}
-//	}
+	override fun process(manager: ScreenManager, uri: Uri) {
+		when (uri.scheme) {
+			Scheme.File -> schemeContent(manager, uri)
+			Scheme.Content -> schemeContent(manager, uri)
+			Scheme.Rachel -> schemeRachel(manager, uri)
+			Scheme.QQMusic -> {
+//				if (!app.musicFactory.isReady) model.navigate(ScreenPlatformMusic.Args(
+//					deeplink = uri.copy(scheme = Scheme.Https).toString(),
+//					type = PlatformMusicType.QQMusic
+//				))
+//				else model.slot.tip.warning("请先停止播放器")
+			}
+			Scheme.NetEaseCloud -> {
+//				if (!app.musicFactory.isReady) model.navigate(ScreenPlatformMusic.Args(
+//					deeplink = uri.copy(scheme = Scheme.Https).toString(),
+//					type = PlatformMusicType.NetEaseCloud
+//				))
+//				else manager.topScreen.slot.tip.warning("请先停止播放器")
+			}
+		}
+	}
+}
 
 @Composable
 fun AppEntry(
@@ -47,7 +88,7 @@ fun AppEntry(
 
 @Composable
 fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
-	AppScreen<ScreenMain>(modifier = modifier) {
+	AppScreen<ScreenMain>(modifier = modifier, deeplink = AppDeepLink) {
 		// 主页
 		screen(::ScreenMain)
 	}

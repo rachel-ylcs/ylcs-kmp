@@ -191,4 +191,8 @@ class ScreenMain(manager: ScreenManager) : CommonNavigationScreen<TabItem>(manag
             }
         }
     }
+
+    override suspend fun initialize() {
+        println(manager.topScreen)
+    }
 }

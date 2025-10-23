@@ -2,6 +2,7 @@ package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -21,12 +22,16 @@ class ScreenBuilder(
     @JvmName("type2")
     inline fun <reified T1, reified T2> type() = mapOf(typeOf<T1>() to getNavType<T1>(), typeOf<T2>() to getNavType<T2>())
 
+    inline fun <reified A> BasicScreen<A>.registerAndLaunch(backStackEntry: NavBackStackEntry): BasicScreen<A> {
+        manager.registerScreen(this, backStackEntry.id)
+        launch { initialize() }
+        return this
+    }
+
     inline fun <reified S : BasicScreen<Unit>> screen(crossinline factory: (ScreenManager) -> S) {
-        builder.composable(route = route<S>()) {
-            val screen = viewModel {
-                factory(manager).also {
-                    it.launch { it.initialize() }
-                }
+        builder.composable(route = route<S>()) { backStackEntry ->
+            val screen = viewModel(key = backStackEntry.id) {
+                factory(manager).registerAndLaunch(backStackEntry)
             }
             screen.ComposedUI()
         }
@@ -37,10 +42,8 @@ class ScreenBuilder(
         typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap()
     ) {
         builder.composable<A>(typeMap = typeMap) {  backStackEntry ->
-            val screen = viewModel {
-                factory(manager, backStackEntry.toRoute<A>()).also {
-                    it.launch { it.initialize() }
-                }
+            val screen = viewModel(key = backStackEntry.id) {
+                factory(manager, backStackEntry.toRoute<A>()).registerAndLaunch(backStackEntry)
             }
             screen.ComposedUI()
         }

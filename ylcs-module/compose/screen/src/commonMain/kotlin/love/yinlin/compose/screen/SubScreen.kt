@@ -38,6 +38,4 @@ abstract class SubScreen(
 	inline fun <reified T : Screen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = parent.navigate<T>(options, extras)
     fun pop() = parent.pop()
 	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = parent.monitor(state, action)
-
-    // 深层链接
 }
