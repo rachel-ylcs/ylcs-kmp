@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
+        app1.bindActivity(this, activityResultRegistry)
         appNative.activity = this
         appNative.activityResultRegistry = activityResultRegistry
 

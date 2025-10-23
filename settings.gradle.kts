@@ -33,9 +33,9 @@ include(
 
     /* -----------------  [1] 核心模块  ----------------- */
 
-    "ylcs-core:base", // 语言核心
-    "ylcs-core:compose-base", // compose核心
-    "ylcs-core:cs-base", // C/S核心
+    "ylcs-core:base",
+    "ylcs-core:compose-base",
+    "ylcs-core:cs-base",
 
     /* -----------------  [2] 功能模块  ----------------- */
 
@@ -43,6 +43,7 @@ include(
     "ylcs-module:server-engine",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
+    "ylcs-module:compose:context",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:ui",
     "ylcs-module:compose:app",
@@ -51,14 +52,14 @@ include(
 
     /* -----------------  [3] 结构模块  ----------------- */
 
-    "ylcs-app:mod", // MOD
-    "ylcs-app:cs", // C/S共享
+    "ylcs-app:mod",
+    "ylcs-app:cs",
 
     /* -----------------  [4] 程序模块  ----------------- */
 
-    "ylcs-app:app", // 跨平台APP
-    "ylcs-app:server", // 服务端
-    "ylcs-app:mod-manager", // MOD管理器
+    "ylcs-app:app",
+    "ylcs-app:server",
+    "ylcs-app:mod-manager",
 
     /* -----------------  [5] 测试模块  ----------------- */
 )

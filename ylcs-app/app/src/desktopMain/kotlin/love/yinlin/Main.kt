@@ -58,6 +58,7 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
+    app1 = AppContext1(PlatformContext)
     val appContext = ActualAppContext().apply {
         app = this
         initialize()

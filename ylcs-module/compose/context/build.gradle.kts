@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import kotlin.apply
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -43,16 +44,33 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.compose.context,
-                projects.ylcsModule.compose.screen,
-                libs.compose.components.resources,
+                projects.ylcsCore.composeBase,
             )
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain)
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
+            }
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.compose.app"
+    namespace = "${C.app.packageName}.module.compose.context"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

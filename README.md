@@ -40,6 +40,7 @@
 |               |    `compose`    |                       |                                              |   |
 |               |                 |         `app`         |     fast and easy compose app framework      | ✅ |
 |               |                 |       `screen`        |     screen page, floating and navigation     | ✅ |
+|               |                 |       `context`       |      multiplatform application context       | ✅ |
 |               |                 |       `device`        | adaptive device layout and immersive padding | ✅ |
 |               |                 |        `theme`        |        app theme resources definition        | ✅ |
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |

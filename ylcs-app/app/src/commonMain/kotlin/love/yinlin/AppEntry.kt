@@ -138,7 +138,7 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 
 		// 社区
 	    screen(::ScreenUserCard)
-	    screen(::ScreenTopic, type<Topic>())
+		screen(::ScreenTopic, type<Topic>())
 		screen(::ScreenAddTopic)
 		screen(::ScreenFollows)
 
@@ -174,3 +174,11 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 		screen(::ScreenRhyme)
 	}
 }
+
+@Stable
+class AppContext1(context: PlatformContext) : BasicContext(context) {
+
+}
+
+lateinit var app1: AppContext1
+	internal set
