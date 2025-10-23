@@ -41,9 +41,11 @@ class ScreenManager(
         }
     }
 
-    val topScreen: BasicScreen<*> get() = idMap[navController.currentBackStackEntry!!.id]!!
+    val top: BasicScreen<*> get() = idMap[navController.currentBackStackEntry!!.id]!!
 
-    inline fun <reified S : BasicScreen<*>> forScreen(block: S.() -> Unit) {
+    inline fun <reified S : BasicScreen<*>> get(): S = infoMap[S::class.qualifiedName!!]!!.first().screen as S
+
+    inline fun <reified S : BasicScreen<*>> forEach(block: S.() -> Unit) {
         val key = S::class.qualifiedName!!
         val value = infoMap[key]
         if (value != null) {

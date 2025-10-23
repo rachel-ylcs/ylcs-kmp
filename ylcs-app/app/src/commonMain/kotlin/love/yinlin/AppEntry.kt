@@ -11,10 +11,20 @@ import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
+import love.yinlin.data.common.Picture
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
-import love.yinlin.screen.common.ScreenMain
+import love.yinlin.screen.account.*
+import love.yinlin.screen.common.*
+import love.yinlin.screen.community.*
+import love.yinlin.screen.msg.*
+import love.yinlin.screen.msg.activity.*
+import love.yinlin.screen.msg.douyin.*
+import love.yinlin.screen.msg.pictures.*
+import love.yinlin.screen.msg.weibo.*
+import love.yinlin.screen.music.*
+import love.yinlin.screen.world.*
 
 data object AppDeepLink : DeepLink {
 	private fun schemeContent(manager: ScreenManager, uri: Uri) {
@@ -89,36 +99,35 @@ fun AppEntry(
 @Composable
 fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 	AppScreen<ScreenMain>(modifier = modifier, deeplink = AppDeepLink) {
-		// 主页
+		// 通用
 		screen(::ScreenMain)
+		screen(::ScreenImagePreview, type<List<Picture>>())
+		screen(::ScreenWebpage)
+		screen(::ScreenVideo)
+		screen(::ScreenTest)
+
+		// 美图
+		screen(::ScreenPictures)
+
+		// 资讯
+		screen(::ScreenWeibo)
+		screen(::ScreenChaohua)
+		screen(::ScreenWeiboDetails)
+		screen(::ScreenWeiboUser)
+		screen(::ScreenWeiboFollows)
+		screen(::ScreenWeiboAlbum)
+
+		// 抖音
+		screen(::ScreenDouyin)
+
+		// 活动
+		screen(::ScreenActivityDetails)
+		screen(::ScreenAddActivity)
+		screen(::ScreenModifyActivity)
+		screen(::ScreenActivityLink)
 	}
 }
 
-//fun ScreenRouteScope.screens() {
-//
-//    // 通用
-//    screen(::ScreenTest)
-//    screen(::ScreenWebpage)
-//    screen(::ScreenImagePreview, type<List<Picture>>())
-//    screen(::ScreenVideo)
-//
-//    // 资讯
-//    screen(::ScreenPictures)
-//
-//    screen(::ScreenWeibo)
-//    screen(::ScreenChaohua)
-//    screen(::ScreenWeiboDetails)
-//    screen(::ScreenWeiboUser)
-//    screen(::ScreenWeiboFollows)
-//    screen(::ScreenWeiboAlbum)
-//
-//    screen(::ScreenDouyin)
-//
-//    // 活动
-//    screen(::ScreenActivityDetails)
-//    screen(::ScreenAddActivity)
-//    screen(::ScreenModifyActivity)
-//    screen(::ScreenActivityLink)
 //
 //    // 世界
 //    screen(::ScreenGameHall, type<Game>())

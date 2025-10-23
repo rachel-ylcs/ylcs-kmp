@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.zIndex
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
@@ -19,7 +20,6 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.screen.CommonNavigationScreen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.resources.*
 import love.yinlin.screen.account.SubScreenMe
@@ -133,28 +133,29 @@ private fun LandscapeNavigation(
 }
 
 @Stable
-class ScreenMain(manager: ScreenManager) : CommonNavigationScreen<TabItem>(manager) {
-    override val pages: List<TabItem> = TabItem.entries
-    override val subs: List<SubScreen> = listOf(
-        SubScreenMsg(this),
-        SubScreenWorld(this),
-        SubScreenMusic(this),
-        SubScreenDiscovery(this),
-        SubScreenMe(this)
-    )
+class ScreenMain(manager: ScreenManager) : CommonNavigationScreen(manager) {
+    override val subs: List<SubScreenInfo> by lazy { listOf(
+        sub(::SubScreenMsg),
+        sub(::SubScreenWorld),
+        sub(::SubScreenMusic),
+        sub(::SubScreenDiscovery),
+        sub(::SubScreenMe),
+    ) }
 
     @Composable
-    private fun Portrait(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+    private fun Portrait(device: Device, index: Int, content: @Composable (Device) -> Unit) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ) {
             CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutBottom) {
-                content(device, Modifier.fillMaxWidth().weight(1f))
+                Box(modifier = Modifier.fillMaxWidth().weight(1f).zIndex(1f)) {
+                    content(device)
+                }
             }
             CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutTop) {
                 PortraitNavigation(
-                    modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                    modifier = Modifier.fillMaxWidth().zIndex(2f),
                     currentPage = index,
                     onNavigate = { pageIndex = it }
                 )
@@ -163,26 +164,28 @@ class ScreenMain(manager: ScreenManager) : CommonNavigationScreen<TabItem>(manag
     }
 
     @Composable
-    private fun Landscape(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+    private fun Landscape(device: Device, index: Int, content: @Composable (Device) -> Unit) {
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Start
         ) {
             CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutEnd) {
                 LandscapeNavigation(
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().zIndex(2f),
                     currentPage = index,
                     onNavigate = { pageIndex = it }
                 )
             }
             CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutStart) {
-                content(device, Modifier.weight(1f).fillMaxHeight())
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().zIndex(1f)) {
+                    content(device)
+                }
             }
         }
     }
 
     @Composable
-    override fun Wrapper(device: Device, index: Int, content: @Composable (Device, Modifier) -> Unit) {
+    override fun Wrapper(device: Device, index: Int, content: @Composable (Device) -> Unit) {
         val immersivePadding = rememberImmersivePadding()
         CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
             when (device.type) {
@@ -193,6 +196,11 @@ class ScreenMain(manager: ScreenManager) : CommonNavigationScreen<TabItem>(manag
     }
 
     override suspend fun initialize() {
-        println(manager.topScreen)
+        println("initialize screen main")
+        // TODO:
+    }
+
+    init {
+        println("init screen main")
     }
 }
