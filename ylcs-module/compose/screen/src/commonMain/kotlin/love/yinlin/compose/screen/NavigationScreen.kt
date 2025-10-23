@@ -10,6 +10,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABLayout
 import kotlin.reflect.KClass
 
 @Stable
@@ -39,7 +40,17 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
         Wrapper(LocalDevice.current, pageIndex) { device ->
             AnimatedContent(targetState = pageIndex) { index ->
                 Box(modifier = Modifier.fillMaxSize()) {
-                    subs[index].screen.Content(device)
+                    val screen = subs[index].screen
+                    screen.Content(device)
+
+                    screen.fabIcon?.let { icon ->
+                        FABLayout(
+                            icon = icon,
+                            canExpand = screen.fabCanExpand,
+                            onClick = screen::onFabClick,
+                            menus = screen.fabMenus
+                        )
+                    }
                 }
             }
 
@@ -52,11 +63,6 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
             }
         }
     }
-
-    override val fabIcon: ImageVector? get() = currentScreen.fabIcon
-    override val fabCanExpand: Boolean get() = currentScreen.fabCanExpand
-    override val fabMenus: Array<FABAction> get() = currentScreen.fabMenus
-    override suspend fun onFabClick() = currentScreen.onFabClick()
 
     @Composable
     override fun Floating() = currentScreen.Floating()
