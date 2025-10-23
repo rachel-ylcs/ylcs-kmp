@@ -1,10 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import kotlin.apply
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -43,16 +42,48 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.screen,
-                libs.compose.components.resources,
+                projects.ylcsCore.base,
             )
+        }
+
+        val nonAndroidMain by creating {
+            useSourceSet(commonMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(commonMain)
+            useLib(
+                libs.compose.activity
+            )
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(nonAndroidMain)
+            }
+        }
+
+        val desktopMain by getting {
+            useSourceSet(nonAndroidMain)
+        }
+
+        wasmJsMain.configure {
+            useSourceSet(nonAndroidMain)
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.compose.app"
+    namespace = "${C.app.packageName}.module.context"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

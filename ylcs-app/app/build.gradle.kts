@@ -109,6 +109,8 @@ kotlin {
                 // project
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.componentAll,
+                projects.ylcsModule.os,
+                projects.ylcsModule.service.base,
                 projects.ylcsModule.clientEngine,
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,

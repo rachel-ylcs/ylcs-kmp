@@ -42,12 +42,20 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore.base,
+                projects.ylcsModule.context,
             )
         }
 
-        val iosMain = iosMain.get().apply {
+        val nonAndroidMain by creating {
             useSourceSet(commonMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(commonMain)
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain, nonAndroidMain)
         }
 
         buildList {
@@ -65,16 +73,12 @@ kotlin {
             }
         }
 
-        androidMain.configure {
-            useSourceSet(commonMain)
-        }
-
         val desktopMain by getting {
-            useSourceSet(commonMain)
+            useSourceSet(nonAndroidMain)
         }
 
         wasmJsMain.configure {
-            useSourceSet(commonMain)
+            useSourceSet(nonAndroidMain)
         }
     }
 }

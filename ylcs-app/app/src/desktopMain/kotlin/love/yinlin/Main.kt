@@ -9,10 +9,7 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,8 +55,8 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
-    app1 = AppContext1(PlatformContext)
-    val appContext = ActualAppContext().apply {
+    appContext = AppContext(PlatformContext)
+    val appContext1 = ActualAppContext().apply {
         app = this
         initialize()
     }
@@ -87,7 +84,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.img_logo),
-            visible = appContext.windowVisible,
+            visible = appContext1.windowVisible,
             undecorated = true,
             resizable = true,
             transparent = true,
@@ -157,7 +154,7 @@ fun main() {
                                 tip = "最小化到托盘",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
-                                appContext.windowVisible = false
+                                appContext1.windowVisible = false
                             }
                             Action(
                                 icon = Icons.Outlined.CropSquare,
@@ -187,18 +184,18 @@ fun main() {
             message = "已隐藏到任务栏托盘中",
             type = Notification.Type.Info
         )
-        LaunchedEffect(appContext.windowVisible) {
-            if (!appContext.windowVisible && appContext.config.enabledTip) trayState.sendNotification(notification)
+        LaunchedEffect(appContext1.windowVisible) {
+            if (!appContext1.windowVisible && appContext1.config.enabledTip) trayState.sendNotification(notification)
         }
         Tray(
             icon = painterResource(Res.drawable.img_logo),
             state = trayState,
-            onAction = { appContext.windowVisible = true }
+            onAction = { appContext1.windowVisible = true }
         )
 
         // 悬浮歌词
-        (appContext.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
-            if (it.isAttached && appContext.config.enabledFloatingLyrics) it.Content()
+        (appContext1.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
+            if (it.isAttached && appContext1.config.enabledFloatingLyrics) it.Content()
         }
     }
 }

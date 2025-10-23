@@ -3,7 +3,6 @@ package love.yinlin
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.delay
-import love.yinlin.compose.PlatformContext
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
@@ -14,7 +13,7 @@ import platform.UIKit.UIViewController
 lateinit var controller: UIViewController
 
 fun MainViewController(): UIViewController {
-    app1 = AppContext1(PlatformContext)
+    appContext = AppContext(PlatformContext)
     ActualAppContext().apply {
         app = this
         initialize()

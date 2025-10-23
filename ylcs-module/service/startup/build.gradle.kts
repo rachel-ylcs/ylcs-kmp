@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -43,16 +41,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.screen,
-                libs.compose.components.resources,
+                projects.ylcsModule.context,
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.compose.app"
+    namespace = "${C.app.packageName}.module.service.startup"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

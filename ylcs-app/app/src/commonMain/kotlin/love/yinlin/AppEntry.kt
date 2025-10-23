@@ -174,11 +174,3 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 		screen(::ScreenRhyme)
 	}
 }
-
-@Stable
-class AppContext1(context: PlatformContext) : BasicContext(context) {
-
-}
-
-lateinit var app1: AppContext1
-	internal set

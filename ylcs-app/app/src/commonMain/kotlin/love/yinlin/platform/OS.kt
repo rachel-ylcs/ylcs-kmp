@@ -11,41 +11,41 @@ import love.yinlin.extension.catchingNull
 
 @Stable
 object OS {
-	@Stable
-	object Application {
-		suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
-		fun copyText(text: String): Boolean = osApplicationCopyText(text)
-	}
+    @Stable
+    object Application {
+        suspend fun startAppIntent(uri: Uri): Boolean = osApplicationStartAppIntent(uri)
+        fun copyText(text: String): Boolean = osApplicationCopyText(text)
+    }
 
-	@Stable
-	object Net {
-		fun openUrl(url: String) = osNetOpenUrl(url)
-	}
+    @Stable
+    object Net {
+        fun openUrl(url: String) = osNetOpenUrl(url)
+    }
 
-	@Stable
-	object Storage {
-		val dataPath: Path by lazy { osStorageDataPath }
+    @Stable
+    object Storage {
+        val dataPath: Path by lazy { osStorageDataPath }
 
-		val musicPath: Path by lazy { Path(dataPath, "music") }
+        val musicPath: Path by lazy { Path(dataPath, "music") }
 
-		val cachePath: Path by lazy { osStorageCachePath }
-		val cacheSize get() = osStorageCacheSize
-		fun clearCache() = osStorageClearCache()
+        val cachePath: Path by lazy { osStorageCachePath }
+        val cacheSize get() = osStorageCacheSize
+        fun clearCache() = osStorageClearCache()
 
-		suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
-			val path = Path(cachePath, DateEx.CurrentLong.toString())
-			require(SystemFileSystem.sink(path).buffered().use { Coroutines.io { block(it) } })
-			path
-		}
+        suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
+            val path = Path(cachePath, DateEx.CurrentLong.toString())
+            require(SystemFileSystem.sink(path).buffered().use { Coroutines.io { block(it) } })
+            path
+        }
 
-		suspend fun createTempFolder(): Path? = catchingNull {
-			Coroutines.io {
-				val path = Path(cachePath, DateEx.CurrentLong.toString())
-				SystemFileSystem.createDirectories(path)
-				path
-			}
-		}
-	}
+        suspend fun createTempFolder(): Path? = catchingNull {
+            Coroutines.io {
+                val path = Path(cachePath, DateEx.CurrentLong.toString())
+                SystemFileSystem.createDirectories(path)
+                path
+            }
+        }
+    }
 }
 
 // ------------  Application

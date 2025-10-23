@@ -4,9 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.LaunchedEffect
-import androidx.core.view.WindowInsetsControllerCompat
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.appNative
@@ -14,10 +11,10 @@ import love.yinlin.platform.appNative
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        window.isNavigationBarContrastEnforced = false
 
-        app1.bindActivity(this, activityResultRegistry)
+        enabledImmersiveMode()
+
+        appContext.bindActivity(this, activityResultRegistry)
         appNative.activity = this
         appNative.activityResultRegistry = activityResultRegistry
 
@@ -32,10 +29,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppEntry {
-                val isDarkMode = LocalDarkMode.current
-                LaunchedEffect(isDarkMode) {
-                    WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isDarkMode
-                }
+                autoStatusBarTheme(window, LocalDarkMode.current)
                 ScreenEntry()
             }
         }
@@ -45,6 +39,8 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         (appNative.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.detach()
         appNative.musicFactory.floatingLyrics = null
+        appNative.activity = null
+        appNative.activityResultRegistry = null
     }
 
     override fun onNewIntent(intent: Intent) {
