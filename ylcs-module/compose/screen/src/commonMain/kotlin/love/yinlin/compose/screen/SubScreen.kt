@@ -8,16 +8,10 @@ import androidx.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.compose.Device
-import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.ui.floating.FABAction
 
 @Stable
-abstract class SubScreen(
-    val parent: BasicScreen<*>,
-
-) {
-    val firstLoad = LaunchFlag()
-
+abstract class SubScreen(val parent: BasicScreen<*>) {
     val slot: ScreenSlot get() = parent.slot
 
     open suspend fun initialize(update: Boolean) {}

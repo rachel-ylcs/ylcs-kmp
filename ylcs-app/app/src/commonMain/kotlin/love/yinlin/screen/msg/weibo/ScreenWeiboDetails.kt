@@ -164,15 +164,10 @@ class ScreenWeiboDetails(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     override suspend fun initialize() {
-        println("initialize screen weibo")
         weibo?.let {
             val data = WeiboAPI.getWeiboDetails(it.id)
             comments = if (data is Data.Success) data.data else emptyList()
         }
-    }
-
-    init {
-        println("init screen weibo")
     }
 
     override val title: String = "微博详情"

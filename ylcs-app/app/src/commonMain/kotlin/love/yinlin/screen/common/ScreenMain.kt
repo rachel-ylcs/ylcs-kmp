@@ -134,13 +134,13 @@ private fun LandscapeNavigation(
 
 @Stable
 class ScreenMain(manager: ScreenManager) : CommonNavigationScreen(manager) {
-    override val subs: List<SubScreenInfo> by lazy { listOf(
+    override val subs: List<SubScreenInfo> = listOf(
         sub(::SubScreenMsg),
         sub(::SubScreenWorld),
         sub(::SubScreenMusic),
         sub(::SubScreenDiscovery),
         sub(::SubScreenMe),
-    ) }
+    )
 
     @Composable
     private fun Portrait(device: Device, index: Int, content: @Composable (Device) -> Unit) {
@@ -196,11 +196,6 @@ class ScreenMain(manager: ScreenManager) : CommonNavigationScreen(manager) {
     }
 
     override suspend fun initialize() {
-        println("initialize screen main")
-        // TODO:
-    }
-
-    init {
-        println("init screen main")
+        get<SubScreenMe>().updateUserToken()
     }
 }

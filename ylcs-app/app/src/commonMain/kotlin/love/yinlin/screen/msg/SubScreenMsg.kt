@@ -359,19 +359,12 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
     }
 
     override suspend fun initialize(update: Boolean) {
-        if (!update) {
-            requestActivity()
-            println("initialize screen msg")
-        }
-    }
-
-    init {
-        println("init screen msg")
+        if (!update) requestActivity()
     }
 
     @Composable
     override fun Content(device: Device) {
-        when (LocalDevice.current.type) {
+        when (device.type) {
             Device.Type.PORTRAIT -> Portrait()
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.Device
+import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.ui.floating.FABAction
 import kotlin.reflect.KClass
@@ -16,7 +17,8 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
     @Stable
     data class SubScreenInfo(
         val screen: SubScreen,
-        val clz: KClass<out SubScreen>
+        val clz: KClass<out SubScreen>,
+        val flag: LaunchFlag = LaunchFlag()
     )
 
     abstract val subs: List<SubScreenInfo>
@@ -42,10 +44,10 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
             }
 
             LaunchedEffect(pageIndex) {
-                val subScreen = currentScreen
-                subScreen.firstLoad(
-                    update = { launch { subScreen.initialize(true) } },
-                    init = { launch { subScreen.initialize(false) } }
+                val info = subs[pageIndex]
+                info.flag(
+                    update = { launch { info.screen.initialize(true) } },
+                    init = { launch { info.screen.initialize(false) } }
                 )
             }
         }
