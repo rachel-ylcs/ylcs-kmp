@@ -111,7 +111,7 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 	AppScreen<ScreenMain>(modifier = modifier, deeplink = AppDeepLink) {
 		// 通用
 		screen(::ScreenMain)
-		screen(::ScreenImagePreview, type<List<Picture>>())
+		screen(::ScreenImagePreview, listType<Picture>())
 		screen(::ScreenWebpage)
 		screen(::ScreenVideo)
 		screen(::ScreenTest)
@@ -139,8 +139,8 @@ fun ScreenEntry(modifier: Modifier = Modifier.fillMaxSize()) {
 		// 社区
 	    screen(::ScreenUserCard)
 	    screen(::ScreenTopic, type<Topic>())
-	    screen(::ScreenAddTopic)
-	    screen(::ScreenFollows)
+		screen(::ScreenAddTopic)
+		screen(::ScreenFollows)
 
 		// 账户
 		screen(::ScreenLogin)
