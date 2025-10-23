@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,8 +15,8 @@ import love.yinlin.compose.LocalAnimationSpeed
 
 @Composable
 inline fun <reified Main : BasicScreen<Unit>> AppScreen(
-	modifier: Modifier = Modifier,
-	deeplink: DeepLink,
+	modifier: Modifier = Modifier.fillMaxSize(),
+	deeplink: DeepLink = DeepLink.DEFAULT,
 	crossinline screens: ScreenBuilder.() -> Unit
 ) {
 	val navController = rememberNavController()

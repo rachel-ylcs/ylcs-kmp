@@ -3,6 +3,7 @@ package love.yinlin.compose
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -20,14 +21,14 @@ import org.jetbrains.compose.resources.FontResource
 @Composable
 fun App(
     deviceFactory: (maxWidth: Dp, maxHeight: Dp) -> Device = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
-    themeMode: ThemeMode,
-    fontScale: Float,
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
+    fontScale: Float = 1f,
     mainFontResource: FontResource,
     colorSystem: ColorSystem = DefaultColorSystem,
     shapeSystem: ShapeSystem = DefaultShapeSystem,
     textSystem: TextSystem = DefaultTextSystem,
     customTheme: BaseCustomTheme = LocalCustomTheme.current,
-    modifier: Modifier,
+    modifier: Modifier = Modifier.fillMaxSize(),
     localProvider: Array<ProvidedValue<*>> = emptyArray(),
     content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
