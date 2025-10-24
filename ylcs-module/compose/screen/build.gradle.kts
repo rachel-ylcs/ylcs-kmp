@@ -44,8 +44,9 @@ kotlin {
         val commonMain by getting {
             useApi(
                 projects.ylcsModule.compose.ui,
-                libs.compose.ui.backhandler,
                 libs.compose.navigation,
+            )
+            useLib(
                 libs.compose.navigation.event,
                 libs.compose.components.resources,
             )

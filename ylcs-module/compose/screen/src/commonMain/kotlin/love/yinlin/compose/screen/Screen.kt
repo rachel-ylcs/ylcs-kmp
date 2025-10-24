@@ -1,28 +1,18 @@
 package love.yinlin.compose.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.compose.CustomTheme
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.*
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.floating.Floating
 import love.yinlin.compose.ui.image.ClickIcon
@@ -50,7 +40,7 @@ abstract class Screen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     final override fun BasicContent() {
-        BackHandler { onBack() }
+        NavigationBack(onBack = ::onBack)
 
         val immersivePadding = rememberImmersivePadding()
         Column(modifier = Modifier.fillMaxSize()) {

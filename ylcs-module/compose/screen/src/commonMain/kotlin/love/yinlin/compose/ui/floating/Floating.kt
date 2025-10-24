@@ -14,10 +14,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.compose.*
+import love.yinlin.compose.screen.NavigationBack
 import love.yinlin.compose.ui.node.clickableNoRipple
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -107,7 +107,7 @@ abstract class Floating<A : Any> {
                 }
             }
 
-            BackHandler {
+            NavigationBack {
                 if (dismissOnBackPress) close()
             }
 
