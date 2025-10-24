@@ -367,8 +367,8 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
         }
     }
 
-    override suspend fun initialize(update: Boolean) {
-        if (update) updateUserProfile()
+    override suspend fun update() {
+        updateUserProfile()
     }
 
     @Composable

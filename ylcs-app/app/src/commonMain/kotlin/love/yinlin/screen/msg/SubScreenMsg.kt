@@ -358,8 +358,8 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
         }
     }
 
-    override suspend fun initialize(update: Boolean) {
-        if (!update) requestActivity()
+    override suspend fun initialize() {
+        requestActivity()
     }
 
     @Composable

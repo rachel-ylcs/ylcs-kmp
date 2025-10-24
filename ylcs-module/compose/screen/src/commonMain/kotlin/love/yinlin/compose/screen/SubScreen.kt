@@ -14,7 +14,8 @@ import love.yinlin.compose.ui.floating.FABAction
 abstract class SubScreen(val parent: BasicScreen<*>) {
     val slot: ScreenSlot get() = parent.slot
 
-    open suspend fun initialize(update: Boolean) {}
+    open suspend fun initialize() {}
+	open suspend fun update() {}
 
     @Composable
     abstract fun Content(device: Device)

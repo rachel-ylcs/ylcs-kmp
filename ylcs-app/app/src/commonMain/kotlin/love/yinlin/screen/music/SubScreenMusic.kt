@@ -758,41 +758,39 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		}
 	}
 
-	override suspend fun initialize(update: Boolean) {
-		if (!update) {
-			monitor(state = { factory.currentPosition }) { position ->
-				// 处理进度条
-				if (abs(position - currentDebounceTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentDebounceTime = position
-				// 处理歌词
-				val newLine = lyrics.updateIndex(position)
-				// 处理悬浮歌词
-				factory.floatingLyrics?.let {
-					if (it.isAttached) it.updateLyrics(newLine)
-				}
+	override suspend fun initialize() {
+		monitor(state = { factory.currentPosition }) { position ->
+			// 处理进度条
+			if (abs(position - currentDebounceTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentDebounceTime = position
+			// 处理歌词
+			val newLine = lyrics.updateIndex(position)
+			// 处理悬浮歌词
+			factory.floatingLyrics?.let {
+				if (it.isAttached) it.updateLyrics(newLine)
 			}
-			monitor(state = { factory.currentMusic }) { musicInfo ->
-				lyrics.reset()
+		}
+		monitor(state = { factory.currentMusic }) { musicInfo ->
+			lyrics.reset()
 
-				if (musicInfo != null) catching {
-					Coroutines.io {
-						SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-							lyrics.parseLrcString(source.readString())
-						}
-						hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
-						hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
+			if (musicInfo != null) catching {
+				Coroutines.io {
+					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
+						lyrics.parseLrcString(source.readString())
 					}
+					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
+					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
 				}
-				else {
-					hasAnimation = false
-					hasVideo = false
-					exitSleepMode()
-				}
+			}
+			else {
+				hasAnimation = false
+				hasVideo = false
+				exitSleepMode()
+			}
 
-				if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
-			}
-			monitor(state = { factory.error }) { error ->
-				error?.let { slot.tip.error(it.message) }
-			}
+			if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
+		}
+		monitor(state = { factory.error }) { error ->
+			error?.let { slot.tip.error(it.message) }
 		}
 	}
 

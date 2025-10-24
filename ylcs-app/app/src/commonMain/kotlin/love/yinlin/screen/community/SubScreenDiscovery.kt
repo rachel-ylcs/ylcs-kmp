@@ -238,8 +238,8 @@ class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
         }
     }
 
-    override suspend fun initialize(update: Boolean) {
-        if (!update) requestNewData(true)
+    override suspend fun initialize() {
+        requestNewData(true)
     }
 
     @Composable

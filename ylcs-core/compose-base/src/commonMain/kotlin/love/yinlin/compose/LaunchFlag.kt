@@ -8,4 +8,9 @@ data class LaunchFlag(val value: AtomicBoolean = atomic(false)) {
         if (value.compareAndSet(expect = false, update = true)) init()
         else update()
     }
+
+    suspend operator fun invoke(update: suspend () -> Unit = {}, init: suspend () -> Unit) {
+        if (value.compareAndSet(expect = false, update = true)) init()
+        else update()
+    }
 }
