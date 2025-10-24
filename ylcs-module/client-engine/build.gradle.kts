@@ -42,7 +42,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore.csBase,
+                projects.ylcsBase.csCore,
                 libs.ktor.client,
                 libs.ktor.client.negotiation,
                 libs.ktor.client.websockets,

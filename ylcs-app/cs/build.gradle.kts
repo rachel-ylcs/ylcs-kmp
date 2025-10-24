@@ -42,7 +42,7 @@ kotlin {
         commonMain.configure {
             kotlin.srcDir(C.root.cs.srcGenerated)
             useApi(
-                projects.ylcsCore.csBase,
+                projects.ylcsBase.core,
             )
             useLib(
                 libs.compose.runtime,
@@ -52,7 +52,7 @@ kotlin {
 }
 
 android {
-    namespace = "${C.app.packageName}.cs"
+    namespace = "${C.app.packageName}.base.cs"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

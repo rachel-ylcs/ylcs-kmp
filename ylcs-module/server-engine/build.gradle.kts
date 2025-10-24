@@ -10,7 +10,7 @@ kotlin {
     sourceSets {
         main.configure {
             useApi(
-                projects.ylcsCore.csBase,
+                projects.ylcsBase.csCore,
                 libs.ktor.server,
                 libs.ktor.server.websockets,
                 libs.redis,

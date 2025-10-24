@@ -111,7 +111,7 @@ kotlin {
 }
 
 android {
-    namespace = "${C.app.packageName}.core.base"
+    namespace = "${C.app.packageName}.base.core"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

@@ -41,14 +41,14 @@ kotlin {
     sourceSets {
         commonMain.configure {
             useApi(
-                projects.ylcsCore.base
+                projects.ylcsBase.core,
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.core.cs.base"
+    namespace = "${C.app.packageName}.base.cs_core"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

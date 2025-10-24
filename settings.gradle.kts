@@ -33,9 +33,9 @@ include(
 
     /* -----------------  [1] 核心模块  ----------------- */
 
-    "ylcs-core:base",
-    "ylcs-core:compose-base",
-    "ylcs-core:cs-base",
+    "ylcs-base:core",
+    "ylcs-base:compose-core",
+    "ylcs-base:cs-core",
 
     /* -----------------  [2] 功能模块  ----------------- */
 

@@ -32,10 +32,10 @@
 
 |      M0       |       M1        |          M2           |                      D                       | P |
 |:-------------:|:---------------:|:---------------------:|:--------------------------------------------:|:-:|
-|  `ylcs-core`  |                 |                       |                                              |   |
-|               |     `base`      |                       |                language core                 | ✅ |
-|               | `compose-base`  |                       |                 compose core                 | ✅ |
-|               |    `cs-base`    |                       |                   C/S core                   | ✅ |
+|  `ylcs-base`  |                 |                       |                                              |   |
+|               |     `core`      |                       |                language core                 | ✅ |
+|               | `compose-core`  |                       |                 compose core                 | ✅ |
+|               |    `cs-core`    |                       |                   C/S core                   | ✅ |
 | `ylcs-module` |                 |                       |                                              |   |
 |               |    `compose`    |                       |                                              |   |
 |               |                 |         `app`         |     fast and easy compose app framework      | ✅ |
@@ -47,8 +47,8 @@
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
 |               |    `context`    |                       |      multiplatform application context       | ✅ |
 |               |      `os`       |                       |    system platform related implementation    | ✅ |
-|               |    `startup`    |                       |                                              |   |
-|               |                 |        `base`         |     common application startup services      | ✅ |
+|               |    `service`    |                       |                                              |   |
+|               |                 |       `startup`       |     common application startup services      | ✅ |
 |               | `client-engine` |                       |                client engine                 | ✅ |
 |               | `server-engine` |                       |                server engine                 | ❌ |
 |  `ylcs-app`   |                 |                       |                                              |   |

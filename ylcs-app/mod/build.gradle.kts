@@ -41,7 +41,7 @@ kotlin {
     sourceSets {
         commonMain.configure {
             useApi(
-                projects.ylcsCore.base,
+                projects.ylcsBase.core,
             )
             useLib(
                 libs.compose.runtime

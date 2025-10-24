@@ -43,7 +43,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore.composeBase,
+                projects.ylcsBase.composeCore,
                 libs.compose.components.resources,
             )
         }

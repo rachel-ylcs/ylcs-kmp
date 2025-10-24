@@ -43,7 +43,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsCore.base,
+                projects.ylcsBase.core,
                 libs.compose.runtime,
                 libs.compose.foundation,
                 libs.compose.savedstate,
@@ -103,7 +103,7 @@ dependencies {
 }
 
 android {
-    namespace = "${C.app.packageName}.core.compose.base"
+    namespace = "${C.app.packageName}.base.compose_core"
     compileSdk = C.android.compileSdk
 
     defaultConfig {
