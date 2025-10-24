@@ -143,6 +143,10 @@ Redis 和 MySQL 配置可在 `resources` 中的 `config.properties` 配置
 
 **即每次更新只需要更换服务器 JAR 文件重启即可**
 
+### 构建艺术
+
+![项目依赖结构](docs/pics/art.png)
+
 ## 自研轻量级 C/S 数据共享框架
 
 ### 接口定义

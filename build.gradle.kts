@@ -11,9 +11,4 @@ plugins {
     alias(libs.plugins.kotlinAndroid) apply false
 }
 
-println("---------- ylcs ----------")
-println("[TaskName] $currentTaskName")
-println("[Platform] ${C.platform}")
-println("[Architecture] ${C.architecture}")
-println("[Environment] ${C.environment}")
-println("---------- ylcs ----------")
+showtime()

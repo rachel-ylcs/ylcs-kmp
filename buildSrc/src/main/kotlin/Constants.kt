@@ -106,6 +106,9 @@ class Constants(project: Project) {
         }
     }
 
+    // 平台版本
+    val platformVersion = System.getProperty("os.version") ?: ""
+
     // 架构
     val architecture = System.getProperty("os.arch").lowercase().let {
         when {
@@ -118,6 +121,21 @@ class Constants(project: Project) {
             else -> error("Unsupported architecture: $it")
         }
     }
+
+    // Gradle版本
+    val gradleVersion = project.gradle.gradleVersion
+
+    // Java版本
+    val javaVersion = System.getProperty("java.version") ?: ""
+
+    // 最大内存
+    val maxMemory = Runtime.getRuntime().maxMemory()
+
+    // 已分配内存
+    val totalMemory = Runtime.getRuntime().totalMemory()
+
+    // 可用内存
+    val freeMemory = Runtime.getRuntime().freeMemory()
 
     // kotlin 特性
     val features = listOf(
