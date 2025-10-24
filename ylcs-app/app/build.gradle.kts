@@ -110,7 +110,7 @@ kotlin {
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.componentAll,
                 projects.ylcsModule.os,
-                projects.ylcsModule.service.base,
+                projects.ylcsModule.service.startup,
                 projects.ylcsModule.clientEngine,
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,

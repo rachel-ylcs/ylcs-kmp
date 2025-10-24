@@ -44,7 +44,6 @@ include(
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
     "ylcs-module:service:startup",
-    "ylcs-module:service:base",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:screen",
