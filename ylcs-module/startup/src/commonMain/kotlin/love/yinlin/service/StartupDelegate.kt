@@ -9,7 +9,11 @@ class StartupDelegate<S : Startup> internal constructor(
     private val factory: () -> S,
     private val args: Array<Any?>,
 ) : ReadOnlyProperty<Any?, Startup> {
-    constructor(type: StartupType, factory: () -> S, args: Array<Any?>) : this(StartupPrivilege.System, type, factory, args)
+    constructor(type: StartupType, factory: () -> S, args: Array<Any?>) : this(StartupPrivilege.User, type, factory, args)
+
+    companion object {
+        fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>) = StartupDelegate(StartupPrivilege.System, type, factory, args)
+    }
 
     private lateinit var startup: S
 

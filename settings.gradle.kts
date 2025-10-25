@@ -39,7 +39,7 @@ include(
 
     /* -----------------  [2] 功能模块  ----------------- */
 
-    "ylcs-module:service:startup",
+    "ylcs-module:startup",
     "ylcs-module:service:all",
     "ylcs-module:service:context",
     "ylcs-module:service:os",

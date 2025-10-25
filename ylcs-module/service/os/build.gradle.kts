@@ -41,7 +41,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.service.startup,
+                projects.ylcsModule.startup,
             )
         }
     }
