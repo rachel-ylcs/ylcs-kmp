@@ -50,7 +50,7 @@ internal fun rememberWebImageKeyUrl(uri: String, key: Any? = null): String = rem
 }
 
 @Composable
-fun rememberWebImageState(
+internal fun rememberWebImageState(
     quality: ImageQuality,
     background: Color? = MaterialTheme.colorScheme.scrim,
     isCrossfade: Boolean = true,
@@ -126,7 +126,7 @@ internal fun rememberWebImageIndicator(): WebImageIndicator {
 }
 
 @Composable
-fun WebImage(
+internal fun WebImage(
     uri: String,
     key: Any? = null,
     modifier: Modifier = Modifier,
@@ -135,8 +135,7 @@ fun WebImage(
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
     alpha: Float = 1f,
-    animated: Boolean = true,
-    state: AsyncImageState = rememberWebImageState(quality, animated = animated),
+    state: AsyncImageState,
     onClick: (() -> Unit)? = null
 ) {
     Box(modifier = modifier) {
@@ -155,4 +154,31 @@ fun WebImage(
                 .progressIndicator(state, progressIndicator)
         )
     }
+}
+
+@Composable
+fun WebImage(
+    uri: String,
+    key: Any? = null,
+    modifier: Modifier = Modifier,
+    circle: Boolean = false,
+    quality: ImageQuality = ImageQuality.Medium,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = 1f,
+    animated: Boolean = true,
+    onClick: (() -> Unit)? = null
+) {
+    WebImage(
+        uri = uri,
+        key = key,
+        modifier = modifier,
+        circle = circle,
+        quality = quality,
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        state = rememberWebImageState(quality, animated = animated),
+        onClick = onClick
+    )
 }

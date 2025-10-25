@@ -7,6 +7,7 @@ import kotlinx.io.Source
 import kotlinx.io.asInputStream
 import kotlinx.io.asOutputStream
 import androidx.core.graphics.scale
+import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.data.ImageQuality
 
 actual typealias ImageOwner = Bitmap
@@ -40,7 +41,7 @@ actual data object ImageCompress : ImageOp {
     }
 }
 
-actual data class ImageCrop actual constructor(val rect: CropResult): ImageOp {
+actual data class ImageCrop actual constructor(val rect: ImageCropResult): ImageOp {
     actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
         return Bitmap.createBitmap(
             owner,

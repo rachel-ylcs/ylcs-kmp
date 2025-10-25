@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
-import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
@@ -47,6 +46,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.ui.component.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
@@ -704,7 +704,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
 
     @Composable
     private fun Portrait(details: TopicDetails) {
-        bindPauseLoadWhenScrolling(listState)
+        PauseLoading(listState)
 
         PaginationColumn(
             items = pageComments.items,
@@ -753,7 +753,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             }
             VerticalDivider()
 
-            bindPauseLoadWhenScrolling(listState)
+            PauseLoading(listState)
 
             PaginationColumn(
                 items = pageComments.items,
@@ -858,7 +858,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
         @Composable
         override fun Content(args: Comment) {
             val state = rememberLazyListState()
-            bindPauseLoadWhenScrolling(state)
+            PauseLoading(state)
 
             PaginationColumn(
                 items = page.items,

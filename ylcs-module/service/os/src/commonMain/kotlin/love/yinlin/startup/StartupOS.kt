@@ -19,10 +19,8 @@ class StartupOS : SyncStartup {
         private set
 
     override fun init(context: PlatformContext, args: StartupArgs) {
-        val appName: String = args[0]
-
         application = buildOSApplication(context)
         net = buildOSNet(context)
-        storage = buildOSStorage(context, appName)
+        storage = buildOSStorage(context, args[0])
     }
 }

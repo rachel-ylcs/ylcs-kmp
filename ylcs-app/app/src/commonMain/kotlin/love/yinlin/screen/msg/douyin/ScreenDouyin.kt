@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.api.DouyinAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
@@ -29,6 +28,7 @@ import love.yinlin.extension.parseJson
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
@@ -186,7 +186,8 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            bindPauseLoadWhenScrolling(gridState)
+            PauseLoading(gridState)
+
             PaginationStaggeredGrid(
                 items = items,
                 key = { it.id },

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.AsyncImageState
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.compose.data.ImageQuality
@@ -25,11 +24,11 @@ fun LocalFileImage(
     contentScale: ContentScale = ContentScale.Fit,
     alpha: Float = 1f,
     animated: Boolean = true,
-    state: AsyncImageState = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
     onClick: (() -> Unit)? = null
 ) {
     val baseUri = remember(*key) { path().toString() }
     val baseKey = remember(*key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
+    val state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated)
     Box(modifier = modifier) {
         AsyncImage(
             uri = rememberWebImageKeyUrl(baseUri, baseKey),

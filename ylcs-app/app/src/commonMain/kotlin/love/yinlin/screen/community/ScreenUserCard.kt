@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -27,6 +26,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -247,7 +247,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
     @Composable
     private fun Portrait(profile: UserPublicProfile) {
         if (profile.status.canShowTopics) {
-            bindPauseLoadWhenScrolling(listState)
+            PauseLoading(listState)
 
             PaginationStaggeredGrid(
                 items = page.items,
@@ -292,7 +292,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
                     .padding(CustomTheme.padding.equalExtraValue)
             )
             if (profile.status.canShowTopics) {
-                bindPauseLoadWhenScrolling(listState)
+                PauseLoading(listState)
 
                 PaginationStaggeredGrid(
                     items = page.items,

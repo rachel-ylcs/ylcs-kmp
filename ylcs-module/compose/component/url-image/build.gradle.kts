@@ -45,6 +45,8 @@ kotlin {
             useApi(
                 projects.ylcsModule.compose.ui,
                 projects.ylcsModule.startup,
+            )
+            useLib(
                 projects.ylcsModule.clientEngine,
                 libs.sketch,
                 libs.sketch.http,
@@ -53,8 +55,6 @@ kotlin {
                 libs.sketch.webp,
                 libs.sketch.extensions.compose,
                 libs.sketch.zoom,
-            )
-            useLib(
                 libs.compose.components.resources,
             )
         }

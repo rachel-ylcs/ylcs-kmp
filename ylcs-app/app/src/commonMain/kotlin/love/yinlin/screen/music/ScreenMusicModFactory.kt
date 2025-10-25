@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
@@ -36,6 +35,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 
 @Composable
@@ -175,7 +175,7 @@ class ScreenMusicModFactory(manager: ScreenManager) : CommonScreen(manager) {
     override fun Content(device: Device) {
         if (pageSongs.items.isEmpty()) EmptyBox()
         else {
-            bindPauseLoadWhenScrolling(gridState)
+            PauseLoading(gridState)
 
             PaginationGrid(
                 items = pageSongs.items,

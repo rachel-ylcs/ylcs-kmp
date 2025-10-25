@@ -3,6 +3,7 @@ package love.yinlin.platform
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
+import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.data.ImageQuality
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
@@ -83,7 +84,7 @@ actual data object ImageCompress : ImageOp {
     }
 }
 
-actual data class ImageCrop actual constructor(val rect: CropResult): ImageOp {
+actual data class ImageCrop actual constructor(val rect: ImageCropResult): ImageOp {
     actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
         val actualX = rect.xPercent * owner.width
         val actualY = rect.yPercent * owner.height

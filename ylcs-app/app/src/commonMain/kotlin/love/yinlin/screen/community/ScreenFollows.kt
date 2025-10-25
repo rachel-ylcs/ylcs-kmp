@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
-import com.github.panpf.sketch.ability.bindPauseLoadWhenScrolling
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
@@ -23,6 +22,7 @@ import love.yinlin.api.ServerRes
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -263,7 +263,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 if (items.isEmpty()) EmptyBox()
                 else {
-                    bindPauseLoadWhenScrolling(gridState)
+                    PauseLoading(gridState)
 
                     PaginationGrid(
                         items = items,

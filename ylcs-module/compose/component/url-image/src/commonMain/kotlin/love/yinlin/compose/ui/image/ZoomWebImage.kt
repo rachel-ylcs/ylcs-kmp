@@ -5,10 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import com.github.panpf.sketch.AsyncImageState
 import com.github.panpf.sketch.ability.progressIndicator
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
-import com.github.panpf.zoomimage.SketchZoomState
 import com.github.panpf.zoomimage.rememberSketchZoomState
 import love.yinlin.compose.data.ImageQuality
 
@@ -16,16 +14,16 @@ import love.yinlin.compose.data.ImageQuality
 fun ZoomWebImage(
     uri: String,
     key: Any? = null,
-    zoomState: SketchZoomState = rememberSketchZoomState(),
     modifier: Modifier = Modifier,
     quality: ImageQuality = ImageQuality.High,
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
-    alpha: Float = 1f,
-    state: AsyncImageState = rememberWebImageState(quality, isCrossfade = false)
+    alpha: Float = 1f
 ) {
     Box(modifier = modifier) {
         val progressIndicator = rememberWebImageIndicator()
+        val state = rememberWebImageState(quality, isCrossfade = false)
+        val zoomState = rememberSketchZoomState()
 
         SketchZoomAsyncImage(
             uri = rememberWebImageKeyUrl(uri, key),

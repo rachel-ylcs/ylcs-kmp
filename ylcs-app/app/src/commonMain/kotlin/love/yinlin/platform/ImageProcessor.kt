@@ -3,6 +3,7 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
+import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.data.ImageQuality
 import kotlin.math.max
 import kotlin.math.min
@@ -55,14 +56,7 @@ expect object ImageCompress : ImageOp {
     override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
 }
 
-data class CropResult(
-    val xPercent: Float,
-    val yPercent: Float,
-    val widthPercent: Float,
-    val heightPercent: Float
-)
-
-expect class ImageCrop(rect: CropResult): ImageOp {
+expect class ImageCrop(rect: ImageCropResult): ImageOp {
     override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
 }
 
