@@ -9,7 +9,7 @@ import love.yinlin.service.PlatformContext
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    AppService.init(PlatformContext)
+    service.init(PlatformContext)
     ActualAppContext().apply {
         app = this
         initialize()

@@ -22,6 +22,7 @@ import love.yinlin.platform.*
 import love.yinlin.resources.Res
 import love.yinlin.resources.app_name
 import love.yinlin.resources.img_logo
+import love.yinlin.service.PlatformContext
 import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -29,7 +30,7 @@ import java.awt.Dimension
 import java.awt.Rectangle
 
 fun main() {
-    AppService.init(love.yinlin.service.PlatformContext)
+    service.init(PlatformContext)
 
     val appContext = ActualAppContext().apply {
         app = this

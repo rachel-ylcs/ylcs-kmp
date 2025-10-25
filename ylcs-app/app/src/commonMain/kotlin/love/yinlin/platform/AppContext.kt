@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.AppService
 import love.yinlin.common.KVConfig
 import love.yinlin.common.Paths
 import love.yinlin.common.Resource
+import love.yinlin.service
 
 @Stable
 abstract class AppContext {
@@ -24,8 +24,8 @@ abstract class AppContext {
 
 	private fun initializePath() {
 		Platform.useNot(Platform.WebWasm) {
-			SystemFileSystem.createDirectories(AppService.os.storage.dataPath)
-			SystemFileSystem.createDirectories(AppService.os.storage.cachePath)
+			SystemFileSystem.createDirectories(service.os.storage.dataPath)
+			SystemFileSystem.createDirectories(service.os.storage.cachePath)
 
 			SystemFileSystem.createDirectories(Paths.musicPath)
 		}

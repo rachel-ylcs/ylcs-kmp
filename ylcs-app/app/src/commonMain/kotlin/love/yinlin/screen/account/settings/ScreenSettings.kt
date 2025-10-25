@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.AppService
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -62,6 +61,7 @@ import love.yinlin.screen.account.ScreenLogin
 import love.yinlin.screen.account.SubScreenMe
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.ScreenUserCard
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -72,10 +72,10 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun pickPicture(aspectRatio: Float): Path? {
         return Picker.pickPicture()?.use { source ->
-            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }?.let { path ->
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                AppService.os.storage.createTempFile { sink ->
+                service.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
@@ -220,8 +220,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun clearCache(): String = Coroutines.io {
-        AppService.os.storage.clearCache()
-        AppService.os.storage.cacheSize.fileSizeString
+        service.os.storage.clearCache()
+        service.os.storage.cacheSize.fileSizeString
     }
 
     private suspend fun sendFeedback(content: String) {
@@ -455,7 +455,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
             title = "应用",
             icon = Icons.Outlined.Info
         ) {
-            var cacheSizeText by rememberState { AppService.os.storage.cacheSize.fileSizeString }
+            var cacheSizeText by rememberState { service.os.storage.cacheSize.fileSizeString }
             ItemExpanderSuspend(
                 title = "清理缓存",
                 icon = colorfulImageVector(icon = Icons.Outlined.DeleteSweep, background = Colors.Red4),
@@ -671,7 +671,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                         onClick = {
                             launch {
                                 Uri.parse(getString(Res.string.app_website))?.let {
-                                    AppService.os.net.openUri(it)
+                                    service.os.net.openUri(it)
                                 }
                             }
                         }
@@ -682,7 +682,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                         onClick = {
                             launch {
                                 Uri.parse(getString(Res.string.app_repository))?.let {
-                                    AppService.os.net.openUri(it)
+                                    service.os.net.openUri(it)
                                 }
                             }
                         }

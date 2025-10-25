@@ -30,7 +30,6 @@ import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
-import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ExtraIcons
@@ -70,6 +69,7 @@ import love.yinlin.screen.community.TipButtonContainer
 import love.yinlin.screen.community.UserProfileCard
 import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
+import love.yinlin.service
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.QrcodeScanner
@@ -235,12 +235,12 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     Platform.use(
                         *Platform.Phone,
                         ifTrue = {
-                            if (!AppService.os.application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning(
+                            if (!service.os.application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning(
                                 "未安装QQ"
                             )
                         },
                         ifFalse = {
-                            AppService.os.application.startAppIntent(
+                            service.os.application.startAppIntent(
                                 UriGenerator.qqGroup(
                                     "0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E",
                                     "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R"
@@ -252,7 +252,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             }
             Item("店铺", ExtraIcons.Taobao) {
                 launch {
-                    if (!AppService.os.application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                    if (!service.os.application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
                 }
             }
         }

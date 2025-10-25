@@ -1,8 +1,6 @@
 package love.yinlin.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -10,12 +8,11 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
-import love.yinlin.AppService
 import love.yinlin.common.uri.toPath
-import love.yinlin.extension.DateEx
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.extension.toNSData
+import love.yinlin.service
 import platform.darwin.*
 import platform.Foundation.*
 import platform.UniformTypeIdentifiers.*
@@ -51,7 +48,7 @@ actual object Picker {
                             val srcUrl = url?.toPath()
                             if (srcUrl != null) {
                                 Coroutines.startIO {
-                                    val tempUrl = AppService.os.storage.createTempFile { sink ->
+                                    val tempUrl = service.os.storage.createTempFile { sink ->
                                         SystemFileSystem.source(srcUrl).buffered().use { it.transferTo(sink) } > 0L
                                     }
                                     if (tempUrl != null) images += tempUrl

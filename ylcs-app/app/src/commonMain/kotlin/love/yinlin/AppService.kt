@@ -2,6 +2,8 @@ package love.yinlin
 
 import love.yinlin.service.Service
 
-expect object AppService : Service {
+abstract class AppService : Service(Local.info) {
 
 }
+
+expect val service: AppService

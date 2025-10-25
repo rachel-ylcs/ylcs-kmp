@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
-import love.yinlin.AppService
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -57,6 +56,7 @@ import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.SubScreenDiscovery
 import love.yinlin.screen.community.UserBar
+import love.yinlin.service
 
 @Stable
 private enum class ModQQGroup(
@@ -393,8 +393,8 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
                 else {
                     val result = Platform.use(*Platform.Phone,
-                        ifTrue = { AppService.os.application.startAppIntent(UriGenerator.qqGroup(group.id)) },
-                        ifFalse = { AppService.os.application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
+                        ifTrue = { service.os.application.startAppIntent(UriGenerator.qqGroup(group.id)) },
+                        ifFalse = { service.os.application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
                     )
                     if (!result) slot.tip.warning("未安装QQ")
                 }

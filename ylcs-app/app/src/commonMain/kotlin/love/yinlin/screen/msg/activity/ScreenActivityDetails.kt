@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.uri.Uri
@@ -42,6 +41,7 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.service
 
 @Composable
 private fun ActivityDetailsLayout(
@@ -144,7 +144,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 							launch {
 								val uri = Uri.parse(showstart)
 								if (uri == null) slot.tip.warning("链接已失效")
-								else if (!AppService.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
+								else if (!service.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
 							}
 						}
 					)

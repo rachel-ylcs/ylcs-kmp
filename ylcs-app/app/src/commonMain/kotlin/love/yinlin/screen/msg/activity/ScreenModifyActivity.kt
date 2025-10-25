@@ -8,7 +8,6 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
-import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.Device
@@ -24,6 +23,7 @@ import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 
 @Stable
@@ -147,7 +147,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 
 	private suspend fun modifyPictures(index: Int) {
 		Picker.pickPicture()?.use { source ->
-			AppService.os.storage.createTempFile { sink ->
+			service.os.storage.createTempFile { sink ->
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
 		}?.let { path ->

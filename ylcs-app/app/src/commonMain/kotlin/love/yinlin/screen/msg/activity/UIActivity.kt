@@ -15,7 +15,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.AppService
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.text.TextInput
@@ -24,6 +23,7 @@ import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.*
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.ReplaceableImage
@@ -64,11 +64,11 @@ internal class ActivityInputState(initActivity: Activity? = null) {
 
     suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
         val path = Picker.pickPicture()?.use { source ->
-            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
-                AppService.os.storage.createTempFile { sink ->
+                service.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
@@ -81,7 +81,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
         Picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
-                AppService.os.storage.createTempFile { sink ->
+                service.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let { path += it }
             }

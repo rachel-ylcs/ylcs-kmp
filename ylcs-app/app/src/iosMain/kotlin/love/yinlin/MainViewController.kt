@@ -14,7 +14,7 @@ import platform.UIKit.UIViewController
 lateinit var controller: UIViewController
 
 fun MainViewController(): UIViewController {
-    AppService.init(PlatformContext)
+    service.init(PlatformContext)
     ActualAppContext().apply {
         app = this
         initialize()

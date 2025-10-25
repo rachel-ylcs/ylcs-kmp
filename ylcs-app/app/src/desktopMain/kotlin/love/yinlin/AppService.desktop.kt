@@ -3,13 +3,12 @@ package love.yinlin
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.platform.Platform
 import love.yinlin.platform.platform
-import love.yinlin.service.Service
 import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
 import love.yinlin.startup.StartupSingleInstance
 import kotlin.io.path.Path
 
-actual object AppService : Service(Local.info) {
+actual val service = object : AppService() {
     val loadNativeLibrary by sync { System.loadLibrary("ylcs_native") }
 
     val setupVLC by sync {

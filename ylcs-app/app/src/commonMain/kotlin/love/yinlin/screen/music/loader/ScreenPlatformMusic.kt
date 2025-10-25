@@ -23,7 +23,6 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
-import love.yinlin.AppService
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
@@ -49,6 +48,7 @@ import love.yinlin.compose.ui.input.Radio
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.*
+import love.yinlin.service
 import love.yinlin.ui.component.lyrics.LyricsLrc
 
 @Composable
@@ -196,7 +196,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
             Coroutines.io {
                 for (item in items) {
                     // 1. 下载音频
-                    val audioFile = AppService.os.storage.createTempFile { sink ->
+                    val audioFile = service.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.audioUrl,
                             sink = sink,
@@ -206,7 +206,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                         )
                     }
                     // 2. 下载封面
-                    val recordFile = AppService.os.storage.createTempFile { sink ->
+                    val recordFile = service.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.pic,
                             sink = sink,

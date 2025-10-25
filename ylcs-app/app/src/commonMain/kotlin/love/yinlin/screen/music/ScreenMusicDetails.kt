@@ -26,7 +26,6 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
-import love.yinlin.AppService
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -50,6 +49,7 @@ import love.yinlin.ui.component.layout.ExpandableLayout
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 
 @Stable
@@ -121,10 +121,10 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
         @Stable
         data class Picture(val aspectRatio: Float = 0f) : ReplaceStrategy(needUpdateInfo = true) {
             override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickPicture()?.use { source ->
-                AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+                service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
             }?.let { path ->
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                    AppService.os.storage.createTempFile { sink ->
+                    service.os.storage.createTempFile { sink ->
                         SystemFileSystem.source(path).buffered().use { source ->
                             ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
                         }

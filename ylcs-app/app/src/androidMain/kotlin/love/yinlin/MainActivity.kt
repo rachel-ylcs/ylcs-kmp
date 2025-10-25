@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
 
         enabledImmersiveMode()
 
-        AppService.context.bindActivity(this, activityResultRegistry)
+        service.context.bindActivity(this, activityResultRegistry)
         appNative.activity = this
         appNative.activityResultRegistry = activityResultRegistry
 

@@ -19,7 +19,6 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
-import love.yinlin.AppService
 import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -38,6 +37,7 @@ import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.*
+import love.yinlin.service
 
 @Stable
 private class MusicInfoState {
@@ -67,11 +67,11 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
         val path = Picker.pickPicture()?.use { source ->
-            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                AppService.os.storage.createTempFile { sink ->
+                service.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
                     }
