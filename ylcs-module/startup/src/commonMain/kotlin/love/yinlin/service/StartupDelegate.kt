@@ -7,14 +7,15 @@ class StartupDelegate<S : Startup> internal constructor(
     val privilege: StartupPrivilege,
     val type: StartupType,
     private val factory: () -> S,
-    private val args: Array<Any?>,
+    args: Array<Any?>,
 ) : ReadOnlyProperty<Any?, Startup> {
     constructor(type: StartupType, factory: () -> S, args: Array<Any?>) : this(StartupPrivilege.User, type, factory, args)
 
     companion object {
-        fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>) = StartupDelegate(StartupPrivilege.System, type, factory, args)
+        fun <S : Startup> system(type: StartupType, args: Array<Any?>, factory: () -> S) = StartupDelegate(StartupPrivilege.System, type, factory, args)
     }
 
+    private val startupArgs = StartupArgs(args)
     private lateinit var startup: S
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): S = startup
@@ -24,10 +25,10 @@ class StartupDelegate<S : Startup> internal constructor(
     }
 
     fun init(context: PlatformContext) {
-        (startup as SyncStartup).init(context, args)
+        (startup as SyncStartup).init(context, startupArgs)
     }
 
     suspend fun initAsync(context: PlatformContext) {
-        (startup as AsyncStartup).init(context, args)
+        (startup as AsyncStartup).init(context, startupArgs)
     }
 }

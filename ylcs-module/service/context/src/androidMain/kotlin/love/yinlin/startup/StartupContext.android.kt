@@ -3,6 +3,7 @@ package love.yinlin.startup
 import android.app.Activity
 import androidx.activity.result.ActivityResultRegistry
 import love.yinlin.service.PlatformContext
+import love.yinlin.service.StartupArgs
 import love.yinlin.service.SyncStartup
 
 actual class StartupContext : SyncStartup {
@@ -12,7 +13,7 @@ actual class StartupContext : SyncStartup {
 
     actual val platformContext: PlatformContext get() = mContext
 
-    actual override fun init(context: PlatformContext, args: Array<Any?>) {
+    actual override fun init(context: PlatformContext, args: StartupArgs) {
         mContext = context
     }
 

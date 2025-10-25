@@ -27,16 +27,16 @@ open class BasicService {
         return delegate
     }
 
-    protected fun sync(vararg args: Any?, factory: (args: Array<Any?>) -> Unit) = service<SyncStartup>(*args) {
-        SyncStartup { _, args -> factory(args) }
+    protected fun sync(vararg args: Any?, factory: (StartupArgs) -> Unit) = service<SyncStartup>(*args) {
+        SyncStartup { _, startupArgs -> factory(startupArgs) }
     }
 
-    protected fun async(vararg args: Any?, factory: suspend (args: Array<Any?>) -> Unit) = service<AsyncStartup>(*args) {
-        AsyncStartup { _, args -> factory(args) }
+    protected fun async(vararg args: Any?, factory: suspend (StartupArgs) -> Unit) = service<AsyncStartup>(*args) {
+        AsyncStartup { _, startupArgs -> factory(startupArgs) }
     }
 
-    protected fun free(vararg args: Any?, factory: suspend (args: Array<Any?>) -> Unit) = service<FreeStartup>(*args) {
-        FreeStartup { _, args -> factory(args) }
+    protected fun free(vararg args: Any?, factory: suspend (StartupArgs) -> Unit) = service<FreeStartup>(*args) {
+        FreeStartup { _, startupArgs -> factory(startupArgs) }
     }
 
     private fun initSync(context: PlatformContext, delegate: StartupDelegate<out Startup>) {
