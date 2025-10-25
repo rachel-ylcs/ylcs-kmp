@@ -4,9 +4,10 @@ import love.yinlin.service.PlatformContext
 
 actual fun buildStartupExceptionHandler(): StartupExceptionHandler = object : StartupExceptionHandler() {
     override fun init(context: PlatformContext, args: Array<Any?>) {
-        val handler = args[0] as Handler
+        super.init(context, args)
+        val handler = args[1] as Handler
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            handler.handle(e, e.stackTraceToString())
+            handler.handle(crashKey, e, e.stackTraceToString())
         }
     }
 }

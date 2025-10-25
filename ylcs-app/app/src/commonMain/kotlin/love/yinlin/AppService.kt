@@ -20,8 +20,8 @@ abstract class AppService : Service(Local.info) {
         }
     }
 
-    val exceptionHandler by service(StartupExceptionHandler.Handler { e, error ->
-        app.kv.set("crash_key", "${DateEx.CurrentString}\n$error")
+    val exceptionHandler by service("crash_key", StartupExceptionHandler.Handler { key, e, error ->
+        app.kv.set(key, "${DateEx.CurrentString}\n$error")
         println(e.stackTraceToString())
     }, factory = ::buildStartupExceptionHandler)
 

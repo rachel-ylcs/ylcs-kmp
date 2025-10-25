@@ -7,10 +7,6 @@ import love.yinlin.common.KVConfig
 
 @Stable
 abstract class AppContext {
-	companion object {
-		const val CRASH_KEY = "crash_key"
-	}
-
 	// KV
 	abstract val kv: KV
 	lateinit var config: KVConfig
