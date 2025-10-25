@@ -111,7 +111,6 @@ kotlin {
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.service.all,
                 projects.ylcsModule.clientEngine,
-                projects.ylcsModule.os,
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
                 libs.compose.components.resources,

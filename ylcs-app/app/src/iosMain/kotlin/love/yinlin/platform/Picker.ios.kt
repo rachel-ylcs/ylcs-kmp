@@ -1,6 +1,8 @@
 package love.yinlin.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -8,7 +10,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
+import love.yinlin.AppService
 import love.yinlin.common.uri.toPath
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.extension.toNSData
@@ -42,16 +46,24 @@ actual object Picker {
                     val images = mutableListOf<Path>()
                     var processedImages = 0
                     results.forEach { pickerResult ->
-                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
-                                url, _ ->
-                            val tempUrl = copyToTempDir(url)
-                            tempUrl?.toPath()?.let { path -> images.add(path) }
-                            processedImages++
-                            if (processedImages == results.size) {
-                                continuation.resume(images.safeToSources {
-                                    SystemFileSystem.source(it).buffered()
-                                })
+                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) { url, _ ->
+                            // TODO: 此处已被修改, 需要review
+                            val srcUrl = url?.toPath()
+                            if (srcUrl != null) {
+                                Coroutines.startIO {
+                                    val tempUrl = AppService.os.storage.createTempFile { sink ->
+                                        SystemFileSystem.source(srcUrl).buffered().use { it.transferTo(sink) } > 0L
+                                    }
+                                    if (tempUrl != null) images += tempUrl
+                                    processedImages++
+                                    if (processedImages == results.size) {
+                                        continuation.resume(images.safeToSources {
+                                            SystemFileSystem.source(it).buffered()
+                                        })
+                                    }
+                                }
                             }
+                            else processedImages++
                         }
                     }
                 }

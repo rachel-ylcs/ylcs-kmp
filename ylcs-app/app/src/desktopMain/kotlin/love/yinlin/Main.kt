@@ -16,9 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import kotlinx.coroutines.launch
-import love.yinlin.common.uri.toUri
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.DeepLink
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
 import love.yinlin.resources.Res
@@ -27,45 +25,15 @@ import love.yinlin.resources.img_logo
 import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Rectangle
-import kotlin.io.path.Path
-
-private object LibraryLoader {
-    init {
-        // 本机库
-        System.loadLibrary("ylcs_native")
-        // VLC
-        val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
-            when (platform) {
-                Platform.Windows -> it.resolve("vlc")
-                Platform.Linux -> it.resolve("bin/vlc")
-                Platform.MacOS -> it.resolve("MacOS/vlc")
-                else -> it
-            }
-        }
-        System.setProperty("jna.library.path", vlcPath.toString())
-    }
-}
 
 fun main() {
-    LibraryLoader.run { singleInstance() }
-
-    System.setProperty("compose.swing.render.on.graphics", "true")
-    System.setProperty("compose.interop.blending", "true")
-
     AppService.init(love.yinlin.service.PlatformContext)
 
-    val appContext1 = ActualAppContext().apply {
+    val appContext = ActualAppContext().apply {
         app = this
         initialize()
-    }
-
-    Platform.use(Platform.MacOS) {
-        Desktop.getDesktop().setOpenURIHandler { event ->
-            DeepLink.openUri(event.uri.toUri())
-        }
     }
 
     application(exitProcessOnExit = true) {
@@ -84,7 +52,7 @@ fun main() {
             onCloseRequest = ::exitApplication,
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.img_logo),
-            visible = appContext1.windowVisible,
+            visible = appContext.windowVisible,
             undecorated = true,
             resizable = true,
             transparent = true,
@@ -154,7 +122,7 @@ fun main() {
                                 tip = "最小化到托盘",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             ) {
-                                appContext1.windowVisible = false
+                                appContext.windowVisible = false
                             }
                             Action(
                                 icon = Icons.Outlined.CropSquare,
@@ -184,18 +152,18 @@ fun main() {
             message = "已隐藏到任务栏托盘中",
             type = Notification.Type.Info
         )
-        LaunchedEffect(appContext1.windowVisible) {
-            if (!appContext1.windowVisible && appContext1.config.enabledTip) trayState.sendNotification(notification)
+        LaunchedEffect(appContext.windowVisible) {
+            if (!appContext.windowVisible && appContext.config.enabledTip) trayState.sendNotification(notification)
         }
         Tray(
             icon = painterResource(Res.drawable.img_logo),
             state = trayState,
-            onAction = { appContext1.windowVisible = true }
+            onAction = { appContext.windowVisible = true }
         )
 
         // 悬浮歌词
-        (appContext1.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
-            if (it.isAttached && appContext1.config.enabledFloatingLyrics) it.Content()
+        (appContext.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
+            if (it.isAttached && appContext.config.enabledFloatingLyrics) it.Content()
         }
     }
 }

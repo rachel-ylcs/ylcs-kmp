@@ -5,6 +5,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
+import love.yinlin.common.Paths
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -24,7 +25,7 @@ abstract class MusicFactory {
     abstract val isInit: Boolean
 
     private fun initLibrary() = Coroutines.startIO {
-        val musicPath = OS.Storage.musicPath
+        val musicPath = Paths.musicPath
         SystemFileSystem.list(musicPath).map { it.name }.forEach { id ->
             catching {
                 val configPath = Path(musicPath, id, MusicResourceType.Config.default.toString())
@@ -96,7 +97,7 @@ abstract class MusicFactory {
             val modification = musicLibrary[id]?.modification ?: 0
             val info = Coroutines.io {
                 catchingNull {
-                    val configPath = Path(OS.Storage.musicPath, id, MusicResourceType.Config.default.toString())
+                    val configPath = Path(Paths.musicPath, id, MusicResourceType.Config.default.toString())
                     SystemFileSystem.source(configPath).buffered().use { it.readString().parseJsonValue<MusicInfo>() }!!
                 }
             }

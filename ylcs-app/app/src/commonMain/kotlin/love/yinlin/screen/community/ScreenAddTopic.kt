@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
@@ -31,7 +32,6 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.ImageCompress
 import love.yinlin.platform.ImageProcessor
-import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
@@ -61,7 +61,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
     private suspend fun pickPictures() {
         Picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
-                OS.Storage.createTempFile { sink ->
+                AppService.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let {
                     input.pics += Picture(it.toString())

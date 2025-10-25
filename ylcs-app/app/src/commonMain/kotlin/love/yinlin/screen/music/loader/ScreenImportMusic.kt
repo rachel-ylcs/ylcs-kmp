@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
+import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -91,7 +92,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
     private suspend fun processMod(path: ImplicitPath) {
         val data = try {
             path.source.use { source ->
-                ModFactory.Release(source, OS.Storage.musicPath).process { current, total, id ->
+                ModFactory.Release(source, Paths.musicPath).process { current, total, id ->
                     step = Step.Processing(message = "解压中... [$id] $current / $total")
                 }
             }

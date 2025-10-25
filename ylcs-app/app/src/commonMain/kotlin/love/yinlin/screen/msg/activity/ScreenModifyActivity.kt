@@ -8,6 +8,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.Device
@@ -146,7 +147,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 
 	private suspend fun modifyPictures(index: Int) {
 		Picker.pickPicture()?.use { source ->
-			OS.Storage.createTempFile { sink ->
+			AppService.os.storage.createTempFile { sink ->
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
 		}?.let { path ->

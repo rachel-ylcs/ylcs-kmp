@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.uri.Uri
@@ -27,7 +28,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
-import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_damai
@@ -144,7 +144,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 							launch {
 								val uri = Uri.parse(showstart)
 								if (uri == null) slot.tip.warning("链接已失效")
-								else if (!OS.Application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
+								else if (!AppService.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
 							}
 						}
 					)

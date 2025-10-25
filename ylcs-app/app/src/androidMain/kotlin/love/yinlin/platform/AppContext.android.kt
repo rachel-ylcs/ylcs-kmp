@@ -8,6 +8,7 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
+import love.yinlin.AppService
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
@@ -22,13 +23,13 @@ class ActualAppContext(val context: Context) : AppContext() {
 		logger(level = Logger.Level.Error)
 		downloadCacheOptions {
 			DiskCache.Options(
-				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
+				appCacheDirectory = AppService.os.storage.cachePath.toString().toPath(),
 				maxSize = 400 * 1024 * 1024
 			)
 		}
 		resultCacheOptions {
 			DiskCache.Options(
-				appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
+				appCacheDirectory = AppService.os.storage.cachePath.toString().toPath(),
 				maxSize = 400 * 1024 * 1024
 			)
 		}

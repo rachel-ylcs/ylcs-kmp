@@ -9,6 +9,7 @@ import com.github.panpf.sketch.util.Logger
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
+import love.yinlin.AppService
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.DateEx
 import okio.Path.Companion.toPath
@@ -24,13 +25,13 @@ class ActualAppContext : AppContext() {
         logger(level = Logger.Level.Error)
         downloadCacheOptions {
             DiskCache.Options(
-                appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
+                appCacheDirectory = AppService.os.storage.cachePath.toString().toPath(),
                 maxSize = 400 * 1024 * 1024
             )
         }
         resultCacheOptions {
             DiskCache.Options(
-                appCacheDirectory = OS.Storage.cachePath.toString().toPath(),
+                appCacheDirectory = AppService.os.storage.cachePath.toString().toPath(),
                 maxSize = 400 * 1024 * 1024
             )
         }

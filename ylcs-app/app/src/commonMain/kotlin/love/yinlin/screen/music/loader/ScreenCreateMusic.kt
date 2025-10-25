@@ -19,6 +19,8 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
+import love.yinlin.AppService
+import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.CommonScreen
@@ -65,11 +67,11 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
         val path = Picker.pickPicture()?.use { source ->
-            OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                OS.Storage.createTempFile { sink ->
+                AppService.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
                     }
@@ -107,7 +109,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                 return
             }
             // 4. 生成目录
-            val musicPath = Path(OS.Storage.musicPath, id)
+            val musicPath = Path(Paths.musicPath, id)
             SystemFileSystem.createDirectories(musicPath)
             // 5. 写入配置
             val info = MusicInfo(

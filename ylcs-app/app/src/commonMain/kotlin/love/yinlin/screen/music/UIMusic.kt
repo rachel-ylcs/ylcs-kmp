@@ -6,29 +6,29 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.io.files.Path
+import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicResourceType
-import love.yinlin.platform.OS
 
 @Stable
-val MusicInfo.path: Path get() = Path(OS.Storage.musicPath, this.id)
+val MusicInfo.path: Path get() = Path(Paths.musicPath, this.id)
 @Stable
-val MusicInfo.configPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Config.default.toString())
+val MusicInfo.configPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Config.default.toString())
 @Stable
-val MusicInfo.audioPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Audio.default.toString())
+val MusicInfo.audioPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Audio.default.toString())
 @Stable
-val MusicInfo.recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
+val MusicInfo.recordPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Record.default.toString())
 @Stable
-val MusicInfo.backgroundPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Background.default.toString())
+val MusicInfo.backgroundPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Background.default.toString())
 @Stable
-val MusicInfo.AnimationPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Animation.default.toString())
+val MusicInfo.AnimationPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Animation.default.toString())
 @Stable
-val MusicInfo.lyricsPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
+val MusicInfo.lyricsPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.LineLyrics.default.toString())
 @Stable
-val MusicInfo.videoPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Video.default.toString())
+val MusicInfo.videoPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Video.default.toString())
 @Stable
-val MusicInfo.rhymePath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Rhyme.default.toString())
+val MusicInfo.rhymePath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Rhyme.default.toString())
 
 val MusicResourceType?.background: Brush get() = when (this) {
     MusicResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))

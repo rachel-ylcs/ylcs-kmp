@@ -8,11 +8,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
+import love.yinlin.common.uri.Uri
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.ui.component.platform.WebPage
 import love.yinlin.ui.component.platform.WebPageSettings
@@ -28,7 +29,7 @@ class ScreenWebpage(manager: ScreenManager, args: Args) : Screen<ScreenWebpage.A
 		inline fun gotoWebPage(arg: String, onNavigate: (Args) -> Unit) {
 			Platform.use(
 				*Platform.Desktop,
-				ifTrue = { OS.Net.openUrl(arg) },
+				ifTrue = { Uri.parse(arg)?.let { AppService.os.net.openUri(it) } },
 				ifFalse = { onNavigate(Args(arg)) }
 			)
 		}

@@ -6,7 +6,7 @@ import love.yinlin.service.PlatformContext
 import love.yinlin.service.SyncStartup
 
 actual class StartupContext : SyncStartup {
-    lateinit var mContext: PlatformContext
+    private lateinit var mContext: PlatformContext
     lateinit var activity: Activity
     lateinit var activityResultRegistry: ActivityResultRegistry
 

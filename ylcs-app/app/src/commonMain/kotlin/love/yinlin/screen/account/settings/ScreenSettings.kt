@@ -24,11 +24,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.AppService
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
+import love.yinlin.common.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.CommonScreen
@@ -70,10 +72,10 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun pickPicture(aspectRatio: Float): Path? {
         return Picker.pickPicture()?.use { source ->
-            OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }?.let { path ->
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                OS.Storage.createTempFile { sink ->
+                AppService.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
@@ -218,8 +220,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun clearCache(): String = Coroutines.io {
-        OS.Storage.clearCache()
-        OS.Storage.cacheSize.fileSizeString
+        AppService.os.storage.clearCache()
+        AppService.os.storage.cacheSize.fileSizeString
     }
 
     private suspend fun sendFeedback(content: String) {
@@ -453,7 +455,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
             title = "应用",
             icon = Icons.Outlined.Info
         ) {
-            var cacheSizeText by rememberState { OS.Storage.cacheSize.fileSizeString }
+            var cacheSizeText by rememberState { AppService.os.storage.cacheSize.fileSizeString }
             ItemExpanderSuspend(
                 title = "清理缓存",
                 icon = colorfulImageVector(icon = Icons.Outlined.DeleteSweep, background = Colors.Red4),
@@ -668,7 +670,9 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                         icon = Icons.Outlined.Home,
                         onClick = {
                             launch {
-                                OS.Net.openUrl(getString(Res.string.app_website))
+                                Uri.parse(getString(Res.string.app_website))?.let {
+                                    AppService.os.net.openUri(it)
+                                }
                             }
                         }
                     )
@@ -677,7 +681,9 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                         icon = ExtraIcons.Github,
                         onClick = {
                             launch {
-                                OS.Net.openUrl(getString(Res.string.app_repository))
+                                Uri.parse(getString(Res.string.app_repository))?.let {
+                                    AppService.os.net.openUri(it)
+                                }
                             }
                         }
                     )

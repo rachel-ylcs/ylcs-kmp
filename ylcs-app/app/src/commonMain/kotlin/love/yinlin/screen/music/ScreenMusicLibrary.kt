@@ -21,6 +21,7 @@ import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.ExtraIcons
+import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -37,7 +38,6 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.mod.ModFactory
-import love.yinlin.platform.OS
 import love.yinlin.platform.Picker
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LocalFileImage
@@ -60,7 +60,7 @@ data class MusicInfoPreview(
     constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
 
     @Stable
-    val recordPath: Path get() = Path(OS.Storage.musicPath, this.id, MusicResourceType.Record.default.toString())
+    val recordPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Record.default.toString())
 }
 
 @Composable

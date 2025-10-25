@@ -23,6 +23,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
@@ -38,7 +39,6 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.OS
 import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.resources.Res
@@ -196,7 +196,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
             Coroutines.io {
                 for (item in items) {
                     // 1. 下载音频
-                    val audioFile = OS.Storage.createTempFile { sink ->
+                    val audioFile = AppService.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.audioUrl,
                             sink = sink,
@@ -206,7 +206,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                         )
                     }
                     // 2. 下载封面
-                    val recordFile = OS.Storage.createTempFile { sink ->
+                    val recordFile = AppService.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.pic,
                             sink = sink,
@@ -220,7 +220,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                     if ((SystemFileSystem.metadataOrNull(recordFile)?.size ?: 0L) <= 1024 * 10L) continue
                     // 3. 生成目录
                     val id = "${platformType.prefix}${item.id}"
-                    val musicPath = Path(OS.Storage.musicPath, id)
+                    val musicPath = Path(Paths.musicPath, id)
                     SystemFileSystem.createDirectories(musicPath)
                     // 4. 写入配置
                     val info = MusicInfo(

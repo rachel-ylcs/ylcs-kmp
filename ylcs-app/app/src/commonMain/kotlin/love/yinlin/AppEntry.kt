@@ -35,11 +35,6 @@ import love.yinlin.screen.music.loader.*
 import love.yinlin.screen.world.*
 import love.yinlin.screen.world.battle.ScreenGuessLyrics
 import love.yinlin.screen.world.single.rhyme.ScreenRhyme
-import love.yinlin.service.Service
-
-data object AppService : Service(Local.info) {
-
-}
 
 data object AppDeepLink : DeepLink {
 	private fun schemeContent(manager: ScreenManager, uri: Uri) {

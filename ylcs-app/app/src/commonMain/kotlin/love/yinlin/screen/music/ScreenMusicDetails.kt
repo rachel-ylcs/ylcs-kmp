@@ -26,6 +26,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -67,7 +68,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
             if (!enabled) return
             if (!slot.confirm.openSuspend(content = "删除资源")) return
             catching {
-                val resourceFile = Path(OS.Storage.musicPath, args.id, item.resource.toString())
+                val resourceFile = Path(Paths.musicPath, args.id, item.resource.toString())
                 Coroutines.io { SystemFileSystem.delete(resourceFile) }
                 resources.removeAll { it == item }
             }
@@ -94,7 +95,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
             catching {
                 Coroutines.io {
                     openSource()?.use { source ->
-                        val resourceFile = Path(OS.Storage.musicPath, id, item.resource.toString())
+                        val resourceFile = Path(Paths.musicPath, id, item.resource.toString())
                         SystemFileSystem.sink(resourceFile).buffered().use { sink ->
                             source.transferTo(sink)
                         }
@@ -120,10 +121,10 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
         @Stable
         data class Picture(val aspectRatio: Float = 0f) : ReplaceStrategy(needUpdateInfo = true) {
             override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickPicture()?.use { source ->
-                OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+                AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
             }?.let { path ->
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                    OS.Storage.createTempFile { sink ->
+                    AppService.os.storage.createTempFile { sink ->
                         SystemFileSystem.source(path).buffered().use { source ->
                             ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
                         }

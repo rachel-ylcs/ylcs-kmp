@@ -2,10 +2,11 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
+import love.yinlin.AppService
 
 @Stable
 actual class KV {
-	val handle: Long = init(Path(osAppPath, "config").toString())
+	val handle: Long = init(Path(AppService.os.storage.dataPath, "config").toString())
 
 	actual fun set(key: String, value: Boolean, expire: Int) = setBoolean(handle, key, value, expire)
 	actual fun set(key: String, value: Int, expire: Int) = setInt(handle, key, value, expire)

@@ -7,24 +7,36 @@ open class BasicService {
     protected val startups = mutableListOf<StartupDelegate<out Startup>>()
 
     @JvmName("serviceSync")
-    protected inline fun <reified S : SyncStartup> service(noinline factory: () -> S, vararg args: Any?) : StartupDelegate<S> {
+    protected inline fun <reified S : SyncStartup> service(vararg args: Any?, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Sync, factory, arrayOf(*args))
         startups += delegate
         return delegate
     }
 
     @JvmName("serviceASync")
-    protected inline fun <reified S : AsyncStartup> service(noinline factory: () -> S, vararg args: Any?) : StartupDelegate<S> {
+    protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Async, factory, arrayOf(*args))
         startups += delegate
         return delegate
     }
 
     @JvmName("serviceFree")
-    protected inline fun <reified S : FreeStartup> service(noinline factory: () -> S, vararg args: Any?) : StartupDelegate<S> {
+    protected inline fun <reified S : FreeStartup> service(vararg args: Any?, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Free, factory, arrayOf(*args))
         startups += delegate
         return delegate
+    }
+
+    protected fun sync(vararg args: Any?, factory: (args: Array<Any?>) -> Unit) = service<SyncStartup>(*args) {
+        SyncStartup { _, args -> factory(args) }
+    }
+
+    protected fun async(vararg args: Any?, factory: suspend (args: Array<Any?>) -> Unit) = service<AsyncStartup>(*args) {
+        AsyncStartup { _, args -> factory(args) }
+    }
+
+    protected fun free(vararg args: Any?, factory: suspend (args: Array<Any?>) -> Unit) = service<FreeStartup>(*args) {
+        FreeStartup { _, args -> factory(args) }
     }
 
     private fun initSync(context: PlatformContext, delegate: StartupDelegate<out Startup>) {

@@ -30,6 +30,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
+import love.yinlin.AppService
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ExtraIcons
@@ -57,7 +58,6 @@ import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.resources.*
@@ -235,12 +235,12 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     Platform.use(
                         *Platform.Phone,
                         ifTrue = {
-                            if (!OS.Application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning(
+                            if (!AppService.os.application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning(
                                 "未安装QQ"
                             )
                         },
                         ifFalse = {
-                            OS.Application.startAppIntent(
+                            AppService.os.application.startAppIntent(
                                 UriGenerator.qqGroup(
                                     "0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E",
                                     "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R"
@@ -252,7 +252,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             }
             Item("店铺", ExtraIcons.Taobao) {
                 launch {
-                    if (!OS.Application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                    if (!AppService.os.application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
                 }
             }
         }

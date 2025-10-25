@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
+import love.yinlin.AppService
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -46,7 +47,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.OS
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.compose.ui.input.NormalText
@@ -393,8 +393,8 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
                 else {
                     val result = Platform.use(*Platform.Phone,
-                        ifTrue = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.id)) },
-                        ifFalse = { OS.Application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
+                        ifTrue = { AppService.os.application.startAppIntent(UriGenerator.qqGroup(group.id)) },
+                        ifFalse = { AppService.os.application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
                     )
                     if (!result) slot.tip.warning("未安装QQ")
                 }

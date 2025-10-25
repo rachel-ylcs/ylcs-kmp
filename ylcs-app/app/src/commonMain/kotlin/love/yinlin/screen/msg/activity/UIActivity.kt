@@ -15,6 +15,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.AppService
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.text.TextInput
@@ -63,11 +64,11 @@ internal class ActivityInputState(initActivity: Activity? = null) {
 
     suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
         val path = Picker.pickPicture()?.use { source ->
-            OS.Storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            AppService.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
-                OS.Storage.createTempFile { sink ->
+                AppService.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
@@ -80,7 +81,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
         Picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
-                OS.Storage.createTempFile { sink ->
+                AppService.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let { path += it }
             }
