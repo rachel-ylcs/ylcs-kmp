@@ -45,9 +45,12 @@
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
 |               |                 |    `component:all`    |           merge all component libs           | ✅ |
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
-|               |      `os`       |                       |    system platform related implementation    | ✅ |
+|               |    `startup`    |                       |         application startup services         | ✅ |
 |               |    `service`    |                       |                                              |   |
-|               |                 |       `startup`       |     common application startup services      | ✅ |
+|               |                 |         `all`         |            merge all service libs            | ✅ |
+|               |                 |       `context`       |      multiplatform application context       | ✅ |
+|               |                 |      `exception`      |      multiplatform exception processor       | ✅ |
+|               |                 |         `os`          |    system platform related implementation    | ✅ |
 |               | `client-engine` |                       |                client engine                 | ✅ |
 |               | `server-engine` |                       |                server engine                 | ❌ |
 |  `ylcs-app`   |                 |                       |                                              |   |
