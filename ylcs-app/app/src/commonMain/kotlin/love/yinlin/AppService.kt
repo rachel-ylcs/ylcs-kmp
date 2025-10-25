@@ -24,25 +24,6 @@ abstract class AppService : Service(Local.info) {
         }
     }
 
-    val kv by service(
-        StartupLazyFetcher {
-            Platform.use(*Platform.Desktop,
-                ifTrue = { Path(os.storage.dataPath, "config") },
-                ifFalse = { null }
-            )
-        },
-        factory = ::StartupKV
-    )
-
-    val exceptionHandler by service(
-        "crash_key",
-        StartupExceptionHandler.Handler { key, e, error ->
-            service.kv.set(key, "${DateEx.CurrentString}\n$error")
-            println(e.stackTraceToString())
-        },
-        factory = ::buildStartupExceptionHandler
-    )
-
     val loadResources by free {
         Coroutines.io {
             Resource.initialize()
@@ -54,6 +35,27 @@ abstract class AppService : Service(Local.info) {
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
         factory = ::StartupUrlImage
+    )
+
+    val kv by service(
+        StartupLazyFetcher {
+            Platform.use(*Platform.Desktop,
+                ifTrue = { Path(os.storage.dataPath, "config") },
+                ifFalse = { null }
+            )
+        },
+        order = 1,
+        factory = ::StartupKV
+    )
+
+    val exceptionHandler by service(
+        "crash_key",
+        StartupExceptionHandler.Handler { key, e, error ->
+            service.kv.set(key, "${DateEx.CurrentString}\n$error")
+            println(e.stackTraceToString())
+        },
+        order = 2,
+        factory = ::buildStartupExceptionHandler
     )
 }
 
