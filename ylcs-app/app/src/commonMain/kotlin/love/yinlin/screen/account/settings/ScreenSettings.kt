@@ -240,8 +240,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
         when (val result = ClientAPI.request<ServerStatus>(route = ServerRes.Server)) {
             is Data.Success -> {
                 val data = result.data
-                if (data.targetVersion > Local.VERSION) slot.tip.warning("新版本${data.targetVersion}可用")
-                else if (data.minVersion > Local.VERSION) slot.tip.error("当前版本不满足服务器最低兼容版本${data.minVersion}")
+                if (data.targetVersion > Local.info.version) slot.tip.warning("新版本${data.targetVersion}可用")
+                else if (data.minVersion > Local.info.version) slot.tip.error("当前版本不满足服务器最低兼容版本${data.minVersion}")
                 else slot.tip.success("当前已是最新版本")
             }
             is Data.Failure -> slot.tip.error(result.message)
@@ -470,7 +470,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
             ItemExpanderSuspend(
                 title = "检查更新",
                 icon = colorfulImageVector(icon = Icons.Outlined.RocketLaunch, background = Colors.Yellow4),
-                text = Local.VERSION_NAME,
+                text = Local.info.versionName,
                 onClick = { checkUpdate() }
             )
 
@@ -626,12 +626,12 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                     modifier = Modifier.size(CustomTheme.size.mediumImage).clip(CircleShape)
                 )
                 Text(
-                    text = Local.NAME,
+                    text = Local.info.name,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = Local.VERSION_NAME,
+                    text = Local.info.versionName,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(

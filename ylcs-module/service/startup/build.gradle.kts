@@ -44,6 +44,40 @@ kotlin {
                 projects.ylcsBase.core,
             )
         }
+
+        val nonAndroidMain by creating {
+            useSourceSet(commonMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(commonMain)
+            useLib(
+                libs.compose.activity
+            )
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(nonAndroidMain)
+            }
+        }
+
+        val desktopMain by getting {
+            useSourceSet(nonAndroidMain)
+        }
+
+        wasmJsMain.configure {
+            useSourceSet(nonAndroidMain)
+        }
     }
 }
 

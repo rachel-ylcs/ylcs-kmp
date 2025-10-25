@@ -7,7 +7,7 @@ import love.yinlin.platform.app
 class RachelApplication : Application() {
 	override fun onCreate() {
 		super.onCreate()
-		appContext = AppContext(this, Local.APP_NAME)
+		AppService.init(this)
 		ActualAppContext(this).apply {
 			app = this
 			initialize()

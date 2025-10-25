@@ -106,7 +106,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
                 ) {
                     WebImage(
                         uri = remember { record.type.yPath },
-                        key = Local.VERSION,
+                        key = Local.info.version,
                         contentScale = ContentScale.Crop,
                         circle = true,
                         modifier = Modifier.size(CustomTheme.size.mediumImage)

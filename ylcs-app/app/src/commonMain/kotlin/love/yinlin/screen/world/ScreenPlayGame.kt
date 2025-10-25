@@ -264,7 +264,7 @@ class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
 
                 WebImage(
                     uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT) },
-                    key = Local.VERSION,
+                    key = Local.info.version,
                     contentScale = ContentScale.Crop,
                     alpha = 0.75f,
                     modifier = Modifier.fillMaxSize().zIndex(1f)

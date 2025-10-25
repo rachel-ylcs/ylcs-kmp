@@ -67,7 +67,7 @@ private fun GameCard(
 	) {
 		WebImage(
 			uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
-			key = Local.VERSION,
+			key = Local.info.version,
 			contentScale = ContentScale.Crop,
 			circle = true,
 			modifier = Modifier.fillMaxWidth(fraction = 0.75f).aspectRatio(1f),
@@ -145,7 +145,7 @@ class SubScreenWorld(parent: BasicScreen<*>) : SubScreen(parent) {
 
 			WebImage(
 				uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
-				key = Local.VERSION,
+				key = Local.info.version,
 				contentScale = ContentScale.Crop,
 				alignment = Alignment.TopCenter,
 				modifier = Modifier

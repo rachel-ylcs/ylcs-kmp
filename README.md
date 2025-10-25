@@ -43,9 +43,8 @@
 |               |                 |       `device`        | adaptive device layout and immersive padding | ✅ |
 |               |                 |        `theme`        |        app theme resources definition        | ✅ |
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
-|               |                 |    `component-all`    |           merge all component libs           | ✅ |
+|               |                 |    `component:all`    |           merge all component libs           | ✅ |
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
-|               |    `context`    |                       |      multiplatform application context       | ✅ |
 |               |      `os`       |                       |    system platform related implementation    | ✅ |
 |               |    `service`    |                       |                                              |   |
 |               |                 |       `startup`       |     common application startup services      | ✅ |

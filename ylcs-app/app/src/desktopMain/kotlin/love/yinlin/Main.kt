@@ -55,7 +55,8 @@ fun main() {
     System.setProperty("compose.swing.render.on.graphics", "true")
     System.setProperty("compose.interop.blending", "true")
 
-    appContext = AppContext(PlatformContext, Local.APP_NAME)
+    AppService.init(love.yinlin.service.PlatformContext)
+
     val appContext1 = ActualAppContext().apply {
         app = this
         initialize()
@@ -70,7 +71,6 @@ fun main() {
     application(exitProcessOnExit = true) {
         val scope = rememberCoroutineScope()
 
-        // 主窗口
         val state = rememberWindowState(
             placement = WindowPlacement.Floating,
             isMinimized = false,

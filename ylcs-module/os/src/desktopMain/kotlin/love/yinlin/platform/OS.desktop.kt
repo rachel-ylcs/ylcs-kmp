@@ -1,7 +1,6 @@
 package love.yinlin.platform
 
 import kotlinx.io.files.Path
-import love.yinlin.appContext
 import love.yinlin.common.uri.Uri
 import love.yinlin.common.uri.toJvmUri
 import love.yinlin.extension.catching
@@ -46,7 +45,7 @@ actual fun osNetOpenUrl(uri: Uri) = catching {
 val osAppPath: Path by lazy {
 	val workingDir = Path(System.getProperty("user.dir"))
 	val homeDir = Path(System.getProperty("user.home"))
-	val appName = appContext.appName
+	val appName = "ylcs"
 	if (Files.isWritable(Paths.get(workingDir.toString()))) workingDir else {
 		when (platform) {
 			Platform.Windows -> System.getenv("APPDATA")?.let { Path(it, appName) } ?: workingDir
@@ -59,7 +58,7 @@ val osAppPath: Path by lazy {
 
 actual val osStorageDataPath: Path by lazy { Path(osAppPath, "data") }
 
-actual val osStorageCachePath: Path by lazy { Path(System.getProperty("java.io.tmpdir"), appContext.appName) }
+actual val osStorageCachePath: Path by lazy { Path(System.getProperty("java.io.tmpdir"), "ylcs") }
 
 actual val osStorageCacheSize: Long get() {
 	// TODO:

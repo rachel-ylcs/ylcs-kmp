@@ -5,10 +5,11 @@ import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import love.yinlin.platform.ActualAppContext
 import love.yinlin.platform.app
+import love.yinlin.service.PlatformContext
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    appContext = AppContext(PlatformContext, Local.APP_NAME)
+    AppService.init(PlatformContext)
     ActualAppContext().apply {
         app = this
         initialize()

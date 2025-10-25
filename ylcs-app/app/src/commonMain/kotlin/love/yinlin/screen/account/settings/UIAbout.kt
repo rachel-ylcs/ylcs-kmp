@@ -197,7 +197,7 @@ internal fun UpdateInfoLayout(
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace),
     ) {
         Text(
-            text = "${Local.NAME} ${Local.VERSION_NAME} 更新日志",
+            text = "${Local.info.name} ${Local.info.versionName} 更新日志",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             maxLines = 1,

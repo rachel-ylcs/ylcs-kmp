@@ -126,7 +126,7 @@ class ScreenGameRanking(manager: ScreenManager, val args: Args) : Screen<ScreenG
 
             WebImage(
                 uri = remember(isLandscape) { args.type.xyPath(isLandscape) },
-                key = Local.VERSION,
+                key = Local.info.version,
                 contentScale = ContentScale.Crop,
                 alpha = 0.75f,
                 modifier = Modifier.fillMaxSize().zIndex(1f)

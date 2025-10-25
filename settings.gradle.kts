@@ -39,18 +39,20 @@ include(
 
     /* -----------------  [2] 功能模块  ----------------- */
 
-    "ylcs-module:context",
-    "ylcs-module:os",
-    "ylcs-module:client-engine",
-    "ylcs-module:server-engine",
     "ylcs-module:service:startup",
+    "ylcs-module:service:all",
+    "ylcs-module:service:context",
+    "ylcs-module:service:os",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:ui",
     "ylcs-module:compose:app",
-    "ylcs-module:compose:component-all",
+    "ylcs-module:compose:component:all",
     "ylcs-module:compose:component:url-image",
+    "ylcs-module:os",
+    "ylcs-module:client-engine",
+    "ylcs-module:server-engine",
 
     /* -----------------  [3] 结构模块  ----------------- */
 

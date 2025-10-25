@@ -1,5 +1,5 @@
 package love.yinlin.service
 
 fun interface AsyncStartup : Startup {
-    suspend fun init()
+    suspend fun init(context: PlatformContext, args: Array<Any?>)
 }

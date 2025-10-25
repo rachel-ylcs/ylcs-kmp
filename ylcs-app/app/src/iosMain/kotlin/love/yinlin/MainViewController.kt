@@ -8,12 +8,13 @@ import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.platform.appNative
+import love.yinlin.service.PlatformContext
 import platform.UIKit.UIViewController
 
 lateinit var controller: UIViewController
 
 fun MainViewController(): UIViewController {
-    appContext = AppContext(PlatformContext, Local.APP_NAME)
+    AppService.init(PlatformContext)
     ActualAppContext().apply {
         app = this
         initialize()

@@ -191,7 +191,7 @@ fun GameItem(
             ) {
                 WebImage(
                     uri = remember { game.type.yPath },
-                    key = Local.VERSION,
+                    key = Local.info.version,
                     contentScale = ContentScale.Crop,
                     circle = true,
                     modifier = Modifier.size(CustomTheme.size.mediumImage)

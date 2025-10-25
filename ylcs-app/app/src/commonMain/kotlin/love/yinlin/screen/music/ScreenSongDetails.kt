@@ -484,7 +484,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                     ) {
                         WebImage(
                             uri = args.song.recordPath,
-                            key = Local.VERSION,
+                            key = Local.info.version,
                             quality = ImageQuality.Full,
                             modifier = Modifier.fillMaxWidth(fraction = 0.65f)
                                 .aspectRatio(1f)

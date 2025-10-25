@@ -71,6 +71,7 @@ afterEvaluate {
         val content = """
             package love.yinlin
             
+            import love.yinlin.data.AppInfo
             import love.yinlin.platform.Platform
             import love.yinlin.platform.platform
             
@@ -78,14 +79,17 @@ afterEvaluate {
             object Local {
                 const val DEVELOPMENT: Boolean = ${C.environment == BuildEnvironment.Dev}
                 
-                const val APP_NAME: String = "${C.app.name}"
-                const val NAME: String = "${C.app.displayName}"
-                const val VERSION: Int = ${C.app.version}
-                const val VERSION_NAME: String = "${C.app.versionName}"
+                val info = AppInfo(
+                    appName = "${C.app.name}",
+                    name = "${C.app.displayName}",
+                    version = ${C.app.version},
+                    versionName = "${C.app.versionName}",
+                    packageName = "${C.app.packageName}",
+                )
                 
                 const val MAIN_HOST: String = "${C.host.mainHost}"
                 const val API_HOST: String = "${C.host.apiHost}"
-                @Suppress("HttpUrlsUsage")
+                
                 val API_BASE_URL: String = run {
                     if (platform == Platform.WebWasm && ${C.host.webUseProxy}) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
                 }
