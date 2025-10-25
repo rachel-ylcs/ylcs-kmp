@@ -3,11 +3,7 @@ package love.yinlin.platform
 import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.KVConfig
-import love.yinlin.common.Paths
-import love.yinlin.common.Resource
-import love.yinlin.service
 
 @Stable
 abstract class AppContext {
@@ -20,17 +16,6 @@ abstract class AppContext {
 	lateinit var config: KVConfig
 	lateinit var musicFactory: MusicFactory
 
-	// 初始化部分
-
-	private fun initializePath() {
-		Platform.useNot(Platform.WebWasm) {
-			SystemFileSystem.createDirectories(service.os.storage.dataPath)
-			SystemFileSystem.createDirectories(service.os.storage.cachePath)
-
-			SystemFileSystem.createDirectories(Paths.musicPath)
-		}
-	}
-
 	// ImageLoader
 	abstract fun initializeSketch(): Sketch
 
@@ -38,12 +23,8 @@ abstract class AppContext {
 	abstract fun initializeMusicFactory(): MusicFactory
 
 	open fun initialize() {
-		// 初始化目录
-		initializePath()
 		// 初始化配置
 		config = KVConfig(kv)
-		// 初始化资源
-		Resource.initialize()
 		// 初始化图片加载器
 		SingletonSketch.setSafe { initializeSketch() }
 		// 初始化音乐播放器
