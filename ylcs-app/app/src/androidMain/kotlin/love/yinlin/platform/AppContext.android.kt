@@ -9,7 +9,6 @@ import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.extension.DateEx
 import love.yinlin.service
 import okio.Path.Companion.toPath
 
@@ -42,14 +41,6 @@ class ActualAppContext(val context: Context) : AppContext() {
 	}.build()
 
 	override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory(context)
-
-	override fun initialize() {
-		super.initialize()
-		// 注册异常回调
-		Thread.setDefaultUncaughtExceptionHandler { _, e ->
-			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
-		}
-	}
 }
 
 val appNative: ActualAppContext get() = app as ActualAppContext

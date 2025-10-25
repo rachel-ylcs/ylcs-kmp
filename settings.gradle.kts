@@ -42,6 +42,7 @@ include(
     "ylcs-module:startup",
     "ylcs-module:service:all",
     "ylcs-module:service:context",
+    "ylcs-module:service:exception",
     "ylcs-module:service:os",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",

@@ -11,7 +11,6 @@ import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.extension.DateEx
 import love.yinlin.service
 import okio.Path.Companion.toPath
 
@@ -49,10 +48,6 @@ class ActualAppContext : AppContext() {
 
 	override fun initialize() {
 		super.initialize()
-		// 注册异常回调
-		Thread.setDefaultUncaughtExceptionHandler { _, e ->
-			kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
-		}
 		// 创建悬浮歌词
 		appNative.musicFactory.floatingLyrics = ActualFloatingLyrics().apply { isAttached = true }
 	}

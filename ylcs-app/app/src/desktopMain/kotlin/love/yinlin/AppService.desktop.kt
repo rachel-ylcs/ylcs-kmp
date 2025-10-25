@@ -27,5 +27,7 @@ actual val service = object : AppService() {
 
     val setComposeRender by service(factory = ::StartupComposeSwingRender)
 
-    val setupMacOSDeepLink by service(StartupMacOSDeepLink.Handler { uri -> DeepLink.openUri(uri) }, factory = ::StartupMacOSDeepLink)
+    val setupMacOSDeepLink by service(StartupMacOSDeepLink.Handler { uri ->
+        DeepLink.openUri(uri)
+    }, factory = ::StartupMacOSDeepLink)
 }

@@ -3,9 +3,13 @@ package love.yinlin
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Paths
 import love.yinlin.common.Resource
+import love.yinlin.extension.DateEx
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
+import love.yinlin.platform.app
 import love.yinlin.service.Service
+import love.yinlin.startup.StartupExceptionHandler
+import love.yinlin.startup.buildStartupExceptionHandler
 
 abstract class AppService : Service(Local.info) {
     val createDirectories by sync {
@@ -15,6 +19,11 @@ abstract class AppService : Service(Local.info) {
             SystemFileSystem.createDirectories(Paths.musicPath)
         }
     }
+
+    val exceptionHandler by service(StartupExceptionHandler.Handler { e, error ->
+        app.kv.set("crash_key", "${DateEx.CurrentString}\n$error")
+        println(e.stackTraceToString())
+    }, factory = ::buildStartupExceptionHandler)
 
     val loadResources by free {
         Coroutines.io {

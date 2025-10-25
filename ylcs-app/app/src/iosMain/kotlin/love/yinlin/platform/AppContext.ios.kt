@@ -6,18 +6,10 @@ import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.staticCFunction
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.extension.DateEx
 import love.yinlin.service
 import okio.Path.Companion.toPath
-import platform.Foundation.NSSetUncaughtExceptionHandler
-import platform.Foundation.NSUncaughtExceptionHandler
-import kotlin.experimental.ExperimentalNativeApi
 
-@OptIn(ExperimentalForeignApi::class)
 class ActualAppContext : AppContext() {
     override val kv: KV = KV()
 
@@ -44,22 +36,6 @@ class ActualAppContext : AppContext() {
     }.build()
 
     override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory()
-
-    @OptIn(ExperimentalNativeApi::class)
-    override fun initialize() {
-        super.initialize()
-        // 注册异常回调
-        setUnhandledExceptionHook { e ->
-            kv.set(CRASH_KEY, "${DateEx.CurrentString}\n${e.stackTraceToString()}")
-        }
-        val exceptionHandler: CPointer<NSUncaughtExceptionHandler> = staticCFunction { e ->
-            e?.let { ex ->
-                appNative.kv.set(CRASH_KEY,
-                    "${DateEx.CurrentString}\n${ex.reason}\n${ex.callStackSymbols.joinToString(",")}")
-            }
-        }
-        NSSetUncaughtExceptionHandler(exceptionHandler)
-    }
 }
 
 val appNative: ActualAppContext get() = app as ActualAppContext
