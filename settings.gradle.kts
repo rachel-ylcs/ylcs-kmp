@@ -44,6 +44,7 @@ include(
     "ylcs-module:service:context",
     "ylcs-module:service:exception",
     "ylcs-module:service:os",
+    "ylcs-module:service:mmkv-kmp",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:screen",

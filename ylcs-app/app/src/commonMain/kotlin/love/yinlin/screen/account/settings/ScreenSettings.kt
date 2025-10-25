@@ -554,7 +554,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     private val crashLogSheet = object : FloatingSheet() {
         @Composable
         override fun Content() {
-            val text = remember { app.kv.get(service.exceptionHandler.crashKey, "无崩溃日志") }
+            val text = remember { service.kv.get(service.exceptionHandler.crashKey, "无崩溃日志") }
             Box(modifier = Modifier.fillMaxWidth()
                 .padding(CustomTheme.padding.sheetValue)
                 .verticalScroll(rememberScrollState())

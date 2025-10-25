@@ -29,14 +29,14 @@ import love.yinlin.extension.replaceAll
 import love.yinlin.extension.toJsonString
 import love.yinlin.compose.toMutableStateMap
 import love.yinlin.platform.FloatingLyrics
-import love.yinlin.platform.KV
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
+import love.yinlin.startup.StartupKV
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 @Stable
-class KVConfig(private val kv: KV) {
+class KVConfig(private val kv: StartupKV) {
 	companion object {
 		const val UPDATE: Long = Long.MAX_VALUE
 	}
@@ -200,7 +200,7 @@ class KVConfig(private val kv: KV) {
 	}
 
 	@Stable
-	private class CacheState(private val kv: KV, private val default: Long = 0L) : ConfigState, ReadWriteProperty<Any?, Long> {
+	private class CacheState(private val kv: StartupKV, private val default: Long = 0L) : ConfigState, ReadWriteProperty<Any?, Long> {
 		private var state: MutableState<Long>? = null
 
 		override fun getValue(thisRef: Any?, property: KProperty<*>): Long {

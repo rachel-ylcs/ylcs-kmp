@@ -7,8 +7,6 @@ import androidx.compose.runtime.setValue
 class ActualAppContext : AppContext() {
     var windowVisible by mutableStateOf(true)
 
-	override val kv: KV = KV()
-
 	override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory()
 
 	override fun initialize() {

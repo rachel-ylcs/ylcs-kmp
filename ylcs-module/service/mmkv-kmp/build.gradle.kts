@@ -41,17 +41,40 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.service.context,
-                projects.ylcsModule.service.exception,
-                projects.ylcsModule.service.os,
-                projects.ylcsModule.service.mmkvKmp,
+                projects.ylcsModule.startup,
             )
+        }
+
+        androidMain.configure {
+            useSourceSet(commonMain)
+            useLib(
+                libs.mmkv.android,
+            )
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain)
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
+            }
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.service.all"
+    namespace = "${C.app.packageName}.module.service.mmkv_kmp"
     compileSdk = C.android.compileSdk
 
     defaultConfig {
