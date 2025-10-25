@@ -9,6 +9,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.service.Service
+import love.yinlin.service.StartupLazyFetcher
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupUrlImage
 import love.yinlin.startup.buildStartupExceptionHandler
@@ -38,7 +39,7 @@ abstract class AppService : Service(Local.info) {
     }
 
     val setupUrlImage by service(
-        StartupUrlImage.CachePathFetcher { os.storage.cachePath },
+        StartupLazyFetcher { os.storage.cachePath },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
         factory = ::StartupUrlImage

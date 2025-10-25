@@ -3,11 +3,15 @@ package love.yinlin.startup
 import love.yinlin.service.PlatformContext
 import love.yinlin.service.StartupArg
 import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupDoc
+import love.yinlin.service.StartupHandler
 
-@StartupDoc(
-    StartupArg(0, "crashKey", String::class),
-    StartupArg(1, "handler", StartupExceptionHandler.Handler::class)
+@StartupArg(index = 0, name = "crashKey", type = String::class)
+@StartupHandler(
+    index = 1,
+    name = "onError",
+    handlerType = StartupExceptionHandler.Handler::class,
+    returnType = Unit::class,
+    String::class, Throwable::class, String::class
 )
 actual fun buildStartupExceptionHandler(): StartupExceptionHandler = object : StartupExceptionHandler() {
     override fun init(context: PlatformContext, args: StartupArgs) {

@@ -6,14 +6,18 @@ import kotlinx.cinterop.staticCFunction
 import love.yinlin.service.PlatformContext
 import love.yinlin.service.StartupArg
 import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupDoc
+import love.yinlin.service.StartupHandler
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import platform.Foundation.NSUncaughtExceptionHandler
 import kotlin.experimental.ExperimentalNativeApi
 
-@StartupDoc(
-    StartupArg(0, "crashKey", String::class),
-    StartupArg(1, "handler", StartupExceptionHandler.Handler::class)
+@StartupArg(index = 0, name = "crashKey", type = String::class)
+@StartupHandler(
+    index = 1,
+    name = "onError",
+    handlerType = StartupExceptionHandler.Handler::class,
+    returnType = Unit::class,
+    String::class, Throwable::class, String::class
 )
 actual fun buildStartupExceptionHandler(): StartupExceptionHandler = object : StartupExceptionHandler() {
     @OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)

@@ -9,25 +9,15 @@ import com.github.panpf.sketch.util.Logger
 import kotlinx.io.files.Path
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.platform.Platform
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArg
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupDoc
-import love.yinlin.service.SyncStartup
+import love.yinlin.service.*
 import okio.Path.Companion.toPath
 
-@StartupDoc(
-    StartupArg(0, "cachePath lazy fetcher", StartupUrlImage.CachePathFetcher::class),
-    StartupArg(1, "maxCacheSize/MB", Int::class),
-    StartupArg(2, "imageQuality", ImageQuality::class)
-)
+@StartupFetcher(index = 0, name = "cachePath", returnType = Path::class)
+@StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
+@StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 class StartupUrlImage : SyncStartup {
-    fun interface CachePathFetcher {
-        fun run(): Path
-    }
-
     override fun init(context: PlatformContext, args: StartupArgs) {
-        val cachePath: Path = (args[0] as CachePathFetcher).run()
+        val cachePath: Path = args.fetch(0)
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
         SingletonSketch.setSafe { buildSketch(context).apply {

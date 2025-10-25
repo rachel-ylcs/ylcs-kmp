@@ -4,15 +4,12 @@ import love.yinlin.common.uri.Uri
 import love.yinlin.common.uri.toUri
 import love.yinlin.platform.Platform
 import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArg
 import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupDoc
+import love.yinlin.service.StartupHandler
 import love.yinlin.service.SyncStartup
 import java.awt.Desktop
 
-@StartupDoc(
-    StartupArg(0, "handler", StartupMacOSDeepLink.Handler::class),
-)
+@StartupHandler(index = 0, name = "onDeepLinkOpen", handlerType = StartupMacOSDeepLink.Handler::class, returnType = Unit::class, Uri::class)
 class StartupMacOSDeepLink : SyncStartup {
     fun interface Handler {
         fun handle(uri: Uri)
