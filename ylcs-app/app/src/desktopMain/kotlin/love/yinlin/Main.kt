@@ -19,9 +19,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.compose.*
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
-import love.yinlin.resources.Res
-import love.yinlin.resources.app_name
-import love.yinlin.resources.img_logo
+import love.yinlin.resources.*
 import love.yinlin.service.PlatformContext
 import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource

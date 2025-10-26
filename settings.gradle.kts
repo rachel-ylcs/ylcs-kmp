@@ -40,12 +40,14 @@ include(
     /* -----------------  [2] 功能模块  ----------------- */
 
     "ylcs-module:startup",
+
     "ylcs-module:service:all",
     "ylcs-module:service:context",
     "ylcs-module:service:exception",
     "ylcs-module:service:os",
     "ylcs-module:service:mmkv-kmp",
     "ylcs-module:service:config",
+
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:platform-view",
@@ -54,8 +56,11 @@ include(
     "ylcs-module:compose:app",
     "ylcs-module:compose:component:all",
     "ylcs-module:compose:component:url-image",
+
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
+
+    "ylcs-module:auto-update",
 
     /* -----------------  [3] 结构模块  ----------------- */
 

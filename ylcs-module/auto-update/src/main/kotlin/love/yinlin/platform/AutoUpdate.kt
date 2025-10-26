@@ -1,18 +1,17 @@
-package love.yinlin
+package love.yinlin.platform
 
 import love.yinlin.extension.catching
-import love.yinlin.platform.Platform
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.util.*
+import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.system.exitProcess
 
-object AutoUpdate {
+data object AutoUpdate {
     private fun handleEntry(zipFile: ZipFile, entry: ZipEntry, targetDir: Path) {
         var entryName = entry.getName()
         entryName = entryName.replace('\\', '/')
@@ -58,8 +57,7 @@ object AutoUpdate {
     }
 
     fun start(filename: String) = catching {
-        val currentDir = Paths.get(System.getProperty("compose.application.resources.dir"))
-            .parent.parent.toAbsolutePath()
+        val currentDir = Paths.get(System.getProperty("compose.application.resources.dir")).parent.parent.toAbsolutePath()
 
         // 1. 解压更新包到当前目录
         val zipPath = File(filename)

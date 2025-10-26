@@ -172,6 +172,7 @@ kotlin {
         val desktopMain by getting {
             useSourceSet(jvmMain)
             useLib(
+                projects.ylcsModule.autoUpdate,
                 libs.vlcj,
                 fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
             )

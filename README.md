@@ -56,6 +56,7 @@
 |               |                 |       `config`        |   application state-memory-storage config    | ✅ |
 |               | `client-engine` |                       |                client engine                 | ✅ |
 |               | `server-engine` |                       |                server engine                 | ❌ |
+|               |  `auto-update`  |                       |       desktop application auto update        | ❌ |
 |  `ylcs-app`   |                 |                       |                                              |   |
 |               |      `cs`       |                       |                  C/S bridge                  | ✅ |
 |               |      `mod`      |                       |                   song MOD                   | ✅ |
