@@ -9,22 +9,22 @@ open class Service(appInfo: AppInfo) : BasicService() {
     val os by system(appInfo.appName, factory = ::StartupOS)
 
     @JvmName("systemSync")
-    private inline fun <reified S : SyncStartup> system(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate.system(StartupType.Sync, factory, arrayOf(*args), order)
+    private inline fun <reified S : SyncStartup> system(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
+        val delegate = StartupDelegate.system(StartupType.Sync, factory, arrayOf(*args), priority)
         startups += delegate
         return delegate
     }
 
     @JvmName("systemASync")
-    private inline fun <reified S : AsyncStartup> system(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate.system(StartupType.Async, factory, arrayOf(*args), order)
+    private inline fun <reified S : AsyncStartup> system(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
+        val delegate = StartupDelegate.system(StartupType.Async, factory, arrayOf(*args), priority)
         startups += delegate
         return delegate
     }
 
     @JvmName("systemFree")
-    private inline fun <reified S : FreeStartup> system(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate.system(StartupType.Free, factory, arrayOf(*args), order)
+    private inline fun <reified S : FreeStartup> system(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
+        val delegate = StartupDelegate.system(StartupType.Free, factory, arrayOf(*args), priority)
         startups += delegate
         return delegate
     }

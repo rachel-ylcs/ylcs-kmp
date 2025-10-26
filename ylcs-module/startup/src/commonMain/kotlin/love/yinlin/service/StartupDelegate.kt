@@ -8,14 +8,20 @@ class StartupDelegate<S : Startup> internal constructor(
     val type: StartupType,
     private val factory: () -> S,
     args: Array<Any?>,
-    val order: Int,
+    val priority: Int,
 ) : ReadOnlyProperty<Any?, Startup> {
-    constructor(type: StartupType, factory: () -> S, args: Array<Any?>, order: Int) : this(StartupPrivilege.User, type, factory, args, order)
+    constructor(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) : this(StartupPrivilege.User, type, factory, args, priority)
 
     companion object {
-        const val DEFAULT_ORDER = 100
+        const val HIGH3 = 1000
+        const val HIGH2 = 500
+        const val HIGH1 = 200
+        const val DEFAULT = 0
+        const val LOW1 = -200
+        const val LOW2 = -500
+        const val LOW3 = -1000
 
-        fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>, order: Int) = StartupDelegate(StartupPrivilege.System, type, factory, args, order)
+        fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) = StartupDelegate(StartupPrivilege.System, type, factory, args, priority)
     }
 
     private val startupArgs = StartupArgs(args)

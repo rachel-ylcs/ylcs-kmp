@@ -10,9 +10,9 @@ import love.yinlin.startup.StartupSingleInstance
 import kotlin.io.path.Path
 
 actual val service = object : AppService() {
-    private val loadNativeLibrary by sync(order = StartupDelegate.DEFAULT_ORDER - 1) { System.loadLibrary("ylcs_native") }
+    private val loadNativeLibrary by sync(priority = StartupDelegate.HIGH3) { System.loadLibrary("ylcs_native") }
 
-    private val setupVLC by sync {
+    private val setupVLC by sync(priority = StartupDelegate.HIGH2) {
         val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
             when (platform) {
                 Platform.Windows -> it.resolve("vlc")
@@ -24,9 +24,9 @@ actual val service = object : AppService() {
         System.setProperty("jna.library.path", vlcPath.toString())
     }
 
-    private val singleInstance by service(factory = ::StartupSingleInstance)
+    private val singleInstance by service(priority = StartupDelegate.HIGH3, factory = ::StartupSingleInstance)
 
-    private val setComposeRender by service(factory = ::StartupComposeSwingRender)
+    private val setComposeRender by service(priority = StartupDelegate.HIGH3, factory = ::StartupComposeSwingRender)
 
     private val setupMacOSDeepLink by service(
         StartupMacOSDeepLink.Handler { uri ->
