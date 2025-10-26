@@ -35,7 +35,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.api.APIConfig
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.animation.LoadingAnimation
-import love.yinlin.data.ItemKey
+import love.yinlin.compose.data.ItemKey
 import love.yinlin.extension.replaceAll
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.image.MiniIcon

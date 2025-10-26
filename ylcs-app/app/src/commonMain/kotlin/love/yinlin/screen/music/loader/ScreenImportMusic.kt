@@ -22,7 +22,7 @@ import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.animation.LoadingAnimation
 import love.yinlin.data.Data
-import love.yinlin.data.ItemKey
+import love.yinlin.compose.data.ItemKey
 import love.yinlin.data.MimeType
 import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory

@@ -1,4 +1,4 @@
-package love.yinlin.data
+package love.yinlin.compose.data
 
 import android.os.Parcel
 import android.os.Parcelable

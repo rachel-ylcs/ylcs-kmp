@@ -44,6 +44,7 @@ kotlin {
         val commonMain by getting {
             useApi(
                 projects.ylcsBase.core,
+                libs.skiko,
                 libs.compose.runtime,
                 libs.compose.foundation,
                 libs.compose.savedstate,
