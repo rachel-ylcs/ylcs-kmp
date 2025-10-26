@@ -29,7 +29,6 @@ import love.yinlin.compose.*
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.app
 import love.yinlin.ui.component.common.UserLabel
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
@@ -38,6 +37,7 @@ import love.yinlin.ui.component.layout.EqualRow
 import love.yinlin.ui.component.layout.EqualRowScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.service
 import kotlin.math.max
 
 @Composable
@@ -144,7 +144,7 @@ internal fun UserProfileInfo(
             Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
                 WebImage(
                     uri = profile.avatarPath,
-                    key = if (owner) app.config.cacheUserAvatar else remember { DateEx.TodayString },
+                    key = if (owner) service.config.cacheUserAvatar else remember { DateEx.TodayString },
                     contentScale = ContentScale.Crop,
                     circle = true,
                     modifier = Modifier.matchParentSize().shadow(CustomTheme.shadow.icon, CircleShape)
@@ -189,7 +189,7 @@ internal fun UserProfileCard(
         Column(modifier = Modifier.fillMaxWidth()) {
             WebImage(
                 uri = profile.wallPath,
-                key = app.config.cacheUserWall,
+                key = service.config.cacheUserWall,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
             )
             Column(

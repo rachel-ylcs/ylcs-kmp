@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import love.yinlin.AppEntry
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.service
 
 @Stable
 class ActualFloatingLyrics : FloatingLyrics() {
@@ -47,7 +48,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
     @Composable
     fun Content() {
         (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
-            val config by derivedStateOf { app.config.floatingLyricsDesktopConfig }
+            val config by derivedStateOf { service.config.floatingLyricsDesktopConfig }
             val state = rememberWindowState(
                 placement = WindowPlacement.Floating,
                 isMinimized = false,
@@ -71,10 +72,10 @@ class ActualFloatingLyrics : FloatingLyrics() {
 
                 LaunchedEffect(state) {
                     snapshotFlow { state.size }.debounce(300L).onEach { size: DpSize ->
-                        app.config.floatingLyricsDesktopConfig = config.copy(width = size.width.value, height = size.height.value)
+                        service.config.floatingLyricsDesktopConfig = config.copy(width = size.width.value, height = size.height.value)
                     }.launchIn(this)
                     snapshotFlow { state.position }.debounce(300L).filter { it.isSpecified }.onEach { position: WindowPosition ->
-                        app.config.floatingLyricsDesktopConfig = config.copy(x = position.x.value, y = position.y.value)
+                        service.config.floatingLyricsDesktopConfig = config.copy(x = position.x.value, y = position.y.value)
                     }.launchIn(this)
                 }
 

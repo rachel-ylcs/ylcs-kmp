@@ -28,7 +28,6 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.input.SecondaryButton
@@ -38,6 +37,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
 import love.yinlin.screen.world.game.playGameState
+import love.yinlin.service
 import love.yinlin.ui.component.layout.Space
 
 @Stable
@@ -62,7 +62,7 @@ class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.PreflightGame,
             data = API.User.Game.PreflightGame.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 gid = game?.gid ?: 0
             )
         )
@@ -236,7 +236,7 @@ class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
                     val result = ClientAPI.request(
                         route = API.User.Game.VerifyGame,
                         data = API.User.Game.VerifyGame.Request(
-                            token = app.config.userToken,
+                            token = service.config.userToken,
                             gid = game.gid,
                             rid = preflight.rid,
                             answer = state.submitAnswer

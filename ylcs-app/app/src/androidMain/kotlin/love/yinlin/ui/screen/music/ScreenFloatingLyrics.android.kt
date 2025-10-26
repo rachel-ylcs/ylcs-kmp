@@ -22,11 +22,15 @@ import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
+import love.yinlin.screen.music.ColumnLayout
+import love.yinlin.screen.music.RowLayout
+import love.yinlin.screen.music.ScreenFloatingLyrics
+import love.yinlin.service
 
 private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyrics) {
     launch {
         delay(200)
-        app.config.enabledFloatingLyrics = floatingLyrics.isAttached
+        service.config.enabledFloatingLyrics = floatingLyrics.isAttached
     }
 }
 
@@ -53,7 +57,7 @@ private fun ScreenFloatingLyrics.enableFloatingLyrics(value: Boolean) {
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var androidConfig by rememberRefState { app.config.floatingLyricsAndroidConfig }
+    var androidConfig by rememberRefState { service.config.floatingLyricsAndroidConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
@@ -64,7 +68,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     ) {
         RowLayout("悬浮歌词模式") {
             Switch(
-                checked = app.config.enabledFloatingLyrics,
+                checked = service.config.enabledFloatingLyrics,
                 onCheckedChange = { enableFloatingLyrics(it) }
             )
         }
@@ -96,7 +100,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             ProgressSlider(
                 value = androidConfig.leftProgress,
                 onValueChange = { androidConfig = androidConfig.copyLeft(it) },
-                onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                onValueChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
@@ -105,7 +109,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             ProgressSlider(
                 value = androidConfig.rightProgress,
                 onValueChange = { androidConfig = androidConfig.copyRight(it) },
-                onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                onValueChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
@@ -114,7 +118,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             ProgressSlider(
                 value = androidConfig.topProgress,
                 onValueChange = { androidConfig = androidConfig.copyTop(it) },
-                onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                onValueChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
@@ -123,7 +127,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             ProgressSlider(
                 value = androidConfig.textSizeProgress,
                 onValueChange = { androidConfig = androidConfig.copyTextSize(it) },
-                onValueChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                onValueChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
@@ -134,9 +138,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.floatingLyricsAndroidConfig.textColor),
+                        initialColor = Colors(service.config.floatingLyricsAndroidConfig.textColor),
                         onColorChanged = { androidConfig = androidConfig.copy(textColor = it.value) },
-                        onColorChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                        onColorChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
@@ -144,9 +148,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.floatingLyricsAndroidConfig.backgroundColor),
+                        initialColor = Colors(service.config.floatingLyricsAndroidConfig.backgroundColor),
                         onColorChanged = { androidConfig = androidConfig.copy(backgroundColor = it.value) },
-                        onColorChangeFinished = { app.config.floatingLyricsAndroidConfig = androidConfig },
+                        onColorChangeFinished = { service.config.floatingLyricsAndroidConfig = androidConfig },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }

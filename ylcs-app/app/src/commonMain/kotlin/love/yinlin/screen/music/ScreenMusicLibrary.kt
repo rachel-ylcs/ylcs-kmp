@@ -48,6 +48,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.loader.ScreenCreateMusic
 import love.yinlin.screen.music.loader.ScreenImportMusic
 import love.yinlin.screen.music.loader.ScreenPlatformMusic
+import love.yinlin.service
 
 @Stable
 data class MusicInfoPreview(
@@ -120,7 +121,7 @@ private fun MusicCard(
 
 @Stable
 class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val playlistLibrary = app.config.playlistLibrary
+    private val playlistLibrary = service.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
     private val selectIdList: List<String> get() = library.fastFilter { it.selected }.fastMap { it.id }
@@ -240,7 +241,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
                     ModFactory.Merge(
                         mediaPaths = packageItems.fastMapNotNull { musicFactory.musicLibrary[it]?.path },
                         sink = sink,
-                        info = ModInfo(author = app.config.userProfile?.name ?: "无名")
+                        info = ModInfo(author = service.config.userProfile?.name ?: "无名")
                     ).process { _, _, _ -> }
                 }
                 slot.loading.close()

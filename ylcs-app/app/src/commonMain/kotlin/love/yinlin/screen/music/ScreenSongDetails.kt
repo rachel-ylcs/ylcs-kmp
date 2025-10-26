@@ -47,7 +47,6 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.Platform
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.ui.component.layout.Pagination
@@ -112,11 +111,11 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
     }
 
     private suspend fun onSendComment(content: String): Boolean {
-        app.config.userProfile?.let { user ->
+        service.config.userProfile?.let { user ->
             val result = ClientAPI.request(
                 route = API.User.Song.SendSongComment,
                 data = API.User.Song.SendSongComment.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     sid = args.song.sid,
                     content = content
                 )
@@ -146,7 +145,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
             val result = ClientAPI.request(
                 route = API.User.Song.DeleteSongComment,
                 data = API.User.Song.DeleteSongComment.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     cid = cid
                 )
             )
@@ -266,7 +265,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                app.config.userProfile?.let { user ->
+                service.config.userProfile?.let { user ->
                     if (user.uid == comment.uid || user.hasPrivilegeVIPTopic) {
                         Text(
                             text = "删除",
@@ -404,7 +403,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
 
     @Composable
     override fun BottomBar() {
-        if (app.config.userProfile != null) {
+        if (service.config.userProfile != null) {
             BottomLayout(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxWidth()

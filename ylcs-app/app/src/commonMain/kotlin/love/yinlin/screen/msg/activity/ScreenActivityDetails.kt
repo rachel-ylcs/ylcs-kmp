@@ -27,7 +27,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
-import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_damai
 import love.yinlin.resources.img_maoyan
@@ -105,7 +104,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivity,
 			data = API.User.Activity.DeleteActivity.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				aid = args.aid
 			)
 		)
@@ -232,7 +231,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 
 	@Composable
 	override fun ActionScope.RightActions() {
-		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
+		val hasPrivilegeVIPCalendar by rememberDerivedState { service.config.userProfile?.hasPrivilegeVIPCalendar == true }
 		if (hasPrivilegeVIPCalendar) {
 			Action(Icons.Outlined.Edit, "编辑") {
 				navigate(ScreenModifyActivity.Args(args.aid))

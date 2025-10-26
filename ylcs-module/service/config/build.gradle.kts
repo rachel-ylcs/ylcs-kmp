@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary)
 }
 
@@ -41,6 +43,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
+                projects.ylcsBase.composeCore,
                 projects.ylcsModule.service.mmkvKmp,
             )
         }

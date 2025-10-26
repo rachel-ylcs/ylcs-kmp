@@ -14,6 +14,7 @@ import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.service
 
 @Stable
 abstract class MusicFactory {
@@ -38,12 +39,12 @@ abstract class MusicFactory {
     private suspend fun initLastStatus() {
         if (isInit) {
             // 更新播放模式
-            updatePlayMode(app.config.musicPlayMode)
+            updatePlayMode(service.config.musicPlayMode)
             // 恢复上一次播放
-            val playlistName = app.config.lastPlaylist
+            val playlistName = service.config.lastPlaylist
             if (playlistName.isNotEmpty()) {
-                val playlist = app.config.playlistLibrary[playlistName]
-                val musicName = app.config.lastMusic
+                val playlist = service.config.playlistLibrary[playlistName]
+                val musicName = service.config.lastMusic
                 if (playlist != null) startPlaylist(playlist, musicName.ifEmpty { null }, false)
             }
         }
@@ -130,18 +131,18 @@ abstract class MusicFactory {
     // 回调
     protected fun onMusicChanged(musicInfo: MusicInfo?) {
         val lastPlaylist = currentPlaylist?.name ?: ""
-        app.config.lastPlaylist = lastPlaylist
-        if (lastPlaylist.isNotEmpty()) musicInfo?.let { app.config.lastMusic = it.id }
-        else app.config.lastMusic = ""
+        service.config.lastPlaylist = lastPlaylist
+        if (lastPlaylist.isNotEmpty()) musicInfo?.let { service.config.lastMusic = it.id }
+        else service.config.lastMusic = ""
     }
 
     protected fun onPlayModeChanged(mode: MusicPlayMode) {
-        app.config.musicPlayMode = mode
+        service.config.musicPlayMode = mode
     }
 
     protected fun onPlayerStop() {
-        app.config.lastPlaylist = ""
-        app.config.lastMusic = ""
+        service.config.lastPlaylist = ""
+        service.config.lastMusic = ""
     }
 }
 

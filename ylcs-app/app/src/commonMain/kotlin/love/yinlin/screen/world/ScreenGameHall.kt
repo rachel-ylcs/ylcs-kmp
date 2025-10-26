@@ -23,12 +23,12 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
+import love.yinlin.service
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 
@@ -83,7 +83,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
         val result = ClientAPI.request(
             route = API.User.Game.DeleteGame,
             data = API.User.Game.DeleteGame.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 gid = gid
             )
         )
@@ -103,7 +103,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            val canDelete by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
+            val canDelete by rememberDerivedState { service.config.userProfile?.hasPrivilegeVIPTopic == true }
 
             PaginationStaggeredGrid(
                 items = page.items,
@@ -123,7 +123,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
                     game = it,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        val profile = app.config.userProfile
+                        val profile = service.config.userProfile
                         if (profile != null) {
                             if (profile.name == it.name) slot.tip.warning("不能参与自己创建的游戏哦")
                             else if (profile.name in it.winner) slot.tip.warning("不能参与完成过的游戏哦")

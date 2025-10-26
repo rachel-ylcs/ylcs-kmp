@@ -24,6 +24,7 @@ import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
@@ -36,7 +37,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun requestWeibo() {
         if (state != BoxState.LOADING) {
-            val users = app.config.weiboUsers.map { it.id }
+            val users = service.config.weiboUsers.map { it.id }
             if (users.isEmpty()) state = BoxState.EMPTY
             else {
                 state = BoxState.LOADING

@@ -28,12 +28,11 @@ import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.app
 import love.yinlin.ui.component.container.TabBar
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.screen.community.ScreenUserCard
+import love.yinlin.service
 import love.yinlin.ui.component.layout.Pagination
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
@@ -131,7 +130,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollows,
                     data = API.User.Follows.GetFollows.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         num = pageFollows.pageNum
                     )
                 )
@@ -147,7 +146,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollowers,
                     data = API.User.Follows.GetFollowers.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         num = pageFollowers.pageNum
                     )
                 )
@@ -163,7 +162,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetBlockedUsers,
                     data = API.User.Follows.GetBlockedUsers.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         num = pageBlockUsers.pageNum
                     )
                 )
@@ -184,7 +183,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollows,
                     data = API.User.Follows.GetFollows.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         score = pageFollows.offset,
                         fid = pageFollows.arg1,
                         num = pageFollows.pageNum
@@ -196,7 +195,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetFollowers,
                     data = API.User.Follows.GetFollowers.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         score = pageFollowers.offset,
                         fid = pageFollowers.arg1,
                         num = pageFollowers.pageNum
@@ -208,7 +207,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                 val result = ClientAPI.request(
                     route = API.User.Follows.GetBlockedUsers,
                     data = API.User.Follows.GetBlockedUsers.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         fid = pageBlockUsers.offset,
                         num = pageBlockUsers.pageNum
                     )
@@ -222,7 +221,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
         val result = ClientAPI.request(
             route = API.User.Follows.UnblockUser,
             data = API.User.Follows.UnblockUser.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 uid = item.uid
             )
         )

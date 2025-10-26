@@ -42,6 +42,7 @@ import love.yinlin.compose.ui.layout.SimpleLoadingBox
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.service
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
@@ -174,7 +175,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
     private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
 
     private fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
-        val weiboUsers = app.config.weiboUsers
+        val weiboUsers = service.config.weiboUsers
         if (isFollow) {
             if (!weiboUsers.contains { it.id == user.info.id }) weiboUsers += user.info
         }
@@ -247,7 +248,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                 )
                 UserInfoCard(
                     user = user,
-                    isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
+                    isFollowed = service.config.weiboUsers.contains { it.id == user.info.id },
                     onFollowClick = { onFollowClick(user, it) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -309,7 +310,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                     )
                     UserInfoCard(
                         user = user,
-                        isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
+                        isFollowed = service.config.weiboUsers.contains { it.id == user.info.id },
                         onFollowClick = { onFollowClick(user, it) },
                         modifier = Modifier.fillMaxWidth()
                     )

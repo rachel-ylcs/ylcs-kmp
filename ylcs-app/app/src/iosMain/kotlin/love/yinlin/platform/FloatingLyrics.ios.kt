@@ -21,6 +21,7 @@ import kotlinx.cinterop.autoreleasepool
 import love.yinlin.AppEntry
 import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
+import love.yinlin.service
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*
 import platform.AVKit.*
@@ -51,15 +52,15 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
 
     private var pipDelegate = object : NSObject(), PictureInPictureDelegateProtocol {
         override fun didFailToStartPictureInPictureWithError(error: NSError) {
-            app.config.enabledFloatingLyrics = false
+            service.config.enabledFloatingLyrics = false
         }
 
         override fun didStartPictureInPicture() {
-            app.config.enabledFloatingLyrics = true
+            service.config.enabledFloatingLyrics = true
         }
 
         override fun didStopPictureInPicture() {
-            app.config.enabledFloatingLyrics = false
+            service.config.enabledFloatingLyrics = false
         }
     }
 
@@ -104,7 +105,7 @@ class ActualFloatingLyrics(private val controller: UIViewController) : FloatingL
 
     @Composable
     private fun Content() {
-        val config = app.config.floatingLyricsIOSConfig
+        val config = service.config.floatingLyricsIOSConfig
         currentLyrics?.let { lyrics ->
             Box(
                 modifier = Modifier.fillMaxSize(),

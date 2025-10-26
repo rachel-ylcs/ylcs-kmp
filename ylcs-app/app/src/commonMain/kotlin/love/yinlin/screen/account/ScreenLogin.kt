@@ -22,7 +22,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.app
 import love.yinlin.platform.platform
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
@@ -33,6 +32,7 @@ import love.yinlin.compose.ui.text.InputType
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.LoadingPrimaryButton
+import love.yinlin.service
 
 @Stable
 class ScreenLogin(manager: ScreenManager) : CommonScreen(manager) {
@@ -78,8 +78,8 @@ class ScreenLogin(manager: ScreenManager) : CommonScreen(manager) {
 		when (result) {
 			is Data.Success -> {
 				val token = result.data
-				app.config.userShortToken = DateEx.CurrentLong
-				app.config.userToken = token
+				service.config.userShortToken = DateEx.CurrentLong
+				service.config.userToken = token
 				pop()
 			}
 			is Data.Failure -> slot.tip.error(result.message)

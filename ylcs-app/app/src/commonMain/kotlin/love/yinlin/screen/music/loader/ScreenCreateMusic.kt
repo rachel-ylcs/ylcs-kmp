@@ -43,7 +43,7 @@ import love.yinlin.service
 private class MusicInfoState {
     val id = TextInputState(DateEx.CurrentLong.toString())
     val name = TextInputState()
-    val author = TextInputState(app.config.userProfile?.name ?: "")
+    val author = TextInputState(service.config.userProfile?.name ?: "")
     val singer = TextInputState("未知")
     val lyricist = TextInputState("未知")
     val composer = TextInputState("未知")

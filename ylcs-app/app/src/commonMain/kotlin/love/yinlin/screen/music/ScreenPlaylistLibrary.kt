@@ -42,6 +42,7 @@ import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.service
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -108,7 +109,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 
 @Stable
 class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val playlistLibrary = app.config.playlistLibrary
+    private val playlistLibrary = service.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
     private val library = mutableStateListOf<MusicStatusPreview>()
@@ -283,7 +284,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private suspend fun downloadCloudPlaylist(): Data<Map<String, List<PlaylistPreviewItem>>> {
         val result = ClientAPI.request(
             route = API.User.Backup.DownloadPlaylist,
-            data = app.config.userToken
+            data = service.config.userToken
         )
         return when (result) {
             is Data.Success -> {
@@ -406,7 +407,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                                 val result = ClientAPI.request(
                                     route = API.User.Backup.UploadPlaylist,
                                     data = API.User.Backup.UploadPlaylist.Request(
-                                        token = app.config.userToken,
+                                        token = service.config.userToken,
                                         playlist = playlistLibrary.items.toJson().Object
                                     )
                                 )

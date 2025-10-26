@@ -44,7 +44,6 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.ui.component.image.NineGrid
@@ -56,6 +55,7 @@ import love.yinlin.platform.UnsupportedPlatformComponent
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
+import love.yinlin.service
 import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.text.RichEditor
 import love.yinlin.ui.component.text.RichEditorState
@@ -178,7 +178,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             val userList = remember(details, pageComments.items) {
                 val userSet = mutableSetOf(AtInfo(topic.uid, topic.name))
                 pageComments.items.fastForEach { userSet.add(AtInfo(it.uid, it.name)) }
-                userSet -= AtInfo(app.config.userProfile?.uid ?: 0, "")
+                userSet -= AtInfo(service.config.userProfile?.uid ?: 0, "")
                 userSet.toList()
             }
 
@@ -263,7 +263,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
         val result = ClientAPI.request(
             route = API.User.Topic.UpdateTopicTop,
             data = API.User.Topic.UpdateTopicTop.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 tid = topic.tid,
                 isTop = value
             )
@@ -279,7 +279,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             val result = ClientAPI.request(
                 route = API.User.Topic.DeleteTopic,
                 data =  API.User.Topic.DeleteTopic.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     tid = topic.tid
                 )
             )
@@ -305,7 +305,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                 val result = ClientAPI.request(
                     route = API.User.Topic.MoveTopic,
                     data = API.User.Topic.MoveTopic.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         tid = topic.tid,
                         section = newSection
                     )
@@ -323,14 +323,14 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     }
 
     private suspend fun onSendCoin(num: Int) {
-        if (app.config.userProfile?.uid == topic.uid) {
+        if (service.config.userProfile?.uid == topic.uid) {
             slot.tip.warning("不能给自己投币哦")
             return
         }
         val result = ClientAPI.request(
             route = API.User.Topic.SendCoin,
             data = API.User.Topic.SendCoin.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 uid = topic.uid,
                 tid = topic.tid,
                 value = num
@@ -341,8 +341,8 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                 subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
                     it.copy(coinNum = it.coinNum + num)
                 }
-                app.config.userProfile?.let {
-                    app.config.userProfile = it.copy(coin = it.coin - num)
+                service.config.userProfile?.let {
+                    service.config.userProfile = it.copy(coin = it.coin - num)
                 }
                 slot.tip.success(result.message)
             }
@@ -351,14 +351,14 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     }
 
     private suspend fun onSendComment(content: String): Boolean {
-        app.config.userProfile?.let { user ->
+        service.config.userProfile?.let { user ->
             // 回复主题
             val target = currentSendComment
             if (target == null) {
                 val result = ClientAPI.request(
                     route = API.User.Topic.SendComment,
                     data = API.User.Topic.SendComment.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         tid = topic.tid,
                         rawSection = topic.rawSection,
                         content = content
@@ -390,7 +390,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                 val result = ClientAPI.request(
                     route = API.User.Topic.SendSubComment,
                     data = API.User.Topic.SendSubComment.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         tid = topic.tid,
                         cid = target.cid,
                         rawSection = topic.rawSection,
@@ -416,7 +416,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
         val result = ClientAPI.request(
             route = API.User.Topic.UpdateCommentTop,
             data = API.User.Topic.UpdateCommentTop.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 tid = topic.tid,
                 cid = cid,
                 rawSection = topic.rawSection,
@@ -440,7 +440,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             val result = ClientAPI.request(
                 route = API.User.Topic.DeleteComment,
                 data = API.User.Topic.DeleteComment.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     tid = topic.tid,
                     cid = cid,
                     rawSection = topic.rawSection
@@ -463,7 +463,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             val result = ClientAPI.request(
                 route = API.User.Topic.DeleteSubComment,
                 data = API.User.Topic.DeleteSubComment.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     tid = topic.tid,
                     pid = pid,
                     rawSection = topic.rawSection,
@@ -580,7 +580,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                     modifier = Modifier.clickable { currentSendComment = comment }
                         .padding(CustomTheme.padding.littleValue)
                 )
-                app.config.userProfile?.let { user ->
+                service.config.userProfile?.let { user ->
                     if (user.canUpdateCommentTop(topic.uid)) {
                         Text(
                             text = if (comment.isTop) "取消置顶" else "置顶",
@@ -633,7 +633,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
             ) {
                 if (subComment.uid == topic.uid) BoxText(text = "楼主", color = MaterialTheme.colorScheme.secondary)
                 if (subComment.uid == parentComment.uid) BoxText(text = "层主", color = MaterialTheme.colorScheme.tertiary)
-                app.config.userProfile?.let { user ->
+                service.config.userProfile?.let { user ->
                     if (user.canDeleteComment(topic.uid, subComment.uid)) {
                         Row(
                             modifier = Modifier.weight(1f),
@@ -792,9 +792,9 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     @Composable
     override fun ActionScope.RightActions() {
         if (details != null) {
-            val canUpdateTopicTop by rememberDerivedState { app.config.userProfile?.canUpdateTopicTop(topic.uid) == true }
-            val canDeleteTopic by rememberDerivedState { app.config.userProfile?.canDeleteTopic(topic.uid) == true }
-            val canMoveTopic by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
+            val canUpdateTopicTop by rememberDerivedState { service.config.userProfile?.canUpdateTopicTop(topic.uid) == true }
+            val canDeleteTopic by rememberDerivedState { service.config.userProfile?.canDeleteTopic(topic.uid) == true }
+            val canMoveTopic by rememberDerivedState { service.config.userProfile?.hasPrivilegeVIPTopic == true }
             if (canUpdateTopicTop) {
                 ActionSuspend(
                     icon = if (topic.isTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,
@@ -818,7 +818,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
 
     @Composable
     override fun BottomBar() {
-        if (details != null && app.config.userProfile != null) {
+        if (details != null && service.config.userProfile != null) {
             BottomLayout(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxWidth()
@@ -901,7 +901,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 Text(
-                    text = "银币: ${app.config.userProfile?.coin ?: 0}",
+                    text = "银币: ${service.config.userProfile?.coin ?: 0}",
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()

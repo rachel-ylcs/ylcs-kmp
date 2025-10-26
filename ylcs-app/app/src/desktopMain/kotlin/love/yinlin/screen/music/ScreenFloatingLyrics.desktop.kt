@@ -13,6 +13,7 @@ import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.platform.app
+import love.yinlin.service
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
 
@@ -30,7 +31,7 @@ private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var desktopConfig by rememberRefState { app.config.floatingLyricsDesktopConfig }
+    var desktopConfig by rememberRefState { service.config.floatingLyricsDesktopConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
@@ -41,7 +42,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     ) {
         (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
             DisposableEffect(Unit) {
-                desktopConfig = app.config.floatingLyricsDesktopConfig
+                desktopConfig = service.config.floatingLyricsDesktopConfig
                 floatingLyrics.canMove = true
                 macosClickFixup(floatingLyrics)
                 onDispose {
@@ -52,10 +53,10 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
 
             RowLayout("悬浮歌词模式") {
                 Switch(
-                    checked = app.config.enabledFloatingLyrics,
+                    checked = service.config.enabledFloatingLyrics,
                     onCheckedChange = {
                         floatingLyrics.isAttached = it
-                        app.config.enabledFloatingLyrics = it
+                        service.config.enabledFloatingLyrics = it
                     }
                 )
             }
@@ -64,7 +65,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 ProgressSlider(
                     value = desktopConfig.textSizeProgress,
                     onValueChange = { desktopConfig = desktopConfig.copyTextSize(it) },
-                    onValueChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
+                    onValueChangeFinished = { service.config.floatingLyricsDesktopConfig = desktopConfig },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
                 )
             }
@@ -75,9 +76,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 left = {
                     ColumnLayout("字体颜色") {
                         DockedColorPicker(
-                            initialColor = Colors(app.config.floatingLyricsDesktopConfig.textColor),
+                            initialColor = Colors(service.config.floatingLyricsDesktopConfig.textColor),
                             onColorChanged = { desktopConfig = desktopConfig.copy(textColor = it.value) },
-                            onColorChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
+                            onColorChangeFinished = { service.config.floatingLyricsDesktopConfig = desktopConfig },
                             modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                         )
                     }
@@ -85,9 +86,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
                 right = {
                     ColumnLayout("背景颜色") {
                         DockedColorPicker(
-                            initialColor = Colors(app.config.floatingLyricsDesktopConfig.backgroundColor),
+                            initialColor = Colors(service.config.floatingLyricsDesktopConfig.backgroundColor),
                             onColorChanged = { desktopConfig = desktopConfig.copy(backgroundColor = it.value) },
-                            onColorChangeFinished = { app.config.floatingLyricsDesktopConfig = desktopConfig },
+                            onColorChangeFinished = { service.config.floatingLyricsDesktopConfig = desktopConfig },
                             modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                         )
                     }

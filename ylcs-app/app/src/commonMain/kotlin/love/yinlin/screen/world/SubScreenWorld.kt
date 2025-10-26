@@ -40,7 +40,6 @@ import love.yinlin.compose.screen.SubScreen
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.WebImage
@@ -50,6 +49,7 @@ import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.screen.community.BoxText
 import love.yinlin.screen.world.battle.ScreenGuessLyrics
 import love.yinlin.screen.world.single.rhyme.ScreenRhyme
+import love.yinlin.service
 import kotlin.math.absoluteValue
 
 @Composable
@@ -120,7 +120,7 @@ class SubScreenWorld(parent: BasicScreen<*>) : SubScreen(parent) {
             Game.FlowersOrder, Game.SearchAll,
             Game.Pictionary -> navigate(ScreenGameHall.Args(game))
             Game.GuessLyrics -> {
-				val profile = app.config.userProfile
+				val profile = service.config.userProfile
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
@@ -186,7 +186,7 @@ class SubScreenWorld(parent: BasicScreen<*>) : SubScreen(parent) {
                         icon = Icons.Outlined.Edit,
                         tip = "创建",
                         onClick = {
-                            if (app.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
+                            if (service.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
                             else slot.tip.warning("请先登录")
                         }
                     )

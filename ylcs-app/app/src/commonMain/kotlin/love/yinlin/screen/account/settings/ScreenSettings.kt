@@ -57,6 +57,7 @@ import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.ui.component.layout.Space
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.config.CacheState
 import love.yinlin.screen.account.ScreenLogin
 import love.yinlin.screen.account.SubScreenMe
 import love.yinlin.screen.common.ScreenMain
@@ -88,7 +89,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
         pickPicture(1f)?.let { path ->
             val result = ClientAPI.request(
                 route = API.User.Profile.UpdateAvatar,
-                data = app.config.userToken,
+                data = service.config.userToken,
                 files = {
                     API.User.Profile.UpdateAvatar.Files(
                         avatar = file(SystemFileSystem.source(path))
@@ -96,7 +97,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 }
             )
             when (result) {
-                is Data.Success -> app.config.cacheUserAvatar = KVConfig.UPDATE
+                is Data.Success -> service.config.cacheUserAvatar = CacheState.UPDATE
                 is Data.Failure -> slot.tip.error(result.message)
             }
         }
@@ -106,7 +107,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
         pickPicture(1.77777f)?.let { path ->
             val result = ClientAPI.request(
                 route = API.User.Profile.UpdateWall,
-                data = app.config.userToken,
+                data = service.config.userToken,
                 files = {
                     API.User.Profile.UpdateWall.Files(
                         wall = file(SystemFileSystem.source(path))
@@ -114,7 +115,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 }
             )
             when (result) {
-                is Data.Success -> app.config.cacheUserWall = KVConfig.UPDATE
+                is Data.Success -> service.config.cacheUserWall = CacheState.UPDATE
                 is Data.Failure -> slot.tip.error(result.message)
             }
         }
@@ -122,18 +123,18 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun modifyUserId(initText: String) {
         idModifyDialog.openSuspend(initText)?.let { text ->
-            val profile = app.config.userProfile
+            val profile = service.config.userProfile
             if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) launch {
                 val result = ClientAPI.request(
                     route = API.User.Profile.UpdateName,
                     data = API.User.Profile.UpdateName.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         name = text
                     )
                 )
                 when (result) {
                     is Data.Success -> {
-                        app.config.userProfile = profile.copy(
+                        service.config.userProfile = profile.copy(
                             name = text,
                             coin = profile.coin - UserConstraint.RENAME_COIN_COST
                         )
@@ -146,18 +147,18 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun modifyUserSignature(initText: String) {
         signatureModifyDialog.openSuspend(initText)?.let { text ->
-            val profile = app.config.userProfile
+            val profile = service.config.userProfile
             if (profile != null) launch {
                 val result = ClientAPI.request(
                     route = API.User.Profile.UpdateSignature,
                     data = API.User.Profile.UpdateSignature.Request(
-                        token = app.config.userToken,
+                        token = service.config.userToken,
                         signature = text
                     )
                 )
                 when (result) {
                     is Data.Success -> {
-                        app.config.userProfile = profile.copy(signature = text)
+                        service.config.userProfile = profile.copy(signature = text)
                     }
                     is Data.Failure -> slot.tip.error(result.message)
                 }
@@ -166,7 +167,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun modifyPassword(oldPwd: String, newPwd: String) {
-        val token = app.config.userToken
+        val token = service.config.userToken
         if (token.isNotEmpty()) {
             val result = ClientAPI.request(
                 route = API.User.Account.ChangePassword,
@@ -187,7 +188,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun resetPicture() {
-        val token = app.config.userToken
+        val token = service.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "重置默认头像与背景墙")) {
                 val result = ClientAPI.request(
@@ -196,8 +197,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 )
                 when (result) {
                     is Data.Success -> {
-                        app.config.cacheUserAvatar = KVConfig.UPDATE
-                        app.config.cacheUserWall = KVConfig.UPDATE
+                        service.config.cacheUserAvatar = CacheState.UPDATE
+                        service.config.cacheUserWall = CacheState.UPDATE
                     }
                     is Data.Failure-> slot.tip.error(result.message)
                 }
@@ -206,7 +207,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun logoff() {
-        val token = app.config.userToken
+        val token = service.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "退出登录")) {
                 ClientAPI.request(
@@ -228,7 +229,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Info.SendFeedback,
             data = API.User.Info.SendFeedback.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 content = content
             )
         )
@@ -282,7 +283,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 ) {
                     WebImage(
                         uri = userProfile.avatarPath,
-                        key = app.config.cacheUserAvatar,
+                        key = service.config.cacheUserAvatar,
                         contentScale = ContentScale.Crop,
                         circle = true,
                         modifier = Modifier.size(CustomTheme.size.image)
@@ -306,7 +307,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 ) {
                     WebImage(
                         uri = userProfile.wallPath,
-                        key = app.config.cacheUserWall,
+                        key = service.config.cacheUserWall,
                         modifier = Modifier.width(CustomTheme.size.largeImage).aspectRatio(1.77778f)
                             .shadow(CustomTheme.shadow.icon)
                     )
@@ -352,7 +353,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
             Item(
                 title = "主题",
                 icon = colorfulImageVector(
-                    icon = when (app.config.themeMode) {
+                    icon = when (service.config.themeMode) {
                         ThemeMode.SYSTEM -> Icons.Outlined.Contrast
                         ThemeMode.LIGHT -> Icons.Outlined.LightMode
                         ThemeMode.DARK -> Icons.Outlined.DarkMode
@@ -361,8 +362,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 )
             ) {
                 SingleSelector(
-                    current = app.config.themeMode,
-                    onSelected = { app.config.themeMode = it },
+                    current = service.config.themeMode,
+                    onSelected = { service.config.themeMode = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
@@ -384,8 +385,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 val animationSpeedValue = remember { intArrayOf(600, 400, 200) }
                 val animationSpeedString = remember { arrayOf("慢", "标准", "快") }
                 SingleSelector(
-                    current = LocalAnimationSpeed.current,
-                    onSelected = { app.config.animationSpeed = it },
+                    current = service.config.animationSpeed,
+                    onSelected = { service.config.animationSpeed = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
@@ -407,8 +408,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 val fontScaleValue = remember { floatArrayOf(0.83333f, 1f, 1.2f) }
                 val fontScaleString = remember { arrayOf("小", "标准", "大") }
                 SingleSelector(
-                    current = app.config.fontScale,
-                    onSelected = { app.config.fontScale = it },
+                    current = service.config.fontScale,
+                    onSelected = { service.config.fontScale = it },
                     style = MaterialTheme.typography.bodySmall,
                     hasIcon = false,
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace),
@@ -426,9 +427,9 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                     icon = Icons.Outlined.MusicNote,
                     background = MaterialTheme.colorScheme.primaryContainer
                 ),
-                checked = app.config.audioFocus,
+                checked = service.config.audioFocus,
                 onCheckedChange = {
-                    app.config.audioFocus = it
+                    service.config.audioFocus = it
                     slot.tip.success("重启APP后生效")
                 }
             )
@@ -440,9 +441,9 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                     background = MaterialTheme.colorScheme.primaryContainer
                 ),
                 hasDivider = false,
-                checked = app.config.enabledTip,
+                checked = service.config.enabledTip,
                 onCheckedChange = {
-                    app.config.enabledTip = it
+                    service.config.enabledTip = it
                 }
             )
         }
@@ -547,8 +548,8 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
 
     @Composable
     override fun Content(device: Device) = when (device.type) {
-        Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(app.config.userProfile)
-        Device.Type.LANDSCAPE -> Landscape(app.config.userProfile)
+        Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(service.config.userProfile)
+        Device.Type.LANDSCAPE -> Landscape(service.config.userProfile)
     }
 
     private val crashLogSheet = object : FloatingSheet() {

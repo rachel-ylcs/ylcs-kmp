@@ -32,7 +32,6 @@ import love.yinlin.extension.safeToSources
 import love.yinlin.platform.ImageCompress
 import love.yinlin.platform.ImageProcessor
 import love.yinlin.platform.Picker
-import love.yinlin.platform.app
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.input.SingleSelector
 import love.yinlin.compose.ui.layout.ActionScope
@@ -80,7 +79,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Topic.SendTopic,
             data = API.User.Topic.SendTopic.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 title = title,
                 content = input.content.richString.toString(),
                 section = section
@@ -108,7 +107,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
                         name = profile.name
                     ))
                 }
-                app.config.editedTopic = null
+                service.config.editedTopic = null
                 pop()
             }
             is Data.Failure -> slot.tip.error(result.message)
@@ -122,21 +121,21 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
         val content = input.content.text
         val pics = input.pics.map { it.image }
         if (title.isNotEmpty() || content.isNotEmpty() || pics.isNotEmpty()) {
-            app.config.editedTopic = EditedTopic(
+            service.config.editedTopic = EditedTopic(
                 title = title,
                 content = content,
                 section = input.section,
                 pics = pics
             )
         }
-        else if (app.config.editedTopic != null) app.config.editedTopic = null
+        else if (service.config.editedTopic != null) service.config.editedTopic = null
         pop()
     }
 
     @Composable
     override fun ActionScope.LeftActions() {
         Action(Icons.Outlined.Close, "发表") {
-            app.config.editedTopic = null
+            service.config.editedTopic = null
             pop()
         }
     }
@@ -148,14 +147,14 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
             tip = "放弃更改",
             enabled = input.canSubmit
         ) {
-            val profile = app.config.userProfile
+            val profile = service.config.userProfile
             if (profile != null) addTopic(profile = profile)
             else slot.tip.warning("请先登录")
         }
     }
 
     override suspend fun initialize() {
-        app.config.editedTopic?.let { editedTopic ->
+        service.config.editedTopic?.let { editedTopic ->
             input.title.text = editedTopic.title
             input.content.text = editedTopic.content
             input.section = editedTopic.section
@@ -165,7 +164,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
 
     @Composable
     override fun Content(device: Device) {
-        app.config.userProfile?.let { profile ->
+        service.config.userProfile?.let { profile ->
             Column(
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current)

@@ -38,7 +38,6 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.WebImage
@@ -50,6 +49,7 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.service
 
 @Composable
 private fun UserItem(
@@ -167,7 +167,7 @@ class ScreenGuessLyrics(manager: ScreenManager, val args: Args) : Screen<ScreenG
                 url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
             }
             session = newSession
-            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
+            send(LyricsSockets.CM.Login(service.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
             newSession.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) {
                     val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()

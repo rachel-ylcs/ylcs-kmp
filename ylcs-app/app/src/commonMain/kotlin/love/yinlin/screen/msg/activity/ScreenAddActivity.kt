@@ -15,11 +15,11 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
+import love.yinlin.service
 import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
 
 @Stable
@@ -45,7 +45,7 @@ class ScreenAddActivity(manager: ScreenManager) : CommonScreen(manager) {
 		val result = ClientAPI.request(
 			route = API.User.Activity.AddActivity,
 			data = API.User.Activity.AddActivity.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				activity = activity
 			),
 			files = { API.User.Activity.AddActivity.Files(

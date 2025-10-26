@@ -89,7 +89,7 @@ fun main() {
                                 start = CustomTheme.padding.horizontalExtraSpace
                             )
                         ) {
-                            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                            if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
                                 Action(
                                     icon = Icons.Outlined.CleaningServices,
                                     tip = "GC",
@@ -154,7 +154,7 @@ fun main() {
             type = Notification.Type.Info
         )
         LaunchedEffect(appContext.windowVisible) {
-            if (!appContext.windowVisible && appContext.config.enabledTip) trayState.sendNotification(notification)
+            if (!appContext.windowVisible && service.config.enabledTip) trayState.sendNotification(notification)
         }
         Tray(
             icon = painterResource(Res.drawable.img_logo),
@@ -164,7 +164,7 @@ fun main() {
 
         // 悬浮歌词
         (appContext.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
-            if (it.isAttached && appContext.config.enabledFloatingLyrics) it.Content()
+            if (it.isAttached && service.config.enabledFloatingLyrics) it.Content()
         }
     }
 }

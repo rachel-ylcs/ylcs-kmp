@@ -40,7 +40,6 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.replaceAll
-import love.yinlin.platform.app
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.screen.common.ScreenWebpage
@@ -49,6 +48,7 @@ import love.yinlin.screen.msg.activity.ScreenAddActivity
 import love.yinlin.screen.msg.douyin.ScreenDouyin
 import love.yinlin.screen.msg.pictures.ScreenPictures
 import love.yinlin.screen.msg.weibo.*
+import love.yinlin.service
 import love.yinlin.ui.component.container.Calendar
 import love.yinlin.ui.component.container.CalendarState
 import love.yinlin.ui.component.image.Banner
@@ -261,7 +261,7 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
 
     @Composable
     private fun ActionScope.ToolBarLayout() {
-        if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+        if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
             Action(Icons.Outlined.Add, "添加") {
                 navigate<ScreenAddActivity>()
             }

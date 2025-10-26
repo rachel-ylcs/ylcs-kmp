@@ -23,8 +23,8 @@ import love.yinlin.R
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.platform.ForwardPlayer
-import love.yinlin.platform.app
 import love.yinlin.platform.mergePlayMode
+import love.yinlin.service
 
 object CustomCommands {
     object Args {
@@ -131,7 +131,7 @@ class MusicService : MediaSessionService() {
 
         val context = this
 
-        val ffmpegPlayer = FfmpegRenderersFactory.build(this, app.config.audioFocus)
+        val ffmpegPlayer = FfmpegRenderersFactory.build(this, service.config.audioFocus)
         val forwardPlayer = ForwardPlayer(ffmpegPlayer)
         exoPlayer = ffmpegPlayer
         session = MediaSession.Builder(context, forwardPlayer)

@@ -13,6 +13,7 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.service
 import kotlin.math.roundToLong
 import love.yinlin.ui.screen.music.audioPath
 import love.yinlin.ui.screen.music.recordPath
@@ -70,7 +71,7 @@ class ActualMusicFactory : MusicFactory() {
                         }
                     }
                 }
-                val options = if (app.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
+                val options = if (service.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
                 setCategory(AVAudioSessionCategoryPlayback, options, null)
                 setActive(true, null)
                 setupNowPlayingInfoCenter()

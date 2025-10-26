@@ -29,6 +29,7 @@ import love.yinlin.AppEntry
 import love.yinlin.common.uri.Scheme
 import love.yinlin.compose.*
 import love.yinlin.extension.catching
+import love.yinlin.service
 import java.util.UUID
 
 @Stable
@@ -98,7 +99,7 @@ class ActualFloatingLyrics(private val activity: ComponentActivity) : FloatingLy
     @Composable
     private fun Content(maxWidth: Dp) {
         currentLyrics?.let { lyrics ->
-            val config = app.config.floatingLyricsAndroidConfig
+            val config = service.config.floatingLyricsAndroidConfig
 
             Box(
                 modifier = Modifier.padding(

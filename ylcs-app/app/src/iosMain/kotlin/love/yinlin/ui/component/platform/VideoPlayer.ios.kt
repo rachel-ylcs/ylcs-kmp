@@ -15,6 +15,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
 import love.yinlin.ui.CustomUI
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.service
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSNotification
 import platform.Foundation.NSURL
@@ -77,7 +78,7 @@ actual fun VideoPlayer(
     var wasMusicPlaying by rememberFalse()
     val state = rememberRefState<VideoPlayerView?> { null }
 
-    if (app.config.audioFocus) {
+    if (service.config.audioFocus) {
         DisposableEffect(Unit) {
             wasMusicPlaying = app.musicFactory.isPlaying
             if (wasMusicPlaying) {

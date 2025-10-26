@@ -31,7 +31,6 @@ import love.yinlin.extension.Array
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.to
-import love.yinlin.platform.app
 import love.yinlin.resources.img_not_login
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
@@ -42,6 +41,7 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.layout.StatusBox
 import love.yinlin.screen.world.game.GameRecordCard
+import love.yinlin.service
 
 @Stable
 class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
@@ -60,7 +60,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGameRecords,
                 data = API.User.Game.GetUserGameRecords.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     num = page.pageNum
                 )
             )
@@ -74,7 +74,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.GetUserGameRecords,
             data = API.User.Game.GetUserGameRecords.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 rid = page.offset,
                 num = page.pageNum
             )

@@ -30,7 +30,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationGrid
@@ -39,6 +38,7 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.community.BoxText
+import love.yinlin.service
 import love.yinlin.ui.component.text.RichString
 import love.yinlin.ui.component.text.RichText
 
@@ -60,7 +60,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.GetMails,
                 data = API.User.Mail.GetMails.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     num = page.pageNum
                 )
             )
@@ -74,7 +74,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Mail.GetMails,
             data = API.User.Mail.GetMails.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 isProcessed = page.arg1,
                 mid = page.offset,
                 num = page.pageNum
@@ -89,7 +89,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.ProcessMail,
                 data = API.User.Mail.ProcessMail.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     mid = mid,
                     confirm = value
                 )
@@ -113,7 +113,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.DeleteMail,
                 data = API.User.Mail.DeleteMail.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     mid = mid
                 )
             )

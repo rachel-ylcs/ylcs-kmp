@@ -20,10 +20,14 @@ import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
+import love.yinlin.screen.music.ColumnLayout
+import love.yinlin.screen.music.RowLayout
+import love.yinlin.screen.music.ScreenFloatingLyrics
+import love.yinlin.service
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
-    var iosConfig by rememberRefState { app.config.floatingLyricsIOSConfig }
+    var iosConfig by rememberRefState { service.config.floatingLyricsIOSConfig }
 
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
@@ -34,7 +38,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     ) {
         RowLayout("悬浮歌词模式") {
             Switch(
-                checked = app.config.enabledFloatingLyrics,
+                checked = service.config.enabledFloatingLyrics,
                 onCheckedChange = { value ->
                     (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
                         if (value) {
@@ -75,7 +79,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             ProgressSlider(
                 value = iosConfig.textSizeProgress,
                 onValueChange = { iosConfig = iosConfig.copyTextSize(it) },
-                onValueChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
+                onValueChangeFinished = { service.config.floatingLyricsIOSConfig = iosConfig },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = CustomTheme.padding.horizontalExtraSpace)
             )
         }
@@ -86,9 +90,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.floatingLyricsIOSConfig.textColor),
+                        initialColor = Colors(service.config.floatingLyricsIOSConfig.textColor),
                         onColorChanged = { iosConfig = iosConfig.copy(textColor = it.value) },
-                        onColorChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
+                        onColorChangeFinished = { service.config.floatingLyricsIOSConfig = iosConfig },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }
@@ -96,9 +100,9 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.floatingLyricsIOSConfig.backgroundColor),
+                        initialColor = Colors(service.config.floatingLyricsIOSConfig.backgroundColor),
                         onColorChanged = { iosConfig = iosConfig.copy(backgroundColor = it.value) },
-                        onColorChangeFinished = { app.config.floatingLyricsIOSConfig = iosConfig },
+                        onColorChangeFinished = { service.config.floatingLyricsIOSConfig = iosConfig },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
                     )
                 }

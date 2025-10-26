@@ -22,7 +22,6 @@ import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.ui.component.layout.PaginationArgs
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
@@ -31,6 +30,7 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.world.game.GameCardQuestionAnswer
 import love.yinlin.screen.world.game.GameItem
+import love.yinlin.service
 
 @Stable
 class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
@@ -50,7 +50,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGames,
                 data = API.User.Game.GetUserGames.Request(
-                    token = app.config.userToken,
+                    token = service.config.userToken,
                     num = page.pageNum
                 )
             )
@@ -64,7 +64,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.GetUserGames,
             data = API.User.Game.GetUserGames.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 gid = page.offset,
                 isCompleted = page.arg1,
                 num = page.pageNum
@@ -77,7 +77,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.DeleteGame,
             data = API.User.Game.DeleteGame.Request(
-                token = app.config.userToken,
+                token = service.config.userToken,
                 gid = gid
             )
         )
@@ -99,7 +99,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            val name = remember { app.config.userProfile?.name ?: "" }
+            val name = remember { service.config.userProfile?.name ?: "" }
 
             PaginationStaggeredGrid(
                 items = page.items,

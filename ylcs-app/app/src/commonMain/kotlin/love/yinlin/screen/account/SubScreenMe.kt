@@ -33,7 +33,6 @@ import kotlinx.datetime.number
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.KVConfig
 import love.yinlin.common.uri.Scheme
 import love.yinlin.common.uri.Uri
 import love.yinlin.common.uri.UriGenerator
@@ -51,6 +50,7 @@ import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.config.CacheState
 import love.yinlin.data.Data
 import love.yinlin.data.ItemKey
 import love.yinlin.data.RequestError
@@ -58,7 +58,6 @@ import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.Platform
-import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.screen.account.settings.ScreenSettings
 import love.yinlin.screen.common.ScreenTest
@@ -118,17 +117,17 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
     private val isUpdateToken = atomic(false)
 
     fun cleanUserToken() {
-        app.config.userShortToken = 0L
-        app.config.userToken = ""
-        app.config.userProfile = null
-        app.config.cacheUserAvatar = KVConfig.UPDATE
-        app.config.cacheUserWall = KVConfig.UPDATE
+        service.config.userShortToken = 0L
+        service.config.userToken = ""
+        service.config.userProfile = null
+        service.config.cacheUserAvatar = CacheState.UPDATE
+        service.config.cacheUserWall = CacheState.UPDATE
     }
 
     suspend fun updateUserToken() {
-        val token = app.config.userToken
+        val token = service.config.userToken
         val currentTime = DateEx.CurrentLong
-        val duration = currentTime - app.config.userShortToken
+        val duration = currentTime - service.config.userShortToken
         if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
             isUpdateToken.compareAndSet(expect = false, update = true)) {
             val result = ClientAPI.request(
@@ -138,8 +137,8 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             isUpdateToken.value = false
             when (result) {
                 is Data.Success -> {
-                    app.config.userShortToken = currentTime
-                    app.config.userToken = result.data
+                    service.config.userShortToken = currentTime
+                    service.config.userToken = result.data
                 }
                 is Data.Failure if result.type == RequestError.Unauthorized -> {
                     cleanUserToken()
@@ -151,13 +150,13 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
     }
 
     suspend fun updateUserProfile() {
-        val token = app.config.userToken
+        val token = service.config.userToken
         if (token.isNotEmpty() && !isUpdateToken.value) {
             val result = ClientAPI.request(
                 route = API.User.Profile.GetProfile,
                 data = token
             )
-            if (result is Data.Success) app.config.userProfile = result.data
+            if (result is Data.Success) service.config.userProfile = result.data
         }
     }
 
@@ -173,7 +172,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
         ) {
             Item("扫码", Icons.Filled.CropFree) { scanSheet.open() }
             Item("名片", Icons.Filled.AccountBox) {
-                app.config.userProfile?.let {
+                service.config.userProfile?.let {
                     userCardSheet.open(it)
                 } ?: slot.tip.warning("请先登录")
             }
@@ -191,19 +190,19 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             shape = shape,
             title = "个人空间"
         ) {
-            val notification = app.config.userProfile?.notification
+            val notification = service.config.userProfile?.notification
 
             Item(
                 text = "签到",
                 icon = Icons.Filled.EventAvailable,
                 label = if (notification?.isSignin == false) 1 else 0
             ) {
-                app.config.userProfile?.let {
+                service.config.userProfile?.let {
                     signinSheet.open(it)
                 } ?: slot.tip.warning("请先登录")
             }
             Item("主题", Icons.AutoMirrored.Filled.Article) {
-                app.config.userProfile?.let {
+                service.config.userProfile?.let {
                     navigate(ScreenUserCard.Args(it.uid))
                 } ?: slot.tip.warning("请先登录")
             }
@@ -212,7 +211,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                 icon = Icons.Filled.Mail,
                 label = notification?.mailCount ?: 0
             ) {
-                app.config.userProfile?.let {
+                service.config.userProfile?.let {
                     navigate<ScreenMail>()
                 } ?: slot.tip.warning("请先登录")
             }
@@ -326,7 +325,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             ToolContainer(modifier = Modifier.fillMaxWidth())
             UserSpaceContainer(modifier = Modifier.fillMaxWidth())
             PromotionContainer(modifier = Modifier.fillMaxWidth())
-            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+            if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
                 AdminContainer(modifier = Modifier.fillMaxWidth())
             }
             Space()
@@ -356,7 +355,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                     shape = MaterialTheme.shapes.large
                 )
-                if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
                     AdminContainer(
                         modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalExtraValue),
                         shape = MaterialTheme.shapes.large
@@ -373,7 +372,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
 
     @Composable
     override fun Content(device: Device) {
-        app.config.userProfile?.let { userProfile ->
+        service.config.userProfile?.let { userProfile ->
             when (device.type) {
                 Device.Type.PORTRAIT -> Portrait(userProfile = userProfile)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(userProfile = userProfile)
@@ -413,7 +412,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             ) {
                 WebImage(
                     uri = args.avatarPath,
-                    key = app.config.cacheUserAvatar,
+                    key = service.config.cacheUserAvatar,
                     contentScale = ContentScale.Crop,
                     circle = true,
                     modifier = Modifier.size(CustomTheme.size.largeImage)
@@ -471,7 +470,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             todaySignin = true
             val result = ClientAPI.request(
                 route = API.User.Profile.Signin,
-                data = app.config.userToken
+                data = service.config.userToken
             )
             if (result is Data.Success) {
                 with(result.data) {
@@ -479,7 +478,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     todayIndex = index
                     signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
                 }
-                if (!todaySignin) app.config.userProfile = args.copy(
+                if (!todaySignin) service.config.userProfile = args.copy(
                     coin = args.coin + 1,
                     exp = args.exp + 1,
                     notification = args.notification.copy(isSignin = true)
@@ -580,7 +579,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                         index = index,
                         item = item,
                         modifier = Modifier.fillMaxWidth()
-                            .condition(index + 1 == app.config.userProfile?.level) {
+                            .condition(index + 1 == service.config.userProfile?.level) {
                                 border(
                                     width = CustomTheme.border.small,
                                     color = MaterialTheme.colorScheme.primary

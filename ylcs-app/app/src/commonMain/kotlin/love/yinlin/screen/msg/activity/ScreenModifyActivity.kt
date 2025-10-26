@@ -46,7 +46,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.ModifyActivityInfo,
 			data = API.User.Activity.ModifyActivityInfo.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				activity = Activity(
 					aid = args.aid,
 					ts = ts,
@@ -85,7 +85,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.ModifyActivityPicture,
 			data = API.User.Activity.ModifyActivityPicture.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				aid = args.aid
 			),
 			files = { API.User.Activity.ModifyActivityPicture.Files(
@@ -108,7 +108,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPicture,
 			data = API.User.Activity.DeleteActivityPicture.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				aid = args.aid
 			)
 		)
@@ -127,7 +127,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.AddActivityPictures,
 			data = API.User.Activity.AddActivityPictures.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				aid = args.aid
 			),
 			files = { API.User.Activity.AddActivityPictures.Files(
@@ -155,7 +155,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			val result = ClientAPI.request(
 				route = API.User.Activity.ModifyActivityPictures,
 				data = API.User.Activity.ModifyActivityPictures.Request(
-					token = app.config.userToken,
+					token = service.config.userToken,
 					aid = args.aid,
 					index = index
 				),
@@ -180,7 +180,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPictures,
 			data = API.User.Activity.DeleteActivityPictures.Request(
-				token = app.config.userToken,
+				token = service.config.userToken,
 				aid = args.aid,
 				index = index
 			)
