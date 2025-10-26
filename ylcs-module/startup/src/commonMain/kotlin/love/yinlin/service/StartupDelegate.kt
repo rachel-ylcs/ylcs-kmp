@@ -13,13 +13,27 @@ class StartupDelegate<S : Startup> internal constructor(
     constructor(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) : this(StartupPrivilege.User, type, factory, args, priority)
 
     companion object {
-        const val HIGH3 = 1000
-        const val HIGH2 = 500
-        const val HIGH1 = 200
+        const val HIGH10 = 1000
+        const val HIGH9 = 900
+        const val HIGH8 = 800
+        const val HIGH7 = 700
+        const val HIGH6 = 600
+        const val HIGH5 = 500
+        const val HIGH4 = 400
+        const val HIGH3 = 300
+        const val HIGH2 = 200
+        const val HIGH1 = 100
         const val DEFAULT = 0
-        const val LOW1 = -200
-        const val LOW2 = -500
-        const val LOW3 = -1000
+        const val LOW1 = -100
+        const val LOW2 = -200
+        const val LOW3 = -300
+        const val LOW4 = -400
+        const val LOW5 = -500
+        const val LOW6 = -600
+        const val LOW7 = -700
+        const val LOW8 = -800
+        const val LOW9 = -900
+        const val LOW10 = -1000
 
         fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) = StartupDelegate(StartupPrivilege.System, type, factory, args, priority)
     }
