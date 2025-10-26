@@ -1,6 +1,6 @@
 package love.yinlin.screen.music.loader
 
-import love.yinlin.platform.ImplicitPath
-import love.yinlin.platform.NormalPath
+import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.common.uri.RegularUri
 
-actual fun processImportMusicDeepLink(deepLink: String): ImplicitPath = NormalPath(deepLink)
+actual fun processImportMusicDeepLink(deepLink: String): ImplicitUri = RegularUri(deepLink)

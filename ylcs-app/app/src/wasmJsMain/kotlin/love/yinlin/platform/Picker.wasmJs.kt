@@ -8,6 +8,7 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import love.yinlin.common.ArrayBufferSource
+import love.yinlin.common.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
@@ -90,9 +91,9 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = null
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = null
 
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = null
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = null
 
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
         val buffer = Buffer()

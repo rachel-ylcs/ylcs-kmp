@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Paths
+import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.common.uri.RegularUri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -34,7 +36,7 @@ import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dragAndDrop
 import love.yinlin.service
 
-expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
+expect fun processImportMusicDeepLink(deepLink: String): ImplicitUri
 
 @Stable
 class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen<ScreenImportMusic.Args>(manager) {
@@ -47,9 +49,9 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
         @Stable
         data class Initial(val message: String = "未加载文件", val isError: Boolean = false) : Step
         @Stable
-        data class Prepare(val path: ImplicitPath) : Step
+        data class Prepare(val path: ImplicitUri) : Step
         @Stable
-        data class Preview(val path: ImplicitPath, val preview: ModFactory.Preview.PreviewResult?) : Step
+        data class Preview(val path: ImplicitUri, val preview: ModFactory.Preview.PreviewResult?) : Step
         @Stable
         data class Processing(val message: String) : Step
     }
@@ -74,7 +76,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
         )
     }
 
-    private suspend fun previewMod(path: ImplicitPath) {
+    private suspend fun previewMod(path: ImplicitUri) {
         step = Step.Preview(path, null)
         val data = try {
             path.source.use { source ->
@@ -90,7 +92,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
         }
     }
 
-    private suspend fun processMod(path: ImplicitPath) {
+    private suspend fun processMod(path: ImplicitUri) {
         val data = try {
             path.source.use { source ->
                 ModFactory.Release(source, Paths.musicPath).process { current, total, id ->
@@ -267,7 +269,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
                 onDrop = {
                     val files = (it as? DropResult.File)?.path
                     if (files != null) {
-                        if (files.size == 1) step = Step.Prepare(NormalPath(files[0].toString()))
+                        if (files.size == 1) step = Step.Prepare(RegularUri(files[0].toString()))
                         else slot.tip.warning("最多一次只能导入一个MOD")
                     }
                 }

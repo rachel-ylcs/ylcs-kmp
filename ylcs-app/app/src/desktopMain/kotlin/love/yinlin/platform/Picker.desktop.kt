@@ -6,6 +6,8 @@ import kotlinx.io.asSource
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.common.uri.RegularUri
 import love.yinlin.extension.Sources
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.safeToSources
@@ -42,17 +44,17 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = Coroutines.io {
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.io {
         catchingNull {
             val path = openFileDialog(windowHandle, "选择一个文件", "文件", filter.joinToString(";"))
-            NormalPath(path!!)
+            RegularUri(path!!)
         }
     }
 
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = Coroutines.io {
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.io {
         catchingNull {
             val path = saveFileDialog(windowHandle, "保存文件", filename, filter, "文件")
-            NormalPath(path!!)
+            RegularUri(path!!)
         }
     }
 

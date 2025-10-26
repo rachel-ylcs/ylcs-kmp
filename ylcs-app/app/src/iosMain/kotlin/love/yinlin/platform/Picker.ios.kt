@@ -8,6 +8,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
+import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.common.uri.SandboxSource
+import love.yinlin.common.uri.SandboxUri
 import love.yinlin.common.uri.toPath
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
@@ -92,10 +95,10 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = suspendCoroutine { continuation ->
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = suspendCoroutine { continuation ->
         openPicker(mimeType, filter) { url ->
             continuation.safeResume {
-                continuation.resume(url?.let { SandboxPath(it) })
+                continuation.resume(url?.let { SandboxUri(it) })
             }
         }
     }
@@ -131,14 +134,14 @@ actual object Picker {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = suspendCoroutine { continuation ->
         Coroutines.startMain {
             val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
             documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
                 override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
                     val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
                     continuation.safeResume {
-                        continuation.resume(fileUrl?.let { SandboxPath(it, didPickDocumentAtURL) })
+                        continuation.resume(fileUrl?.let { SandboxUri(it, didPickDocumentAtURL) })
                     }
                 }
 

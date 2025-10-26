@@ -20,6 +20,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import love.yinlin.common.Paths
+import love.yinlin.common.uri.ImplicitUri
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.graphics.ImageCrop
@@ -53,7 +54,7 @@ private class MusicInfoState {
     val lyrics = TextInputState("")
     var record: String? by mutableStateOf(null)
     var background: String? by mutableStateOf(null)
-    var audioUri: ImplicitPath? by mutableRefStateOf(null)
+    var audioUri: ImplicitUri? by mutableRefStateOf(null)
 
     val canSubmit by derivedStateOf {
         id.ok && name.ok && singer.ok && lyricist.ok && composer.ok &&

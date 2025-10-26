@@ -11,6 +11,8 @@ import kotlinx.io.Source
 import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import love.yinlin.common.uri.ContentUri
+import love.yinlin.common.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
@@ -63,27 +65,27 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitPath? = suspendCoroutine { continuation ->
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = suspendCoroutine { continuation ->
         continuation.safeResume {
             service.context.activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
                 continuation.safeResume {
-                    continuation.resume(ContentPath(uri!!.toString()))
+                    continuation.resume(ContentUri(service.context.platformContext, uri!!.toString()))
                 }
             }.launch(mimeType.toTypedArray())
         }
     }
 
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitPath? = suspendCoroutine { continuation ->
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = suspendCoroutine { continuation ->
         continuation.safeResume {
             service.context.activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
                 contract = ActivityResultContracts.CreateDocument(mimeType)
             ) { uri ->
                 continuation.safeResume {
-                    continuation.resume(ContentPath(uri!!.toString()))
+                    continuation.resume(ContentUri(service.context.platformContext, uri!!.toString()))
                 }
             }.launch(filename)
         }
