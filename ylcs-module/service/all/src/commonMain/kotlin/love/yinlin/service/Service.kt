@@ -1,12 +1,10 @@
 package love.yinlin.service
 
-import love.yinlin.data.AppInfo
 import love.yinlin.startup.*
 import kotlin.jvm.JvmName
 
-open class Service(appInfo: AppInfo) : BasicService() {
+open class Service : BasicService() {
     val context by system(factory = ::StartupContext)
-    val os by system(appInfo.appName, factory = ::StartupOS)
 
     @JvmName("systemSync")
     private inline fun <reified S : SyncStartup> system(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {

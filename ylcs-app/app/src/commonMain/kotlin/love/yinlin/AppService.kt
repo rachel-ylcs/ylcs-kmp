@@ -13,10 +13,16 @@ import love.yinlin.service.StartupLazyFetcher
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
 import love.yinlin.startup.StartupMusicFactory
+import love.yinlin.startup.StartupOS
 import love.yinlin.startup.StartupUrlImage
 import love.yinlin.startup.buildStartupExceptionHandler
 
-abstract class AppService : Service(Local.info) {
+abstract class AppService : Service() {
+    val os by service(
+        Local.info.appName,
+        factory = ::StartupOS
+    )
+
     private val createDirectories by sync {
         Platform.useNot(Platform.WebWasm) {
             SystemFileSystem.createDirectories(os.storage.dataPath)
