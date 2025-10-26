@@ -11,7 +11,6 @@ import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.floating.FloatingDialog
 import love.yinlin.compose.ui.image.CropImage
 import love.yinlin.compose.ui.image.CropState
-import kotlin.coroutines.resume
 
 @Stable
 class FloatingDialogCrop : FloatingDialog<ImageCropResult>() {
@@ -44,7 +43,7 @@ class FloatingDialogCrop : FloatingDialog<ImageCropResult>() {
                     color = Colors.White,
                     modifier = Modifier.padding(CustomTheme.padding.equalValue),
                     onClick = {
-                        continuation?.resume(cropState.result)
+                        future?.send(cropState.result)
                     }
                 )
             }

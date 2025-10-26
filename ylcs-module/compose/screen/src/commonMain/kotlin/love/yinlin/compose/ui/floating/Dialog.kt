@@ -21,8 +21,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.suspendCancellableCoroutine
 import love.yinlin.compose.*
 import love.yinlin.extension.catchingNull
 import love.yinlin.platform.Coroutines
@@ -35,9 +33,8 @@ import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.screen.resources.Res
 import love.yinlin.compose.screen.resources.*
+import love.yinlin.platform.SyncFuture
 import org.jetbrains.compose.resources.stringResource
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
 import kotlin.math.roundToInt
 
 @Stable
@@ -55,26 +52,25 @@ abstract class FloatingDialog<R> : Floating<Unit>() {
     )
     override val zIndex: Float = Z_INDEX_DIALOG
 
-    protected var continuation: CancellableContinuation<R?>? = null
+    protected var future: SyncFuture<R>? = null
 
     override fun close() {
-        continuation?.resume(null)
-        continuation = null
+        future?.send()
+        future = null
         super.close()
     }
 
     protected suspend fun awaitResult(): R? = catchingNull {
-        val result = suspendCancellableCoroutine { cont ->
-            cont.invokeOnCancellation {
-                continuation = null
-                super.close()
-            }
-            continuation?.cancel(CancellationException())
-            continuation = cont
+        val result = Coroutines.sync(onCancel = {
+            future = null
+            super.close()
+        }) {
+            future?.cancel()
+            future = it
             super.open(Unit)
         }
         if (result != null) {
-            continuation = null
+            future = null
             super.close()
         }
         result
@@ -193,7 +189,7 @@ open class FloatingDialogConfirm(
     override val actions: @Composable (RowScope.() -> Unit)? = {
         ClickText(
             text = stringResource(Res.string.dialog_yes),
-            onClick = { continuation?.resume(Unit) }
+            onClick = { future?.send(Unit) }
         )
         ClickText(
             text = stringResource(Res.string.dialog_no),
@@ -238,7 +234,7 @@ open class FloatingDialogInput(
         ClickText(
             text = stringResource(Res.string.dialog_ok),
             enabled = textInputState.ok,
-            onClick = { continuation?.resume(textInputState.text) }
+            onClick = { future?.send(textInputState.text) }
         )
         ClickText(
             text = stringResource(Res.string.dialog_cancel),
@@ -269,7 +265,7 @@ open class FloatingDialogInput(
                 minLines = minLines,
                 clearButton = clearButton,
                 onImeClick = {
-                    if (textInputState.ok) continuation?.resume(textInputState.text)
+                    if (textInputState.ok) future?.send(textInputState.text)
                 },
                 modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
@@ -299,7 +295,7 @@ abstract class FloatingDialogChoice(
                 repeat(num) { index ->
                     Row(
                         modifier = Modifier.fillMaxWidth().clickable {
-                            continuation?.resume(index)
+                            future?.send(index)
                         }.padding(CustomTheme.padding.value),
                         horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                         verticalAlignment = Alignment.CenterVertically

@@ -22,8 +22,6 @@ import platform.UniformTypeIdentifiers.*
 import platform.UIKit.*
 import platform.Photos.*
 import platform.PhotosUI.*
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 actual object Picker {
     // 全局引用, 避免被gc
@@ -33,9 +31,9 @@ actual object Picker {
 
     actual suspend fun pickPicture(): Source? = pickPicture(1)?.getOrNull(0)
 
-    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.sync { future ->
         Coroutines.startMain {
-            continuation.safeResume {
+            future.catching {
                 val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
                     selectionLimit = maxNum.toLong()
                     selection = PHPickerConfigurationSelectionOrdered
@@ -57,7 +55,7 @@ actual object Picker {
                                     if (tempUrl != null) images += tempUrl
                                     processedImages++
                                     if (processedImages == results.size) {
-                                        continuation.resume(images.safeToSources {
+                                        future.send(images.safeToSources {
                                             SystemFileSystem.source(it).buffered()
                                         })
                                     }
@@ -87,18 +85,18 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
-        openPicker(mimeType, filter) { url ->
-            continuation.safeResume {
-                continuation.resume(url?.let { SandboxSource(it).buffered() })
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.sync { future ->
+        future.catching {
+            openPicker(mimeType, filter) { url ->
+                future.send { url?.let { SandboxSource(it).buffered() } }
             }
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = suspendCoroutine { continuation ->
-        openPicker(mimeType, filter) { url ->
-            continuation.safeResume {
-                continuation.resume(url?.let { SandboxUri(it) })
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.sync { future ->
+        future.catching {
+            openPicker(mimeType, filter) { url ->
+                future.send { url?.let { SandboxUri(it) } }
             }
         }
     }
@@ -134,24 +132,24 @@ actual object Picker {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = suspendCoroutine { continuation ->
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.sync { future ->
         Coroutines.startMain {
-            val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
-            documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
-                override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                    val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
-                    continuation.safeResume {
-                        continuation.resume(fileUrl?.let { SandboxUri(it, didPickDocumentAtURL) })
+            future.catching {
+                val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
+                documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
+                    override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
+                        val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
+                        future.send { fileUrl?.let { SandboxUri(it, didPickDocumentAtURL) } }
+                    }
+
+                    override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+                        future.send()
                     }
                 }
-
-                override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
-                    continuation.resume(null)
-                }
+                picker.delegate = documentPickerDelegate
+                val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+                rootViewController?.presentViewController(picker, true, null)
             }
-            picker.delegate = documentPickerDelegate
-            val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-            rootViewController?.presentViewController(picker, true, null)
         }
     }
 

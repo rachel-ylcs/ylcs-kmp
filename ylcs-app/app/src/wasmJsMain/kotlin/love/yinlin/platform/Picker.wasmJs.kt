@@ -21,8 +21,6 @@ import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 actual object Picker {
     private fun htmlFileInput(
@@ -44,14 +42,14 @@ actual object Picker {
         worker.postMessage(files)
     }
 
-    actual suspend fun pickPicture(): Source? = suspendCoroutine { continuation ->
-        continuation.safeResume {
+    actual suspend fun pickPicture(): Source? = Coroutines.sync { future ->
+        future.catching {
             htmlFileInput(multiple = false, filter = MimeType.IMAGE) { files ->
-                continuation.safeResume {
+                future.catching {
                     openFileUpLoadWorker(files) { data ->
-                        continuation.safeResume {
+                        future.catching {
                             val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
-                            continuation.resume(ArrayBufferSource(buffer).buffered())
+                            future.send { ArrayBufferSource(buffer).buffered() }
                         }
                     }
                 }
@@ -59,16 +57,18 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = suspendCoroutine { continuation ->
-        continuation.safeResume {
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.sync { future ->
+        future.catching {
             require(maxNum > 0)
             htmlFileInput(multiple = true, filter = MimeType.IMAGE) { files ->
-                continuation.safeResume {
+                future.catching {
                     openFileUpLoadWorker(files) { data ->
-                        continuation.safeResume {
-                            continuation.resume((data as? JsArray<*>)?.toList()?.safeToSources {
-                                (it as? ArrayBuffer)?.let { buffer -> ArrayBufferSource(buffer).buffered() }
-                            })
+                        future.catching {
+                            future.send {
+                                (data as? JsArray<*>)?.toList()?.safeToSources {
+                                    (it as? ArrayBuffer)?.let { buffer -> ArrayBufferSource(buffer).buffered() }
+                                }
+                            }
                         }
                     }
                 }
@@ -76,14 +76,14 @@ actual object Picker {
         }
     }
 
-    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = suspendCoroutine { continuation ->
-        continuation.safeResume {
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.sync { future ->
+        future.catching {
             htmlFileInput(multiple = false, filter = mimeType.joinToString(",")) { files ->
-                continuation.safeResume {
+                future.catching {
                     openFileUpLoadWorker(files) { data ->
-                        continuation.safeResume {
+                        future.catching {
                             val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
-                            continuation.resume(ArrayBufferSource(buffer).buffered())
+                            future.send { ArrayBufferSource(buffer).buffered() }
                         }
                     }
                 }
