@@ -11,7 +11,7 @@ fun buildLyrics(): List<String> {
 
 fun Project.showtime() {
     val s0 = System.getProperty("user.dir")
-    val s1 = currentTaskName.padStart(22).take(22)
+    val s1 = currentTaskName.split(":").last().padStart(22).take(22)
     val s2 = C.platform.toString().padStart(22).take(22)
     val s3 = C.platformVersion.padStart(22).take(22)
     val s4 = C.architecture.toString().padStart(22).take(22)
