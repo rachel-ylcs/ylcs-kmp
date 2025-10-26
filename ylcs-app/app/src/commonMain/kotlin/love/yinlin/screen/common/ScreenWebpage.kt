@@ -13,11 +13,11 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.platform.WebView
+import love.yinlin.compose.ui.platform.WebViewConfig
+import love.yinlin.compose.ui.platform.WebViewState
 import love.yinlin.platform.Platform
 import love.yinlin.service
-import love.yinlin.ui.component.platform.WebPage
-import love.yinlin.ui.component.platform.WebPageSettings
-import love.yinlin.ui.component.platform.WebPageState
 
 @Stable
 class ScreenWebpage(manager: ScreenManager, args: Args) : Screen<ScreenWebpage.Args>(manager) {
@@ -35,7 +35,7 @@ class ScreenWebpage(manager: ScreenManager, args: Args) : Screen<ScreenWebpage.A
 		}
 	}
 
-	private val state = WebPageState(WebPageSettings(), args.url)
+	private val state = WebViewState(WebViewConfig(), args.url)
 
 	override val title: String by derivedStateOf { state.title }
 
@@ -46,7 +46,7 @@ class ScreenWebpage(manager: ScreenManager, args: Args) : Screen<ScreenWebpage.A
 
 	@Composable
 	override fun Content(device: Device) {
-		WebPage(
+		WebView(
 			state = state,
 			modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
 		)

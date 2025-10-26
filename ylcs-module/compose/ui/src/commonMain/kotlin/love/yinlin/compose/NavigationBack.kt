@@ -1,4 +1,4 @@
-package love.yinlin.compose.screen
+package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.navigationevent.NavigationEventInfo

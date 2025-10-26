@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.NavigationBack
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition

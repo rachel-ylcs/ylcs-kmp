@@ -46,6 +46,7 @@
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
 |               |                 |    `component:all`    |           merge all component libs           | ✅ |
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
+|               |                 |  `component:webview`  |  multiplatform webview and headless webview  | ✅ |
 |               |    `startup`    |                       |         application startup services         | ✅ |
 |               |    `service`    |                       |                                              |   |
 |               |                 |         `all`         |            merge all service libs            | ✅ |

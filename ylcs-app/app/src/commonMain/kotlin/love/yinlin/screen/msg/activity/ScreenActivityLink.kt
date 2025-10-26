@@ -16,16 +16,16 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.platform.UnsupportedPlatformComponent
-import love.yinlin.ui.component.platform.WebPage
-import love.yinlin.ui.component.platform.WebPageLoadingState.Finished
-import love.yinlin.ui.component.platform.WebPageSettings
-import love.yinlin.ui.component.platform.WebPageState
+import love.yinlin.compose.ui.platform.WebView
+import love.yinlin.compose.ui.platform.WebViewConfig
+import love.yinlin.compose.ui.platform.WebViewLoadingState
+import love.yinlin.compose.ui.platform.WebViewState
+import love.yinlin.compose.ui.platform.UnsupportedPlatformComponent
 
 @Stable
 class ScreenActivityLink(manager: ScreenManager) : CommonScreen(manager) {
     val showstartInput = TextInputState()
-    val webPageState = WebPageState(WebPageSettings())
+    val webPageState = WebViewState(WebViewConfig())
 
     override val title: String = "链接提取"
 
@@ -46,7 +46,7 @@ class ScreenActivityLink(manager: ScreenManager) : CommonScreen(manager) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace),
                 ) {
-                    WebPage(
+                    WebView(
                         state = webPageState,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                     )
@@ -67,7 +67,7 @@ class ScreenActivityLink(manager: ScreenManager) : CommonScreen(manager) {
                         )
                         ClickText(
                             text = "提取",
-                            enabled = webPageState.loadingState is Finished,
+                            enabled = webPageState.loadingState is WebViewLoadingState.Finished,
                             onClick = {
                                 webPageState.evaluateJavaScript("document.getElementById('openApp').click();")
                             }

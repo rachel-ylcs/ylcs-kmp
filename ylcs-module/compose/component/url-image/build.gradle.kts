@@ -43,8 +43,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.compose.ui,
-                projects.ylcsModule.startup,
+                projects.ylcsModule.compose.ui
             )
             useLib(
                 projects.ylcsModule.clientEngine,

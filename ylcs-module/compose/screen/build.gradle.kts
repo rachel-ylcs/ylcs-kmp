@@ -47,7 +47,6 @@ kotlin {
                 libs.compose.navigation,
             )
             useLib(
-                libs.compose.navigation.event,
                 libs.compose.components.resources,
             )
         }

@@ -1,4 +1,4 @@
-package love.yinlin.platform
+package love.yinlin.compose.ui.platform
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.platform.UnsupportedPlatformText
 
 @Composable
 fun UnsupportedPlatformComponent(modifier: Modifier = Modifier) {

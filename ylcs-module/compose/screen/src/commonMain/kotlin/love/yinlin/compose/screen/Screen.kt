@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
-import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.floating.Floating
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.layout.ActionScope

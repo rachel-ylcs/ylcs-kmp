@@ -33,9 +33,10 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
+import love.yinlin.compose.ui.platform.HeadlessWebView
 import love.yinlin.screen.common.ScreenVideo
+import love.yinlin.service
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.platform.HeadlessBrowser
 import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
 
 @Stable
@@ -43,7 +44,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableRefStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
-    private val browser = object : HeadlessBrowser() {
+    private val browser = object : HeadlessWebView(service.context.platformContext) {
         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")
 
         override fun onRequestIntercepted(url: String, response: String): Boolean {

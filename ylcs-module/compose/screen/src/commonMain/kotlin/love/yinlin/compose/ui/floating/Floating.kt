@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.NavigationBack
 import love.yinlin.compose.ui.node.clickableNoRipple
 
 @OptIn(ExperimentalComposeUiApi::class)

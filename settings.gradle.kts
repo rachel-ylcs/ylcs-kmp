@@ -56,6 +56,7 @@ include(
     "ylcs-module:compose:app",
     "ylcs-module:compose:component:all",
     "ylcs-module:compose:component:url-image",
+    "ylcs-module:compose:component:webview",
 
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
