@@ -12,6 +12,7 @@ import love.yinlin.service.Service
 import love.yinlin.service.StartupLazyFetcher
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
+import love.yinlin.startup.StartupMusicFactory
 import love.yinlin.startup.StartupUrlImage
 import love.yinlin.startup.buildStartupExceptionHandler
 
@@ -64,6 +65,10 @@ abstract class AppService : Service(Local.info) {
     val config by service(
         StartupLazyFetcher { kv },
         factory = ::AppConfig,
+    )
+
+    val musicFactory by service(
+        factory = ::StartupMusicFactory
     )
 }
 

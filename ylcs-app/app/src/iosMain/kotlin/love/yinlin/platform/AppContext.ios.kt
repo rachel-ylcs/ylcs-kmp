@@ -1,8 +1,6 @@
 package love.yinlin.platform
 
 class ActualAppContext : AppContext() {
-    override val kv: KV = KV()
-
     override fun initializeMusicFactory(): MusicFactory = ActualMusicFactory()
 }
 
