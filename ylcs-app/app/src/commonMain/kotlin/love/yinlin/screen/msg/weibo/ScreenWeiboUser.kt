@@ -39,6 +39,7 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.ui.layout.SimpleEmptyBox
 import love.yinlin.compose.ui.layout.SimpleLoadingBox
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg

@@ -38,6 +38,7 @@ import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.ui.component.layout.*
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.BoxState
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.layout.StatusBox
 import love.yinlin.screen.world.game.GameRecordCard

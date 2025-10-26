@@ -18,8 +18,8 @@ import love.yinlin.compose.*
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.extension.timeString
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.ui.component.input.ProgressSlider
-import love.yinlin.ui.component.layout.Space
 
 @Composable
 expect fun VideoPlayer(

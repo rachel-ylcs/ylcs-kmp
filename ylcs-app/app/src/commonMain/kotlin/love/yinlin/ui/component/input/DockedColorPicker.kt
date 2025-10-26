@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import love.yinlin.compose.*
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.compose.ui.layout.Space
 import kotlin.math.*
 
 private data class HSV(val hue: Float, val saturation: Float, val brightness: Float)

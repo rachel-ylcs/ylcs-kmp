@@ -62,6 +62,7 @@ import love.yinlin.ui.component.layout.*
 import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.SplitActionLayout
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.screen.common.ScreenVideo

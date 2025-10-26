@@ -34,11 +34,11 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.LoadingSecondaryButton
 import love.yinlin.compose.ui.layout.StatusBox
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
 import love.yinlin.screen.world.game.playGameState
 import love.yinlin.service
-import love.yinlin.ui.component.layout.Space
 
 @Stable
 class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {

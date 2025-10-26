@@ -3,6 +3,7 @@ package love.yinlin.compose
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @Stable
 data class TextSystem(
@@ -22,7 +23,7 @@ data class TextSystem(
     val labelMedium: ModeText,
     val labelSmall: ModeText,
 ) {
-    fun toTypography(font: Font, size: Device.Size): Typography = when (size) {
+    fun toTypography(font: FontFamily, size: Device.Size): Typography = when (size) {
         Device.Size.SMALL -> Typography(
             displayLarge = displayLarge.small(font),
             displayMedium = displayMedium.small(font),

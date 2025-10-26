@@ -22,7 +22,7 @@ import love.yinlin.compose.ui.image.ColorfulImageVector
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.StaticLoadingIcon
 import love.yinlin.compose.ui.input.Switch
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.compose.ui.layout.Space
 
 object SettingsScope {
 	@Composable

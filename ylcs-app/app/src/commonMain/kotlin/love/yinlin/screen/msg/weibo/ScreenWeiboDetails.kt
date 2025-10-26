@@ -19,12 +19,12 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.LoadingBox
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.text.RichText
 
 @Stable

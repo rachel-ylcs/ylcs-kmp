@@ -24,8 +24,8 @@ import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.input.NormalText
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.screen.community.BoxText
-import love.yinlin.ui.component.layout.Space
 
 @Stable
 internal data class Contributor(

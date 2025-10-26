@@ -23,7 +23,7 @@ fun App(
     deviceFactory: (maxWidth: Dp, maxHeight: Dp) -> Device = { maxWidth, maxHeight -> Device(maxWidth, maxHeight) },
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     fontScale: Float = 1f,
-    mainFontResource: FontResource,
+    mainFontResource: FontResource? = null,
     colorSystem: ColorSystem = DefaultColorSystem,
     shapeSystem: ShapeSystem = DefaultShapeSystem,
     textSystem: TextSystem = DefaultTextSystem,

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,9 +28,9 @@ data class ModeText(
     val medium: Number,
     val large: Number,
 ) {
-    fun small(font: Font): TextStyle = basicTextStyle(font, small.toDouble().sp, isBold)
-    fun medium(font: Font): TextStyle = basicTextStyle(font, medium.toDouble().sp, isBold)
-    fun large(font: Font): TextStyle = basicTextStyle(font, large.toDouble().sp, isBold)
+    fun small(font: FontFamily): TextStyle = basicTextStyle(font, small.toDouble().sp, isBold)
+    fun medium(font: FontFamily): TextStyle = basicTextStyle(font, medium.toDouble().sp, isBold)
+    fun large(font: FontFamily): TextStyle = basicTextStyle(font, large.toDouble().sp, isBold)
 
     val style: TextStyle @Composable get() = mainFont().let { font ->
         when (LocalDevice.current.size) {

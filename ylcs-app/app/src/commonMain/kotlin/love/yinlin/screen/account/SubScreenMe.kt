@@ -49,6 +49,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.config.CacheState
@@ -70,7 +71,6 @@ import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.service
 import love.yinlin.ui.component.common.UserLabel
-import love.yinlin.ui.component.layout.Space
 import love.yinlin.ui.component.platform.QrcodeScanner
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource

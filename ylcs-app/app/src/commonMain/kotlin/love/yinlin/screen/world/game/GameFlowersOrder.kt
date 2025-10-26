@@ -40,7 +40,7 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.Space
+import love.yinlin.compose.ui.layout.Space
 import kotlin.to
 
 @Composable

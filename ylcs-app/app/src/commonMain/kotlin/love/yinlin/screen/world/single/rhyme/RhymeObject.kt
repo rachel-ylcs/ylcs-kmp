@@ -67,10 +67,9 @@ internal class TextCache(maxSize: Int = 8) {
 // 文本绘制管理器
 @Stable
 internal class RhymeTextManager(
-    font: Font,
+    private val font: FontFamily,
     private val fontFamilyResolver: FontFamily.Resolver
 ) {
-    private val fontFamily = FontFamily(font)
     private val density = Density(1f)
 
     fun makeParagraph(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
@@ -80,7 +79,7 @@ internal class RhymeTextManager(
             style = TextStyle(
                 fontSize = TextUnit(height / 1.17f, TextUnitType.Sp),
                 fontWeight = fontWeight,
-                fontFamily = fontFamily
+                fontFamily = font
             ),
             annotations = emptyList(),
             density = density,
