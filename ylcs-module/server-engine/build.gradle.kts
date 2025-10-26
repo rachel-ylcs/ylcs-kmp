@@ -13,12 +13,12 @@ kotlin {
                 projects.ylcsBase.csCore,
                 libs.ktor.server,
                 libs.ktor.server.websockets,
-                libs.redis,
             )
             useLib(
                 libs.logback,
                 libs.mysql,
                 libs.mysql.pool,
+                libs.redis,
                 libs.ktor.json,
                 libs.ktor.server.negotiation,
                 libs.ktor.server.netty,

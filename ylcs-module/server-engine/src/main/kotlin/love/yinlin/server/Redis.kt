@@ -5,17 +5,17 @@ import redis.clients.jedis.Connection
 import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.JedisPooled
 
-object Redis {
+data object Redis {
     private val dataSource = JedisPooled.builder()
-        .hostAndPort(Config.Redis.HOST, Config.Redis.PORT)
+        .hostAndPort(Config.Redis.host, Config.Redis.port)
         .clientConfig(DefaultJedisClientConfig.builder()
-            .password(Config.Redis.PASSWORD)
-            .timeoutMillis(3000)
+            .password(Config.Redis.password)
+            .timeoutMillis(Config.Redis.timeoutMillis)
             .build()
         ).poolConfig(GenericObjectPoolConfig<Connection>().apply {
-            maxTotal = 20
-            maxIdle = 20
-            minIdle = 5
+            maxTotal = Config.Redis.maxTotal
+            maxIdle = Config.Redis.maxIdle
+            minIdle = Config.Redis.minIdle
         })
         .build()
 

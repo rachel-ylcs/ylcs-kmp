@@ -23,17 +23,17 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-object Database {
+data object Database {
     private val dataSource = HikariDataSource(HikariConfig().apply {
-        jdbcUrl = "jdbc:mysql://${Config.Mysql.HOST}:${Config.Mysql.PORT}/${Config.Mysql.NAME}"
-        username = Config.Mysql.USERNAME
-        password = Config.Mysql.PASSWORD
+        jdbcUrl = "jdbc:mysql://${Config.Mysql.host}:${Config.Mysql.port}/${Config.Mysql.name}"
+        username = Config.Mysql.username
+        password = Config.Mysql.password
         isAutoCommit = true
-        maximumPoolSize = 10
-        minimumIdle = 2
-        idleTimeout = 30000
-        connectionTimeout = 30000
-        maxLifetime = 1800000
+        maximumPoolSize = Config.Mysql.maximumPoolSize
+        minimumIdle = Config.Mysql.minimumIdle
+        idleTimeout = Config.Mysql.idleTimeout
+        connectionTimeout = Config.Mysql.connectionTimeout
+        maxLifetime = Config.Mysql.maxLifetime
     })
 
     val connection: Connection get() = dataSource.connection
@@ -41,7 +41,7 @@ object Database {
     fun close() = dataSource.close()
 }
 
-object SQLConverter {
+data object SQLConverter {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
