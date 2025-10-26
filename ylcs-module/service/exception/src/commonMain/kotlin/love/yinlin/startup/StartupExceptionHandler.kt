@@ -14,25 +14,12 @@ import love.yinlin.service.SyncStartup
     returnType = Unit::class,
     String::class, Throwable::class, String::class
 )
-abstract class StartupExceptionHandler : SyncStartup {
+expect class StartupExceptionHandler() : SyncStartup {
     fun interface Handler {
         fun handle(key: String, e: Throwable, error: String)
     }
 
-    lateinit var crashKey: String
-        private set
+    val crashKey: String
 
-    override fun init(context: PlatformContext, args: StartupArgs) {
-        crashKey = args[0]
-    }
+    override fun init(context: PlatformContext, args: StartupArgs)
 }
-
-@StartupArg(index = 0, name = "crashKey", type = String::class)
-@StartupHandler(
-    index = 1,
-    name = "onError",
-    handlerType = StartupExceptionHandler.Handler::class,
-    returnType = Unit::class,
-    String::class, Throwable::class, String::class
-)
-expect fun buildStartupExceptionHandler(): StartupExceptionHandler

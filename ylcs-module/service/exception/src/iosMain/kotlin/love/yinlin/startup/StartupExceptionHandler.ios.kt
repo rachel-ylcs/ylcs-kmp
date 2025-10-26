@@ -7,6 +7,7 @@ import love.yinlin.service.PlatformContext
 import love.yinlin.service.StartupArg
 import love.yinlin.service.StartupArgs
 import love.yinlin.service.StartupHandler
+import love.yinlin.service.SyncStartup
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import platform.Foundation.NSUncaughtExceptionHandler
 import kotlin.experimental.ExperimentalNativeApi
@@ -19,10 +20,18 @@ import kotlin.experimental.ExperimentalNativeApi
     returnType = Unit::class,
     String::class, Throwable::class, String::class
 )
-actual fun buildStartupExceptionHandler(): StartupExceptionHandler = object : StartupExceptionHandler() {
+actual class StartupExceptionHandler : SyncStartup {
+    actual fun interface Handler {
+        actual fun handle(key: String, e: Throwable, error: String)
+    }
+
+    private lateinit var mCrashKey: String
+
+    actual val crashKey: String get() = mCrashKey
+
     @OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)
-    override fun init(context: PlatformContext, args: StartupArgs) {
-        super.init(context, args)
+    actual override fun init(context: PlatformContext, args: StartupArgs) {
+        mCrashKey = args[0]
         val handler: Handler = args[1]
         setUnhandledExceptionHook { e ->
             handler.handle(crashKey, e, e.stackTraceToString())

@@ -15,7 +15,6 @@ import love.yinlin.startup.StartupKV
 import love.yinlin.startup.StartupMusicFactory
 import love.yinlin.startup.StartupOS
 import love.yinlin.startup.StartupUrlImage
-import love.yinlin.startup.buildStartupExceptionHandler
 
 abstract class AppService : Service() {
     val os by service(
@@ -65,7 +64,7 @@ abstract class AppService : Service() {
             kv.set(key, "${DateEx.CurrentString}\n$error")
             println(e.stackTraceToString())
         },
-        factory = ::buildStartupExceptionHandler
+        factory = ::StartupExceptionHandler
     )
 
     val config by service(
