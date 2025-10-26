@@ -1,11 +1,9 @@
 package love.yinlin
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.Modifier
 import love.yinlin.compose.composeApplication
 import love.yinlin.data.MimeType
 import love.yinlin.fixup.FixupWindowsSwingMaximize
@@ -61,6 +59,6 @@ fun main() {
         },
         entry = { framework -> AppEntry { framework() } }
     ) {
-        ScreenEntry(modifier = Modifier.fillMaxSize())
+        ScreenEntry()
     }
 }
