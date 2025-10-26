@@ -43,8 +43,7 @@ internal class ComposeVideoSurface : VideoSurface(null) {
             return RV32BufferFormat(sourceWidth, sourceHeight)
         }
 
-        override fun newFormatSize(bufferWidth: Int, bufferHeight: Int, displayWidth: Int, displayHeight: Int) {
-        }
+        override fun newFormatSize(bufferWidth: Int, bufferHeight: Int, displayWidth: Int, displayHeight: Int) {}
 
         override fun allocatedBuffers(buffers: Array<ByteBuffer>) {
             frameBytes = buffers[0].run { ByteArray(remaining()).also(::get) }
@@ -58,8 +57,7 @@ internal class ComposeVideoSurface : VideoSurface(null) {
     }
 
     private inner class SkiaBitmapRenderCallback : RenderCallback {
-        override fun lock(mediaPlayer: MediaPlayer) {
-        }
+        override fun lock(mediaPlayer: MediaPlayer) {}
 
         override fun display(
             mediaPlayer: MediaPlayer,
@@ -76,8 +74,7 @@ internal class ComposeVideoSurface : VideoSurface(null) {
             }
         }
 
-        override fun unlock(mediaPlayer: MediaPlayer) {
-        }
+        override fun unlock(mediaPlayer: MediaPlayer) {}
     }
 
     private inner class SkiaBitmapVideoSurface : CallbackVideoSurface(

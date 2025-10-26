@@ -22,15 +22,15 @@ import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.R
 import love.yinlin.common.FfmpegRenderersFactory
-import love.yinlin.common.LocalFileProvider
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.fixup.FixupAndroidLocalFileProvider
+import love.yinlin.screen.music.audioPath
+import love.yinlin.screen.music.recordPath
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
-import love.yinlin.ui.screen.music.audioPath
-import love.yinlin.ui.screen.music.recordPath
 import java.io.File
 
 fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
@@ -250,7 +250,7 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                 .setAlbumArtist(this.singer)
                 .setComposer(this.composer)
                 .setWriter(this.lyricist)
-                .setArtworkUri(LocalFileProvider.uri(
+                .setArtworkUri(FixupAndroidLocalFileProvider.uri(
                     context = context,
                     authority = context.getString(R.string.music_file_provider),
                     file = File(this.recordPath.toString())

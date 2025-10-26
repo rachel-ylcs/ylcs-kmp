@@ -60,6 +60,8 @@ include(
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
 
+    "ylcs-module:fixup",
+
     "ylcs-module:auto-update",
 
     /* -----------------  [3] 结构模块  ----------------- */

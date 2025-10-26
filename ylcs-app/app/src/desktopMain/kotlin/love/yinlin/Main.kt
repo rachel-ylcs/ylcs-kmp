@@ -18,6 +18,7 @@ import androidx.compose.ui.window.*
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
 import love.yinlin.data.MimeType
+import love.yinlin.fixup.FixupWindowsSwingMaximize
 import love.yinlin.platform.*
 import love.yinlin.resources.*
 import love.yinlin.service.PlatformContext
@@ -25,7 +26,6 @@ import love.yinlin.ui.component.common.AppTopBar
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import java.awt.Dimension
-import java.awt.Rectangle
 
 fun main() {
     service.init(PlatformContext)
@@ -61,17 +61,7 @@ fun main() {
             // MinimumSize
             LaunchedEffect(Unit) {
                 window.minimumSize = Dimension(360, 640)
-                // See https://github.com/JetBrains/compose-multiplatform/issues/1724
-                Platform.use(Platform.Windows) {
-                    val screenBounds = window.graphicsConfiguration.bounds
-                    val screenInsets = window.toolkit.getScreenInsets(window.graphicsConfiguration)
-                    window.maximizedBounds = Rectangle(
-                        screenBounds.x + screenInsets.left,
-                        screenBounds.y + screenInsets.top,
-                        screenBounds.width - screenInsets.left - screenInsets.right,
-                        screenBounds.height - screenInsets.top - screenInsets.bottom
-                    )
-                }
+                FixupWindowsSwingMaximize.setBounds(window)
                 Picker.windowHandle = window.windowHandle
             }
 

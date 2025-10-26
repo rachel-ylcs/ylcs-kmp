@@ -5,29 +5,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.delay
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
+import love.yinlin.fixup.FixupMacOSMouseClick
 import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.platform.app
 import love.yinlin.service
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
-
-// ignoresMouseEvents on macOS is buggy, see https://stackoverflow.com/questions/29441015
-private fun macosClickFixup(floatingLyrics: ActualFloatingLyrics) =
-    Platform.use(Platform.MacOS) {
-        if (floatingLyrics.isAttached) {
-            floatingLyrics.isAttached = false
-            Coroutines.startMain {
-                delay(100)
-                floatingLyrics.isAttached = true
-            }
-        }
-    }
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
@@ -44,10 +30,10 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             DisposableEffect(Unit) {
                 desktopConfig = service.config.floatingLyricsDesktopConfig
                 floatingLyrics.canMove = true
-                macosClickFixup(floatingLyrics)
+                FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.isAttached = it }
                 onDispose {
                     floatingLyrics.canMove = false
-                    macosClickFixup(floatingLyrics)
+                    FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.isAttached = it }
                 }
             }
 
