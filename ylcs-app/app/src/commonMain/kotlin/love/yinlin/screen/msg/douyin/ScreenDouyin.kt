@@ -44,7 +44,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableRefStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
-    private val browser = object : HeadlessWebView(service.context.platformContext) {
+    private val browser = object : HeadlessWebView(service.context.platformPage) {
         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")
 
         override fun onRequestIntercepted(url: String, response: String): Boolean {

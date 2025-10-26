@@ -1,3 +1,3 @@
 package love.yinlin.service
 
-actual data object PlatformContext
+actual typealias PlatformContext = Unit
