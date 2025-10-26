@@ -1,4 +1,4 @@
-package love.yinlin.common.uri
+package love.yinlin.uri
 
 import org.w3c.dom.url.URL
 

@@ -3,7 +3,7 @@ package love.yinlin.compose.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 
 @Stable
 fun interface DeepLink {

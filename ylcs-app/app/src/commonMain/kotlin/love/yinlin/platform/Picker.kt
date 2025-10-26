@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager

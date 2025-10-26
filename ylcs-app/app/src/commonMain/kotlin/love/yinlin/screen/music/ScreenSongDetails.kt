@@ -30,7 +30,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
-import love.yinlin.common.uri.UriGenerator
+import love.yinlin.uri.UriGenerator
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.Screen

@@ -9,7 +9,7 @@ import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.weibo.*

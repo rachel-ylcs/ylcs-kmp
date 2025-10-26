@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.service.PlatformContext
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection

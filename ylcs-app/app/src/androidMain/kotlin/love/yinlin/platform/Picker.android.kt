@@ -11,8 +11,8 @@ import kotlinx.io.Source
 import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
-import love.yinlin.common.uri.ContentUri
-import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.uri.ContentUri
+import love.yinlin.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources

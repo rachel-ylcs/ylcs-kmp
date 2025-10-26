@@ -1,7 +1,7 @@
 package love.yinlin.startup
 
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.toUri
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toUri
 import love.yinlin.platform.Platform
 import love.yinlin.service.PlatformContext
 import love.yinlin.service.StartupArgs

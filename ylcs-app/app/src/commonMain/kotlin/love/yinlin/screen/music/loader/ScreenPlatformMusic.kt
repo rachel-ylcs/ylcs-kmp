@@ -26,7 +26,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.common.*
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager

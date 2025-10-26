@@ -26,7 +26,7 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.AppEntry
-import love.yinlin.common.uri.Scheme
+import love.yinlin.uri.Scheme
 import love.yinlin.compose.*
 import love.yinlin.extension.catching
 import love.yinlin.service

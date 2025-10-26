@@ -1,4 +1,4 @@
-package love.yinlin.common.uri
+package love.yinlin.io
 
 import kotlinx.io.Buffer
 import kotlinx.io.RawSource

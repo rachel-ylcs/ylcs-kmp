@@ -7,11 +7,11 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
-import love.yinlin.common.ArrayBufferSource
-import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
+import love.yinlin.io.ArrayBufferSource
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.toInt8Array
 import org.w3c.dom.HTMLAnchorElement

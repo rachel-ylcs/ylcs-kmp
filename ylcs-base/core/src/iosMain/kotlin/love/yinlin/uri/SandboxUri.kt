@@ -1,9 +1,11 @@
-package love.yinlin.common.uri
+package love.yinlin.uri
 
 import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
+import love.yinlin.io.SandboxSink
+import love.yinlin.io.SandboxSource
 import platform.Foundation.NSURL
 
 open class SandboxUri(val url: NSURL, val parentUrl: NSURL? = null) : ImplicitUri {

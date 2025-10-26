@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
 import love.yinlin.common.Paths
-import love.yinlin.common.uri.ImplicitUri
-import love.yinlin.common.uri.RegularUri
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.RegularUri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager

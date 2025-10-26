@@ -3,8 +3,8 @@ package love.yinlin
 import androidx.compose.runtime.Stable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
-import love.yinlin.common.uri.Scheme
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Scheme
+import love.yinlin.uri.Uri
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data

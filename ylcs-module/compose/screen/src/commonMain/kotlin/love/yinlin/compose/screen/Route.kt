@@ -4,7 +4,7 @@ import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 

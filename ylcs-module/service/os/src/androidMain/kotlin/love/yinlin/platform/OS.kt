@@ -2,8 +2,8 @@ package love.yinlin.platform
 
 import android.content.Context
 import android.content.Intent
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.toAndroidUri
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toAndroidUri
 
 internal data object OSUtil {
     fun openUri(context: Context, uri: Uri) {

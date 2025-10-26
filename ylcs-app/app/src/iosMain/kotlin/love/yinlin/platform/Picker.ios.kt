@@ -8,10 +8,10 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
-import love.yinlin.common.uri.ImplicitUri
-import love.yinlin.common.uri.SandboxSource
-import love.yinlin.common.uri.SandboxUri
-import love.yinlin.common.uri.toPath
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.io.SandboxSource
+import love.yinlin.uri.SandboxUri
+import love.yinlin.uri.toPath
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.extension.toNSData

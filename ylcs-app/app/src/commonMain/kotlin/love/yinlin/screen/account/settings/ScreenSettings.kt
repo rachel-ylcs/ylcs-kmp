@@ -29,7 +29,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.common.*
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.data.ItemKey

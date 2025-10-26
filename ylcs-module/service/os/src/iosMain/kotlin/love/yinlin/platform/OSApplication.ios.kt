@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.extension.catchingDefault
 import love.yinlin.service.PlatformContext
 import platform.UIKit.UIPasteboard

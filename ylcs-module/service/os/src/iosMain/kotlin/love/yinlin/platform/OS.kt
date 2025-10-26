@@ -1,7 +1,7 @@
 package love.yinlin.platform
 
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.toNSUrl
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toNSUrl
 import platform.UIKit.UIApplication
 
 internal data object OSUtil {

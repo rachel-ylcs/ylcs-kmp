@@ -13,7 +13,7 @@ import cocoapods.SGQRCode.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
-import love.yinlin.common.colorWithHex
+import love.yinlin.extension.colorWithHex
 import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
 import love.yinlin.platform.Coroutines

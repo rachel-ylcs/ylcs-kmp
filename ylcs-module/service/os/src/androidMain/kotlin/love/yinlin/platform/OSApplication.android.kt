@@ -3,7 +3,7 @@ package love.yinlin.platform
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.extension.catchingDefault
 import love.yinlin.service.PlatformContext
 

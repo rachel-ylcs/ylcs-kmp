@@ -6,8 +6,8 @@ import kotlinx.io.asSource
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.common.uri.ImplicitUri
-import love.yinlin.common.uri.RegularUri
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.RegularUri
 import love.yinlin.extension.Sources
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.safeToSources

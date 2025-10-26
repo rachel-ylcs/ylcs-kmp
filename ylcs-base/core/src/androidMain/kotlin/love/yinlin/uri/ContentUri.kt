@@ -1,4 +1,4 @@
-package love.yinlin.common.uri
+package love.yinlin.uri
 
 import android.content.Context
 import kotlinx.io.Sink

@@ -3,9 +3,9 @@ package love.yinlin
 import android.content.Intent
 import android.os.Build
 import love.yinlin.common.DeepLinkHandler
-import love.yinlin.common.uri.Scheme
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.toUri
+import love.yinlin.uri.Scheme
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toUri
 import love.yinlin.extension.catching
 
 object IntentProcessor {

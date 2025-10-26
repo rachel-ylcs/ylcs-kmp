@@ -33,9 +33,9 @@ import kotlinx.datetime.number
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.ExtraIcons
-import love.yinlin.common.uri.Scheme
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.UriGenerator
+import love.yinlin.uri.Scheme
+import love.yinlin.uri.Uri
+import love.yinlin.uri.UriGenerator
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.screen.BasicScreen

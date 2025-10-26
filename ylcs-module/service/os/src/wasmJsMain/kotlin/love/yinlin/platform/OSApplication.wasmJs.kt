@@ -1,7 +1,7 @@
 package love.yinlin.platform
 
 import kotlinx.browser.window
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.service.PlatformContext
 
 actual fun buildOSApplication(context: PlatformContext) = object : OSApplication() {

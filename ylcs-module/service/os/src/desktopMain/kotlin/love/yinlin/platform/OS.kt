@@ -1,7 +1,7 @@
 package love.yinlin.platform
 
-import love.yinlin.common.uri.Uri
-import love.yinlin.common.uri.toJvmUri
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toJvmUri
 import java.awt.Desktop
 
 internal external fun requestSingleInstance(): Boolean

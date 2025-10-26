@@ -8,7 +8,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
-import love.yinlin.common.uri.Uri
+import love.yinlin.uri.Uri
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen

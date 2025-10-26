@@ -20,7 +20,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
 import love.yinlin.common.Paths
-import love.yinlin.common.uri.ImplicitUri
+import love.yinlin.uri.ImplicitUri
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.graphics.ImageCrop
