@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.platform
+package love.yinlin.compose.graphics
 
 import android.graphics.RuntimeShader
 import android.os.Build

@@ -22,6 +22,8 @@ import kotlinx.io.writeString
 import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.graphics.ImageCrop
+import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.MimeType

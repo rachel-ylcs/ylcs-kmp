@@ -55,6 +55,25 @@ kotlin {
                 libs.compose.components.resources,
             )
         }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain)
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
+            }
+        }
     }
 }
 

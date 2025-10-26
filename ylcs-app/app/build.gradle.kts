@@ -125,14 +125,6 @@ kotlin {
             )
         }
 
-        val nonAndroidMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        val nonDesktopMain by creating {
-            useSourceSet(commonMain)
-        }
-
         val jvmMain by creating {
             useSourceSet(commonMain)
             useLib(
@@ -142,7 +134,7 @@ kotlin {
         }
 
         androidMain.configure {
-            useSourceSet(jvmMain, nonDesktopMain)
+            useSourceSet(jvmMain)
             useLib(
                 // media3
                 libs.media3.ui,
@@ -159,7 +151,7 @@ kotlin {
         }
 
         val iosMain = iosMain.get().apply {
-            useSourceSet(nonAndroidMain, nonDesktopMain)
+            useSourceSet(commonMain)
         }
 
         buildList {
@@ -178,7 +170,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain, jvmMain)
+            useSourceSet(jvmMain)
             useLib(
                 libs.vlcj,
                 fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
@@ -186,7 +178,7 @@ kotlin {
         }
 
         wasmJsMain.configure {
-            useSourceSet(nonAndroidMain, nonDesktopMain)
+            useSourceSet(commonMain)
         }
     }
 }

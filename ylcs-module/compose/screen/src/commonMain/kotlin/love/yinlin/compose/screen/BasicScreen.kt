@@ -77,7 +77,7 @@ abstract class BasicScreen<A>(val manager: ScreenManager) : ViewModel() {
 
     fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
     inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate(route, options, extras)
-    inline fun <reified T : BasicScreen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate<T>(options, extras)
+    inline fun <reified T : CommonBasicScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate<T>(options, extras)
     fun pop() = manager.pop()
     fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
 }

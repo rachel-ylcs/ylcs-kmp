@@ -33,6 +33,9 @@ import love.yinlin.common.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.graphics.ImageCompress
+import love.yinlin.compose.graphics.ImageCrop
+import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.LoadingIcon

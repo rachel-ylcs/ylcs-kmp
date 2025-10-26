@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.music
+package love.yinlin.screen.music
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

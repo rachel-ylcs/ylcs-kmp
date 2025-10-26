@@ -26,7 +26,7 @@ class ScreenBuilder(
         return this
     }
 
-    inline fun <reified S : BasicScreen<Unit>> screen(crossinline factory: (ScreenManager) -> S) {
+    inline fun <reified S : CommonBasicScreen> screen(crossinline factory: (ScreenManager) -> S) {
         builder.composable(route = route<S>()) { backStackEntry ->
             val screen = viewModel {
                 factory(manager).registerAndLaunch(backStackEntry)

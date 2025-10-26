@@ -17,6 +17,8 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.graphics.ImageCompress
+import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -29,8 +31,6 @@ import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
-import love.yinlin.platform.ImageCompress
-import love.yinlin.platform.ImageProcessor
 import love.yinlin.platform.Picker
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.input.SingleSelector

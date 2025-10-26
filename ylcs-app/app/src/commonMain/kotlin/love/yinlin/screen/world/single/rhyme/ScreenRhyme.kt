@@ -41,7 +41,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
+import love.yinlin.common.Shaders
 import love.yinlin.compose.*
+import love.yinlin.compose.graphics.ShaderBox
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.MusicInfo
@@ -66,8 +68,6 @@ import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.screen.music.*
 import love.yinlin.ui.component.platform.Orientation
 import love.yinlin.ui.component.platform.rememberOrientationController
-import love.yinlin.ui.component.platform.ShaderBox
-import love.yinlin.ui.component.platform.Shaders
 import org.jetbrains.compose.resources.getDrawableResourceBytes
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import kotlin.time.Duration.Companion.milliseconds

@@ -1,15 +1,43 @@
-package love.yinlin.platform
+package love.yinlin.compose.graphics
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.data.ImageQuality
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class ImmutableImage
+
+expect class ImageOwner
+
+@Stable
+fun interface ImageOp {
+    suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
+}
+
+@Stable
+expect object ImageCompress : ImageOp {
+    override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
+}
+
+@Stable
+expect class ImageCrop(rect: ImageCropResult): ImageOp {
+    override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
+}
+
+@Stable
+class ImageProcessor(
+    vararg items: ImageOp,
+    private val quality: ImageQuality = ImageQuality.Medium
+) {
+    private val items = mutableListOf(*items)
+    operator fun invoke(op: ImageOp): ImageProcessor = apply { items += op }
+    suspend fun process(source: Source, sink: Sink): Boolean = imageProcess(source, sink, items, quality)
+}
+
+internal expect suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean
 
 internal data class ScaleQualityInfo(
     val width: Int,
@@ -42,30 +70,4 @@ internal data class ScaleQualityInfo(
             }
         }
     }
-}
-
-expect class ImageOwner
-
-fun interface ImageOp {
-    suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
-}
-
-internal expect suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean
-
-expect object ImageCompress : ImageOp {
-    override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
-}
-
-expect class ImageCrop(rect: ImageCropResult): ImageOp {
-    override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner?
-}
-
-@Stable
-class ImageProcessor(
-    vararg items: ImageOp,
-    private val quality: ImageQuality = ImageQuality.Medium
-) {
-    private val items = mutableListOf(*items)
-    operator fun invoke(op: ImageOp): ImageProcessor = apply { items += op }
-    suspend fun process(source: Source, sink: Sink): Boolean = imageProcess(source, sink, items, quality)
 }

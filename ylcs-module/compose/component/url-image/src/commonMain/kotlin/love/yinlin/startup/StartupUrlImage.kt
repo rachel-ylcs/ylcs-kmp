@@ -17,7 +17,7 @@ import okio.Path.Companion.toPath
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 class StartupUrlImage : SyncStartup {
     override fun init(context: PlatformContext, args: StartupArgs) {
-        val cachePath: Path = args.fetch(0)
+        val cachePath: Path? = args.fetch(0)
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
         SingletonSketch.setSafe { buildSketch(context).apply {
@@ -26,6 +26,7 @@ class StartupUrlImage : SyncStartup {
                 addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
             }
             Platform.useNot(Platform.WebWasm) {
+                require(cachePath != null)
                 downloadCacheOptions {
                     DiskCache.Options(
                         appCacheDirectory = cachePath.toString().toPath(),

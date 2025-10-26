@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import love.yinlin.compose.LocalAnimationSpeed
 
 @Composable
-inline fun <reified Main : BasicScreen<Unit>> AppScreen(
+inline fun <reified Main : CommonBasicScreen> AppScreen(
 	modifier: Modifier = Modifier.fillMaxSize(),
 	deeplink: DeepLink = DeepLink.DEFAULT,
 	crossinline screens: ScreenBuilder.() -> Unit

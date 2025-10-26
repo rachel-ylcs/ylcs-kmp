@@ -1,11 +1,20 @@
-package love.yinlin.platform
+package love.yinlin.compose.graphics
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.data.ImageQuality
-import org.jetbrains.skia.*
+import love.yinlin.platform.Coroutines
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ColorInfo
+import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.SamplingMode
 import org.jetbrains.skia.impl.use
 
 private val ImageQuality.samplingMode: SamplingMode get() = when (this) {
@@ -66,6 +75,7 @@ actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>
     }
 }
 
+@Stable
 actual data object ImageCompress : ImageOp {
     actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
         val info = ScaleQualityInfo.calculate(owner.width, owner.height)
@@ -84,6 +94,7 @@ actual data object ImageCompress : ImageOp {
     }
 }
 
+@Stable
 actual data class ImageCrop actual constructor(val rect: ImageCropResult): ImageOp {
     actual override suspend fun process(@ImmutableImage owner: ImageOwner, quality: ImageQuality): ImageOwner? {
         val actualX = rect.xPercent * owner.width

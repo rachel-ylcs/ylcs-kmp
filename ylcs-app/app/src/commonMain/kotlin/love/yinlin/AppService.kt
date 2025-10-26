@@ -31,7 +31,12 @@ abstract class AppService : Service(Local.info) {
     }
 
     private val setupUrlImage by service(
-        StartupLazyFetcher { os.storage.cachePath },
+        StartupLazyFetcher {
+            Platform.use(Platform.WebWasm,
+                ifTrue = { null },
+                ifFalse = { os.storage.cachePath }
+            )
+        },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
         factory = ::StartupUrlImage

@@ -32,4 +32,4 @@ inline fun <reified T> getNavType(): NavType<*> {
     else return type
 }
 
-inline fun <reified S : BasicScreen<Unit>> route(): String = S::class.qualifiedName!!
+inline fun <reified S : CommonBasicScreen> route(): String = S::class.qualifiedName!!

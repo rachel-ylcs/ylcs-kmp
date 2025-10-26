@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.platform
+package love.yinlin.compose.graphics
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ShaderBrush

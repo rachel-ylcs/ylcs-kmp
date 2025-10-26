@@ -57,7 +57,7 @@ class ScreenManager(
 
     inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
 
-    inline fun <reified T : BasicScreen<Unit>> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route<T>(), options, extras)
+    inline fun <reified T : CommonBasicScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route<T>(), options, extras)
 
     fun pop() {
         if (navController.previousBackStackEntry != null) navController.popBackStack()

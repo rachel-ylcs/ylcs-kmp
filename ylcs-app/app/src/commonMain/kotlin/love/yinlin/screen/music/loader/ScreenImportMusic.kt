@@ -28,10 +28,10 @@ import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.node.DragFlag
+import love.yinlin.compose.ui.node.DropResult
+import love.yinlin.compose.ui.node.dragAndDrop
 import love.yinlin.ui.component.layout.Space
-import love.yinlin.ui.component.platform.DragFlag
-import love.yinlin.ui.component.platform.DropResult
-import love.yinlin.ui.component.platform.dragAndDrop
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
 

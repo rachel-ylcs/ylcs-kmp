@@ -17,6 +17,9 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.graphics.ImageCompress
+import love.yinlin.compose.graphics.ImageCrop
+import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.common.Picture
