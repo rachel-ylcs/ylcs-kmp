@@ -10,6 +10,7 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.service.Service
 import love.yinlin.service.StartupLazyFetcher
+import love.yinlin.startup.StartupConfig
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
 import love.yinlin.startup.StartupUrlImage
@@ -44,18 +45,21 @@ abstract class AppService : Service(Local.info) {
                 ifFalse = { null }
             )
         },
-        order = 1,
         factory = ::StartupKV
     )
 
     val exceptionHandler by service(
         "crash_key",
         StartupExceptionHandler.Handler { key, e, error ->
-            service.kv.set(key, "${DateEx.CurrentString}\n$error")
+            kv.set(key, "${DateEx.CurrentString}\n$error")
             println(e.stackTraceToString())
         },
-        order = 2,
         factory = ::buildStartupExceptionHandler
+    )
+
+    val config by service(
+        StartupLazyFetcher { kv },
+        factory = ::StartupConfig
     )
 }
 

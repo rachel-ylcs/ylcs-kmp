@@ -13,6 +13,8 @@ class StartupDelegate<S : Startup> internal constructor(
     constructor(type: StartupType, factory: () -> S, args: Array<Any?>, order: Int) : this(StartupPrivilege.User, type, factory, args, order)
 
     companion object {
+        const val DEFAULT_ORDER = 100
+
         fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>, order: Int) = StartupDelegate(StartupPrivilege.System, type, factory, args, order)
     }
 

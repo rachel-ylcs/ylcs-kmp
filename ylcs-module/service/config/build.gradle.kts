@@ -41,18 +41,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.service.context,
-                projects.ylcsModule.service.exception,
-                projects.ylcsModule.service.os,
                 projects.ylcsModule.service.mmkvKmp,
-                projects.ylcsModule.service.config,
             )
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.service.all"
+    namespace = "${C.app.packageName}.module.service.config"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

@@ -7,35 +7,35 @@ open class BasicService {
     protected val startups = mutableListOf<StartupDelegate<out Startup>>()
 
     @JvmName("serviceSync")
-    protected inline fun <reified S : SyncStartup> service(vararg args: Any?, order: Int = 0, noinline factory: () -> S) : StartupDelegate<S> {
+    protected inline fun <reified S : SyncStartup> service(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Sync, factory, arrayOf(*args), order)
         startups += delegate
         return delegate
     }
 
     @JvmName("serviceASync")
-    protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, order: Int = 0, noinline factory: () -> S) : StartupDelegate<S> {
+    protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Async, factory, arrayOf(*args), order)
         startups += delegate
         return delegate
     }
 
     @JvmName("serviceFree")
-    protected inline fun <reified S : FreeStartup> service(vararg args: Any?, order: Int = 0, noinline factory: () -> S) : StartupDelegate<S> {
+    protected inline fun <reified S : FreeStartup> service(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(StartupType.Free, factory, arrayOf(*args), order)
         startups += delegate
         return delegate
     }
 
-    protected fun sync(vararg args: Any?, order: Int = 0, factory: (StartupArgs) -> Unit) = service<SyncStartup>(*args, order = order) {
+    protected fun sync(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, factory: (StartupArgs) -> Unit) = service<SyncStartup>(*args, order = order) {
         SyncStartup { _, startupArgs -> factory(startupArgs) }
     }
 
-    protected fun async(vararg args: Any?, order: Int = 0, factory: suspend (StartupArgs) -> Unit) = service<AsyncStartup>(*args, order = order) {
+    protected fun async(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, factory: suspend (StartupArgs) -> Unit) = service<AsyncStartup>(*args, order = order) {
         AsyncStartup { _, startupArgs -> factory(startupArgs) }
     }
 
-    protected fun free(vararg args: Any?, order: Int = 0, factory: suspend (StartupArgs) -> Unit) = service<FreeStartup>(*args, order = order) {
+    protected fun free(vararg args: Any?, order: Int = StartupDelegate.DEFAULT_ORDER, factory: suspend (StartupArgs) -> Unit) = service<FreeStartup>(*args, order = order) {
         FreeStartup { _, startupArgs -> factory(startupArgs) }
     }
 
