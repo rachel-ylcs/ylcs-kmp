@@ -42,6 +42,7 @@
 |               |                 |       `screen`        |     screen page, floating and navigation     | ✅ |
 |               |                 |       `device`        | adaptive device layout and immersive padding | ✅ |
 |               |                 |        `theme`        |        app theme resources definition        | ✅ |
+|               |                 |    `platform-view`    |      embed platform-related native view      | ✅ |
 |               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
 |               |                 |    `component:all`    |           merge all component libs           | ✅ |
 |               |                 | `component:url-image` |        web or local file image loader        | ✅ |
@@ -51,6 +52,8 @@
 |               |                 |       `context`       |      multiplatform application context       | ✅ |
 |               |                 |      `exception`      |      multiplatform exception processor       | ✅ |
 |               |                 |         `os`          |    system platform related implementation    | ✅ |
+|               |                 |      `mmkv-kmp`       |       fast key-value storage framework       | ✅ |
+|               |                 |       `config`        |   application state-memory-storage config    | ✅ |
 |               | `client-engine` |                       |                client engine                 | ✅ |
 |               | `server-engine` |                       |                server engine                 | ❌ |
 |  `ylcs-app`   |                 |                       |                                              |   |
