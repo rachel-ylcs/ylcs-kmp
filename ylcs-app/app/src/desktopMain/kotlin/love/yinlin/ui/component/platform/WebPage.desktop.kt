@@ -117,7 +117,7 @@ actual abstract class HeadlessBrowser actual constructor() {
 //	state: WebPageState,
 //	modifier: Modifier
 //) {
-//	CustomUI(
+//	PlatformView(
 //		view = state.jfxPanel,
 //		modifier = modifier,
 //		factory = {

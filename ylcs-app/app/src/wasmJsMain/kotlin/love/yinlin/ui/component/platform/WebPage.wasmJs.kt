@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.browser.document
 import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.ui.CustomUI
+import love.yinlin.platform.PlatformView
 import org.w3c.dom.HTMLIFrameElement
 
 @Stable
@@ -29,17 +29,17 @@ actual fun WebPage(
 	state: WebPageState,
 	modifier: Modifier
 ) {
-    CustomUI(
-        view = state.webview,
-        factory = {
-            (document.createElement("iframe") as HTMLIFrameElement).also { iframe ->
-                iframe.frameBorder = "0"
-                iframe.referrerPolicy = "no-referrer"
-                iframe.src = state.url
-            }
-        },
-        modifier = modifier
-    )
+	PlatformView(
+		view = state.webview,
+		factory = {
+			(document.createElement("iframe") as HTMLIFrameElement).also { iframe ->
+				iframe.frameBorder = "0"
+				iframe.referrerPolicy = "no-referrer"
+				iframe.src = state.url
+			}
+		},
+		modifier = modifier
+	)
 }
 
 @Stable

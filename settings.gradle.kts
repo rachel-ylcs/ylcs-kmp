@@ -48,6 +48,7 @@ include(
     "ylcs-module:service:config",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
+    "ylcs-module:compose:platform-view",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:ui",
     "ylcs-module:compose:app",

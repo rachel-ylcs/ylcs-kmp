@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.platform.PlatformView
 import love.yinlin.platform.appNative
-import love.yinlin.ui.CustomUI
 
 @Stable
 actual class WebPageState actual constructor(val settings: WebPageSettings, initUrl: String) {
@@ -113,7 +113,7 @@ actual fun WebPage(
 		state.goBack()
 	}
 
-	CustomUI(
+	PlatformView(
 		view = state.webview,
 		modifier = modifier,
 		factory = { context ->

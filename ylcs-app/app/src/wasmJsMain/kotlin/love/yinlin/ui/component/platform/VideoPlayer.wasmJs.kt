@@ -7,7 +7,7 @@ import kotlinx.browser.document
 import love.yinlin.compose.OffScreenEffect
 import love.yinlin.compose.rememberRefState
 import love.yinlin.data.MimeType
-import love.yinlin.ui.CustomUI
+import love.yinlin.platform.PlatformView
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
 
@@ -26,7 +26,7 @@ actual fun VideoPlayer(
         }
     }
 
-    CustomUI(
+    PlatformView(
         view = view,
         factory = {
             (document.createElement("video") as HTMLVideoElement).also { video ->

@@ -1,16 +1,15 @@
-package love.yinlin.ui
+package love.yinlin.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.WebElementView
-import org.w3c.dom.HTMLElement
+import androidx.compose.ui.awt.SwingPanel
+import androidx.compose.ui.graphics.Color
+import java.awt.Component
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T : HTMLElement> CustomUI(
+fun <T : Component> PlatformView(
     view: MutableState<T?>,
     modifier: Modifier = Modifier,
     factory: () -> T,
@@ -27,7 +26,8 @@ fun <T : HTMLElement> CustomUI(
         }
     }
 
-    WebElementView(
+    SwingPanel(
+        background = Color.Transparent,
         modifier = modifier,
         factory = {
             view.value ?: factory().let {

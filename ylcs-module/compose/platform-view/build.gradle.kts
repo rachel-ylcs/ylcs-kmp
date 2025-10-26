@@ -43,17 +43,33 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.platformView,
-                libs.compose.components.resources,
+                projects.ylcsBase.composeCore,
             )
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain)
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
+            }
         }
     }
 }
 
 android {
-    namespace = "${C.app.packageName}.module.compose.app"
+    namespace = "${C.app.packageName}.module.compose.platform_view"
     compileSdk = C.android.compileSdk
 
     defaultConfig {

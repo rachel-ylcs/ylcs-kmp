@@ -18,9 +18,9 @@ import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
-import love.yinlin.ui.CustomUI
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.platform.PlatformView
 import platform.AVFoundation.*
 import platform.darwin.NSObject
 import platform.CoreGraphics.*
@@ -105,7 +105,7 @@ actual fun QrcodeScanner(
     val state: MutableState<QrScanView?> = rememberRefState { null }
 
     Box(modifier = modifier) {
-        CustomUI(
+        PlatformView(
             view = state,
             modifier = Modifier.fillMaxSize().zIndex(1f),
             factory = {

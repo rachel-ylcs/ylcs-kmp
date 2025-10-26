@@ -13,8 +13,8 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.app
-import love.yinlin.ui.CustomUI
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.platform.PlatformView
 import love.yinlin.service
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSNotification
@@ -105,7 +105,7 @@ actual fun VideoPlayer(
 
     Box(modifier = modifier) {
         Box(Modifier.matchParentSize().background(Colors.Black).zIndex(1f))
-        CustomUI(
+        PlatformView(
             view = state,
             modifier = Modifier.fillMaxSize().zIndex(2f),
             factory = {

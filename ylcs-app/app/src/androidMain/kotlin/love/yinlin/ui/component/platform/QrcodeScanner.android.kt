@@ -26,9 +26,9 @@ import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
 import love.yinlin.platform.appNative
-import love.yinlin.ui.CustomUI
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.platform.PlatformView
 import java.util.*
 
 @Stable
@@ -48,12 +48,12 @@ actual fun QrcodeScanner(
     val state = remember { QrCodeScannerState() }
 
     Box(modifier = modifier) {
-        CustomUI(
+        PlatformView(
             view = state.previewView,
             modifier = Modifier.fillMaxSize().zIndex(1f),
             factory = { context ->
                 val view = PreviewView(context)
-                state.cameraScan = BaseCameraScan<com.google.zxing.Result>(context, lifecycleOwner, view).apply {
+                state.cameraScan = BaseCameraScan<Result>(context, lifecycleOwner, view).apply {
                     setAnalyzer(QRCodeAnalyzer(DecodeConfig().apply {
                         hints = DecodeFormatManager.QR_CODE_HINTS
                         isFullAreaScan = false
@@ -81,7 +81,7 @@ actual fun QrcodeScanner(
                 onRelease()
             }
         )
-        CustomUI(
+        PlatformView(
             view = state.viewFinderView,
             modifier = Modifier.fillMaxSize().zIndex(2f),
             factory = { context ->

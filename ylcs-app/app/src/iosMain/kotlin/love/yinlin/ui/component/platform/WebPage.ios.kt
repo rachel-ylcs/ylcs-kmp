@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.cinterop.ObjCSignatureOverride
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.platform.PlatformView
 import platform.Foundation.NSError
 import platform.WebKit.WKNavigation
 import platform.WebKit.WKNavigationDelegateProtocol
 import platform.WebKit.WKWebView
 import platform.WebKit.javaScriptEnabled
 import platform.darwin.NSObject
-import love.yinlin.ui.CustomUI
 import platform.Foundation.NSMutableURLRequest
 import platform.Foundation.NSURL
 
@@ -93,7 +93,7 @@ actual fun WebPage(
     state: WebPageState,
     modifier: Modifier
 ) {
-    CustomUI(
+    PlatformView(
         view = state.webview,
         modifier = modifier,
         factory = {
