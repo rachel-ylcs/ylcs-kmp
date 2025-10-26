@@ -7,7 +7,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import kotlin.jvm.JvmName
 import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf

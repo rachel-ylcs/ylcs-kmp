@@ -50,6 +50,8 @@ kotlin {
                 libs.compose.material3.icons,
                 libs.compose.material3.iconsExtended,
                 libs.compose.ui,
+            )
+            useLib(
                 libs.compose.components.resources,
             )
         }
