@@ -28,7 +28,6 @@ import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.song.Song
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
@@ -37,6 +36,7 @@ import love.yinlin.ui.component.layout.PaginationGrid
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.service
 
 @Composable
 private fun SongCard(
@@ -190,7 +190,7 @@ class ScreenMusicModFactory(manager: ScreenManager) : CommonScreen(manager) {
             ) {
                 SongCard(
                     song = it,
-                    status = app.musicFactory.musicLibrary.contains(it.id),
+                    status = service.musicFactory.instance.musicLibrary.contains(it.id),
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         navigate(ScreenSongDetails.Args(it))

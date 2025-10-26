@@ -15,6 +15,7 @@ import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.service
+import love.yinlin.service.PlatformContext
 
 @Stable
 abstract class MusicFactory {
@@ -146,8 +147,10 @@ abstract class MusicFactory {
     }
 }
 
+expect fun buildMusicFactory(context: PlatformContext): MusicFactory
+
 @Stable
-expect class MusicPlayer() {
+expect class MusicPlayer(context: PlatformContext) {
     val isInit: Boolean
     val isPlaying: Boolean
     val position: Long

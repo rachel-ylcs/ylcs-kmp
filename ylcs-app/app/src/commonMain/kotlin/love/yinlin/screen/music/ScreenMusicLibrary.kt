@@ -39,7 +39,6 @@ import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.Picker
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
@@ -121,6 +120,7 @@ private fun MusicCard(
 
 @Stable
 class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
+    private val factory = service.musicFactory.instance
     private val playlistLibrary = service.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
@@ -140,7 +140,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private fun resetLibrary() {
-        library.replaceAll(app.musicFactory.musicLibrary.map {
+        library.replaceAll(factory.musicLibrary.map {
             MusicInfoPreview(it.value)
         })
     }
@@ -160,7 +160,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private suspend fun openSearch() {
         val result = searchDialog.openSuspend()
         if (result != null) {
-            library.replaceAll(app.musicFactory.musicLibrary
+            library.replaceAll(factory.musicLibrary
                 .filter { it.value.name.contains(result, true) }
                 .map { MusicInfoPreview(it.value) })
             isSearching = true
@@ -201,11 +201,10 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
                     if (newItems.isNotEmpty()) {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
                         // 添加到当前播放的列表
-                        val musicFactory = app.musicFactory
-                        if (musicFactory.currentPlaylist?.name == name) {
-                            musicFactory.addMedias(newItems
-                                .fastFilter { id -> musicFactory.musicList.find { it.id == id } == null }
-                                .fastMapNotNull { musicFactory.musicLibrary[it] })
+                        if (factory.currentPlaylist?.name == name) {
+                            factory.addMedias(newItems
+                                .fastFilter { id -> factory.musicList.find { it.id == id } == null }
+                                .fastMapNotNull { factory.musicLibrary[it] })
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")
                     }
@@ -218,12 +217,11 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun onMusicDelete() {
-        val musicFactory = app.musicFactory
-        if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        if (factory.isReady) slot.tip.warning("请先停止播放器")
         else if (slot.confirm.openSuspend(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
             for (item in deleteItems) {
-                val removeItem = app.musicFactory.musicLibrary.remove(item)
+                val removeItem = factory.musicLibrary.remove(item)
                 if (removeItem != null) SystemFileSystem.deleteRecursively(removeItem.path)
             }
             resetLibrary()
@@ -231,15 +229,14 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun onMusicPackage() {
-        val musicFactory = app.musicFactory
-        if (musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        if (factory.isReady) slot.tip.warning("请先停止播放器")
         else Picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
             try {
                 slot.loading.openSuspend()
                 path.sink.use { sink ->
                     val packageItems = selectIdList
                     ModFactory.Merge(
-                        mediaPaths = packageItems.fastMapNotNull { musicFactory.musicLibrary[it]?.path },
+                        mediaPaths = packageItems.fastMapNotNull { factory.musicLibrary[it]?.path },
                         sink = sink,
                         info = ModInfo(author = service.config.userProfile?.name ?: "无名")
                     ).process { _, _, _ -> }
@@ -256,7 +253,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     override suspend fun initialize() {
         resetLibrary()
-        monitor(state = { app.musicFactory.musicLibrary }) {
+        monitor(state = { factory.musicLibrary }) {
             if (isManaging) exitManagement()
             if (!isSearching) resetLibrary()
         }
@@ -348,7 +345,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
             pop()
             navigate<ScreenMusicModFactory>()
         }
-        else if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+        else if (factory.isReady) slot.tip.warning("请先停止播放器")
         else {
             pop()
             when (result) {

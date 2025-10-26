@@ -8,6 +8,7 @@ import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
 import love.yinlin.extension.replaceAll
 import love.yinlin.screen.music.audioPath
+import love.yinlin.service.PlatformContext
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.media.MediaRef
@@ -235,8 +236,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 }
 
+actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory()
+
 @Stable
-actual class MusicPlayer {
+actual class MusicPlayer actual constructor(context: PlatformContext) {
     private external fun nativeCreatePlayer(): Long
     private external fun nativeReleasePlayer(handle: Long)
     private external fun nativeIsPlaying(handle: Long): Boolean

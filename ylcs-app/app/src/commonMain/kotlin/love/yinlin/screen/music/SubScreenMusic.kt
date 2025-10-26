@@ -49,7 +49,6 @@ import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
-import love.yinlin.platform.app
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_music_record
 import love.yinlin.resources.no_audio_source
@@ -66,6 +65,7 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.SplitActionLayout
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.screen.common.ScreenVideo
+import love.yinlin.service
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -106,7 +106,7 @@ private fun PlayingMusicStatusCard(
 
 @Stable
 class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
-	private val factory = app.musicFactory
+	private val factory = service.musicFactory.instance
 
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
@@ -172,7 +172,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "曲库",
                     color = Colors.White
                 ) {
-                    if (app.musicFactory.isInit) navigate<ScreenMusicLibrary>()
+                    if (factory.isInit) navigate<ScreenMusicLibrary>()
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -180,7 +180,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌单",
                     color = Colors.White
                 ) {
-                    if (app.musicFactory.isInit) navigate<ScreenPlaylistLibrary>()
+                    if (factory.isInit) navigate<ScreenPlaylistLibrary>()
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -188,7 +188,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌词",
                     color = Colors.White
                 ) {
-                    if (app.musicFactory.isInit) navigate<ScreenFloatingLyrics>()
+                    if (factory.isInit) navigate<ScreenFloatingLyrics>()
                     else slot.tip.warning("播放器尚未初始化")
                 }
             },

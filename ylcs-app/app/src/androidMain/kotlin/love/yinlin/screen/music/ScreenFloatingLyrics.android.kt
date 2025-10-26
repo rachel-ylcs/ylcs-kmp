@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.music
+package love.yinlin.screen.music
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,14 +17,10 @@ import kotlinx.coroutines.delay
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
-import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.screen.music.ColumnLayout
-import love.yinlin.screen.music.RowLayout
-import love.yinlin.screen.music.ScreenFloatingLyrics
 import love.yinlin.service
 
 private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyrics) {
@@ -35,7 +31,7 @@ private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyr
 }
 
 private fun ScreenFloatingLyrics.enableFloatingLyrics(value: Boolean) {
-    (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
+    (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
         if (value) {
             if (floatingLyrics.canAttached) {
                 floatingLyrics.attach()
@@ -159,7 +155,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
     }
 
     OffScreenEffect {
-        (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
+        (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
             if (!floatingLyrics.canAttached && floatingLyrics.isAttached) {
                 floatingLyrics.detach()
                 updateEnabledStatus(floatingLyrics)

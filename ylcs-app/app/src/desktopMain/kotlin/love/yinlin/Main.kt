@@ -14,10 +14,7 @@ import love.yinlin.service.PlatformContext
 fun main() {
     service.init(PlatformContext)
 
-    val appContext = ActualAppContext().apply {
-        app = this
-        initialize()
-    }
+    service.musicFactory.instance.floatingLyrics = ActualFloatingLyrics().apply { isAttached = true }
 
     composeApplication(
         title = Res.string.app_name,
@@ -53,7 +50,7 @@ fun main() {
         trayHideNotification = "已隐藏到任务栏托盘中",
         multiWindow = {
             // 悬浮歌词
-            (appContext.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let {
+            (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let {
                 if (it.isAttached && service.config.enabledFloatingLyrics) it.Content()
             }
         },

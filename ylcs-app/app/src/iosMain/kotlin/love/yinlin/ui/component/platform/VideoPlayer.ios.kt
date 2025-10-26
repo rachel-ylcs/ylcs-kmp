@@ -12,7 +12,6 @@ import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.app
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.platform.PlatformView
 import love.yinlin.service
@@ -80,16 +79,16 @@ actual fun VideoPlayer(
 
     if (service.config.audioFocus) {
         DisposableEffect(Unit) {
-            wasMusicPlaying = app.musicFactory.isPlaying
+            wasMusicPlaying = service.musicFactory.instance.isPlaying
             if (wasMusicPlaying) {
                 Coroutines.startMain {
-                    app.musicFactory.pause()
+                    service.musicFactory.instance.pause()
                 }
             }
             onDispose {
                 if (wasMusicPlaying) {
                     Coroutines.startMain {
-                        app.musicFactory.play()
+                        service.musicFactory.instance.play()
                     }
                 }
             }

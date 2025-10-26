@@ -32,6 +32,7 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.service
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitPath
 
@@ -102,7 +103,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
         }
         when (data) {
             is Data.Success -> {
-                app.musicFactory.updateMusicLibraryInfo(data.data.medias)
+                service.musicFactory.instance.updateMusicLibraryInfo(data.data.medias)
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }

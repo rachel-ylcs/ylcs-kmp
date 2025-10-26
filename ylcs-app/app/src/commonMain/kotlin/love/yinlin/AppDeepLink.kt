@@ -9,7 +9,6 @@ import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicType
-import love.yinlin.platform.app
 import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.screen.music.ScreenSongDetails
 import love.yinlin.screen.music.loader.ScreenImportMusic
@@ -18,7 +17,7 @@ import love.yinlin.screen.music.loader.ScreenPlatformMusic
 @Stable
 data object AppDeepLink : DeepLink {
     private fun schemeContent(manager: ScreenManager, uri: Uri) {
-        if (!app.musicFactory.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
+        if (!service.musicFactory.instance.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
         else manager.top.slot.tip.warning("请先停止播放器")
     }
 
@@ -49,14 +48,14 @@ data object AppDeepLink : DeepLink {
             Scheme.Content -> schemeContent(manager, uri)
             Scheme.Rachel -> schemeRachel(manager, uri)
             Scheme.QQMusic -> {
-                if (!app.musicFactory.isReady) manager.navigate(ScreenPlatformMusic.Args(
+                if (!service.musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
                     deeplink = uri.copy(scheme = Scheme.Https).toString(),
                     type = PlatformMusicType.QQMusic
                 ))
                 else manager.top.slot.tip.warning("请先停止播放器")
             }
             Scheme.NetEaseCloud -> {
-                if (!app.musicFactory.isReady) manager.navigate(ScreenPlatformMusic.Args(
+                if (!service.musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
                     deeplink = uri.copy(scheme = Scheme.Https).toString(),
                     type = PlatformMusicType.NetEaseCloud
                 ))

@@ -88,7 +88,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
             // 1. 检查ID
             val id = input.id.text
             val name = input.name.text
-            if (id in app.musicFactory.musicLibrary) {
+            if (id in service.musicFactory.instance.musicLibrary) {
                 slot.tip.warning("ID已存在")
                 return
             }
@@ -151,7 +151,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                 sink.writeString(lyrics.toString())
             }
             // 10. 更新曲库
-            app.musicFactory.updateMusicLibraryInfo(listOf(id))
+            service.musicFactory.instance.updateMusicLibraryInfo(listOf(id))
             slot.tip.success("已成功导入$name")
             pop()
         }

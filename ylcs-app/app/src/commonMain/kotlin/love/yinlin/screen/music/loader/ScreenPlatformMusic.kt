@@ -38,7 +38,6 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.app
 import love.yinlin.platform.safeDownload
 import love.yinlin.resources.Res
 import love.yinlin.compose.ui.image.WebImage
@@ -262,7 +261,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                 }
             }
             require(ids.isNotEmpty())
-            app.musicFactory.updateMusicLibraryInfo(ids)
+            service.musicFactory.instance.updateMusicLibraryInfo(ids)
             slot.tip.success("已成功导入${ids.size}首歌曲")
         }
         catch (_: Throwable) {

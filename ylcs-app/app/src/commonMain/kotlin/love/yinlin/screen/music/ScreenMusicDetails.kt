@@ -104,7 +104,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                         }
                         Coroutines.main {
                             if (needUpdateInfo) {
-                                app.musicFactory.musicLibrary.findAssign(id) {
+                                service.musicFactory.instance.musicLibrary.findAssign(id) {
                                     it.copy(modification = it.modification + 1)
                                 }
                             }
@@ -175,7 +175,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                         enabled = name.ok && singer.ok && lyricist.ok && composer.ok && album.ok,
                         onClick = {
                             val id = args.id
-                            app.musicFactory.musicLibrary.findAssign(id) {
+                            service.musicFactory.instance.musicLibrary.findAssign(id) {
                                 it.copy(
                                     name = name.text,
                                     singer = singer.text,
@@ -310,7 +310,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
         }
     }
 
-    private val musicInfo by derivedStateOf { app.musicFactory.musicLibrary[args.id] }
+    private val musicInfo by derivedStateOf { service.musicFactory.instance.musicLibrary[args.id] }
     private var lyricsText by mutableStateOf("")
     private val resources = mutableStateListOf<ResourceItem>()
 
@@ -479,7 +479,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "删除",
                             color = Colors.White,
                             onClick = {
-                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else with(item.onDelete) { invoke(item) }
                             }
                         )
@@ -490,7 +490,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "替换",
                             color = Colors.White,
                             onClick = {
-                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else with(item.onReplace) { invoke(item) }
                             }
                         )
@@ -501,7 +501,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "编辑",
                             color = Colors.White,
                             onClick = {
-                                if (app.musicFactory.isReady) slot.tip.warning("请先停止播放器")
+                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else modifySheet.open(item)
                             }
                         )

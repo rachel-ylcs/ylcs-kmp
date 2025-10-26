@@ -31,6 +31,7 @@ import love.yinlin.screen.music.audioPath
 import love.yinlin.screen.music.recordPath
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
+import love.yinlin.service.PlatformContext
 import java.io.File
 
 fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
@@ -286,8 +287,10 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override suspend fun removeMedia(index: Int) = withMainPlayer { it.removeMediaItem(index)  }
 }
 
+actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory(context)
+
 @Stable
-actual class MusicPlayer {
+actual class MusicPlayer actual constructor(private val context: PlatformContext) {
     private var player: ExoPlayer? = null
 
     actual val isInit: Boolean get() = player != null
@@ -299,7 +302,7 @@ actual class MusicPlayer {
     actual val duration: Long get() = player?.duration.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
     actual suspend fun init() {
-        player = FfmpegRenderersFactory.build(appNative.context, false).apply {
+        player = FfmpegRenderersFactory.build(context, false).apply {
             repeatMode = Player.REPEAT_MODE_OFF
             shuffleModeEnabled = false
             addListener(object : Player.Listener {

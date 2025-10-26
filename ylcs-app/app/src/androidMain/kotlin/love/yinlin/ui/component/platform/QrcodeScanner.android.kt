@@ -25,10 +25,10 @@ import kotlinx.io.asInputStream
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
-import love.yinlin.platform.appNative
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.platform.PlatformView
+import love.yinlin.service
 import java.util.*
 
 @Stable
@@ -66,12 +66,12 @@ actual fun QrcodeScanner(
                         setAnalyzeImage(false)
                         onResult(it.result.text)
                     }
-                    appNative.activityResultRegistry?.register(
+                    service.context.activityResultRegistry.register(
                         key = UUID.randomUUID().toString(),
                         contract = ActivityResultContracts.RequestPermission()
                     ) {
                         if (it) startCamera()
-                    }?.launch(android.Manifest.permission.CAMERA)
+                    }.launch(android.Manifest.permission.CAMERA)
                 }
                 view
             },

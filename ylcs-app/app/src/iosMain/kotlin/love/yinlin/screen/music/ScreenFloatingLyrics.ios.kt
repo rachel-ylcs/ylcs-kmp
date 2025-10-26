@@ -1,4 +1,4 @@
-package love.yinlin.ui.screen.music
+package love.yinlin.screen.music
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,14 +15,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.app
 import love.yinlin.ui.component.input.ProgressSlider
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.screen.music.ColumnLayout
-import love.yinlin.screen.music.RowLayout
-import love.yinlin.screen.music.ScreenFloatingLyrics
 import love.yinlin.service
 
 @Composable
@@ -40,7 +36,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
             Switch(
                 checked = service.config.enabledFloatingLyrics,
                 onCheckedChange = { value ->
-                    (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
+                    (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
                         if (value) {
                             if (floatingLyrics.canAttached) {
                                 floatingLyrics.attach()

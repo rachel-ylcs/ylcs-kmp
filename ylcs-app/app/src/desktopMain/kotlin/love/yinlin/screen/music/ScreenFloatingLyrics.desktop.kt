@@ -10,7 +10,6 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.fixup.FixupMacOSMouseClick
 import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.app
 import love.yinlin.service
 import love.yinlin.ui.component.input.DockedColorPicker
 import love.yinlin.ui.component.input.ProgressSlider
@@ -26,7 +25,7 @@ actual fun ScreenFloatingLyrics.ActualContent(device: Device) {
         .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
-        (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
+        (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
             DisposableEffect(Unit) {
                 desktopConfig = service.config.floatingLyricsDesktopConfig
                 floatingLyrics.canMove = true

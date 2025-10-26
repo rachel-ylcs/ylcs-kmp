@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import love.yinlin.compose.*
 import love.yinlin.fixup.FixupAndroidStatusBarColor
 import love.yinlin.platform.ActualFloatingLyrics
-import love.yinlin.platform.appNative
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,12 +17,10 @@ class MainActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
 
         service.context.bindActivity(this, activityResultRegistry)
-        appNative.activity = this
-        appNative.activityResultRegistry = activityResultRegistry
 
         ActualFloatingLyrics(this).also {
-            appNative.musicFactory.floatingLyrics = it
-            if (appNative.config.enabledFloatingLyrics) it.attach()
+            service.musicFactory.instance.floatingLyrics = it
+            if (service.config.enabledFloatingLyrics) it.attach()
         }
 
         intent?.let {
@@ -40,10 +37,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        (appNative.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.detach()
-        appNative.musicFactory.floatingLyrics = null
-        appNative.activity = null
-        appNative.activityResultRegistry = null
+        (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.detach()
+        service.musicFactory.instance.floatingLyrics = null
     }
 
     override fun onNewIntent(intent: Intent) {

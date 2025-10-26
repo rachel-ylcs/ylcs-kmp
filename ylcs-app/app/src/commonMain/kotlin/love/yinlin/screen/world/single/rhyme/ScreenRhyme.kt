@@ -53,7 +53,6 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
-import love.yinlin.platform.app
 import love.yinlin.resources.*
 import love.yinlin.ui.component.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
@@ -66,6 +65,7 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.screen.music.*
+import love.yinlin.service
 import love.yinlin.ui.component.platform.Orientation
 import love.yinlin.ui.component.platform.rememberOrientationController
 import org.jetbrains.compose.resources.getDrawableResourceBytes
@@ -80,7 +80,7 @@ class ScreenRhyme(manager: ScreenManager) : CommonScreen(manager) {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val musicPlayer = MusicPlayer()
+    private val musicPlayer = MusicPlayer(service.context.platformContext)
     private val stage = RhymeStage()
 
     private var canvasFrameJob: Job? = null
@@ -507,7 +507,7 @@ class ScreenRhyme(manager: ScreenManager) : CommonScreen(manager) {
     override val title: String? = null
 
     override suspend fun initialize() {
-        if (app.musicFactory.isInit) {
+        if (service.musicFactory.instance.isInit) {
             coroutineScope {
                 val task1 = async {
                     musicPlayer.init()
@@ -515,7 +515,7 @@ class ScreenRhyme(manager: ScreenManager) : CommonScreen(manager) {
                 val task2 = async {
                     Coroutines.io {
                         // 检查包含游戏配置文件的 MOD
-                        library = app.musicFactory.musicLibrary.values.map { info ->
+                        library = service.musicFactory.instance.musicLibrary.values.map { info ->
                             RhymeMusic(
                                 musicInfo = info,
                                 enabled = SystemFileSystem.metadataOrNull(info.rhymePath)?.isRegularFile == true

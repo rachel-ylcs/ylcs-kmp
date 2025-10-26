@@ -13,10 +13,11 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.screen.music.audioPath
+import love.yinlin.screen.music.recordPath
 import love.yinlin.service
+import love.yinlin.service.PlatformContext
 import kotlin.math.roundToLong
-import love.yinlin.ui.screen.music.audioPath
-import love.yinlin.ui.screen.music.recordPath
 import platform.darwin.*
 import platform.Foundation.*
 import platform.AVFAudio.*
@@ -344,8 +345,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 }
 
+actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory()
+
 @Stable
-actual class MusicPlayer {
+actual class MusicPlayer actual constructor(context: PlatformContext) {
     // TODO: iOS端待实现
     actual val isInit: Boolean = false
     actual val isPlaying: Boolean = false

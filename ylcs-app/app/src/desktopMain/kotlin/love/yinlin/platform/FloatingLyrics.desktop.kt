@@ -47,7 +47,7 @@ class ActualFloatingLyrics : FloatingLyrics() {
     @OptIn(FlowPreview::class)
     @Composable
     fun Content() {
-        (app.musicFactory.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
+        (service.musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let { floatingLyrics ->
             val config by derivedStateOf { service.config.floatingLyricsDesktopConfig }
             val state = rememberWindowState(
                 placement = WindowPlacement.Floating,
