@@ -16,7 +16,7 @@ import love.yinlin.startup.StartupUrlImage
 import love.yinlin.startup.buildStartupExceptionHandler
 
 abstract class AppService : Service(Local.info) {
-    val createDirectories by sync {
+    private val createDirectories by sync {
         Platform.useNot(Platform.WebWasm) {
             SystemFileSystem.createDirectories(os.storage.dataPath)
             SystemFileSystem.createDirectories(os.storage.cachePath)
@@ -24,13 +24,13 @@ abstract class AppService : Service(Local.info) {
         }
     }
 
-    val loadResources by free {
+    private val loadResources by free {
         Coroutines.io {
             Resource.initialize()
         }
     }
 
-    val setupUrlImage by service(
+    private val setupUrlImage by service(
         StartupLazyFetcher { os.storage.cachePath },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
