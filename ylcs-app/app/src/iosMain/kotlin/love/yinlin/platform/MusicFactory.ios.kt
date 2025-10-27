@@ -161,7 +161,7 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override suspend fun gotoIndex(index: Int) {
-        if (index in 0 ..< shuffleList.size) {
+        if (index in shuffleList.indices) {
             setCurrentPlaying(shuffleList.indexOf(index), true)
         }
     }
@@ -199,7 +199,7 @@ class ActualMusicFactory : MusicFactory() {
     }
 
     override suspend fun removeMedia(index: Int) {
-        if (index !in 0 ..< musicList.size) return
+        if (index !in musicList.indices) return
 
         Coroutines.main {
             val shuffleIndex = shuffleList.indexOf(index)
@@ -236,7 +236,7 @@ class ActualMusicFactory : MusicFactory() {
 
     private fun shufflePlayList(musicIndex: Int = shuffleList.getOrNull(currentIndex) ?: 0) {
         shuffleList = if (playMode == MusicPlayMode.RANDOM) {
-            listOf(musicIndex) + (0 until musicList.size).filter { it != musicIndex }.shuffled()
+            listOf(musicIndex) + musicList.indices.filter { it != musicIndex }.shuffled()
         } else {
             List(musicList.size) { it }
         }

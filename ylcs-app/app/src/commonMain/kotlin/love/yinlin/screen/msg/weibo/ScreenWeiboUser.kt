@@ -44,7 +44,7 @@ import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.service
-import love.yinlin.ui.component.layout.*
+import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Composable

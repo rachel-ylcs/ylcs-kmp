@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
@@ -28,7 +29,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.common.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.*
+import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.BoxState
@@ -41,7 +42,11 @@ class ScreenPictures(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private var keyword: String? = null
-    private val page = object : PaginationArgs<PhotoAlbum, Int, String, Int>("2099-12-31", Int.MAX_VALUE) {
+    private val page = object : PaginationArgs<PhotoAlbum, Int, String, Int>(
+        default = "2099-12-31",
+        default1 = Int.MAX_VALUE,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: PhotoAlbum): Int = item.aid
         override fun offset(item: PhotoAlbum): String = item.ts
         override fun arg1(item: PhotoAlbum): Int = item.aid

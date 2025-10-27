@@ -16,16 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
-import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.layout.PaginationArgs
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.world.game.GameCardQuestionAnswer
@@ -36,7 +37,11 @@ import love.yinlin.service
 class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private val page = object : PaginationArgs<GameDetailsWithName, Int, Int, Boolean>(Int.MAX_VALUE, false) {
+    private val page = object : PaginationArgs<GameDetailsWithName, Int, Int, Boolean>(
+        default = Int.MAX_VALUE,
+        default1 = false,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: GameDetailsWithName): Int = item.gid
         override fun offset(item: GameDetailsWithName): Int = item.gid
         override fun arg1(item: GameDetailsWithName): Boolean = item.isCompleted

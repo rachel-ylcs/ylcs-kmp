@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import kotlinx.datetime.LocalDateTime
 import love.yinlin.data.common.Picture
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.text.RichString
+import love.yinlin.compose.ui.text.RichString
 
 @Stable
 data class Weibo(

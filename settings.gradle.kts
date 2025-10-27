@@ -55,6 +55,7 @@ include(
     "ylcs-module:compose:ui",
     "ylcs-module:compose:app",
     "ylcs-module:compose:component:all",
+    "ylcs-module:compose:component:pagination-layout",
     "ylcs-module:compose:component:url-image",
     "ylcs-module:compose:component:webview",
 

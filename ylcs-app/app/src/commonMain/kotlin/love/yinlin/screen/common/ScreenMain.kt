@@ -27,8 +27,8 @@ import love.yinlin.screen.community.SubScreenDiscovery
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.screen.music.SubScreenMusic
 import love.yinlin.screen.world.SubScreenWorld
-import love.yinlin.ui.component.layout.EqualItem
-import love.yinlin.ui.component.layout.EqualRow
+import love.yinlin.compose.ui.layout.EqualItem
+import love.yinlin.compose.ui.layout.EqualRow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource

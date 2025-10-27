@@ -23,7 +23,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.data.rachel.game.*
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.input.CylinderSlider
+import love.yinlin.compose.ui.input.CylinderSlider
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.screen.community.BoxText
 

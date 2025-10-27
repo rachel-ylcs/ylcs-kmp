@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
@@ -35,9 +36,9 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.container.TabBar
+import love.yinlin.compose.ui.layout.PaginationArgs
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 
 @Stable
 @Serializable
@@ -68,7 +69,11 @@ class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
     private var currentPage by mutableIntStateOf(0)
     val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
 
-    val page = object : PaginationArgs<Topic, Int, Int, Double>(Int.MAX_VALUE, Double.MAX_VALUE) {
+    val page = object : PaginationArgs<Topic, Int, Int, Double>(
+        default = Int.MAX_VALUE,
+        default1 = Double.MAX_VALUE,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: Topic): Int = item.tid
         override fun offset(item: Topic): Int = item.tid
         override fun arg1(item: Topic): Double = item.score

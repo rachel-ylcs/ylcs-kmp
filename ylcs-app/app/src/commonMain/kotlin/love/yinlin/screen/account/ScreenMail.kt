@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
@@ -31,22 +32,26 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationGrid
+import love.yinlin.compose.ui.layout.PaginationArgs
+import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.community.BoxText
 import love.yinlin.service
-import love.yinlin.ui.component.text.RichString
-import love.yinlin.ui.component.text.RichText
+import love.yinlin.compose.ui.text.RichString
+import love.yinlin.compose.ui.text.RichText
 
 @Stable
 class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private val page = object : PaginationArgs<Mail, Long, Long, Boolean>(Long.MAX_VALUE, false) {
+    private val page = object : PaginationArgs<Mail, Long, Long, Boolean>(
+        default = Long.MAX_VALUE,
+        default1 = false,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: Mail): Long = item.mid
         override fun offset(item: Mail): Long = item.mid
         override fun arg1(item: Mail): Boolean = item.processed

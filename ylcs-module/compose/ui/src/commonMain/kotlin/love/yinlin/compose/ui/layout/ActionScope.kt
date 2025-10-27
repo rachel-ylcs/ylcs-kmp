@@ -36,7 +36,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -65,7 +65,7 @@ sealed class ActionScope(private val ltr: Boolean) {
             icon = icon,
             color = color,
             enabled = enabled,
-            modifier = Modifier.Companion.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
             onClick = onClick
         )
 	}
@@ -92,7 +92,7 @@ sealed class ActionScope(private val ltr: Boolean) {
         Row(
             modifier = modifier,
             horizontalArrangement = if (ltr) Arrangement.Start else Arrangement.End,
-            verticalAlignment = Alignment.Companion.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Actions(block)
         }

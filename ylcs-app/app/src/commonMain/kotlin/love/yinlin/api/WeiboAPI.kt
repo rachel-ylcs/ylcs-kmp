@@ -18,9 +18,9 @@ import love.yinlin.platform.NetClient
 import love.yinlin.platform.Platform
 import love.yinlin.platform.safeGet
 import love.yinlin.platform.safePost
-import love.yinlin.ui.component.text.RichContainer
-import love.yinlin.ui.component.text.RichString
-import love.yinlin.ui.component.text.buildRichString
+import love.yinlin.compose.ui.text.RichContainer
+import love.yinlin.compose.ui.text.RichString
+import love.yinlin.compose.ui.text.buildRichString
 
 object WeiboAPI {
 	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"

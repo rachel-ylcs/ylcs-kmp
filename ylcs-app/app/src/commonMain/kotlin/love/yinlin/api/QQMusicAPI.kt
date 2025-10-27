@@ -18,7 +18,7 @@ import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.NetClient
 import love.yinlin.platform.safeGet
-import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.compose.ui.lyrics.LyricsLrc
 import kotlin.io.encoding.Base64
 
 object QQMusicAPI {

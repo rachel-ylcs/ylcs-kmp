@@ -55,7 +55,7 @@ import love.yinlin.platform.*
 import love.yinlin.resources.*
 import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.compose.ui.input.SecondaryButton
-import love.yinlin.ui.component.input.SingleSelector
+import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet

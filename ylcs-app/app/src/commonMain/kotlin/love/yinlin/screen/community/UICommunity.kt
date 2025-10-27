@@ -29,12 +29,12 @@ import love.yinlin.compose.*
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.common.UserLabel
+import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.layout.EqualItem
-import love.yinlin.ui.component.layout.EqualRow
-import love.yinlin.ui.component.layout.EqualRowScope
+import love.yinlin.compose.ui.layout.EqualItem
+import love.yinlin.compose.ui.layout.EqualRow
+import love.yinlin.compose.ui.layout.EqualRowScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.service

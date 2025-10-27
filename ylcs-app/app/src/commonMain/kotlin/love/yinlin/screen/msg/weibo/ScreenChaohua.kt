@@ -25,7 +25,7 @@ import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable

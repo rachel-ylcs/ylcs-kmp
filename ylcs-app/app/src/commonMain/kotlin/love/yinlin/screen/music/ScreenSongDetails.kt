@@ -28,6 +28,7 @@ import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.common.*
 import love.yinlin.uri.UriGenerator
@@ -49,8 +50,8 @@ import love.yinlin.extension.DateEx
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationColumn
+import love.yinlin.compose.ui.layout.Pagination
+import love.yinlin.compose.ui.layout.PaginationColumn
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.SubScreenDiscovery
@@ -75,7 +76,10 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
     @Serializable
     data class Args(val song: Song)
 
-    private val pageComments = object : Pagination<SongComment, Long, Long>(0L) {
+    private val pageComments = object : Pagination<SongComment, Long, Long>(
+        default = 0L,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: SongComment): Long = item.cid
         override fun offset(item: SongComment): Long = item.cid
     }

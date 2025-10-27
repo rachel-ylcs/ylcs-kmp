@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.Local
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.Device
 import love.yinlin.compose.*
@@ -35,7 +36,7 @@ import love.yinlin.resources.img_not_login
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
-import love.yinlin.ui.component.layout.*
+import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.Space
@@ -48,7 +49,10 @@ import love.yinlin.service
 class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private val page = object : Pagination<GameRecordWithName, Long, Long>(Long.MAX_VALUE) {
+    private val page = object : Pagination<GameRecordWithName, Long, Long>(
+        default = Long.MAX_VALUE,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: GameRecordWithName): Long = item.rid
         override fun offset(item: GameRecordWithName): Long = item.rid
     }

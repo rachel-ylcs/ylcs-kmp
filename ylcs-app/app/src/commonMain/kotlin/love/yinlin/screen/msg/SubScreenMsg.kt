@@ -49,9 +49,9 @@ import love.yinlin.screen.msg.douyin.ScreenDouyin
 import love.yinlin.screen.msg.pictures.ScreenPictures
 import love.yinlin.screen.msg.weibo.*
 import love.yinlin.service
-import love.yinlin.ui.component.container.Calendar
-import love.yinlin.ui.component.container.CalendarState
-import love.yinlin.ui.component.image.Banner
+import love.yinlin.compose.ui.container.Calendar
+import love.yinlin.compose.ui.container.CalendarState
+import love.yinlin.compose.ui.image.Banner
 import kotlin.math.abs
 
 @Stable

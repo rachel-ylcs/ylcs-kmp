@@ -43,6 +43,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
+                projects.ylcsModule.compose.component.paginationLayout,
                 projects.ylcsModule.compose.component.urlImage,
                 projects.ylcsModule.compose.component.webview,
             )

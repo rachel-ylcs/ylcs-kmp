@@ -36,8 +36,8 @@ import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
-import love.yinlin.ui.component.image.ReplaceableImage
-import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.compose.ui.image.ReplaceableImage
+import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.*
 import love.yinlin.service

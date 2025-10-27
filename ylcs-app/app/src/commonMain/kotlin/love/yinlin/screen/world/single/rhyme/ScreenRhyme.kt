@@ -54,7 +54,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicPlayer
 import love.yinlin.resources.*
-import love.yinlin.ui.component.animation.AnimationLayout
+import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage

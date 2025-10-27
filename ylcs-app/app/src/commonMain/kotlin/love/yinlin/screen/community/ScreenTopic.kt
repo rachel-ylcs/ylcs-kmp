@@ -27,6 +27,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.compose.*
@@ -46,7 +47,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
-import love.yinlin.ui.component.image.NineGrid
+import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -56,11 +57,11 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.service
-import love.yinlin.ui.component.layout.*
-import love.yinlin.ui.component.text.RichEditor
-import love.yinlin.ui.component.text.RichEditorState
-import love.yinlin.ui.component.text.RichString
-import love.yinlin.ui.component.text.RichText
+import love.yinlin.compose.ui.layout.*
+import love.yinlin.compose.ui.text.RichEditor
+import love.yinlin.compose.ui.text.RichEditorState
+import love.yinlin.compose.ui.text.RichString
+import love.yinlin.compose.ui.text.RichText
 
 @Composable
 private fun CoinLayout(
@@ -159,7 +160,11 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     private var details: TopicDetails? by mutableRefStateOf(null)
     private var topic: Topic by mutableRefStateOf(args.currentTopic)
 
-    private val pageComments = object : PaginationArgs<Comment, Int, Int, Boolean>(0, true) {
+    private val pageComments = object : PaginationArgs<Comment, Int, Int, Boolean>(
+        default = 0,
+        default1 = true,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: Comment): Int = item.cid
         override fun offset(item: Comment): Int = item.cid
         override fun arg1(item: Comment): Boolean = item.isTop
@@ -838,13 +843,19 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     }
 
     private val subCommentSheet = object : FloatingArgsSheet<Comment>() {
-        var page: Pagination<SubComment, Int, Int> by mutableRefStateOf(object : Pagination<SubComment, Int, Int>(0) {
+        var page: Pagination<SubComment, Int, Int> by mutableRefStateOf(object : Pagination<SubComment, Int, Int>(
+            default = 0,
+            pageNum = APIConfig.MIN_PAGE_NUM
+        ) {
             override fun distinctValue(item: SubComment): Int = item.cid
             override fun offset(item: SubComment): Int = item.cid
         })
 
         override suspend fun initialize(args: Comment) {
-            page = object : Pagination<SubComment, Int, Int>(0) {
+            page = object : Pagination<SubComment, Int, Int>(
+                default = 0,
+                pageNum = APIConfig.MIN_PAGE_NUM
+            ) {
                 override fun distinctValue(item: SubComment): Int = item.cid
                 override fun offset(item: SubComment): Int = item.cid
             }

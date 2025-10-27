@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -26,11 +27,11 @@ import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
+import love.yinlin.compose.ui.layout.Pagination
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
 import love.yinlin.service
-import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
 
 @Stable
 class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGameHall.Args>(manager) {
@@ -42,7 +43,10 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
 
     private var state by mutableStateOf(BoxState.EMPTY)
 
-    private var page = object : Pagination<GamePublicDetailsWithName, Int, Int>(Int.MAX_VALUE) {
+    private var page = object : Pagination<GamePublicDetailsWithName, Int, Int>(
+        default = Int.MAX_VALUE,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: GamePublicDetailsWithName): Int = item.gid
         override fun offset(item: GamePublicDetailsWithName): Int = item.gid
     }

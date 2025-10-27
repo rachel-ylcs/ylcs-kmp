@@ -30,9 +30,9 @@ import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
-import love.yinlin.ui.component.image.NineGrid
+import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.ui.component.text.RichText
+import love.yinlin.compose.ui.text.RichText
 
 @Stable
 interface WeiboProcessor {

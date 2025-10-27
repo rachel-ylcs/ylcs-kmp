@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -35,8 +36,8 @@ import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.service
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.layout.PaginationArgs
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 
 @Stable
 class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<ScreenUserCard.Args>(manager) {
@@ -48,7 +49,11 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
 
     private val listState = LazyStaggeredGridState()
 
-    private val page = object : PaginationArgs<Topic, Int, Int, Boolean>(Int.MAX_VALUE, true) {
+    private val page = object : PaginationArgs<Topic, Int, Int, Boolean>(
+        default = Int.MAX_VALUE,
+        default1 = true,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: Topic): Int = item.tid
         override fun offset(item: Topic): Int = item.tid
         override fun arg1(item: Topic): Boolean = item.isTop

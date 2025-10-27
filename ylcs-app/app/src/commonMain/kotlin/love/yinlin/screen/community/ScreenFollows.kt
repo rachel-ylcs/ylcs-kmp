@@ -17,6 +17,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
+import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.api.ServerRes
 import love.yinlin.compose.*
@@ -28,14 +29,14 @@ import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.ui.component.container.TabBar
+import love.yinlin.compose.ui.container.TabBar
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.service
-import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationArgs
-import love.yinlin.ui.component.layout.PaginationGrid
+import love.yinlin.compose.ui.layout.Pagination
+import love.yinlin.compose.ui.layout.PaginationArgs
+import love.yinlin.compose.ui.layout.PaginationGrid
 
 @Stable
 enum class FollowTabItem(val title: String) {
@@ -91,19 +92,30 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
     private var tab by mutableRefStateOf(FollowTabItem.fromInt(args.tab))
     private val gridState = LazyGridState()
 
-    private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(
+        default = Int.MAX_VALUE,
+        default1 = 0L,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: FollowInfo): Long = item.fid
         override fun offset(item: FollowInfo): Int = item.score
         override fun arg1(item: FollowInfo): Long = item.fid
     }
 
-    private val pageFollowers = object : PaginationArgs<FollowerInfo, Long, Int, Long>(Int.MAX_VALUE, 0L) {
+    private val pageFollowers = object : PaginationArgs<FollowerInfo, Long, Int, Long>(
+        default = Int.MAX_VALUE,
+        default1 = 0L,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: FollowerInfo): Long = item.fid
         override fun offset(item: FollowerInfo): Int = item.score
         override fun arg1(item: FollowerInfo): Long = item.fid
     }
 
-    private val pageBlockUsers = object : Pagination<BlockedUserInfo, Long, Long>(0L) {
+    private val pageBlockUsers = object : Pagination<BlockedUserInfo, Long, Long>(
+        default = 0L,
+        pageNum = APIConfig.MIN_PAGE_NUM
+    ) {
         override fun distinctValue(item: BlockedUserInfo): Long = item.fid
         override fun offset(item: BlockedUserInfo): Long = item.fid
     }

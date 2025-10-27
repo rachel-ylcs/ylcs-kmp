@@ -55,10 +55,10 @@ import love.yinlin.resources.no_audio_source
 import love.yinlin.resources.unknown_singer
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.ui.component.input.ProgressSlider
+import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.ui.component.layout.*
-import love.yinlin.ui.component.lyrics.LyricsLrc
+import love.yinlin.compose.ui.layout.*
+import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.Space

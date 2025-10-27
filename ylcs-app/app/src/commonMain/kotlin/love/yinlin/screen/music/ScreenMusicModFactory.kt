@@ -31,8 +31,8 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.ui.component.layout.Pagination
-import love.yinlin.ui.component.layout.PaginationGrid
+import love.yinlin.compose.ui.layout.Pagination
+import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -110,7 +110,10 @@ private fun SongCard(
 
 @Stable
 class ScreenMusicModFactory(manager: ScreenManager) : CommonScreen(manager) {
-    private val pageSongs = object : Pagination<Song, Int, Int>(0, APIConfig.MAX_PAGE_NUM) {
+    private val pageSongs = object : Pagination<Song, Int, Int>(
+        default = 0,
+        pageNum = APIConfig.MAX_PAGE_NUM
+    ) {
         override fun distinctValue(item: Song): Int = item.sid
         override fun offset(item: Song): Int = item.sid
     }

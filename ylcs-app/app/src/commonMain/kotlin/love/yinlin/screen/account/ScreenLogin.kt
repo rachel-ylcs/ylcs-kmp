@@ -25,7 +25,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.platform.platform
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_logo
-import love.yinlin.ui.component.animation.AnimationLayout
+import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.text.InputType

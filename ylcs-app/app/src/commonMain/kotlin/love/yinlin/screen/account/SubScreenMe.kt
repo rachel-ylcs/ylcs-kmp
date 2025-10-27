@@ -70,8 +70,8 @@ import love.yinlin.screen.community.UserProfileCard
 import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.service
-import love.yinlin.ui.component.common.UserLabel
-import love.yinlin.ui.component.platform.QrcodeScanner
+import love.yinlin.compose.ui.common.UserLabel
+import love.yinlin.compose.ui.platform.QrcodeScanner
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

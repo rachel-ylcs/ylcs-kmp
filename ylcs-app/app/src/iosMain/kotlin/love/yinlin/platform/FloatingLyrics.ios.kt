@@ -32,7 +32,7 @@ import platform.darwin.NSObject
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Stable
-class ActualFloatingLyrics(private val controller: UIViewController) : FloatingLyrics() {
+class ActualFloatingLyrics(controller: UIViewController) : FloatingLyrics() {
 
     private val composeScene by lazy {
         ImageComposeScene(

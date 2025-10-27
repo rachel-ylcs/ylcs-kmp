@@ -17,8 +17,8 @@ import kotlinx.coroutines.delay
 import love.yinlin.compose.*
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.FloatingLyrics
-import love.yinlin.ui.component.input.ProgressSlider
-import love.yinlin.ui.component.input.DockedColorPicker
+import love.yinlin.compose.ui.input.ProgressSlider
+import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.service

@@ -30,8 +30,8 @@ import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.*
-import love.yinlin.ui.component.container.TabBar
-import love.yinlin.ui.component.container.Tree
+import love.yinlin.compose.ui.container.TabBar
+import love.yinlin.compose.ui.container.Tree
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState

@@ -25,7 +25,7 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.ui.component.text.RichText
+import love.yinlin.compose.ui.text.RichText
 
 @Stable
 class ScreenWeiboDetails(manager: ScreenManager) : CommonScreen(manager) {

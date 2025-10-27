@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.compose.Device
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.ui.component.platform.VideoPlayer
+import love.yinlin.compose.ui.platform.VideoPlayer
 
 @Stable
 class ScreenVideo(manager: ScreenManager, val args: Args) : Screen<ScreenVideo.Args>(manager) {

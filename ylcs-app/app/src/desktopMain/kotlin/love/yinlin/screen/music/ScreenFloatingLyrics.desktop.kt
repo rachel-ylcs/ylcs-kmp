@@ -7,12 +7,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.input.Switch
+import love.yinlin.compose.ui.input.DockedColorPicker
+import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.fixup.FixupMacOSMouseClick
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.service
-import love.yinlin.ui.component.input.DockedColorPicker
-import love.yinlin.ui.component.input.ProgressSlider
 
 @Composable
 actual fun ScreenFloatingLyrics.ActualContent(device: Device) {

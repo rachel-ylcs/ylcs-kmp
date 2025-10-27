@@ -46,9 +46,9 @@ import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.Radio
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.screen.music.*
 import love.yinlin.service
-import love.yinlin.ui.component.lyrics.LyricsLrc
 
 @Composable
 private fun PlatformMusicInfoCard(

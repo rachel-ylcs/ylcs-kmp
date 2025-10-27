@@ -32,14 +32,14 @@ import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.Picker
-import love.yinlin.ui.component.image.ImageAdder
-import love.yinlin.ui.component.input.SingleSelector
+import love.yinlin.compose.ui.image.ImageAdder
+import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.service
-import love.yinlin.ui.component.text.RichEditor
-import love.yinlin.ui.component.text.RichEditorState
+import love.yinlin.compose.ui.text.RichEditor
+import love.yinlin.compose.ui.text.RichEditorState
 
 @Stable
 class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {

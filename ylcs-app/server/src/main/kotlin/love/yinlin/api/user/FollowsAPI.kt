@@ -31,19 +31,23 @@ fun Routing.followsAPI(implMap: ImplMap) {
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能关注自己哦".failureData
         val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
-        if (relationship1 == null && relationship2 != true) DB.throwTransaction {
-            it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
-            it.throwExecuteSQL("""
-                UPDATE user
-                SET
-                    follows = CASE WHEN uid = ? THEN follows + 1 ELSE follows END,
-                    followers = CASE WHEN uid = ? THEN followers + 1 ELSE followers END
-                WHERE uid IN (?, ?)
-            """, uid1, uid2, uid1, uid2)
-            "关注成功".successData
+        when (relationship1) {
+            null if relationship2 != true -> DB.throwTransaction {
+                it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
+                it.throwExecuteSQL(
+                    """
+                    UPDATE user
+                    SET
+                        follows = CASE WHEN uid = ? THEN follows + 1 ELSE follows END,
+                        followers = CASE WHEN uid = ? THEN followers + 1 ELSE followers END
+                    WHERE uid IN (?, ?)
+                """, uid1, uid2, uid1, uid2
+                )
+                "关注成功".successData
+            }
+            true -> "已被拉黑".failureData
+            else -> "已关注对方".failureData
         }
-        else if (relationship1 == true) "已被拉黑".failureData
-        else "已关注对方".failureData
     }
 
     api(API.User.Follows.UnfollowUser) { (token, uid2) ->

@@ -1,7 +1,6 @@
 package love.yinlin.data.rachel.game
 
 import androidx.compose.runtime.Stable
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 

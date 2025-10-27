@@ -36,7 +36,7 @@ import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.platform.HeadlessWebView
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.service
-import love.yinlin.ui.component.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable

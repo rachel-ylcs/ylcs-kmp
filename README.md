@@ -30,42 +30,43 @@
 
 `M*: Module Level`  `D: Description`  `P: Multiplatform Supported`
 
-|      M0       |       M1        |          M2           |                      D                       | P |
-|:-------------:|:---------------:|:---------------------:|:--------------------------------------------:|:-:|
-|  `ylcs-base`  |                 |                       |                                              |   |
-|               |     `core`      |                       |                language core                 | ✅ |
-|               | `compose-core`  |                       |                 compose core                 | ✅ |
-|               |    `cs-core`    |                       |                   C/S core                   | ✅ |
-| `ylcs-module` |                 |                       |                                              |   |
-|               |    `compose`    |                       |                                              |   |
-|               |                 |         `app`         |     fast and easy compose app framework      | ✅ |
-|               |                 |       `screen`        |     screen page, floating and navigation     | ✅ |
-|               |                 |       `device`        | adaptive device layout and immersive padding | ✅ |
-|               |                 |        `theme`        |        app theme resources definition        | ✅ |
-|               |                 |    `platform-view`    |      embed platform-related native view      | ✅ |
-|               |                 |         `ui`          | custom theme and basic component definition  | ✅ |
-|               |                 |    `component:all`    |           merge all component libs           | ✅ |
-|               |                 | `component:url-image` |        web or local file image loader        | ✅ |
-|               |                 |  `component:webview`  |  multiplatform webview and headless webview  | ✅ |
-|               |    `startup`    |                       |         application startup services         | ✅ |
-|               |    `service`    |                       |                                              |   |
-|               |                 |         `all`         |            merge all service libs            | ✅ |
-|               |                 |       `context`       |      multiplatform application context       | ✅ |
-|               |                 |      `exception`      |      multiplatform exception processor       | ✅ |
-|               |                 |         `os`          |    system platform related implementation    | ✅ |
-|               |                 |      `mmkv-kmp`       |       fast key-value storage framework       | ✅ |
-|               |                 |       `config`        |   application state-memory-storage config    | ✅ |
-|               | `client-engine` |                       |                client engine                 | ✅ |
-|               | `server-engine` |                       |                server engine                 | ❌ |
-|               |     `fixup`     |                       |      fix upstream compatibility issues       | ❌ |
-|               |  `auto-update`  |                       |       desktop application auto update        | ❌ |
-|  `ylcs-app`   |                 |                       |                                              |   |
-|               |      `cs`       |                       |                  C/S bridge                  | ✅ |
-|               |      `mod`      |                       |                   song MOD                   | ✅ |
-|               |      `app`      |                       |                rachel client                 | ✅ |
-|               |    `server`     |                       |                rachel server                 | ❌ |
-|               |  `mod-manager`  |                       |               song MOD mangaer               | ❌ |
-|  `ylcs-test`  |                 |                       |               test and feature               | ✅ |
+|      M0       |       M1        |              M2               |                      D                       | P |
+|:-------------:|:---------------:|:-----------------------------:|:--------------------------------------------:|:-:|
+|  `ylcs-base`  |                 |                               |                                              |   |
+|               |     `core`      |                               |                language core                 | ✅ |
+|               | `compose-core`  |                               |                 compose core                 | ✅ |
+|               |    `cs-core`    |                               |                   C/S core                   | ✅ |
+| `ylcs-module` |                 |                               |                                              |   |
+|               |    `compose`    |                               |                                              |   |
+|               |                 |             `app`             |     fast and easy compose app framework      | ✅ |
+|               |                 |           `screen`            |     screen page, floating and navigation     | ✅ |
+|               |                 |           `device`            | adaptive device layout and immersive padding | ✅ |
+|               |                 |            `theme`            |        app theme resources definition        | ✅ |
+|               |                 |        `platform-view`        |      embed platform-related native view      | ✅ |
+|               |                 |             `ui`              | custom theme and basic component definition  | ✅ |
+|               |                 |        `component:all`        |           merge all component libs           | ✅ |
+|               |                 | `component:pagination-layout` |         data pagination ui framework         | ✅ |
+|               |                 |     `component:url-image`     |        web or local file image loader        | ✅ |
+|               |                 |      `component:webview`      |  multiplatform webview and headless webview  | ✅ |
+|               |    `startup`    |                               |         application startup services         | ✅ |
+|               |    `service`    |                               |                                              |   |
+|               |                 |             `all`             |            merge all service libs            | ✅ |
+|               |                 |           `context`           |      multiplatform application context       | ✅ |
+|               |                 |          `exception`          |      multiplatform exception processor       | ✅ |
+|               |                 |             `os`              |    system platform related implementation    | ✅ |
+|               |                 |          `mmkv-kmp`           |       fast key-value storage framework       | ✅ |
+|               |                 |           `config`            |   application state-memory-storage config    | ✅ |
+|               | `client-engine` |                               |                client engine                 | ✅ |
+|               | `server-engine` |                               |                server engine                 | ❌ |
+|               |     `fixup`     |                               |      fix upstream compatibility issues       | ❌ |
+|               |  `auto-update`  |                               |       desktop application auto update        | ❌ |
+|  `ylcs-app`   |                 |                               |                                              |   |
+|               |      `cs`       |                               |                  C/S bridge                  | ✅ |
+|               |      `mod`      |                               |                   song MOD                   | ✅ |
+|               |      `app`      |                               |                rachel client                 | ✅ |
+|               |    `server`     |                               |                rachel server                 | ❌ |
+|               |  `mod-manager`  |                               |               song MOD mangaer               | ❌ |
+|  `ylcs-test`  |                 |                               |               test and feature               | ✅ |
 
 ## 源代码集依赖
 

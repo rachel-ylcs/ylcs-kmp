@@ -28,8 +28,8 @@ import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.ui.component.container.PaintCanvas
-import love.yinlin.ui.component.container.PaintCanvasState
+import love.yinlin.compose.ui.container.PaintCanvas
+import love.yinlin.compose.ui.container.PaintCanvasState
 import love.yinlin.compose.ui.input.NormalText
 
 @Composable
