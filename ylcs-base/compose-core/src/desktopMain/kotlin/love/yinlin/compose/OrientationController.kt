@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.platform
+package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

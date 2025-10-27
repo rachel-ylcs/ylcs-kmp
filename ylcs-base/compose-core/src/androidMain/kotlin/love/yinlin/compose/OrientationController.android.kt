@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.platform
+package love.yinlin.compose
 
 import android.app.Activity
 import android.content.pm.ActivityInfo

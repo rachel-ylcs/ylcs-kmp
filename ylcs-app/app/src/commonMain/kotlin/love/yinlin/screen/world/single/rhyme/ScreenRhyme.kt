@@ -66,8 +66,6 @@ import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.screen.music.*
 import love.yinlin.service
-import love.yinlin.ui.component.platform.Orientation
-import love.yinlin.ui.component.platform.rememberOrientationController
 import org.jetbrains.compose.resources.getDrawableResourceBytes
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import kotlin.time.Duration.Companion.milliseconds

@@ -27,7 +27,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.*
 import love.yinlin.service
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
+import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.ui.component.image.ImageAdder
 import love.yinlin.ui.component.image.ReplaceableImage
 import love.yinlin.ui.component.input.DockedDatePicker

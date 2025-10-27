@@ -25,7 +25,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.service
-import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
+import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
 class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {

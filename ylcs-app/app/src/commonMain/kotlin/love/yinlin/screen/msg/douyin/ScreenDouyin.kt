@@ -37,7 +37,7 @@ import love.yinlin.compose.ui.platform.HeadlessWebView
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.service
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
+import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
 class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {

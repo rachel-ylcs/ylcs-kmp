@@ -53,7 +53,7 @@ import love.yinlin.ui.component.lyrics.LyricsLrc
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.service
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
+import love.yinlin.compose.ui.floating.FloatingDialogCrop
 
 @Stable
 class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<ScreenMusicDetails.Args>(manager) {

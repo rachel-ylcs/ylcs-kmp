@@ -26,7 +26,7 @@ import love.yinlin.platform.*
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.ui.component.layout.PaginationStaggeredGrid
-import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
+import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
 class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {

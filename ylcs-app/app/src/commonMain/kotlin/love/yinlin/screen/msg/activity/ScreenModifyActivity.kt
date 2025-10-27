@@ -26,7 +26,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.service
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
+import love.yinlin.compose.ui.floating.FloatingDialogCrop
 
 @Stable
 class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Screen<ScreenModifyActivity.Args>(manager) {

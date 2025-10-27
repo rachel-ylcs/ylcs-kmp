@@ -1,4 +1,4 @@
-package love.yinlin.ui.component.screen.dialog
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageCropResult
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.compose.ui.floating.FloatingDialog
 import love.yinlin.compose.ui.image.CropImage
 import love.yinlin.compose.ui.image.CropState
 

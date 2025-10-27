@@ -66,7 +66,7 @@ import love.yinlin.screen.account.SubScreenMe
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.service
-import love.yinlin.ui.component.screen.dialog.FloatingDialogCrop
+import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 

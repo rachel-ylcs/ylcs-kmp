@@ -30,7 +30,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.ui.component.screen.dialog.FloatingDownloadDialog
+import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
 class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImagePreview.Args>(manager) {
