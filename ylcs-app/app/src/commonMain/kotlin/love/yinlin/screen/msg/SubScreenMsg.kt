@@ -33,7 +33,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo

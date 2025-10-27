@@ -37,7 +37,7 @@ import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
@@ -530,9 +530,15 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
                 NineGrid(
                     modifier = Modifier.fillMaxWidth(),
                     pics = pics,
-                    onImageClick = { onImageClick(pics, it) },
-                    onVideoClick = {}
-                )
+                    onImageClick = { onImageClick(pics, it) }
+                ) { modifier, pic, contentScale, onClick ->
+                    WebImage(
+                        uri = pic.image,
+                        contentScale = contentScale,
+                        modifier = modifier,
+                        onClick = onClick
+                    )
+                }
             }
         }
     }

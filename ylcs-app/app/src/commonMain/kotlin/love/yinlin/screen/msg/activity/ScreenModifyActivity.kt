@@ -17,7 +17,7 @@ import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources

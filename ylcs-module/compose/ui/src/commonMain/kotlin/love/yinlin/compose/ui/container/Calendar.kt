@@ -14,11 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
-import love.yinlin.common.Resource
 import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.resources.Res
 
 private val lunarFestivalTable = mapOf(
     101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",
@@ -48,7 +48,9 @@ private val solarTermTable = arrayOf(
     "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
 )
 
-private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
+private var LunarTable: ByteArray? by mutableRefStateOf(null)
+
+private val LocalDate.lunar: String get() = LunarTable?.let { table ->
     val solarYear = this.year
     val solarMonth = this.month.number
     val solarDay = this.day
@@ -70,7 +72,7 @@ private val LocalDate.lunar: String get() = Resource.lunar?.let { table ->
         30 -> "三十"
         else -> "${lunarDaysTable[lunarDay / 10]}${lunarDayTable[lunarDay % 10]}"
     }
-} ?: ""
+} ?: ".."
 
 @Stable
 class CalendarState : PagerState(currentPage = 5) { override val pageCount: Int = 12 }
@@ -162,7 +164,7 @@ private fun CalendarDayGrid(
                             date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> MaterialTheme.colorScheme.tertiary
                             else -> Colors.Unspecified
                         }
-                        val text = remember(eventTitle, date) { eventTitle ?: date.lunar }
+                        val text = remember(eventTitle, date, LunarTable) { eventTitle ?: date.lunar }
 
                         Box(modifier = Modifier.weight(1f).aspectRatio(1f)
                             .condition(eventTitle != null) { clickable(onClick = { onEventClick(date) }) },
@@ -208,6 +210,10 @@ fun Calendar(
     actions: @Composable ActionScope.() -> Unit = {},
     onEventClick: (LocalDate) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        if (LunarTable == null) LunarTable = Res.readBytes("files/lunar.bin")
+    }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)

@@ -24,7 +24,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
 import love.yinlin.resources.Res
@@ -182,9 +182,15 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 			NineGrid(
 				pics = pics,
 				modifier = Modifier.fillMaxWidth(),
-				onImageClick = { onPicClick(pics, it) },
-				onVideoClick = {}
-			)
+				onImageClick = { onPicClick(pics, it) }
+			) { modifier, pic, contentScale, onClick ->
+				WebImage(
+					uri = pic.image,
+					contentScale = contentScale,
+					modifier = modifier,
+					onClick = onClick
+				)
+			}
 		}
 	}
 

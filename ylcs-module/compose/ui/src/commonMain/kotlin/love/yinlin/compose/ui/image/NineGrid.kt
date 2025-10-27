@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 
 @Composable
 fun NineGrid(
@@ -18,7 +18,8 @@ fun NineGrid(
     padding: Dp = CustomTheme.padding.littleSpace,
     modifier: Modifier = Modifier,
     onImageClick: (Int) -> Unit,
-    onVideoClick: (Picture) -> Unit
+    onVideoClick: (Picture) -> Unit = {},
+    content: @Composable (Modifier, Picture, ContentScale, () -> Unit) -> Unit
 ) {
     val size = pics.size.coerceAtMost(9)
     if (size == 1) {
@@ -27,14 +28,10 @@ fun NineGrid(
             modifier = modifier.height(if (pic.isVideo) CustomTheme.size.extraImage else CustomTheme.size.cardWidth),
             contentAlignment = Alignment.Center
         ) {
-            WebImage(
-                uri = pic.image,
-                modifier = Modifier.matchParentSize().zIndex(1f),
-                onClick = {
-                    if (pic.isVideo) onVideoClick(pic)
-                    else onImageClick(0)
-                }
-            )
+            content(Modifier.matchParentSize().zIndex(1f), pic, ContentScale.Fit) {
+                if (pic.isVideo) onVideoClick(pic)
+                else onImageClick(0)
+            }
             if (pic.isVideo) {
                 MiniIcon(
                     icon = Icons.Outlined.SmartDisplay,
@@ -62,12 +59,9 @@ fun NineGrid(
                         repeat(columnCount) { col ->
                             val index = row * columnCount + col
                             if (index < size) {
-                                WebImage(
-                                    uri = pics[index].image,
-                                    modifier = Modifier.size(squareSize),
-                                    contentScale = ContentScale.Crop,
-                                    onClick = { onImageClick(index) }
-                                )
+                                content(Modifier.size(squareSize), pics[index], ContentScale.Crop) {
+                                    onImageClick(index)
+                                }
                             }
                         }
                     }

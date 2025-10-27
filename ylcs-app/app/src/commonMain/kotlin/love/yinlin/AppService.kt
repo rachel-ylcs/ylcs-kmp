@@ -3,10 +3,8 @@ package love.yinlin
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Paths
-import love.yinlin.common.Resource
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.service.Service
 import love.yinlin.service.StartupLazyFetcher
@@ -27,12 +25,6 @@ abstract class AppService : Service() {
             SystemFileSystem.createDirectories(os.storage.dataPath)
             SystemFileSystem.createDirectories(os.storage.cachePath)
             SystemFileSystem.createDirectories(Paths.musicPath)
-        }
-    }
-
-    private val loadResources by free {
-        Coroutines.io {
-            Resource.initialize()
         }
     }
 

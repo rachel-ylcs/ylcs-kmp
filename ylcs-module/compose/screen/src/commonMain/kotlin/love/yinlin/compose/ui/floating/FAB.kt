@@ -20,6 +20,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
 

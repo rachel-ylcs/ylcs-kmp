@@ -37,6 +37,7 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.compose.ui.image.ReplaceableImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.*
@@ -244,8 +245,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ReplaceableImage(
-                    uri = input.record,
-                    contentScale = ContentScale.Crop,
+                    pic = input.record,
                     modifier = Modifier.weight(0.64f).aspectRatio(1f),
                     onReplace = {
                         launch {
@@ -253,10 +253,15 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                         }
                     },
                     onDelete = { input.record = null }
-                )
+                ) { uri ->
+                    WebImage(
+                        uri = uri,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 ReplaceableImage(
-                    uri = input.background,
-                    contentScale = ContentScale.Crop,
+                    pic = input.background,
                     modifier = Modifier.weight(0.36f).aspectRatio(0.5625f),
                     onReplace = {
                         launch {
@@ -264,7 +269,13 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                         }
                     },
                     onDelete = { input.background = null }
-                )
+                ) { uri ->
+                    WebImage(
+                        uri = uri,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),

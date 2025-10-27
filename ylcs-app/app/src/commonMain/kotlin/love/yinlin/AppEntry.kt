@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.song.Song

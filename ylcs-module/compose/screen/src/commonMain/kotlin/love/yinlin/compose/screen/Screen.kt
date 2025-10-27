@@ -16,6 +16,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.ui.floating.Floating
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.compose.ui.layout.SplitActionLayout
 
 @Stable

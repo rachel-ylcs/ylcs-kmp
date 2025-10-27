@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -25,7 +26,7 @@ import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
@@ -33,6 +34,7 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ImageAdder
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
@@ -210,8 +212,14 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },
                     onDelete = { deletePic(it) },
-                    onClick = { navigate(ScreenImagePreview.Args(input.pics, it)) }
-                )
+                    onClick = { index, _ -> navigate(ScreenImagePreview.Args(input.pics, index)) }
+                ) { _, pic ->
+                    WebImage(
+                        uri = pic.image,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         } ?: EmptyBox()
     }

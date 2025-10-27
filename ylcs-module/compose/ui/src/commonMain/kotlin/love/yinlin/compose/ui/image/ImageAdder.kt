@@ -16,23 +16,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
-import love.yinlin.data.common.Picture
 
 @Composable
-fun ImageAdder(
+fun <T> ImageAdder(
     maxNum: Int,
-    pics: List<Picture>,
+    pics: List<T>,
     size: Dp,
     space: Dp = CustomTheme.padding.equalSpace,
     modifier: Modifier = Modifier,
     onAdd: () -> Unit,
     onDelete: (Int) -> Unit,
-    onClick: (Int) -> Unit
+    onClick: (Int, T) -> Unit,
+    content: @Composable (index: Int, pic: T) -> Unit
 ) {
     FlowRow(
         modifier = modifier,
@@ -53,12 +52,11 @@ fun ImageAdder(
                     modifier = Modifier.zIndex(2f),
                     onClick = { onDelete(index) }
                 )
-                WebImage(
-                    uri = pic.image,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().zIndex(1f),
-                    onClick = { onClick(index) }
-                )
+                Box(modifier = Modifier.fillMaxSize().clickable {
+                    onClick(index, pic)
+                }.zIndex(1f)) {
+                    content(index, pic)
+                }
             }
         }
         if (actualPics.size < maxNum) {

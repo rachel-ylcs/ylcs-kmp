@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
 import love.yinlin.uri.Uri
 import love.yinlin.data.Data
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient

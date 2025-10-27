@@ -22,7 +22,7 @@ import love.yinlin.compose.graphics.ImageCrop
 import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.*
@@ -30,6 +30,7 @@ import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.compose.ui.image.ImageAdder
 import love.yinlin.compose.ui.image.ReplaceableImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.DockedDatePicker
 
 @Stable
@@ -166,14 +167,19 @@ internal fun ActivityInfoLayout(
             style = MaterialTheme.typography.titleMedium
         )
         ReplaceableImage(
-            uri = input.pic,
-            contentScale = ContentScale.Crop,
+            pic = input.pic,
             modifier = Modifier.fillMaxWidth().aspectRatio(2f),
             onReplace = {
                 scope.launch { input.pickPicture(cropDialog, onPicAdd) }
             },
             onDelete = onPicDelete
-        )
+        ) { uri ->
+            WebImage(
+                uri = uri,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         Text(
             text = "活动海报",
             style = MaterialTheme.typography.titleMedium
@@ -185,7 +191,13 @@ internal fun ActivityInfoLayout(
             modifier = Modifier.fillMaxWidth(),
             onAdd = { scope.launch { input.pickPictures(onPicsAdd) } },
             onDelete = { onPicsDelete(it) },
-            onClick = { onPicsClick(input.pics, it) }
-        )
+            onClick = { index, _ -> onPicsClick(input.pics, index) }
+        ) { _, pic ->
+            WebImage(
+                uri = pic.image,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

@@ -3,7 +3,7 @@ package love.yinlin.compose.ui.platform
 import android.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.NavigationBack
+import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.platform.PlatformView
 
 typealias AndroidWebView = android.webkit.WebView

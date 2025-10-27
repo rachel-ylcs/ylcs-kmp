@@ -13,21 +13,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
 
 @Composable
-fun ReplaceableImage(
-    uri: String? = null,
-    contentScale: ContentScale = ContentScale.Fit,
+fun <T> ReplaceableImage(
+    pic: T? = null,
     modifier: Modifier = Modifier,
     onReplace: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    content: @Composable (T) -> Unit
 ) {
     Box(modifier = modifier) {
-        if (uri == null) {
+        if (pic == null) {
             BoxWithConstraints(
                 modifier = Modifier.fillMaxSize()
                     .clip(MaterialTheme.shapes.small)
@@ -53,12 +52,9 @@ fun ReplaceableImage(
                     modifier = Modifier.align(Alignment.TopEnd).zIndex(2f),
                     onClick = onDelete
                 )
-                WebImage(
-                    uri = uri,
-                    contentScale = contentScale,
-                    modifier = Modifier.fillMaxSize().zIndex(1f),
-                    onClick = onReplace
-                )
+                Box(modifier = Modifier.fillMaxSize().clickable(onClick = onReplace).zIndex(1f)) {
+                    content(pic)
+                }
             }
         }
     }

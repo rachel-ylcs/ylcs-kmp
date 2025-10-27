@@ -22,7 +22,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.common.Picture
+import love.yinlin.compose.data.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Picker
