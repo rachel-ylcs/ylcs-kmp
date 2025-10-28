@@ -2,7 +2,7 @@ package love.yinlin
 
 import android.content.Intent
 import android.os.Build
-import love.yinlin.common.DeepLinkHandler
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toUri
@@ -13,7 +13,7 @@ object IntentProcessor {
         fun process(data: android.net.Uri) {
             val uri = data.toUri()
             when (uri.scheme) {
-                Scheme.Content -> DeepLinkHandler.onOpenUri(uri)
+                Scheme.Content -> DeepLink.openUri(uri)
             }
         }
     }
@@ -24,11 +24,11 @@ object IntentProcessor {
                 when {
                     text.contains("QQ音乐") -> {
                         val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
-                        DeepLinkHandler.onOpenUri(result.copy(scheme = Scheme.QQMusic))
+                        DeepLink.openUri(result.copy(scheme = Scheme.QQMusic))
                     }
                     text.contains("网易云音乐") -> {
                         val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
-                        DeepLinkHandler.onOpenUri(result.copy(scheme = Scheme.NetEaseCloud))
+                        DeepLink.openUri(result.copy(scheme = Scheme.NetEaseCloud))
                     }
                 }
             }
@@ -38,7 +38,7 @@ object IntentProcessor {
             fun process(data: android.net.Uri) {
                 val uri = data.toUri()
                 if (uri.scheme == Scheme.Content) {
-                    DeepLinkHandler.onOpenUri(uri)
+                    DeepLink.openUri(uri)
                 }
             }
         }
