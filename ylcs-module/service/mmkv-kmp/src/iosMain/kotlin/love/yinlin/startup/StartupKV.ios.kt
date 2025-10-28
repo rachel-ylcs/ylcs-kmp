@@ -16,6 +16,7 @@ actual class StartupKV : SyncStartup {
     lateinit var mmkv: MMKV
 
     actual override fun init(context: PlatformContext, args: StartupArgs) {
+        // TODO: 把MMKV.initialized从swift中移到这里
         // MMKV initialized in RachelApp.swift
         mmkv = MMKV.defaultMMKV()!!
     }

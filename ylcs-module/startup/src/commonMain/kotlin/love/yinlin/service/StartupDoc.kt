@@ -1,5 +1,6 @@
 package love.yinlin.service
 
+import love.yinlin.platform.Platform
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
@@ -19,3 +20,8 @@ annotation class StartupHandler(val index: Int, val name: String, val handlerTyp
 @Repeatable
 @Retention(AnnotationRetention.SOURCE)
 annotation class StartupFetcher(val index: Int, val name: String, val returnType: KClass<*>)
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@MustBeDocumented
+@Retention(AnnotationRetention.SOURCE)
+annotation class StartupInitialize(vararg val platform: Platform)
