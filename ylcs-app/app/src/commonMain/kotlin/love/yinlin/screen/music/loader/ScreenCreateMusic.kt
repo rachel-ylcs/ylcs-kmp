@@ -31,7 +31,6 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.toJsonString
-import love.yinlin.platform.*
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
@@ -70,7 +69,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
     override val title: String = "创建MOD"
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
-        val path = Picker.pickPicture()?.use { source ->
+        val path = service.picker.pickPicture()?.use { source ->
             service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
@@ -297,7 +296,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                                 icon = Icons.Outlined.Add,
                                 onClick = {
                                     launch {
-                                        input.audioUri = Picker.pickPath(
+                                        input.audioUri = service.picker.pickPath(
                                             mimeType = listOf(MimeType.AUDIO),
                                             filter = listOf("*.mp3", "*.flac", "*.m4a", "*.wav")
                                         )

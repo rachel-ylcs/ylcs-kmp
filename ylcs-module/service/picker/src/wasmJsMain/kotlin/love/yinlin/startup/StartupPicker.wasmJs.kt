@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
-package love.yinlin.platform
+package love.yinlin.startup
 
 import kotlinx.browser.document
 import kotlinx.io.Buffer
@@ -7,11 +7,17 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
-import love.yinlin.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.io.ArrayBufferSource
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.Platform
+import love.yinlin.service.PlatformContext
+import love.yinlin.service.StartupArgs
+import love.yinlin.service.StartupInitialize
+import love.yinlin.service.SyncStartup
+import love.yinlin.uri.ImplicitUri
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.toInt8Array
 import org.w3c.dom.HTMLAnchorElement
@@ -22,7 +28,8 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
 
-actual object Picker {
+@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+actual class StartupPicker : SyncStartup {
     private fun htmlFileInput(
         multiple: Boolean,
         filter: String,
@@ -41,6 +48,8 @@ actual object Picker {
         worker.onmessage = { event -> block(event.data) }
         worker.postMessage(files)
     }
+
+    actual override fun init(context: PlatformContext, args: StartupArgs) {}
 
     actual suspend fun pickPicture(): Source? = Coroutines.sync { future ->
         future.catching {
@@ -95,16 +104,13 @@ actual object Picker {
 
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = null
 
-    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? {
-        val buffer = Buffer()
-        return buffer to buffer
-    }
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = Unit to Buffer()
 
-    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSavePicture(filename)
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = Unit to Buffer()
 
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
         val blob = Coroutines.io {
-            val bytes = (origin as Buffer).readByteArray()
+            val bytes = (sink as Buffer).readByteArray()
             Blob(listOf(bytes.toInt8Array()).toJsArray(), BlobPropertyBag(type = MimeType.ANY))
         }
         val url = URL.createObjectURL(blob)
@@ -114,5 +120,5 @@ actual object Picker {
         link.click()
     }
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) = Unit
+    actual suspend fun cleanSave(origin: Any, result: Boolean) {}
 }

@@ -1,12 +1,20 @@
-package love.yinlin.platform
+package love.yinlin.startup
 
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import love.yinlin.uri.ImplicitUri
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
+import love.yinlin.platform.Platform
+import love.yinlin.service.PlatformContext
+import love.yinlin.service.StartupArgs
+import love.yinlin.service.StartupInitialize
+import love.yinlin.service.SyncStartup
+import love.yinlin.uri.ImplicitUri
 
-expect object Picker {
+@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+expect class StartupPicker() : SyncStartup {
+    override fun init(context: PlatformContext, args: StartupArgs)
+
     suspend fun pickPicture(): Source?
     suspend fun pickPicture(maxNum: Int): Sources<Source>?
     suspend fun pickFile(mimeType: List<String> = emptyList(), filter: List<String> = emptyList()): Source?

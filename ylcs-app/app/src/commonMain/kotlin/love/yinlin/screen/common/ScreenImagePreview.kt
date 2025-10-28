@@ -25,12 +25,12 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.data.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.service
 
 @Stable
 class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImagePreview.Args>(manager) {
@@ -53,9 +53,10 @@ class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImag
 		val filename = url.filenameOrRandom(".webp")
 		launch {
 			Coroutines.io {
-				Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
-					val result = downloadDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-					Picker.cleanSave(origin, result)
+				val picker = service.picker
+				picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+					val result = downloadDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
+					picker.cleanSave(origin, result)
 				}
 			}
 		}

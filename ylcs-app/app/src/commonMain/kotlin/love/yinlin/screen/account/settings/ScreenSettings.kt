@@ -75,7 +75,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
     private val subScreenMe = manager.get<ScreenMain>().get<SubScreenMe>()
 
     private suspend fun pickPicture(aspectRatio: Float): Path? {
-        return Picker.pickPicture()?.use { source ->
+        return service.picker.pickPicture()?.use { source ->
             service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }?.let { path ->
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->

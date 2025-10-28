@@ -123,7 +123,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
 
         @Stable
         data class Picture(val aspectRatio: Float = 0f) : ReplaceStrategy(needUpdateInfo = true) {
-            override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickPicture()?.use { source ->
+            override suspend fun ScreenMusicDetails.openSource(): Source? = service.picker.pickPicture()?.use { source ->
                 service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
             }?.let { path ->
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
@@ -141,7 +141,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
             val mimeType: List<String> = emptyList(),
             val filter: List<String> = emptyList()
         ) : ReplaceStrategy(needUpdateInfo = false) {
-            override suspend fun ScreenMusicDetails.openSource(): Source? = Picker.pickFile(mimeType, filter)
+            override suspend fun ScreenMusicDetails.openSource(): Source? = service.picker.pickFile(mimeType, filter)
         }
     }
 

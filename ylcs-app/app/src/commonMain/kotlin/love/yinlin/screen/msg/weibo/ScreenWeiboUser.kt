@@ -197,7 +197,8 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                         for (pic in pics) {
                             val url = pic.source
                             val filename = url.filenameOrRandom(".webp")
-                            Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+                            val picker = service.picker
+                            picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                 val result = sink.use {
                                     val result = NetClient.file.safeDownload(
                                         url = url,
@@ -206,10 +207,10 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                                         onGetSize = {},
                                         onTick = { _, _ -> }
                                     )
-                                    if (result) Picker.actualSave(filename, origin, sink)
+                                    if (result) picker.actualSave(filename, origin, sink)
                                     result
                                 }
-                                Picker.cleanSave(origin, result)
+                                picker.cleanSave(origin, result)
                             }
                         }
                     }
@@ -226,9 +227,10 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
         val filename = url.filenameOrRandom(".mp4")
         launch {
             Coroutines.io {
-                Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-                    val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-                    Picker.cleanSave(origin, result)
+                val picker = service.picker
+                picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                    val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
+                    picker.cleanSave(origin, result)
                 }
             }
         }

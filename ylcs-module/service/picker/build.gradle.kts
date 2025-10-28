@@ -45,6 +45,13 @@ kotlin {
             )
         }
 
+        androidMain.configure {
+            useSourceSet(commonMain)
+            useLib(
+                libs.compose.activity
+            )
+        }
+
         val iosMain = iosMain.get().apply {
             useSourceSet(commonMain)
         }

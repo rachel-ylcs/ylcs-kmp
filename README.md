@@ -375,6 +375,7 @@ MOD 管理器是方便桌面客户端创建, 解析, 预览 MOD 的简易工具
 | Library |    Jetbrains    |                [kotlin](https://github.com/JetBrains/kotlin)                |
 | Library |    Jetbrains    | [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) |
 | Library |    Jetbrains    |                   [ktor](https://github.com/ktorio/ktor)                    |
+| Library |     mlabbe      |       [nativefiledialog](https://github.com/mlabbe/nativefiledialog)        |
 | Library |      mysql      |                       [mysql](https://dev.mysql.com)                        |
 | Library |      panpf      |                  [sketch](https://github.com/panpf/sketch)                  |
 | Library |     qos-ch      |                [logback](https://github.com/qos-ch/logback)                 |

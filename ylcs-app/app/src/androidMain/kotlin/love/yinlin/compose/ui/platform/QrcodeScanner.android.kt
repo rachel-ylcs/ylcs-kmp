@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.platform.PlatformView
@@ -110,7 +109,7 @@ actual fun QrcodeScanner(
                 onClick = {
                     scope.launch {
                         Coroutines.io {
-                            Picker.pickPicture()?.use { picture ->
+                            service.picker.pickPicture()?.use { picture ->
                                 val bitmap = BitmapFactory.decodeStream(picture.asInputStream())
                                 val text = CodeUtils.parseQRCode(bitmap)
                                 bitmap.recycle()

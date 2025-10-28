@@ -69,7 +69,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
                 slot.tip.warning(UnsupportedPlatformText)
             },
             ifFalse = {
-                Picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
+                service.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
                     step = Step.Prepare(it)
                 }
             }

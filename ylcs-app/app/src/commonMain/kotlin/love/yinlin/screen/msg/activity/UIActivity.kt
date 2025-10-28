@@ -25,7 +25,6 @@ import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
-import love.yinlin.platform.*
 import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.compose.ui.image.ImageAdder
@@ -67,7 +66,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     val linkString: String? get() = link.text.ifEmpty { null }
 
     suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
-        val path = Picker.pickPicture()?.use { source ->
+        val path = service.picker.pickPicture()?.use { source ->
             service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
@@ -82,7 +81,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     }
 
     suspend fun pickPictures(onPicsAdd: (List<Path>) -> Unit) {
-        Picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
+        service.picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
                 service.os.storage.createTempFile { sink ->

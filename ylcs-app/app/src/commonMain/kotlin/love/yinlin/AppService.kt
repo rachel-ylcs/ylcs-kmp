@@ -12,6 +12,7 @@ import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
 import love.yinlin.startup.StartupMusicFactory
 import love.yinlin.startup.StartupOS
+import love.yinlin.startup.StartupPicker
 import love.yinlin.startup.StartupUrlImage
 
 abstract class AppService : Service() {
@@ -27,6 +28,10 @@ abstract class AppService : Service() {
             SystemFileSystem.createDirectories(Paths.musicPath)
         }
     }
+
+    val picker by service(
+        factory = ::StartupPicker
+    )
 
     private val setupUrlImage by service(
         StartupLazyFetcher {

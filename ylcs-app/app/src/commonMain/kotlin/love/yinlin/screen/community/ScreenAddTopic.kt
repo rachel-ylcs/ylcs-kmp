@@ -32,7 +32,6 @@ import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.safeToSources
-import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ImageAdder
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.SingleSelector
@@ -60,7 +59,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
     private val input = InputState()
 
     private suspend fun pickPictures() {
-        Picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
+        service.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
                 service.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)

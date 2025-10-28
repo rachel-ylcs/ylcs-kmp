@@ -27,6 +27,7 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.service
 
 @Stable
 class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
@@ -113,7 +114,8 @@ class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
                                             for (pic in pics) {
                                                 val url = pic.source
                                                 val filename = url.filenameOrRandom(".webp")
-                                                Picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+                                                val picker = service.picker
+                                                picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                     val result = sink.use {
                                                         val result = NetClient.file.safeDownload(
                                                             url = url,
@@ -122,10 +124,10 @@ class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
                                                             onGetSize = {},
                                                             onTick = { _, _ -> }
                                                         )
-                                                        if (result) Picker.actualSave(filename, origin, sink)
+                                                        if (result) picker.actualSave(filename, origin, sink)
                                                         result
                                                     }
-                                                    Picker.cleanSave(origin, result)
+                                                    picker.cleanSave(origin, result)
                                                 }
                                             }
                                         }
@@ -141,9 +143,10 @@ class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
                             val filename = url.filenameOrRandom(".mp4")
                             launch {
                                 Coroutines.io {
-                                    Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-                                        val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-                                        Picker.cleanSave(origin, result)
+                                    val picker = service.picker
+                                    picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                        val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
+                                        picker.cleanSave(origin, result)
                                     }
                                 }
                             }

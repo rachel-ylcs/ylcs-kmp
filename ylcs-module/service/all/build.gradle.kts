@@ -46,6 +46,7 @@ kotlin {
                 projects.ylcsModule.service.os,
                 projects.ylcsModule.service.mmkvKmp,
                 projects.ylcsModule.service.config,
+                projects.ylcsModule.service.picker,
             )
         }
     }

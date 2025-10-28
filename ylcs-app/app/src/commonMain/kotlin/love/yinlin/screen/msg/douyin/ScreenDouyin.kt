@@ -26,7 +26,6 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
@@ -156,9 +155,10 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
                                 val filename = url.filenameOrRandom(".mp4")
                                 launch {
                                     Coroutines.io {
-                                        Picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
-                                            val result = downloadVideoDialog.openSuspend(url, sink) { Picker.actualSave(filename, origin, sink) }
-                                            Picker.cleanSave(origin, result)
+                                        val picker = service.picker
+                                        picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+                                            val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
+                                            picker.cleanSave(origin, result)
                                         }
                                     }
                                 }

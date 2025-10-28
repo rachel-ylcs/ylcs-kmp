@@ -21,7 +21,6 @@ import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources
-import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
@@ -148,7 +147,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 	}
 
 	private suspend fun modifyPictures(index: Int) {
-		Picker.pickPicture()?.use { source ->
+		service.picker.pickPicture()?.use { source ->
 			service.os.storage.createTempFile { sink ->
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}

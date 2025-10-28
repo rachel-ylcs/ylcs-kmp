@@ -22,7 +22,7 @@ fun main() {
         actionAlwaysOnTop = true,
         onWindowCreate = {
             FixupWindowsSwingMaximize.setBounds(this)
-            Picker.windowHandle = this.windowHandle
+            service.picker.bindWindow(this.windowHandle)
         },
         actions = {
             if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
@@ -39,7 +39,7 @@ fun main() {
                 tip = "加载更新包",
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             ) {
-                Picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
+                service.picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
                     Coroutines.io {
                         AutoUpdate.start(path.path)
                     }

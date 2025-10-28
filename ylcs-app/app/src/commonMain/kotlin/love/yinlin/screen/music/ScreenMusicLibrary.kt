@@ -38,7 +38,6 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.mod.ModFactory
-import love.yinlin.platform.Picker
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
@@ -230,7 +229,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun onMusicPackage() {
         if (factory.isReady) slot.tip.warning("请先停止播放器")
-        else Picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
+        else service.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
             try {
                 slot.loading.openSuspend()
                 path.sink.use { sink ->

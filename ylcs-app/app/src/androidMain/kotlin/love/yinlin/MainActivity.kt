@@ -16,7 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
-        service.context.bindActivity(this, activityResultRegistry)
+        service.context.bindActivity(this)
+        service.picker.bindActivity(this)
 
         ActualFloatingLyrics(this).also {
             service.musicFactory.instance.floatingLyrics = it

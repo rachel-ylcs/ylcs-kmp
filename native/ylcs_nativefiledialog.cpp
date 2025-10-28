@@ -33,7 +33,7 @@ inline nfdwindowhandle_t nfd_get_window(void* handle)
 }
 
 extern "C" {
-	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_Picker_openFileDialog(
+	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_PickerKt_openFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
@@ -61,7 +61,7 @@ extern "C" {
 		return nullptr;
 	}
 
-	JNIEXPORT jobjectArray JNICALL Java_love_yinlin_platform_Picker_openMultipleFileDialog(
+	JNIEXPORT jobjectArray JNICALL Java_love_yinlin_platform_PickerKt_openMultipleFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
@@ -100,7 +100,7 @@ extern "C" {
 		return arr;
 	}
 
-	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_Picker_saveFileDialog(
+	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_PickerKt_saveFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
