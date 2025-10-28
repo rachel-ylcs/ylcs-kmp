@@ -56,6 +56,7 @@
 |               |                 |             `os`              |    system platform related implementation    | ✅ |
 |               |                 |          `mmkv-kmp`           |       fast key-value storage framework       | ✅ |
 |               |                 |           `config`            |   application state-memory-storage config    | ✅ |
+|               |                 |           `picker`            |  multiplatform system native UI file picker  | ✅ |
 |               | `client-engine` |                               |                client engine                 | ✅ |
 |               | `server-engine` |                               |                server engine                 | ❌ |
 |               |     `fixup`     |                               |      fix upstream compatibility issues       | ❌ |

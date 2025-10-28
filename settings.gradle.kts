@@ -47,6 +47,7 @@ include(
     "ylcs-module:service:os",
     "ylcs-module:service:mmkv-kmp",
     "ylcs-module:service:config",
+    "ylcs-module:service:picker",
 
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
@@ -63,7 +64,6 @@ include(
     "ylcs-module:server-engine",
 
     "ylcs-module:fixup",
-
     "ylcs-module:auto-update",
 
     /* -----------------  [3] 结构模块  ----------------- */
