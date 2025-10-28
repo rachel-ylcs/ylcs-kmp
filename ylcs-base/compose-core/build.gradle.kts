@@ -61,12 +61,12 @@ kotlin {
             )
         }
 
-        val nonAndroidMain by creating {
+        val skikoMain by creating {
             useSourceSet(commonMain)
         }
 
         val iosMain = iosMain.get().apply {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
         }
 
         buildList {
@@ -85,14 +85,14 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
             useApi(
                 compose.desktop.currentOs,
             )
         }
 
         wasmJsMain.configure {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
         }
     }
 }

@@ -49,20 +49,20 @@ kotlin {
             )
         }
 
-        val nonAndroidMain by creating {
+        val skikoMain by creating {
             useSourceSet(commonMain)
         }
 
-        val nonWasmJsMain by creating {
+        val clientMain by creating {
             useSourceSet(commonMain)
         }
 
         val appleMain = appleMain.get().apply {
-            useSourceSet(nonAndroidMain, nonWasmJsMain)
+            useSourceSet(skikoMain, clientMain)
         }
 
         val jvmMain by creating {
-            useSourceSet(nonWasmJsMain)
+            useSourceSet(clientMain)
         }
 
         val iosMain = iosMain.get().apply {
@@ -92,7 +92,7 @@ kotlin {
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain, jvmMain)
+            useSourceSet(skikoMain, jvmMain)
             if (C.platform == BuildPlatform.Mac) {
                 useSourceSet(appleMain)
             }
@@ -102,7 +102,7 @@ kotlin {
         }
 
         wasmJsMain.configure {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
             useApi(
                 libs.kotlinx.broswer
             )

@@ -45,7 +45,7 @@ kotlin {
             )
         }
 
-        val nonAndroidMain by creating {
+        val skikoMain by creating {
             useSourceSet(commonMain)
         }
 
@@ -67,16 +67,16 @@ kotlin {
             }
         }.forEach {
             it.configure {
-                useSourceSet(nonAndroidMain)
+                useSourceSet(skikoMain)
             }
         }
 
         val desktopMain by getting {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
         }
 
         wasmJsMain.configure {
-            useSourceSet(nonAndroidMain)
+            useSourceSet(skikoMain)
         }
     }
 }
