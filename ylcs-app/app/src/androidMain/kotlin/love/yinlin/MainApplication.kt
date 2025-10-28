@@ -1,8 +1,8 @@
 package love.yinlin
 
-import android.app.Application
+import love.yinlin.compose.RachelApplication
 
-class RachelApplication : Application() {
+class MainApplication : RachelApplication() {
 	override fun onCreate() {
 		super.onCreate()
 		service.init(this)

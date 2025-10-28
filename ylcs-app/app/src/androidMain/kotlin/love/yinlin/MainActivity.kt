@@ -2,19 +2,14 @@ package love.yinlin
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import love.yinlin.compose.*
 import love.yinlin.fixup.FixupAndroidStatusBarColor
 import love.yinlin.platform.ActualFloatingLyrics
 
-class MainActivity : ComponentActivity() {
+class MainActivity : RachelActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
-        window.isNavigationBarContrastEnforced = false
 
         service.context.bindActivity(this)
         service.picker.bindActivity(this)
