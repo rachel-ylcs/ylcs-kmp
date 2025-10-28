@@ -11,6 +11,7 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.io.ArrayBufferSource
+import love.yinlin.io.ScriptWorker
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.service.PlatformContext
@@ -22,7 +23,6 @@ import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.toInt8Array
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.Worker
 import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
@@ -43,10 +43,20 @@ actual class StartupPicker : SyncStartup {
         input.click()
     }
 
-    private fun openFileUpLoadWorker(files: FileList?, block: (JsAny?) -> Unit) {
-        val worker = Worker("js/worker/FileUpload.js")
-        worker.onmessage = { event -> block(event.data) }
-        worker.postMessage(files)
+    private fun openFileUpLoadWorker(files: FileList?, block: (List<ArrayBuffer>) -> Unit) {
+        ScriptWorker("""
+            if (data && data instanceof FileList && data.length > 0) {
+                const reader = new FileReaderSync();
+                let items = [];
+                for (const file of data) {
+                    const buffer = reader.readAsArrayBuffer(file);
+                    items.push(buffer);
+                }
+                postMessage(items);
+            }
+        """.trimIndent()).execute(files) { data ->
+            block((data as? JsArray<*>)?.toList()?.map { it as ArrayBuffer }!!)
+        }
     }
 
     actual override fun init(context: PlatformContext, args: StartupArgs) {}
@@ -55,11 +65,9 @@ actual class StartupPicker : SyncStartup {
         future.catching {
             htmlFileInput(multiple = false, filter = MimeType.IMAGE) { files ->
                 future.catching {
-                    openFileUpLoadWorker(files) { data ->
-                        future.catching {
-                            val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
-                            future.send { ArrayBufferSource(buffer).buffered() }
-                        }
+                    openFileUpLoadWorker(files) { buffers ->
+                        println(buffers[0].byteLength)
+                        future.send { ArrayBufferSource(buffers[0]).buffered() }
                     }
                 }
             }
@@ -71,14 +79,8 @@ actual class StartupPicker : SyncStartup {
             require(maxNum > 0)
             htmlFileInput(multiple = true, filter = MimeType.IMAGE) { files ->
                 future.catching {
-                    openFileUpLoadWorker(files) { data ->
-                        future.catching {
-                            future.send {
-                                (data as? JsArray<*>)?.toList()?.safeToSources {
-                                    (it as? ArrayBuffer)?.let { buffer -> ArrayBufferSource(buffer).buffered() }
-                                }
-                            }
-                        }
+                    openFileUpLoadWorker(files) { buffers ->
+                        future.send { buffers.safeToSources { ArrayBufferSource(it).buffered() } }
                     }
                 }
             }
@@ -89,11 +91,8 @@ actual class StartupPicker : SyncStartup {
         future.catching {
             htmlFileInput(multiple = false, filter = mimeType.joinToString(",")) { files ->
                 future.catching {
-                    openFileUpLoadWorker(files) { data ->
-                        future.catching {
-                            val buffer = ((data as JsArray<*>).toArray().getOrNull(0) as ArrayBuffer)
-                            future.send { ArrayBufferSource(buffer).buffered() }
-                        }
+                    openFileUpLoadWorker(files) { buffers ->
+                        future.send { ArrayBufferSource(buffers[0]).buffered() }
                     }
                 }
             }
