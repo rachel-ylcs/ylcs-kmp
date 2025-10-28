@@ -44,7 +44,6 @@ kotlin {
         val commonMain by getting {
             useApi(
                 projects.ylcsBase.core,
-                libs.skiko,
                 libs.compose.runtime,
                 libs.compose.foundation,
                 libs.compose.savedstate,
@@ -63,6 +62,9 @@ kotlin {
 
         val skikoMain by creating {
             useSourceSet(commonMain)
+            useApi(
+                libs.skiko,
+            )
         }
 
         val iosMain = iosMain.get().apply {
