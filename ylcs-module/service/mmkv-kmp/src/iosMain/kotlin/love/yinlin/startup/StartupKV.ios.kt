@@ -4,10 +4,10 @@ import cocoapods.MMKV.MMKV
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
 import love.yinlin.extension.toNSData
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupFetcher
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupFetcher
+import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 @OptIn(ExperimentalForeignApi::class)
@@ -15,7 +15,7 @@ actual class StartupKV : SyncStartup {
     // TODO: 需要重新review
     lateinit var mmkv: MMKV
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {
+    actual override fun init(context: Context, args: StartupArgs) {
         // TODO: 把MMKV.initialized从swift中移到这里
         // MMKV initialized in RachelApp.swift
         mmkv = MMKV.defaultMMKV()!!

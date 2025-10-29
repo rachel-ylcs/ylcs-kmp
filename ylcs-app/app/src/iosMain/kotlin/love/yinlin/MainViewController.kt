@@ -1,39 +1,23 @@
 package love.yinlin
 
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
-import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.delay
 import love.yinlin.platform.ActualFloatingLyrics
 import love.yinlin.platform.Coroutines
-import love.yinlin.service.PlatformContext
 import platform.UIKit.UIViewController
 
-lateinit var controller: UIViewController
-
-fun MainViewController(): UIViewController {
-    service.init(PlatformContext)
-
-    return ComposeUIViewController(
-        configure = {
-            delegate = object : ComposeUIViewControllerDelegate {
-                override fun viewDidAppear(animated: Boolean) {
-                    ActualFloatingLyrics(controller).let {
-                        service.musicFactory.instance.floatingLyrics = it
-                        if (service.config.enabledFloatingLyrics) {
-                            Coroutines.startMain {
-                                delay(1000L)
-                                it.attach()
-                            }
-                        }
+fun MainViewController() = object : RachelApplication(PlatformContextDelegate) {
+    override fun buildDelegate(uiViewController: UIViewController): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {
+        override fun viewDidAppear(animated: Boolean) {
+            ActualFloatingLyrics(uiViewController).let {
+                musicFactory.instance.floatingLyrics = it
+                if (config.enabledFloatingLyrics) {
+                    Coroutines.startMain {
+                        delay(1000L)
+                        it.attach()
                     }
                 }
             }
         }
-    ) {
-        AppEntry {
-            ScreenEntry()
-        }
-    }.apply {
-        controller = this
     }
-}
+}.run()

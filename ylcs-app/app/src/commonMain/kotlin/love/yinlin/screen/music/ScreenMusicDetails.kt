@@ -26,6 +26,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
+import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -52,7 +53,6 @@ import love.yinlin.compose.ui.layout.ExpandableLayout
 import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.layout.EmptyBox
-import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 
 @Stable
@@ -104,7 +104,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                         }
                         Coroutines.main {
                             if (needUpdateInfo) {
-                                service.musicFactory.instance.musicLibrary.findAssign(id) {
+                                app.musicFactory.instance.musicLibrary.findAssign(id) {
                                     it.copy(modification = it.modification + 1)
                                 }
                             }
@@ -123,11 +123,11 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
 
         @Stable
         data class Picture(val aspectRatio: Float = 0f) : ReplaceStrategy(needUpdateInfo = true) {
-            override suspend fun ScreenMusicDetails.openSource(): Source? = service.picker.pickPicture()?.use { source ->
-                service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            override suspend fun ScreenMusicDetails.openSource(): Source? = app.picker.pickPicture()?.use { source ->
+                app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
             }?.let { path ->
                 cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                    service.os.storage.createTempFile { sink ->
+                    app.os.storage.createTempFile { sink ->
                         SystemFileSystem.source(path).buffered().use { source ->
                             ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.Full).process(source, sink)
                         }
@@ -141,7 +141,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
             val mimeType: List<String> = emptyList(),
             val filter: List<String> = emptyList()
         ) : ReplaceStrategy(needUpdateInfo = false) {
-            override suspend fun ScreenMusicDetails.openSource(): Source? = service.picker.pickFile(mimeType, filter)
+            override suspend fun ScreenMusicDetails.openSource(): Source? = app.picker.pickFile(mimeType, filter)
         }
     }
 
@@ -175,7 +175,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                         enabled = name.ok && singer.ok && lyricist.ok && composer.ok && album.ok,
                         onClick = {
                             val id = args.id
-                            service.musicFactory.instance.musicLibrary.findAssign(id) {
+                            app.musicFactory.instance.musicLibrary.findAssign(id) {
                                 it.copy(
                                     name = name.text,
                                     singer = singer.text,
@@ -310,7 +310,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
         }
     }
 
-    private val musicInfo by derivedStateOf { service.musicFactory.instance.musicLibrary[args.id] }
+    private val musicInfo by derivedStateOf { app.musicFactory.instance.musicLibrary[args.id] }
     private var lyricsText by mutableStateOf("")
     private val resources = mutableStateListOf<ResourceItem>()
 
@@ -479,7 +479,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "删除",
                             color = Colors.White,
                             onClick = {
-                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
+                                if (app.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else with(item.onDelete) { invoke(item) }
                             }
                         )
@@ -490,7 +490,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "替换",
                             color = Colors.White,
                             onClick = {
-                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
+                                if (app.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else with(item.onReplace) { invoke(item) }
                             }
                         )
@@ -501,7 +501,7 @@ class ScreenMusicDetails(manager: ScreenManager, val args: Args) : Screen<Screen
                             tip = "编辑",
                             color = Colors.White,
                             onClick = {
-                                if (service.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
+                                if (app.musicFactory.instance.isReady) slot.tip.warning("请先停止播放器")
                                 else modifySheet.open(item)
                             }
                         )

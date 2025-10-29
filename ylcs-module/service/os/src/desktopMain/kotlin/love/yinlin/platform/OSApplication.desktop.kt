@@ -1,11 +1,11 @@
 package love.yinlin.platform
 
+import love.yinlin.Context
 import love.yinlin.uri.Uri
-import love.yinlin.service.PlatformContext
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
-actual fun buildOSApplication(context: PlatformContext) = object : OSApplication() {
+actual fun buildOSApplication(context: Context) = object : OSApplication() {
     override suspend fun startAppIntent(uri: Uri): Boolean {
         OSUtil.openUri(uri)
         return true

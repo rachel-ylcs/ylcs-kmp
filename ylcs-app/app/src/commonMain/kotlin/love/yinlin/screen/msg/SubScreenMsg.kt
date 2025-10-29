@@ -23,6 +23,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.until
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ItemKey
@@ -48,7 +49,6 @@ import love.yinlin.screen.msg.activity.ScreenAddActivity
 import love.yinlin.screen.msg.douyin.ScreenDouyin
 import love.yinlin.screen.msg.pictures.ScreenPictures
 import love.yinlin.screen.msg.weibo.*
-import love.yinlin.service
 import love.yinlin.compose.ui.container.Calendar
 import love.yinlin.compose.ui.container.CalendarState
 import love.yinlin.compose.ui.image.Banner
@@ -261,7 +261,7 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
 
     @Composable
     private fun ActionScope.ToolBarLayout() {
-        if (service.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+        if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
             Action(Icons.Outlined.Add, "添加") {
                 navigate<ScreenAddActivity>()
             }

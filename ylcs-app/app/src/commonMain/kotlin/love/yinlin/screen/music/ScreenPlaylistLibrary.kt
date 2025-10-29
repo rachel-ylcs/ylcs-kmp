@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -41,7 +42,6 @@ import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.EmptyBox
-import love.yinlin.service
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -108,8 +108,8 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 
 @Stable
 class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val factory = service.musicFactory.instance
-    private val playlistLibrary = service.config.playlistLibrary
+    private val factory = app.musicFactory.instance
+    private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
     private val library = mutableStateListOf<MusicStatusPreview>()
@@ -282,7 +282,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private suspend fun downloadCloudPlaylist(): Data<Map<String, List<PlaylistPreviewItem>>> {
         val result = ClientAPI.request(
             route = API.User.Backup.DownloadPlaylist,
-            data = service.config.userToken
+            data = app.config.userToken
         )
         return when (result) {
             is Data.Success -> {
@@ -405,7 +405,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                                 val result = ClientAPI.request(
                                     route = API.User.Backup.UploadPlaylist,
                                     data = API.User.Backup.UploadPlaylist.Request(
-                                        token = service.config.userToken,
+                                        token = app.config.userToken,
                                         playlist = playlistLibrary.items.toJson().Object
                                     )
                                 )

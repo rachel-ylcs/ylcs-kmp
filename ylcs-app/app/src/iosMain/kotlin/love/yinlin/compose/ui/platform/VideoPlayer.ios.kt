@@ -10,11 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.platform.PlatformView
-import love.yinlin.service
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSNotification
 import platform.Foundation.NSURL
@@ -77,18 +77,18 @@ actual fun VideoPlayer(
     var wasMusicPlaying by rememberFalse()
     val state = rememberRefState<VideoPlayerView?> { null }
 
-    if (service.config.audioFocus) {
+    if (app.config.audioFocus) {
         DisposableEffect(Unit) {
-            wasMusicPlaying = service.musicFactory.instance.isPlaying
+            wasMusicPlaying = app.musicFactory.instance.isPlaying
             if (wasMusicPlaying) {
                 Coroutines.startMain {
-                    service.musicFactory.instance.pause()
+                    app.musicFactory.instance.pause()
                 }
             }
             onDispose {
                 if (wasMusicPlaying) {
                     Coroutines.startMain {
-                        service.musicFactory.instance.play()
+                        app.musicFactory.instance.play()
                     }
                 }
             }

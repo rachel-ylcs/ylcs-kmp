@@ -1,14 +1,17 @@
 package love.yinlin.startup
 
 import kotlinx.io.files.Path
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupFetcher
+import love.yinlin.SyncStartup
 import love.yinlin.platform.*
-import love.yinlin.service.*
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 actual class StartupKV : SyncStartup {
     var nativeHandle: Long = 0
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {
+    actual override fun init(context: Context, args: StartupArgs) {
         val path: Path? = args.fetch(0)
         if (path != null) nativeHandle = nativeInit(path.toString())
     }

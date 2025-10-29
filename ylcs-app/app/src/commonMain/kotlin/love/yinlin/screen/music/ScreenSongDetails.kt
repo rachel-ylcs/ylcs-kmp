@@ -30,6 +30,7 @@ import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.UriGenerator
 import love.yinlin.compose.*
@@ -56,7 +57,6 @@ import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.SubScreenDiscovery
 import love.yinlin.screen.community.UserBar
-import love.yinlin.service
 
 @Stable
 private enum class ModQQGroup(
@@ -115,11 +115,11 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
     }
 
     private suspend fun onSendComment(content: String): Boolean {
-        service.config.userProfile?.let { user ->
+        app.config.userProfile?.let { user ->
             val result = ClientAPI.request(
                 route = API.User.Song.SendSongComment,
                 data = API.User.Song.SendSongComment.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     sid = args.song.sid,
                     content = content
                 )
@@ -149,7 +149,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
             val result = ClientAPI.request(
                 route = API.User.Song.DeleteSongComment,
                 data = API.User.Song.DeleteSongComment.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     cid = cid
                 )
             )
@@ -269,7 +269,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                service.config.userProfile?.let { user ->
+                app.config.userProfile?.let { user ->
                     if (user.uid == comment.uid || user.hasPrivilegeVIPTopic) {
                         Text(
                             text = "删除",
@@ -396,8 +396,8 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
                 if (group == null) slot.tip.warning("未找到此歌曲的下载源")
                 else {
                     val result = Platform.use(*Platform.Phone,
-                        ifTrue = { service.os.application.startAppIntent(UriGenerator.qqGroup(group.id)) },
-                        ifFalse = { service.os.application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
+                        ifTrue = { app.os.application.startAppIntent(UriGenerator.qqGroup(group.id)) },
+                        ifFalse = { app.os.application.startAppIntent(UriGenerator.qqGroup(group.k, group.authKey)) }
                     )
                     if (!result) slot.tip.warning("未安装QQ")
                 }
@@ -407,7 +407,7 @@ class ScreenSongDetails(manager: ScreenManager, val args: Args) : Screen<ScreenS
 
     @Composable
     override fun BottomBar() {
-        if (service.config.userProfile != null) {
+        if (app.config.userProfile != null) {
             BottomLayout(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxWidth()

@@ -23,12 +23,12 @@ import com.king.zxing.analyze.QRCodeAnalyzer
 import com.king.zxing.util.CodeUtils
 import kotlinx.coroutines.launch
 import kotlinx.io.asInputStream
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.platform.PlatformView
-import love.yinlin.service
 import java.util.*
 
 @Stable
@@ -66,7 +66,7 @@ actual fun QrcodeScanner(
                         setAnalyzeImage(false)
                         onResult(it.result.text)
                     }
-                    service.context.activityResultRegistry.register(
+                    app.context.activityResultRegistry.register(
                         key = UUID.randomUUID().toString(),
                         contract = ActivityResultContracts.RequestPermission()
                     ) {
@@ -109,7 +109,7 @@ actual fun QrcodeScanner(
                 onClick = {
                     scope.launch {
                         Coroutines.io {
-                            service.picker.pickPicture()?.use { picture ->
+                            app.picker.pickPicture()?.use { picture ->
                                 val bitmap = BitmapFactory.decodeStream(picture.asInputStream())
                                 val text = CodeUtils.parseQRCode(bitmap)
                                 bitmap.recycle()

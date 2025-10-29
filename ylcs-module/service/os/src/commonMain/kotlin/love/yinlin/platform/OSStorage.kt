@@ -4,9 +4,9 @@ import kotlinx.io.Sink
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.Context
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
-import love.yinlin.service.PlatformContext
 
 abstract class OSStorage {
     abstract val dataPath: Path
@@ -29,4 +29,4 @@ abstract class OSStorage {
     }
 }
 
-expect fun buildOSStorage(context: PlatformContext, appName: String): OSStorage
+expect fun buildOSStorage(context: Context, appName: String): OSStorage

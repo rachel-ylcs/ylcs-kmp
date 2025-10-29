@@ -12,11 +12,11 @@ import love.yinlin.data.music.MusicPlayMode
 import kotlinx.cinterop.*
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
+import love.yinlin.Context
+import love.yinlin.app
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.screen.music.audioPath
 import love.yinlin.screen.music.recordPath
-import love.yinlin.service
-import love.yinlin.service.PlatformContext
 import kotlin.math.roundToLong
 import platform.darwin.*
 import platform.Foundation.*
@@ -72,7 +72,7 @@ class ActualMusicFactory : MusicFactory() {
                         }
                     }
                 }
-                val options = if (service.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
+                val options = if (app.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
                 setCategory(AVAudioSessionCategoryPlayback, options, null)
                 setActive(true, null)
                 setupNowPlayingInfoCenter()
@@ -345,10 +345,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 }
 
-actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory()
+actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory()
 
 @Stable
-actual class MusicPlayer actual constructor(context: PlatformContext) {
+actual class MusicPlayer actual constructor(context: Context) {
     // TODO: iOS端待实现
     actual val isInit: Boolean = false
     actual val isPlaying: Boolean = false

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -31,7 +32,6 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameSlider
 import love.yinlin.screen.world.game.cast
 import love.yinlin.screen.world.game.createGameState
-import love.yinlin.service
 
 @Stable
 class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCreateGame.Args>(manager) {
@@ -141,7 +141,7 @@ class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCr
             tip = "提交",
             enabled = canSubmit
         ) {
-            val profile = service.config.userProfile
+            val profile = app.config.userProfile
             if (profile != null) {
                 val reward = reward.cast(config.minReward, config.maxReward)
                 val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
@@ -149,7 +149,7 @@ class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCr
                     val result = ClientAPI.request(
                         route = API.User.Game.CreateGame,
                         data = API.User.Game.CreateGame.Request(
-                            token = service.config.userToken,
+                            token = app.config.userToken,
                             title = titleState.text,
                             type = args.type,
                             reward = reward,
@@ -163,7 +163,7 @@ class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCr
                     when (result) {
                         is Data.Success -> {
                             subScreenWorld.slot.tip.success(result.message)
-                            service.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
+                            app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
                             pop()
                         }
                         is Data.Failure -> slot.tip.error(result.message)

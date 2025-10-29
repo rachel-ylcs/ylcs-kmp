@@ -2,7 +2,6 @@
 package love.yinlin.platform
 
 import android.content.ComponentName
-import android.content.Context
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.compose.runtime.*
@@ -20,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
+import love.yinlin.Context
 import love.yinlin.R
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.compose.mutableRefStateOf
@@ -31,7 +31,6 @@ import love.yinlin.screen.music.audioPath
 import love.yinlin.screen.music.recordPath
 import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
-import love.yinlin.service.PlatformContext
 import java.io.File
 
 fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MusicPlayMode = when {
@@ -89,15 +88,15 @@ class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
     }
 }
 
-class ActualMusicFactory(private val context: Context) : MusicFactory() {
+class ActualMusicFactory(private val androidContext: android.content.Context) : MusicFactory() {
     private var controller: MediaController? by mutableRefStateOf(null)
     override val isInit: Boolean by derivedStateOf { controller != null }
 
     override suspend fun init() {
         Coroutines.main {
             val mediaController = Coroutines.io {
-                val sessionToken = SessionToken(context, ComponentName(context, MusicService::class.java))
-                MediaController.Builder(context, sessionToken).buildAsync().get()
+                val sessionToken = SessionToken(androidContext, ComponentName(androidContext, MusicService::class.java))
+                MediaController.Builder(androidContext, sessionToken).buildAsync().get()
             }
             mediaController.removeListener(listener)
             mediaController.addListener(listener)
@@ -252,8 +251,8 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
                 .setComposer(this.composer)
                 .setWriter(this.lyricist)
                 .setArtworkUri(FixupAndroidLocalFileProvider.uri(
-                    context = context,
-                    authority = context.getString(R.string.music_file_provider),
+                    context = androidContext,
+                    authority = androidContext.getString(R.string.music_file_provider),
                     file = File(this.recordPath.toString())
                 )).build()
         ).build()
@@ -287,10 +286,10 @@ class ActualMusicFactory(private val context: Context) : MusicFactory() {
     override suspend fun removeMedia(index: Int) = withMainPlayer { it.removeMediaItem(index)  }
 }
 
-actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory(context)
+actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory(context.application)
 
 @Stable
-actual class MusicPlayer actual constructor(private val context: PlatformContext) {
+actual class MusicPlayer actual constructor(private val context: Context) {
     private var player: ExoPlayer? = null
 
     actual val isInit: Boolean get() = player != null
@@ -302,7 +301,7 @@ actual class MusicPlayer actual constructor(private val context: PlatformContext
     actual val duration: Long get() = player?.duration.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
     actual suspend fun init() {
-        player = FfmpegRenderersFactory.build(context, false).apply {
+        player = FfmpegRenderersFactory.build(context.application, false).apply {
             repeatMode = Player.REPEAT_MODE_OFF
             shuffleModeEnabled = false
             addListener(object : Player.Listener {

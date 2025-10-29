@@ -16,6 +16,7 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -32,7 +33,6 @@ import love.yinlin.compose.ui.text.InputType
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.LoadingPrimaryButton
-import love.yinlin.service
 
 @Stable
 class ScreenLogin(manager: ScreenManager) : CommonScreen(manager) {
@@ -78,8 +78,8 @@ class ScreenLogin(manager: ScreenManager) : CommonScreen(manager) {
 		when (result) {
 			is Data.Success -> {
 				val token = result.data
-				service.config.userShortToken = DateEx.CurrentLong
-				service.config.userToken = token
+				app.config.userShortToken = DateEx.CurrentLong
+				app.config.userToken = token
 				pop()
 			}
 			is Data.Failure -> slot.tip.error(result.message)

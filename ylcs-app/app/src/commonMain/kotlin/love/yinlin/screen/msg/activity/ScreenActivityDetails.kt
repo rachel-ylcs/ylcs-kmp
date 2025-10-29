@@ -19,6 +19,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -40,7 +41,6 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.service
 
 @Composable
 private fun ActivityDetailsLayout(
@@ -104,7 +104,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivity,
 			data = API.User.Activity.DeleteActivity.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				aid = args.aid
 			)
 		)
@@ -143,7 +143,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 							launch {
 								val uri = Uri.parse(showstart)
 								if (uri == null) slot.tip.warning("链接已失效")
-								else if (!service.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
+								else if (!app.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
 							}
 						}
 					)
@@ -237,7 +237,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 
 	@Composable
 	override fun ActionScope.RightActions() {
-		val hasPrivilegeVIPCalendar by rememberDerivedState { service.config.userProfile?.hasPrivilegeVIPCalendar == true }
+		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 		if (hasPrivilegeVIPCalendar) {
 			Action(Icons.Outlined.Edit, "编辑") {
 				navigate(ScreenModifyActivity.Args(args.aid))

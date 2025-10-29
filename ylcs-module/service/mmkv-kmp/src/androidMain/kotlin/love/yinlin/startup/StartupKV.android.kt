@@ -3,17 +3,17 @@ package love.yinlin.startup
 import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
 import kotlinx.io.files.Path
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupFetcher
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupFetcher
+import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 actual class StartupKV : SyncStartup {
     lateinit var mmkv: MMKV
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {
-        MMKV.initialize(context, MMKVLogLevel.LevelNone)
+    actual override fun init(context: Context, args: StartupArgs) {
+        MMKV.initialize(context.application, MMKVLogLevel.LevelNone)
         mmkv = MMKV.defaultMMKV()
     }
 

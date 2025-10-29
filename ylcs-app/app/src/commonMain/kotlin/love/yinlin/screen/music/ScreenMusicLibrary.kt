@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
 import love.yinlin.compose.*
@@ -46,7 +47,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.loader.ScreenCreateMusic
 import love.yinlin.screen.music.loader.ScreenImportMusic
 import love.yinlin.screen.music.loader.ScreenPlatformMusic
-import love.yinlin.service
 
 @Stable
 data class MusicInfoPreview(
@@ -119,8 +119,8 @@ private fun MusicCard(
 
 @Stable
 class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val factory = service.musicFactory.instance
-    private val playlistLibrary = service.config.playlistLibrary
+    private val factory = app.musicFactory.instance
+    private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
     private val selectIdList: List<String> get() = library.fastFilter { it.selected }.fastMap { it.id }
@@ -229,7 +229,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun onMusicPackage() {
         if (factory.isReady) slot.tip.warning("请先停止播放器")
-        else service.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
+        else app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
             try {
                 slot.loading.openSuspend()
                 path.sink.use { sink ->
@@ -237,7 +237,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
                     ModFactory.Merge(
                         mediaPaths = packageItems.fastMapNotNull { factory.musicLibrary[it]?.path },
                         sink = sink,
-                        info = ModInfo(author = service.config.userProfile?.name ?: "无名")
+                        info = ModInfo(author = app.config.userProfile?.name ?: "无名")
                     ).process { _, _, _ -> }
                 }
                 slot.loading.close()

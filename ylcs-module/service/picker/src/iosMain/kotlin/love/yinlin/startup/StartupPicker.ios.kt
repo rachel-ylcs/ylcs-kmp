@@ -15,10 +15,10 @@ import love.yinlin.extension.toNSData
 import love.yinlin.io.SandboxSource
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupInitialize
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupInitialize
+import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.toPath
@@ -55,7 +55,7 @@ actual class StartupPicker : SyncStartup {
     lateinit var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol
     lateinit var documentPickerDelegate: UIDocumentPickerDelegateProtocol
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {}
+    actual override fun init(context: Context, args: StartupArgs) {}
 
     @OptIn(ExperimentalForeignApi::class)
     private fun copyToTempDir(url: NSURL?): NSURL? {

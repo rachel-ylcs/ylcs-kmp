@@ -3,11 +3,11 @@ package love.yinlin.startup
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArg
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupHandler
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArg
+import love.yinlin.StartupArgs
+import love.yinlin.StartupHandler
+import love.yinlin.SyncStartup
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import platform.Foundation.NSUncaughtExceptionHandler
 import kotlin.experimental.ExperimentalNativeApi
@@ -30,7 +30,7 @@ actual class StartupExceptionHandler : SyncStartup {
     actual val crashKey: String get() = mCrashKey
 
     @OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)
-    actual override fun init(context: PlatformContext, args: StartupArgs) {
+    actual override fun init(context: Context, args: StartupArgs) {
         mCrashKey = args[0]
         val handler: Handler = args[1]
         setUnhandledExceptionHook { e ->

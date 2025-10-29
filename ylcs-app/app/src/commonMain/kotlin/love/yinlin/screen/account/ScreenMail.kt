@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -39,7 +40,6 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.community.BoxText
-import love.yinlin.service
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.RichText
 
@@ -65,7 +65,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.GetMails,
                 data = API.User.Mail.GetMails.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     num = page.pageNum
                 )
             )
@@ -79,7 +79,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Mail.GetMails,
             data = API.User.Mail.GetMails.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 isProcessed = page.arg1,
                 mid = page.offset,
                 num = page.pageNum
@@ -94,7 +94,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.ProcessMail,
                 data = API.User.Mail.ProcessMail.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     mid = mid,
                     confirm = value
                 )
@@ -118,7 +118,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Mail.DeleteMail,
                 data = API.User.Mail.DeleteMail.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     mid = mid
                 )
             )

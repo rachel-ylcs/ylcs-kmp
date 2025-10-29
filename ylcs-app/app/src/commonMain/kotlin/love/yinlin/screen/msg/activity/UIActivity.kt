@@ -15,6 +15,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
@@ -25,7 +26,6 @@ import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.data.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
-import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.compose.ui.image.ImageAdder
 import love.yinlin.compose.ui.image.ReplaceableImage
@@ -66,12 +66,12 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     val linkString: String? get() = link.text.ifEmpty { null }
 
     suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
-        val path = service.picker.pickPicture()?.use { source ->
-            service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+        val path = app.picker.pickPicture()?.use { source ->
+            app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
-                service.os.storage.createTempFile { sink ->
+                app.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
@@ -81,10 +81,10 @@ internal class ActivityInputState(initActivity: Activity? = null) {
     }
 
     suspend fun pickPictures(onPicsAdd: (List<Path>) -> Unit) {
-        service.picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
+        app.picker.pickPicture((9 - pics.size).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
-                service.os.storage.createTempFile { sink ->
+                app.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let { path += it }
             }

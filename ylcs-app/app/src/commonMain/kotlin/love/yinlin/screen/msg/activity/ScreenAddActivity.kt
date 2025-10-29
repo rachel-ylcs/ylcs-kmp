@@ -8,6 +8,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -19,7 +20,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 
 @Stable
@@ -45,7 +45,7 @@ class ScreenAddActivity(manager: ScreenManager) : CommonScreen(manager) {
 		val result = ClientAPI.request(
 			route = API.User.Activity.AddActivity,
 			data = API.User.Activity.AddActivity.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				activity = activity
 			),
 			files = { API.User.Activity.AddActivity.Files(

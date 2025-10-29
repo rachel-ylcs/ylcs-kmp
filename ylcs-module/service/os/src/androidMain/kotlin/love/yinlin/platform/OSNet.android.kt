@@ -1,8 +1,8 @@
 package love.yinlin.platform
 
+import love.yinlin.Context
 import love.yinlin.uri.Uri
-import love.yinlin.service.PlatformContext
 
-actual fun buildOSNet(context: PlatformContext): OSNet = object : OSNet() {
-    override fun openUri(uri: Uri) = OSUtil.openUri(context, uri)
+actual fun buildOSNet(context: Context): OSNet = object : OSNet() {
+    override fun openUri(uri: Uri) = OSUtil.openUri(context.application, uri)
 }

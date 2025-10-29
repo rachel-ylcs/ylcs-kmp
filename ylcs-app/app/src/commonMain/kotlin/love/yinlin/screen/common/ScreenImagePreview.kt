@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -30,7 +31,6 @@ import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
-import love.yinlin.service
 
 @Stable
 class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImagePreview.Args>(manager) {
@@ -53,7 +53,7 @@ class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImag
 		val filename = url.filenameOrRandom(".webp")
 		launch {
 			Coroutines.io {
-				val picker = service.picker
+				val picker = app.picker
 				picker.prepareSavePicture(filename)?.let { (origin, sink) ->
 					val result = downloadDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
 					picker.cleanSave(origin, result)

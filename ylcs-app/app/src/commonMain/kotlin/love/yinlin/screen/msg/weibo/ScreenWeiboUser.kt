@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.Serializable
 import love.yinlin.api.WeiboAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.screen.Screen
@@ -43,7 +44,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.service
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
@@ -176,7 +176,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
     private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
 
     private fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
-        val weiboUsers = service.config.weiboUsers
+        val weiboUsers = app.config.weiboUsers
         if (isFollow) {
             if (!weiboUsers.contains { it.id == user.info.id }) weiboUsers += user.info
         }
@@ -197,7 +197,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                         for (pic in pics) {
                             val url = pic.source
                             val filename = url.filenameOrRandom(".webp")
-                            val picker = service.picker
+                            val picker = app.picker
                             picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                 val result = sink.use {
                                     val result = NetClient.file.safeDownload(
@@ -227,7 +227,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
         val filename = url.filenameOrRandom(".mp4")
         launch {
             Coroutines.io {
-                val picker = service.picker
+                val picker = app.picker
                 picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
                     val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
                     picker.cleanSave(origin, result)
@@ -251,7 +251,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                 )
                 UserInfoCard(
                     user = user,
-                    isFollowed = service.config.weiboUsers.contains { it.id == user.info.id },
+                    isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
                     onFollowClick = { onFollowClick(user, it) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -313,7 +313,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
                     )
                     UserInfoCard(
                         user = user,
-                        isFollowed = service.config.weiboUsers.contains { it.id == user.info.id },
+                        isFollowed = app.config.weiboUsers.contains { it.id == user.info.id },
                         onFollowClick = { onFollowClick(user, it) },
                         modifier = Modifier.fillMaxWidth()
                     )

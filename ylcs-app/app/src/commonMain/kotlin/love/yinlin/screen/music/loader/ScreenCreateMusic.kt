@@ -19,6 +19,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.writeString
+import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.compose.*
@@ -40,13 +41,12 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.music.*
-import love.yinlin.service
 
 @Stable
 private class MusicInfoState {
     val id = TextInputState(DateEx.CurrentLong.toString())
     val name = TextInputState()
-    val author = TextInputState(service.config.userProfile?.name ?: "")
+    val author = TextInputState(app.config.userProfile?.name ?: "")
     val singer = TextInputState("未知")
     val lyricist = TextInputState("未知")
     val composer = TextInputState("未知")
@@ -69,12 +69,12 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
     override val title: String = "创建MOD"
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
-        val path = service.picker.pickPicture()?.use { source ->
-            service.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+        val path = app.picker.pickPicture()?.use { source ->
+            app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                service.os.storage.createTempFile { sink ->
+                app.os.storage.createTempFile { sink ->
                     SystemFileSystem.source(path).buffered().use { source ->
                         ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
                     }
@@ -89,7 +89,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
             // 1. 检查ID
             val id = input.id.text
             val name = input.name.text
-            if (id in service.musicFactory.instance.musicLibrary) {
+            if (id in app.musicFactory.instance.musicLibrary) {
                 slot.tip.warning("ID已存在")
                 return
             }
@@ -152,7 +152,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                 sink.writeString(lyrics.toString())
             }
             // 10. 更新曲库
-            service.musicFactory.instance.updateMusicLibraryInfo(listOf(id))
+            app.musicFactory.instance.updateMusicLibraryInfo(listOf(id))
             slot.tip.success("已成功导入$name")
             pop()
         }
@@ -296,7 +296,7 @@ class ScreenCreateMusic(manager: ScreenManager) : CommonScreen(manager) {
                                 icon = Icons.Outlined.Add,
                                 onClick = {
                                     launch {
-                                        input.audioUri = service.picker.pickPath(
+                                        input.audioUri = app.picker.pickPath(
                                             mimeType = listOf(MimeType.AUDIO),
                                             filter = listOf("*.mp3", "*.flac", "*.m4a", "*.wav")
                                         )

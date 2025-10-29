@@ -2,13 +2,13 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
+import love.yinlin.Context
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.catching
 import love.yinlin.extension.replaceAll
 import love.yinlin.screen.music.audioPath
-import love.yinlin.service.PlatformContext
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
 import uk.co.caprica.vlcj.media.MediaRef
@@ -236,10 +236,10 @@ class ActualMusicFactory : MusicFactory() {
     }
 }
 
-actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory()
+actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory()
 
 @Stable
-actual class MusicPlayer actual constructor(context: PlatformContext) {
+actual class MusicPlayer actual constructor(context: Context) {
     private external fun nativeCreatePlayer(): Long
     private external fun nativeReleasePlayer(handle: Long)
     private external fun nativeIsPlaying(handle: Long): Boolean

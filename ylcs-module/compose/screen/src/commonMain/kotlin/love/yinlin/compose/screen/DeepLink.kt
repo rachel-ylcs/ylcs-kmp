@@ -7,7 +7,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 fun interface DeepLink {
-    fun process(manager: ScreenManager, uri: Uri)
+    fun onDeepLink(manager: ScreenManager, uri: Uri)
 
     @Stable
     companion object {
@@ -26,7 +26,7 @@ fun interface DeepLink {
         @Composable
         fun Register(deeplink: DeepLink, manager: ScreenManager) {
             DisposableEffect(deeplink, manager) {
-                listener = { deeplink.process(manager, it) }
+                listener = { deeplink.onDeepLink(manager, it) }
                 onDispose { listener = null }
             }
         }

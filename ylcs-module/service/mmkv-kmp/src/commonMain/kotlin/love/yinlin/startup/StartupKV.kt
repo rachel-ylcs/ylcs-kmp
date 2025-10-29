@@ -2,14 +2,14 @@ package love.yinlin.startup
 
 import kotlinx.io.files.Path
 import love.yinlin.platform.KVExpire
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupFetcher
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupFetcher
+import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 expect class StartupKV() : SyncStartup {
-    override fun init(context: PlatformContext, args: StartupArgs)
+    override fun init(context: Context, args: StartupArgs)
 
     fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)

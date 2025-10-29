@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.WeiboAPI
+import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.CommonScreen
@@ -24,7 +25,6 @@ import love.yinlin.platform.*
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
@@ -37,7 +37,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun requestWeibo() {
         if (state != BoxState.LOADING) {
-            val users = service.config.weiboUsers.map { it.id }
+            val users = app.config.weiboUsers.map { it.id }
             if (users.isEmpty()) state = BoxState.EMPTY
             else {
                 state = BoxState.LOADING
@@ -97,7 +97,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
                                         for (pic in pics) {
                                             val url = pic.source
                                             val filename = url.filenameOrRandom(".webp")
-                                            val picker = service.picker
+                                            val picker = app.picker
                                             picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                 val result = sink.use {
                                                     val result = NetClient.file.safeDownload(
@@ -126,7 +126,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
                         val filename = url.filenameOrRandom(".mp4")
                         launch {
                             Coroutines.io {
-                                val picker = service.picker
+                                val picker = app.picker
                                 picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
                                     val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
                                     picker.cleanSave(origin, result)

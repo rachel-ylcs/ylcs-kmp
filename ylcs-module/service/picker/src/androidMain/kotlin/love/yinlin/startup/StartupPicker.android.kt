@@ -2,7 +2,6 @@ package love.yinlin.startup
 
 import android.content.ContentResolver
 import android.content.ContentValues
-import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -15,29 +14,29 @@ import kotlinx.io.Source
 import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import love.yinlin.Context
 import love.yinlin.data.MimeType
 import love.yinlin.extension.Sources
 import love.yinlin.extension.safeToSources
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupInitialize
-import love.yinlin.service.SyncStartup
+import love.yinlin.StartupArgs
+import love.yinlin.StartupInitialize
+import love.yinlin.SyncStartup
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import java.util.UUID
 
 @StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
 actual class StartupPicker : SyncStartup {
-    private lateinit var context: Context
+    private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver
     private lateinit var activityResultRegistry: ActivityResultRegistry
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {}
+    actual override fun init(context: Context, args: StartupArgs) {}
 
     fun bindActivity(activity: ComponentActivity) {
-        context = activity
+        this.activity = activity
         resolver = activity.contentResolver
         activityResultRegistry = activity.activityResultRegistry
     }
@@ -81,7 +80,7 @@ actual class StartupPicker : SyncStartup {
                 key = UUID.randomUUID().toString(),
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
-                future.send { ContentUri(context, uri!!.toString()) }
+                future.send { ContentUri(activity, uri!!.toString()) }
             }.launch(mimeType.toTypedArray())
         }
     }
@@ -93,7 +92,7 @@ actual class StartupPicker : SyncStartup {
                 key = UUID.randomUUID().toString(),
                 contract = ActivityResultContracts.CreateDocument(mimeType)
             ) { uri ->
-                future.send { ContentUri(context, uri!!.toString()) }
+                future.send { ContentUri(activity, uri!!.toString()) }
             }.launch(filename)
         }
     }

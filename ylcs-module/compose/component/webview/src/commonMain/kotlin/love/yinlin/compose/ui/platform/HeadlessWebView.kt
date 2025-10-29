@@ -1,8 +1,8 @@
 package love.yinlin.compose.ui.platform
 
-import love.yinlin.service.PlatformPage
+import love.yinlin.Context
 
-expect abstract class HeadlessWebView(context: PlatformPage) {
+expect abstract class HeadlessWebView(context: Context) {
     fun load(url: String)
     fun destroy()
     abstract fun onUrlIntercepted(url: String): Boolean

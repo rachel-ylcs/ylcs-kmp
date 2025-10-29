@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.DouyinAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -34,7 +35,6 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.platform.HeadlessWebView
 import love.yinlin.screen.common.ScreenVideo
-import love.yinlin.service
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
@@ -43,7 +43,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableRefStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
-    private val browser = object : HeadlessWebView(service.context.platformPage) {
+    private val browser = object : HeadlessWebView(app.context) {
         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")
 
         override fun onRequestIntercepted(url: String, response: String): Boolean {
@@ -155,7 +155,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
                                 val filename = url.filenameOrRandom(".mp4")
                                 launch {
                                     Coroutines.io {
-                                        val picker = service.picker
+                                        val picker = app.picker
                                         picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
                                             val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
                                             picker.cleanSave(origin, result)

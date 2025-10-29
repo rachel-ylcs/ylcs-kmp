@@ -10,16 +10,16 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupFetcher
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.StartupFetcher
+import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
 open class StartupConfig : SyncStartup {
     lateinit var kv: StartupKV
 
-    override fun init(context: PlatformContext, args: StartupArgs) {
+    override fun init(context: Context, args: StartupArgs) {
         kv = args.fetch(0)
     }
 

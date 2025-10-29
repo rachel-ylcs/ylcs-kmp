@@ -1,10 +1,10 @@
 package love.yinlin.startup
 
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArg
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.StartupHandler
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArg
+import love.yinlin.StartupArgs
+import love.yinlin.StartupHandler
+import love.yinlin.SyncStartup
 
 @StartupArg(index = 0, name = "crashKey", type = String::class)
 @StartupHandler(
@@ -23,7 +23,7 @@ actual class StartupExceptionHandler : SyncStartup {
 
     actual val crashKey: String get() = mCrashKey
 
-    actual override fun init(context: PlatformContext, args: StartupArgs) {
+    actual override fun init(context: Context, args: StartupArgs) {
         mCrashKey = args[0]
         val handler: Handler = args[1]
         Thread.setDefaultUncaughtExceptionHandler { _, e ->

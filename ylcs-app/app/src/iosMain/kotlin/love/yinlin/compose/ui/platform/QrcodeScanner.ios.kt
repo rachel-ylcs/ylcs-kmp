@@ -13,6 +13,7 @@ import cocoapods.SGQRCode.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.launch
 import kotlinx.io.readByteArray
+import love.yinlin.app
 import love.yinlin.extension.colorWithHex
 import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
@@ -20,7 +21,6 @@ import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.platform.PlatformView
-import love.yinlin.service
 import platform.AVFoundation.*
 import platform.darwin.NSObject
 import platform.CoreGraphics.*
@@ -139,7 +139,7 @@ actual fun QrcodeScanner(
                 onClick = {
                     scope.launch {
                         Coroutines.io {
-                            service.picker.pickPicture()?.use { picture ->
+                            app.picker.pickPicture()?.use { picture ->
                                 val data = picture.readByteArray().toNSData()
                                 val image = UIImage(data)
                                 scanCode.readQRCode(image) { text ->

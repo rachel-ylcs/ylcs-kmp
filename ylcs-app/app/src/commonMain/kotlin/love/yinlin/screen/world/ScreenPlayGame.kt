@@ -20,6 +20,7 @@ import androidx.lifecycle.viewModelScope
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -38,7 +39,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
 import love.yinlin.screen.world.game.playGameState
-import love.yinlin.service
 
 @Stable
 class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
@@ -62,7 +62,7 @@ class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.PreflightGame,
             data = API.User.Game.PreflightGame.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 gid = game?.gid ?: 0
             )
         )
@@ -236,7 +236,7 @@ class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
                     val result = ClientAPI.request(
                         route = API.User.Game.VerifyGame,
                         data = API.User.Game.VerifyGame.Request(
-                            token = service.config.userToken,
+                            token = app.config.userToken,
                             gid = game.gid,
                             rid = preflight.rid,
                             answer = state.submitAnswer

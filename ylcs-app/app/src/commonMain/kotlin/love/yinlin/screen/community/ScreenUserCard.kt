@@ -23,6 +23,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -35,7 +36,6 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Topic
-import love.yinlin.service
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 
@@ -63,7 +63,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Profile.GetPublicProfile,
             data = API.User.Profile.GetPublicProfile.Request(
-                token = service.config.userToken.ifEmpty { null },
+                token = app.config.userToken.ifEmpty { null },
                 uid = args.uid
             )
         )
@@ -98,7 +98,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Follows.FollowUser,
             data = API.User.Follows.FollowUser.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 uid = profile.uid
             )
         )
@@ -115,7 +115,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Follows.UnfollowUser,
             data = API.User.Follows.UnfollowUser.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 uid = profile.uid
             )
         )
@@ -132,7 +132,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Follows.BlockUser,
             data = API.User.Follows.BlockUser.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 uid = profile.uid
             )
         )

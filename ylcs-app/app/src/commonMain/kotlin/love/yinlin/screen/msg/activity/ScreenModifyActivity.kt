@@ -10,6 +10,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
@@ -24,7 +25,6 @@ import love.yinlin.extension.safeToSources
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
-import love.yinlin.service
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 
 @Stable
@@ -47,7 +47,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.ModifyActivityInfo,
 			data = API.User.Activity.ModifyActivityInfo.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				activity = Activity(
 					aid = args.aid,
 					ts = ts,
@@ -86,7 +86,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.ModifyActivityPicture,
 			data = API.User.Activity.ModifyActivityPicture.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				aid = args.aid
 			),
 			files = { API.User.Activity.ModifyActivityPicture.Files(
@@ -109,7 +109,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPicture,
 			data = API.User.Activity.DeleteActivityPicture.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				aid = args.aid
 			)
 		)
@@ -128,7 +128,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.AddActivityPictures,
 			data = API.User.Activity.AddActivityPictures.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				aid = args.aid
 			),
 			files = { API.User.Activity.AddActivityPictures.Files(
@@ -147,8 +147,8 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 	}
 
 	private suspend fun modifyPictures(index: Int) {
-		service.picker.pickPicture()?.use { source ->
-			service.os.storage.createTempFile { sink ->
+		app.picker.pickPicture()?.use { source ->
+			app.os.storage.createTempFile { sink ->
 				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
 			}
 		}?.let { path ->
@@ -156,7 +156,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			val result = ClientAPI.request(
 				route = API.User.Activity.ModifyActivityPictures,
 				data = API.User.Activity.ModifyActivityPictures.Request(
-					token = service.config.userToken,
+					token = app.config.userToken,
 					aid = args.aid,
 					index = index
 				),
@@ -181,7 +181,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		val result = ClientAPI.request(
 			route = API.User.Activity.DeleteActivityPictures,
 			data = API.User.Activity.DeleteActivityPictures.Request(
-				token = service.config.userToken,
+				token = app.config.userToken,
 				aid = args.aid,
 				index = index
 			)

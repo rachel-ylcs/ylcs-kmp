@@ -23,12 +23,12 @@ import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import love.yinlin.app
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.MusicFactory
 import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.service
 
 @Stable
 private class VideoPlayerState {
@@ -95,7 +95,7 @@ actual fun VideoPlayer(
     val orientationController = rememberOrientationController()
 
     DisposableEffect(Unit) {
-        state.controller = FfmpegRenderersFactory.build(context, service.config.audioFocus).apply {
+        state.controller = FfmpegRenderersFactory.build(context, app.config.audioFocus).apply {
             repeatMode = Player.REPEAT_MODE_ONE
             addListener(state.listener)
             setMediaItem(MediaItem.fromUri(url))

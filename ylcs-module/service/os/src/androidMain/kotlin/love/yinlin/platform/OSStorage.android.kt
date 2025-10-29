@@ -1,12 +1,12 @@
 package love.yinlin.platform
 
 import kotlinx.io.files.Path
-import love.yinlin.service.PlatformContext
+import love.yinlin.Context
 
-actual fun buildOSStorage(context: PlatformContext, appName: String): OSStorage = object : OSStorage() {
-    override val dataPath: Path = Path(context.filesDir.absolutePath)
+actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
+    override val dataPath: Path = Path(context.application.filesDir.absolutePath)
 
-    override val cachePath: Path = Path(context.cacheDir.absolutePath)
+    override val cachePath: Path = Path(context.application.cacheDir.absolutePath)
 
     override val cacheSize: Long get() {
         return 0L

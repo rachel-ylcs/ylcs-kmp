@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
+import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -49,7 +50,6 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
-import love.yinlin.service
 
 @Composable
 private fun UserItem(
@@ -167,7 +167,7 @@ class ScreenGuessLyrics(manager: ScreenManager, val args: Args) : Screen<ScreenG
                 url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
             }
             session = newSession
-            send(LyricsSockets.CM.Login(service.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
+            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
             newSession.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) {
                     val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()

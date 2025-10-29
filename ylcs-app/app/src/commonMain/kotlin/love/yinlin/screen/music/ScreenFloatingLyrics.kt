@@ -14,8 +14,8 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 
-@Composable
-expect fun ScreenFloatingLyrics.ActualContent(device: Device)
+//@Composable
+//expect fun ScreenFloatingLyrics.ActualContent(device: Device)
 
 @Stable
 class ScreenFloatingLyrics(manager: ScreenManager) : CommonScreen(manager) {
@@ -23,7 +23,7 @@ class ScreenFloatingLyrics(manager: ScreenManager) : CommonScreen(manager) {
 
     @Composable
     override fun Content(device: Device) {
-        ActualContent(device)
+        //ActualContent(device)
     }
 }
 

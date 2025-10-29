@@ -2,9 +2,9 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
+import love.yinlin.Context
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
-import love.yinlin.service.PlatformContext
 
 class ActualMusicFactory : MusicFactory() {
     override val isInit: Boolean = false
@@ -30,10 +30,10 @@ class ActualMusicFactory : MusicFactory() {
     override suspend fun removeMedia(index: Int) {}
 }
 
-actual fun buildMusicFactory(context: PlatformContext): MusicFactory = ActualMusicFactory()
+actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory()
 
 @Stable
-actual class MusicPlayer actual constructor(context: PlatformContext) {
+actual class MusicPlayer actual constructor(context: Context) {
     actual val isInit: Boolean = false
     actual val isPlaying: Boolean = false
     actual val position: Long = 0L

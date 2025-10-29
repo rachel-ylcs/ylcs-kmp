@@ -1,11 +1,11 @@
 package love.yinlin.startup
 
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArgs
+import love.yinlin.SyncStartup
 
 class StartupComposeSwingRender : SyncStartup {
-    override fun init(context: PlatformContext, args: StartupArgs) {
+    override fun init(context: Context, args: StartupArgs) {
         System.setProperty("compose.swing.render.on.graphics", "true")
         System.setProperty("compose.interop.blending", "true")
     }

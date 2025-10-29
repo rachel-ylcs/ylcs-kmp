@@ -38,6 +38,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
@@ -65,7 +66,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.SplitActionLayout
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.screen.common.ScreenVideo
-import love.yinlin.service
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -106,7 +106,7 @@ private fun PlayingMusicStatusCard(
 
 @Stable
 class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
-	private val factory = service.musicFactory.instance
+	private val factory = app.musicFactory.instance
 
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
@@ -765,10 +765,10 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 			if (abs(position - currentDebounceTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
 			val newLine = lyrics.updateIndex(position)
-			// 处理悬浮歌词
-			factory.floatingLyrics?.let {
-				if (it.isAttached) it.updateLyrics(newLine)
-			}
+			// TODO: 处理悬浮歌词
+//			factory.floatingLyrics?.let {
+//				if (it.isAttached) it.updateLyrics(newLine)
+//			}
 		}
 		monitor(state = { factory.currentMusic }) { musicInfo ->
 			lyrics.reset()

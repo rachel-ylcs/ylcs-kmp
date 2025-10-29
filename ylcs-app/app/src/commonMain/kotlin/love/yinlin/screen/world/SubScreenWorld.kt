@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
+import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
@@ -49,7 +50,6 @@ import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.screen.community.BoxText
 import love.yinlin.screen.world.battle.ScreenGuessLyrics
 import love.yinlin.screen.world.single.rhyme.ScreenRhyme
-import love.yinlin.service
 import kotlin.math.absoluteValue
 
 @Composable
@@ -120,7 +120,7 @@ class SubScreenWorld(parent: BasicScreen<*>) : SubScreen(parent) {
             Game.FlowersOrder, Game.SearchAll,
             Game.Pictionary -> navigate(ScreenGameHall.Args(game))
             Game.GuessLyrics -> {
-				val profile = service.config.userProfile
+				val profile = app.config.userProfile
 				if (profile != null) navigate(ScreenGuessLyrics.Args(profile.uid, profile.name))
 				else slot.tip.warning("请先登录")
 			}
@@ -186,7 +186,7 @@ class SubScreenWorld(parent: BasicScreen<*>) : SubScreen(parent) {
                         icon = Icons.Outlined.Edit,
                         tip = "创建",
                         onClick = {
-                            if (service.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
+                            if (app.config.userProfile != null) navigate(ScreenCreateGame.Args(game))
                             else slot.tip.warning("请先登录")
                         }
                     )

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -36,7 +37,6 @@ import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
-import love.yinlin.service
 
 @Composable
 private fun SongCard(
@@ -193,7 +193,7 @@ class ScreenMusicModFactory(manager: ScreenManager) : CommonScreen(manager) {
             ) {
                 SongCard(
                     song = it,
-                    status = service.musicFactory.instance.musicLibrary.contains(it.id),
+                    status = app.musicFactory.instance.musicLibrary.contains(it.id),
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         navigate(ScreenSongDetails.Args(it))

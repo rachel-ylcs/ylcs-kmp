@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.androidLibrary1) apply false
     alias(libs.plugins.kotlinCocoapods) apply false
     alias(libs.plugins.ktor) apply false
     alias(libs.plugins.kotlinAndroid) apply false

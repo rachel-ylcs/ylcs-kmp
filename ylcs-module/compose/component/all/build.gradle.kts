@@ -5,15 +5,25 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidLibrary1)
 }
 
 kotlin {
     C.useCompilerFeatures(this)
 
-    androidTarget {
-        C.jvmTarget(this)
-        publishLibraryVariants("release")
+    android {
+        namespace = "${C.app.packageName}.module.compose.component.all"
+        compileSdk = C.android.compileSdk
+        minSdk = C.android.minSdk
+        lint.targetSdk = C.android.targetSdk
+
+        compilations.configureEach {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(C.jvm.target)
+                }
+            }
+        }
     }
 
     iosArm64()
@@ -48,20 +58,5 @@ kotlin {
                 projects.ylcsModule.compose.component.webview,
             )
         }
-    }
-}
-
-android {
-    namespace = "${C.app.packageName}.module.compose.component.all"
-    compileSdk = C.android.compileSdk
-
-    defaultConfig {
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-    }
-
-    compileOptions {
-        sourceCompatibility = C.jvm.compatibility
-        targetCompatibility = C.jvm.compatibility
     }
 }

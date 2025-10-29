@@ -2,19 +2,18 @@ package love.yinlin.platform
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
+import love.yinlin.Context
 import love.yinlin.uri.Uri
 import love.yinlin.extension.catchingDefault
-import love.yinlin.service.PlatformContext
 
-actual fun buildOSApplication(context: PlatformContext) = object : OSApplication() {
+actual fun buildOSApplication(context: Context) = object : OSApplication() {
     override suspend fun startAppIntent(uri: Uri): Boolean = catchingDefault(false) {
-        OSUtil.openUri(context, uri)
+        OSUtil.openUri(context.application, uri)
         true
     }
 
     override fun copyText(text: String): Boolean = catchingDefault(false) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = context.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("", text)
         clipboard.setPrimaryClip(clip)
         true

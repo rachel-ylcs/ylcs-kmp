@@ -25,6 +25,7 @@ import kotlinx.io.writeString
 import kotlinx.serialization.Serializable
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
+import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.Uri
 import love.yinlin.compose.*
@@ -48,7 +49,6 @@ import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.screen.music.*
-import love.yinlin.service
 
 @Composable
 private fun PlatformMusicInfoCard(
@@ -195,7 +195,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
             Coroutines.io {
                 for (item in items) {
                     // 1. 下载音频
-                    val audioFile = service.os.storage.createTempFile { sink ->
+                    val audioFile = app.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.audioUrl,
                             sink = sink,
@@ -205,7 +205,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                         )
                     }
                     // 2. 下载封面
-                    val recordFile = service.os.storage.createTempFile { sink ->
+                    val recordFile = app.os.storage.createTempFile { sink ->
                         NetClient.file.safeDownload(
                             url = item.pic,
                             sink = sink,
@@ -261,7 +261,7 @@ class ScreenPlatformMusic(manager: ScreenManager, args: Args) : Screen<ScreenPla
                 }
             }
             require(ids.isNotEmpty())
-            service.musicFactory.instance.updateMusicLibraryInfo(ids)
+            app.musicFactory.instance.updateMusicLibraryInfo(ids)
             slot.tip.success("已成功导入${ids.size}首歌曲")
         }
         catch (_: Throwable) {

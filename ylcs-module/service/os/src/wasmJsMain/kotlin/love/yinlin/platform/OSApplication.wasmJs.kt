@@ -1,10 +1,10 @@
 package love.yinlin.platform
 
 import kotlinx.browser.window
+import love.yinlin.Context
 import love.yinlin.uri.Uri
-import love.yinlin.service.PlatformContext
 
-actual fun buildOSApplication(context: PlatformContext) = object : OSApplication() {
+actual fun buildOSApplication(context: Context) = object : OSApplication() {
     override suspend fun startAppIntent(uri: Uri): Boolean {
         OSUtil.openUri(uri)
         return true

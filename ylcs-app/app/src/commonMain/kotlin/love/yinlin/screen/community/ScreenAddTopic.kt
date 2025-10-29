@@ -16,6 +16,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
@@ -38,7 +39,6 @@ import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
-import love.yinlin.service
 import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
 
@@ -59,9 +59,9 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
     private val input = InputState()
 
     private suspend fun pickPictures() {
-        service.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
+        app.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
-                service.os.storage.createTempFile { sink ->
+                app.os.storage.createTempFile { sink ->
                     ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
                 }?.let {
                     input.pics += Picture(it.toString())
@@ -80,7 +80,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Topic.SendTopic,
             data = API.User.Topic.SendTopic.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 title = title,
                 content = input.content.richString.toString(),
                 section = section
@@ -108,7 +108,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
                         name = profile.name
                     ))
                 }
-                service.config.editedTopic = null
+                app.config.editedTopic = null
                 pop()
             }
             is Data.Failure -> slot.tip.error(result.message)
@@ -122,21 +122,21 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
         val content = input.content.text
         val pics = input.pics.map { it.image }
         if (title.isNotEmpty() || content.isNotEmpty() || pics.isNotEmpty()) {
-            service.config.editedTopic = EditedTopic(
+            app.config.editedTopic = EditedTopic(
                 title = title,
                 content = content,
                 section = input.section,
                 pics = pics
             )
         }
-        else if (service.config.editedTopic != null) service.config.editedTopic = null
+        else if (app.config.editedTopic != null) app.config.editedTopic = null
         pop()
     }
 
     @Composable
     override fun ActionScope.LeftActions() {
         Action(Icons.Outlined.Close, "发表") {
-            service.config.editedTopic = null
+            app.config.editedTopic = null
             pop()
         }
     }
@@ -148,14 +148,14 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
             tip = "放弃更改",
             enabled = input.canSubmit
         ) {
-            val profile = service.config.userProfile
+            val profile = app.config.userProfile
             if (profile != null) addTopic(profile = profile)
             else slot.tip.warning("请先登录")
         }
     }
 
     override suspend fun initialize() {
-        service.config.editedTopic?.let { editedTopic ->
+        app.config.editedTopic?.let { editedTopic ->
             input.title.text = editedTopic.title
             input.content.text = editedTopic.content
             input.section = editedTopic.section
@@ -165,7 +165,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
 
     @Composable
     override fun Content(device: Device) {
-        service.config.userProfile?.let { profile ->
+        app.config.userProfile?.let { profile ->
             Column(
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current)

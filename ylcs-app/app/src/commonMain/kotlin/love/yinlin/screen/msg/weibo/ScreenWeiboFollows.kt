@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import love.yinlin.api.WeiboAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -33,7 +34,6 @@ import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.service
 
 @Composable
 private fun WeiboUserItem(
@@ -73,7 +73,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
     private var searchResult by mutableRefStateOf(emptyList<WeiboUserInfo>())
 
     private suspend fun refreshLocalUser() {
-        val weiboUsers = service.config.weiboUsers
+        val weiboUsers = app.config.weiboUsers
         for ((index, user) in weiboUsers.withIndex()) {
             if (user.avatar.isEmpty()) {
                 val data = WeiboAPI.getWeiboUser(user.id)
@@ -135,7 +135,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
-                    items = if (isLocal) service.config.weiboUsers.items else searchResult,
+                    items = if (isLocal) app.config.weiboUsers.items else searchResult,
                     key = { it.id }
                 ) {
                     WeiboUserItem(
@@ -176,7 +176,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
                         enabled = state.ok,
                         onClick = {
                             try {
-                                val localUsers = service.config.weiboUsers
+                                val localUsers = app.config.weiboUsers
                                 val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
                                 for (item in items) {
                                     if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
@@ -193,7 +193,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
                         icon = Icons.Outlined.Upload,
                         onClick = {
                             try {
-                                state.text = service.config.weiboUsers.items.fastMap { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
+                                state.text = app.config.weiboUsers.items.fastMap { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
                             }
                             catch (e: Throwable) {
                                 slot.tip.error(e.message ?: "导出失败")

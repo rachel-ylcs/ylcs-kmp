@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.WeiboAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -27,7 +28,6 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
-import love.yinlin.service
 
 @Stable
 class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
@@ -114,7 +114,7 @@ class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
                                             for (pic in pics) {
                                                 val url = pic.source
                                                 val filename = url.filenameOrRandom(".webp")
-                                                val picker = service.picker
+                                                val picker = app.picker
                                                 picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                     val result = sink.use {
                                                         val result = NetClient.file.safeDownload(
@@ -143,7 +143,7 @@ class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
                             val filename = url.filenameOrRandom(".mp4")
                             launch {
                                 Coroutines.io {
-                                    val picker = service.picker
+                                    val picker = app.picker
                                     picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
                                         val result = downloadVideoDialog.openSuspend(url, sink) { picker.actualSave(filename, origin, sink) }
                                         picker.cleanSave(origin, result)

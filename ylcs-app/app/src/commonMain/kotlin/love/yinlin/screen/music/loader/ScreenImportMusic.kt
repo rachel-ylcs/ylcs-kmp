@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.serialization.Serializable
+import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
@@ -34,7 +35,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dragAndDrop
-import love.yinlin.service
 
 expect fun processImportMusicDeepLink(deepLink: String): ImplicitUri
 
@@ -69,7 +69,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
                 slot.tip.warning(UnsupportedPlatformText)
             },
             ifFalse = {
-                service.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
+                app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
                     step = Step.Prepare(it)
                 }
             }
@@ -105,7 +105,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
         }
         when (data) {
             is Data.Success -> {
-                service.musicFactory.instance.updateMusicLibraryInfo(data.data.medias)
+                app.musicFactory.instance.updateMusicLibraryInfo(data.data.medias)
                 slot.tip.success("解压成功")
                 step = Step.Initial()
             }

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
+import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
@@ -31,7 +32,6 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.world.game.GameCardQuestionAnswer
 import love.yinlin.screen.world.game.GameItem
-import love.yinlin.service
 
 @Stable
 class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
@@ -55,7 +55,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
             val result = ClientAPI.request(
                 route = API.User.Game.GetUserGames,
                 data = API.User.Game.GetUserGames.Request(
-                    token = service.config.userToken,
+                    token = app.config.userToken,
                     num = page.pageNum
                 )
             )
@@ -69,7 +69,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.GetUserGames,
             data = API.User.Game.GetUserGames.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 gid = page.offset,
                 isCompleted = page.arg1,
                 num = page.pageNum
@@ -82,7 +82,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
         val result = ClientAPI.request(
             route = API.User.Game.DeleteGame,
             data = API.User.Game.DeleteGame.Request(
-                token = service.config.userToken,
+                token = app.config.userToken,
                 gid = gid
             )
         )
@@ -104,7 +104,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            val name = remember { service.config.userProfile?.name ?: "" }
+            val name = remember { app.config.userProfile?.name ?: "" }
 
             PaginationStaggeredGrid(
                 items = page.items,

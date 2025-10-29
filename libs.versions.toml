@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.0-Beta1"
+kotlin = "2.3.0-Beta2"
 cmp = "1.10.0-alpha03"
 agp = "8.12.3"
 
@@ -35,6 +35,7 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidLibrary1 = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 

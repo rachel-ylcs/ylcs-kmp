@@ -5,6 +5,8 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
+import love.yinlin.Context
+import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.music.MusicInfo
@@ -14,8 +16,6 @@ import love.yinlin.data.music.MusicResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.service
-import love.yinlin.service.PlatformContext
 
 @Stable
 abstract class MusicFactory {
@@ -40,12 +40,12 @@ abstract class MusicFactory {
     private suspend fun initLastStatus() {
         if (isInit) {
             // 更新播放模式
-            updatePlayMode(service.config.musicPlayMode)
+            updatePlayMode(app.config.musicPlayMode)
             // 恢复上一次播放
-            val playlistName = service.config.lastPlaylist
+            val playlistName = app.config.lastPlaylist
             if (playlistName.isNotEmpty()) {
-                val playlist = service.config.playlistLibrary[playlistName]
-                val musicName = service.config.lastMusic
+                val playlist = app.config.playlistLibrary[playlistName]
+                val musicName = app.config.lastMusic
                 if (playlist != null) startPlaylist(playlist, musicName.ifEmpty { null }, false)
             }
         }
@@ -61,8 +61,8 @@ abstract class MusicFactory {
         }
     }
 
-    // 悬浮歌词
-    var floatingLyrics: FloatingLyrics? by mutableRefStateOf(null)
+//    // TODO: 悬浮歌词
+//    var floatingLyrics: FloatingLyrics? by mutableRefStateOf(null)
 
     // 当前状态
     abstract val error: Throwable?
@@ -132,25 +132,25 @@ abstract class MusicFactory {
     // 回调
     protected fun onMusicChanged(musicInfo: MusicInfo?) {
         val lastPlaylist = currentPlaylist?.name ?: ""
-        service.config.lastPlaylist = lastPlaylist
-        if (lastPlaylist.isNotEmpty()) musicInfo?.let { service.config.lastMusic = it.id }
-        else service.config.lastMusic = ""
+        app.config.lastPlaylist = lastPlaylist
+        if (lastPlaylist.isNotEmpty()) musicInfo?.let { app.config.lastMusic = it.id }
+        else app.config.lastMusic = ""
     }
 
     protected fun onPlayModeChanged(mode: MusicPlayMode) {
-        service.config.musicPlayMode = mode
+        app.config.musicPlayMode = mode
     }
 
     protected fun onPlayerStop() {
-        service.config.lastPlaylist = ""
-        service.config.lastMusic = ""
+        app.config.lastPlaylist = ""
+        app.config.lastMusic = ""
     }
 }
 
-expect fun buildMusicFactory(context: PlatformContext): MusicFactory
+expect fun buildMusicFactory(context: Context): MusicFactory
 
 @Stable
-expect class MusicPlayer(context: PlatformContext) {
+expect class MusicPlayer(context: Context) {
     val isInit: Boolean
     val isPlaying: Boolean
     val position: Long

@@ -1,10 +1,10 @@
 package love.yinlin.startup
 
 import love.yinlin.platform.*
-import love.yinlin.service.PlatformContext
-import love.yinlin.service.StartupArg
-import love.yinlin.service.StartupArgs
-import love.yinlin.service.SyncStartup
+import love.yinlin.Context
+import love.yinlin.StartupArg
+import love.yinlin.StartupArgs
+import love.yinlin.SyncStartup
 
 @StartupArg(index = 0, name = "appName", type = String::class)
 class StartupOS : SyncStartup {
@@ -15,7 +15,7 @@ class StartupOS : SyncStartup {
     lateinit var storage: OSStorage
         private set
 
-    override fun init(context: PlatformContext, args: StartupArgs) {
+    override fun init(context: Context, args: StartupArgs) {
         application = buildOSApplication(context)
         net = buildOSNet(context)
         storage = buildOSStorage(context, args[0])
