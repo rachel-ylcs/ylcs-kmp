@@ -24,6 +24,8 @@ kotlin {
                 }
             }
         }
+
+        androidResources.enable = true
     }
 
     iosArm64()

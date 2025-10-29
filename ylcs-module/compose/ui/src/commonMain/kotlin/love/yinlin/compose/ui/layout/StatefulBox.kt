@@ -21,7 +21,6 @@ import love.yinlin.compose.*
 import love.yinlin.compose.ui.animation.LoadingAnimation
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.input.LoadingPrimaryButton
-import love.yinlin.compose.ui.resources.Res
 import love.yinlin.compose.ui.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource

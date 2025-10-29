@@ -24,6 +24,8 @@ kotlin {
                 }
             }
         }
+
+        androidResources.enable = true
     }
 
     iosArm64()
@@ -62,8 +64,8 @@ kotlin {
                 libs.compose.ui,
             )
             useLib(
-                libs.compose.navigation.event,
                 libs.compose.components.resources,
+                libs.compose.navigation.event,
             )
         }
 

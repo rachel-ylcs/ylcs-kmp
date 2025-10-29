@@ -45,11 +45,6 @@ App 不需要任何文件存储读写权限，所有数据和文件均存储在 
 收集、使用已满 14 周岁但未满 18 周岁的未成年人的个人信息，可由监护人授权同意或自行授权同意。
     </string>
 
-    <string name="loading_state_string">加载中...</string>
-    <string name="empty_state_string">空空如也...</string>
-    <string name="network_error_state_string">世界上最遥远的距离就是没有网络...</string>
-    <string name="network_error_retry_string">重试</string>
-
     <string name="rachel_name">银临Rachel</string>
 
     <string name="home_nav_world">世界</string>
@@ -65,7 +60,6 @@ App 不需要任何文件存储读写权限，所有数据和文件均存储在 
 
     <string name="locked">未解锁</string>
     <string name="unlocked">已解锁</string>
-
 
     <string name="login">登录</string>
     <string name="default_name">未登录</string>
