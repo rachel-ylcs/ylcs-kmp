@@ -9,7 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import love.yinlin.extension.catching
 
 abstract class ComposeActivity : ComponentActivity() {
-    private val instance = (application as ComposeApplication).instance
+    private val instance get() = (application as ComposeApplication).instance
 
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +26,10 @@ abstract class ComposeActivity : ComponentActivity() {
         }
 
         setContent {
-            instance.BeginContent(this)
-            instance.Layout()
+            instance.Layout {
+                instance.BeginContent(this)
+                instance.Content()
+            }
         }
     }
 

@@ -39,7 +39,7 @@ abstract class Application<out A : Application<A>>(
     protected open fun onCreate() {}
 
     @Composable
-    protected abstract fun Content()
+    abstract fun Content()
 
     val context: Context = Context(delegate)
 

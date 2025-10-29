@@ -20,8 +20,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         initialize()
 
         ComposeViewport(viewportContainer = document.body!!) {
-            BeginContent()
-            Layout()
+            Layout {
+                BeginContent()
+                Content()
+            }
         }
     }
 }

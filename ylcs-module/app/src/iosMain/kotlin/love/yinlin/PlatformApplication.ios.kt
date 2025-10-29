@@ -27,8 +27,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 delegate = buildDelegate(uiViewController)
             }
         ) {
-            BeginContent()
-            Layout()
+            Layout {
+                BeginContent()
+                Content()
+            }
         }
 
         return uiViewController
