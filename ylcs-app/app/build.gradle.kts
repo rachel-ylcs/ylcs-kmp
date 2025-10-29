@@ -285,8 +285,11 @@ compose.desktop {
         if ("desktopRun" in currentTaskName) {
             val desktopWorkSpace = C.root.app.desktopWorkSpace.asFile
             desktopWorkSpace.mkdir()
-            jvmArgs += "-Duser.dir=$desktopWorkSpace"
-            jvmArgs += "-Djava.library.path=${C.root.native.libs}"
+            jvmArgs += arrayOf(
+                "-Duser.dir=$desktopWorkSpace",
+                "-Djava.library.path=${C.root.native.libs}",
+                "--enable-native-access=ALL-UNNAMED"
+            )
         }
 
         buildTypes.release.proguard {
