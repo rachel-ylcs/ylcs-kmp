@@ -69,8 +69,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
 //        }
     }
 
-    private val loadNativeLibrary by sync(priority = StartupDelegate.HIGH9) { System.loadLibrary("ylcs_native") }
-
     private val setupVLC by sync(priority = StartupDelegate.HIGH3) {
         val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
             when (platform) {

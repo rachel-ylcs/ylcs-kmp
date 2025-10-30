@@ -11,6 +11,11 @@ annotation class StartupArg(val index: Int, val name: String, val type: KClass<*
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @MustBeDocumented
+@Retention(AnnotationRetention.SOURCE)
+annotation class StartupArgList(val name: String, val type: KClass<*>)
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@MustBeDocumented
 @Repeatable
 @Retention(AnnotationRetention.SOURCE)
 annotation class StartupHandler(val index: Int, val name: String, val handlerType: KClass<*>, val returnType: KClass<*>, vararg val argTypes: KClass<*>)

@@ -19,6 +19,7 @@ import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.Data
+import love.yinlin.data.NativeLibrary
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.PlatformMusicType
@@ -111,6 +112,11 @@ class AppConfig : StartupConfig() {
 
 @Stable
 abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<RachelApplication>(appReference, delegate) {
+    private val loadNativeLibrary by system(
+        NativeLibrary("ylcs_native", *Platform.Desktop),
+        factory = ::StartupNativeLibrary
+    )
+
     val os by service(
         Local.info.appName,
         factory = ::StartupOS

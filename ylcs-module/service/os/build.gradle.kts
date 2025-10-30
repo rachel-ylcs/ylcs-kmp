@@ -55,6 +55,14 @@ kotlin {
             )
         }
 
+        val jvmMain by creating {
+            useSourceSet(commonMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(jvmMain)
+        }
+
         val iosMain = iosMain.get().apply {
             useSourceSet(commonMain)
         }
@@ -72,6 +80,10 @@ kotlin {
             it.configure {
                 useSourceSet(iosMain)
             }
+        }
+
+        val desktopMain by getting {
+            useSourceSet(jvmMain)
         }
     }
 }
