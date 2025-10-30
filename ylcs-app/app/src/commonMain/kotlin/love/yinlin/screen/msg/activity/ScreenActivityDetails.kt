@@ -25,7 +25,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
 import love.yinlin.resources.Res

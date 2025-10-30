@@ -12,7 +12,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 
 @Composable
 internal fun <T> SwipePaginationColumn(

@@ -32,8 +32,8 @@ import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.Uri
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ImageQuality
+import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.graphics.ImageCompress
 import love.yinlin.compose.graphics.ImageCrop
 import love.yinlin.compose.graphics.ImageProcessor

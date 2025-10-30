@@ -14,7 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.rememberState
 
 @Composable

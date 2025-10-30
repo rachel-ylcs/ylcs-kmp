@@ -37,7 +37,7 @@ import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.LocalAnimationSpeed
 import love.yinlin.compose.component.url_image.resources.Res
 import love.yinlin.compose.component.url_image.resources.placeholder_pic
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.roundToIntOffset
 import love.yinlin.compose.ui.node.condition
 import org.jetbrains.compose.resources.imageResource

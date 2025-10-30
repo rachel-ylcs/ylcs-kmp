@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.Colors
-import love.yinlin.compose.data.ImageCropResult
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageCropResult
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.rememberRefState
 import love.yinlin.compose.translate

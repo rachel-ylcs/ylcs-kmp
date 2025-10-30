@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 
 @Composable
 fun <T> SwipePaginationGrid(

@@ -38,7 +38,7 @@ import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.UriGenerator
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.SubScreen

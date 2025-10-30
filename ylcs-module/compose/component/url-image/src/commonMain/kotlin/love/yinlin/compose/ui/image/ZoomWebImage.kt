@@ -8,7 +8,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.ability.progressIndicator
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.rememberSketchZoomState
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 
 @Composable
 fun ZoomWebImage(

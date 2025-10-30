@@ -3,8 +3,8 @@ package love.yinlin.compose.graphics
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import love.yinlin.compose.data.ImageCropResult
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageCropResult
+import love.yinlin.data.compose.ImageQuality
 import kotlin.math.*
 
 @Target(AnnotationTarget.VALUE_PARAMETER)

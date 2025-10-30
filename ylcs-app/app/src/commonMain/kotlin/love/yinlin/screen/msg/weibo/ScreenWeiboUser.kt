@@ -23,11 +23,11 @@ import kotlinx.serialization.Serializable
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser

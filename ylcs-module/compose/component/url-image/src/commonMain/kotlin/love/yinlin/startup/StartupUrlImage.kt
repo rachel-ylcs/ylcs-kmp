@@ -12,7 +12,7 @@ import love.yinlin.StartupArg
 import love.yinlin.StartupArgs
 import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
 

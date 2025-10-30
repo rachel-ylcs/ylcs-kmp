@@ -34,7 +34,7 @@ import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.UriGenerator
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.ColorfulIcon

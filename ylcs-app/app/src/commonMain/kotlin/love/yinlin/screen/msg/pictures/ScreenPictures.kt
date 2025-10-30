@@ -26,7 +26,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.*

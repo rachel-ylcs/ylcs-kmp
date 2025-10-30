@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 
 @Composable
 internal fun <T> SwipePaginationStaggeredGrid(

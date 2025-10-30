@@ -8,8 +8,8 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.asInputStream
 import kotlinx.io.asOutputStream
-import love.yinlin.compose.data.ImageCropResult
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageCropResult
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.platform.Coroutines
 
 actual typealias ImageOwner = Bitmap

@@ -13,7 +13,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.safeToSources
 import love.yinlin.compose.ui.layout.ActionScope

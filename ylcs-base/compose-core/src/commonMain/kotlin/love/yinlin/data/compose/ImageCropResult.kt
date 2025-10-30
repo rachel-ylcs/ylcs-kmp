@@ -1,4 +1,4 @@
-package love.yinlin.compose.data
+package love.yinlin.data.compose
 
 import androidx.compose.runtime.Stable
 

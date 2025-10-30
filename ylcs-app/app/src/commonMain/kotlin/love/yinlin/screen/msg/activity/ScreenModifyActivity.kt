@@ -12,13 +12,13 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.Device
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
 import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.extension.safeToSources

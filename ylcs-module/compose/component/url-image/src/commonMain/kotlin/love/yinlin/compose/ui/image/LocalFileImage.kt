@@ -12,7 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.ui.node.condition
 
 @Composable

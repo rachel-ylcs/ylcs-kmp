@@ -23,7 +23,7 @@ import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.graphics.ImageCrop
 import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.screen.CommonScreen

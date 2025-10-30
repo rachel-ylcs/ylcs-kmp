@@ -23,7 +23,7 @@ import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.WebImage

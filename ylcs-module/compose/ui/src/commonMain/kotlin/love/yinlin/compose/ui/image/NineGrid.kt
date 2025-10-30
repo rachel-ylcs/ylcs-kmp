@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.Picture
 
 @Composable
 fun NineGrid(

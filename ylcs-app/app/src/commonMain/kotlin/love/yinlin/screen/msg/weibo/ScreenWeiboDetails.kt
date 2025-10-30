@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading

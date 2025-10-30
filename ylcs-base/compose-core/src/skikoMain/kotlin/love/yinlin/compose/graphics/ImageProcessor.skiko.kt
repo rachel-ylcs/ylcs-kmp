@@ -4,8 +4,8 @@ import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.readByteArray
-import love.yinlin.compose.data.ImageCropResult
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.data.compose.ImageCropResult
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.platform.Coroutines
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas

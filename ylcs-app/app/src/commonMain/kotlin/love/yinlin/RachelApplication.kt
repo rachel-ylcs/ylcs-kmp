@@ -13,8 +13,8 @@ import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.LocalAnimationSpeed
 import love.yinlin.compose.ThemeMode
-import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.data.Picture
+import love.yinlin.data.compose.ImageQuality
+import love.yinlin.data.compose.Picture
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
@@ -50,7 +50,6 @@ import love.yinlin.startup.*
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
-import kotlin.getValue
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
 class AppConfig : StartupConfig() {
