@@ -5,9 +5,9 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.extension.Sources
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.safeToSources
+import love.yinlin.io.Sources
+import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.platform.openFileDialog

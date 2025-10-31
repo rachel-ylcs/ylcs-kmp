@@ -6,6 +6,6 @@ import androidx.compose.ui.Modifier
 @Composable
 actual fun Modifier.dragAndDrop(
     enabled: Boolean,
-    flag: Int,
+    flag: DragFlag,
     onDrop: (DropResult) -> Unit
 ): Modifier = this

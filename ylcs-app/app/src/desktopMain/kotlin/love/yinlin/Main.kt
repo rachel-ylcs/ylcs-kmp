@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.window.ApplicationScope
+import kotlinx.coroutines.runBlocking
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.MimeType
@@ -17,11 +18,11 @@ import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
 import love.yinlin.startup.StartupSingleInstance
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import kotlin.io.path.Path
 
 fun main() = object : RachelApplication(PlatformContextDelegate) {
-    override val title: StringResource = Res.string.app_name
+    override val title: String = runBlocking { getString(Res.string.app_name) }
     override val icon: DrawableResource = Res.drawable.img_logo
     override val actionAlwaysOnTop: Boolean = true
     override val tray: Boolean = true

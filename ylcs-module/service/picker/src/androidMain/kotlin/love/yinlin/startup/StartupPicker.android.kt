@@ -16,8 +16,8 @@ import kotlinx.io.asSource
 import kotlinx.io.buffered
 import love.yinlin.Context
 import love.yinlin.data.MimeType
-import love.yinlin.extension.Sources
-import love.yinlin.extension.safeToSources
+import love.yinlin.io.Sources
+import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.StartupArgs

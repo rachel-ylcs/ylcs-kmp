@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.ui.floating.BallonTip
 import love.yinlin.compose.ui.image.ClickIcon
@@ -57,7 +56,7 @@ sealed class ActionScope(private val ltr: Boolean) {
         icon: ImageVector,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
-        onClick: suspend CoroutineScope.() -> Unit
+        onClick: suspend () -> Unit
 	) {
 		val padding = if (ltr) CustomTheme.padding.horizontalSpace else CustomTheme.padding.zeroSpace
 
@@ -76,7 +75,7 @@ sealed class ActionScope(private val ltr: Boolean) {
         tip: String,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
-        onClick: suspend CoroutineScope.() -> Unit
+        onClick: suspend () -> Unit
     ) {
         BallonTip(text = tip) { ActionSuspend(icon, color, enabled, onClick) }
     }
@@ -86,7 +85,7 @@ sealed class ActionScope(private val ltr: Boolean) {
 
     @Composable
     fun ActionLayout(
-        modifier: Modifier = Modifier.Companion,
+        modifier: Modifier = Modifier,
         block: @Composable ActionScope.() -> Unit
     ) {
         Row(

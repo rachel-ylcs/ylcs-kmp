@@ -71,6 +71,11 @@ class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
     val outputFile = outputs.file(c.server.outputName)
 }
 
+class ModManagerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("mod-manager") {
+    private val build = dir("build")
+    val desktopOriginOutput = build.dir("compose").dir("binaries").dir("main-release").dir("app")
+}
+
 class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val buildSrc = BuildSrcNode(this)
     val config = ConfigNode(this, c)
@@ -82,6 +87,7 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val cs = CSNode(this)
     val app = AppNode(this, c)
     val server = ServerNode(this, c)
+    val modManager = ModManagerNode(this, c)
     val libsVersion = file("libs.version.toml")
     val license = file("LICENSE")
     val localProperties = file("local.properties")

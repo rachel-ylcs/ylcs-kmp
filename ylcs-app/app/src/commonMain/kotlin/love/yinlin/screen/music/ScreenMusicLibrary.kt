@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.*
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
@@ -221,7 +220,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
             val deleteItems = selectIdList
             for (item in deleteItems) {
                 val removeItem = factory.musicLibrary.remove(item)
-                if (removeItem != null) SystemFileSystem.deleteRecursively(removeItem.path)
+                removeItem?.path?.deleteRecursively()
             }
             resetLibrary()
         }

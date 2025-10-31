@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
@@ -182,7 +181,7 @@ fun LoadingIcon(
     color: Color = MaterialTheme.colorScheme.onSurface,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isLoading by rememberFalse()
@@ -220,7 +219,7 @@ fun LoadingIcon(
     color: Color = MaterialTheme.colorScheme.onSurface,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     BallonTip(text = tip) { LoadingIcon(icon, size, color, enabled, modifier, onClick) }
 }

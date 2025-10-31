@@ -3,7 +3,7 @@ package love.yinlin.startup
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.data.MimeType
-import love.yinlin.extension.Sources
+import love.yinlin.io.Sources
 import love.yinlin.platform.Platform
 import love.yinlin.Context
 import love.yinlin.StartupArgs

@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import love.yinlin.compose.CustomTheme
+import love.yinlin.compose.DefaultIcon
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.AppTopBar
@@ -30,8 +32,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun BeginContent() {}
 
-    protected abstract val title: StringResource
-    protected abstract val icon: DrawableResource
+    protected open val title: String = ""
+    protected open val icon: DrawableResource? = null
     protected open val initSize: DpSize = DpSize(1200.dp, 700.dp)
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
     protected open val actionAlwaysOnTop: Boolean = false
@@ -68,8 +70,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         application(exitProcessOnExit = true) {
             Window(
                 onCloseRequest = ::exitApplication,
-                title = stringResource(title),
-                icon = painterResource(icon),
+                title = title,
+                icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
                 visible = windowVisible,
                 undecorated = true,
                 resizable = true,
@@ -87,7 +89,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
                             AppTopBar(
-                                title = stringResource(title),
+                                title = title,
                                 icon = icon,
                                 modifier = Modifier.fillMaxWidth()
                                     .background(MaterialTheme.colorScheme.primaryContainer)
@@ -153,7 +155,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 val trayState = rememberTrayState()
 
                 Tray(
-                    icon = painterResource(icon),
+                    icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
                     state = trayState,
                     onAction = {
                         onTrayClick { windowVisible = true }
@@ -162,7 +164,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
                 trayHideNotification?.let { notificationText ->
                     val notification = rememberNotification(
-                        title = stringResource(title),
+                        title = title,
                         message = notificationText,
                         type = Notification.Type.Info
                     )

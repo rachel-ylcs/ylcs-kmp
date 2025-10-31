@@ -9,6 +9,10 @@
 .DS_Store
 kotlin-js-store/
 
+# 资源目录
+ylcs-app/mod-manager/mod/
+ylcs-app/mod-manager/output/
+
 # Gradle
 .gradle/
 

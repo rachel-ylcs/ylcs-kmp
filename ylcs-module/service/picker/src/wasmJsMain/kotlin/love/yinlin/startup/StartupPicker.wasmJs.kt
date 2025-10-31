@@ -8,10 +8,10 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import love.yinlin.data.MimeType
-import love.yinlin.extension.Sources
-import love.yinlin.extension.safeToSources
 import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.ScriptWorker
+import love.yinlin.io.Sources
+import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.Context

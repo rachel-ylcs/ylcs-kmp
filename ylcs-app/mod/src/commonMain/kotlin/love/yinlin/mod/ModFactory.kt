@@ -3,20 +3,14 @@ package love.yinlin.mod
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readTo
-import love.yinlin.data.Data
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.extension.extension
-import love.yinlin.extension.nameWithoutExtension
-import love.yinlin.extension.parseJsonValue
-import love.yinlin.extension.toJsonString
+import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import kotlin.random.Random
 
@@ -52,14 +46,14 @@ object ModFactory {
 
         private suspend fun Sink.writeResource(resourcePath: Path, resource: ModResourceType) {
             Coroutines.io {
-                writeLengthString(resource.name) // 写资源名称
-                val resLength = SystemFileSystem.metadataOrNull(resourcePath)!!.size.toInt()
+                writeLengthString(resource.type) // 写资源名称
+                val resLength = resourcePath.size.toInt()
                 require(resLength > 0) { "资源长度非法 $resourcePath Length: $resLength" }
                 val times = resLength / INTERVAL
                 val remain = resLength - times * INTERVAL
                 writeInt(resLength) // 写资源长度
                 // 写资源数据
-                SystemFileSystem.source(resourcePath).buffered().use { source ->
+                resourcePath.read { source ->
                     repeat(times) {
                         source.readTo(this@writeResource, INTERVAL.toLong())
                         writeByte(Random.nextInt(127).toByte())
@@ -69,13 +63,13 @@ object ModFactory {
             }
         }
 
-        private suspend fun Sink.writeMedia(mediaPath: Path, filter: List<ModResourceType>) {
+        private suspend fun Sink.writeMedia(mediaPath: Path, filters: List<ModResourceType>) {
             Coroutines.io {
                 writeLengthString(mediaPath.name) // 写媒体ID
                 val resourcePaths = mutableListOf<Pair<Path, ModResourceType>>()
-                for (path in SystemFileSystem.list(mediaPath)) {
+                for (path in mediaPath.list()) {
                     val type = ModResourceType.fromType(path.nameWithoutExtension)
-                    if (path.extension == ModResourceType.RES_EXT && type != null && type !in filter) {
+                    if (path.extension == ModResourceType.RES_EXT && type != null && type in filters) {
                         resourcePaths += path to type
                     }
                 }
@@ -88,19 +82,16 @@ object ModFactory {
         }
 
         suspend fun process(
-            filter: List<ModResourceType> = emptyList(),
-            onProcess: (Int, Int, String) -> Unit
-        ): Data<Unit> = try {
+            filters: List<ModResourceType>,
+            onProcess: (index: Int, total: Int, name: String) -> Unit
+        ) {
             sink.writeMetadata()
             for ((index, mediaPath) in mediaPaths.withIndex()) {
-                sink.writeMedia(mediaPath, filter)
+                sink.writeMedia(mediaPath, filters)
                 Coroutines.main {
                     onProcess(index, mediaPaths.size, mediaPath.name)
                 }
             }
-            Data.Success(Unit)
-        } catch (e: Throwable) {
-            Data.Failure(throwable = e)
         }
     }
 
@@ -148,7 +139,7 @@ object ModFactory {
             val times = resLength / INTERVAL
             val remain = resLength - times * INTERVAL
             // 读资源数据
-            SystemFileSystem.sink(Path(mediaPath, type.filename)).buffered().use { sink ->
+            Path(mediaPath, type.filename).write { sink ->
                 repeat(times) {
                     readTo(sink, INTERVAL.toLong())
                     readByte()
@@ -160,7 +151,7 @@ object ModFactory {
         private suspend fun Source.readMedia(): String = Coroutines.io {
             val id = readLengthString() // 读媒体ID
             val mediaPath = Path(savePath, id)
-            SystemFileSystem.createDirectories(mediaPath)
+            mediaPath.mkdir()
             val resourceNum = readInt() // 读资源数
             repeat(resourceNum) {
                 readResource(mediaPath)
@@ -168,7 +159,7 @@ object ModFactory {
             id
         }
 
-        suspend fun process(onProcess: (Int, Int, String) -> Unit): Data<ReleaseResult> = try {
+        suspend fun process(onProcess: (index: Int, total: Int, id: String) -> Unit): ReleaseResult {
             val metadata = source.readMetadata()
             val ids = mutableListOf<String>()
             repeat(metadata.mediaNum) { index ->
@@ -178,9 +169,7 @@ object ModFactory {
                     onProcess(index, metadata.mediaNum, id)
                 }
             }
-            Data.Success(ReleaseResult(metadata, ids))
-        } catch (e: Throwable) {
-            Data.Failure(throwable = e)
+            return ReleaseResult(metadata, ids)
         }
     }
 
@@ -237,15 +226,13 @@ object ModFactory {
             MediaItem(id, mainConfig, resources)
         }
 
-        suspend fun process(): Data<PreviewResult> = try {
+        suspend fun process(): PreviewResult {
             val metadata = source.readMetadata()
             val medias = mutableListOf<MediaItem>()
             repeat(metadata.mediaNum) {
                 medias += source.previewMedia()
             }
-            Data.Success(PreviewResult(metadata, medias))
-        } catch (e: Throwable) {
-            Data.Failure(throwable = e)
+            return PreviewResult(metadata, medias)
         }
     }
 }

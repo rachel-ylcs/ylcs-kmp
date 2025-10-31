@@ -17,7 +17,7 @@ import org.w3c.files.get
 @Composable
 actual fun Modifier.dragAndDrop(
     enabled: Boolean,
-    flag: Int,
+    flag: DragFlag,
     onDrop: (DropResult) -> Unit
 ): Modifier = if (enabled) dragAndDropTarget(
     shouldStartDragAndDrop = { event ->
@@ -25,8 +25,8 @@ actual fun Modifier.dragAndDrop(
         types != null && run {
             val acceptText = MimeType.TEXT in types
             val acceptFile = "files" in types
-            (acceptText && (flag and DragFlag.TEXT == DragFlag.TEXT)) ||
-                    (acceptFile && (flag and DragFlag.FILE == DragFlag.FILE))
+            (acceptText && (flag and DragFlag.Text == DragFlag.Text)) ||
+                    (acceptFile && (flag and DragFlag.File == DragFlag.File))
         }
     },
     target = remember(onDrop) { object : DragAndDropTarget {

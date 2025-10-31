@@ -9,10 +9,10 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
-import love.yinlin.extension.Sources
-import love.yinlin.extension.safeToSources
 import love.yinlin.extension.toNSData
+import love.yinlin.io.safeToSources
 import love.yinlin.io.SandboxSource
+import love.yinlin.io.Sources
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
 import love.yinlin.Context

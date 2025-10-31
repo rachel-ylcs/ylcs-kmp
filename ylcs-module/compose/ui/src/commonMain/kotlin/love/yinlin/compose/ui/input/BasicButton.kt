@@ -18,7 +18,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.animation.LoadingAnimation
@@ -152,7 +151,7 @@ fun LoadingClickText(
     color: Color = MaterialTheme.colorScheme.primary,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isLoading by rememberFalse()
@@ -260,7 +259,7 @@ private fun LoadingBasicButton(
     contentColor: Color,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isLoading by rememberFalse()
@@ -297,7 +296,7 @@ fun LoadingPrimaryButton(
     icon: ImageVector? = null,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     LoadingBasicButton(
         text = text,
@@ -316,7 +315,7 @@ fun LoadingSecondaryButton(
     icon: ImageVector? = null,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     LoadingBasicButton(
         text = text,
@@ -335,7 +334,7 @@ fun LoadingTertiaryButton(
     icon: ImageVector? = null,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: suspend CoroutineScope.() -> Unit
+    onClick: suspend () -> Unit
 ) {
     LoadingBasicButton(
         text = text,

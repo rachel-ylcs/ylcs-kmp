@@ -12,7 +12,7 @@ internal data object RhymeConfig {
     const val LOCK_SCRIM_ALPHA = 0.5f // 锁定遮罩透明度
 }
 
-internal val Size.Companion.Game get() = Size(1920f, 1080f)
+internal val Size.Game get() = Size(1920f, 1080f)
 
 // 图片资源集
 @Stable

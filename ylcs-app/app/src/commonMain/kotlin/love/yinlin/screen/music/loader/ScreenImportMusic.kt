@@ -265,7 +265,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
             .padding(CustomTheme.padding.equalExtraValue)
             .dragAndDrop(
                 enabled = step is Step.Initial || step is Step.Prepare,
-                flag = DragFlag.FILE,
+                flag = DragFlag.File,
                 onDrop = {
                     val files = (it as? DropResult.File)?.path
                     if (files != null) {

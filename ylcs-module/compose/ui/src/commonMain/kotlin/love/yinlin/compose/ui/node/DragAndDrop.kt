@@ -5,10 +5,19 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 
+@ConsistentCopyVisibility
 @Stable
-data object DragFlag {
-    const val FILE = 1
-    const val TEXT = 2
+data class DragFlag private constructor(val value: Int) {
+    infix fun and(other: DragFlag): DragFlag = DragFlag(value and other.value)
+    infix fun or(other: DragFlag): DragFlag = DragFlag(value or other.value)
+
+    override fun equals(other: Any?): Boolean = (other as? DragFlag)?.value == value
+    override fun hashCode(): Int = value
+
+    companion object {
+        val File = DragFlag(1)
+        val Text = DragFlag(2)
+    }
 }
 
 @Stable
@@ -22,6 +31,6 @@ sealed interface DropResult {
 @Composable
 expect fun Modifier.dragAndDrop(
     enabled: Boolean,
-    flag: Int,
+    flag: DragFlag,
     onDrop: (DropResult) -> Unit
 ): Modifier

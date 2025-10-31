@@ -16,7 +16,7 @@ enum class ModResourceType(
         base = true,
     ),
     Audio(
-        type = "flac",
+        type = "audio",
         description = "音源",
         base = true,
     ),

@@ -17,10 +17,10 @@ kotlin {
     sourceSets {
         jvmMain.configure {
             useLib(
-                projects.ylcsBase.composeCore,
                 projects.ylcsApp.mod,
+                projects.ylcsModule.app,
+                projects.ylcsModule.compose.component.urlImage,
                 libs.compose.components.resources,
-                compose.desktop.currentOs,
             )
         }
     }
@@ -40,12 +40,43 @@ compose.desktop {
 
         nativeDistributions {
             packageName = C.modManager.name
+            packageVersion = C.app.versionName
+            description = C.app.description
+            copyright = C.app.copyright
+            vendor = C.app.vendor
 
             targetFormats(TargetFormat.Exe)
+
+            modules(*C.desktop.modules)
 
             windows {
                 console = false
             }
         }
+    }
+}
+
+afterEvaluate {
+    val run = tasks.named("run")
+    val createReleaseDistributable = tasks.named("createReleaseDistributable")
+
+    // 运行 桌面程序 Debug
+    val modManagerRunDebug by tasks.registering {
+        dependsOn(run)
+    }
+
+    val modManagerCopyDir by tasks.registering {
+        mustRunAfter(createReleaseDistributable)
+        doLast {
+            copy {
+                from(C.root.modManager.desktopOriginOutput)
+                into(C.root.outputs)
+            }
+        }
+    }
+
+    val modManagerPublish by tasks.registering {
+        dependsOn(createReleaseDistributable)
+        dependsOn(modManagerCopyDir)
     }
 }

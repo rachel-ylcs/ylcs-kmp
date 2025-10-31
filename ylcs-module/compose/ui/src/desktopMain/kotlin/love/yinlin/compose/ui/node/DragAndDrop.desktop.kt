@@ -16,15 +16,15 @@ import java.io.File
 @Composable
 actual fun Modifier.dragAndDrop(
     enabled: Boolean,
-    flag: Int,
+    flag: DragFlag,
     onDrop: (DropResult) -> Unit
 ): Modifier = if (enabled) dragAndDropTarget(
     shouldStartDragAndDrop = { event ->
         val transferable = event.awtTransferable
         val acceptText = transferable.isDataFlavorSupported(DataFlavor.stringFlavor)
         val acceptFile = transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-        (acceptText && (flag and DragFlag.TEXT == DragFlag.TEXT)) ||
-                (acceptFile && (flag and DragFlag.FILE == DragFlag.FILE))
+        (acceptText && (flag and DragFlag.Text == DragFlag.Text)) ||
+                (acceptFile && (flag and DragFlag.File == DragFlag.File))
     },
     target = remember(onDrop) { object : DragAndDropTarget {
         override fun onDrop(event: DragAndDropEvent): Boolean {

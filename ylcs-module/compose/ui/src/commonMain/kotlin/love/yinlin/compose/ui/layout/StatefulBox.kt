@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.animation.LoadingAnimation
@@ -140,7 +139,7 @@ fun EmptyBox(
 fun NetWorkErrorBox(
     text: String = stringResource(Res.string.network_error_state_string),
     icon: DrawableResource = Res.drawable.img_state_network_error,
-    retry: (suspend CoroutineScope.() -> Unit)? = null,
+    retry: (suspend () -> Unit)? = null,
     retryText: String = stringResource(Res.string.network_error_retry_string)
 ) {
     Box(
@@ -191,7 +190,7 @@ fun StatusBox(
 @Composable
 fun StatefulBox(
     state: BoxState,
-    retry: (suspend CoroutineScope.() -> Unit)? = null,
+    retry: (suspend () -> Unit)? = null,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {

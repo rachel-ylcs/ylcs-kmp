@@ -8,6 +8,14 @@ data class Reference<T>(var value: T) {
 }
 
 inline fun catching(block: () -> Unit): Unit = try { block() } catch (_: Throwable) {}
+
+inline fun catchingError(block: () -> Unit): Throwable? = try {
+    block()
+    null
+} catch (e: Throwable) { e }
+
 inline fun <R> catchingNull(block: () -> R): R? = try { block() } catch (_: Throwable) { null }
+
 inline fun <R> catchingDefault(default: R, block: () -> R): R = try { block() } catch (_: Throwable) { default }
+
 inline fun <R> catchingDefault(default: () -> R, block: () -> R): R = try { block() } catch (_: Throwable) { default() }
