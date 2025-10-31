@@ -9,7 +9,8 @@ kotlin {
     sourceSets {
         main.configure {
             useLib(
-                libs.kotlinx.coroutines
+                libs.kotlinx.io,
+                libs.kotlinx.coroutines,
             )
         }
     }

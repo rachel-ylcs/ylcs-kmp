@@ -1,3 +1,3 @@
-suspend fun main() {
+fun main() {
 
 }

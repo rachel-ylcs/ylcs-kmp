@@ -339,7 +339,7 @@ val result = ClientAPI.request(
 
 music 模块是应用 MOD 存储协议及序列化与反序列化的核心实现, 被多平台客户端和 MOD 管理器调用
 
-具体协议可参看 [Music 模组协议文档](docs/markdown/music.md)
+具体协议可参看 [Music 模组协议文档](ylcs-app/mod/mod.md)
 
 ### MOD 管理器 modManager
 

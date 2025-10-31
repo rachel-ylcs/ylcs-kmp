@@ -7,29 +7,9 @@ import kotlinx.io.files.FileSystem
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 
-
-
-
-
-class Sources<S : RawSource>(
-    private val sources: MutableList<S> = mutableListOf()
-) : AutoCloseable, MutableList<S> by sources {
-    override fun close() {
-        for (source in sources) source.close()
-    }
-}
-
-inline fun <T, S : RawSource> Collection<T>.safeToSources(crossinline block: (T) -> S?): Sources<S>? {
-    val sources = Sources<S>()
-    return try {
-        for (item in this) block(item)?.let { sources += it }
-        sources
-    }
-    catch (_: Throwable) {
-        sources.close()
-        null
-    }
-}
+val Path.path: String get() = this.toString()
+val Path.extension: String get() = this.name.substringAfterLast('.')
+val Path.nameWithoutExtension: String get() = this.name.substringBeforeLast('.')
 
 fun FileSystem.deleteRecursively(path: Path, mustExist: Boolean = true) {
     if (mustExist && !SystemFileSystem.exists(path)) throw FileNotFoundException("File does not exist: $path")
@@ -52,5 +32,25 @@ fun FileSystem.deleteRecursively(path: Path, mustExist: Boolean = true) {
                 } else queue.addAll(0, list)
             }
         }
+    }
+}
+
+class Sources<S : RawSource>(
+    private val sources: MutableList<S> = mutableListOf()
+) : AutoCloseable, MutableList<S> by sources {
+    override fun close() {
+        for (source in sources) source.close()
+    }
+}
+
+inline fun <T, S : RawSource> Collection<T>.safeToSources(crossinline block: (T) -> S?): Sources<S>? {
+    val sources = Sources<S>()
+    return try {
+        for (item in this) block(item)?.let { sources += it }
+        sources
+    }
+    catch (_: Throwable) {
+        sources.close()
+        null
     }
 }
