@@ -33,13 +33,12 @@ import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
+import love.yinlin.compose.ui.container.lyrics.LrcEngine
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
@@ -53,7 +52,6 @@ import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.layout.*
-import love.yinlin.compose.ui.lyrics.LyricsLrc
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.Space
@@ -104,13 +102,14 @@ private fun PlayingMusicStatusCard(
 class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	private val mp = app.mp
 
+	private val lyrics = LrcEngine()
+
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
 
 	private var currentDebounceTime by mutableLongStateOf(0L)
 	private var hasAnimation by mutableStateOf(false)
 	private var hasVideo by mutableStateOf(false)
-	private var lyrics = LyricsLrc()
 
 	private var sleepJob: Job? by mutableRefStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
@@ -553,7 +552,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
 		Box(modifier = modifier) {
-			lyrics.Content(
+			lyrics.Layout(
 				modifier = Modifier.fillMaxSize(),
 				onLyricsClick = {
 					launch {
@@ -770,7 +769,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 			// 处理进度条
 			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
-			val newLine = lyrics.updateIndex(position)
+			lyrics.updateIndex(position)
 			// TODO: 处理悬浮歌词
 //			factory.floatingLyrics?.let {
 //				if (it.isAttached) it.updateLyrics(newLine)

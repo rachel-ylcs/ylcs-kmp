@@ -3,12 +3,12 @@ package love.yinlin.api
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.compose.ui.container.lyrics.LrcParser
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
 import love.yinlin.platform.safeGet
-import love.yinlin.compose.ui.lyrics.LyricsLrc
 
 object NetEaseCloudAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
@@ -37,7 +37,7 @@ object NetEaseCloudAPI {
         url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
     ) { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
-        LyricsLrc.Parser(text).toString()
+        LrcParser(text).toString()
     }
 
     suspend fun requestMusic(id: String): Data<PlatformMusicInfo> {
