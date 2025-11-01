@@ -20,6 +20,7 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.Data
 import love.yinlin.data.NativeLibrary
+import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.PlatformMusicType
@@ -43,10 +44,8 @@ import love.yinlin.screen.msg.douyin.*
 import love.yinlin.screen.msg.pictures.*
 import love.yinlin.screen.msg.weibo.*
 import love.yinlin.screen.music.*
-import love.yinlin.screen.music.loader.*
 import love.yinlin.screen.world.*
 import love.yinlin.screen.world.battle.*
-import love.yinlin.screen.world.single.rhyme.*
 import love.yinlin.startup.*
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
@@ -126,7 +125,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
         Platform.useNot(Platform.WebWasm) {
             SystemFileSystem.createDirectories(os.storage.dataPath)
             SystemFileSystem.createDirectories(os.storage.cachePath)
-            SystemFileSystem.createDirectories(Paths.musicPath)
+            SystemFileSystem.createDirectories(Paths.modPath)
         }
     }
 
@@ -170,8 +169,32 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
         factory = ::AppConfig,
     )
 
-    val musicFactory by service(
-        factory = ::StartupMusicFactory
+    val mp by service(
+        StartupLazyFetcher { Paths.modPath },
+        object : StartupMusicPlayer.Listener {
+            override fun StartupMusicPlayer.onMusicChanged(musicInfo: MusicInfo?) {
+                val lastPlaylist = playlist?.name ?: ""
+                config.lastPlaylist = lastPlaylist
+                if (lastPlaylist.isNotEmpty()) musicInfo?.let { config.lastMusic = it.id }
+                else config.lastMusic = ""
+            }
+
+            override fun StartupMusicPlayer.onPlayModeChanged(mode: MusicPlayMode) {
+                config.musicPlayMode = mode
+            }
+
+            override fun StartupMusicPlayer.onPlayerStop() {
+                config.lastPlaylist = ""
+                config.lastMusic = ""
+            }
+
+            override val onLastStatusResume: StartupMusicPlayer.LastStatus get() = StartupMusicPlayer.LastStatus(
+                playMode = config.musicPlayMode,
+                playlist = config.playlistLibrary[config.lastPlaylist],
+                musicId = config.lastMusic
+            )
+        },
+        factory = ::buildMusicPlayer
     )
 
     override val themeMode: ThemeMode get() = config.themeMode
@@ -226,15 +249,15 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             // 听歌
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlaylistLibrary)
-            screen(::ScreenFloatingLyrics)
-            screen(::ScreenMusicDetails)
-
-            screen(::ScreenMusicModFactory)
-            screen(::ScreenSongDetails, type<Song>())
-
-            screen(::ScreenImportMusic)
-            screen(::ScreenCreateMusic)
-            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
+//            screen(::ScreenFloatingLyrics)
+//            screen(::ScreenMusicDetails)
+//
+//            screen(::ScreenMusicModFactory)
+//            screen(::ScreenSongDetails, type<Song>())
+//
+//            screen(::ScreenImportMusic)
+//            screen(::ScreenCreateMusic)
+//            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
 
 
             // 世界
@@ -247,15 +270,15 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
             screen(::ScreenGuessLyrics)
 
-            screen(::ScreenRhyme)
+            // screen(::ScreenRhyme)
         }
     }
 
     override fun onDeepLink(manager: ScreenManager, uri: Uri) {
         when (uri.scheme) {
             Scheme.File, Scheme.Content -> {
-                if (!musicFactory.instance.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
-                else manager.top.slot.tip.warning("请先停止播放器")
+//                if (!mp.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
+//                else manager.top.slot.tip.warning("请先停止播放器")
             }
             Scheme.Rachel -> {
                 when (uri.path) {
@@ -265,31 +288,31 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
                         }
                     }
                     "/openSong" -> {
-                        uri.params["id"]?.let { id ->
-                            manager.top.launch {
-                                val result = ClientAPI.request(
-                                    route = API.User.Song.GetSong,
-                                    data = id
-                                )
-                                if (result is Data.Success) manager.navigate(ScreenSongDetails.Args(result.data))
-                            }
-                        }
+//                        uri.params["id"]?.let { id ->
+//                            manager.top.launch {
+//                                val result = ClientAPI.request(
+//                                    route = API.User.Song.GetSong,
+//                                    data = id
+//                                )
+//                                if (result is Data.Success) manager.navigate(ScreenSongDetails.Args(result.data))
+//                            }
+//                        }
                     }
                 }
             }
             Scheme.QQMusic -> {
-                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
-                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
-                    type = PlatformMusicType.QQMusic
-                ))
-                else manager.top.slot.tip.warning("请先停止播放器")
+//                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
+//                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
+//                    type = PlatformMusicType.QQMusic
+//                ))
+//                else manager.top.slot.tip.warning("请先停止播放器")
             }
             Scheme.NetEaseCloud -> {
-                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
-                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
-                    type = PlatformMusicType.NetEaseCloud
-                ))
-                else manager.top.slot.tip.warning("请先停止播放器")
+//                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
+//                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
+//                    type = PlatformMusicType.NetEaseCloud
+//                ))
+//                else manager.top.slot.tip.warning("请先停止播放器")
             }
         }
     }

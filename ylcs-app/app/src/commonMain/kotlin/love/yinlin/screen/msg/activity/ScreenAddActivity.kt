@@ -15,12 +15,12 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
-import love.yinlin.extension.safeToSources
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
+import love.yinlin.io.safeToSources
 
 @Stable
 class ScreenAddActivity(manager: ScreenManager) : CommonScreen(manager) {

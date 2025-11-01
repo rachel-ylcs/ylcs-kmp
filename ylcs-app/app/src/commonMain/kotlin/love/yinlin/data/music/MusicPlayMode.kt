@@ -15,6 +15,8 @@ enum class MusicPlayMode {
     }
 
     companion object {
+        val DEFAULT = ORDER
+
         fun fromInt(value: Int): MusicPlayMode? = when (value) {
             ORDER.ordinal -> ORDER
             LOOP.ordinal -> LOOP

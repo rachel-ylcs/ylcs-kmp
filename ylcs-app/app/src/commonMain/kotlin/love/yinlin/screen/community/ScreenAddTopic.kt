@@ -32,7 +32,6 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
-import love.yinlin.extension.safeToSources
 import love.yinlin.compose.ui.image.ImageAdder
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.SingleSelector
@@ -41,6 +40,7 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
+import love.yinlin.io.safeToSources
 
 @Stable
 class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {

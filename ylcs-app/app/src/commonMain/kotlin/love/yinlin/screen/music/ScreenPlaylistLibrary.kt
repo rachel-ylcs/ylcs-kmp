@@ -108,7 +108,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 
 @Stable
 class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val factory = app.musicFactory.instance
+    private val mp = app.mp
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
@@ -144,7 +144,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                 val name = tabs[index]
                 if (slot.confirm.openSuspend(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
-                    if (factory.currentPlaylist?.name == name) factory.stop()
+                    if (mp.playlist?.name == name) mp.stop()
                     playlistLibrary -= name
                     if (currentPage == tabs.size) currentPage = if (tabs.isEmpty()) -1 else currentPage - 1
                 }
@@ -157,7 +157,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
         val playlist = playlistLibrary[name]
         if (playlist != null) {
             if (playlist.items.isNotEmpty()) {
-                factory.startPlaylist(playlist, null, true)
+                mp.startPlaylist(playlist, null, true)
                 pop()
             }
             else slot.tip.warning("歌单中还没有添加歌曲哦")
@@ -171,8 +171,8 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
-                val playingIndex = factory.musicList.indexOfFirst { it.id == musicInfo.id }
-                if (factory.currentPlaylist?.name == name && playingIndex != -1) factory.removeMedia(playingIndex)
+                val playingIndex = mp.musicList.indexOfFirst { it.id == musicInfo.id }
+                if (mp.playlist?.name == name && playingIndex != -1) mp.removeMedia(playingIndex)
 
                 val newItems = playlist.items.toMutableList()
                 newItems -= musicInfo.id
@@ -224,9 +224,8 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
             else {
                 val playlist = playlistLibrary[tabs[currentPage]]
                 if (playlist != null) {
-                    val musicLibrary = factory.musicLibrary
                     library.replaceAll(playlist.items.fastMap {
-                        val musicInfo = musicLibrary[it]
+                        val musicInfo = mp.library[it]
                         if (musicInfo != null) MusicStatusPreview(musicInfo) else MusicStatusPreview(it)
                     })
                 }
@@ -253,7 +252,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                         onLongClick = {
                             launch { deleteMusicFromPlaylist(index) }
                         },
-                        enabledDrag = !factory.isReady,
+                        enabledDrag = !mp.isReady,
                         onDragStart = {
                             dragStartIndex = -1
                             dragEndIndex = -1
@@ -273,9 +272,8 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private data class PlaylistPreviewItem(val id: String, val name: String)
 
     private fun decodePlaylist(map: Map<String, MusicPlaylist>): Map<String, List<PlaylistPreviewItem>> {
-        val musicLibrary = factory.musicLibrary
         return map.mapValues { (_, playlist) ->
-            playlist.items.fastMap { id -> PlaylistPreviewItem(id, musicLibrary[id]?.name ?: "未知[id=$id]") }
+            playlist.items.fastMap { id -> PlaylistPreviewItem(id, mp.library[id]?.name ?: "未知[id=$id]") }
         }
     }
 
@@ -373,7 +371,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                         icon = Icons.Outlined.Download,
                         enabled = state.ok,
                         onClick = {
-                            if (!factory.isReady) {
+                            if (!mp.isReady) {
                                 if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
                                     try {
                                         val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
@@ -424,7 +422,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
                         icon = Icons.Outlined.CloudDownload,
                         onClick = {
                             if (playlists.isNotEmpty()) {
-                                if (!factory.isReady) {
+                                if (!mp.isReady) {
                                     if (slot.confirm.openSuspend(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
                                         val items = playlists.mapValues { (name, value) ->
                                             MusicPlaylist(name, value.fastMap { it.id })

@@ -1,8 +1,10 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
+import kotlinx.io.files.Path
 import kotlinx.serialization.Transient
 import kotlinx.serialization.Serializable
+import love.yinlin.data.mod.ModResourceType
 
 @Stable
 @Serializable
@@ -17,4 +19,6 @@ data class MusicInfo(
     val album: String, // 专辑
     val chorus: List<Long>?, // 副歌点
     @Transient val modification: Int = 0 // 修改标记
-)
+) {
+    fun path(root: Path, type: ModResourceType? = null) = if (type == null) Path(root, id) else Path(root, id, type.filename)
+}

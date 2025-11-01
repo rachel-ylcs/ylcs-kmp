@@ -54,6 +54,9 @@ enum class ModResourceType(
         const val MOD_EXT = "rachel"
         const val RES_EXT = "${MOD_EXT}res"
 
+        val BASE = entries.filter { it.base }
+        val ALL = entries.toList()
+
         fun fromType(type: String): ModResourceType? = when (type) {
             Config.type -> Config
             Audio.type -> Audio

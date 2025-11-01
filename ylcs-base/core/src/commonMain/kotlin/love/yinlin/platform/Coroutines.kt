@@ -14,6 +14,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 class SyncFuture<T>(private val continuation: CancellableContinuation<T?>) {
     fun send() = continuation.resumeWith(Result.success(null))
@@ -61,7 +62,8 @@ data object Coroutines {
     }
 
     suspend fun isActive(): Boolean = currentCoroutineContext().isActive
-    suspend fun startCurrent(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(currentCoroutineContext()).launch(block = block)
+    suspend fun startCurrent(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job =
+        CoroutineScope(currentCoroutineContext()).launch(context = context, block = block)
     fun startMain(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(mainContext).launch(block = block)
     fun startCPU(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(cpuContext).launch(block = block)
     fun startIO(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(ioContext).launch(block = block)

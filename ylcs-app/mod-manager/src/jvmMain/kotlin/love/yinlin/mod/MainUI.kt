@@ -297,7 +297,7 @@ class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
         private var isRunning by mutableStateOf(false)
         private val filters = mutableStateListOf<ModResourceType>()
         private var mergeMode by mutableStateOf(true)
-        private val canSubmit by derivedStateOf { ModResourceType.entries.filter { it.base }.all { it in filters } }
+        private val canSubmit by derivedStateOf { ModResourceType.BASE.all { it in filters } }
 
         private var statusText by mutableStateOf("正在打包中...")
 
@@ -325,7 +325,7 @@ class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
 
         override suspend fun initialize() {
             isRunning = false
-            filters.replaceAll(ModResourceType.entries.filter { it.base })
+            filters.replaceAll(ModResourceType.BASE)
             mergeMode = true
         }
 

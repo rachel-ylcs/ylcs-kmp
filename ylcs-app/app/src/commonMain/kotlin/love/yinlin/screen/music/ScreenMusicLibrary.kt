@@ -32,8 +32,6 @@ import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicResourceType
-import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
@@ -43,9 +41,7 @@ import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.screen.music.loader.ScreenCreateMusic
-import love.yinlin.screen.music.loader.ScreenImportMusic
-import love.yinlin.screen.music.loader.ScreenPlatformMusic
+import love.yinlin.data.mod.ModResourceType
 
 @Stable
 data class MusicInfoPreview(
@@ -57,8 +53,7 @@ data class MusicInfoPreview(
 ) {
     constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
 
-    @Stable
-    val recordPath: Path get() = Path(Paths.musicPath, this.id, MusicResourceType.Record.default.toString())
+    fun path(rootPath: Path, type: ModResourceType) = Path(rootPath, id, type.filename)
 }
 
 @Composable
@@ -85,7 +80,7 @@ private fun MusicCard(
         ) {
             Box(modifier = Modifier.aspectRatio(1f).fillMaxHeight()) {
                 LocalFileImage(
-                    path = { musicInfo.recordPath },
+                    path = { musicInfo.path(Paths.modPath, ModResourceType.Record) },
                     musicInfo,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
@@ -118,7 +113,7 @@ private fun MusicCard(
 
 @Stable
 class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
-    private val factory = app.musicFactory.instance
+    private val mp = app.mp
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
@@ -138,7 +133,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private fun resetLibrary() {
-        library.replaceAll(factory.musicLibrary.map {
+        library.replaceAll(mp.library.map {
             MusicInfoPreview(it.value)
         })
     }
@@ -158,7 +153,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private suspend fun openSearch() {
         val result = searchDialog.openSuspend()
         if (result != null) {
-            library.replaceAll(factory.musicLibrary
+            library.replaceAll(mp.library
                 .filter { it.value.name.contains(result, true) }
                 .map { MusicInfoPreview(it.value) })
             isSearching = true
@@ -175,7 +170,10 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
         if (isManaging) {
             library[index] = item.copy(selected = !item.selected)
         }
-        else navigate(ScreenMusicDetails.Args(item.id))
+        else {
+            // TODO:
+            // navigate(ScreenMusicDetails.Args(item.id))
+        }
     }
 
     private fun onCardLongClick(index: Int) {
@@ -199,10 +197,10 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
                     if (newItems.isNotEmpty()) {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
                         // 添加到当前播放的列表
-                        if (factory.currentPlaylist?.name == name) {
-                            factory.addMedias(newItems
-                                .fastFilter { id -> factory.musicList.find { it.id == id } == null }
-                                .fastMapNotNull { factory.musicLibrary[it] })
+                        if (mp.playlist?.name == name) {
+                            mp.addMedias(newItems
+                                .fastFilter { id -> mp.musicList.find { it.id == id } == null }
+                                .fastMapNotNull { mp.library[it] })
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")
                     }
@@ -215,29 +213,29 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     private suspend fun onMusicDelete() {
-        if (factory.isReady) slot.tip.warning("请先停止播放器")
+        if (mp.isReady) slot.tip.warning("请先停止播放器")
         else if (slot.confirm.openSuspend(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
             for (item in deleteItems) {
-                val removeItem = factory.musicLibrary.remove(item)
-                removeItem?.path?.deleteRecursively()
+                val removeItem = mp.library.remove(item)
+                removeItem?.path(Paths.modPath)?.deleteRecursively()
             }
             resetLibrary()
         }
     }
 
     private suspend fun onMusicPackage() {
-        if (factory.isReady) slot.tip.warning("请先停止播放器")
+        if (mp.isReady) slot.tip.warning("请先停止播放器")
         else app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
             try {
                 slot.loading.openSuspend()
                 path.sink.use { sink ->
                     val packageItems = selectIdList
                     ModFactory.Merge(
-                        mediaPaths = packageItems.fastMapNotNull { factory.musicLibrary[it]?.path },
+                        mediaPaths = packageItems.fastMapNotNull { mp.library[it]?.path(Paths.modPath) },
                         sink = sink,
                         info = ModInfo(author = app.config.userProfile?.name ?: "无名")
-                    ).process { _, _, _ -> }
+                    ).process(filters = ModResourceType.ALL) { _, _, _ -> }
                 }
                 slot.loading.close()
                 exitManagement()
@@ -251,7 +249,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     override suspend fun initialize() {
         resetLibrary()
-        monitor(state = { factory.musicLibrary }) {
+        monitor(state = { mp.library }) {
             if (isManaging) exitManagement()
             if (!isSearching) resetLibrary()
         }
@@ -341,18 +339,20 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
         val result = importDialog.openSuspend() ?: return
         if (result == ImportMusicItem.FromFactory.ordinal) {
             pop()
-            navigate<ScreenMusicModFactory>()
+            // TODO:
+            // navigate<ScreenMusicModFactory>()
         }
-        else if (factory.isReady) slot.tip.warning("请先停止播放器")
+        else if (mp.isReady) slot.tip.warning("请先停止播放器")
         else {
             pop()
-            when (result) {
-                ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
-                ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
-                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
-                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
-                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
-            }
+            // TODO:
+//            when (result) {
+//                ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
+//                ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
+//                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
+//                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
+//                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
+//            }
         }
     }
 

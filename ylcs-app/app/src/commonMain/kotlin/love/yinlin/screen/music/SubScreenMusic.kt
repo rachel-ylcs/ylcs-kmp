@@ -33,9 +33,6 @@ import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.io.buffered
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readString
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -43,13 +40,10 @@ import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
-import love.yinlin.data.Data.Failure
-import love.yinlin.data.Data.Success
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.MusicFactory
 import love.yinlin.resources.Res
 import love.yinlin.resources.img_music_record
 import love.yinlin.resources.no_audio_source
@@ -65,7 +59,9 @@ import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.SplitActionLayout
 import love.yinlin.compose.ui.layout.SplitLayout
+import love.yinlin.data.mod.ModResourceType
 import love.yinlin.screen.common.ScreenVideo
+import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -106,7 +102,7 @@ private fun PlayingMusicStatusCard(
 
 @Stable
 class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
-	private val factory = app.musicFactory.instance
+	private val mp = app.mp
 
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
@@ -120,17 +116,18 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
 	private fun openMusicComment() {
-		factory.currentMusic?.let { musicInfo ->
-			launch {
-				val result = ClientAPI.request(
-					route = API.User.Song.GetSong,
-					data = musicInfo.id
-				)
-				when (result) {
-					is Success -> navigate(ScreenSongDetails.Args(song = result.data))
-					is Failure -> slot.tip.error(result.message)
-				}
-			}
+		mp.currentMusic?.let { musicInfo ->
+			// TODO: 歌曲详情
+//			launch {
+//				val result = ClientAPI.request(
+//					route = API.User.Song.GetSong,
+//					data = musicInfo.id
+//				)
+//				when (result) {
+//					is Success -> navigate(ScreenSongDetails.Args(song = result.data))
+//					is Failure -> slot.tip.error(result.message)
+//				}
+//			}
 		}
 	}
 
@@ -150,9 +147,12 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		modifier: Modifier = Modifier
 	) {
 		Box(modifier = modifier) {
-			factory.currentMusic?.let { musicInfo ->
+			mp.currentMusic?.let { musicInfo ->
 				LocalFileImage(
-					path = { if (isAnimationBackground) musicInfo.AnimationPath else musicInfo.backgroundPath },
+					path = { musicInfo.path(
+						root = Paths.modPath,
+						type = if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background
+					) },
 					musicInfo, isAnimationBackground,
 					contentScale = ContentScale.Crop,
 					alpha = alpha,
@@ -172,7 +172,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "曲库",
                     color = Colors.White
                 ) {
-                    if (factory.isInit) navigate<ScreenMusicLibrary>()
+                    if (mp.isInit) navigate<ScreenMusicLibrary>()
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -180,7 +180,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌单",
                     color = Colors.White
                 ) {
-                    if (factory.isInit) navigate<ScreenPlaylistLibrary>()
+                    if (mp.isInit) navigate<ScreenPlaylistLibrary>()
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -188,8 +188,9 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌词",
                     color = Colors.White
                 ) {
-                    if (factory.isInit) navigate<ScreenFloatingLyrics>()
-                    else slot.tip.warning("播放器尚未初始化")
+					// TODO:
+//                    if (mp.isInit) navigate<ScreenFloatingLyrics>()
+//                    else slot.tip.warning("播放器尚未初始化")
                 }
             },
             right = {
@@ -213,8 +214,8 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		var lastDegree by rememberValueState(0f)
 		val isForeground = rememberOffScreenState()
 
-		LaunchedEffect(factory.isPlaying, isForeground) {
-			if (factory.isPlaying && isForeground) {
+		LaunchedEffect(mp.isPlaying, isForeground) {
+			if (mp.isPlaying && isForeground) {
 				animationRecord.animateTo(
 					targetValue = 360f + lastDegree,
 					animationSpec = infiniteRepeatable(
@@ -232,7 +233,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		}
 
 		LocalFileImage(
-			path = { musicInfo.recordPath },
+			path = { musicInfo.path(Paths.modPath, ModResourceType.Record) },
 			musicInfo,
 			contentScale = ContentScale.Crop,
 			circle = true,
@@ -260,7 +261,10 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					MusicRecord(
 						musicInfo = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f)
-                            .clickable { navigate(ScreenMusicDetails.Args(it.id)) }
+                            .clickable {
+								// TODO:
+								// navigate(ScreenMusicDetails.Args(it.id))
+							}
                             .zIndex(2f)
 					)
 				}
@@ -270,7 +274,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 
 	@Composable
 	private fun PortraitMusicInfoLayout(modifier: Modifier = Modifier) {
-		val musicInfo = factory.currentMusic
+		val musicInfo = mp.currentMusic
 		Row(
 			modifier = modifier,
 			horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
@@ -307,7 +311,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 
 	@Composable
 	private fun LandscapeMusicInfoLayout(modifier: Modifier = Modifier) {
-		val musicInfo = factory.currentMusic
+		val musicInfo = mp.currentMusic
 		Column(
 			modifier = modifier,
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -374,8 +378,8 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					.height(CustomTheme.size.progressHeight * 2)
 					.clickableNoRipple {
 						launch {
-							factory.seekTo(hotpot)
-							if (!factory.isPlaying) factory.play()
+							mp.seekTo(hotpot)
+							if (!mp.isPlaying) mp.play()
 						}
 					}
 					.padding(horizontal = CustomTheme.padding.littleSpace)
@@ -402,8 +406,8 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 			showThumb = false,
 			onValueChangeFinished = {
 				launch {
-					factory.seekTo((it * duration).toLong())
-					if (!factory.isPlaying) factory.play()
+					mp.seekTo((it * duration).toLong())
+					if (!mp.isPlaying) mp.play()
 				}
 			},
 			modifier = modifier
@@ -426,14 +430,14 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		) {
 			MusicProgressText(
 				currentTime = currentDebounceTime,
-				duration = factory.currentDuration,
+				duration = mp.currentDuration,
 				modifier = Modifier.fillMaxWidth()
 			)
 
 			MusicProgressBar(
 				currentTime = currentDebounceTime,
-				duration = factory.currentDuration,
-				chorus = factory.currentMusic?.chorus,
+				duration = mp.currentDuration,
+				chorus = mp.currentMusic?.chorus,
 				modifier = Modifier.fillMaxWidth().height(CustomTheme.size.progressHeight * 2)
 			)
 		}
@@ -444,7 +448,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 		EqualRow(modifier = modifier) {
 			EqualItem {
 				ClickIcon(
-					icon = when (factory.playMode) {
+					icon = when (mp.playMode) {
                         MusicPlayMode.ORDER -> ExtraIcons.OrderMode
                         MusicPlayMode.LOOP -> ExtraIcons.LoopMode
                         MusicPlayMode.RANDOM -> ExtraIcons.ShuffleMode
@@ -452,7 +456,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "播放模式",
 					color = Colors.White,
 					onClick = {
-						launch { factory.switchPlayMode() }
+						launch { mp.switchPlayMode() }
 					}
 				)
 			}
@@ -461,18 +465,18 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					icon = ExtraIcons.GotoPrevious,
 					color = Colors.White,
 					onClick = {
-						launch { factory.gotoPrevious() }
+						launch { mp.gotoPrevious() }
 					}
 				)
 			}
 			EqualItem {
 				ClickIcon(
-					icon = if (factory.isPlaying) ExtraIcons.Pause else ExtraIcons.Play,
+					icon = if (mp.isPlaying) ExtraIcons.Pause else ExtraIcons.Play,
 					color = Colors.White,
 					onClick = {
 						launch {
-							if (factory.isPlaying) factory.pause()
-							else factory.play()
+							if (mp.isPlaying) mp.pause()
+							else mp.play()
 						}
 					}
 				)
@@ -482,7 +486,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					icon = ExtraIcons.GotoNext,
 					color = Colors.White,
 					onClick = {
-						launch { factory.gotoNext() }
+						launch { mp.gotoNext() }
 					}
 				)
 			}
@@ -492,7 +496,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "播放列表",
 					color = Colors.White,
 					onClick = {
-						if (factory.isReady) currentPlaylistSheet.open()
+						if (mp.isReady) currentPlaylistSheet.open()
 					}
 				)
 			}
@@ -518,9 +522,11 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					color = Colors.White,
 					enabled = hasVideo,
 					onClick = {
-						launch {
-							factory.pause()
-							navigate(ScreenVideo.Args(factory.currentMusic?.videoPath.toString()))
+						mp.currentMusic?.path(Paths.modPath, ModResourceType.Video)?.let { path ->
+							launch {
+								mp.pause()
+								navigate(ScreenVideo.Args(path.toString()))
+							}
 						}
 					}
 				)
@@ -551,7 +557,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 				modifier = Modifier.fillMaxSize(),
 				onLyricsClick = {
 					launch {
-						factory.seekTo(it)
+						mp.seekTo(it)
 					}
 				}
 			)
@@ -566,7 +572,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 				delay(1000L)
 				sleepRemainSeconds -= 1
 			}
-			factory.stop()
+			mp.stop()
 			sleepJob = null
 		}
 	}
@@ -649,7 +655,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 							.fillMaxWidth().weight(1f),
 						contentAlignment = Alignment.Center
 					) {
-						val musicInfo = factory.currentMusic
+						val musicInfo = mp.currentMusic
 						if (musicInfo != null) {
 							MusicRecordLayout(
 								offset = CustomTheme.padding.zeroSpace,
@@ -713,7 +719,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 							.fillMaxWidth().weight(1f),
 						contentAlignment = Alignment.Center
 					) {
-						val musicInfo = factory.currentMusic
+						val musicInfo = mp.currentMusic
 						if (musicInfo != null) {
 							MusicRecordLayout(
 								offset = CustomTheme.padding.zeroSpace,
@@ -760,9 +766,9 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	}
 
 	override suspend fun initialize() {
-		monitor(state = { factory.currentPosition }) { position ->
+		monitor(state = { mp.currentPosition }) { position ->
 			// 处理进度条
-			if (abs(position - currentDebounceTime) > 1000L - MusicFactory.UPDATE_INTERVAL) currentDebounceTime = position
+			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
 			val newLine = lyrics.updateIndex(position)
 			// TODO: 处理悬浮歌词
@@ -770,16 +776,16 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 //				if (it.isAttached) it.updateLyrics(newLine)
 //			}
 		}
-		monitor(state = { factory.currentMusic }) { musicInfo ->
+		monitor(state = { mp.currentMusic }) { musicInfo ->
 			lyrics.reset()
 
 			if (musicInfo != null) catching {
 				Coroutines.io {
-					SystemFileSystem.source(musicInfo.lyricsPath).buffered().use { source ->
-						lyrics.parseLrcString(source.readString())
+					musicInfo.path(Paths.modPath, ModResourceType.LineLyrics).readText()?.let {
+						lyrics.parseLrcString(it)
 					}
-					hasAnimation = SystemFileSystem.metadataOrNull(musicInfo.AnimationPath)?.isRegularFile == true
-					hasVideo = SystemFileSystem.metadataOrNull(musicInfo.videoPath)?.isRegularFile == true
+					hasAnimation = musicInfo.path(Paths.modPath, ModResourceType.Animation).isFile
+					hasVideo = musicInfo.path(Paths.modPath, ModResourceType.Video).isFile
 				}
 			}
 			else {
@@ -790,7 +796,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 
 			if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
 		}
-		monitor(state = { factory.error }) { error ->
+		monitor(state = { mp.error }) { error ->
 			error?.let { slot.tip.error(it.message) }
 		}
 	}
@@ -807,13 +813,13 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	private val currentPlaylistSheet = object : FloatingSheet() {
 		@Composable
 		override fun Content() {
-			val isEmptyList by rememberDerivedState { factory.musicList.isEmpty() }
+			val isEmptyList by rememberDerivedState { mp.musicList.isEmpty() }
 
 			LaunchedEffect(isEmptyList) {
 				if (isEmptyList) close()
 			}
 
-			val currentIndex by rememberDerivedState { factory.musicList.indexOf(factory.currentMusic) }
+			val currentIndex by rememberDerivedState { mp.musicList.indexOf(mp.currentMusic) }
 
 			Column(modifier = Modifier.fillMaxWidth()) {
 				Row(
@@ -822,7 +828,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					verticalAlignment = Alignment.CenterVertically
 				) {
 					Text(
-						text = factory.currentPlaylist?.name ?: "",
+						text = mp.playlist?.name ?: "",
 						style = MaterialTheme.typography.titleLarge,
 						color = MaterialTheme.colorScheme.primary,
 						modifier = Modifier.weight(1f)
@@ -832,7 +838,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                         tip = "停止",
 						onClick = {
 							close()
-							launch { factory.stop() }
+							launch { mp.stop() }
 						}
 					)
 				}
@@ -842,7 +848,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 					state = rememberLazyListState(if (currentIndex != -1) currentIndex else 0)
 				) {
 					itemsIndexed(
-						items = factory.musicList,
+						items = mp.musicList,
 						key = { _, musicInfo -> musicInfo.id }
 					) { index, musicInfo ->
 						PlayingMusicStatusCard(
@@ -850,7 +856,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 							isCurrent = index == currentIndex,
 							onClick = {
 								close()
-								launch { factory.gotoIndex(index) }
+								launch { mp.gotoIndex(index) }
 							},
 							modifier = Modifier.fillMaxWidth()
 						)
@@ -885,7 +891,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                             text = if (sleepJob == null) "启动" else "停止",
                             icon = if (sleepJob == null) Icons.Outlined.AlarmOn else Icons.Outlined.AlarmOff,
                             onClick = {
-                                if (factory.isReady) {
+                                if (mp.isReady) {
                                     if (sleepJob == null) {
                                         val time = state.hour * 3600 + state.minute * 60
                                         if (time > 0) startSleepMode(time)
