@@ -48,7 +48,7 @@ import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
-class AppConfig : StartupConfig() {
+class StartupAppConfig : StartupConfig() {
     /* ------------------  系统  ------------------ */
 
     // 主题模式
@@ -159,7 +159,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
     val config by service(
         StartupLazyFetcher { kv },
-        factory = ::AppConfig,
+        factory = ::StartupAppConfig,
     )
 
     val mp by service(
