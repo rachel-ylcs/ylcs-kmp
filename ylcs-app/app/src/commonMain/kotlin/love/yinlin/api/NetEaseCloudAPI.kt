@@ -3,7 +3,7 @@ package love.yinlin.api
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.compose.ui.container.lyrics.LrcParser
+import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*

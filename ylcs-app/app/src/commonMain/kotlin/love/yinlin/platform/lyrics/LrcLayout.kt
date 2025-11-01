@@ -1,4 +1,4 @@
-package love.yinlin.compose.ui.container.lyrics
+package love.yinlin.platform.lyrics
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.DragInteraction
@@ -86,13 +86,13 @@ private fun LyricsLrcLine(text: String, offset: Int) {
 }
 
 @Stable
-class LrcEngine : LyricsEngine {
+class LrcLayout {
     private var lines: List<LrcLine>? by mutableRefStateOf(null)
     private val listState = LazyListState()
     private var currentIndex by mutableIntStateOf(-1)
     private var isDragging by mutableStateOf(false)
 
-    fun parseLrcString(source: String) {
+    fun load(source: String) {
         lines = LrcParser(source).paddingLyrics
     }
 
@@ -111,7 +111,7 @@ class LrcEngine : LyricsEngine {
     }
 
     @Composable
-    fun Layout(
+    fun Content(
         modifier: Modifier,
         onLyricsClick: (Long) -> Unit
     ) {
@@ -169,10 +169,5 @@ class LrcEngine : LyricsEngine {
                 }
             }
         }
-    }
-
-    @Composable
-    override fun Content(modifier: Modifier, position: Long) {
-        val text = remember(lines, currentIndex) { lines?.getOrNull(currentIndex)?.text ?: "" }
     }
 }

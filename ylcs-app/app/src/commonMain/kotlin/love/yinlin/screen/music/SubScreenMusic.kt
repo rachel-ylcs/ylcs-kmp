@@ -38,7 +38,6 @@ import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
-import love.yinlin.compose.ui.container.lyrics.LrcEngine
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.extension.*
@@ -58,6 +57,7 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.SplitActionLayout
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.platform.lyrics.LyricsEngine
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.painterResource
@@ -101,8 +101,6 @@ private fun PlayingMusicStatusCard(
 @Stable
 class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	private val mp = app.mp
-
-	private val lyrics = LrcEngine()
 
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
@@ -187,9 +185,8 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌词",
                     color = Colors.White
                 ) {
-					// TODO:
-//                    if (mp.isInit) navigate<ScreenFloatingLyrics>()
-//                    else slot.tip.warning("播放器尚未初始化")
+                    if (mp.isInit) navigate<ScreenFloatingLyrics>()
+                    else slot.tip.warning("播放器尚未初始化")
                 }
             },
             right = {
@@ -263,8 +260,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                             .clickable {
 								// TODO:
 								// navigate(ScreenMusicDetails.Args(it.id))
-							}
-                            .zIndex(2f)
+							}.zIndex(2f)
 					)
 				}
 			}
@@ -552,7 +548,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
 		Box(modifier = modifier) {
-			lyrics.Layout(
+			mp.lyrics.Content(
 				modifier = Modifier.fillMaxSize(),
 				onLyricsClick = {
 					launch {
@@ -769,20 +765,28 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 			// 处理进度条
 			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
-			lyrics.updateIndex(position)
-			// TODO: 处理悬浮歌词
-//			factory.floatingLyrics?.let {
-//				if (it.isAttached) it.updateLyrics(newLine)
-//			}
+			mp.lyrics.updateIndex(position)
+			if (mp.floatingLyrics.isAttached) mp.engine.update(position)
 		}
 		monitor(state = { mp.currentMusic }) { musicInfo ->
-			lyrics.reset()
+			mp.lyrics.reset()
+			mp.engine.reset()
 
 			if (musicInfo != null) catching {
 				Coroutines.io {
+					// 加载歌词
 					musicInfo.path(Paths.modPath, ModResourceType.LineLyrics).readText()?.let {
-						lyrics.parseLrcString(it)
+						mp.lyrics.load(it)
 					}
+
+					// 加载悬浮歌词, 加载失败则回退到默认歌词引擎
+					val rootPath = musicInfo.path(Paths.modPath)
+					if (!mp.engine.load(rootPath)) {
+						mp.engine = LyricsEngine.Default
+						mp.engine.load(rootPath)
+					}
+
+					// 更新状态标志
 					hasAnimation = musicInfo.path(Paths.modPath, ModResourceType.Animation).isFile
 					hasVideo = musicInfo.path(Paths.modPath, ModResourceType.Video).isFile
 				}

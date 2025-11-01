@@ -1,4 +1,4 @@
-package love.yinlin.compose.ui.container.lyrics
+package love.yinlin.platform.lyrics
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastDistinctBy

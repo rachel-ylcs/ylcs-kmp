@@ -10,13 +10,13 @@ inline MMKV* kv_cast(jlong handle)
 }
 
 extern "C" {
-    JNIEXPORT jlong JNICALL Java_love_yinlin_platform_KVKt_nativeInit(JNIEnv* env, jclass, jstring path)
+    JNIEXPORT jlong JNICALL Java_love_yinlin_platform_NativeKVKt_nativeInit(JNIEnv* env, jclass, jstring path)
 	{
 		MMKV::initializeMMKV(string2MMKVPath_t(j2s(env, path)), MMKVLogLevel::MMKVLogNone);
 		return reinterpret_cast<jlong>(MMKV::defaultMMKV());
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetBoolean(JNIEnv* env, jclass, jlong handle, jstring key, jboolean value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetBoolean(JNIEnv* env, jclass, jlong handle, jstring key, jboolean value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -24,7 +24,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetInt(JNIEnv* env, jclass, jlong handle, jstring key, jint value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetInt(JNIEnv* env, jclass, jlong handle, jstring key, jint value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -32,7 +32,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetLong(JNIEnv* env, jclass, jlong handle, jstring key, jlong value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetLong(JNIEnv* env, jclass, jlong handle, jstring key, jlong value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -40,7 +40,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetFloat(JNIEnv* env, jclass, jlong handle, jstring key, jfloat value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetFloat(JNIEnv* env, jclass, jlong handle, jstring key, jfloat value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -48,7 +48,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetDouble(JNIEnv* env, jclass, jlong handle, jstring key, jdouble value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetDouble(JNIEnv* env, jclass, jlong handle, jstring key, jdouble value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -56,7 +56,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetString(JNIEnv* env, jclass, jlong handle, jstring key, jstring value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetString(JNIEnv* env, jclass, jlong handle, jstring key, jstring value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -64,7 +64,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeSetByteArray(JNIEnv* env, jclass, jlong handle, jstring key, jbyteArray value, jint expire)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeSetByteArray(JNIEnv* env, jclass, jlong handle, jstring key, jbyteArray value, jint expire)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -79,7 +79,7 @@ extern "C" {
 		}
 	}
 
-	JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_KVKt_nativeGetBoolean(JNIEnv* env, jclass, jlong handle, jstring key, jboolean def)
+	JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetBoolean(JNIEnv* env, jclass, jlong handle, jstring key, jboolean def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -88,7 +88,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jint JNICALL Java_love_yinlin_platform_KVKt_nativeGetInt(JNIEnv* env, jclass, jlong handle, jstring key, jint def)
+	JNIEXPORT jint JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetInt(JNIEnv* env, jclass, jlong handle, jstring key, jint def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -97,7 +97,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_KVKt_nativeGetLong(JNIEnv* env, jclass, jlong handle, jstring key, jlong def)
+	JNIEXPORT jlong JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetLong(JNIEnv* env, jclass, jlong handle, jstring key, jlong def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -106,7 +106,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jfloat JNICALL Java_love_yinlin_platform_KVKt_nativeGetFloat(JNIEnv* env, jclass, jlong handle, jstring key, jfloat def)
+	JNIEXPORT jfloat JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetFloat(JNIEnv* env, jclass, jlong handle, jstring key, jfloat def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -115,7 +115,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jdouble JNICALL Java_love_yinlin_platform_KVKt_nativeGetDouble(JNIEnv* env, jclass, jlong handle, jstring key, jdouble def)
+	JNIEXPORT jdouble JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetDouble(JNIEnv* env, jclass, jlong handle, jstring key, jdouble def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -124,7 +124,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_KVKt_nativeGetString(JNIEnv* env, jclass, jlong handle, jstring key, jstring def)
+	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetString(JNIEnv* env, jclass, jlong handle, jstring key, jstring def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -138,7 +138,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jbyteArray JNICALL Java_love_yinlin_platform_KVKt_nativeGetByteArray(JNIEnv* env, jclass, jlong handle, jstring key, jbyteArray def)
+	JNIEXPORT jbyteArray JNICALL Java_love_yinlin_platform_NativeKVKt_nativeGetByteArray(JNIEnv* env, jclass, jlong handle, jstring key, jbyteArray def)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -156,7 +156,7 @@ extern "C" {
 		return def;
 	}
 
-	JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_KVKt_nativeContains(JNIEnv* env, jclass, jlong handle, jstring key)
+	JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_NativeKVKt_nativeContains(JNIEnv* env, jclass, jlong handle, jstring key)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{
@@ -165,7 +165,7 @@ extern "C" {
 		return false;
 	}
 
-	JNIEXPORT void JNICALL Java_love_yinlin_platform_KVKt_nativeRemove(JNIEnv* env, jclass, jlong handle, jstring key)
+	JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeKVKt_nativeRemove(JNIEnv* env, jclass, jlong handle, jstring key)
 	{
 		if (auto kv = kv_cast(handle); kv && key)
 		{

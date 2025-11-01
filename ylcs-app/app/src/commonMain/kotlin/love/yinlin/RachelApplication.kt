@@ -7,8 +7,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
 import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.LocalAnimationSpeed
@@ -18,21 +16,19 @@ import love.yinlin.data.compose.Picture
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.data.Data
 import love.yinlin.data.NativeLibrary
-import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
-import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.profile.UserProfile
-import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Reference
 import love.yinlin.platform.Platform
+import love.yinlin.platform.lyrics.LyricsEngineConfig
+import love.yinlin.platform.lyrics.LyricsEngineType
 import love.yinlin.resources.Res
 import love.yinlin.resources.xwwk
 import love.yinlin.screen.account.*
@@ -84,13 +80,10 @@ class AppConfig : StartupConfig() {
     var musicPlayMode by enumState(MusicPlayMode.ORDER)
     // 开启悬浮歌词
     var enabledFloatingLyrics by booleanState(true)
-// TODO: 浮动歌词
-//    // Android悬浮歌词配置
-//    var floatingLyricsAndroidConfig by jsonState { FloatingLyrics.AndroidConfig() }
-//    // iOS悬浮歌词配置
-//    var floatingLyricsIOSConfig by jsonState { FloatingLyrics.IOSConfig() }
-//    // 桌面悬浮歌词配置
-//    var floatingLyricsDesktopConfig by jsonState { FloatingLyrics.DesktopConfig() }
+    // 歌词引擎配置
+    var lyricsEngineConfig by jsonState { LyricsEngineConfig() }
+    // 歌词引擎类型
+    var lyricsEngineType by enumState(LyricsEngineType.Line)
 
     /* ------------------  社区  ------------------ */
 
@@ -171,29 +164,6 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
     val mp by service(
         StartupLazyFetcher { Paths.modPath },
-        object : StartupMusicPlayer.Listener {
-            override fun StartupMusicPlayer.onMusicChanged(musicInfo: MusicInfo?) {
-                val lastPlaylist = playlist?.name ?: ""
-                config.lastPlaylist = lastPlaylist
-                if (lastPlaylist.isNotEmpty()) musicInfo?.let { config.lastMusic = it.id }
-                else config.lastMusic = ""
-            }
-
-            override fun StartupMusicPlayer.onPlayModeChanged(mode: MusicPlayMode) {
-                config.musicPlayMode = mode
-            }
-
-            override fun StartupMusicPlayer.onPlayerStop() {
-                config.lastPlaylist = ""
-                config.lastMusic = ""
-            }
-
-            override val onLastStatusResume: StartupMusicPlayer.LastStatus get() = StartupMusicPlayer.LastStatus(
-                playMode = config.musicPlayMode,
-                playlist = config.playlistLibrary[config.lastPlaylist],
-                musicId = config.lastMusic
-            )
-        },
         factory = ::buildMusicPlayer
     )
 
@@ -249,7 +219,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             // 听歌
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlaylistLibrary)
-//            screen(::ScreenFloatingLyrics)
+            screen(::ScreenFloatingLyrics)
 //            screen(::ScreenMusicDetails)
 //
 //            screen(::ScreenMusicModFactory)

@@ -2,7 +2,6 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
-import love.yinlin.StartupArg
 import love.yinlin.StartupFetcher
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.mod.ModResourceType
@@ -33,7 +32,6 @@ private class ShuffledOrder(size: Int = 0, start: Int? = null) {
 }
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
-@StartupArg(index = 1, name = "listener", type = StartupMusicPlayer.Listener::class)
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     override val isInit: Boolean by derivedStateOf { controller != null }
     override var error: Throwable? by mutableRefStateOf(null)
@@ -47,7 +45,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
-        with(listener) { onPlayModeChanged(musicPlayMode) }
+        onPlayModeChanged(musicPlayMode)
         // 重新换模式要重设洗牌顺序
         if (musicPlayMode == MusicPlayMode.RANDOM) reshuffled(start = currentIndex)
     }
@@ -150,7 +148,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
             val musicInfo = musicList[currentIndex]
             if (musicInfo.id != currentMusic?.id) {
                 currentMusic = musicInfo
-                with(listener) { onMusicChanged(musicInfo) }
+                onMusicChanged(musicInfo)
             }
         }
 
@@ -186,7 +184,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         playlist = null
         shuffledList = ShuffledOrder()
         controls().stop()
-        with(listener) { onPlayerStop() }
+        onPlayerStop()
     }
 
     private fun MediaPlayer.innerGotoIndex(index: Int, playing: Boolean = true) {

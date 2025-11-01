@@ -28,12 +28,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     override val tray: Boolean = true
     override val trayHideNotification: String = "已隐藏到任务栏托盘中"
 
-    override fun onCreate() {
-        super.onCreate()
-        // TODO: 悬浮歌词
-        // musicFactory.instance.floatingLyrics = ActualFloatingLyrics().apply { isAttached = true }
-    }
-
     override fun ComposeWindow.onWindowCreate() {
         FixupWindowsSwingMaximize.setBounds(this)
     }
@@ -64,10 +58,9 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
 
     @Composable
     override fun ApplicationScope.MultipleWindow() {
-        // TODO: 悬浮歌词
-//        (musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.let {
-//            if (it.isAttached && config.enabledFloatingLyrics) it.Content()
-//        }
+        if (mp.floatingLyrics.isAttached && config.enabledFloatingLyrics) {
+            mp.floatingLyrics.Content()
+        }
     }
 
     private val setupVLC by sync(priority = StartupDelegate.HIGH3) {

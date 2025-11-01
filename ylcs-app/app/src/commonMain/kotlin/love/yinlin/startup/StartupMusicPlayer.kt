@@ -4,12 +4,13 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import love.yinlin.AsyncStartup
 import love.yinlin.Context
-import love.yinlin.StartupArg
 import love.yinlin.StartupArgs
 import love.yinlin.StartupFetcher
+import love.yinlin.app
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
@@ -20,9 +21,11 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.readText
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
+import love.yinlin.platform.lyrics.FloatingLyrics
+import love.yinlin.platform.lyrics.LrcLayout
+import love.yinlin.platform.lyrics.LyricsEngine
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
-@StartupArg(index = 1, name = "listener", type = StartupMusicPlayer.Listener::class)
 abstract class StartupMusicPlayer : AsyncStartup {
     companion object {
         const val PROGRESS_UPDATE_INTERVAL = 150L
@@ -53,6 +56,12 @@ abstract class StartupMusicPlayer : AsyncStartup {
 
     protected abstract suspend fun initController()
 
+    // 歌词引擎
+    val lyrics = LrcLayout()
+    var engine by mutableRefStateOf(LyricsEngine.Default)
+    lateinit var floatingLyrics: FloatingLyrics
+        private set
+
     // 公共
     protected lateinit var rootPath: Path
     val library = mutableStateMapOf<String, MusicInfo>()
@@ -69,19 +78,16 @@ abstract class StartupMusicPlayer : AsyncStartup {
         }
     }
 
-    @Stable
-    data class LastStatus(
-        val playMode: MusicPlayMode = MusicPlayMode.DEFAULT,
-        val playlist: MusicPlaylist? = null,
-        val musicId: String = "",
-    )
-
-    private suspend fun initLastStatus(lastStatus: LastStatus) {
+    private suspend fun initLastStatus() {
         // 更新播放模式
-        updatePlayMode(lastStatus.playMode)
+        updatePlayMode(app.config.musicPlayMode)
+        // 更新歌词引擎
+        LyricsEngine[app.config.lyricsEngineType].let {
+            if (engine != it) engine = it
+        }
         // 恢复上一次播放
-        lastStatus.playlist?.let {
-            startPlaylist(it, lastStatus.musicId.ifEmpty { null }, false)
+        app.config.playlistLibrary[app.config.lastPlaylist]?.let {
+            startPlaylist(it, app.config.lastMusic.ifEmpty { null }, false)
         }
     }
 
@@ -120,31 +126,36 @@ abstract class StartupMusicPlayer : AsyncStartup {
 
     protected fun MusicInfo.path(type: ModResourceType) = this.path(rootPath, type)
 
-    // 回调
-    interface Listener {
-        fun StartupMusicPlayer.onMusicChanged(musicInfo: MusicInfo?) { }
-        fun StartupMusicPlayer.onPlayModeChanged(mode: MusicPlayMode) { }
-        fun StartupMusicPlayer.onPlayerStop() { }
-        val onLastStatusResume: LastStatus get() = LastStatus()
-    }
-
-    protected var listener: Listener = object : Listener {}
-
     final override suspend fun init(context: Context, args: StartupArgs) {
         rootPath = args.fetch(0)
-        listener = args[1]
+        floatingLyrics = FloatingLyrics(context)
         Coroutines.startCurrent {
             awaitAll(
                 async { initLibrary() },
-                async { initController() },
+                async { initController() }
             )
-            if (isInit) {
-                initLastStatus(with(listener) { onLastStatusResume })
-            }
+            launch { floatingLyrics.init() }
+            if (isInit) initLastStatus()
         }
+    }
+
+    // 回调
+    fun onMusicChanged(musicInfo: MusicInfo?) {
+        val lastPlaylist = playlist?.name ?: ""
+        app.config.lastPlaylist = lastPlaylist
+        if (lastPlaylist.isNotEmpty()) musicInfo?.let { app.config.lastMusic = it.id }
+        else app.config.lastMusic = ""
+    }
+
+    fun onPlayModeChanged(mode: MusicPlayMode) {
+        app.config.musicPlayMode = mode
+    }
+
+    fun onPlayerStop() {
+        app.config.lastPlaylist = ""
+        app.config.lastMusic = ""
     }
 }
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
-@StartupArg(index = 1, name = "listener", type = StartupMusicPlayer.Listener::class)
 expect fun buildMusicPlayer() : StartupMusicPlayer

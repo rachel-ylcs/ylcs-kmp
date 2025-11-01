@@ -44,7 +44,7 @@ abstract class Application<out A : Application<A>>(
     val context: Context = Context(delegate)
 
     @Composable
-    internal fun Layout(modifier: Modifier = Modifier.fillMaxSize(), content: @Composable () -> Unit = { Content() }) {
+    fun Layout(modifier: Modifier = Modifier.fillMaxSize(), content: @Composable () -> Unit = { Content() }) {
         BoxWithConstraints(
             modifier = modifier,
             contentAlignment = Alignment.Center
