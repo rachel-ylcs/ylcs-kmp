@@ -44,6 +44,7 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catchingError
 import love.yinlin.platform.Coroutines
+import love.yinlin.screen.music.loader.ScreenCreateMusic
 import love.yinlin.screen.music.loader.ScreenImportMusic
 
 @Stable
@@ -308,18 +309,23 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
                 // navigate<ScreenMusicModFactory>()
             }
             Action(Icons.Outlined.Upload, "导入") {
+                pop()
                 navigate(::ScreenImportMusic, null)
             }
             Action(Icons.Outlined.DesignServices, "创造") {
-                // navigate<ScreenCreateMusic>()
+                pop()
+                navigate(::ScreenCreateMusic)
             }
             Action(ExtraIcons.QQMusic, "QQ音乐", useImage = true) {
+                pop()
                 // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
             }
             Action(ExtraIcons.NetEaseCloudMusic, "网易云音乐", useImage = true) {
+                pop()
                 // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
             }
             Action(ExtraIcons.KugouMusic, "酷狗音乐", useImage = true) {
+                pop()
                 // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
             }
         }

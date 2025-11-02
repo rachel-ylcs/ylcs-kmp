@@ -226,7 +226,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
 //            screen(::ScreenSongDetails, type<Song>())
 //
             screen(::ScreenImportMusic)
-//            screen(::ScreenCreateMusic)
+            screen(::ScreenCreateMusic)
 //            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
 
 
