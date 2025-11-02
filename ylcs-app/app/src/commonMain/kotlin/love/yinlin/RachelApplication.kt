@@ -42,6 +42,7 @@ import love.yinlin.screen.music.*
 import love.yinlin.screen.music.loader.*
 import love.yinlin.screen.world.*
 import love.yinlin.screen.world.battle.*
+import love.yinlin.screen.world.single.rhyme.ScreenRhyme
 import love.yinlin.startup.*
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
@@ -241,7 +242,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
 
             screen(::ScreenGuessLyrics)
 
-            // screen(::ScreenRhyme)
+            screen(::ScreenRhyme)
         }
     }
 

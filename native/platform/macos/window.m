@@ -10,7 +10,7 @@ void ylcs_window_set_click_through(void *handle, bool enable) {
 }
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeWindowKt_setWindowClickThrough(JNIEnv* env, jobject, jlong window, jboolean enabled) {
+    JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeWindowKt_setWindowClickThrough(JNIEnv* env, jclass, jlong window, jboolean enabled) {
         ylcs_window_set_click_through((void*)window, enabled);
     }
 }

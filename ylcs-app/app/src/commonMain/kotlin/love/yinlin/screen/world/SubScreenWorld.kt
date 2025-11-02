@@ -49,6 +49,7 @@ import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.screen.community.BoxText
 import love.yinlin.screen.world.battle.ScreenGuessLyrics
+import love.yinlin.screen.world.single.rhyme.ScreenRhyme
 import kotlin.math.absoluteValue
 
 @Composable
@@ -123,10 +124,7 @@ class SubScreenWorld(parent: BasicScreen) : SubScreen(parent) {
 				if (profile != null) navigate(::ScreenGuessLyrics, profile.uid, profile.name)
 				else slot.tip.warning("请先登录")
 			}
-            Game.Rhyme -> {
-				// TODO:
-				// navigate<ScreenRhyme>()
-			}
+            Game.Rhyme -> navigate(::ScreenRhyme)
 		}
 	}
 

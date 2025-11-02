@@ -346,18 +346,3 @@ class ActualMusicFactory : MusicFactory() {
 }
 
 actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory()
-
-@Stable
-actual class MusicPlayer actual constructor(context: Context) {
-    // TODO: iOS端待实现
-    actual val isInit: Boolean = false
-    actual val isPlaying: Boolean = false
-    actual val position: Long = 0L
-    actual val duration: Long = 0L
-    actual suspend fun init() {}
-    actual suspend fun load(path: Path) {}
-    actual fun play() {}
-    actual fun pause() {}
-    actual fun stop() {}
-    actual fun release() {}
-}
