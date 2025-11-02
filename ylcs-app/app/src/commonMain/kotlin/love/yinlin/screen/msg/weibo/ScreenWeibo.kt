@@ -14,7 +14,7 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
@@ -29,7 +29,7 @@ import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 import love.yinlin.compose.ui.image.PauseLoading
 
 @Stable
-class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
     private val subScreenMsg = manager.get<ScreenMain>().get<SubScreenMsg>()
 
     private var state: BoxState by mutableStateOf(BoxState.EMPTY)
@@ -69,7 +69,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
     @Composable
     override fun ActionScope.RightActions() {
         Action(Icons.Outlined.AccountCircle, "关注列表") {
-            navigate<ScreenWeiboFollows>()
+            navigate(::ScreenWeiboFollows)
         }
     }
 

@@ -28,7 +28,6 @@ import io.ktor.http.URLProtocol
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
@@ -133,10 +132,7 @@ private fun GameResultUserItem(
 }
 
 @Stable
-class ScreenGuessLyrics(manager: ScreenManager, val args: Args) : Screen<ScreenGuessLyrics.Args>(manager) {
-    @Serializable
-    data class Args(val uid: Int, val name: String)
-
+class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private val name: String) : Screen(manager) {
     @Stable
     private sealed interface Status {
         @Stable
@@ -167,7 +163,7 @@ class ScreenGuessLyrics(manager: ScreenManager, val args: Args) : Screen<ScreenG
                 url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
             }
             session = newSession
-            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(args.uid, args.name)))
+            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(uid, name)))
             newSession.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) {
                     val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
@@ -299,7 +295,7 @@ class ScreenGuessLyrics(manager: ScreenManager, val args: Args) : Screen<ScreenG
                         info = it,
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            if (it.uid == args.uid) slot.tip.warning("不能与自己对战")
+                            if (it.uid == uid) slot.tip.warning("不能与自己对战")
                             else launch { sendInvite(it) }
                         }
                     )

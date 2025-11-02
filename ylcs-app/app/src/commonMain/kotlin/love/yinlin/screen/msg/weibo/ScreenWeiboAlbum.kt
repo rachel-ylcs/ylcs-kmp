@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import kotlinx.serialization.Serializable
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -27,11 +26,7 @@ import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenWeiboAlbum(manager: ScreenManager, private val args: Args) : Screen<ScreenWeiboAlbum.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val containerId: String, val title: String)
-
+class ScreenWeiboAlbum(manager: ScreenManager, private val containerId: String, private val albumTitle: String) : Screen(manager) {
     private data class AlbumCache(val count: Int, val items: List<Picture>)
 
     companion object {
@@ -49,7 +44,7 @@ class ScreenWeiboAlbum(manager: ScreenManager, private val args: Args) : Screen<
     private suspend fun requestAlbum(page: Int) {
         if (caches[page] == null) { // 无缓存
             state = BoxState.LOADING
-            val result = WeiboAPI.getWeiboAlbumPics(args.containerId, page, PIC_LIMIT)
+            val result = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)
             if (result is Data.Success) {
                 val (data, count) = result.data
                 caches[page] = AlbumCache(count, data)
@@ -86,7 +81,7 @@ class ScreenWeiboAlbum(manager: ScreenManager, private val args: Args) : Screen<
         requestAlbum(1)
     }
 
-    override val title: String by derivedStateOf { "${args.title} - 共 $num 张" }
+    override val title: String by derivedStateOf { "$albumTitle - 共 $num 张" }
 
     @Composable
     override fun Content(device: Device) {
@@ -115,7 +110,7 @@ class ScreenWeiboAlbum(manager: ScreenManager, private val args: Args) : Screen<
                         WebImage(
                             uri = pic.image,
                             modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                            onClick = { navigate(ScreenImagePreview.Args(data.items, index)) }
+                            onClick = { navigate(::ScreenImagePreview, data.items, index) }
                         )
                     }
                 }

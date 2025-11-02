@@ -4,46 +4,127 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
-import kotlin.jvm.JvmSuppressWildcards
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
+import love.yinlin.extension.parseJsonValue
+import kotlin.jvm.JvmName
 
 @Stable
 class ScreenBuilder(
     val builder: NavGraphBuilder,
     val manager: ScreenManager
 ) {
-    inline fun <reified T> type() = typeOf<T>() to getNavType<T>()
-    inline fun <reified T> listType() = typeOf<List<T>>() to getNavType<List<T>>()
-    inline fun <reified K, reified V> mapType() = typeOf<Map<K, V>>() to getNavType<Map<K, V>>()
-
-    inline fun <reified A> BasicScreen<A>.registerAndLaunch(backStackEntry: NavBackStackEntry): BasicScreen<A> {
-        manager.registerScreen(this, backStackEntry.id)
-        launch { initialize() }
-        return this
-    }
-
-    inline fun <reified S : CommonBasicScreen> screen(crossinline factory: (ScreenManager) -> S) {
-        builder.composable(route = route<S>()) { backStackEntry ->
+    inline fun <reified S : BasicScreen> registerAndLaunch(num: Int, crossinline block: (ScreenManager, NavBackStackEntry) -> S) {
+        builder.composable(route = Route.build<S>(num)) { backStackEntry ->
             val screen = viewModel {
-                factory(manager).registerAndLaunch(backStackEntry)
+                block(manager, backStackEntry).apply {
+                    manager.registerScreen(this, backStackEntry.id)
+                    launch { initialize() }
+                }
             }
             screen.ComposedUI()
         }
     }
 
-    inline fun <reified A : Any> screen(
-        crossinline factory: (ScreenManager, A) -> BasicScreen<A>,
-        vararg types: Pair<KType, @JvmSuppressWildcards NavType<*>>
-    ) {
-        builder.composable<A>(typeMap = mapOf(*types)) {  backStackEntry ->
-            val screen = viewModel {
-                factory(manager, backStackEntry.toRoute<A>()).registerAndLaunch(backStackEntry)
-            }
-            screen.ComposedUI()
+    inline fun <reified S : BasicScreen> screen(crossinline factory: (ScreenManager) -> S) =
+        registerAndLaunch(0) { manager, _ ->
+            factory(manager)
         }
-    }
+
+    @JvmName("screen1a")
+    inline fun <reified S : BasicScreen, reified A1 : Any> screen(crossinline factory: (ScreenManager, A1) -> S) =
+        registerAndLaunch(1) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!)
+        }
+
+    @JvmName("screen1n")
+    inline fun <reified S : BasicScreen, reified A1> screen(crossinline factory: (ScreenManager, A1?) -> S) =
+        registerAndLaunch(1) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue())
+        }
+
+    @JvmName("screen2aa")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2 : Any> screen(crossinline factory: (ScreenManager, A1, A2) -> S) =
+        registerAndLaunch(2) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue()!!)
+        }
+
+    @JvmName("screen2an")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2> screen(crossinline factory: (ScreenManager, A1, A2?) -> S) =
+        registerAndLaunch(2) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue())
+        }
+
+    @JvmName("screen2na")
+    inline fun <reified S : BasicScreen, reified A1, reified A2 : Any> screen(crossinline factory: (ScreenManager, A1?, A2) -> S) =
+        registerAndLaunch(2) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue()!!)
+        }
+
+    @JvmName("screen2nn")
+    inline fun <reified S : BasicScreen, reified A1, reified A2> screen(crossinline factory: (ScreenManager, A1?, A2?) -> S) =
+        registerAndLaunch(2) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue())
+        }
+
+    @JvmName("screen3aaa")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2 : Any, reified A3 : Any> screen(crossinline factory: (ScreenManager, A1, A2, A3) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue()!!, args[2].parseJsonValue()!!)
+        }
+
+    @JvmName("screen3aan")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2 : Any, reified A3> screen(crossinline factory: (ScreenManager, A1, A2, A3?) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue()!!, args[2].parseJsonValue())
+        }
+
+    @JvmName("screen3ana")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2, reified A3 : Any> screen(crossinline factory: (ScreenManager, A1, A2?, A3) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue(), args[2].parseJsonValue()!!)
+        }
+
+    @JvmName("screen3ann")
+    inline fun <reified S : BasicScreen, reified A1 : Any, reified A2, reified A3> screen(crossinline factory: (ScreenManager, A1, A2?, A3?) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue()!!, args[1].parseJsonValue(), args[2].parseJsonValue())
+        }
+
+    @JvmName("screen3naa")
+    inline fun <reified S : BasicScreen, reified A1, reified A2 : Any, reified A3 : Any> screen(crossinline factory: (ScreenManager, A1?, A2, A3) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue()!!, args[2].parseJsonValue()!!)
+        }
+
+    @JvmName("screen3nan")
+    inline fun <reified S : BasicScreen, reified A1, reified A2 : Any, reified A3> screen(crossinline factory: (ScreenManager, A1?, A2, A3?) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue()!!, args[2].parseJsonValue())
+        }
+
+    @JvmName("screen3nna")
+    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3 : Any> screen(crossinline factory: (ScreenManager, A1?, A2?, A3) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue(), args[2].parseJsonValue()!!)
+        }
+
+    @JvmName("screen3nnn")
+    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> screen(crossinline factory: (ScreenManager, A1?, A2?, A3?) -> S) =
+        registerAndLaunch(3) { manager, backStackEntry ->
+            val args = Route.fetch(backStackEntry)
+            factory(manager, args[0].parseJsonValue(), args[1].parseJsonValue(), args[2].parseJsonValue())
+        }
 }

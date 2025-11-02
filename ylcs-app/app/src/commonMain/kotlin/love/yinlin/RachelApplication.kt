@@ -12,17 +12,14 @@ import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.LocalAnimationSpeed
 import love.yinlin.compose.ThemeMode
 import love.yinlin.data.compose.ImageQuality
-import love.yinlin.data.compose.Picture
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.NativeLibrary
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
-import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
-import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Reference
@@ -181,7 +178,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
         AppScreen<ScreenMain>(modifier = Modifier.fillMaxSize(), deeplink = this) {
             // 通用
             screen(::ScreenMain)
-            screen(::ScreenImagePreview, listType<Picture>())
+            screen(::ScreenImagePreview)
             screen(::ScreenWebpage)
             screen(::ScreenVideo)
             screen(::ScreenTest)
@@ -208,7 +205,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
             // 社区
             screen(::ScreenUserCard)
-            screen(::ScreenTopic, type<Topic>())
+            screen(::ScreenTopic)
             screen(::ScreenAddTopic)
             screen(::ScreenFollows)
 
@@ -226,15 +223,15 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 //            screen(::ScreenMusicModFactory)
 //            screen(::ScreenSongDetails, type<Song>())
 //
-            screen(::ScreenImportMusic, type<Uri?>())
+            screen(::ScreenImportMusic)
 //            screen(::ScreenCreateMusic)
 //            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
 
 
             // 世界
-            screen(::ScreenGameHall, type<Game>())
-            screen(::ScreenGameRanking, type<Game>())
-            screen(::ScreenCreateGame, type<Game>())
+            screen(::ScreenGameHall)
+            screen(::ScreenGameRanking)
+            screen(::ScreenCreateGame)
             screen(::ScreenPlayGame)
             screen(::ScreenGameHistory)
             screen(::ScreenGameRecordHistory)
@@ -248,14 +245,14 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     override fun onDeepLink(manager: ScreenManager, uri: Uri) {
         when (uri.scheme) {
             Scheme.File, Scheme.Content -> {
-                if (!mp.isReady) manager.navigate(ScreenImportMusic.Args(uri))
+                if (!mp.isReady) manager.navigate(::ScreenImportMusic, uri)
                 else manager.top.slot.tip.warning("请先停止播放器")
             }
             Scheme.Rachel -> {
                 when (uri.path) {
                     "/openProfile" -> {
                         uri.params["uid"]?.toIntOrNull()?.let { uid ->
-                            manager.navigate(ScreenUserCard.Args(uid))
+                            manager.navigate(::ScreenUserCard, uid)
                         }
                     }
                     "/openSong" -> {

@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -33,17 +32,13 @@ import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.screen.community.ScreenUserCard
 
 @Stable
-class ScreenGameRanking(manager: ScreenManager, val args: Args) : Screen<ScreenGameRanking.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val type: Game)
-
+class ScreenGameRanking(manager: ScreenManager, private val type: Game) : Screen(manager) {
     private var items by mutableRefStateOf(emptyList<GameRank>())
 
     private suspend fun requestRank() {
         val result = ClientAPI.request(
             route = API.User.Game.GetGameRank,
-            data = args.type
+            data = type
         )
         if (result is Data.Success) items = result.data
     }
@@ -110,7 +105,7 @@ class ScreenGameRanking(manager: ScreenManager, val args: Args) : Screen<ScreenG
         }
     }
 
-    override val title: String = args.type.title
+    override val title: String = type.title
 
     override suspend fun initialize() {
         requestRank()
@@ -125,7 +120,7 @@ class ScreenGameRanking(manager: ScreenManager, val args: Args) : Screen<ScreenG
             val isLandscape = LocalDevice.current.type != Device.Type.PORTRAIT
 
             WebImage(
-                uri = remember(isLandscape) { args.type.xyPath(isLandscape) },
+                uri = remember(isLandscape) { type.xyPath(isLandscape) },
                 key = Local.info.version,
                 contentScale = ContentScale.Crop,
                 alpha = 0.75f,
@@ -160,7 +155,7 @@ class ScreenGameRanking(manager: ScreenManager, val args: Args) : Screen<ScreenG
                                 rank = item,
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    navigate(ScreenUserCard.Args(uid = item.uid))
+                                    navigate(::ScreenUserCard, item.uid)
                                 }
                             )
                         }

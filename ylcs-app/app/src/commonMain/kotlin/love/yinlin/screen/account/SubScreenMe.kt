@@ -113,7 +113,7 @@ private fun LevelItem(
 }
 
 @Stable
-class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
+class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
     private val isUpdateToken = atomic(false)
 
     fun cleanUserToken() {
@@ -142,7 +142,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                 }
                 is Data.Failure if result.type == RequestError.Unauthorized -> {
                     cleanUserToken()
-                    navigate<ScreenLogin>()
+                    navigate(::ScreenLogin)
                 }
                 else -> {}
             }
@@ -176,7 +176,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     userCardSheet.open(it)
                 } ?: slot.tip.warning("请先登录")
             }
-            Item("设置", Icons.Filled.Settings) { navigate<ScreenSettings>() }
+            Item("设置", Icons.Filled.Settings) { navigate(::ScreenSettings) }
         }
     }
 
@@ -203,7 +203,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             }
             Item("主题", Icons.AutoMirrored.Filled.Article) {
                 app.config.userProfile?.let {
-                    navigate(ScreenUserCard.Args(it.uid))
+                    navigate(::ScreenUserCard, it.uid)
                 } ?: slot.tip.warning("请先登录")
             }
             Item(
@@ -212,7 +212,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                 label = notification?.mailCount ?: 0
             ) {
                 app.config.userProfile?.let {
-                    navigate<ScreenMail>()
+                    navigate(::ScreenMail)
                 } ?: slot.tip.warning("请先登录")
             }
             Item("徽章", Icons.Filled.MilitaryTech) { }
@@ -268,10 +268,10 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             title = "超管空间"
         ) {
             Item("活动", Icons.Filled.Link) {
-                navigate<ScreenActivityLink>()
+                navigate(::ScreenActivityLink)
             }
             Item("测试", Icons.Filled.BugReport) {
-                navigate<ScreenTest>()
+                navigate(::ScreenTest)
             }
         }
     }
@@ -285,7 +285,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
             ) {
                 ActionScope.Right.Actions {
                     Action(Icons.Filled.Settings) {
-                        navigate<ScreenSettings>()
+                        navigate(::ScreenSettings)
                     }
                 }
             }
@@ -303,7 +303,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                     )
                     ClickText(
                         text = stringResource(Res.string.login),
-                        onClick = { navigate<ScreenLogin>() }
+                        onClick = { navigate(::ScreenLogin) }
                     )
                 }
             }
@@ -320,7 +320,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                 modifier = Modifier.fillMaxWidth(),
                 profile = userProfile,
                 onLevelClick = { levelSheet.open(userProfile) },
-                onFollowClick = { navigate(ScreenFollows.Args(it)) }
+                onFollowClick = { navigate(::ScreenFollows, it) }
             )
             ToolContainer(modifier = Modifier.fillMaxWidth())
             UserSpaceContainer(modifier = Modifier.fillMaxWidth())
@@ -340,7 +340,7 @@ class SubScreenMe(parent: BasicScreen<*>) : SubScreen(parent) {
                 shape = MaterialTheme.shapes.large,
                 modifier = Modifier.weight(1f).padding(CustomTheme.padding.equalExtraValue),
                 onLevelClick = { levelSheet.open(userProfile) },
-                onFollowClick = { navigate(ScreenFollows.Args(it)) }
+                onFollowClick = { navigate(::ScreenFollows, it) }
             )
             Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
                 ToolContainer(

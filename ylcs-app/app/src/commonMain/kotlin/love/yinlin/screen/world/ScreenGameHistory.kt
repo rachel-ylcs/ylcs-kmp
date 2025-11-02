@@ -20,7 +20,7 @@ import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
@@ -35,7 +35,7 @@ import love.yinlin.screen.world.game.GameCardQuestionAnswer
 import love.yinlin.screen.world.game.GameItem
 
 @Stable
-class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private val page = object : PaginationArgs<GameDetailsWithName, Int, Int, Boolean>(

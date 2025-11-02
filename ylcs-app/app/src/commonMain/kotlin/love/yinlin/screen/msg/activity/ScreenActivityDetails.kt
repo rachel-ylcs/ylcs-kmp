@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
-import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -87,17 +86,13 @@ private fun ActivityDetailsLayout(
 }
 
 @Stable
-class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Screen<ScreenActivityDetails.Args>(manager) {
-	@Stable
-	@Serializable
-	data class Args(val aid: Int)
-
+class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Screen(manager) {
 	private val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
 
-	private val activity: Activity? by derivedStateOf { activities.find { it.aid == args.aid } }
+	private val activity: Activity? by derivedStateOf { activities.find { it.aid == aid } }
 
 	private fun onPicClick(pics: List<Picture>, index: Int) {
-		navigate(ScreenImagePreview.Args(pics, index))
+		navigate(::ScreenImagePreview, pics, index)
 	}
 
 	private suspend fun deleteActivity() {
@@ -105,12 +100,12 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 			route = API.User.Activity.DeleteActivity,
 			data = API.User.Activity.DeleteActivity.Request(
 				token = app.config.userToken,
-				aid = args.aid
+				aid = aid
 			)
 		)
         when (result) {
             is Data.Success -> {
-				activities.findModify(predicate = { it.aid == args.aid }) { this -= it }
+				activities.findModify(predicate = { it.aid == aid }) { this -= it }
                 pop()
             }
             is Data.Failure -> slot.tip.error(result.message)
@@ -153,7 +148,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 						res = Res.drawable.img_damai,
                         tip = "打开大麦",
 						size = CustomTheme.size.mediumIcon,
-						onClick = { ScreenWebpage.gotoWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}") { navigate(it) } }
+						onClick = { ScreenWebpage.gotoWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}") { navigate(::ScreenWebpage, it) } }
 					)
 				}
 				activity.maoyan?.let { maoyan ->
@@ -161,7 +156,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 						res = Res.drawable.img_maoyan,
                         tip = "打开猫眼",
 						size = CustomTheme.size.mediumIcon,
-						onClick = { ScreenWebpage.gotoWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}") { navigate(it) } }
+						onClick = { ScreenWebpage.gotoWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}") { navigate(::ScreenWebpage, it) } }
 					)
 				}
 				activity.link?.let { link ->
@@ -169,7 +164,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 						icon = Icons.Outlined.Link,
                         tip = "打开链接",
 						size = CustomTheme.size.mediumIcon,
-						onClick = { ScreenWebpage.gotoWebPage(link) { navigate(it) } }
+						onClick = { ScreenWebpage.gotoWebPage(link) { navigate(::ScreenWebpage, it) } }
 					)
 				}
 			}
@@ -240,7 +235,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val args: Args) : Sc
 		val hasPrivilegeVIPCalendar by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPCalendar == true }
 		if (hasPrivilegeVIPCalendar) {
 			Action(Icons.Outlined.Edit, "编辑") {
-				navigate(ScreenModifyActivity.Args(args.aid))
+				navigate(::ScreenModifyActivity, aid)
 			}
 			ActionSuspend(Icons.Outlined.Delete, "删除") {
 				if (slot.confirm.openSuspend(content = "删除活动")) {

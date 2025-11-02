@@ -55,32 +55,32 @@ import love.yinlin.compose.ui.image.Banner
 import kotlin.math.abs
 
 @Stable
-class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
+class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     // 当前微博
     var currentWeibo: Weibo? = null
     // 微博处理器
     val processor = object : WeiboProcessor {
         override fun onWeiboClick(weibo: Weibo) {
             currentWeibo = weibo
-            navigate<ScreenWeiboDetails>()
+            navigate(::ScreenWeiboDetails)
         }
 
         override fun onWeiboAvatarClick(info: WeiboUserInfo) {
-            navigate(ScreenWeiboUser.Args(info.id))
+            navigate(::ScreenWeiboUser, info.id)
         }
 
-        override fun onWeiboLinkClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(it) }
+        override fun onWeiboLinkClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(::ScreenWebpage, it) }
 
-        override fun onWeiboTopicClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(it) }
+        override fun onWeiboTopicClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(::ScreenWebpage, it) }
 
-        override fun onWeiboAtClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(it) }
+        override fun onWeiboAtClick(arg: String) = ScreenWebpage.gotoWebPage(arg) { navigate(::ScreenWebpage, it) }
 
         override fun onWeiboPicClick(pics: List<Picture>, current: Int) {
-            navigate(ScreenImagePreview.Args(pics, current))
+            navigate(::ScreenImagePreview, pics, current)
         }
 
         override fun onWeiboVideoClick(pic: Picture) {
-            navigate(ScreenVideo.Args(pic.video))
+            navigate(::ScreenVideo, pic.video)
         }
     }
 
@@ -96,7 +96,7 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
     }
 
     private fun showActivityDetails(aid: Int) {
-        navigate(ScreenActivityDetails.Args(aid))
+        navigate(::ScreenActivityDetails, aid)
     }
 
     private fun onDateClick(date: LocalDate) {
@@ -152,22 +152,22 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
                 IconText(
                     icon = ExtraIcons.Pictures,
                     text = "美图",
-                    onClick = { navigate<ScreenPictures>() }
+                    onClick = { navigate(::ScreenPictures) }
                 )
                 IconText(
                     icon = ExtraIcons.Weibo,
                     text = "微博",
-                    onClick = { navigate<ScreenWeibo>() }
+                    onClick = { navigate(::ScreenWeibo) }
                 )
                 IconText(
                     icon = ExtraIcons.Chaohua,
                     text = "超话",
-                    onClick = { navigate<ScreenChaohua>() }
+                    onClick = { navigate(::ScreenChaohua) }
                 )
                 IconText(
                     icon = ExtraIcons.Douyin,
                     text = "抖音",
-                    onClick = { navigate<ScreenDouyin>() }
+                    onClick = { navigate(::ScreenDouyin) }
                 )
             }
         }
@@ -263,7 +263,7 @@ class SubScreenMsg(parent: BasicScreen<*>) : SubScreen(parent) {
     private fun ActionScope.ToolBarLayout() {
         if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
             Action(Icons.Outlined.Add, "添加") {
-                navigate<ScreenAddActivity>()
+                navigate(::ScreenAddActivity)
             }
         }
         ActionSuspend(Icons.Outlined.Refresh, "刷新") {

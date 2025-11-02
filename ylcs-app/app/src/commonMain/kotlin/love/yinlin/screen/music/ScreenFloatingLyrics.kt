@@ -14,14 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 
 @Composable
 expect fun ScreenFloatingLyrics.platformContent(device: Device)
 
 @Stable
-class ScreenFloatingLyrics(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenFloatingLyrics(manager: ScreenManager) : Screen(manager) {
     override val title: String = "悬浮歌词"
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)

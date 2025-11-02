@@ -22,7 +22,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
@@ -41,7 +41,7 @@ import love.yinlin.screen.world.game.GameItem
 import love.yinlin.screen.world.game.playGameState
 
 @Stable
-class ScreenPlayGame(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
     @Stable
     private enum class Status {
         Preparing, Playing, Settling

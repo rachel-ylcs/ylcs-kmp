@@ -18,7 +18,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
@@ -35,7 +35,7 @@ import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.LoadingPrimaryButton
 
 @Stable
-class ScreenLogin(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 	@Stable
 	@Serializable
 	private enum class Mode {

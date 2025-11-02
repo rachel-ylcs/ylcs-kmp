@@ -37,7 +37,7 @@ import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.graphics.ImageCompress
 import love.yinlin.compose.graphics.ImageCrop
 import love.yinlin.compose.graphics.ImageProcessor
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.MiniIcon
@@ -71,7 +71,7 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     private val subScreenMe = manager.get<ScreenMain>().get<SubScreenMe>()
 
     private suspend fun pickPicture(aspectRatio: Float): Path? {
@@ -275,7 +275,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                     hasDivider = false,
                     onClick = {
                         pop()
-                        navigate<ScreenLogin>()
+                        navigate(::ScreenLogin)
                     }
                 )
             }
@@ -700,7 +700,7 @@ class ScreenSettings(manager: ScreenManager) : CommonScreen(manager) {
                 ContributorList(
                     contributors = About.contributors,
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { navigate(ScreenUserCard.Args(it.uid)) }
+                    onClick = { navigate(::ScreenUserCard, it.uid) }
                 )
                 UpdateInfoLayout(
                     updateInfo = About.updateInfo,

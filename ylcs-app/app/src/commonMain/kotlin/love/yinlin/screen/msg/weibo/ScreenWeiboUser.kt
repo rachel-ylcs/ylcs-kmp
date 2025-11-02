@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.serialization.Serializable
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.compose.*
@@ -162,11 +161,7 @@ private fun UserAlbumItem(
 }
 
 @Stable
-class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<ScreenWeiboUser.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val id: String)
-
+class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Screen(manager) {
     private val subScreenMsg = manager.get<ScreenMain>().get<SubScreenMsg>()
 
     private var state by mutableStateOf(BoxState.EMPTY)
@@ -184,7 +179,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
     }
 
     private fun onAlbumClick(album: WeiboAlbum) {
-        navigate(ScreenWeiboAlbum.Args(album.containerId, album.title))
+        navigate(::ScreenWeiboAlbum, album.containerId, album.title)
     }
 
     private fun onPicturesDownload(pics: List<Picture>) {
@@ -365,7 +360,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
 
     override suspend fun initialize() {
         launch {
-            val data = WeiboAPI.getWeiboUser(args.id)
+            val data = WeiboAPI.getWeiboUser(userId)
             user = if (data is Data.Success) data.data else null
             user?.info?.id?.let { id ->
                 if (state != BoxState.LOADING) {
@@ -379,7 +374,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val args: Args) : Screen<S
             }
         }
         launch {
-            val data = WeiboAPI.getWeiboUserAlbum(args.id)
+            val data = WeiboAPI.getWeiboUserAlbum(userId)
             albums = if (data is Data.Success) data.data else null
         }
     }

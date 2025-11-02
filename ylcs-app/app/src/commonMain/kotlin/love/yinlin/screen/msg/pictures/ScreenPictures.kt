@@ -23,7 +23,7 @@ import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
@@ -39,7 +39,7 @@ import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.screen.common.ScreenImagePreview
 
 @Stable
-class ScreenPictures(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenPictures(manager: ScreenManager) : Screen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private var keyword: String? = null
@@ -150,7 +150,7 @@ class ScreenPictures(manager: ScreenManager) : CommonScreen(manager) {
                             val pics = List(album.picNum) {
                                 Picture(album.thumbPath(it), album.picPath(it))
                             }
-                            navigate(ScreenImagePreview.Args(pics, index))
+                            navigate(::ScreenImagePreview, pics, index)
                         }
                     )
                 }

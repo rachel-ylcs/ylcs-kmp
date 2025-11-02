@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ItemKey
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -28,7 +28,7 @@ import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.text.RichText
 
 @Stable
-class ScreenWeiboDetails(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenWeiboDetails(manager: ScreenManager) : Screen(manager) {
     private val subScreenMsg = manager.get<ScreenMain>().get<SubScreenMsg>()
     private val weibo: Weibo? = subScreenMsg.currentWeibo
     private var comments: List<WeiboComment>? by mutableRefStateOf(null)

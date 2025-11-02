@@ -17,7 +17,7 @@ import androidx.compose.ui.util.fastMap
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -67,7 +67,7 @@ private fun WeiboUserItem(
 }
 
 @Stable
-class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
     private var isLocal by mutableStateOf(true)
     private var state by mutableStateOf(BoxState.CONTENT)
     private var searchResult by mutableRefStateOf(emptyList<WeiboUserInfo>())
@@ -141,7 +141,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : CommonScreen(manager) {
                     WeiboUserItem(
                         user = it,
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { navigate(ScreenWeiboUser.Args(it.id)) }
+                        onClick = { navigate(::ScreenWeiboUser, it.id) }
                     )
                 }
             }

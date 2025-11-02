@@ -10,7 +10,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.Device
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
@@ -23,7 +23,7 @@ import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.io.safeToSources
 
 @Stable
-class ScreenAddActivity(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenAddActivity(manager: ScreenManager) : Screen(manager) {
 	val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
 
 	private val input = ActivityInputState()
@@ -89,7 +89,7 @@ class ScreenAddActivity(manager: ScreenManager) : CommonScreen(manager) {
             onPicDelete = { input.pic = null },
             onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
             onPicsDelete = { input.pics.removeAt(it) },
-            onPicsClick = { items, current -> navigate(ScreenImagePreview.Args(items, current)) }
+            onPicsClick = { items, current -> navigate(::ScreenImagePreview, items, current) }
         )
 	}
 

@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
-import kotlinx.serialization.Serializable
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
@@ -150,15 +149,11 @@ private fun AtUserItem(
 }
 
 @Stable
-class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val currentTopic: Topic)
-
+class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager) {
     private val subScreenDiscovery = manager.get<ScreenMain>().get<SubScreenDiscovery>()
 
     private var details: TopicDetails? by mutableRefStateOf(null)
-    private var topic: Topic by mutableRefStateOf(args.currentTopic)
+    private var topic: Topic by mutableRefStateOf(currentTopic)
 
     private val pageComments = object : PaginationArgs<Comment, Int, Int, Boolean>(
         default = 0,
@@ -261,7 +256,7 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
     }
 
     private fun onImageClick(images: List<Picture>, current: Int) {
-        navigate(ScreenImagePreview.Args(images, current))
+        navigate(::ScreenImagePreview, images, current)
     }
 
     private suspend fun onChangeTopicIsTop(value: Boolean) {
@@ -490,9 +485,9 @@ class ScreenTopic(manager: ScreenManager, args: Args) : Screen<ScreenTopic.Args>
         RichText(
             text = text,
             fixLineHeight = true,
-            onLinkClick = { uri -> ScreenWebpage.gotoWebPage(uri) { navigate(it) } },
+            onLinkClick = { uri -> ScreenWebpage.gotoWebPage(uri) { navigate(::ScreenWebpage, it) } },
             onTopicClick = {},
-            onAtClick = { navigate(ScreenUserCard.Args(it.toIntOrNull() ?: 0)) },
+            onAtClick = { navigate(::ScreenUserCard, it.toIntOrNull() ?: 0) },
             modifier = modifier
         )
     }

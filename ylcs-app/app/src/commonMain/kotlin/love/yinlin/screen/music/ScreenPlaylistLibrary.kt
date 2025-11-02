@@ -25,7 +25,7 @@ import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
@@ -107,7 +107,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 }
 
 @Stable
-class ScreenPlaylistLibrary(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
     private val mp = app.mp
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }

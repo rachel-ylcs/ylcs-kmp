@@ -24,7 +24,7 @@ import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameRecordWithName
@@ -47,7 +47,7 @@ import love.yinlin.compose.ui.layout.StatusBox
 import love.yinlin.screen.world.game.GameRecordCard
 
 @Stable
-class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private val page = object : Pagination<GameRecordWithName, Long, Long>(

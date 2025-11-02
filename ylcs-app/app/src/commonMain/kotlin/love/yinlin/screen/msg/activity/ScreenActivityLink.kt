@@ -10,7 +10,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
@@ -23,7 +23,7 @@ import love.yinlin.compose.ui.platform.WebViewState
 import love.yinlin.compose.ui.platform.UnsupportedPlatformComponent
 
 @Stable
-class ScreenActivityLink(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {
     val showstartInput = TextInputState()
     val webPageState = WebViewState(WebViewConfig())
 

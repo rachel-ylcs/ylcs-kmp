@@ -21,7 +21,7 @@ import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
 import love.yinlin.compose.graphics.ImageProcessor
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.text.TextInput
@@ -43,7 +43,7 @@ import love.yinlin.compose.ui.text.RichEditorState
 import love.yinlin.io.safeToSources
 
 @Stable
-class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
     @Stable
     private class InputState {
         val title = TextInputState()
@@ -211,7 +211,7 @@ class ScreenAddTopic(manager: ScreenManager) : CommonScreen(manager) {
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },
                     onDelete = { deletePic(it) },
-                    onClick = { index, _ -> navigate(ScreenImagePreview.Args(input.pics, index)) }
+                    onClick = { index, _ -> navigate(::ScreenImagePreview, input.pics, index) }
                 ) { _, pic ->
                     WebImage(
                         uri = pic.image,

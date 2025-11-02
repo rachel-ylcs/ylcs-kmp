@@ -15,9 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import kotlinx.serialization.Serializable
 import love.yinlin.app
-import love.yinlin.common.Paths
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 import love.yinlin.compose.*
@@ -38,11 +36,7 @@ import love.yinlin.compose.ui.node.dragAndDrop
 import love.yinlin.uri.Uri
 
 @Stable
-class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen<ScreenImportMusic.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val uri: Uri?)
-
+class ScreenImportMusic(manager: ScreenManager, private val uri: Uri?) : Screen(manager) {
     @Stable
     private sealed interface Step {
         @Stable
@@ -202,7 +196,7 @@ class ScreenImportMusic(manager: ScreenManager, private val args: Args) : Screen
     }
 
     override suspend fun initialize() {
-        args.uri?.let {
+        uri?.let {
             // step = Step.Prepare(processImportMusicDeepLink(it))
         }
     }

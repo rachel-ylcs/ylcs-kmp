@@ -17,7 +17,7 @@ import love.yinlin.compose.ui.floating.FABLayout
 import kotlin.reflect.KClass
 
 @Stable
-abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
+abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
     @Stable
     data class SubScreenInfo(
         val screen: SubScreen,
@@ -27,7 +27,7 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
 
     abstract val subs: List<SubScreenInfo>
 
-    inline fun <reified S : SubScreen> sub(factory: (BasicScreen<*>) -> S): SubScreenInfo = SubScreenInfo(factory(this), S::class)
+    inline fun <reified S : SubScreen> sub(factory: (BasicScreen) -> S): SubScreenInfo = SubScreenInfo(factory(this), S::class)
 
     inline fun <reified S : SubScreen> get(): S = subs.first { it.clz == S::class }.screen as S
 
@@ -92,5 +92,3 @@ abstract class NavigationScreen<A>(manager: ScreenManager) : BasicScreen<A>(mana
     @Composable
     override fun Floating() = currentScreen.Floating()
 }
-
-typealias CommonNavigationScreen = NavigationScreen<Unit>

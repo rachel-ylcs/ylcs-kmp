@@ -13,12 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import kotlinx.serialization.Serializable
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
-import love.yinlin.compose.screen.CommonNavigationScreen
+import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.resources.*
@@ -34,7 +33,6 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-@Serializable
 enum class TabItem(
     val title: StringResource,
     val iconNormal: DrawableResource,
@@ -133,7 +131,7 @@ private fun LandscapeNavigation(
 }
 
 @Stable
-class ScreenMain(manager: ScreenManager) : CommonNavigationScreen(manager) {
+class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
     override val subs: List<SubScreenInfo> = listOf(
         sub(::SubScreenMsg),
         sub(::SubScreenWorld),

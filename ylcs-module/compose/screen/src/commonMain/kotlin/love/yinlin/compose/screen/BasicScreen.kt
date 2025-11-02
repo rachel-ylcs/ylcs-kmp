@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -23,7 +21,7 @@ import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.floating.FABLayout
 
 @Stable
-abstract class BasicScreen<A>(val manager: ScreenManager) : ViewModel() {
+abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
     open suspend fun initialize() {}
 
     open fun finalize() {}
@@ -76,10 +74,20 @@ abstract class BasicScreen<A>(val manager: ScreenManager) : ViewModel() {
     }
 
     fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
-    inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate(route, options, extras)
-    inline fun <reified T : CommonBasicScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = manager.navigate<T>(options, extras)
+
+    inline fun <reified S : BasicScreen> navigate(s: (ScreenManager) -> S) =
+        manager.navigate(s)
+
+    inline fun <reified S : BasicScreen, reified A1> navigate(s: (ScreenManager, A1) -> S, arg1: A1) =
+        manager.navigate(s, arg1)
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(s: (ScreenManager, A1, A2) -> S, arg1: A1, arg2: A2) =
+        manager.navigate(s, arg1, arg2)
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(s: (ScreenManager, A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3) =
+        manager.navigate(s, arg1, arg2, arg3)
+
     fun pop() = manager.pop()
+
     fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
 }
-
-typealias CommonBasicScreen = BasicScreen<Unit>

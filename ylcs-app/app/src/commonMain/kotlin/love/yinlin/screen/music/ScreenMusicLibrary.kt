@@ -25,7 +25,7 @@ import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.FloatingDialogDynamicChoice
 import love.yinlin.compose.ui.floating.FloatingDialogInput
@@ -115,7 +115,7 @@ private fun MusicCard(
 }
 
 @Stable
-class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     private val mp = app.mp
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
@@ -308,7 +308,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
                 // navigate<ScreenMusicModFactory>()
             }
             Action(Icons.Outlined.Upload, "导入") {
-                navigate(ScreenImportMusic.Args(null))
+                navigate(::ScreenImportMusic, null)
             }
             Action(Icons.Outlined.DesignServices, "创造") {
                 // navigate<ScreenCreateMusic>()

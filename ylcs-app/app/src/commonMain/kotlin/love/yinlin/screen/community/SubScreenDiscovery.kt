@@ -61,7 +61,7 @@ private enum class DiscoveryItem(
 }
 
 @Stable
-class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
+class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private val gridState = LazyStaggeredGridState()
@@ -154,11 +154,11 @@ class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
     }
 
     private fun onTopicClick(topic: Topic) {
-        navigate(ScreenTopic.Args(topic))
+        navigate(::ScreenTopic, topic)
     }
 
     fun onUserAvatarClick(uid: Int) {
-        navigate(ScreenUserCard.Args(uid))
+        navigate(::ScreenUserCard, uid)
     }
 
     @Composable
@@ -303,7 +303,7 @@ class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
 
     override val fabMenus: Array<FABAction> = arrayOf(
         FABAction(Icons.Outlined.Edit, "发表主题") {
-            navigate<ScreenAddTopic>()
+            navigate(::ScreenAddTopic)
         },
         FABAction(Icons.Outlined.Refresh, "刷新") {
             launch { requestNewData(true) }

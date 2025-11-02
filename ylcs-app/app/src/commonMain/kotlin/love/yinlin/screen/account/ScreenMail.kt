@@ -27,7 +27,7 @@ import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
@@ -44,7 +44,7 @@ import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.RichText
 
 @Stable
-class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
 
     private val page = object : PaginationArgs<Mail, Long, Long, Boolean>(
@@ -279,7 +279,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
                 }
                 RichText(
                     text = remember(args) { RichString.parse(args.content) },
-                    onLinkClick = { uri -> ScreenWebpage.gotoWebPage(uri) { navigate(it) } },
+                    onLinkClick = { uri -> ScreenWebpage.gotoWebPage(uri) { navigate(::ScreenWebpage, it) } },
                     modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
                 )
             }

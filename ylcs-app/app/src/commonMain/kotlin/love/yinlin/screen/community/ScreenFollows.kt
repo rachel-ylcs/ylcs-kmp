@@ -84,12 +84,8 @@ private fun FollowItemLayout(
 }
 
 @Stable
-class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val tab: Int)
-
-    private var tab by mutableRefStateOf(FollowTabItem.fromInt(args.tab))
+class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
+    private var tab by mutableRefStateOf(FollowTabItem.fromInt(currentTab))
     private val gridState = LazyGridState()
 
     private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(
@@ -291,7 +287,7 @@ class ScreenFollows(manager: ScreenManager, args: Args) : Screen<ScreenFollows.A
                             item = it,
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                if (tab != FollowTabItem.BLOCK_USERS) navigate(ScreenUserCard.Args(it.uid))
+                                if (tab != FollowTabItem.BLOCK_USERS) navigate(::ScreenUserCard, it.uid)
                                 else {
                                     launch {
                                         if (slot.confirm.openSuspend(content = "取消拉黑")) unBlockUser(it)

@@ -2,23 +2,19 @@ package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigator
 
 @Stable
-class ScreenManager(
-    val navController: NavHostController
-) {
+class ScreenManager(val navController: NavHostController) {
     @Stable
     data class ScreenInfo(
-        val screen: BasicScreen<*>,
+        val screen: BasicScreen,
         val id: String
     )
 
     val infoMap = mutableMapOf<String, MutableList<ScreenInfo>>()
-    val idMap = mutableMapOf<String, BasicScreen<*>>()
+    val idMap = mutableMapOf<String, BasicScreen>()
 
-    fun registerScreen(screen: BasicScreen<*>, id: String) {
+    fun registerScreen(screen: BasicScreen, id: String) {
         val key = screen::class.qualifiedName!!
         val value = infoMap[key]
         val info = ScreenInfo(screen, id)
@@ -27,7 +23,7 @@ class ScreenManager(
         idMap[id] = screen
     }
 
-    fun unregisterScreen(screen: BasicScreen<*>) {
+    fun unregisterScreen(screen: BasicScreen) {
         val key = screen::class.qualifiedName!!
         val value = infoMap[key]
         if (value != null) {
@@ -41,11 +37,11 @@ class ScreenManager(
         }
     }
 
-    val top: BasicScreen<*> get() = idMap[navController.currentBackStackEntry!!.id]!!
+    val top: BasicScreen get() = idMap[navController.currentBackStackEntry!!.id]!!
 
-    inline fun <reified S : BasicScreen<*>> get(): S = infoMap[S::class.qualifiedName!!]!!.first().screen as S
+    inline fun <reified S : BasicScreen> get(): S = infoMap[S::class.qualifiedName!!]!!.first().screen as S
 
-    inline fun <reified S : BasicScreen<*>> forEach(block: S.() -> Unit) {
+    inline fun <reified S : BasicScreen> forEach(block: S.() -> Unit) {
         val key = S::class.qualifiedName!!
         val value = infoMap[key]
         if (value != null) {
@@ -55,9 +51,17 @@ class ScreenManager(
         }
     }
 
-    inline fun <reified T : Any> navigate(route: T, options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route, options, extras)
+    inline fun <reified S : BasicScreen> navigate(s: (ScreenManager) -> S) =
+        navController.navigate(route = route<S>().toString())
 
-    inline fun <reified T : CommonBasicScreen> navigate(options: NavOptions? = null, extras: Navigator.Extras? = null) = navController.navigate(route<T>(), options, extras)
+    inline fun <reified S : BasicScreen, reified A1> navigate(s: (ScreenManager, A1) -> S, arg1: A1) =
+        navController.navigate(route = route<S>().arg(arg1).toString())
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(s: (ScreenManager, A1, A2) -> S, arg1: A1, arg2: A2) =
+        navController.navigate(route = route<S>().arg(arg1).arg(arg2).toString())
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(s: (ScreenManager, A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3) =
+        navController.navigate(route = route<S>().arg(arg1).arg(arg2).arg(arg3).toString())
 
     fun pop() {
         if (navController.previousBackStackEntry != null) navController.popBackStack()

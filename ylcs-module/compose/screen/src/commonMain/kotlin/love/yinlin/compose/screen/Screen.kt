@@ -20,7 +20,7 @@ import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.compose.ui.layout.SplitActionLayout
 
 @Stable
-abstract class Screen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
+abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
     protected abstract val title: String?
 
     protected open fun onBack() = pop()
@@ -110,5 +110,3 @@ abstract class Screen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
         }
     }
 }
-
-typealias CommonScreen = Screen<Unit>

@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
@@ -35,11 +34,7 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameItem
 
 @Stable
-class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGameHall.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val type: Game)
-
+class ScreenGameHall(manager: ScreenManager, private val type: Game) : Screen(manager) {
     private val subScreenWorld = manager.get<ScreenMain>().get<SubScreenWorld>()
 
     private var state by mutableStateOf(BoxState.EMPTY)
@@ -54,7 +49,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
 
     private val gridState = LazyStaggeredGridState()
 
-    override val title: String = args.type.title
+    override val title: String = type.title
 
     private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
@@ -62,7 +57,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
             val result = ClientAPI.request(
                 route = API.User.Game.GetGames,
                 data = API.User.Game.GetGames.Request(
-                    type = args.type,
+                    type = type,
                     num = page.pageNum
                 )
             )
@@ -76,7 +71,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
         val result = ClientAPI.request(
             route = API.User.Game.GetGames,
             data = API.User.Game.GetGames.Request(
-                type = args.type,
+                type = type,
                 gid = page.offset,
                 num = page.pageNum
             )
@@ -137,7 +132,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
                             else if (profile.coin < it.cost) slot.tip.warning("银币不足入场")
                             else {
                                 subScreenWorld.currentGame = it
-                                navigate<ScreenPlayGame>()
+                                navigate(::ScreenPlayGame)
                             }
                         }
                         else slot.tip.warning("请先登录")

@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -34,14 +33,10 @@ import love.yinlin.screen.world.game.cast
 import love.yinlin.screen.world.game.createGameState
 
 @Stable
-class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCreateGame.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val type: Game)
-
+class ScreenCreateGame(manager: ScreenManager, private val type: Game) : Screen(manager) {
     private val subScreenWorld = manager.get<ScreenMain>().get<SubScreenWorld>()
 
-    private val state = createGameState(args.type, slot)
+    private val state = createGameState(type, slot)
     private val config = state.config
 
     private val titleState = TextInputState()
@@ -132,7 +127,7 @@ class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCr
         }
     }
 
-    override val title: String = "${args.type.title} - 新游戏"
+    override val title: String = "${type.title} - 新游戏"
 
     @Composable
     override fun ActionScope.RightActions() {
@@ -151,7 +146,7 @@ class ScreenCreateGame(manager: ScreenManager, val args: Args) : Screen<ScreenCr
                         data = API.User.Game.CreateGame.Request(
                             token = app.config.userToken,
                             title = titleState.text,
-                            type = args.type,
+                            type = type,
                             reward = reward,
                             num = num.cast(config.minRank, maxNum),
                             cost = cost.cast(0, maxCost),

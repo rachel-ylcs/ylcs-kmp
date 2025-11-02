@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ClientAPI
@@ -40,11 +39,7 @@ import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 
 @Stable
-class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<ScreenUserCard.Args>(manager) {
-    @Stable
-    @Serializable
-    data class Args(val uid: Int)
-
+class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(manager) {
     private var profile: UserPublicProfile? by mutableRefStateOf(null)
 
     private val listState = LazyStaggeredGridState()
@@ -64,7 +59,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
             route = API.User.Profile.GetPublicProfile,
             data = API.User.Profile.GetPublicProfile.Request(
                 token = app.config.userToken.ifEmpty { null },
-                uid = args.uid
+                uid = uid
             )
         )
         if (result is Data.Success) profile = result.data
@@ -74,7 +69,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Topic.GetTopics,
             data = API.User.Topic.GetTopics.Request(
-                uid = args.uid,
+                uid = uid,
                 num = page.pageNum
             )
         )
@@ -85,7 +80,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
         val result = ClientAPI.request(
             route = API.User.Topic.GetTopics,
             data = API.User.Topic.GetTopics.Request(
-                uid = args.uid,
+                uid = uid,
                 isTop = page.arg1,
                 tid = page.offset,
                 num = page.pageNum
@@ -143,7 +138,7 @@ class ScreenUserCard(manager: ScreenManager, private val args: Args) : Screen<Sc
     }
 
     private fun onTopicClick(topic: Topic) {
-        navigate(ScreenTopic.Args(topic))
+        navigate(::ScreenTopic, topic)
     }
 
     @Composable

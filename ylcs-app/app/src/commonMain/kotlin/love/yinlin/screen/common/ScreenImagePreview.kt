@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
-import kotlinx.serialization.Serializable
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -33,18 +32,14 @@ import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
-class ScreenImagePreview(manager: ScreenManager, args: Args) : Screen<ScreenImagePreview.Args>(manager) {
-	@Stable
-	@Serializable
-	data class Args(val images: List<Picture>, val index: Int)
-
+class ScreenImagePreview(manager: ScreenManager, images: List<Picture>, initIndex: Int) : Screen(manager) {
 	@Stable
 	private class PreviewPicture(val pic: Picture) {
 		var isSource: Boolean by mutableStateOf(false)
 	}
 
-	private val previews: List<PreviewPicture> = args.images.fastMap { PreviewPicture(it) }
-	private var current: Int by mutableIntStateOf(args.index)
+	private val previews: List<PreviewPicture> = images.fastMap { PreviewPicture(it) }
+	private var current: Int by mutableIntStateOf(initIndex)
 	private val pagerState = PagerState(current) { previews.size }
 
 	private fun downloadPicture() {

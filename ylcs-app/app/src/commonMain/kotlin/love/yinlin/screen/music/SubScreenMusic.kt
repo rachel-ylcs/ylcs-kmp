@@ -99,7 +99,7 @@ private fun PlayingMusicStatusCard(
 }
 
 @Stable
-class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
+class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	private val mp = app.mp
 
 	private var isAnimationBackground by mutableStateOf(false)
@@ -169,7 +169,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "曲库",
                     color = Colors.White
                 ) {
-                    if (mp.isInit) navigate<ScreenMusicLibrary>()
+                    if (mp.isInit) navigate(::ScreenMusicLibrary)
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -177,7 +177,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌单",
                     color = Colors.White
                 ) {
-                    if (mp.isInit) navigate<ScreenPlaylistLibrary>()
+                    if (mp.isInit) navigate(::ScreenPlaylistLibrary)
                     else slot.tip.warning("播放器尚未初始化")
                 }
                 Action(
@@ -185,7 +185,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
                     tip = "歌词",
                     color = Colors.White
                 ) {
-                    if (mp.isInit) navigate<ScreenFloatingLyrics>()
+                    if (mp.isInit) navigate(::ScreenFloatingLyrics)
                     else slot.tip.warning("播放器尚未初始化")
                 }
             },
@@ -520,7 +520,7 @@ class SubScreenMusic(parent: BasicScreen<*>) : SubScreen(parent) {
 						mp.currentMusic?.path(Paths.modPath, ModResourceType.Video)?.let { path ->
 							launch {
 								mp.pause()
-								navigate(ScreenVideo.Args(path.toString()))
+								navigate(::ScreenVideo, path.toString())
 							}
 						}
 					}

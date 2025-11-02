@@ -7,7 +7,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import kotlinx.serialization.Serializable
 import love.yinlin.app
 import love.yinlin.uri.Uri
 import love.yinlin.compose.Device
@@ -20,22 +19,18 @@ import love.yinlin.compose.ui.platform.WebViewState
 import love.yinlin.platform.Platform
 
 @Stable
-class ScreenWebpage(manager: ScreenManager, args: Args) : Screen<ScreenWebpage.Args>(manager) {
-	@Stable
-	@Serializable
-	data class Args(val url: String)
-
+class ScreenWebpage(manager: ScreenManager, url: String) : Screen(manager) {
 	companion object {
-		inline fun gotoWebPage(arg: String, onNavigate: (Args) -> Unit) {
+		inline fun gotoWebPage(arg: String, onNavigate: (String) -> Unit) {
 			Platform.use(
 				*Platform.Desktop,
 				ifTrue = { Uri.parse(arg)?.let { app.os.net.openUri(it) } },
-				ifFalse = { onNavigate(Args(arg)) }
+				ifFalse = { onNavigate(arg) }
 			)
 		}
 	}
 
-	private val state = WebViewState(WebViewConfig(), args.url)
+	private val state = WebViewState(WebViewConfig(), url)
 
 	override val title: String by derivedStateOf { state.title }
 

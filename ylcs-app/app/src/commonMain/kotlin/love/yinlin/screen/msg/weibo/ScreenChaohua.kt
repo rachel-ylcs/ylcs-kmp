@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
@@ -30,7 +30,7 @@ import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
-class ScreenChaohua(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
     private val subScreenMsg = manager.get<ScreenMain>().get<SubScreenMsg>()
 
     private var state by mutableStateOf(BoxState.EMPTY)

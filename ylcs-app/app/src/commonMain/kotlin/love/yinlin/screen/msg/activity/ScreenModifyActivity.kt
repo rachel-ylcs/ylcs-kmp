@@ -7,7 +7,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
-import kotlinx.serialization.Serializable
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -28,13 +27,9 @@ import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.io.safeToSources
 
 @Stable
-class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Screen<ScreenModifyActivity.Args>(manager) {
-	@Stable
-	@Serializable
-	data class Args(val aid: Int)
-
+class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Screen(manager) {
 	private val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
-	private val input = ActivityInputState(activities.find { it.aid == args.aid })
+	private val input = ActivityInputState(activities.find { it.aid == aid })
 
 	private suspend fun modifyActivity() {
 		val ts = input.ts
@@ -49,7 +44,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			data = API.User.Activity.ModifyActivityInfo.Request(
 				token = app.config.userToken,
 				activity = Activity(
-					aid = args.aid,
+					aid = aid,
 					ts = ts,
 					title = title,
 					content = content,
@@ -64,7 +59,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 		)
 		when (result) {
 			is Data.Success -> {
-				activities.findAssign(predicate = { it.aid == args.aid }) {
+				activities.findAssign(predicate = { it.aid == aid }) {
 					it.copy(
 						ts = ts,
 						title = title,
@@ -87,14 +82,14 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			route = API.User.Activity.ModifyActivityPicture,
 			data = API.User.Activity.ModifyActivityPicture.Request(
 				token = app.config.userToken,
-				aid = args.aid
+				aid = aid
 			),
 			files = { API.User.Activity.ModifyActivityPicture.Files(
 				pic = file(SystemFileSystem.source(path))
 			) }
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 				val newPic = result.data
 				input.pic = it.picPath(newPic)
 				it.copy(pic = newPic)
@@ -110,11 +105,11 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			route = API.User.Activity.DeleteActivityPicture,
 			data = API.User.Activity.DeleteActivityPicture.Request(
 				token = app.config.userToken,
-				aid = args.aid
+				aid = aid
 			)
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 				input.pic = null
 				it.copy(pic = null)
 			}
@@ -129,14 +124,14 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			route = API.User.Activity.AddActivityPictures,
 			data = API.User.Activity.AddActivityPictures.Request(
 				token = app.config.userToken,
-				aid = args.aid
+				aid = aid
 			),
 			files = { API.User.Activity.AddActivityPictures.Files(
 				pics = file(files.safeToSources { SystemFileSystem.source(it) })
 			) }
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 				val newPics = result.data
 				input.pics += newPics.fastMap { pic -> Picture(it.picPath(pic)) }
 				it.copy(pics = it.pics + newPics)
@@ -157,7 +152,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 				route = API.User.Activity.ModifyActivityPictures,
 				data = API.User.Activity.ModifyActivityPictures.Request(
 					token = app.config.userToken,
-					aid = args.aid,
+					aid = aid,
 					index = index
 				),
 				files = { API.User.Activity.ModifyActivityPictures.Files(
@@ -165,7 +160,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 				) }
 			)
 			when (result) {
-				is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+				is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 					val newPic = result.data
 					input.pics[index] = Picture(it.picPath(newPic))
 					it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
@@ -182,12 +177,12 @@ class ScreenModifyActivity(manager: ScreenManager, private val args: Args) : Scr
 			route = API.User.Activity.DeleteActivityPictures,
 			data = API.User.Activity.DeleteActivityPictures.Request(
 				token = app.config.userToken,
-				aid = args.aid,
+				aid = aid,
 				index = index
 			)
 		)
 		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == args.aid }) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 				input.pics.removeAt(index)
 				it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
 			}

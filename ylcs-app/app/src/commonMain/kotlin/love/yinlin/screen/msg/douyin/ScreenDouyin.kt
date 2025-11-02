@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.DouyinAPI
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.CommonScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
@@ -39,7 +39,7 @@ import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 
 @Stable
-class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
+class ScreenDouyin(manager: ScreenManager) : Screen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private var items by mutableRefStateOf(emptyList<DouyinVideo>())
     private val gridState = LazyStaggeredGridState()
@@ -74,7 +74,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
             Column(
                 modifier = Modifier.fillMaxWidth().clickable {
                     item.videoUrl.getOrNull(videoIndex)?.let { url ->
-                        navigate(ScreenVideo.Args(url = url))
+                        navigate(::ScreenVideo, url)
                     }
                 }
             ) {

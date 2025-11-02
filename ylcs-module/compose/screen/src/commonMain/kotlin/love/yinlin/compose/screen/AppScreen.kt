@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import love.yinlin.compose.LocalAnimationSpeed
 
 @Composable
-inline fun <reified Main : CommonBasicScreen> AppScreen(
+inline fun <reified Main : BasicScreen> AppScreen(
 	modifier: Modifier = Modifier.fillMaxSize(),
 	deeplink: DeepLink = DeepLink.DEFAULT,
 	crossinline screens: ScreenBuilder.() -> Unit
@@ -27,7 +27,7 @@ inline fun <reified Main : CommonBasicScreen> AppScreen(
 
 	NavHost(
 		navController = navController,
-		startDestination = route<Main>(),
+		startDestination = Route.build<Main>(0),
 		modifier = modifier.background(MaterialTheme.colorScheme.background),
 		enterTransition = {
 			slideIntoContainer(
