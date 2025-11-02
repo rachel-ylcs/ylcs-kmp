@@ -7,7 +7,10 @@ import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
 
-open class ContentUri(private val context: Context, override val path: String) : ImplicitUri {
-    override val source: Source get() = context.contentResolver.openInputStream(Uri.parse(path)!!.toAndroidUri())!!.asSource().buffered()
-    override val sink: Sink get() = context.contentResolver.openOutputStream(Uri.parse(path)!!.toAndroidUri())!!.asSink().buffered()
+open class ContentUri(
+    private val context: Context,
+    override val path: String
+) : ImplicitUri {
+    override suspend fun <R> read(block: suspend (Source) -> R): R = context.contentResolver.openInputStream(Uri.parse(path)!!.toAndroidUri())!!.asSource().buffered().use { block(it) }
+    override suspend fun write(block: suspend (Sink) -> Unit) = context.contentResolver.openOutputStream(Uri.parse(path)!!.toAndroidUri())!!.asSink().buffered().use { block(it) }
 }

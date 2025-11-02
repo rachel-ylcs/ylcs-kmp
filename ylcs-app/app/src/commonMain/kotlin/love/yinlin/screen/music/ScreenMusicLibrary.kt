@@ -42,6 +42,9 @@ import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.extension.catchingError
+import love.yinlin.platform.Coroutines
+import love.yinlin.screen.music.loader.ScreenImportMusic
 
 @Stable
 data class MusicInfoPreview(
@@ -218,25 +221,22 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     private suspend fun onMusicPackage() {
         if (mp.isReady) slot.tip.warning("请先停止播放器")
-        else app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.let { path ->
-            try {
-                slot.loading.openSuspend()
-                path.sink.use { sink ->
+        else catchingError {
+            Coroutines.io {
+                app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.write { sink ->
+                    slot.loading.openSuspend()
                     val packageItems = selectIdList
                     ModFactory.Merge(
                         mediaPaths = packageItems.fastMapNotNull { mp.library[it]?.path(Paths.modPath) },
                         sink = sink,
                         info = ModInfo(author = app.config.userProfile?.name ?: "无名")
                     ).process(filters = ModResourceType.ALL) { _, _, _ -> }
+                    slot.loading.close()
+                    exitManagement()
+                    slot.tip.success("导出成功")
                 }
-                slot.loading.close()
-                exitManagement()
-                slot.tip.success("导出成功")
             }
-            catch (_: Throwable) {
-                slot.tip.warning("无法导出MOD")
-            }
-        }
+        }?.let { slot.tip.warning("无法导出MOD") }
     }
 
     override suspend fun initialize() {
@@ -303,12 +303,12 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
         val selectedSize by rememberDerivedState { selectIdList.size.let { if (it > 0) "已选择 - $it" else "" } }
 
         ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
+            // TODO:
             Action(Icons.Outlined.Token, "工坊") {
-                // TODO:
                 // navigate<ScreenMusicModFactory>()
             }
             Action(Icons.Outlined.Upload, "导入") {
-                // navigate(ScreenImportMusic.Args(null))
+                navigate(ScreenImportMusic.Args(null))
             }
             Action(Icons.Outlined.DesignServices, "创造") {
                 // navigate<ScreenCreateMusic>()

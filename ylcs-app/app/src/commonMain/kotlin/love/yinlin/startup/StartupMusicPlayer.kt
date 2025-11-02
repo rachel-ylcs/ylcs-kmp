@@ -92,13 +92,13 @@ abstract class StartupMusicPlayer : AsyncStartup {
     }
 
     suspend fun updateMusicLibraryInfo(ids: List<String>) {
-        for (id in ids) {
-            val modification = library[id]?.modification ?: 0
-            val info = Coroutines.io {
+        Coroutines.io {
+            for (id in ids) {
+                val modification = library[id]?.modification ?: 0
                 val configPath = Path(rootPath, id, ModResourceType.Config.filename)
-                configPath.readText()?.parseJsonValue<MusicInfo>()
+                val info = configPath.readText()?.parseJsonValue<MusicInfo>()
+                if (info != null) library[id] = info.copy(modification = modification + 1)
             }
-            if (info != null) library[id] = info.copy(modification = modification + 1)
         }
     }
 

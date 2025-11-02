@@ -353,8 +353,10 @@ class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
                             launch {
                                 isRunning = true
                                 catchingError {
-                                    runMergeTask(filters, mergeMode) { index, total, name ->
-                                        statusText = "[$index/$total] -> $name"
+                                    Coroutines.io {
+                                        runMergeTask(filters, mergeMode) { index, total, name ->
+                                            statusText = "[$index/$total] -> $name"
+                                        }
                                     }
                                 }?.let { statusText = it.message ?: "未知错误" }
                                 isRunning = false
@@ -517,7 +519,9 @@ class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
                                     reset()
                                     isRunning = true
                                     catchingError {
-                                        result = paths[0].read { source -> ModFactory.Preview(source).process() }
+                                        result = Coroutines.io {
+                                            paths[0].read { source -> ModFactory.Preview(source).process() }
+                                        }
                                         statusText = ""
                                     }?.let { statusText = it.message ?: "未知错误" }
                                     isRunning = false
@@ -591,9 +595,11 @@ class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
                                 launch {
                                     isRunning = true
                                     catchingError {
-                                        for (path in paths) {
-                                            runReleaseTask(path) { index, total, id ->
-                                                statusText = "[$index/$total] -> $id"
+                                        Coroutines.io {
+                                            for (path in paths) {
+                                                runReleaseTask(path) { index, total, id ->
+                                                    statusText = "[$index/$total] -> $id"
+                                                }
                                             }
                                         }
                                     }?.let { statusText = it.message ?: "未知错误" }

@@ -10,9 +10,7 @@ import love.yinlin.extension.toJsonString
 
 val navTypeCaches = mutableMapOf<String, NavType<*>>()
 
-inline fun <reified T> buildNavType(
-    isNullableAllowed: Boolean = false
-): NavType<T> = object : NavType<T>(isNullableAllowed = isNullableAllowed) {
+inline fun <reified T> buildNavType(): NavType<T> = object : NavType<T>(isNullableAllowed = true) {
     override fun put(bundle: SavedState, key: String, value: T) = bundle.write { putString(key, value.toJsonString()) }
     override fun get(bundle: SavedState, key: String): T? = bundle.read { getString(key).parseJsonValue() }
 

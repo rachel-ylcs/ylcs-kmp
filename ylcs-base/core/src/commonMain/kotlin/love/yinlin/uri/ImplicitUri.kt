@@ -5,6 +5,6 @@ import kotlinx.io.Source
 
 interface ImplicitUri {
     val path: String
-    val source: Source
-    val sink: Sink
+    suspend fun <R> read(block: suspend (Source) -> R): R
+    suspend fun write(block: suspend (Sink) -> Unit)
 }

@@ -60,20 +60,20 @@ fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
     true
 }
 
-inline fun <reified R> Path.read(block: (Source) -> R): R = SystemFileSystem.source(this).buffered().use(block)
+suspend inline fun <R> Path.read(crossinline block: suspend (Source) -> R): R = SystemFileSystem.source(this@read).buffered().use { block(it) }
 
-fun Path.readText(): String? = catchingNull { SystemFileSystem.source(this).buffered().use { it.readString() } }
+suspend fun Path.readText(): String? = catchingNull { read { it.readString() } }
 
-fun Path.readByteArray(): ByteArray? = catchingNull { SystemFileSystem.source(this).buffered().use { it.readByteArray() } }
+suspend fun Path.readByteArray(): ByteArray? = catchingNull { read { it.readByteArray() } }
 
-inline fun Path.write(block: (Sink) -> Unit) { SystemFileSystem.sink(this).buffered().use(block) }
+suspend inline fun Path.write(crossinline block: suspend (Sink) -> Unit) = SystemFileSystem.sink(this@write).buffered().use { block(it) }
 
-fun Path.writeText(text: String): Boolean = catchingDefault(false) {
-    SystemFileSystem.sink(this).buffered().use { it.writeString(text) }
+suspend fun Path.writeText(text: String): Boolean = catchingDefault(false) {
+    write { it.writeString(text) }
     true
 }
 
-fun Path.writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
-    SystemFileSystem.sink(this).buffered().use { it.write(data) }
+suspend fun Path.writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
+    write { it.write(data) }
     true
 }

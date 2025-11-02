@@ -40,6 +40,7 @@ import love.yinlin.screen.msg.douyin.*
 import love.yinlin.screen.msg.pictures.*
 import love.yinlin.screen.msg.weibo.*
 import love.yinlin.screen.music.*
+import love.yinlin.screen.music.loader.*
 import love.yinlin.screen.world.*
 import love.yinlin.screen.world.battle.*
 import love.yinlin.startup.*
@@ -225,7 +226,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 //            screen(::ScreenMusicModFactory)
 //            screen(::ScreenSongDetails, type<Song>())
 //
-//            screen(::ScreenImportMusic)
+            screen(::ScreenImportMusic, type<Uri?>())
 //            screen(::ScreenCreateMusic)
 //            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
 
@@ -247,8 +248,8 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     override fun onDeepLink(manager: ScreenManager, uri: Uri) {
         when (uri.scheme) {
             Scheme.File, Scheme.Content -> {
-//                if (!mp.isReady) manager.navigate(ScreenImportMusic.Args(uri.toString()))
-//                else manager.top.slot.tip.warning("请先停止播放器")
+                if (!mp.isReady) manager.navigate(ScreenImportMusic.Args(uri))
+                else manager.top.slot.tip.warning("请先停止播放器")
             }
             Scheme.Rachel -> {
                 when (uri.path) {

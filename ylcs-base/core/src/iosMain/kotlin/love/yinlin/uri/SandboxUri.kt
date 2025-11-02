@@ -8,7 +8,10 @@ import love.yinlin.io.SandboxSink
 import love.yinlin.io.SandboxSource
 import platform.Foundation.NSURL
 
-open class SandboxUri(val url: NSURL, val parentUrl: NSURL? = null) : ImplicitUri {
+open class SandboxUri(
+    private val url: NSURL,
+    private val parentUrl: NSURL? = null
+) : ImplicitUri {
     init {
         parentUrl?.let {
             val canAccess = parentUrl.startAccessingSecurityScopedResource()
@@ -17,6 +20,8 @@ open class SandboxUri(val url: NSURL, val parentUrl: NSURL? = null) : ImplicitUr
     }
 
     override val path: String get() = url.path!!
-    override val source: Source get() = SandboxSource(url).buffered()
-    override val sink: Sink get() = SandboxSink(url) { parentUrl?.stopAccessingSecurityScopedResource() }.buffered()
+
+    override suspend fun <R> read(block: suspend (Source) -> R): R = SandboxSource(url).buffered().use { block(it) }
+
+    override suspend fun write(block: suspend (Sink) -> Unit) = SandboxSink(url) { parentUrl?.stopAccessingSecurityScopedResource() }.buffered().use { block(it) }
 }
