@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
-import love.yinlin.compose.screen.CommonBasicScreen
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.screen.resources.Res
 import love.yinlin.compose.screen.resources.dialog_ok
@@ -56,7 +56,7 @@ import love.yinlin.platform.Coroutines
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class MainUI(manager: ScreenManager) : CommonBasicScreen(manager) {
+class MainUI(manager: ScreenManager) : BasicScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private val library = mutableStateListOf<ModItem>()
     private val searchLibrary by derivedStateOf { library.filter { it.shown } }

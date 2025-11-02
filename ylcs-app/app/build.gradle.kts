@@ -108,6 +108,7 @@ kotlin {
             useLib(
                 // project
                 projects.ylcsModule.app,
+                projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.service.all,
                 projects.ylcsModule.clientEngine,

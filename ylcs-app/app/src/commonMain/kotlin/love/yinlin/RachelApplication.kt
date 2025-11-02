@@ -13,6 +13,7 @@ import love.yinlin.compose.LocalAnimationSpeed
 import love.yinlin.compose.ThemeMode
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.screen.AppScreen
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.NativeLibrary
@@ -101,7 +102,8 @@ class StartupAppConfig : StartupConfig() {
 }
 
 @Stable
-abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<RachelApplication>(appReference, delegate) {
+abstract class RachelApplication(delegate: PlatformContextDelegate) :
+    PlatformApplication<RachelApplication>(appReference, delegate), DeepLink {
     private val loadNativeLibrary by system(
         NativeLibrary("ylcs_native", *Platform.Desktop),
         factory = ::StartupNativeLibrary

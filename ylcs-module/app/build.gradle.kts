@@ -55,9 +55,9 @@ kotlin {
             useApi(
                 projects.ylcsModule.compose.device,
                 projects.ylcsModule.compose.theme,
-                projects.ylcsModule.compose.platformView,
                 projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.screen,
+            )
+            useLib(
                 libs.compose.components.resources,
             )
         }

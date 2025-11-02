@@ -16,17 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import love.yinlin.compose.*
-import love.yinlin.compose.screen.DeepLink
-import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.extension.Reference
-import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class Application<out A : Application<A>>(
     private val self: Reference<A?>,
     delegate: PlatformContextDelegate,
-) : Service(), DeepLink {
+) : Service() {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
     protected open val fontScale: Float = 1f
     protected open val mainFontResource: FontResource? = null
@@ -104,6 +101,4 @@ abstract class Application<out A : Application<A>>(
 
         onCreate()
     }
-
-    override fun onDeepLink(manager: ScreenManager, uri: Uri) {}
 }
