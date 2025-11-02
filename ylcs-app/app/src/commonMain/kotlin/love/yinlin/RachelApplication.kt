@@ -19,6 +19,7 @@ import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.data.NativeLibrary
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -227,7 +228,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
 //
             screen(::ScreenImportMusic)
             screen(::ScreenCreateMusic)
-//            screen(::ScreenPlatformMusic, type<PlatformMusicType>())
+            screen(::ScreenPlatformMusic)
 
 
             // 世界
@@ -271,18 +272,12 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
                 }
             }
             Scheme.QQMusic -> {
-//                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
-//                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
-//                    type = PlatformMusicType.QQMusic
-//                ))
-//                else manager.top.slot.tip.warning("请先停止播放器")
+                if (mp.isReady) manager.top.slot.tip.warning("请先停止播放器")
+                else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.QQMusic)
             }
             Scheme.NetEaseCloud -> {
-//                if (!musicFactory.instance.isReady) manager.navigate(ScreenPlatformMusic.Args(
-//                    deeplink = uri.copy(scheme = Scheme.Https).toString(),
-//                    type = PlatformMusicType.NetEaseCloud
-//                ))
-//                else manager.top.slot.tip.warning("请先停止播放器")
+                if (mp.isReady) manager.top.slot.tip.warning("请先停止播放器")
+                else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.NetEaseCloud)
             }
         }
     }

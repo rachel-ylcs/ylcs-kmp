@@ -40,6 +40,8 @@ import love.yinlin.compose.ui.image.ReplaceableImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.extension.catchingError
+import love.yinlin.platform.Coroutines
 import love.yinlin.platform.lyrics.LrcParser
 
 @Stable
@@ -85,78 +87,80 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun submit() {
         slot.loading.openSuspend()
-        try {
-            // 1. 检查ID
-            val id = input.id.text
-            val name = input.name.text
-            if (id in app.mp.library) {
-                slot.tip.warning("ID已存在")
-                return
-            }
-            if (!id.all { it.isLetterOrDigit() }) {
-                slot.tip.warning("ID仅能由字母或数字构成")
-                return
-            }
-            // 2. 检查歌词
-            val lyrics = LrcParser(input.lyrics.text)
-            if (!lyrics.ok) {
-                slot.tip.warning("歌词格式非法")
-                return
-            }
-            // 3. 检查文件
-            val audioFile = input.audioUri
-            val recordFile = input.record
-            val backgroundFile = input.background
-            if (audioFile == null || recordFile == null || backgroundFile == null) {
-                slot.tip.warning("资源文件异常")
-                return
-            }
-            // 4. 生成目录
-            val musicPath = Path(Paths.modPath, id)
-            SystemFileSystem.createDirectories(musicPath)
-            // 5. 写入配置
-            val info = MusicInfo(
-                version = "1.0",
-                author = input.author.text,
-                id = id,
-                name = name,
-                singer = input.singer.text,
-                lyricist = input.lyricist.text,
-                composer = input.composer.text,
-                album = input.album.text,
-                chorus = null
-            )
-            SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Config)).buffered().use { sink ->
-                sink.writeString(info.toJsonString())
-            }
-            // 6. 写入音频
-            SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Audio)).buffered().use { sink ->
-                audioFile.read { source ->
-                    source.transferTo(sink)
+        catchingError(clean = {
+            slot.loading.close()
+        }) {
+            Coroutines.io {
+                // 1. 检查ID
+                val id = input.id.text
+                val name = input.name.text
+                if (id in app.mp.library) {
+                    slot.tip.warning("ID已存在")
+                    return@io
                 }
-            }
-            // 7. 写入封面
-            SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Record)).buffered().use { sink ->
-                SystemFileSystem.source(Path(recordFile)).buffered().use { source ->
-                    source.transferTo(sink)
+                if (!id.all { it.isLetterOrDigit() }) {
+                    slot.tip.warning("ID仅能由字母或数字构成")
+                    return@io
                 }
-            }
-            // 8. 写入壁纸
-            SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Background)).buffered().use { sink ->
-                SystemFileSystem.source(Path(backgroundFile)).buffered().use { source ->
-                    source.transferTo(sink)
+                // 2. 检查歌词
+                val lyrics = LrcParser(input.lyrics.text)
+                if (!lyrics.ok) {
+                    slot.tip.warning("歌词格式非法")
+                    return@io
                 }
+                // 3. 检查文件
+                val audioFile = input.audioUri
+                val recordFile = input.record
+                val backgroundFile = input.background
+                if (audioFile == null || recordFile == null || backgroundFile == null) {
+                    slot.tip.warning("资源文件异常")
+                    return@io
+                }
+                // 4. 生成目录
+                val musicPath = Path(Paths.modPath, id)
+                SystemFileSystem.createDirectories(musicPath)
+                // 5. 写入配置
+                val info = MusicInfo(
+                    version = "1.0",
+                    author = input.author.text,
+                    id = id,
+                    name = name,
+                    singer = input.singer.text,
+                    lyricist = input.lyricist.text,
+                    composer = input.composer.text,
+                    album = input.album.text,
+                    chorus = null
+                )
+                SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Config)).buffered().use { sink ->
+                    sink.writeString(info.toJsonString())
+                }
+                // 6. 写入音频
+                SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Audio)).buffered().use { sink ->
+                    audioFile.read { source ->
+                        source.transferTo(sink)
+                    }
+                }
+                // 7. 写入封面
+                SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Record)).buffered().use { sink ->
+                    SystemFileSystem.source(Path(recordFile)).buffered().use { source ->
+                        source.transferTo(sink)
+                    }
+                }
+                // 8. 写入壁纸
+                SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Background)).buffered().use { sink ->
+                    SystemFileSystem.source(Path(backgroundFile)).buffered().use { source ->
+                        source.transferTo(sink)
+                    }
+                }
+                // 9. 写入歌词
+                SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.LineLyrics)).buffered().use { sink ->
+                    sink.writeString(lyrics.toString())
+                }
+                // 10. 更新曲库
+                app.mp.updateMusicLibraryInfo(listOf(id))
+                pop()
             }
-            // 9. 写入歌词
-            SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.LineLyrics)).buffered().use { sink ->
-                sink.writeString(lyrics.toString())
-            }
-            // 10. 更新曲库
-            app.mp.updateMusicLibraryInfo(listOf(id))
-            pop()
         }
-        catch (_: Throwable) {}
-        finally { slot.loading.close() }
     }
 
     @Composable
@@ -166,7 +170,8 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
             tip = "创建",
             enabled = input.canSubmit
         ) {
-            submit()
+            if (app.mp.isReady) slot.tip.warning("请先停止播放器")
+            else submit()
         }
     }
 

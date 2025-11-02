@@ -26,10 +26,16 @@ fun <T> lazyName(initializer: (String) -> T) = object : ReadOnlyProperty<Any?, T
 
 inline fun catching(block: () -> Unit): Unit = try { block() } catch (_: Throwable) {}
 
-inline fun catchingError(block: () -> Unit): Throwable? = try {
+inline fun catchingError(clean: () -> Unit = {}, block: () -> Unit): Throwable? = try {
     block()
     null
-} catch (e: Throwable) { e }
+}
+catch (e: Throwable) {
+    e
+}
+finally {
+    clean()
+}
 
 inline fun <R> catchingNull(block: () -> R): R? = try { block() } catch (_: Throwable) { null }
 

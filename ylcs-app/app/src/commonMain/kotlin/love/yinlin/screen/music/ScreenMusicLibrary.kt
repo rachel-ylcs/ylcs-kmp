@@ -42,10 +42,12 @@ import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.catchingError
 import love.yinlin.platform.Coroutines
 import love.yinlin.screen.music.loader.ScreenCreateMusic
 import love.yinlin.screen.music.loader.ScreenImportMusic
+import love.yinlin.screen.music.loader.ScreenPlatformMusic
 
 @Stable
 data class MusicInfoPreview(
@@ -304,8 +306,8 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
         val selectedSize by rememberDerivedState { selectIdList.size.let { if (it > 0) "已选择 - $it" else "" } }
 
         ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
-            // TODO:
             Action(Icons.Outlined.Token, "工坊") {
+                // TODO:
                 // navigate<ScreenMusicModFactory>()
             }
             Action(Icons.Outlined.Upload, "导入") {
@@ -318,15 +320,15 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
             }
             Action(ExtraIcons.QQMusic, "QQ音乐", useImage = true) {
                 pop()
-                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
+                navigate(::ScreenPlatformMusic, null, PlatformMusicType.QQMusic)
             }
             Action(ExtraIcons.NetEaseCloudMusic, "网易云音乐", useImage = true) {
                 pop()
-                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
+                navigate(::ScreenPlatformMusic, null, PlatformMusicType.NetEaseCloud)
             }
             Action(ExtraIcons.KugouMusic, "酷狗音乐", useImage = true) {
                 pop()
-                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
+                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Kugou)
             }
         }
 
