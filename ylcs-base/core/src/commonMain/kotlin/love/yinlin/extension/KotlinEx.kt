@@ -1,11 +1,28 @@
 package love.yinlin.extension
 
+import kotlin.properties.ReadOnlyProperty
+import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-data class Reference<T>(var value: T) {
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
+// Reference
+
+data class Reference<T>(var value: T) : ReadWriteProperty<Any?, T> {
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
 }
+
+// lazyName
+
+fun <T> lazyName(initializer: (String) -> T) = object : ReadOnlyProperty<Any?, T> {
+    private lateinit var name: String
+    private val instance by lazy { initializer(name) }
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        name = property.name
+        return instance
+    }
+}
+
+// catching
 
 inline fun catching(block: () -> Unit): Unit = try { block() } catch (_: Throwable) {}
 

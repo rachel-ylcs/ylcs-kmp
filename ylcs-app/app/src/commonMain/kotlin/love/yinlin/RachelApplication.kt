@@ -63,7 +63,7 @@ class StartupAppConfig : StartupConfig() {
     /* ------------------  微博  ------------------ */
 
     // 微博用户
-    val weiboUsers by listState("weiboUsers") { WeiboUserInfo.DEFAULT }
+    val weiboUsers by listState { WeiboUserInfo.DEFAULT }
 
     /* ------------------  听歌  ------------------ */
 
@@ -71,7 +71,7 @@ class StartupAppConfig : StartupConfig() {
     var audioFocus by booleanState(true)
 
     // 歌单
-    val playlistLibrary by mapState<String, MusicPlaylist>("playlistLibrary")
+    val playlistLibrary by mapState<String, MusicPlaylist>()
     // 上次播放列表
     var lastPlaylist by stringState("")
     // 上次播放歌曲

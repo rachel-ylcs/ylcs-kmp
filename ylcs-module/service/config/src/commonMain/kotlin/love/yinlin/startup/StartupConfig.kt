@@ -14,6 +14,7 @@ import love.yinlin.Context
 import love.yinlin.StartupArgs
 import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
+import love.yinlin.extension.lazyName
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
 open class StartupConfig : SyncStartup {
@@ -93,10 +94,9 @@ open class StartupConfig : SyncStartup {
     }
 
     inline fun <reified T> listState(
-        name: String,
         version: String? = null,
         noinline defaultFactory: () -> List<T> = { emptyList() }
-    ) = lazy {
+    ) = lazyName { name ->
         ListState(
             kv = kv,
             name = name,
@@ -107,10 +107,9 @@ open class StartupConfig : SyncStartup {
     }
 
     inline fun <reified K, reified V> mapState(
-        name: String,
         version: String? = null,
         noinline defaultFactory: () -> Map<K, V> = { emptyMap() }
-    ) = lazy {
+    ) = lazyName { name ->
         MapState(
             kv = kv,
             name = name,
