@@ -26,6 +26,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.compose.ui.image.PauseLoading
 
 @Stable
 class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
@@ -83,6 +84,8 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
                 state = state,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
+                PauseLoading(gridState)
+
                 WeiboGrid(
                     state = gridState,
                     items = items,
@@ -141,7 +144,7 @@ class ScreenWeibo(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestWeibo() }

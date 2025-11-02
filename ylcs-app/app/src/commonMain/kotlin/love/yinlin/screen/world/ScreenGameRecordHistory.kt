@@ -39,6 +39,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
@@ -145,6 +146,8 @@ class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
+            PauseLoading(gridState)
+
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.rid },
@@ -170,7 +173,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewGameRecords(true) }

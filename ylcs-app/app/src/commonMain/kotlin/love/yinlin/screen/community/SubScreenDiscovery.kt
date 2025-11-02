@@ -297,7 +297,7 @@ class SubScreenDiscovery(parent: BasicScreen<*>) : SubScreen(parent) {
         }
     }
 
-    override val fabCanExpand: Boolean get() = gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0
+    override val fabCanExpand: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
     override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
 

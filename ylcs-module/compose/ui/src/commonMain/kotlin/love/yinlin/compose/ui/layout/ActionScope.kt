@@ -13,7 +13,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.ui.floating.BallonTip
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.ClickImage
 import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.LoadingImage
 
 @Stable
 sealed class ActionScope(private val ltr: Boolean) {
@@ -27,17 +29,32 @@ sealed class ActionScope(private val ltr: Boolean) {
         icon: ImageVector,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
+        useImage: Boolean = false,
         onClick: () -> Unit
 	) {
-		val padding = if (ltr) CustomTheme.padding.horizontalSpace else CustomTheme.padding.zeroSpace
+		val padding = if (ltr) {
+            CustomTheme.padding.horizontalSpace
+        } else {
+            CustomTheme.padding.zeroSpace
+        }
 
-        ClickIcon(
-            icon = icon,
-            color = color,
-            enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
-            onClick = onClick
-        )
+        if (useImage) {
+            ClickImage(
+                icon = icon,
+                enabled = enabled,
+                modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+                onClick = onClick
+            )
+        }
+        else {
+            ClickIcon(
+                icon = icon,
+                color = color,
+                enabled = enabled,
+                modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+                onClick = onClick
+            )
+        }
 	}
 
     @Composable
@@ -46,9 +63,10 @@ sealed class ActionScope(private val ltr: Boolean) {
         tip: String,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
+        useImage: Boolean = false,
         onClick: () -> Unit
     ) {
-        BallonTip(text = tip) { Action(icon, color, enabled, onClick) }
+        BallonTip(text = tip) { Action(icon, color, enabled, useImage, onClick) }
     }
 
 	@Composable
@@ -56,17 +74,33 @@ sealed class ActionScope(private val ltr: Boolean) {
         icon: ImageVector,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
+        useImage: Boolean = false,
         onClick: suspend () -> Unit
 	) {
-		val padding = if (ltr) CustomTheme.padding.horizontalSpace else CustomTheme.padding.zeroSpace
+		val padding = if (ltr) {
+            CustomTheme.padding.horizontalSpace
+        } else {
+            CustomTheme.padding.zeroSpace
+        }
 
-        LoadingIcon(
-            icon = icon,
-            color = color,
-            enabled = enabled,
-            modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
-            onClick = onClick
-        )
+        if (useImage) {
+            LoadingImage(
+                icon = icon,
+                color = color,
+                enabled = enabled,
+                modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+                onClick = onClick
+            )
+        }
+        else {
+            LoadingIcon(
+                icon = icon,
+                color = color,
+                enabled = enabled,
+                modifier = Modifier.padding(start = padding, end = CustomTheme.padding.horizontalSpace - padding),
+                onClick = onClick
+            )
+        }
 	}
 
     @Composable
@@ -75,9 +109,10 @@ sealed class ActionScope(private val ltr: Boolean) {
         tip: String,
         color: Color = MaterialTheme.colorScheme.onSurface,
         enabled: Boolean = true,
+        useImage: Boolean = false,
         onClick: suspend () -> Unit
     ) {
-        BallonTip(text = tip) { ActionSuspend(icon, color, enabled, onClick) }
+        BallonTip(text = tip) { ActionSuspend(icon, color, enabled, useImage, onClick) }
     }
 
 	@Composable

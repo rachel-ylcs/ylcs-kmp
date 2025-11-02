@@ -206,6 +206,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
                 items = page.items,
                 key = { it.mid },
                 columns = GridCells.Adaptive(CustomTheme.size.cardWidth),
+                state = gridState,
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewMails(false) },
@@ -225,7 +226,7 @@ class ScreenMail(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewMails(true) }

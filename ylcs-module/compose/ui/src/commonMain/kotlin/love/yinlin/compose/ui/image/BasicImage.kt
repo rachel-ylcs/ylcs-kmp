@@ -60,170 +60,6 @@ fun MiniIcon(
     }
 }
 
-@Stable
-data class ColorfulImageVector(
-    val icon: ImageVector,
-    val color: Color,
-    val background: Color
-)
-
-@Composable
-fun colorfulImageVector(
-    icon: ImageVector,
-    color: Color = Colors.Ghost,
-    background: Color = Colors.Transparent
-) = ColorfulImageVector(icon, color, background)
-
-@Composable
-fun ColorfulIcon(
-    icon: ColorfulImageVector,
-    size: Dp = CustomTheme.size.icon,
-    gap: Float = 1.5f,
-    onClick: (() -> Unit)? = null
-) {
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .condition(onClick != null) { clickable { onClick?.invoke() } }
-            .background(icon.background.copy(alpha = 0.6f)),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            modifier = Modifier.padding(CustomTheme.padding.innerIconSpace * gap).size(size),
-            imageVector = icon.icon,
-            contentDescription = null,
-            tint = icon.color,
-        )
-    }
-}
-
-@Composable
-fun ClickIcon(
-    icon: ImageVector,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    size: Dp = CustomTheme.size.icon,
-    indication: Boolean = true,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) = MiniIcon(
-    icon = icon,
-    color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
-    size = size,
-    modifier = modifier
-        .clip(MaterialTheme.shapes.extraSmall)
-        .clickable(
-            onClick = onClick,
-            indication = if (indication) LocalIndication.current else null,
-            interactionSource = remember { MutableInteractionSource() },
-            enabled = enabled
-        )
-)
-
-@Composable
-fun ClickIcon(
-    icon: ImageVector,
-    tip: String,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    size: Dp = CustomTheme.size.icon,
-    indication: Boolean = true,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    BallonTip(text = tip) { ClickIcon(icon, color, size, indication, enabled, modifier, onClick) }
-}
-
-@Composable
-fun LoadingCircle(
-    modifier: Modifier = Modifier,
-    size: Dp = CustomTheme.size.icon,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-) {
-    Box(modifier = modifier) {
-        CircularProgressIndicator(
-            modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
-            color = color
-        )
-    }
-}
-
-@Composable
-fun StaticLoadingIcon(
-    isLoading: Boolean,
-    icon: ImageVector,
-    size: Dp = CustomTheme.size.icon,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier
-) {
-    if (isLoading) {
-        LoadingCircle(
-            size = size,
-            color = color,
-            modifier = modifier
-        )
-    }
-    else {
-        MiniIcon(
-            icon = icon,
-            color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
-            size = size,
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
-fun LoadingIcon(
-    icon: ImageVector,
-    size: Dp = CustomTheme.size.icon,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier,
-    onClick: suspend () -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    var isLoading by rememberFalse()
-
-    if (isLoading) {
-        LoadingCircle(
-            size = size,
-            color = color,
-            modifier = modifier
-        )
-    }
-    else {
-        ClickIcon(
-            icon = icon,
-            color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
-            size = size,
-            enabled = enabled && !isLoading,
-            onClick = {
-                scope.launch {
-                    isLoading = true
-                    onClick()
-                    isLoading = false
-                }
-            },
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
-fun LoadingIcon(
-    icon: ImageVector,
-    tip: String,
-    size: Dp = CustomTheme.size.icon,
-    color: Color = MaterialTheme.colorScheme.onSurface,
-    enabled: Boolean = true,
-    modifier: Modifier = Modifier,
-    onClick: suspend () -> Unit
-) {
-    BallonTip(text = tip) { LoadingIcon(icon, size, color, enabled, modifier, onClick) }
-}
-
 @Composable
 fun MiniIcon(
     res: DrawableResource,
@@ -238,59 +74,6 @@ fun MiniIcon(
             modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
             painter = painterResource(res),
             contentDescription = null
-        )
-    }
-}
-
-@Composable
-fun ClickIcon(
-    res: DrawableResource,
-    size: Dp = CustomTheme.size.icon,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) = MiniIcon(
-    res = res,
-    size = size,
-    modifier = modifier
-        .clip(MaterialTheme.shapes.extraSmall)
-        .clickable(onClick = onClick)
-)
-
-@Composable
-fun ClickIcon(
-    res: DrawableResource,
-    tip: String,
-    size: Dp = CustomTheme.size.icon,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    BallonTip(text = tip) { ClickIcon(res, size, modifier, onClick) }
-}
-
-@Composable
-fun IconText(
-    icon: ImageVector,
-    text: String,
-    size: Dp = CustomTheme.size.extraIcon,
-    shape: Shape = MaterialTheme.shapes.large,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clip(shape)
-            .clickable(onClick = onClick)
-            .padding(CustomTheme.padding.equalValue),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
-    ) {
-        Image(
-            painter = rememberVectorPainter(icon),
-            contentDescription = null,
-            modifier = Modifier.size(size)
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium
         )
     }
 }
@@ -360,17 +143,418 @@ fun MiniImage(
 }
 
 @Composable
+fun ClickIcon(
+    icon: ImageVector,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    MiniIcon(
+        icon = icon,
+        color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+        size = size,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .clickable(
+                onClick = onClick,
+                indication = if (indication) LocalIndication.current else null,
+                interactionSource = remember { MutableInteractionSource() },
+                enabled = enabled
+            )
+    )
+}
+
+@Composable
+fun ClickIcon(
+    res: DrawableResource,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    MiniIcon(
+        res = res,
+        size = size,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .clickable(
+                onClick = onClick,
+                indication = if (indication) LocalIndication.current else null,
+                interactionSource = remember { MutableInteractionSource() },
+                enabled = enabled
+            )
+    )
+}
+
+@Composable
+fun ClickIcon(
+    icon: ImageVector,
+    tip: String,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickIcon(icon, color, size, indication, enabled, modifier, onClick) }
+}
+
+@Composable
+fun ClickIcon(
+    res: DrawableResource,
+    tip: String,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickIcon(res, size, indication, enabled, modifier, onClick) }
+}
+
+@Composable
+fun ClickImage(
+    icon: ImageVector,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    MiniImage(
+        icon = icon,
+        size = size,
+        modifier = modifier.clickable(
+            onClick = onClick,
+            indication = if (indication) LocalIndication.current else null,
+            interactionSource = remember { MutableInteractionSource() },
+            enabled = enabled
+        )
+    )
+}
+
+@Composable
 fun ClickImage(
     res: DrawableResource,
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
     alpha: Float = 1f,
+    indication: Boolean = true,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
-) = MiniImage(
-    res = res,
-    contentScale = contentScale,
-    alignment = alignment,
-    alpha = alpha,
-    modifier = modifier.clickable(onClick = onClick)
+) {
+    MiniImage(
+        res = res,
+        contentScale = contentScale,
+        alignment = alignment,
+        alpha = alpha,
+        modifier = modifier.clickable(
+            onClick = onClick,
+            indication = if (indication) LocalIndication.current else null,
+            interactionSource = remember { MutableInteractionSource() },
+            enabled = enabled
+        )
+    )
+}
+
+@Composable
+fun ClickImage(
+    painter: Painter,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = 1f,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    MiniImage(
+        painter = painter,
+        contentScale = contentScale,
+        alignment = alignment,
+        alpha = alpha,
+        modifier = modifier.clickable(
+            onClick = onClick,
+            indication = if (indication) LocalIndication.current else null,
+            interactionSource = remember { MutableInteractionSource() },
+            enabled = enabled
+        )
+    )
+}
+
+@Composable
+fun ClickImage(
+    icon: ImageVector,
+    tip: String,
+    size: Dp = CustomTheme.size.icon,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickImage(icon, size, indication, enabled, modifier, onClick) }
+}
+
+@Composable
+fun ClickImage(
+    res: DrawableResource,
+    tip: String,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = 1f,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickImage(res, contentScale, alignment, alpha, indication, enabled, modifier, onClick) }
+}
+
+@Composable
+fun ClickImage(
+    painter: Painter,
+    tip: String,
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = 1f,
+    indication: Boolean = true,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    BallonTip(text = tip) { ClickImage(painter, contentScale, alignment, alpha, indication, enabled, modifier, onClick) }
+}
+
+@Composable
+fun LoadingCircle(
+    modifier: Modifier = Modifier,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Box(modifier = modifier) {
+        CircularProgressIndicator(
+            modifier = Modifier.padding(CustomTheme.padding.innerIconSpace).size(size),
+            color = color
+        )
+    }
+}
+
+@Composable
+fun StaticLoadingIcon(
+    isLoading: Boolean,
+    icon: ImageVector,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    if (isLoading) {
+        LoadingCircle(
+            size = size,
+            color = color,
+            modifier = modifier
+        )
+    }
+    else {
+        MiniIcon(
+            icon = icon,
+            color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+            size = size,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun StaticLoadingImage(
+    isLoading: Boolean,
+    icon: ImageVector,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    modifier: Modifier = Modifier
+) {
+    if (isLoading) {
+        LoadingCircle(
+            size = size,
+            color = color,
+            modifier = modifier
+        )
+    }
+    else {
+        MiniImage(
+            icon = icon,
+            size = size,
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun LoadingIcon(
+    icon: ImageVector,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: suspend () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isLoading by rememberFalse()
+
+    if (isLoading) {
+        LoadingCircle(
+            size = size,
+            color = color,
+            modifier = modifier
+        )
+    }
+    else {
+        ClickIcon(
+            icon = icon,
+            color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+            size = size,
+            enabled = enabled && !isLoading,
+            onClick = {
+                scope.launch {
+                    isLoading = true
+                    onClick()
+                    isLoading = false
+                }
+            },
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun LoadingImage(
+    icon: ImageVector,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: suspend () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isLoading by rememberFalse()
+
+    if (isLoading) {
+        LoadingCircle(
+            size = size,
+            color = color,
+            modifier = modifier
+        )
+    }
+    else {
+        ClickImage(
+            icon = icon,
+            size = size,
+            enabled = enabled && !isLoading,
+            onClick = {
+                scope.launch {
+                    isLoading = true
+                    onClick()
+                    isLoading = false
+                }
+            },
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun LoadingIcon(
+    icon: ImageVector,
+    tip: String,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: suspend () -> Unit
+) {
+    BallonTip(text = tip) { LoadingIcon(icon, size, color, enabled, modifier, onClick) }
+}
+
+@Composable
+fun LoadingImage(
+    icon: ImageVector,
+    tip: String,
+    size: Dp = CustomTheme.size.icon,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: suspend () -> Unit
+) {
+    BallonTip(text = tip) { LoadingImage(icon, size, color, enabled, modifier, onClick) }
+}
+
+@Composable
+fun IconText(
+    icon: ImageVector,
+    text: String,
+    size: Dp = CustomTheme.size.extraIcon,
+    shape: Shape = MaterialTheme.shapes.large,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .clip(shape)
+            .clickable(onClick = onClick)
+            .padding(CustomTheme.padding.equalValue),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
+    ) {
+        Image(
+            painter = rememberVectorPainter(icon),
+            contentDescription = null,
+            modifier = Modifier.size(size)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+@Stable
+data class ColorfulImageVector(
+    val icon: ImageVector,
+    val color: Color,
+    val background: Color
 )
+
+@Composable
+fun colorfulImageVector(
+    icon: ImageVector,
+    color: Color = Colors.Ghost,
+    background: Color = Colors.Transparent
+) = ColorfulImageVector(icon, color, background)
+
+@Composable
+fun ColorfulIcon(
+    icon: ColorfulImageVector,
+    size: Dp = CustomTheme.size.icon,
+    gap: Float = 1.5f,
+    onClick: (() -> Unit)? = null
+) {
+    Box(
+        modifier = Modifier
+            .clip(CircleShape)
+            .condition(onClick != null) { clickable { onClick?.invoke() } }
+            .background(icon.background.copy(alpha = 0.6f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier.padding(CustomTheme.padding.innerIconSpace * gap).size(size),
+            imageVector = icon.icon,
+            contentDescription = null,
+            tint = icon.color,
+        )
+    }
+}

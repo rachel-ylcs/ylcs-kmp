@@ -211,7 +211,7 @@ class ScreenDouyin(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector? get() = if (isScrollTop) null else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector? by derivedStateOf { if (isScrollTop) null else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         gridState.animateScrollToItem(0)

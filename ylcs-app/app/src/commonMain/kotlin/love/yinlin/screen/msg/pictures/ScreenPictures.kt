@@ -31,6 +31,7 @@ import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.SplitLayout
@@ -187,6 +188,8 @@ class ScreenPictures(manager: ScreenManager) : CommonScreen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
+            PauseLoading(listState)
+
             PaginationColumn(
                 items = page.items,
                 key = { it.aid },
@@ -207,7 +210,7 @@ class ScreenPictures(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch {

@@ -26,6 +26,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.layout.Pagination
@@ -109,6 +110,8 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
         ) {
             val canDelete by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
 
+            PauseLoading(gridState)
+
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
@@ -159,7 +162,7 @@ class ScreenGameHall(manager: ScreenManager, val args: Args) : Screen<ScreenGame
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewGames(true) }

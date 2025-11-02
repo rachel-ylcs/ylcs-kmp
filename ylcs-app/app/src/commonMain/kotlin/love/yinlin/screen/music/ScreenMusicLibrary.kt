@@ -3,11 +3,13 @@ package love.yinlin.screen.music
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistAdd
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,8 +27,6 @@ import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.CommonScreen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.ui.floating.FABAction
-import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingDialogDynamicChoice
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.data.MimeType
@@ -37,10 +37,10 @@ import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.mod.ModFactory
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.MiniImage
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
 
 @Stable
@@ -122,15 +122,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
 
-    @Stable
-    private enum class ImportMusicItem(val text: String, val icon: ImageVector, val isImage: Boolean) {
-        FromFactory("MOD工坊", Icons.Outlined.Factory, false),
-        FromMod("导入MOD", Icons.Outlined.Extension, false),
-        FromLocal("本地制作", Icons.Outlined.Unarchive, false),
-        FromQQMusic("QQ音乐", ExtraIcons.QQMusic, true),
-        FromNetEaseCloudMusic("网易云音乐", ExtraIcons.NetEaseCloudMusic, true),
-        FromKugouMusic("酷狗音乐", ExtraIcons.KugouMusic, true),
-    }
+    private val gridState = LazyGridState()
 
     private fun resetLibrary() {
         library.replaceAll(mp.library.map {
@@ -255,9 +247,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
         }
     }
 
-    override val title: String by derivedStateOf {
-        "${if (isSearching) "搜索" else "曲库"} (${if (selectIdList.isNotEmpty()) "${selectIdList.size}/" else ""}${library.size})"
-    }
+    override val title: String by derivedStateOf { if (isSearching) "搜索" else "曲库" }
 
     override fun onBack() {
         if (isManaging) exitManagement()
@@ -278,7 +268,20 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (!isManaging) {
+        if (isManaging) {
+            ActionSuspend(Icons.AutoMirrored.Outlined.PlaylistAdd, "添加到歌单") {
+                onMusicAdd()
+            }
+
+            ActionSuspend(Icons.Outlined.Delete, "删除") {
+                onMusicDelete()
+            }
+
+            ActionSuspend(Icons.Outlined.Archive, "导出MOD") {
+                onMusicPackage()
+            }
+        }
+        else {
             if (isSearching) {
                 Action(Icons.Outlined.Home, "返回曲库") {
                     closeSearch()
@@ -293,11 +296,68 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     }
 
     @Composable
+    override fun ColumnScope.SecondTitleBar() {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = CustomTheme.border.small)
+
+        val librarySize by rememberDerivedState { "已安装 - ${library.size}" }
+        val selectedSize by rememberDerivedState { selectIdList.size.let { if (it > 0) "已选择 - $it" else "" } }
+
+        ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
+            Action(Icons.Outlined.Token, "工坊") {
+                // TODO:
+                // navigate<ScreenMusicModFactory>()
+            }
+            Action(Icons.Outlined.Upload, "导入") {
+                // navigate(ScreenImportMusic.Args(null))
+            }
+            Action(Icons.Outlined.DesignServices, "创造") {
+                // navigate<ScreenCreateMusic>()
+            }
+            Action(ExtraIcons.QQMusic, "QQ音乐", useImage = true) {
+                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
+            }
+            Action(ExtraIcons.NetEaseCloudMusic, "网易云音乐", useImage = true) {
+                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
+            }
+            Action(ExtraIcons.KugouMusic, "酷狗音乐", useImage = true) {
+                // navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
+            }
+        }
+
+        SplitLayout(
+            modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.value),
+            left = {
+                Text(
+                    text = librarySize,
+                    color = MaterialTheme.colorScheme.secondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            right = {
+                Text(
+                    text = selectedSize,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        )
+    }
+
+    @Composable
     override fun Content(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
+            PauseLoading(gridState)
+
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(CustomTheme.size.cellWidth),
+                state = gridState,
                 contentPadding = CustomTheme.padding.equalValue,
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
                 horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.equalSpace),
@@ -319,55 +379,12 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
         }
     }
 
-    override val fabCanExpand: Boolean by derivedStateOf { isManaging }
+    private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.Token }
-
-    override val fabMenus: Array<FABAction> = arrayOf(
-        FABAction(Icons.AutoMirrored.Outlined.PlaylistAdd, "添加到歌单") {
-            launch { onMusicAdd() }
-        },
-        FABAction(Icons.Outlined.Delete, "删除") {
-            launch { onMusicDelete() }
-        },
-        FABAction(Icons.Outlined.Archive, "导出MOD") {
-            launch { onMusicPackage() }
-        }
-    )
+    override val fabIcon: ImageVector? by derivedStateOf { if (isScrollTop) null else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
-        val result = importDialog.openSuspend() ?: return
-        if (result == ImportMusicItem.FromFactory.ordinal) {
-            pop()
-            // TODO:
-            // navigate<ScreenMusicModFactory>()
-        }
-        else if (mp.isReady) slot.tip.warning("请先停止播放器")
-        else {
-            pop()
-            // TODO:
-//            when (result) {
-//                ImportMusicItem.FromMod.ordinal -> navigate(ScreenImportMusic.Args(null))
-//                ImportMusicItem.FromLocal.ordinal -> navigate<ScreenCreateMusic>()
-//                ImportMusicItem.FromQQMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.QQMusic))
-//                ImportMusicItem.FromNetEaseCloudMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.NetEaseCloud))
-//                ImportMusicItem.FromKugouMusic.ordinal -> navigate(ScreenPlatformMusic.Args(null, PlatformMusicType.Kugou))
-//            }
-        }
-    }
-
-    private val importDialog = object : FloatingDialogChoice() {
-        override val num: Int = ImportMusicItem.entries.size
-
-        @Composable
-        override fun Name(index: Int) = Text(text = ImportMusicItem.entries[index].text, modifier = Modifier.fillMaxWidth())
-
-        @Composable
-        override fun Icon(index: Int) {
-            val item = ImportMusicItem.entries[index]
-            if (item.isImage) MiniImage(icon = item.icon, size = CustomTheme.size.mediumIcon)
-            else MiniIcon(icon = item.icon, size = CustomTheme.size.mediumIcon)
-        }
+        if (!isScrollTop) gridState.animateScrollToItem(0)
     }
 
     private val searchDialog = FloatingDialogInput(hint = "歌曲名", maxLength = 32)
@@ -378,6 +395,5 @@ class ScreenMusicLibrary(manager: ScreenManager) : CommonScreen(manager) {
     override fun Floating() {
         searchDialog.Land()
         addMusicDialog.Land()
-        importDialog.Land()
     }
 }

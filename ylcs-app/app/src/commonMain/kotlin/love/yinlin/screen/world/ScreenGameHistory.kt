@@ -26,6 +26,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.layout.BoxState
@@ -106,6 +107,8 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
         ) {
             val name = remember { app.config.userProfile?.name ?: "" }
 
+            PauseLoading(gridState)
+
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.gid },
@@ -142,7 +145,7 @@ class ScreenGameHistory(manager: ScreenManager) : CommonScreen(manager) {
 
     private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
-    override val fabIcon: ImageVector get() = if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward
+    override val fabIcon: ImageVector by derivedStateOf { if (isScrollTop) Icons.Outlined.Refresh else Icons.Outlined.ArrowUpward }
 
     override suspend fun onFabClick() {
         if (isScrollTop) launch { requestNewGames(true) }

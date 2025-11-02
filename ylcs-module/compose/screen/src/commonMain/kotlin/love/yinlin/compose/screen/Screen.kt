@@ -32,6 +32,9 @@ abstract class Screen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
     protected open fun ActionScope.RightActions() { }
 
     @Composable
+    protected open fun ColumnScope.SecondTitleBar() { }
+
+    @Composable
     protected open fun BottomBar() { }
 
     @Composable
@@ -50,38 +53,39 @@ abstract class Screen<A>(manager: ScreenManager) : BasicScreen<A>(manager) {
                     tonalElevation = CustomTheme.shadow.tonal,
                     shadowElevation = CustomTheme.shadow.surface
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(immersivePadding.withoutBottom)
-                            .fillMaxWidth()
-                            .padding(vertical = CustomTheme.padding.verticalSpace),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Column(modifier = Modifier.padding(immersivePadding.withoutBottom).fillMaxWidth()) {
                         Box(
-                            modifier = Modifier.fillMaxWidth().zIndex(2f),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = titleString,
-                                style = MaterialTheme.typography.titleMedium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                            Box(
+                                modifier = Modifier.fillMaxWidth().zIndex(2f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = titleString,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            SplitActionLayout(
+                                modifier = Modifier.fillMaxWidth().zIndex(1f),
+                                left = {
+                                    ClickIcon(
+                                        modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace),
+                                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                                        tip = "返回",
+                                        onClick = ::onBack
+                                    )
+                                    LeftActions()
+                                },
+                                right = {
+                                    RightActions()
+                                }
                             )
                         }
-                        SplitActionLayout(
-                            modifier = Modifier.fillMaxWidth().zIndex(1f),
-                            left = {
-                                ClickIcon(
-                                    modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace),
-                                    icon = Icons.AutoMirrored.Outlined.ArrowBack,
-                                    onClick = ::onBack
-                                )
-                                LeftActions()
-                            },
-                            right = {
-                                RightActions()
-                            }
-                        )
+                        SecondTitleBar()
                     }
                 }
             }
