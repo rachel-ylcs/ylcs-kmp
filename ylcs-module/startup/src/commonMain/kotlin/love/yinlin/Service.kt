@@ -60,28 +60,47 @@ open class Service {
         FreeStartup { _, startupArgs -> factory(startupArgs) }
     }
 
-    private fun initSync(context: Context, delegate: StartupDelegate<out Startup>) {
-        delegate.create()
-        delegate.init(context)
+    private fun initSync(context: Context, delegate: StartupDelegate<out Startup>, delay: Boolean) {
+        if (!delay) delegate.create()
+        delegate.initSync(context, delay)
     }
 
-    private fun initAsync(context: Context, delegate: StartupDelegate<out Startup>) {
-        delegate.create()
-        Coroutines.startMain { delegate.initAsync(context) }
+    private fun destroy(context: Context, delegate: StartupDelegate<out Startup>, delay: Boolean) {
+        delegate.destroy(context, delay)
     }
 
-    private fun initStartups(context: Context, items: List<StartupDelegate<out Startup>>) {
+    private fun initAsync(context: Context, delegate: StartupDelegate<out Startup>, delay: Boolean) {
+        if (!delay) delegate.create()
+        Coroutines.startMain { delegate.initAsync(context, delay) }
+    }
+
+    private fun initStartups(context: Context, items: List<StartupDelegate<out Startup>>, delay: Boolean) {
         val (sync, other) = items.partition { it.type == StartupType.Sync }
         val (free, async) = other.partition { it.type == StartupType.Free }
 
-        for (delegate in free.sortedByDescending { it.priority }) initAsync(context, delegate)
-        for (delegate in sync.sortedByDescending { it.priority }) initSync(context, delegate)
-        for (delegate in async.sortedByDescending { it.priority }) initAsync(context, delegate)
+        for (delegate in free.sortedByDescending { it.priority }) initAsync(context, delegate, delay)
+        for (delegate in sync.sortedByDescending { it.priority }) initSync(context, delegate, delay)
+        for (delegate in async.sortedByDescending { it.priority }) initAsync(context, delegate, delay)
     }
 
-    protected fun initService(context: Context) {
+    private fun destoryStartups(context: Context, items: List<StartupDelegate<out Startup>>, delay: Boolean) {
+        val (sync, other) = items.partition { it.type == StartupType.Sync }
+        // free服务不允许析构, 因为其构造时是任意时刻, 而程序析构时是同步的, 无法确定其析构顺序
+        val (async, _) = other.partition { it.type == StartupType.Async }
+        // 这里必须先倒序排列再反向才能提供正确的析构顺序, 因为 sortedByDescending 排序是稳定的
+        for (delegate in sync.sortedByDescending { it.priority }.reversed()) destroy(context, delegate, delay)
+        for (delegate in async.sortedByDescending { it.priority }.reversed()) destroy(context, delegate, delay)
+    }
+
+    protected fun initService(context: Context, delay: Boolean) {
         val (system, user) = startups.partition { it.privilege == StartupPrivilege.System }
-        initStartups(context, system)
-        initStartups(context, user)
+        initStartups(context, system, delay)
+        initStartups(context, user, delay)
+    }
+
+    protected fun destroyService(context: Context, delay: Boolean) {
+        val (system, user) = startups.partition { it.privilege == StartupPrivilege.System }
+        destoryStartups(context, system, delay)
+        destoryStartups(context, user, delay)
     }
 }

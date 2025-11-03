@@ -43,15 +43,44 @@ class StartupDelegate<S : Startup> internal constructor(
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): S = startup
 
+    override fun toString(): String = "<$type>${if (::startup.isInitialized) startup::class.qualifiedName else null}"
+
     fun create() {
         startup = factory()
     }
 
-    fun init(context: Context) {
-        (startup as SyncStartup).init(context, startupArgs)
+    fun initSync(context: Context, delay: Boolean) {
+        (startup as? SyncStartup)?.let {
+            if (delay) it.initDelay(context, startupArgs)
+            else it.init(context, startupArgs)
+        }
     }
 
-    suspend fun initAsync(context: Context) {
-        (startup as AsyncStartup).init(context, startupArgs)
+    suspend fun initAsync(context: Context, delay: Boolean) {
+        (startup as? AsyncStartup)?.let {
+            if (delay) it.initDelay(context, startupArgs)
+            else it.init(context, startupArgs)
+        }
+    }
+
+    suspend fun initFree(context: Context, delay: Boolean) {
+        (startup as? FreeStartup)?.let {
+            if (delay) it.initDelay(context, startupArgs)
+            else it.init(context, startupArgs)
+        }
+    }
+
+    fun destroy(context: Context, delay: Boolean) {
+        when (val v = startup) {
+            is SyncStartup -> {
+                if (delay) v.destroyDelay(context, startupArgs)
+                else v.destroy(context, startupArgs)
+            }
+            is AsyncStartup -> {
+                if (delay) v.destroyDelay(context, startupArgs)
+                else v.destroy(context, startupArgs)
+            }
+            is FreeStartup -> {}
+        }
     }
 }
