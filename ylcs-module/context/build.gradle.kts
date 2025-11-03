@@ -51,14 +51,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsBase.core,
-            )
-        }
-
-        androidMain.configure {
-            useSourceSet(commonMain)
-            useLib(
-                libs.compose.activity
+                projects.ylcsBase.composeCore,
             )
         }
 

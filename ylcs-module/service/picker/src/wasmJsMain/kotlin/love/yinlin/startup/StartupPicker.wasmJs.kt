@@ -13,10 +13,8 @@ import love.yinlin.io.ScriptWorker
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.Context
 import love.yinlin.StartupArgs
-import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 import org.khronos.webgl.ArrayBuffer
@@ -28,7 +26,6 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
 
-@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     actual override fun init(context: Context, args: StartupArgs) {}
 

@@ -14,10 +14,8 @@ import love.yinlin.io.safeToSources
 import love.yinlin.io.SandboxSource
 import love.yinlin.io.Sources
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.Context
 import love.yinlin.StartupArgs
-import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
@@ -48,7 +46,6 @@ import platform.UniformTypeIdentifiers.UTTypeFolder
 import platform.UniformTypeIdentifiers.UTTypeImage
 import platform.darwin.NSObject
 
-@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     // 全局引用, 避免被gc
     lateinit var phPickerDelegate: PHPickerViewControllerDelegateProtocol

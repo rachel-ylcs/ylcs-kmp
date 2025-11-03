@@ -10,6 +10,9 @@ import love.yinlin.SyncStartup
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 expect class StartupKV() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
+    override fun initDelay(context: Context, args: StartupArgs)
+    override fun destroy(context: Context, args: StartupArgs)
+    override fun destroyDelay(context: Context, args: StartupArgs)
 
     fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)

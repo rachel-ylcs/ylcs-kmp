@@ -13,12 +13,5 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     open fun BeginContent(activity: ComposeActivity) {}
 
-    open fun onActivityCreate(activity: ComposeActivity) {}
-    open fun onActivityDestroy(activity: ComposeActivity) {}
     open fun onIntent(intent: Intent) {}
-
-    @Composable
-    fun FloatingWindow() {
-
-    }
 }

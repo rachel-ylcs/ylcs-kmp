@@ -9,18 +9,15 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.platform.openFileDialog
 import love.yinlin.platform.openMultipleFileDialog
 import love.yinlin.platform.saveFileDialog
 import love.yinlin.Context
 import love.yinlin.StartupArgs
-import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
-@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     private lateinit var context: Context
     private val handle: Long get() = context.handle

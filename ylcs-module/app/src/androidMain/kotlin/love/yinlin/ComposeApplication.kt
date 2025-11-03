@@ -7,6 +7,11 @@ abstract class ComposeApplication : Application() {
 
     final override fun onCreate() {
         super.onCreate()
-        instance.initialize()
+        instance.initialize(delay = false)
+    }
+
+    override fun onTerminate() {
+        instance.destroy(delay = false)
+        super.onTerminate()
     }
 }

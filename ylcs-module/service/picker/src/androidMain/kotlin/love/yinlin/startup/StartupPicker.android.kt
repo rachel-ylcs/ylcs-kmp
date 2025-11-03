@@ -19,15 +19,12 @@ import love.yinlin.data.MimeType
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.StartupArgs
-import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import java.util.UUID
 
-@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver
@@ -35,8 +32,8 @@ actual class StartupPicker : SyncStartup {
 
     actual override fun init(context: Context, args: StartupArgs) {}
 
-    fun bindActivity(activity: ComponentActivity) {
-        this.activity = activity
+    override fun initDelay(context: Context, args: StartupArgs) {
+        activity = context.activity
         resolver = activity.contentResolver
         activityResultRegistry = activity.activityResultRegistry
     }

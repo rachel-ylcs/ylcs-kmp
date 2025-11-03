@@ -22,4 +22,7 @@ expect class StartupExceptionHandler() : SyncStartup {
     val crashKey: String
 
     override fun init(context: Context, args: StartupArgs)
+    override fun initDelay(context: Context, args: StartupArgs)
+    override fun destroy(context: Context, args: StartupArgs)
+    override fun destroyDelay(context: Context, args: StartupArgs)
 }

@@ -18,7 +18,7 @@ class MainApplication : ComposeApplication() {
 		}
 
 		override fun onActivityCreate(activity: ComposeActivity) {
-			picker.bindActivity(activity)
+
 		}
 
 		override fun onActivityDestroy(activity: ComposeActivity) {}

@@ -1,10 +1,13 @@
 package love.yinlin
 
-actual class Context actual constructor(delegate: PlatformContextDelegate) {
-    var handle: Long = 0L
-        private set
+import androidx.compose.ui.awt.ComposeWindow
 
-    fun bindWindow(handle: Long) {
-        this.handle = handle
+actual class Context actual constructor(delegate: PlatformContextDelegate) {
+    lateinit var window: ComposeWindow
+
+    val handle: Long get() = window.windowHandle
+
+    fun bindWindow(window: ComposeWindow) {
+        this.window = window
     }
 }

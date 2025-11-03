@@ -1,9 +1,7 @@
 package love.yinlin
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ProvidedValue
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -150,6 +148,11 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
         factory = ::StartupKV
     )
 
+    val config by service(
+        StartupLazyFetcher { kv },
+        factory = ::StartupAppConfig,
+    )
+
     val exceptionHandler by service(
         "crash_key",
         StartupExceptionHandler.Handler { key, e, error ->
@@ -159,23 +162,18 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
         factory = ::StartupExceptionHandler
     )
 
-    val config by service(
-        StartupLazyFetcher { kv },
-        factory = ::StartupAppConfig,
-    )
-
     val mp by service(
         StartupLazyFetcher { Paths.modPath },
         factory = ::buildMusicPlayer
     )
 
-    override val themeMode: ThemeMode get() = config.themeMode
-    override val fontScale: Float get() = config.fontScale
+    override val themeMode: ThemeMode by derivedStateOf { config.themeMode }
+    override val fontScale: Float by derivedStateOf { config.fontScale }
     override val mainFontResource: FontResource = Res.font.xwwk
-    override val localProvider: Array<ProvidedValue<*>> get() = arrayOf(
+    override val localProvider: Array<ProvidedValue<*>> by derivedStateOf { arrayOf(
         LocalAnimationSpeed provides config.animationSpeed,
         localBalloonTipEnabled provides config.enabledTip
-    )
+    ) }
 
     @Composable
     override fun Content() {

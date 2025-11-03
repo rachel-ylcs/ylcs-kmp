@@ -33,7 +33,10 @@ abstract class Application<out A : Application<A>>(
     protected open val customTheme: BaseCustomTheme? = null
     protected open val localProvider: Array<ProvidedValue<*>> = emptyArray()
 
-    protected open fun onCreate() {}
+    protected open fun onCreate() { }
+    protected open fun onCreateDelay() { }
+    protected open fun onDestroy() { }
+    protected open fun onDestroyDelay() { }
 
     @Composable
     abstract fun Content()
@@ -93,12 +96,19 @@ abstract class Application<out A : Application<A>>(
         }
     }
 
-    internal fun initialize() {
-        @Suppress("UNCHECKED_CAST")
-        self.value = this as? A
+    internal fun initialize(delay: Boolean) {
+        if (self.value == null) {
+            @Suppress("UNCHECKED_CAST")
+            self.value = this as? A
+        }
+        initService(context, delay)
+        if (delay) onCreateDelay()
+        else onCreate()
+    }
 
-        initService(context)
-
-        onCreate()
+    internal fun destroy(delay: Boolean) {
+        destroyService(context, delay)
+        if (delay) onDestroyDelay()
+        else onDestroy()
     }
 }

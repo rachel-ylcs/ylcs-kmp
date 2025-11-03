@@ -20,7 +20,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun buildDelegate(uiViewController: UIViewController): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
 
     fun run(): UIViewController {
-        initialize()
+        initialize(delay = false)
+
+        initialize(delay = true)
 
         uiViewController = ComposeUIViewController(
             configure = {

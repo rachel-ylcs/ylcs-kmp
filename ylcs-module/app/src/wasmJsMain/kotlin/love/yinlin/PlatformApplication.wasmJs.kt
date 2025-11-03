@@ -17,7 +17,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
-        initialize()
+        initialize(delay = false)
+
+        initialize(delay = true)
+
+        // 有待考证
+//        window.onclose = {
+//            destroy(delay = true)
+//
+//            destroy(delay = false)
+//        }
 
         ComposeViewport(viewportContainer = document.body!!) {
             Layout {

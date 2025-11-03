@@ -134,8 +134,13 @@ abstract class StartupMusicPlayer : AsyncStartup {
                 async { initLibrary() },
                 async { initController(context) }
             )
-            launch { floatingLyrics.init() }
             if (isInit) initLastStatus()
+        }
+    }
+
+    override suspend fun initDelay(context: Context, args: StartupArgs) {
+        Coroutines.startCurrent {
+            launch { floatingLyrics.init() }
         }
     }
 

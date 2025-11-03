@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
@@ -17,12 +16,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.DefaultIcon
+import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.AppTopBar
 import love.yinlin.extension.Reference
 import org.jetbrains.compose.resources.*
 import java.awt.Dimension
+import kotlin.system.exitProcess
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -41,8 +42,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open val actionMaximize: Boolean = true
     protected open val actionClose: Boolean = true
 
-    protected open fun ComposeWindow.onWindowCreate() {}
-
     @Composable
     protected open fun ActionScope.Actions() {}
 
@@ -54,7 +53,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun ApplicationScope.MultipleWindow() {}
 
     fun run() {
-        initialize()
+        initialize(delay = false)
 
         var windowVisible by mutableStateOf(true)
         var alwaysOnTop by mutableStateOf(false)
@@ -67,9 +66,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             size = initSize
         )
 
-        application(exitProcessOnExit = true) {
+        val windowStarter = LaunchFlag()
+
+        application(exitProcessOnExit = false) {
             Window(
-                onCloseRequest = ::exitApplication,
+                onCloseRequest = {
+                    destroy(delay = true)
+                    exitApplication()
+                },
                 title = title,
                 icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
                 visible = windowVisible,
@@ -81,8 +85,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             ) {
                 LaunchedEffect(Unit) {
                     window.minimumSize = minimumSize
-                    context.bindWindow(window.windowHandle)
-                    window.onWindowCreate()
+                    context.bindWindow(window)
+                    windowStarter {
+                        initialize(delay = true)
+                    }
                 }
 
                 Layout {
@@ -179,10 +185,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
             MultipleWindow()
         }
-    }
 
-    @Composable
-    fun FloatingWindow() {
+        destroy(delay = false)
 
+        exitProcess(0)
     }
 }

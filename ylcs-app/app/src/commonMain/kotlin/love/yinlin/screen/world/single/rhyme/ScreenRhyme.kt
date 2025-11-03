@@ -555,8 +555,10 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
         // 首次打开切换横屏
         val controller = rememberOrientationController()
-        orientationStarter {
-            controller.orientation = Orientation.LANDSCAPE
+        LaunchedEffect(controller) {
+            orientationStarter {
+                controller.orientation = Orientation.LANDSCAPE
+            }
         }
 
         OffScreenEffect { isForeground ->

@@ -5,7 +5,6 @@ import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.runBlocking
 import love.yinlin.compose.screen.DeepLink
@@ -28,8 +27,8 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     override val tray: Boolean = true
     override val trayHideNotification: String = "已隐藏到任务栏托盘中"
 
-    override fun ComposeWindow.onWindowCreate() {
-        FixupWindowsSwingMaximize.setBounds(this)
+    override fun onCreateDelay() {
+        FixupWindowsSwingMaximize.setBounds(context.window)
     }
 
     @Composable

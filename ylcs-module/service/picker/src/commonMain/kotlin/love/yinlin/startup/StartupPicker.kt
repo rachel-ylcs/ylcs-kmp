@@ -4,16 +4,16 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.data.MimeType
 import love.yinlin.io.Sources
-import love.yinlin.platform.Platform
 import love.yinlin.Context
 import love.yinlin.StartupArgs
-import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 
-@StartupInitialize(Platform.Android)
 expect class StartupPicker() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
+    override fun initDelay(context: Context, args: StartupArgs)
+    override fun destroy(context: Context, args: StartupArgs)
+    override fun destroyDelay(context: Context, args: StartupArgs)
 
     suspend fun pickPicture(): Source?
     suspend fun pickPicture(maxNum: Int): Sources<Source>?

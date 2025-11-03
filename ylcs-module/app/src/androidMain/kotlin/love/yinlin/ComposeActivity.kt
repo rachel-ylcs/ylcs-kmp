@@ -14,12 +14,12 @@ abstract class ComposeActivity : ComponentActivity() {
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
-        window.isNavigationBarContrastEnforced = false
-
         instance.context.bindActivity(this)
 
-        instance.onActivityCreate(this)
+        instance.initialize(delay = true)
+
+        enableEdgeToEdge()
+        window.isNavigationBarContrastEnforced = false
 
         intent?.let {
             catching { instance.onIntent(it) }
@@ -34,7 +34,8 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.onActivityDestroy(this)
+        instance.destroy(delay = true)
+
         super.onDestroy()
     }
 
