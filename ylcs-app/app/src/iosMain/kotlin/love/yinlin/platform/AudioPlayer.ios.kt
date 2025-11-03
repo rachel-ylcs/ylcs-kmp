@@ -5,7 +5,7 @@ import kotlinx.io.files.Path
 import love.yinlin.Context
 
 @Stable
-actual class MusicPlayer actual constructor(context: Context) {
+actual class AudioPlayer actual constructor(context: Context) {
     actual val isInit: Boolean = false
     actual val isPlaying: Boolean = false
     actual val position: Long = 0L

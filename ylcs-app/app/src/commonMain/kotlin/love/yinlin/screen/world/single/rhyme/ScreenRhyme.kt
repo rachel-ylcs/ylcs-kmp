@@ -53,8 +53,8 @@ import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.MusicPlayer
 import love.yinlin.resources.*
 import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
@@ -80,7 +80,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val musicPlayer = MusicPlayer(app.context)
+    private val musicPlayer = AudioPlayer(app.context)
     private val stage = RhymeStage()
 
     private var canvasFrameJob: Job? = null

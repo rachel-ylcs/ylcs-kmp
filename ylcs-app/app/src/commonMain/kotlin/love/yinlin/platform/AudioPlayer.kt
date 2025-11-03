@@ -5,7 +5,7 @@ import kotlinx.io.files.Path
 import love.yinlin.Context
 
 @Stable
-expect class MusicPlayer(context: Context) {
+expect class AudioPlayer(context: Context) {
     val isInit: Boolean
     val isPlaying: Boolean
     val position: Long

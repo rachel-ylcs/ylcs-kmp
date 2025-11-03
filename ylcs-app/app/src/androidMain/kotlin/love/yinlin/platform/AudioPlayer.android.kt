@@ -11,7 +11,7 @@ import love.yinlin.Context
 import love.yinlin.common.FfmpegRenderersFactory
 
 @Stable
-actual class MusicPlayer actual constructor(private val context: Context) {
+actual class AudioPlayer actual constructor(private val context: Context) {
     private var player: ExoPlayer? = null
 
     actual val isInit: Boolean get() = player != null
