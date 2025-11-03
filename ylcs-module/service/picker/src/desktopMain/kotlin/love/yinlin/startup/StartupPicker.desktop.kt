@@ -20,7 +20,7 @@ import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
-@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     private lateinit var context: Context
     private val handle: Long get() = context.handle

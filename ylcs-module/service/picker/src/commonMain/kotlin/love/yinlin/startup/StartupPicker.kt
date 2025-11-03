@@ -11,7 +11,7 @@ import love.yinlin.StartupInitialize
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 
-@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+@StartupInitialize(Platform.Android)
 expect class StartupPicker() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
 

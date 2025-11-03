@@ -27,7 +27,7 @@ import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import java.util.UUID
 
-@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver

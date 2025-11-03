@@ -28,7 +28,7 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
 
-@StartupInitialize(Platform.Android, Platform.Windows, Platform.Linux, Platform.MacOS)
+@StartupInitialize(Platform.Android)
 actual class StartupPicker : SyncStartup {
     actual override fun init(context: Context, args: StartupArgs) {}
 
