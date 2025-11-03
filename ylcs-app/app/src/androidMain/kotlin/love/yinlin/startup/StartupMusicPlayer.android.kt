@@ -20,6 +20,7 @@ import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
+import love.yinlin.AndroidContext
 import love.yinlin.Context
 import love.yinlin.R
 import love.yinlin.StartupFetcher
@@ -39,7 +40,7 @@ import java.io.File
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var controller: MediaController? by mutableRefStateOf(null)
-    private lateinit var androidContext: android.content.Context
+    private lateinit var androidContext: AndroidContext
 
     override val isInit: Boolean by derivedStateOf { controller != null }
     override var error: Throwable? by mutableRefStateOf(null)

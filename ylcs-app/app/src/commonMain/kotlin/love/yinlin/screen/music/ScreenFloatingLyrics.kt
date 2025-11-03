@@ -16,6 +16,7 @@ import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.platform.lyrics.FloatingLyrics
 
 @Composable
 expect fun ScreenFloatingLyrics.platformContent(device: Device)
@@ -25,6 +26,17 @@ class ScreenFloatingLyrics(manager: ScreenManager) : Screen(manager) {
     override val title: String = "悬浮歌词"
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)
+
+    internal fun FloatingLyrics.check() {
+        if (app.config.enabledFloatingLyrics) {
+            // 如果当前处于启用悬浮歌词状态, 但悬浮歌词没有附加上去则附加
+            if (!isAttached) attach()
+        }
+        else {
+            // 如果当前处于禁用悬浮歌词状态, 但悬浮歌词附加上去了则脱离
+            if (isAttached) detach()
+        }
+    }
 
     @Composable
     override fun Content(device: Device) = platformContent(device)

@@ -30,8 +30,9 @@ private fun WindowScope.DragArea(enabled: Boolean, content: @Composable () -> Un
 }
 
 @Stable
-actual class FloatingLyrics actual constructor(context: Context) {
+actual class FloatingLyrics {
     actual var isAttached: Boolean by mutableStateOf(false)
+        private set
 
     private val config by derivedStateOf { app.config.lyricsEngineConfig }
 
@@ -45,8 +46,16 @@ actual class FloatingLyrics actual constructor(context: Context) {
 
     var canMove: Boolean by mutableStateOf(false)
 
-    actual suspend fun init() {
-        if (app.config.enabledFloatingLyrics) isAttached = true
+    actual fun attach() {
+        isAttached = true
+    }
+
+    actual fun detach() {
+        isAttached = false
+    }
+
+    actual suspend fun initDelay(context: Context) {
+        if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 
     @OptIn(FlowPreview::class)

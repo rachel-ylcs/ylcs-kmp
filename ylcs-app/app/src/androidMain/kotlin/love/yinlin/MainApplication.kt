@@ -17,12 +17,6 @@ class MainApplication : ComposeApplication() {
 			FixupAndroidStatusBarColor.AutoTheme(activity.window, LocalDarkMode.current)
 		}
 
-		override fun onActivityCreate(activity: ComposeActivity) {
-
-		}
-
-		override fun onActivityDestroy(activity: ComposeActivity) {}
-
 		override fun onIntent(intent: Intent) {
 			when (intent.action) {
 				Intent.ACTION_VIEW -> intent.data?.let { data ->

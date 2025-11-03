@@ -32,7 +32,7 @@ actual class StartupPicker : SyncStartup {
 
     actual override fun init(context: Context, args: StartupArgs) {}
 
-    override fun initDelay(context: Context, args: StartupArgs) {
+    actual override fun initDelay(context: Context, args: StartupArgs) {
         activity = context.activity
         resolver = activity.contentResolver
         activityResultRegistry = activity.activityResultRegistry

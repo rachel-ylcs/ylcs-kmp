@@ -128,7 +128,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
 
     final override suspend fun init(context: Context, args: StartupArgs) {
         rootPath = args.fetch(0)
-        floatingLyrics = FloatingLyrics(context)
+        floatingLyrics = FloatingLyrics()
         Coroutines.startCurrent {
             awaitAll(
                 async { initLibrary() },
@@ -140,7 +140,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
 
     override suspend fun initDelay(context: Context, args: StartupArgs) {
         Coroutines.startCurrent {
-            launch { floatingLyrics.init() }
+            launch { floatingLyrics.initDelay(context) }
         }
     }
 

@@ -13,42 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.coroutines.delay
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.platform.lyrics.FloatingLyrics
-
-private fun ScreenFloatingLyrics.updateEnabledStatus(floatingLyrics: FloatingLyrics) {
-    launch {
-        delay(200)
-        app.config.enabledFloatingLyrics = floatingLyrics.isAttached
-    }
-}
-
-private fun ScreenFloatingLyrics.enableFloatingLyrics(value: Boolean) {
-    app.mp.floatingLyrics.let {
-        if (value) {
-            if (it.canAttached) {
-                it.attach()
-                updateEnabledStatus(it)
-            }
-            else {
-                it.applyPermission { result ->
-                    if (result) it.attach()
-                    updateEnabledStatus(it)
-                }
-            }
-        }
-        else {
-            it.detach()
-            updateEnabledStatus(it)
-        }
-    }
-}
 
 @Composable
 actual fun ScreenFloatingLyrics.platformContent(device: Device) {
@@ -64,7 +34,10 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
         RowLayout("悬浮歌词模式") {
             Switch(
                 checked = app.config.enabledFloatingLyrics,
-                onCheckedChange = { enableFloatingLyrics(it) }
+                onCheckedChange = {
+                    app.config.enabledFloatingLyrics = it
+                    app.mp.floatingLyrics.check()
+                }
             )
         }
 
@@ -153,12 +126,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
         )
     }
 
-    OffScreenEffect {
-        app.mp.floatingLyrics.let {
-            if (!it.canAttached && it.isAttached) {
-                it.detach()
-                updateEnabledStatus(it)
-            }
-        }
+    OffScreenEffect { isForeground ->
+        if (isForeground) app.mp.floatingLyrics.check()
     }
 }
