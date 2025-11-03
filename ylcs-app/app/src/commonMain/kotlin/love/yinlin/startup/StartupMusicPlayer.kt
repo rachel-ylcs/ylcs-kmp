@@ -54,7 +54,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
     abstract suspend fun addMedias(medias: List<MusicInfo>)
     abstract suspend fun removeMedia(index: Int)
 
-    protected abstract suspend fun initController()
+    protected abstract suspend fun initController(context: Context)
 
     // 歌词引擎
     val lyrics = LrcLayout()
@@ -132,7 +132,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
         Coroutines.startCurrent {
             awaitAll(
                 async { initLibrary() },
-                async { initController() }
+                async { initController(context) }
             )
             launch { floatingLyrics.init() }
             if (isInit) initLastStatus()

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="music_file_provider">love.yinlin.music.file.provider</string>
+    <string name="mod_file_provider">love.yinlin.mod.file.provider</string>
 </resources>

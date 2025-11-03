@@ -68,7 +68,7 @@
             </intent-filter>
         </service>
         <provider
-            android:authorities="@string/music_file_provider"
+            android:authorities="@string/mod_file_provider"
             android:name="androidx.core.content.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true" >

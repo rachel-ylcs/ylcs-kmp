@@ -2,6 +2,7 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
+import love.yinlin.Context
 import love.yinlin.StartupFetcher
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.mod.ModResourceType
@@ -33,6 +34,10 @@ private class ShuffledOrder(size: Int = 0, start: Int? = null) {
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
+    private var controller: AudioPlayerComponent? by mutableRefStateOf(null)
+    private var currentIndex: Int by mutableIntStateOf(-1)
+    private var shuffledList = ShuffledOrder()
+
     override val isInit: Boolean by derivedStateOf { controller != null }
     override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
@@ -136,10 +141,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
     }
 
-    private var controller: AudioPlayerComponent? by mutableRefStateOf(null)
-    private var currentIndex: Int by mutableIntStateOf(-1)
-    private var shuffledList = ShuffledOrder()
-
     private inline fun withPlayer(block: (player: MediaPlayer) -> Unit) = controller?.mediaPlayer()?.let(block) ?: Unit
     private inline fun withReadyPlayer(block: (player: MediaPlayer) -> Unit) = withPlayer { if (isReady) block(it) }
 
@@ -233,7 +234,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         return shuffledList.begin
     }
 
-    override suspend fun initController() {
+    override suspend fun initController(context: Context) {
         Coroutines.io {
             val component = AudioPlayerComponent()
             component.mediaPlayer().events().apply {

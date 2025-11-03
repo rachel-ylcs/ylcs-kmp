@@ -19,18 +19,9 @@ class MainApplication : ComposeApplication() {
 
 		override fun onActivityCreate(activity: ComposeActivity) {
 			picker.bindActivity(activity)
-
-			// TODO: 浮动歌词
-//			ActualFloatingLyrics(activity).also {
-//				musicFactory.instance.floatingLyrics = it
-//				if (config.enabledFloatingLyrics) it.attach()
-//			}
 		}
 
-		override fun onActivityDestroy(activity: ComposeActivity) {
-//			(musicFactory.instance.floatingLyrics as? ActualFloatingLyrics)?.detach()
-//			musicFactory.instance.floatingLyrics = null
-		}
+		override fun onActivityDestroy(activity: ComposeActivity) {}
 
 		override fun onIntent(intent: Intent) {
 			when (intent.action) {

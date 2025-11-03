@@ -23,6 +23,12 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.platform.setWindowClickThrough
 
+@Composable
+private fun WindowScope.DragArea(enabled: Boolean, content: @Composable () -> Unit) {
+    if (enabled) WindowDraggableArea(content = content)
+    else content()
+}
+
 @Stable
 actual class FloatingLyrics actual constructor(context: Context) {
     actual var isAttached: Boolean by mutableStateOf(false)
@@ -40,13 +46,7 @@ actual class FloatingLyrics actual constructor(context: Context) {
     var canMove: Boolean by mutableStateOf(false)
 
     actual suspend fun init() {
-        isAttached = true
-    }
-
-    @Composable
-    private fun WindowScope.DragArea(enabled: Boolean, content: @Composable () -> Unit) {
-        if (enabled) WindowDraggableArea(content = content)
-        else content()
+        if (app.config.enabledFloatingLyrics) isAttached = true
     }
 
     @OptIn(FlowPreview::class)
