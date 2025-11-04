@@ -9,6 +9,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 
 abstract class OSStorage {
+    abstract val appPath: Path
     abstract val dataPath: Path
     abstract val cachePath: Path
     abstract suspend fun calcCacheSize(): Long

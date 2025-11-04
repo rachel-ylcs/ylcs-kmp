@@ -109,7 +109,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
         factory = ::StartupNativeLibrary
     )
 
-    val os by service(
+    val os by system(
         Local.info.appName,
         factory = ::StartupOS
     )

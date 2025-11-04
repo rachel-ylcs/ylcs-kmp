@@ -7,6 +7,8 @@ import love.yinlin.extension.mkdir
 import love.yinlin.extension.size
 
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
+    override val appPath: Path get() = unsupportedPlatform()
+
     override val dataPath: Path = Path(context.application.filesDir.absolutePath)
 
     override val cachePath: Path = Path(context.application.cacheDir.absolutePath, "temp")

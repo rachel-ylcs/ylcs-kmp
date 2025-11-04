@@ -12,6 +12,9 @@ import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
+    // TODO: review
+    override val appPath: Path get() = unsupportedPlatform()
+
     private fun searchPath(directory: NSSearchPathDirectory): Path {
         val paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
         return Path(paths[0]!! as String)

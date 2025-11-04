@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.runBlocking
+import kotlinx.io.files.Path
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.MimeType
@@ -18,7 +19,6 @@ import love.yinlin.startup.StartupMacOSDeepLink
 import love.yinlin.startup.StartupSingleInstance
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.getString
-import kotlin.io.path.Path
 
 fun main() = object : RachelApplication(PlatformContextDelegate) {
     override val title: String = runBlocking { getString(Res.string.app_name) }
@@ -63,15 +63,13 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     }
 
     private val setupVLC by sync(priority = StartupDelegate.HIGH3) {
-        val vlcPath = Path(System.getProperty("compose.application.resources.dir")).parent.parent.let {
-            when (platform) {
-                Platform.Windows -> it.resolve("vlc")
-                Platform.Linux -> it.resolve("bin/vlc")
-                Platform.MacOS -> it.resolve("MacOS/vlc")
-                else -> it
-            }
+        val vlcPath = when (platform) {
+            Platform.Windows -> "vlc"
+            Platform.Linux -> "bin/vlc"
+            Platform.MacOS -> "MacOS/vlc"
+            else -> ""
         }
-        System.setProperty("jna.library.path", vlcPath.toString())
+        System.setProperty("jna.library.path", Path(os.storage.appPath, vlcPath).toString())
     }
 
     private val singleInstance by service(priority = StartupDelegate.HIGH8, factory = ::StartupSingleInstance)

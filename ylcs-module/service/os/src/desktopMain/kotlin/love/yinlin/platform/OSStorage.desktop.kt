@@ -9,10 +9,11 @@ import love.yinlin.extension.toNioPath
 import java.nio.file.Files
 
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
-    override val dataPath: Path = run {
+    override val appPath: Path = run {
         val workingDir = Path(System.getProperty("user.dir"))
         val homeDir = Path(System.getProperty("user.home"))
-        val appPath = if (Files.isWritable(workingDir.toNioPath())) workingDir else {
+        if (Files.isWritable(workingDir.toNioPath())) workingDir
+        else {
             when (platform) {
                 Platform.Windows -> System.getenv("APPDATA")?.let { Path(it, appName) } ?: workingDir
                 Platform.Linux -> Path(System.getenv("XDG_DATA_HOME")?.let { Path(it) } ?: Path(homeDir, ".local", "share"), appName)
@@ -20,8 +21,9 @@ actual fun buildOSStorage(context: Context, appName: String): OSStorage = object
                 else -> workingDir
             }
         }
-        Path(appPath, "data")
     }
+
+    override val dataPath: Path = Path(appPath, "data")
 
     override val cachePath: Path = Path(System.getProperty("java.io.tmpdir"), appName, "temp")
 
