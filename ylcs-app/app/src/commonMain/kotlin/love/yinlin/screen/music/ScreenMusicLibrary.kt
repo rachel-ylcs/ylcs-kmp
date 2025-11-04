@@ -123,7 +123,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
 
-    private val selectIdList: List<String> get() = library.fastFilter { it.selected }.fastMap { it.id }
+    private val selectIdList: List<String> by derivedStateOf { library.fastFilter { it.selected }.fastMap { it.id } }
 
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)

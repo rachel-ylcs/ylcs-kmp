@@ -19,22 +19,22 @@ actual class WebViewState actual constructor(val settings: WebViewConfig, initUr
         set(value) { webview.value?.loadUrl(value) }
 
     internal var mLoadingState: WebViewLoadingState by mutableRefStateOf(WebViewLoadingState.Initializing)
-    actual val loadingState: WebViewLoadingState get() = mLoadingState
+    actual val loadingState: WebViewLoadingState by derivedStateOf { mLoadingState }
 
     internal var mTitle: String by mutableStateOf("")
-    actual val title: String get() = mTitle
+    actual val title: String by derivedStateOf { mTitle }
 
     internal var mIcon: BitmapPainter? by mutableRefStateOf(null)
-    actual val icon: BitmapPainter? get() = mIcon
+    actual val icon: BitmapPainter? by derivedStateOf { mIcon }
 
     internal var mCanGoBack: Boolean by mutableStateOf(false)
-    actual val canGoBack: Boolean get() = mCanGoBack
+    actual val canGoBack: Boolean by derivedStateOf { mCanGoBack }
 
     internal var mCanGoForward: Boolean by mutableStateOf(false)
-    actual val canGoForward: Boolean get() = mCanGoForward
+    actual val canGoForward: Boolean by derivedStateOf { mCanGoForward }
 
     internal var mError: WebViewError? by mutableRefStateOf(null)
-    actual val error: WebViewError? get() = mError
+    actual val error: WebViewError? by derivedStateOf { mError }
 
     internal val client = object : WebViewClient() {
         override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {

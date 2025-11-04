@@ -41,7 +41,7 @@ abstract class Floating<A : Any> {
 
     private var state: A? by mutableRefStateOf(null)
     private var visible: Boolean by mutableStateOf(false)
-    val isOpen: Boolean get() = state != null
+    val isOpen: Boolean by derivedStateOf { state != null }
     fun open(args: A) { state = args }
     open fun close() { visible = false }
 

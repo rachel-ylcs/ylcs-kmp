@@ -1,8 +1,7 @@
 package love.yinlin.config
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.KSerializer
@@ -25,7 +24,7 @@ open class ListState<T>(
     stateFactory = { it.toMutableStateList() },
     defaultFactory = defaultFactory
 ) {
-    override val size: Int get() = state.size
+    override val size: Int by derivedStateOf { state.size }
 
     operator fun set(index: Int, item: T) {
         state[index] = item

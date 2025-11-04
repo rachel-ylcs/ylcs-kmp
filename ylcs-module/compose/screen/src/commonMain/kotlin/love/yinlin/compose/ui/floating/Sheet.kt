@@ -55,7 +55,7 @@ abstract class FloatingArgsSheet<A : Any> : Floating<A>() {
         )
     }
 
-    override val zIndex: Float get() = Z_INDEX_SHEET
+    override val zIndex: Float = Z_INDEX_SHEET
 
     open val minHeightRatio: Float = 0.3f
     open val maxHeightRatio: Float = 0.7f

@@ -284,8 +284,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     private val packageSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
-        override val dismissOnBackPress: Boolean get() = !isRunning
-        override val dismissOnClickOutside: Boolean get() = !isRunning
+        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
+        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
 
         private var isRunning by mutableStateOf(false)
         private val filters = mutableStateListOf<ModResourceType>()
@@ -404,8 +404,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     private val previewSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
-        override val dismissOnBackPress: Boolean get() = !isRunning
-        override val dismissOnClickOutside: Boolean get() = !isRunning
+        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
+        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
 
         private var isRunning by mutableStateOf(false)
         private var result: PreviewResult? by mutableStateOf(null)
@@ -478,8 +478,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     private val importSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
-        override val dismissOnBackPress: Boolean get() = !isRunning
-        override val dismissOnClickOutside: Boolean get() = !isRunning
+        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
+        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
 
         private var isRunning by mutableStateOf(false)
 

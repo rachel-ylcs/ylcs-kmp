@@ -1,6 +1,6 @@
 package love.yinlin.config
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
@@ -24,7 +24,7 @@ open class MapState<K, V>(
     stateFactory = { it.toMutableStateMap() },
     defaultFactory = defaultFactory
 ){
-    override val size: Int get() = state.size
+    override val size: Int by derivedStateOf { state.size }
 
     operator fun set(key: K, value: V) {
         state[key] = value

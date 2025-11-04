@@ -56,13 +56,13 @@ internal class ActivityInputState(initActivity: Activity? = null) {
                 && (pic != null || (title.text.isNotEmpty() && date != null))
     }
 
-    val ts: String? get() = date?.let { DateEx.Formatter.standardDate.format(it) }
-    val titleString: String? get() = title.text.ifEmpty { null }
-    val contentString: String get() = content.text
-    val showstartString: String? get() = showstart.text.ifEmpty { null }
-    val damaiString: String? get() = damai.text.ifEmpty { null }
-    val maoyanString: String? get() = maoyan.text.ifEmpty { null }
-    val linkString: String? get() = link.text.ifEmpty { null }
+    val ts: String? by derivedStateOf { date?.let { DateEx.Formatter.standardDate.format(it) } }
+    val titleString: String? by derivedStateOf { title.text.ifEmpty { null } }
+    val contentString: String by derivedStateOf { content.text }
+    val showstartString: String? by derivedStateOf { showstart.text.ifEmpty { null } }
+    val damaiString: String? by derivedStateOf { damai.text.ifEmpty { null } }
+    val maoyanString: String? by derivedStateOf { maoyan.text.ifEmpty { null } }
+    val linkString: String? by derivedStateOf { link.text.ifEmpty { null } }
 
     suspend fun pickPicture(cropDialog: FloatingDialogCrop, onPicAdd: (Path) -> Unit) {
         val path = app.picker.pickPicture()?.use { source ->

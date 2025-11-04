@@ -56,7 +56,7 @@ actual class FloatingLyrics {
 
     val canAttached: Boolean get() = AVPictureInPictureController.isPictureInPictureSupported()
 
-    actual var isAttached: Boolean get() = pipView.pipController()?.isPictureInPictureActive() ?: false
+    actual val isAttached: Boolean get() = pipView.pipController()?.isPictureInPictureActive() ?: false
 
     actual fun attach() {
         updateLyrics("") // 必须先送一帧才能启动画中画

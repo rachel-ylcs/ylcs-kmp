@@ -33,8 +33,8 @@ abstract class SubScreen(val parent: BasicScreen) {
     @Composable
     abstract fun Content(device: Device)
 
-    open val fabIcon: ImageVector? get() = null
-	open val fabCanExpand: Boolean get() = false
+    open val fabIcon: ImageVector? = null
+	open val fabCanExpand: Boolean = false
 	open val fabMenus: Array<FABAction> = emptyArray()
 	open suspend fun onFabClick() {}
 

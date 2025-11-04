@@ -111,11 +111,11 @@ open class RichEditorState {
     private var enablePreview by mutableStateOf(false)
     private var currentPage by mutableStateOf(RichEditorPage.CONTENT)
 
-    protected open val useEmoji: Boolean get() = true
-    protected open val useImage: Boolean get() = false
-    protected open val useLink: Boolean get() = true
-    protected open val useTopic: Boolean get() = true
-    protected open val useAt: Boolean get() = false
+    protected open val useEmoji: Boolean = true
+    protected open val useImage: Boolean = false
+    protected open val useLink: Boolean = true
+    protected open val useTopic: Boolean = true
+    protected open val useAt: Boolean = false
 
     private var emojiClassify by mutableStateOf(EmojiType.Static)
 

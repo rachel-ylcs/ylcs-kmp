@@ -19,7 +19,7 @@ internal val Game.manager: GameManager get() = when (this) {
 }
 
 sealed class GameManager {
-    open val config: GameConfig get() = GameConfig
+    open val config: GameConfig = GameConfig
 
     // 检查题目
     abstract fun check(info: JsonElement, question: JsonElement, answer: JsonElement)

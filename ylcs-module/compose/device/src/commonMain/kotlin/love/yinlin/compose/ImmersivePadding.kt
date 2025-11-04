@@ -33,15 +33,10 @@ data class ImmersivePadding(
     override fun calculateTopPadding(): Dp = top
     override fun calculateBottomPadding(): Dp = bottom
 
-    @Stable
     val withoutStart: ImmersivePadding get() = this.copy(start = 0.dp)
-    @Stable
     val withoutEnd: ImmersivePadding get() = this.copy(end = 0.dp)
-    @Stable
     val withoutTop: ImmersivePadding get() = this.copy(top = 0.dp)
-    @Stable
     val withoutBottom: ImmersivePadding get() = this.copy(bottom = 0.dp)
-    @Stable
     val withoutVertical: ImmersivePadding get() = this.copy(top = 0.dp, bottom = 0.dp)
 }
 

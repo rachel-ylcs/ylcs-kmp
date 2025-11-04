@@ -67,7 +67,7 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
     private val gridState = LazyStaggeredGridState()
 
     private var currentPage by mutableIntStateOf(0)
-    val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
+    val currentSection: Int by derivedStateOf { DiscoveryItem.entries[currentPage].id }
 
     val page = object : PaginationArgs<Topic, Int, Int, Double>(
         default = Int.MAX_VALUE,

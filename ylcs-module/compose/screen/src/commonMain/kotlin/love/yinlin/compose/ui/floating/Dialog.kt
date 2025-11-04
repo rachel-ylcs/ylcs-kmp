@@ -91,7 +91,7 @@ abstract class FloatingDialog<R : Any> : Floating<Unit>() {
 
 @Stable
 abstract class FloatingBaseDialog<R : Any> : FloatingDialog<R>() {
-    open val scrollable: Boolean get() = true
+    open val scrollable: Boolean = true
     abstract val title: String?
     open val actions: @Composable (RowScope.() -> Unit)? = null
 
@@ -366,9 +366,9 @@ open class FloatingDialogProgress : FloatingBaseDialog<Unit>() {
     var total by mutableStateOf("0")
     var progress by mutableFloatStateOf(0f)
 
-    final override val dismissOnBackPress: Boolean get() = false
-    final override val dismissOnClickOutside: Boolean get() = false
-    final override val scrollable: Boolean get() = false
+    final override val dismissOnBackPress: Boolean = false
+    final override val dismissOnClickOutside: Boolean = false
+    final override val scrollable: Boolean = false
 
     override val title: String? = "下载中..."
 

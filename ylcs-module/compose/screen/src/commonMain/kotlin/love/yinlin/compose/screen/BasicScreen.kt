@@ -31,8 +31,8 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
     @Composable
     protected abstract fun BasicContent()
 
-    protected open val fabIcon: ImageVector? get() = null
-    protected open val fabCanExpand: Boolean get() = false
+    protected open val fabIcon: ImageVector? = null
+    protected open val fabCanExpand: Boolean = false
     protected open val fabMenus: Array<FABAction> = emptyArray()
     protected open suspend fun onFabClick() {}
 
