@@ -233,7 +233,7 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
         else gridState.animateScrollToItem(0)
     }
 
-    private val mailDetailsSheet = object : FloatingArgsSheet<Mail>() {
+    private val mailDetailsSheet = this land object : FloatingArgsSheet<Mail>() {
         @Composable
         override fun Content(args: Mail) {
             Column(
@@ -284,10 +284,5 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
                 )
             }
         }
-    }
-
-    @Composable
-    override fun Floating() {
-        mailDetailsSheet.Land()
     }
 }

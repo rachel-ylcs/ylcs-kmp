@@ -561,7 +561,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         Device.Type.LANDSCAPE -> Landscape(app.config.userProfile)
     }
 
-    private val crashLogSheet = object : FloatingSheet() {
+    private val crashLogSheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             val text = remember { app.kv.get(app.exceptionHandler.crashKey, "无崩溃日志") }
@@ -579,7 +579,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val feedbackSheet = object : FloatingSheet() {
+    private val feedbackSheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             val state = rememberTextInputState()
@@ -606,7 +606,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val privacyPolicySheet = object : FloatingSheet() {
+    private val privacyPolicySheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             Box(modifier = Modifier.fillMaxWidth()
@@ -623,7 +623,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val aboutSheet = object : FloatingSheet() {
+    private val aboutSheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             Column(
@@ -716,7 +716,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val passwordModifySheet = object : FloatingSheet() {
+    private val passwordModifySheet = this land object : FloatingSheet() {
         private suspend fun submit(oldPwd: String, newPwd1: String, newPwd2: String) {
             if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
             else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
@@ -777,29 +777,17 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val cropDialog = FloatingDialogCrop()
+    private val cropDialog = this land FloatingDialogCrop()
 
-    private val idModifyDialog = FloatingDialogInput(
+    private val idModifyDialog = this land FloatingDialogInput(
         hint = "修改ID(消耗${UserConstraint.RENAME_COIN_COST}银币)",
         maxLength = UserConstraint.MAX_NAME_LENGTH
     )
 
-    private val signatureModifyDialog = FloatingDialogInput(
+    private val signatureModifyDialog = this land FloatingDialogInput(
         hint = "修改个性签名",
         maxLength = UserConstraint.MAX_SIGNATURE_LENGTH,
         maxLines = 3,
         clearButton = false
     )
-
-    @Composable
-    override fun Floating() {
-        passwordModifySheet.Land()
-        crashLogSheet.Land()
-        feedbackSheet.Land()
-        privacyPolicySheet.Land()
-        aboutSheet.Land()
-        cropDialog.Land()
-        idModifyDialog.Land()
-        signatureModifyDialog.Land()
-    }
 }

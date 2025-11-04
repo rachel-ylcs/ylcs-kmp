@@ -843,7 +843,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         } ?: EmptyBox()
     }
 
-    private val subCommentSheet = object : FloatingArgsSheet<Comment>() {
+    private val subCommentSheet = this land object : FloatingArgsSheet<Comment>() {
         var page: Pagination<SubComment, Int, Int> by mutableRefStateOf(object : Pagination<SubComment, Int, Int>(
             default = 0,
             pageNum = APIConfig.MIN_PAGE_NUM
@@ -905,7 +905,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         }
     }
 
-    private val sendCoinSheet = object : FloatingSheet() {
+    private val sendCoinSheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             Column(
@@ -938,15 +938,8 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         }
     }
 
-    private val moveTopicDialog = FloatingDialogChoice.fromItems(
+    private val moveTopicDialog = this land FloatingDialogChoice.fromItems(
         items = Comment.Section.MovableSection.fastMap { Comment.Section.sectionName(it) },
         title = "移动主题板块"
     )
-
-    @Composable
-    override fun Floating() {
-        subCommentSheet.Land()
-        sendCoinSheet.Land()
-        moveTopicDialog.Land()
-    }
 }

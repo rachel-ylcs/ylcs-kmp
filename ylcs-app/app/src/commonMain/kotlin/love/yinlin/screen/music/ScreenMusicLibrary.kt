@@ -395,13 +395,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
         if (!isScrollTop) gridState.animateScrollToItem(0)
     }
 
-    private val searchDialog = FloatingDialogInput(hint = "歌曲名", maxLength = 32)
+    private val searchDialog = this land FloatingDialogInput(hint = "歌曲名", maxLength = 32)
 
-    private val addMusicDialog = FloatingDialogDynamicChoice("添加到歌单")
-
-    @Composable
-    override fun Floating() {
-        searchDialog.Land()
-        addMusicDialog.Land()
-    }
+    private val addMusicDialog = this land FloatingDialogDynamicChoice("添加到歌单")
 }

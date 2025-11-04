@@ -393,10 +393,5 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
         }
     }
 
-    private val downloadVideoDialog = FloatingDownloadDialog()
-
-    @Composable
-    override fun Floating() {
-        downloadVideoDialog.Land()
-    }
+    private val downloadVideoDialog = this land FloatingDownloadDialog()
 }

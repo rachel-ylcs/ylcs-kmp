@@ -152,7 +152,7 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
         else gridState.animateScrollToItem(0)
     }
 
-    private val gameDetailsSheet = object : FloatingArgsSheet<GameDetailsWithName>() {
+    private val gameDetailsSheet = this land object : FloatingArgsSheet<GameDetailsWithName>() {
         @Composable
         override fun Content(args: GameDetailsWithName) {
             Column(
@@ -162,10 +162,5 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
                 GameCardQuestionAnswer(args)
             }
         }
-    }
-
-    @Composable
-    override fun Floating() {
-        gameDetailsSheet.Land()
     }
 }

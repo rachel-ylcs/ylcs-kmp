@@ -380,7 +380,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         } ?: LoginBox(Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
     }
 
-    private val scanSheet = object : FloatingSheet() {
+    private val scanSheet = this land object : FloatingSheet() {
         override val maxHeightRatio: Float = 0.9f
         override val initFullScreen: Boolean = true
 
@@ -402,7 +402,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         }
     }
 
-    private val userCardSheet = object : FloatingArgsSheet<UserProfile>() {
+    private val userCardSheet = this land object : FloatingArgsSheet<UserProfile>() {
         @Composable
         override fun Content(args: UserProfile) {
             Column(
@@ -459,7 +459,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         }
     }
 
-    private val signinSheet = object : FloatingArgsSheet<UserProfile>() {
+    private val signinSheet = this land object : FloatingArgsSheet<UserProfile>() {
         var signinData by mutableRefStateOf(BooleanArray(8) { false })
         var todayIndex by mutableIntStateOf(-1)
         var todaySignin by mutableStateOf(true)
@@ -545,7 +545,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         }
     }
 
-    private val levelSheet = object : FloatingArgsSheet<UserProfile>() {
+    private val levelSheet = this land object : FloatingArgsSheet<UserProfile>() {
         @Composable
         override fun Content(args: UserProfile) {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -589,13 +589,5 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
                 }
             }
         }
-    }
-
-    @Composable
-    override fun Floating() {
-        scanSheet.Land()
-        userCardSheet.Land()
-        signinSheet.Land()
-        levelSheet.Land()
     }
 }

@@ -62,8 +62,6 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     private var onSearching by mutableStateOf(false)
 
-    private val inputDialog = FloatingDialogInput(hint = "查找关键字", maxLength = 64)
-
     private suspend fun loadLibrary() {
         onSearching = false
         state = BoxState.LOADING
@@ -285,7 +283,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         }
     }
 
-    private val packageSheet = object : FloatingSheet() {
+    private val packageSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
         override val dismissOnBackPress: Boolean get() = !isRunning
         override val dismissOnClickOutside: Boolean get() = !isRunning
@@ -403,7 +401,9 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         }
     }
 
-    private val previewSheet = object : FloatingSheet() {
+    private val inputDialog = this land FloatingDialogInput(hint = "查找关键字", maxLength = 64)
+
+    private val previewSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
         override val dismissOnBackPress: Boolean get() = !isRunning
         override val dismissOnClickOutside: Boolean get() = !isRunning
@@ -477,7 +477,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         }
     }
 
-    private val importSheet = object : FloatingSheet() {
+    private val importSheet = this land object : FloatingSheet() {
         override val initFullScreen: Boolean = true
         override val dismissOnBackPress: Boolean get() = !isRunning
         override val dismissOnClickOutside: Boolean get() = !isRunning
@@ -542,7 +542,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         }
     }
 
-    private val modDetailsSheet = object : FloatingArgsSheet<ModItem>() {
+    private val modDetailsSheet = this land object : FloatingArgsSheet<ModItem>() {
         private var configText: String? by mutableStateOf(null)
 
         override suspend fun initialize(args: ModItem) {
@@ -585,14 +585,5 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 )
             }
         }
-    }
-
-    @Composable
-    override fun Floating() {
-        inputDialog.Land()
-        packageSheet.Land()
-        previewSheet.Land()
-        importSheet.Land()
-        modDetailsSheet.Land()
     }
 }

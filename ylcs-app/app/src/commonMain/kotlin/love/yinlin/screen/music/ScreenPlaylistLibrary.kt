@@ -325,7 +325,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val cloudBackupSheet = object : FloatingSheet() {
+    private val cloudBackupSheet = this land object : FloatingSheet() {
         var playlists: Map<String, List<PlaylistPreviewItem>> by mutableRefStateOf(emptyMap())
 
         override suspend fun initialize() {
@@ -463,19 +463,12 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val inputPlaylistNameDialog = FloatingDialogInput(hint = "歌单名", maxLength = 16)
+    private val inputPlaylistNameDialog = this land FloatingDialogInput(hint = "歌单名", maxLength = 16)
 
-    private val processPlaylistDialog = FloatingDialogChoice.fromIconItems(
+    private val processPlaylistDialog = this land FloatingDialogChoice.fromIconItems(
         items = listOf(
             "重命名" to Icons.Outlined.Edit,
             "删除" to Icons.Outlined.Delete
         )
     )
-
-    @Composable
-    override fun Floating() {
-        cloudBackupSheet.Land()
-        inputPlaylistNameDialog.Land()
-        processPlaylistDialog.Land()
-    }
 }

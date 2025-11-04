@@ -19,6 +19,8 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.floating.FABLayout
+import love.yinlin.compose.ui.floating.FloatingArgsSheet
+import love.yinlin.compose.ui.floating.FloatingDialog
 
 @Stable
 abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
@@ -39,6 +41,19 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
 
     val slot = ScreenSlot(viewModelScope)
 
+    private val landDialogs = mutableListOf<FloatingDialog<*>>()
+    private val landSheets = mutableListOf<FloatingArgsSheet<*>>()
+
+    protected infix fun <F : FloatingDialog<*>> land(instance: F): F {
+        landDialogs += instance
+        return instance
+    }
+
+    protected infix fun <F : FloatingArgsSheet<*>> land(instance: F): F {
+        landSheets += instance
+        return instance
+    }
+
     @Composable
     fun ComposedUI() {
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -47,6 +62,7 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
 
         val immersivePadding = rememberImmersivePadding()
         CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+            // FAB Layout
             fabIcon?.let {
                 FABLayout(
                     icon = it,
@@ -56,8 +72,16 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
                 )
             }
 
+            // Sheet Land
+            for (instance in landSheets) instance.Land()
+
+            // Dialog Land
+            for (instance in landDialogs) instance.Land()
+
+            // Custom Floating Land
             Floating()
 
+            // Default Dialog Land
             with(slot) {
                 info.Land()
                 confirm.Land()

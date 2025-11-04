@@ -148,7 +148,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val importSheet = object : FloatingSheet() {
+    private val importSheet = this land object : FloatingSheet() {
         @Composable
         override fun Content() {
             val state = rememberTextInputState()
@@ -205,11 +205,5 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val searchDialog = FloatingDialogInput(hint = "输入微博用户昵称关键字", maxLength = 16)
-
-    @Composable
-    override fun Floating() {
-        importSheet.Land()
-        searchDialog.Land()
-    }
+    private val searchDialog = this land FloatingDialogInput(hint = "输入微博用户昵称关键字", maxLength = 16)
 }

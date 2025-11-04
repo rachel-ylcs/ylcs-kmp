@@ -180,7 +180,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
         else gridState.animateScrollToItem(0)
     }
 
-    private val recordDetailsSheet = object : FloatingArgsSheet<GameRecordWithName>() {
+    private val recordDetailsSheet = this land object : FloatingArgsSheet<GameRecordWithName>() {
         @Composable
         override fun Content(args: GameRecordWithName) {
             Column(
@@ -266,10 +266,5 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
                 }
             }
         }
-    }
-
-    @Composable
-    override fun Floating() {
-        recordDetailsSheet.Land()
     }
 }

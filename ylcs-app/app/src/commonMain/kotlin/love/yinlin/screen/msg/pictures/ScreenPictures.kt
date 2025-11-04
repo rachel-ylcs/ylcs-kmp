@@ -220,13 +220,5 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
         else listState.animateScrollToItem(0)
     }
 
-    private val searchDialog = FloatingDialogInput(
-        hint = "关键字/地点/作者",
-        maxLength = 16
-    )
-
-    @Composable
-    override fun Floating() {
-        searchDialog.Land()
-    }
+    private val searchDialog = this land FloatingDialogInput(hint = "关键字/地点/作者", maxLength = 16)
 }

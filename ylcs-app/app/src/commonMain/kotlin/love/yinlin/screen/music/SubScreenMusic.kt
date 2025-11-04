@@ -813,7 +813,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 		}
 	}
 
-	private val currentPlaylistSheet = object : FloatingSheet() {
+	private val currentPlaylistSheet = this land object : FloatingSheet() {
 		@Composable
 		override fun Content() {
 			val isEmptyList by rememberDerivedState { mp.musicList.isEmpty() }
@@ -870,7 +870,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	}
 
 	@OptIn(ExperimentalMaterial3Api::class)
-    private val sleepModeSheet = object : FloatingSheet() {
+    private val sleepModeSheet = this land object : FloatingSheet() {
 		@Composable
 		override fun Content() {
 			val state = rememberTimePickerState(is24Hour = true)
@@ -927,11 +927,5 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 				}
 			}
 		}
-	}
-
-    @Composable
-	override fun Floating() {
-		sleepModeSheet.Land()
-		currentPlaylistSheet.Land()
 	}
 }

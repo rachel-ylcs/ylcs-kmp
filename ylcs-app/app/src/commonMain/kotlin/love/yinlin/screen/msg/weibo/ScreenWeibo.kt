@@ -151,10 +151,5 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
         else gridState.animateScrollToItem(0)
     }
 
-    private val downloadVideoDialog = FloatingDownloadDialog()
-
-    @Composable
-    override fun Floating() {
-        downloadVideoDialog.Land()
-    }
+    private val downloadVideoDialog = this land FloatingDownloadDialog()
 }

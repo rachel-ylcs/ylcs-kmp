@@ -320,10 +320,5 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private val cropDialog = FloatingDialogCrop()
-
-    @Composable
-    override fun Floating() {
-        cropDialog.Land()
-    }
+    private val cropDialog = this land FloatingDialogCrop()
 }

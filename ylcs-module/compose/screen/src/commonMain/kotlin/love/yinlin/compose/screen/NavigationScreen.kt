@@ -77,5 +77,5 @@ abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
     }
 
     @Composable
-    override fun Floating() = currentScreen.Floating()
+    override fun Floating() = currentScreen.ComposedFloating()
 }

@@ -38,7 +38,7 @@ import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 @Stable
-abstract class FloatingDialog<R> : Floating<Unit>() {
+abstract class FloatingDialog<R : Any> : Floating<Unit>() {
     override fun alignment(device: Device): Alignment = Alignment.Center
     override fun enter(device: Device, animationSpeed: Int): EnterTransition = scaleIn(
         animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
@@ -90,7 +90,7 @@ abstract class FloatingDialog<R> : Floating<Unit>() {
 }
 
 @Stable
-abstract class FloatingBaseDialog<R> : FloatingDialog<R>() {
+abstract class FloatingBaseDialog<R : Any> : FloatingDialog<R>() {
     open val scrollable: Boolean get() = true
     abstract val title: String?
     open val actions: @Composable (RowScope.() -> Unit)? = null

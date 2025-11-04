@@ -165,10 +165,5 @@ class ScreenImagePreview(manager: ScreenManager, images: List<Picture>, initInde
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
     }
 
-	private val downloadDialog = FloatingDownloadDialog()
-
-	@Composable
-	override fun Floating() {
-		downloadDialog.Land()
-	}
+	private val downloadDialog = this land FloatingDownloadDialog()
 }
