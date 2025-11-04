@@ -22,19 +22,31 @@
 
 # Rachel快速开发框架
 
-`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的多模块跨平台快速开发框架，
+`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，
 支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端，
 由银临茶舍项目组完成开发。
 
+`Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`.
+It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other client and server platforms, and was developed by the 银临茶舍 project team.
+
 ## 特性
 
-- 跨平台：基于Kotlin Multiplatform / Compose Multiplatform，支持六个平台客户端与服务端，具有多端一致性。
-- 原生性能：生成平台原生二进制文件，无桥接或附加库。
-- 单一语言：仅需掌握kotlin语言即可完成大多数任务需求与开发。
-- 快速：三分钟便能上手构建自己的跨平台应用程序。
-- 简洁：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
-- 模块化：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
-- 高协作：框架支持前后端协作开发，共享数据组织结构。
+- **跨平台**：基于Kotlin Multiplatform / Compose Multiplatform，支持六个平台客户端与服务端，具有多端一致性。
+- **原生性能**：生成平台原生二进制文件，无桥接或附加库。
+- **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
+- **快速**：三分钟便能上手构建自己的跨平台应用程序。
+- **简洁**：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
+- **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
+- **高协作**：框架支持前后端协作开发，共享数据组织结构。
+
+
+- **Cross platform**: Based on Kotlin Multiplatform/Compose Multiplatform, it supports six platform clients and servers, with multi terminal consistency.
+- **Native performance**: Generate platform native binary files without bridging or additional libraries.
+- **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
+- **Quick**: You can start building your own cross platform application in just three minutes.
+- **Simple**: A large number of type safe and structured framework DSL, without the need to write too much template code.
+- **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
+- **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
 
 ## 环境
 
@@ -47,10 +59,140 @@
 
 ## 快速开始
 
-#### 第一个Rachel App
+### First Rachel App
 
 ```kotlin
-// 示例
+
+fun main() = MyApplicaiton().run()
+
+class MyApplication : PlatformApplication<MyApplication>(mApp) {
+    @Composable
+    override fun Content() {
+        Text("hello world!")
+    }
+}
+
+private val mApp = LazyReference<RachelApplication>()
+val app: RachelApplication by mApp
+
+```
+
+### Screen Pages and Navigation
+
+```kotlin
+
+class ScreenMain(manager: ScreenManager) : Screen(manager) {
+    @Composable
+    override fun Content() {
+        PrimaryButton("go to greet page") {
+            navigate(::ScreenGreet, "hello world!")
+        }
+    }
+}
+
+class ScreenGreet(manager: ScreenManager, message: String) : Screen(manager) {
+    @Composable
+    override fun Content() {
+        Text(message)
+        PrimaryButton("back to main page") {
+            pop()
+        }
+    }
+}
+
+class MyApplication : PlatformApplication<MyApplication>() {
+    @Composable
+    override fun Content() {
+        AppScreen<ScreenMain> {
+            screen(::ScreenMain)
+            screen(::ScreenGreet)
+        }
+    }
+}
+
+```
+
+### Floating Component
+
+```kotlin
+
+class ScreenMain(manager: ScreenManager) : Screen(manager) {
+    @Composable
+    override fun Content() {
+        PrimaryButton("open dialog") {
+            val result = dialog.openSuspend()
+            println("the input text is $result")
+        }
+        PrimaryButton("open sheet") {
+            sheet.open()
+        }
+        PrimaryButton("open sheet") {
+            // application floating tip
+            slot.tip.warning("open the tip")
+        }
+    }
+
+    // applicaiton dialog
+    val dialog = FloatingDialogInput()
+    
+    // application side sheet
+    val sheet = object : FloatingSheet() {
+        @Composable
+        override fun Content() {
+            Text("from sheet")
+        }
+    }
+
+    // application fab
+    override val fabIcon: ImageVector = Icons.outlined.Submit
+
+    override suspend fun onFabClick() {
+        println("from fab button")
+    }
+    
+    @Composable
+    override fun Floating() {
+        sheet.Land()
+        dialog.Land()
+    }
+}
+
+```
+
+### Service Startup
+
+```kotlin
+
+// All services are automatically registered.
+// Services can be accessed from any location globally
+// Services can set priorities to resolve dependency relationships
+// Services can be set to start synchronously or asynchronously
+class MyApplication : PlatformApplication<MyApplication>() {
+    // bind os service, then you can use os module functions and variables
+    val os by system(::StartupOS)
+    // bind picker service, then you can open native system dialog, pick the file, pick a photo...
+    val picker by service(::StartupPicker)
+    // bind config service, then you can read or write application config in disk
+    val config by service(::StartupAppConfig)
+    @Composable
+    override fun Content() {
+        PrimaryButton(text = os.storage.dataPath) {
+            picker.pickPhoto()
+        }
+    }
+}
+
+```
+
+### Client and Server
+
+```kotlin
+
+// Client and server code sharing, data structure sharing, one definition for two uses
+// Dual end interface parameters and response types are secure, with fully automatic recognition
+// Automatic construction of directory tree, no need to manually set paths
+
+// Server resource
 object ServerRes : ResNode("public") {
     object Activity : ResNode(this, "activity") {
         fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
@@ -62,25 +204,57 @@ object ServerRes : ResNode("public") {
         val DefaultWall = ResNode(this, "default_wall.webp")
     }
 
-    object Users : ResNode(this, "users") {
-        class User(uid: Int) : ResNode(this, "$uid") {
-            val avatar = ResNode(this, "avatar.webp")
+    val Server = ResNode(this, "server.json")
+    val Update = ResNode(this, "update.json")
+}
 
-            val wall = ResNode(this, "wall.webp")
+// public API for client and server
+object API : APINode(null, "") {
+    object User : APINode(this, "user") {
+        object Profile : APINode(this, "profile") {
+            object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
 
-            inner class Pics : ResNode(this, "pics") {
-                fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+            object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
+                @Serializable
+                data class Request(val token: String, val name: String)
+            }
+
+            object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
+                @Serializable
+                data class Files(val avatar: APIFile)
+            }
+
+            object Signin : APIPostRequest<String>(this, "signin")
+        }
+
+        object Topic : APINode(this, "topic") {
+            object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
+                @Serializable
+                data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
             }
         }
     }
+}
 
-    val Server = ResNode(this, "server.json")
-    val Update = ResNode(this, "update.json")
-    val Photo = ResNode(this, "photo.json")
+// client method
+
+val result = ClientAPI.request(
+    route = API.User.Mail.GetMails,
+    data = API.User.Mail.GetMails.Request(
+        token = config.userToken,
+        offset = offset
+    )
+)
+
+// server method
+
+api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
+    VN.throwEmpty(title, content)
+    VN.throwSection(section)
+    Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "succeed")
 }
 
 ```
-
 
 ## 文档
 
@@ -161,181 +335,7 @@ Redis 和 MySQL 配置可在 `resources` 中的 `config.properties` 配置
 
 ### 构建艺术
 
-![项目依赖结构](docs/pics/art.png)
-
-## 自研轻量级 C/S 数据共享框架
-
-### 接口定义
-
-所有 C/S 交互接口均定义在 `shared` 模块的 `love.yinlin.api.API` 类中
-
-借助 Kotlin 超强的 DSL 能力，提供完美的框架语法糖
-
-### 服务端资源引用 ServerRes
-
-```kotlin
-// 示例
-object ServerRes : ResNode("public") {
-    object Activity : ResNode(this, "activity") {
-        fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
-    }
-
-    object Assets : ResNode(this, "assets") {
-        val DefaultAvatar = ResNode(this, "default_avatar.webp")
-
-        val DefaultWall = ResNode(this, "default_wall.webp")
-    }
-
-    object Users : ResNode(this, "users") {
-        class User(uid: Int) : ResNode(this, "$uid") {
-            val avatar = ResNode(this, "avatar.webp")
-
-            val wall = ResNode(this, "wall.webp")
-
-            inner class Pics : ResNode(this, "pics") {
-                fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
-            }
-        }
-    }
-
-    val Server = ResNode(this, "server.json")
-    val Update = ResNode(this, "update.json")
-    val Photo = ResNode(this, "photo.json")
-}
-
-```
-
-服务端配置或公共文件的配置信息可以按树状object层级依次写出。
-
-路径只需要提供名称，而不需要像其他框架般补全完整路径。
-
-**例 1** 访问 UID 为 8 的用户的头像
-```kotlin
-ServerRes.Users.User(8).avatar
-```
-
-**例 2** 访问 UID 为 8 的用户的图片(图片 ID 是 123)
-```kotlin
-ServerRes.Users.User(8).Pics().pic(123)
-```
-
-### C/S 接口
-
-C/S 接口的定义与数据模型在客户端（Android / iOS / Desktop / Web）与服务端中共享。
-
-#### 公共接口
-
-```kotlin
-
-object API : APINode(null, "") {
-    object User : APINode(this, "user") {
-        object Profile : APINode(this, "profile") {
-            object GetProfile : APIPost<String, UserProfile>(this, "getProfile")
-
-            object GetPublicProfile : APIPost<Int, UserPublicProfile>(this, "getPublicProfile")
-
-            object UpdateName : APIPostRequest<UpdateName.Request>(this, "updateName") {
-                @Serializable
-                data class Request(val token: String, val name: String)
-            }
-
-            object UpdateAvatar : APIFormRequest<String, UpdateAvatar.Files>(this, "updateAvatar") {
-                @Serializable
-                data class Files(val avatar: APIFile)
-            }
-
-            object Signin : APIPostRequest<String>(this, "signin")
-        }
-
-        object Topic : APINode(this, "topic") {
-            object GetTopics : APIPost<GetTopics.Request, List<love.yinlin.data.rachel.Topic>>(this, "getTopics") {
-                @Serializable
-                data class Request(val uid: Int, val isTop: Boolean = true, val offset: Int = Int.MAX_VALUE, val num: Int = APIConfig.MIN_PAGE_NUM)
-            }
-
-            object SendTopic : APIForm<SendTopic.Request, SendTopic.Response, SendTopic.Files>(this, "sendTopic") {
-                @Serializable
-                data class Request(val token: String, val title: String, val content: String, val section: Int)
-                @Serializable
-                data class Files(val pics: APIFiles)
-                @Serializable
-                data class Response(val tid: Int, val pic: String?)
-            }
-        }
-    }
-}
-
-```
-
-与 ServerRes 相同，接口定义也是以树状层级写出。
-
-接口路径不需要全写，只需在对应路径内填写名称。
-
-路径中目录定义 object 继承自 APINode，接口定义 object 继承自 APIRoute
-
-其中为方便简写，在三种方式（Get / Post / Form）与三种结构（自定义 Request 与 Response，简单 Request，简单 Response）中自由组合。
-
-形成数十种别名，如 APIGetRequest，APIPostForm 等。
-
-对于无 Body 的 Request，可以省略 Request 泛型即使用 APIResponse。
-
-对简单 Request 可以直接使用 Int、String 作为 Reques t泛型，Response 同理。
-
-复杂 Request 或 Response 可在 object 内自定义结构并声明 `@Serializable` 序列化。
-
-数据模型可附带默认值。
-
-#### 服务端
-
-在 ServerAPI 中定义
-
-```kotlin
-
-api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
-    VN.throwEmpty(title, content)
-    VN.throwSection(section)
-    val ngp = NineGridProcessor(pics)
-    val uid = AN.throwExpireToken(token)
-    val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
-    if (!UserPrivilege.topic(privilege) ||
-        (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege)))
-        return@api "无权限".failedData
-    val tid = DB.throwInsertSQLGeneratedKey("""
-         INSERT INTO topic(uid, title, content, pics, section, rawSection) VALUES(?, ?, ?, ?, ?, ?)
-     """, uid, title, content, ngp.jsonString, section, section).toInt()
-    // 复制主题图片
-    val userPics = ServerRes.Users.User(uid).Pics()
-    val pic = ngp.copy { userPics.pic(it) }
-    Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "发表成功")
-}
-
-```
-
-使用 api 函数可直接引用公共接口的路径 object 作为参数，其参数，Body，表单的文件均自动识别名称及类型。
-
-编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。
-
-#### 客户端
-
-在 ClientAPI 中定义
-
-```kotlin
-
-val result = ClientAPI.request(
-    route = API.User.Mail.GetMails,
-    data = API.User.Mail.GetMails.Request(
-        token = config.userToken,
-        offset = offset
-    )
-)
-
-```
-
-客户端可直接使用 request 函数并引用公共接口的路径 object，其参数，data 等均自动识别名称及类型。
-
-且接受服务器的响应 result 也与公共接口中定义的完全一致，自动识别响应数据模型。
-
-编译期泛型能保证所有的接口数据传递均是类型安全的，如果任何一个参数不匹配在编译前就会报错。
+![art](docs/pics/art.png)
 
 ## Music模组协议
 

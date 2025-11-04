@@ -1,8 +1,6 @@
 package love.yinlin
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Paths
@@ -22,7 +20,7 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.Reference
+import love.yinlin.extension.LazyReference
 import love.yinlin.platform.Platform
 import love.yinlin.platform.lyrics.LyricsEngineConfig
 import love.yinlin.platform.lyrics.LyricsEngineType
@@ -103,7 +101,7 @@ class StartupAppConfig : StartupConfig() {
 
 @Stable
 abstract class RachelApplication(delegate: PlatformContextDelegate) :
-    PlatformApplication<RachelApplication>(appReference, delegate), DeepLink {
+    PlatformApplication<RachelApplication>(mApp, delegate), DeepLink {
     private val loadNativeLibrary by system(
         NativeLibrary("ylcs_native", *Platform.Desktop),
         factory = ::StartupNativeLibrary
@@ -177,7 +175,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
 
     @Composable
     override fun Content() {
-        AppScreen<ScreenMain>(modifier = Modifier.fillMaxSize(), deeplink = this) {
+        AppScreen<ScreenMain>(deeplink = this) {
             // 通用
             screen(::ScreenMain)
             screen(::ScreenImagePreview)
@@ -282,5 +280,5 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
     }
 }
 
-private val appReference = Reference<RachelApplication?>(null)
-val app: RachelApplication get() = appReference.value!!
+private val mApp = LazyReference<RachelApplication>()
+val app: RachelApplication by mApp

@@ -6,9 +6,17 @@ import kotlin.reflect.KProperty
 
 // Reference
 
-data class Reference<T>(var value: T) : ReadWriteProperty<Any?, T> {
+class Reference<T>(var value: T) : ReadWriteProperty<Any?, T> {
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
     override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
+}
+
+class LazyReference<T : Any> : ReadOnlyProperty<Any?, T> {
+    lateinit var mValue: T
+    fun init(value: T) {
+        if (!::mValue.isInitialized) mValue = value
+    }
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = mValue
 }
 
 // lazyName

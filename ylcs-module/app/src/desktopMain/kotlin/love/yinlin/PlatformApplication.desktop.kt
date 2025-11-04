@@ -20,14 +20,14 @@ import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.AppTopBar
-import love.yinlin.extension.Reference
+import love.yinlin.extension.LazyReference
 import org.jetbrains.compose.resources.*
 import java.awt.Dimension
 import kotlin.system.exitProcess
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
-    self: Reference<A?>,
+    self: LazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Application<A>(self, delegate) {
     @Composable

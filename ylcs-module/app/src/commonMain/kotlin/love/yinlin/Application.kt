@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import love.yinlin.compose.*
-import love.yinlin.extension.Reference
+import love.yinlin.extension.LazyReference
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class Application<out A : Application<A>>(
-    private val self: Reference<A?>,
+    private val self: LazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Service() {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
@@ -97,10 +97,9 @@ abstract class Application<out A : Application<A>>(
     }
 
     internal fun initialize(delay: Boolean) {
-        if (self.value == null) {
-            @Suppress("UNCHECKED_CAST")
-            self.value = this as? A
-        }
+        @Suppress("UNCHECKED_CAST")
+        self.init(this as A)
+
         initService(context, delay)
         if (delay) onCreateDelay()
         else onCreate()
