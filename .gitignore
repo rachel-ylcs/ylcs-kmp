@@ -13,6 +13,9 @@ kotlin-js-store/
 ylcs-app/mod-manager/mod/
 ylcs-app/mod-manager/output/
 
+# 测试目录
+ylcs-test/
+
 # Gradle
 .gradle/
 

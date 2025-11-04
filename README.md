@@ -1,7 +1,6 @@
-![项目依赖结构](docs/pics/title.jpg)
+![logo](docs/pics/logo.png)
 
 <div>
-    <h1 align="center">银临茶舍跨平台 App</h1>
     <h5></h5>
     <div>
         <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt=""/>
@@ -17,80 +16,87 @@
         <img src="https://img.shields.io/github/v/release/rachel-ylcs/ylcs-kmp" alt=""/>
         <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/build.yml/badge.svg" alt=""/>
         <img src="https://github.com/rachel-ylcs/ylcs-kmp/actions/workflows/main.yml/badge.svg" alt=""/>
-        <img src="https://img.shields.io/badge/QQ%E4%BA%A4%E6%B5%81%E7%BE%A4-828049503-red.svg" alt=""/>
     </div>
     <h5></h5>
 </div>
 
+# Rachel快速开发框架
+
+`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的多模块跨平台快速开发框架，
+支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端，
+由银临茶舍项目组完成开发。
+
+## 特性
+
+- 跨平台：基于Kotlin Multiplatform / Compose Multiplatform，支持六个平台客户端与服务端，具有多端一致性。
+- 原生性能：生成平台原生二进制文件，无桥接或附加库。
+- 单一语言：仅需掌握kotlin语言即可完成大多数任务需求与开发。
+- 快速：三分钟便能上手构建自己的跨平台应用程序。
+- 简洁：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
+- 模块化：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
+- 高协作：框架支持前后端协作开发，共享数据组织结构。
+
+## 环境
+
+- `Gradle 9.1.0`
+- `JDK 25`
+- `IntelliJ IDEA 2025.3`
+- `Xcode 16.3`
+- `MSVC v145` | `g++ 13`
+- `Windows 10 SDK` | `Windows 11 SDK`
+
+## 快速开始
+
+#### 第一个Rachel App
+
+```kotlin
+// 示例
+object ServerRes : ResNode("public") {
+    object Activity : ResNode(this, "activity") {
+        fun activity(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+    }
+
+    object Assets : ResNode(this, "assets") {
+        val DefaultAvatar = ResNode(this, "default_avatar.webp")
+
+        val DefaultWall = ResNode(this, "default_wall.webp")
+    }
+
+    object Users : ResNode(this, "users") {
+        class User(uid: Int) : ResNode(this, "$uid") {
+            val avatar = ResNode(this, "avatar.webp")
+
+            val wall = ResNode(this, "wall.webp")
+
+            inner class Pics : ResNode(this, "pics") {
+                fun pic(uniqueId: String) = ResNode(this, "${uniqueId}.webp")
+            }
+        }
+    }
+
+    val Server = ResNode(this, "server.json")
+    val Update = ResNode(this, "update.json")
+    val Photo = ResNode(this, "photo.json")
+}
+
+```
+
+
+## 文档
+
+见
+
+# 银临茶舍跨平台 App
+
 > [!IMPORTANT]
 >
->  集资讯、听歌、美图、论坛、社交于一体的小银子聚集地 茶舍水群：828049503
+>  基于`Rachel`框架开发的集资讯、听歌、美图、论坛、社交于一体的小银子聚集地应用程序
+> 
+>  银临茶舍水群：`828049503`
 
-## 模块表
-
-`M*: Module Level`  `D: Description`  `P: Multiplatform Supported`
-
-|      M0       |       M1        |              M2               |                      D                       | P |
-|:-------------:|:---------------:|:-----------------------------:|:--------------------------------------------:|:-:|
-|  `ylcs-base`  |                 |                               |                                              |   |
-|               |     `core`      |                               |                language core                 | ✅ |
-|               | `compose-core`  |                               |                 compose core                 | ✅ |
-|               |    `cs-core`    |                               |                   C/S core                   | ✅ |
-| `ylcs-module` |                 |                               |                                              |   |
-|               |    `compose`    |                               |                                              |   |
-|               |                 |             `app`             |     fast and easy compose app framework      | ✅ |
-|               |                 |           `screen`            |     screen page, floating and navigation     | ✅ |
-|               |                 |           `device`            | adaptive device layout and immersive padding | ✅ |
-|               |                 |            `theme`            |        app theme resources definition        | ✅ |
-|               |                 |        `platform-view`        |      embed platform-related native view      | ✅ |
-|               |                 |             `ui`              | custom theme and basic component definition  | ✅ |
-|               |                 |        `component:all`        |           merge all component libs           | ✅ |
-|               |                 | `component:pagination-layout` |         data pagination ui framework         | ✅ |
-|               |                 |     `component:url-image`     |        web or local file image loader        | ✅ |
-|               |                 |      `component:webview`      |  multiplatform webview and headless webview  | ✅ |
-|               |    `startup`    |                               |         application startup services         | ✅ |
-|               |    `service`    |                               |                                              |   |
-|               |                 |             `all`             |            merge all service libs            | ✅ |
-|               |                 |           `context`           |      multiplatform application context       | ✅ |
-|               |                 |          `exception`          |      multiplatform exception processor       | ✅ |
-|               |                 |             `os`              |    system platform related implementation    | ✅ |
-|               |                 |          `mmkv-kmp`           |       fast key-value storage framework       | ✅ |
-|               |                 |           `config`            |   application state-memory-storage config    | ✅ |
-|               |                 |           `picker`            |  multiplatform system native UI file picker  | ✅ |
-|               | `client-engine` |                               |                client engine                 | ✅ |
-|               | `server-engine` |                               |                server engine                 | ❌ |
-|               |     `fixup`     |                               |      fix upstream compatibility issues       | ❌ |
-|               |  `auto-update`  |                               |       desktop application auto update        | ❌ |
-|  `ylcs-app`   |                 |                               |                                              |   |
-|               |      `cs`       |                               |                  C/S bridge                  | ✅ |
-|               |      `mod`      |                               |                   song MOD                   | ✅ |
-|               |      `app`      |                               |                rachel client                 | ✅ |
-|               |    `server`     |                               |                rachel server                 | ❌ |
-|               |  `mod-manager`  |                               |               song MOD mangaer               | ❌ |
-|  `ylcs-test`  |                 |                               |               test and feature               | ✅ |
-
-## 源代码集依赖
-
-![项目依赖结构](docs/pics/structure.png)
+![rachel](docs/pics/title.jpg)
 
 ## 部署
-
-### 环境
-
-#### Common
-- gradle 8.14.3-all
-- JDK 21
-#### Android
-- IntelliJ IDEA 2025.3
-#### iOS
-- Xcode 16.3
-#### Windows
-- MSVC v145
-- Windows 10 / 11 SDK
-#### Linux
-- g++ 13
-#### Server
-- JDK 21
 
 ### 编译
 
