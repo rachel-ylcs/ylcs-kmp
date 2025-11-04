@@ -11,7 +11,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.fixup.FixupMacOSMouseClick
+import love.yinlin.fixup.Fixup
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 private fun FloatingLyrics.toggle() {
@@ -33,10 +33,10 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
         DisposableEffect(Unit) {
             config = app.config.lyricsEngineConfig
             floatingLyrics.canMove = true
-            FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
+            Fixup.macOSClickEventDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
             onDispose {
                 floatingLyrics.canMove = false
-                FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
+                Fixup.macOSClickEventDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
             }
         }
 

@@ -2,21 +2,13 @@ package love.yinlin
 
 import android.content.Intent
 import android.os.Build
-import androidx.compose.runtime.Composable
-import love.yinlin.compose.LocalDarkMode
 import love.yinlin.compose.screen.DeepLink
-import love.yinlin.fixup.FixupAndroidStatusBarColor
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toUri
 
 class MainApplication : ComposeApplication() {
 	override val instance = object : RachelApplication(this) {
-		@Composable
-		override fun BeginContent(activity: ComposeActivity) {
-			FixupAndroidStatusBarColor.AutoTheme(activity.window, LocalDarkMode.current)
-		}
-
 		override fun onIntent(intent: Intent) {
 			when (intent.action) {
 				Intent.ACTION_VIEW -> intent.data?.let { data ->

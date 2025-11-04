@@ -25,6 +25,7 @@ import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.extension.LazyReference
+import love.yinlin.fixup.Fixup
 import org.jetbrains.compose.resources.*
 import java.awt.Dimension
 import kotlin.system.exitProcess
@@ -98,7 +99,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
         var windowVisible by mutableStateOf(true)
         var alwaysOnTop by mutableStateOf(false)
-        val minimumSize = Dimension(minSize.width.value.toInt(), minSize.height.value.toInt())
 
         val windowState = WindowState(
             placement = WindowPlacement.Floating,
@@ -125,12 +125,15 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 state = windowState
             ) {
                 LaunchedEffect(Unit) {
-                    window.minimumSize = minimumSize
+                    Fixup.swingWindowMaximizeBounds(window)
                     context.bindWindow(window)
+
                     windowStarter {
                         initialize(delay = true)
                     }
                 }
+
+                Fixup.swingWindowMinimize(window, minSize)
 
                 Layout {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {

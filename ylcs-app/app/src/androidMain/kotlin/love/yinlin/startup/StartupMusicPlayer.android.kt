@@ -30,7 +30,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
-import love.yinlin.fixup.FixupAndroidLocalFileProvider
+import love.yinlin.fixup.Fixup
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.extractMediaItems
 import love.yinlin.platform.mergePlayMode
@@ -221,7 +221,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
                 .setAlbumArtist(this.singer)
                 .setComposer(this.composer)
                 .setWriter(this.lyricist)
-                .setArtworkUri(FixupAndroidLocalFileProvider.uri(
+                .setArtworkUri(Fixup.updateLocalFileProviderPermission(
                     context = androidContext,
                     authority = androidContext.getString(R.string.mod_file_provider),
                     file = File(this.path(ModResourceType.Record).toString())

@@ -6,7 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import love.yinlin.compose.LocalDarkMode
 import love.yinlin.extension.catching
+import love.yinlin.fixup.Fixup
 
 abstract class ComposeActivity : ComponentActivity() {
     private val instance get() = (application as ComposeApplication).instance
@@ -27,6 +29,8 @@ abstract class ComposeActivity : ComponentActivity() {
 
         setContent {
             instance.Layout {
+                Fixup.statusBarAutoTheme(window, LocalDarkMode.current)
+
                 instance.BeginContent(this)
                 instance.Content()
             }

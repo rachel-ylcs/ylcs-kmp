@@ -64,7 +64,6 @@ include(
     "ylcs-module:client-engine",
     "ylcs-module:server-engine",
 
-    "ylcs-module:fixup",
     "ylcs-module:auto-update",
     "ylcs-module:single_instance",
 

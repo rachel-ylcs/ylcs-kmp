@@ -11,7 +11,6 @@ import kotlinx.io.files.Path
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.MimeType
-import love.yinlin.fixup.FixupWindowsSwingMaximize
 import love.yinlin.platform.*
 import love.yinlin.resources.*
 import love.yinlin.startup.StartupComposeSwingRender
@@ -25,10 +24,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     override val actionAlwaysOnTop: Boolean = true
     override val tray: Boolean = true
     override val trayHideNotification: String = "已隐藏到任务栏托盘中"
-
-    override fun onCreateDelay() {
-        FixupWindowsSwingMaximize.setBounds(context.window)
-    }
 
     @Composable
     override fun TopBar(actions: @Composable (ActionScope.() -> Unit)) {
