@@ -23,6 +23,7 @@ import love.yinlin.AndroidContext
 import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.extension.catching
+import love.yinlin.platform.platform
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
