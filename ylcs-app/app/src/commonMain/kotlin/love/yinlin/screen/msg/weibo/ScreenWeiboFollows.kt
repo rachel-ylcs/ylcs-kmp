@@ -34,6 +34,7 @@ import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
+import love.yinlin.extension.catchingError
 
 @Composable
 private fun WeiboUserItem(
@@ -175,15 +176,14 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
                         icon = Icons.Outlined.Download,
                         enabled = state.ok,
                         onClick = {
-                            try {
+                            catchingError {
                                 val localUsers = app.config.weiboUsers
                                 val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
                                 for (item in items) {
                                     if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
                                 }
                                 slot.tip.success("导入成功")
-                            }
-                            catch (_: Throwable) {
+                            }?.let {
                                 slot.tip.error("导入格式错误")
                             }
                         }
@@ -192,11 +192,10 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
                         text = "导出",
                         icon = Icons.Outlined.Upload,
                         onClick = {
-                            try {
+                            catchingError {
                                 state.text = app.config.weiboUsers.items.fastMap { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
-                            }
-                            catch (e: Throwable) {
-                                slot.tip.error(e.message ?: "导出失败")
+                            }?.let {
+                                slot.tip.error(it.message ?: "导出失败")
                             }
                         }
                     )

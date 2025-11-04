@@ -6,6 +6,7 @@ import kotlinx.io.Source
 import kotlinx.io.readByteArray
 import love.yinlin.data.compose.ImageCropResult
 import love.yinlin.data.compose.ImageQuality
+import love.yinlin.extension.catchingDefault
 import love.yinlin.platform.Coroutines
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
@@ -49,7 +50,7 @@ actual typealias ImageOwner = Bitmap
 
 actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean = Coroutines.cpu {
     var bitmap: Bitmap? = null
-    try {
+    val result = catchingDefault(false) {
         val bytes = Coroutines.io { source.readByteArray() }
         bitmap = Image.makeFromEncoded(bytes).use { image ->
             Bitmap.makeFromImage(image)
@@ -68,11 +69,9 @@ actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>
                 Coroutines.io { sink.write(data.bytes) }
             } != null
         }
-    } catch (_: Throwable) {
-        false
-    } finally {
-        if (bitmap != null && !bitmap.isClosed) bitmap.close()
     }
+    if (bitmap != null && !bitmap.isClosed) bitmap.close()
+    result
 }
 
 @Stable

@@ -185,9 +185,7 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
     private var items by mutableRefStateOf(emptyList<PlatformMusicInfo>())
 
     private suspend fun downloadMusic() {
-        catchingError(clean = {
-            slot.loading.close()
-        }) {
+        catchingError {
             slot.loading.openSuspend()
             val ids = mutableListOf<String>()
             Coroutines.io {
@@ -264,6 +262,7 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
         }?.let {
             slot.tip.warning("下载失败")
         }
+        slot.loading.close()
     }
 
     override val title: String by derivedStateOf { platformType.description }

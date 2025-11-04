@@ -10,13 +10,14 @@ import kotlinx.io.asInputStream
 import kotlinx.io.asOutputStream
 import love.yinlin.data.compose.ImageCropResult
 import love.yinlin.data.compose.ImageQuality
+import love.yinlin.extension.catchingDefault
 import love.yinlin.platform.Coroutines
 
 actual typealias ImageOwner = Bitmap
 
 actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean = Coroutines.cpu {
     var bitmap: Bitmap? = null
-    try {
+    val result = catchingDefault(false) {
         bitmap = Coroutines.io { BitmapFactory.decodeStream(source.asInputStream()) }
         for (op in items) {
             val result = op.process(bitmap!!, quality)
@@ -29,11 +30,9 @@ actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>
             bitmap.compress(Bitmap.CompressFormat.WEBP, quality.value, sink.asOutputStream())
         }
         true
-    } catch (_: Throwable) {
-        false
-    } finally {
-        bitmap?.recycle()
     }
+    bitmap?.recycle()
+    result
 }
 
 @Stable

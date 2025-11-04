@@ -1,6 +1,8 @@
 package love.yinlin.uri
 
 import kotlinx.serialization.Serializable
+import love.yinlin.extension.catchingError
+import love.yinlin.extension.catchingThrow
 
 @Serializable
 data class Uri(
@@ -50,18 +52,15 @@ data class Uri(
                 buffer[writePosition++] = byte
             }
 
-            fun decodeToStringAndReset() = try {
+            fun decodeToStringAndReset() = catchingThrow(clean = { writePosition = 0 }) {
                 buffer.decodeToString(startIndex = 0, endIndex = writePosition, throwOnInvalidSequence = false)
-            } finally {
-                writePosition = 0
             }
 
             fun flushDecodingByteAccumulator(builder: StringBuilder) {
                 if (writePosition == 0) return
-                try {
+                catchingError {
                     builder.append(decodeToStringAndReset())
-                }
-                catch (_: Exception) {
+                }?.let {
                     builder.append('\ufffd')
                 }
             }
@@ -129,7 +128,7 @@ data class Uri(
                 var nextAllowed = current + 1
                 while (nextAllowed < oldLength && !isAllowed(str[nextAllowed])) nextAllowed++
                 val toEncode = str.substring(current, nextAllowed)
-                try {
+                catchingError {
                     val bytes: ByteArray = toEncode.encodeToByteArray()
                     val bytesLength = bytes.size
                     for(i in 0 until bytesLength) {
@@ -137,9 +136,7 @@ data class Uri(
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf0 shr 4])
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf])
                     }
-                } catch (_: Exception) {
-                    return str
-                }
+                }?.let { return str }
                 current = nextAllowed
             }
             return encoded.toString()

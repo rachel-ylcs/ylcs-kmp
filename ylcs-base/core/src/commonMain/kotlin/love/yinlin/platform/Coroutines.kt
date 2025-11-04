@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import love.yinlin.extension.catchingError
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -19,9 +20,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 class SyncFuture<T>(private val continuation: CancellableContinuation<T?>) {
     fun send() = continuation.resumeWith(Result.success(null))
     fun send(result: T?) = continuation.resumeWith(Result.success(result))
-    inline fun send(block: () -> T) = try { send(block()) } catch (_: Throwable) { send() }
+    inline fun send(block: () -> T) { catchingError { send(block()) }?.let { send() } }
     fun cancel() { continuation.cancel(CancellationException("SyncFuture cancelled")) }
-    inline fun catching(block: () -> Unit) = try { block() } catch (_: Throwable) { send() }
+    inline fun catching(block: () -> Unit) { catchingError(block = block)?.let { send() } }
 }
 
 @OptIn(ExperimentalContracts::class)

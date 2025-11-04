@@ -67,6 +67,7 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.extension.catching
 import love.yinlin.extension.exists
 import org.jetbrains.compose.resources.getDrawableResourceBytes
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
@@ -175,7 +176,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private fun resumePauseTimer() {
         if (resumePauseJob == null) {
             resumePauseJob = launch {
-                try {
+                catching {
                     // 倒计时解除暂停状态
                     repeat(RhymeConfig.PAUSE_TIME) {
                         lockState = GameLockState.Resume(RhymeConfig.PAUSE_TIME - it)
@@ -185,9 +186,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     musicPlayer.play()
                     if (canvasFrameJob == null) canvasFrameJob = monitorGamePosition()
                 }
-                finally {
-                    resumePauseJob = null
-                }
+                resumePauseJob = null
             }
         }
     }

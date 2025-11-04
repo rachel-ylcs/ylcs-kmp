@@ -40,6 +40,7 @@ import love.yinlin.compose.ui.image.ReplaceableImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.lyrics.LrcParser
@@ -87,26 +88,24 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun submit() {
         slot.loading.openSuspend()
-        catchingError(clean = {
-            slot.loading.close()
-        }) {
-            Coroutines.io {
+        Coroutines.io {
+            catching {
                 // 1. 检查ID
                 val id = input.id.text
                 val name = input.name.text
                 if (id in app.mp.library) {
                     slot.tip.warning("ID已存在")
-                    return@io
+                    return@catching
                 }
                 if (!id.all { it.isLetterOrDigit() }) {
                     slot.tip.warning("ID仅能由字母或数字构成")
-                    return@io
+                    return@catching
                 }
                 // 2. 检查歌词
                 val lyrics = LrcParser(input.lyrics.text)
                 if (!lyrics.ok) {
                     slot.tip.warning("歌词格式非法")
-                    return@io
+                    return@catching
                 }
                 // 3. 检查文件
                 val audioFile = input.audioUri
@@ -114,7 +113,7 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
                 val backgroundFile = input.background
                 if (audioFile == null || recordFile == null || backgroundFile == null) {
                     slot.tip.warning("资源文件异常")
-                    return@io
+                    return@catching
                 }
                 // 4. 生成目录
                 val musicPath = Path(Paths.modPath, id)
@@ -161,6 +160,7 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
                 pop()
             }
         }
+        slot.loading.close()
     }
 
     @Composable

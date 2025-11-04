@@ -284,12 +284,11 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         )
         return when (result) {
             is Data.Success -> {
-                try {
+                catchingDefault({
+                    Data.Failure(message = "云端歌单存在异常", throwable = it)
+                }) {
                     val playlists: Map<String, MusicPlaylist> = result.data.to()
                     Data.Success(decodePlaylist(playlists))
-                }
-                catch (e: Throwable) {
-                    Data.Failure(message = "云端歌单存在异常", throwable = e)
                 }
             }
             is Data.Failure -> result
@@ -358,11 +357,10 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                         text = "导出",
                         icon = Icons.Outlined.Upload,
                         onClick = {
-                            try {
+                            catchingError {
                                 state.text = playlistLibrary.items.toJsonString()
-                            }
-                            catch (e: Throwable) {
-                                slot.tip.error(e.message ?: "导出失败")
+                            }?.let {
+                                slot.tip.error(it.message ?: "导出失败")
                             }
                         }
                     )
@@ -373,13 +371,12 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                         onClick = {
                             if (!mp.isReady) {
                                 if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
-                                    try {
+                                    catchingError {
                                         val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
                                         playlistLibrary.replaceAll(items)
                                         if (items.isNotEmpty()) currentPage = 0
                                         slot.tip.success("导入成功")
-                                    }
-                                    catch (_: Throwable) {
+                                    }?.let {
                                         slot.tip.error("导入格式错误")
                                     }
                                 }

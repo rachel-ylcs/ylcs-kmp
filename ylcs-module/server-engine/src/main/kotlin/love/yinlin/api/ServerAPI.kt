@@ -15,6 +15,7 @@ import io.ktor.utils.io.copyAndClose
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.Data
 import love.yinlin.data.RequestError
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.to
@@ -135,7 +136,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
         val multiFiles = mutableMapOf<String, MutableList<APIFile>>()
         var index = 0
         multipartData.forEachPart { part ->
-            try {
+            catchingError {
                 val name: String = part.name ?: return@forEachPart
                 when (part) {
                     is PartData.FormItem -> {
@@ -177,13 +178,10 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                     }
                     else -> { }
                 }
-            }
-            catch (err: Throwable) {
+            }?.let { err ->
                 logger.error("RoutingCall.toForm - {}", err.stackTraceToString())
             }
-            finally {
-                part.dispose()
-            }
+            part.dispose()
         }
         for ((filesName, files) in multiFiles) filesName with files.toJson()
     }

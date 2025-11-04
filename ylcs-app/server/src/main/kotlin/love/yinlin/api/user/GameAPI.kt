@@ -12,6 +12,7 @@ import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Array
 import love.yinlin.extension.Int
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 import love.yinlin.server.DB
@@ -29,11 +30,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         VN.throwEmpty(title)
         VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
-        try {
-            type.manager.check(info, question, answer)
-        } catch (_: Throwable) {
-            return@api "数据配置非法".failureData
-        }
+        catchingError { type.manager.check(info, question, answer) }?.let { return@api "数据配置非法".failureData }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
         DB.throwTransaction {

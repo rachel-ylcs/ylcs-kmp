@@ -156,7 +156,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
     private suspend fun sessionLoop() {
-        try {
+        catchingError {
             session?.close()
             val newSession = NetClient.sockets.webSocketSession {
                 method = HttpMethod.Get
@@ -170,13 +170,11 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
                     if (msg != null) dispatchMessage(msg)
                 }
             }
+        }?.let {
+            slot.tip.error("断开连接 ${it.message}")
         }
-        catch (e: Throwable) {
-            slot.tip.error("断开连接 ${e.message}")
-        } finally {
-            session?.close()
-            session = null
-        }
+        session?.close()
+        session = null
     }
 
     private suspend inline fun send(data: LyricsSockets.CM) {

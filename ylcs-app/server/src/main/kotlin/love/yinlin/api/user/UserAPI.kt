@@ -1,12 +1,10 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import kotlinx.coroutines.sync.Mutex
 import love.yinlin.api.ImplMap
 import love.yinlin.api.TokenExpireError
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.profile.UserConstraint
-import love.yinlin.server.logger
 import love.yinlin.platform.Platform
 import love.yinlin.server.DB
 import love.yinlin.server.Redis
@@ -16,7 +14,6 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
 import java.util.Base64
-import java.util.concurrent.ConcurrentHashMap
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -138,35 +135,12 @@ object AN {
 			else throw TokenExpireError(token.uid)
 	}
 
-	private val updateTokenMutexMap = ConcurrentHashMap<String, Mutex>()
-
-	val queryTokenMutexMap: List<String> get() = updateTokenMutexMap.keys.toList()
-
 	fun throwReGenerateToken(tokenString: String): String {
 		val token = parseToken(tokenString)
-
-		val mutex = updateTokenMutexMap.computeIfAbsent(tokenString) { Mutex() }
-		if (!mutex.tryLock()) error("请求过多")
-
-		try {
-			val saveTokenString = Redis[token.key]
-
-			val debugInfo = """
-				[regression] 登录信息失效
-				[src tokenString] |$tokenString|
-				[src token] |$token|
-				[save tokenString] |$saveTokenString|
-			"""
-			if (token.uid == 10) logger.warn(debugInfo)
-
-			return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
-			else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
-			else throw TokenExpireError(token.uid)
-		}
-		finally {
-			mutex.unlock()
-			updateTokenMutexMap -= tokenString
-		}
+		val saveTokenString = Redis[token.key]
+		return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
+		else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
+		else throw TokenExpireError(token.uid)
 	}
 
 	fun removeToken(tokenString: String) {

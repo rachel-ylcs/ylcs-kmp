@@ -70,15 +70,14 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 val id = folder.name
                 var name = "未知"
                 var enabled = true
-                try {
+                catchingError {
                     require(Path(folder, ModResourceType.Record.filename).exists)
                     require(Path(folder, ModResourceType.Background.filename).exists)
                     require(Path(folder, ModResourceType.LineLyrics.filename).exists)
                     require(Path(folder, ModResourceType.Audio.filename).exists)
                     name = Path(folder, ModResourceType.Config.filename).readText().parseJsonValue<MusicInfo>()!!.name
-                }
-                catch (e: Throwable) {
-                    e.printStackTrace()
+                }?.let {
+                    it.printStackTrace()
                     enabled = false
                 }
                 ModItem(id = id, name = name, enabled = enabled)

@@ -11,6 +11,7 @@ import kotlinx.serialization.Serializable
 import love.yinlin.api.user.AN
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.sockets.LyricsSockets
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
@@ -174,7 +175,7 @@ object LyricsSocketsManager {
     suspend fun dispatchMessage(session: DefaultWebSocketServerSession) {
         var currentPlayer: Player? = null
 
-        try {
+        catchingError {
             for (frame in session.incoming) {
                 if (frame !is Frame.Text) continue
                 when (val msg = frame.readText().parseJsonValue<LyricsSockets.CM>()!!) {
@@ -255,16 +256,13 @@ object LyricsSocketsManager {
                     else -> {}
                 }
             }
-        }
-        catch (_: Throwable) {
+        }?.let {
             session.send(LyricsSockets.SM.Error("连接服务器异常"))
         }
-        finally {
-            currentPlayer?.let { player ->
-                player.room?.let { room -> submitAnswers(room, player.uid) }
-                players.remove(player.uid)
-            }
-            session.close(CloseReason(CloseReason.Codes.NORMAL, "连接关闭"))
+        currentPlayer?.let { player ->
+            player.room?.let { room -> submitAnswers(room, player.uid) }
+            players.remove(player.uid)
         }
+        session.close(CloseReason(CloseReason.Codes.NORMAL, "连接关闭"))
     }
 }

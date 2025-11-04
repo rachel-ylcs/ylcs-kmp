@@ -12,13 +12,13 @@ inline fun <reified T> StartupKV.setJson(key: String, value: T?, expire: Int = K
 
 fun <T> StartupKV.setJson(serializer: SerializationStrategy<T>, key: String, value: T?, expire: Int = KVExpire.NEVER) = catching { set(key, value.toJsonString(serializer), expire) }
 
-inline fun <reified T> StartupKV.getJson(key: String, defaultFactory: () -> T): T = catchingDefault(defaultFactory) {
+inline fun <reified T> StartupKV.getJson(key: String, defaultFactory: () -> T): T = catchingDefault({ defaultFactory() }) {
     val json = get(key, "")
     require(json.isNotEmpty())
     json.parseJsonValue()!!
 }
 
-fun <T> StartupKV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaultFactory: () -> T): T = catchingDefault(defaultFactory) {
+fun <T> StartupKV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaultFactory: () -> T): T = catchingDefault({ defaultFactory() }) {
     val json = get(key, "")
     require(json.isNotEmpty())
     json.parseJsonValue(deserializer)!!

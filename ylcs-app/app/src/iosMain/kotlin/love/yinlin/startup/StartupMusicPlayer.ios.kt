@@ -14,6 +14,7 @@ import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.extension.catchingError
 import love.yinlin.platform.Coroutines
 import platform.darwin.*
 import platform.Foundation.*
@@ -167,7 +168,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         if (isInit) return
 
         AVAudioSession.sharedInstance().apply {
-            try {
+            catchingError {
                 interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
                     AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
                 ) { notification ->
@@ -192,9 +193,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
                 setCategory(AVAudioSessionCategoryPlayback, options, null)
                 setActive(true, null)
                 setupNowPlayingInfoCenter()
-            } catch (e: Throwable) {
-                error = e
-            }
+            }?.let { error = it }
         }
 
         playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {

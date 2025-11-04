@@ -51,10 +51,6 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		Data.Success(AN.throwReGenerateToken(token))
 	}
 
-	api(API.User.Account.QueryTokenMutexMap) { ->
-		Data.Success(AN.queryTokenMutexMap)
-	}
-
 	api(API.User.Account.Register) { (name, pwd, inviterName) ->
 		VN.throwName(name, inviterName)
 		VN.throwPassword(pwd)

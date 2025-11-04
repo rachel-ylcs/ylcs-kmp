@@ -72,6 +72,7 @@ import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.platform.QrcodeScanner
+import love.yinlin.extension.catchingError
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -389,11 +390,10 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             QrcodeScanner(
                 modifier = Modifier.fillMaxWidth(),
                 onResult = { result ->
-                    try {
+                    catchingError {
                         val uri = Uri.parse(result)!!
                         if (uri.scheme == Scheme.Rachel) DeepLink.openUri(uri)
-                    }
-                    catch (_: Throwable) {
+                    }?.let {
                         slot.tip.warning("不能识别此信息")
                     }
                     close()

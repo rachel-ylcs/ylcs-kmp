@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.catchingThrow
 import love.yinlin.extension.json
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJson
@@ -121,15 +122,16 @@ fun Connection.updateSQL(sql: String, vararg args: Any?): Boolean {
 
 fun Connection.deleteSQL(sql: String, vararg args: Any?): Boolean = updateSQL(sql, *args)
 
-fun Connection.throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = try {
+fun Connection.throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = catchingThrow(
+    onError = { err ->
+        if (err is SQLIntegrityConstraintViolationException && err.errorCode == 1062) true
+        else null
+    }
+) {
     val statement = this.prepareStatement(sql)
     args.forEachIndexed { index, arg -> statement.setObject(index + 1, arg) }
     if (statement.executeUpdate() <= 0) throw Throwable("NoAffect ${args.joinToString()}")
     false
-}
-catch (err: Throwable) {
-    if (err is SQLIntegrityConstraintViolationException && err.errorCode == 1062) true
-    else throw err
 }
 
 fun Connection.throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long {
@@ -160,19 +162,18 @@ object DB {
 
     fun throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long = Database.connection.use { it.throwInsertSQLGeneratedKey(sql, *args) }
 
-    fun <R> throwTransaction(call: (Connection) -> R): R = Database.connection.use {
+    fun <R : Any> throwTransaction(call: (Connection) -> R): R = Database.connection.use {
         it.autoCommit = false
-        try {
+        catchingThrow(
+            clean = { it.autoCommit = true },
+            onError = { _ ->
+                it.rollback()
+                null
+            }
+        ) {
             val result = call(it)
             it.commit()
             result
-        }
-        catch (err: Throwable) {
-            it.rollback()
-            throw err
-        }
-        finally {
-            it.autoCommit = true
         }
     }
 }
