@@ -12,9 +12,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
@@ -31,6 +29,7 @@ import love.yinlin.compose.ui.image.ImageAdder
 import love.yinlin.compose.ui.image.ReplaceableImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.DockedDatePicker
+import love.yinlin.extension.read
 
 @Stable
 internal class ActivityInputState(initActivity: Activity? = null) {
@@ -72,7 +71,7 @@ internal class ActivityInputState(initActivity: Activity? = null) {
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
                 app.os.storage.createTempFile { sink ->
-                    SystemFileSystem.source(path).buffered().use { source ->
+                    path.read { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
                 }?.let { onPicAdd(it) }

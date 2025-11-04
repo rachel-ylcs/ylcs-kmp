@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -24,7 +23,8 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
-import love.yinlin.io.safeToSources
+import love.yinlin.extension.rawSource
+import love.yinlin.extension.safeRawSources
 
 @Stable
 class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Screen(manager) {
@@ -85,7 +85,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				aid = aid
 			),
 			files = { API.User.Activity.ModifyActivityPicture.Files(
-				pic = file(SystemFileSystem.source(path))
+				pic = file(path.rawSource)
 			) }
 		)
 		when (result) {
@@ -127,7 +127,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				aid = aid
 			),
 			files = { API.User.Activity.AddActivityPictures.Files(
-				pics = file(files.safeToSources { SystemFileSystem.source(it) })
+				pics = file(files.safeRawSources())
 			) }
 		)
 		when (result) {
@@ -156,7 +156,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 					index = index
 				),
 				files = { API.User.Activity.ModifyActivityPictures.Files(
-					pic = file(SystemFileSystem.source(path))
+					pic = file(path.rawSource)
 				) }
 			)
 			when (result) {

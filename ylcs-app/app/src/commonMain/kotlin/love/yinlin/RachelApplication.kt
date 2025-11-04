@@ -2,7 +2,6 @@ package love.yinlin
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.LocalAnimationSpeed
@@ -21,6 +20,7 @@ import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.LazyReference
+import love.yinlin.extension.mkdir
 import love.yinlin.platform.Platform
 import love.yinlin.platform.lyrics.LyricsEngineConfig
 import love.yinlin.platform.lyrics.LyricsEngineType
@@ -113,9 +113,9 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
     private val createDirectories by sync {
         Platform.useNot(Platform.WebWasm) {
-            SystemFileSystem.createDirectories(os.storage.dataPath)
-            SystemFileSystem.createDirectories(os.storage.cachePath)
-            SystemFileSystem.createDirectories(Paths.modPath)
+            os.storage.dataPath.mkdir()
+            os.storage.cachePath.mkdir()
+            Paths.modPath.mkdir()
         }
     }
 

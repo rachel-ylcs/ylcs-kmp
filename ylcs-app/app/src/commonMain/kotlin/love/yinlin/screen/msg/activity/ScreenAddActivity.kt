@@ -5,7 +5,6 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -20,7 +19,8 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
-import love.yinlin.io.safeToSources
+import love.yinlin.extension.rawSource
+import love.yinlin.extension.safeRawSources
 
 @Stable
 class ScreenAddActivity(manager: ScreenManager) : Screen(manager) {
@@ -49,8 +49,8 @@ class ScreenAddActivity(manager: ScreenManager) : Screen(manager) {
 				activity = activity
 			),
 			files = { API.User.Activity.AddActivity.Files(
-				pic = file(input.pic?.let { SystemFileSystem.source(Path(it)) }) ,
-				pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
+				pic = file(input.pic?.let { Path(it).rawSource }) ,
+				pics = file(input.pics.map { Path(it.image) }.safeRawSources())
 			) }
 		)
 		when (result) {

@@ -21,9 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
@@ -67,6 +65,8 @@ import love.yinlin.screen.account.SubScreenMe
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
+import love.yinlin.extension.rawSource
+import love.yinlin.extension.read
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
@@ -80,7 +80,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }?.let { path ->
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                 app.os.storage.createTempFile { sink ->
-                    SystemFileSystem.source(path).buffered().use { source ->
+                    path.read { source ->
                         ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
                     }
                 }
@@ -95,7 +95,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 data = app.config.userToken,
                 files = {
                     API.User.Profile.UpdateAvatar.Files(
-                        avatar = file(SystemFileSystem.source(path))
+                        avatar = file(path.rawSource)
                     )
                 }
             )
@@ -113,7 +113,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 data = app.config.userToken,
                 files = {
                     API.User.Profile.UpdateWall.Files(
-                        wall = file(SystemFileSystem.source(path))
+                        wall = file(path.rawSource)
                     )
                 }
             )

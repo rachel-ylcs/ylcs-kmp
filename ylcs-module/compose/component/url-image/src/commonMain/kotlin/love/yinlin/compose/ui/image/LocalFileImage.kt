@@ -11,9 +11,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.extension.size
 
 @Composable
 fun LocalFileImage(
@@ -27,7 +27,7 @@ fun LocalFileImage(
     onClick: (() -> Unit)? = null
 ) {
     val baseUri = remember(*key) { path().toString() }
-    val baseKey = remember(*key) { SystemFileSystem.metadataOrNull(path())?.size ?: 0L }
+    val baseKey = remember(*key) { path().size }
     val state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated)
     Box(modifier = modifier) {
         AsyncImage(

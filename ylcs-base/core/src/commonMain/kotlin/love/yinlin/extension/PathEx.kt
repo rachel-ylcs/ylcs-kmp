@@ -1,5 +1,7 @@
 package love.yinlin.extension
 
+import kotlinx.io.RawSink
+import kotlinx.io.RawSource
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
@@ -8,6 +10,8 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 import kotlinx.io.writeString
+import love.yinlin.io.Sources
+import love.yinlin.io.safeToSources
 
 val Path.extension: String get() = this.name.substringAfterLast('.')
 
@@ -72,6 +76,11 @@ fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
     true
 }
 
+val Path.rawSource: RawSource get() = SystemFileSystem.source(this)
+val Path.rawSink: RawSink get() = SystemFileSystem.sink(this)
+val Path.bufferedSource: Source get() = SystemFileSystem.source(this).buffered()
+val Path.bufferedSink: Sink get() = SystemFileSystem.sink(this).buffered()
+
 suspend inline fun <R> Path.read(crossinline block: suspend (Source) -> R): R = SystemFileSystem.source(this@read).buffered().use { block(it) }
 
 suspend fun Path.readText(): String? = catchingNull { read { it.readString() } }
@@ -89,3 +98,15 @@ suspend fun Path.writeByteArray(data: ByteArray): Boolean = catchingDefault(fals
     write { it.write(data) }
     true
 }
+
+suspend fun Path.writeTo(other: Path): Boolean = catchingDefault(false) {
+    this.read { source ->
+        other.write { sink ->
+            source.transferTo(sink)
+        }
+    }
+    true
+}
+
+fun List<Path>.safeRawSources(): Sources<RawSource>? = this.safeToSources { SystemFileSystem.source(it) }
+fun List<Path>.safeSources(): Sources<Source>? = this.safeToSources { SystemFileSystem.source(it).buffered() }

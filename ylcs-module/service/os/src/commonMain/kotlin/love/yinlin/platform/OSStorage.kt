@@ -1,12 +1,12 @@
 package love.yinlin.platform
 
 import kotlinx.io.Sink
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.Context
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.mkdir
+import love.yinlin.extension.write
 
 abstract class OSStorage {
     abstract val appPath: Path
@@ -16,16 +16,18 @@ abstract class OSStorage {
     abstract suspend fun clearCache()
 
     suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
-        val path = Path(cachePath, DateEx.CurrentLong.toString())
-        require(SystemFileSystem.sink(path).buffered().use { Coroutines.io { block(it) } })
-        path
+        Path(cachePath, DateEx.CurrentLong.toString()).apply {
+            Coroutines.io {
+                write { require(block(it)) }
+            }
+        }
     }
 
     suspend fun createTempFolder(): Path? = catchingNull {
-        Coroutines.io {
-            val path = Path(cachePath, DateEx.CurrentLong.toString())
-            SystemFileSystem.createDirectories(path)
-            path
+        Path(cachePath, DateEx.CurrentLong.toString()).apply {
+            Coroutines.io {
+                mkdir()
+            }
         }
     }
 }

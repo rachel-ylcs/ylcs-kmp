@@ -18,10 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
-import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.writeString
 import love.yinlin.api.NetEaseCloudAPI
 import love.yinlin.api.QQMusicAPI
 import love.yinlin.app
@@ -48,6 +45,11 @@ import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.mkdir
+import love.yinlin.extension.size
+import love.yinlin.extension.writeByteArray
+import love.yinlin.extension.writeText
+import love.yinlin.extension.writeTo
 import love.yinlin.platform.lyrics.LrcParser
 
 @Composable
@@ -211,12 +213,12 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
                         )
                     }
                     if (audioFile == null || recordFile == null) continue
-                    if ((SystemFileSystem.metadataOrNull(audioFile)?.size ?: 0L) <= 1024 * 1024L) continue
-                    if ((SystemFileSystem.metadataOrNull(recordFile)?.size ?: 0L) <= 1024 * 10L) continue
+                    if (audioFile.size <= 1024 * 1024L) continue
+                    if (recordFile.size <= 1024 * 10L) continue
                     // 3. 生成目录
                     val id = "${platformType.prefix}${item.id}"
                     val musicPath = Path(Paths.modPath, id)
-                    SystemFileSystem.createDirectories(musicPath)
+                    musicPath.mkdir()
                     // 4. 写入配置
                     val info = MusicInfo(
                         version = "1.0",
@@ -229,29 +231,15 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
                         album = "未知",
                         chorus = null
                     )
-                    SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Config)).buffered().use { sink ->
-                        sink.writeString(info.toJsonString())
-                    }
+                    info.path(Paths.modPath, ModResourceType.Config).writeText(info.toJsonString())
                     // 5. 写入音频
-                    SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Audio)).buffered().use { sink ->
-                        SystemFileSystem.source(audioFile).buffered().use { source ->
-                            source.transferTo(sink)
-                        }
-                    }
+                    audioFile.writeTo(info.path(Paths.modPath, ModResourceType.Audio))
                     // 6. 写入封面
-                    SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Record)).buffered().use { sink ->
-                        SystemFileSystem.source(recordFile).buffered().use { source ->
-                            source.transferTo(sink)
-                        }
-                    }
+                    recordFile.writeTo(info.path(Paths.modPath, ModResourceType.Record))
                     // 7. 写入壁纸
-                    SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.Background)).buffered().use { sink ->
-                        sink.write(Res.readBytes("files/black_background.webp"))
-                    }
+                    info.path(Paths.modPath, ModResourceType.Background).writeByteArray(Res.readBytes("files/black_background.webp"))
                     // 8. 写入歌词
-                    SystemFileSystem.sink(info.path(Paths.modPath, ModResourceType.LineLyrics)).buffered().use { sink ->
-                        sink.writeString(item.lyrics)
-                    }
+                    info.path(Paths.modPath, ModResourceType.LineLyrics).writeText(item.lyrics)
                     // 9. 更新曲库
                     ids += id
                 }

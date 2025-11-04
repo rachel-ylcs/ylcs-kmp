@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
@@ -40,7 +39,7 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
-import love.yinlin.io.safeToSources
+import love.yinlin.extension.safeRawSources
 
 @Stable
 class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
@@ -87,7 +86,7 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
             ),
             files = {
                 API.User.Topic.SendTopic.Files(
-                    pics = file(input.pics.safeToSources { SystemFileSystem.source(Path(it.image)) })
+                    pics = file(input.pics.map { Path(it.image) }.safeRawSources())
                 )
             }
         )

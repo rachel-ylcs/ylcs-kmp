@@ -21,6 +21,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.readText
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
+import love.yinlin.platform.ioContext
 import love.yinlin.platform.lyrics.FloatingLyrics
 import love.yinlin.platform.lyrics.LrcLayout
 import love.yinlin.platform.lyrics.LyricsEngine
@@ -68,7 +69,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
     var playlist: MusicPlaylist? by mutableRefStateOf(null)
         protected set
 
-    private suspend fun initLibrary() = Coroutines.io {
+    private suspend fun initLibrary() {
         Platform.useNot(Platform.WebWasm) {
             rootPath.list().map { it.name }.forEach { id ->
                 val configPath = Path(rootPath, id, ModResourceType.Config.filename)
@@ -131,7 +132,7 @@ abstract class StartupMusicPlayer : AsyncStartup {
         floatingLyrics = FloatingLyrics()
         Coroutines.startCurrent {
             awaitAll(
-                async { initLibrary() },
+                async(ioContext) { initLibrary() },
                 async { initController(context) }
             )
             if (isInit) initLastStatus()

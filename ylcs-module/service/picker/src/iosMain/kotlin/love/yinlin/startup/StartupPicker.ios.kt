@@ -7,16 +7,16 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import love.yinlin.extension.toNSData
-import love.yinlin.io.safeToSources
 import love.yinlin.io.SandboxSource
 import love.yinlin.io.Sources
 import love.yinlin.platform.Coroutines
 import love.yinlin.Context
 import love.yinlin.StartupArgs
 import love.yinlin.SyncStartup
+import love.yinlin.extension.bufferedSink
+import love.yinlin.extension.safeSources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.toPath
@@ -86,7 +86,7 @@ actual class StartupPicker : SyncStartup {
                             tempUrl?.toPath()?.let { path -> images.add(path) }
                             processedImages++
                             if (processedImages == results.size) {
-                                future.send(images.safeToSources { SystemFileSystem.source(it).buffered() })
+                                future.send(images.safeSources())
                             }
                         }
                     }
@@ -185,7 +185,7 @@ actual class StartupPicker : SyncStartup {
         val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
         val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
         val path = url.toPath() ?: return null
-        return SaveType.Video(filename, url) to SystemFileSystem.sink(path, false).buffered()
+        return SaveType.Video(filename, url) to path.bufferedSink
     }
 
     @OptIn(InternalIoApi::class, ExperimentalForeignApi::class)
@@ -210,7 +210,7 @@ actual class StartupPicker : SyncStartup {
     actual suspend fun cleanSave(origin: Any, result: Boolean) {
         if (origin is SaveType.Video) {
             // 此时保存到相册的动作未完成，还不能删除临时文件
-            // origin.url.toPath()?.let { SystemFileSystem.delete(it) }
+            // origin.url.toPath()?.let { it.delete() }
         }
     }
 }

@@ -35,12 +35,9 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.io.buffered
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readByteArray
-import kotlinx.io.readString
 import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.common.Shaders
@@ -54,7 +51,6 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.platform.AudioPlayer
-import love.yinlin.platform.Coroutines
 import love.yinlin.resources.*
 import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
@@ -69,6 +65,9 @@ import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.exists
+import love.yinlin.extension.readByteArray
+import love.yinlin.extension.readText
+import love.yinlin.platform.ioContext
 import org.jetbrains.compose.resources.getDrawableResourceBytes
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import kotlin.time.Duration.Companion.milliseconds
@@ -115,25 +114,19 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
     private fun startGame(info: MusicInfo) {
         launch {
-            val task1 = async {
-                Coroutines.io {
-                    catchingNull {
-                        SystemFileSystem.source(info.path(Paths.modPath, ModResourceType.Rhyme)).buffered().use {
-                            it.readString().parseJsonValue<RhymeLyricsConfig>()
-                        }
-                    }
+            val task1 = async(ioContext) {
+                catchingNull {
+                    info.path(Paths.modPath, ModResourceType.Rhyme).readText()!!.parseJsonValue<RhymeLyricsConfig>()
                 }
             }
-            val task2 = async {
-                Coroutines.io {
-                    catchingNull {
-                        val environment = getSystemResourceEnvironment()
-                        ImageSet(
-                            record = SystemFileSystem.source(info.path(Paths.modPath, ModResourceType.Record)).buffered().use { it.readByteArray().decodeToImageBitmap() },
-                            noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap(),
-                            clickAnimationNote = getDrawableResourceBytes(environment, Res.drawable.click_animation_note).decodeToImageBitmap(),
-                        )
-                    }
+            val task2 = async(ioContext) {
+                catchingNull {
+                    val environment = getSystemResourceEnvironment()
+                    ImageSet(
+                        record = info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap(),
+                        noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap(),
+                        clickAnimationNote = getDrawableResourceBytes(environment, Res.drawable.click_animation_note).decodeToImageBitmap(),
+                    )
                 }
             }
             val lyrics = task1.await()
@@ -508,11 +501,11 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     override suspend fun initialize() {
         if (app.mp.isInit) {
             coroutineScope {
-                val task1 = async {
-                    musicPlayer.init()
-                }
-                val task2 = async {
-                    Coroutines.io {
+                awaitAll(
+                    async {
+                        musicPlayer.init()
+                    },
+                    async(ioContext) {
                         // 检查包含游戏配置文件的 MOD
                         library = app.mp.library.values.map { info ->
                             RhymeMusic(
@@ -521,9 +514,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                             )
                         }
                     }
-                }
-                task1.await()
-                task2.await()
+                )
             }
         }
         state = GameState.Start
