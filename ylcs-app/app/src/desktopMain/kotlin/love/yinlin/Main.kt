@@ -32,26 +32,31 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     }
 
     @Composable
-    override fun ActionScope.Actions() {
-        if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
-            Action(
-                icon = Icons.Outlined.CleaningServices,
-                tip = "GC",
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            ) {
-                System.gc()
-            }
-        }
-        ActionSuspend(
-            icon = Icons.Outlined.RocketLaunch,
-            tip = "加载更新包",
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        ) {
-            picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
-                Coroutines.io {
-                    AutoUpdate.start(path.path)
+    override fun TopBar(actions: @Composable (ActionScope.() -> Unit)) {
+        super.TopBar {
+            if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                Action(
+                    icon = Icons.Outlined.CleaningServices,
+                    tip = "GC",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    System.gc()
                 }
             }
+
+            ActionSuspend(
+                icon = Icons.Outlined.RocketLaunch,
+                tip = "加载更新包",
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
+                    Coroutines.io {
+                        AutoUpdate.start(path.path)
+                    }
+                }
+            }
+
+            actions()
         }
     }
 

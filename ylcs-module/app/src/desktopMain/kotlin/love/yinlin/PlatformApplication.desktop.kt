@@ -6,11 +6,13 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
@@ -18,8 +20,10 @@ import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.DefaultIcon
 import love.yinlin.compose.LaunchFlag
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
+import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.layout.AppTopBar
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.extension.LazyReference
 import org.jetbrains.compose.resources.*
 import java.awt.Dimension
@@ -43,7 +47,44 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open val actionClose: Boolean = true
 
     @Composable
-    protected open fun ActionScope.Actions() {}
+    protected open fun TopBar(actions: @Composable ActionScope.() -> Unit) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(
+                    top = CustomTheme.padding.verticalExtraSpace,
+                    bottom = CustomTheme.padding.verticalExtraSpace,
+                    start = CustomTheme.padding.horizontalExtraSpace
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val topBarIcon = icon
+            if (topBarIcon != null) {
+                MiniIcon(topBarIcon)
+            }
+            else {
+                MiniImage(
+                    painter = rememberVectorPainter(DefaultIcon),
+                    modifier = Modifier.size(CustomTheme.size.icon)
+                )
+            }
+            Space()
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Space()
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.End
+            ) {
+                ActionScope.Right.actions()
+            }
+        }
+    }
 
     protected open val tray: Boolean = false
     protected open val trayHideNotification: String? = null
@@ -94,19 +135,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Layout {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
                         WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
-                            AppTopBar(
-                                title = title,
-                                icon = icon,
-                                modifier = Modifier.fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
-                                    .padding(
-                                        top = CustomTheme.padding.verticalExtraSpace,
-                                        bottom = CustomTheme.padding.verticalExtraSpace,
-                                        start = CustomTheme.padding.horizontalExtraSpace
-                                    )
-                            ) {
-                                Actions()
-
+                            TopBar {
                                 if (actionAlwaysOnTop) {
                                     Action(
                                         icon = if (alwaysOnTop) Icons.Outlined.MobiledataOff else Icons.Outlined.VerticalAlignTop,

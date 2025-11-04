@@ -7,7 +7,7 @@ import kotlinx.io.files.Path
 import love.yinlin.PlatformApplication
 import love.yinlin.PlatformContextDelegate
 import love.yinlin.compose.screen.AppScreen
-import love.yinlin.extension.Reference
+import love.yinlin.extension.LazyReference
 import love.yinlin.extension.mkdir
 
 class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate) {
@@ -30,5 +30,5 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
     }
 }
 
-private val appReference = Reference<MainApplication?>(null)
-val app: MainApplication get() = appReference.value!!
+private val appReference = LazyReference<MainApplication>()
+val app: MainApplication by appReference
