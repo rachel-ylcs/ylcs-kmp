@@ -4,10 +4,14 @@ import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.StartupArgs
 import love.yinlin.StartupFetcher
+import love.yinlin.StartupNative
 import love.yinlin.SyncStartup
+import love.yinlin.extension.NativeLib
 import love.yinlin.platform.*
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@StartupNative
+@NativeLib
 actual class StartupKV : SyncStartup {
     var nativeHandle: Long = 0
 
@@ -15,7 +19,6 @@ actual class StartupKV : SyncStartup {
         val path: Path? = args.fetch(0)
         if (path != null) nativeHandle = nativeInit(path.toString())
     }
-
     actual fun set(key: String, value: Boolean, expire: Int) = nativeSetBoolean(nativeHandle, key, value, expire)
     actual fun set(key: String, value: Int, expire: Int) = nativeSetInt(nativeHandle, key, value, expire)
     actual fun set(key: String, value: Long, expire: Int) = nativeSetLong(nativeHandle, key, value, expire)

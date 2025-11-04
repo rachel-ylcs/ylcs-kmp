@@ -119,6 +119,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
         }
     }
 
+    @StartupNative
     val picker by service(
         factory = ::StartupPicker
     )
@@ -135,6 +136,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
         factory = ::StartupUrlImage
     )
 
+    @StartupNative
     val kv by service(
         StartupLazyFetcher {
             Platform.use(*Platform.Desktop,

@@ -76,6 +76,7 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
         System.setProperty("jna.library.path", Path(os.storage.appPath, vlcPath).toString())
     }
 
+    @StartupNative
     private val setupSingleInstance by sync(priority = StartupDelegate.HIGH8) { singleInstance(Local.info.name) }
 
     private val setComposeRender by service(priority = StartupDelegate.HIGH8, factory = ::StartupComposeSwingRender)

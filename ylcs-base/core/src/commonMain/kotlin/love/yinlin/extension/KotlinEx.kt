@@ -7,12 +7,12 @@ import kotlin.reflect.KProperty
 // NativeLibrary
 
 @Target(
-    AnnotationTarget.CLASS, AnnotationTarget.FUNCTION,
+    AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION,
     AnnotationTarget.LOCAL_VARIABLE, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY
 )
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
-annotation class NativeLib
+annotation class NativeLib(vararg val libs: String)
 
 // Reference
 

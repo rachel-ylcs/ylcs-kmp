@@ -14,10 +14,14 @@ import love.yinlin.platform.openMultipleFileDialog
 import love.yinlin.platform.saveFileDialog
 import love.yinlin.Context
 import love.yinlin.StartupArgs
+import love.yinlin.StartupNative
 import love.yinlin.SyncStartup
+import love.yinlin.extension.NativeLib
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
+@StartupNative
+@NativeLib
 actual class StartupPicker : SyncStartup {
     private lateinit var context: Context
     private val handle: Long get() = context.handle
