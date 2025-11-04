@@ -66,6 +66,7 @@ include(
 
     "ylcs-module:fixup",
     "ylcs-module:auto-update",
+    "ylcs-module:single_instance",
 
     /* -----------------  [3] 结构模块  ----------------- */
 

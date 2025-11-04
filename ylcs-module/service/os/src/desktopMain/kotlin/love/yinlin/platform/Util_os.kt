@@ -4,9 +4,6 @@ import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
 import java.awt.Desktop
 
-internal external fun requestSingleInstance(): Boolean
-internal external fun releaseSingleInstance()
-
 internal data object OSUtil {
     fun openUri(uri: Uri) {
         val desktop = Desktop.getDesktop()

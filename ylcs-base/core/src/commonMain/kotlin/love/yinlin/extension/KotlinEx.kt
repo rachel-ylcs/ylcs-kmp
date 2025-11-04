@@ -4,6 +4,16 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+// NativeLibrary
+
+@Target(
+    AnnotationTarget.CLASS, AnnotationTarget.FUNCTION,
+    AnnotationTarget.LOCAL_VARIABLE, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY
+)
+@MustBeDocumented
+@Retention(AnnotationRetention.SOURCE)
+annotation class NativeLib
+
 // Reference
 
 class Reference<T>(var value: T) : ReadWriteProperty<Any?, T> {

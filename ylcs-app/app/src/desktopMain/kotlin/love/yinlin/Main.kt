@@ -16,7 +16,6 @@ import love.yinlin.platform.*
 import love.yinlin.resources.*
 import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
-import love.yinlin.startup.StartupSingleInstance
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.getString
 
@@ -77,7 +76,7 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
         System.setProperty("jna.library.path", Path(os.storage.appPath, vlcPath).toString())
     }
 
-    private val singleInstance by service(priority = StartupDelegate.HIGH8, factory = ::StartupSingleInstance)
+    private val setupSingleInstance by sync(priority = StartupDelegate.HIGH8) { singleInstance(Local.info.name) }
 
     private val setComposeRender by service(priority = StartupDelegate.HIGH8, factory = ::StartupComposeSwingRender)
 

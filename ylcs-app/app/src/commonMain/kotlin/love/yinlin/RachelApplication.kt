@@ -100,8 +100,7 @@ class StartupAppConfig : StartupConfig() {
 }
 
 @Stable
-abstract class RachelApplication(delegate: PlatformContextDelegate) :
-    PlatformApplication<RachelApplication>(mApp, delegate), DeepLink {
+abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<RachelApplication>(mApp, delegate), DeepLink {
     private val loadNativeLibrary by system(
         NativeLibrary("ylcs_native", *Platform.Desktop),
         factory = ::StartupNativeLibrary

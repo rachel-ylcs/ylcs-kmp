@@ -39,11 +39,11 @@ void ylcs_single_instance_unlock() {
 }
 
 extern "C" {
-    JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_NativeOSKt_requestSingleInstance(JNIEnv* env, jclass) {
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_platform_SingleInstanceKt_lockApplication(JNIEnv* env, jclass, jstring key) {
         return (jboolean)ylcs_single_instance_try_lock();
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_platform_NativeOSKt_releaseSingleInstance(JNIEnv* env, jclass) {
+    JNIEXPORT void JNICALL Java_love_yinlin_platform_SingleInstanceKt_unlockApplication(JNIEnv* env, jclass) {
         ylcs_single_instance_unlock();
     }
 }

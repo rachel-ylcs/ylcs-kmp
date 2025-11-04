@@ -175,6 +175,7 @@ kotlin {
             useSourceSet(jvmMain)
             useLib(
                 projects.ylcsModule.autoUpdate,
+                projects.ylcsModule.singleInstance,
                 libs.vlcj,
                 fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
             )
