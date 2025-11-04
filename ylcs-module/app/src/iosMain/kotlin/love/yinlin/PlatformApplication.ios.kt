@@ -12,8 +12,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     self: Reference<A?>,
     delegate: PlatformContextDelegate,
 ) : Application<A>(self, delegate) {
-    private lateinit var uiViewController: UIViewController
-
     @Composable
     protected open fun BeginContent() {}
 
@@ -24,9 +22,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
         initialize(delay = true)
 
-        uiViewController = ComposeUIViewController(
+        val uiViewController = ComposeUIViewController(
             configure = {
-                delegate = buildDelegate(uiViewController)
+                delegate = buildDelegate(context.uiViewController)
             }
         ) {
             Layout {
@@ -34,6 +32,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Content()
             }
         }
+        context.uiViewController = uiViewController
 
         return uiViewController
     }

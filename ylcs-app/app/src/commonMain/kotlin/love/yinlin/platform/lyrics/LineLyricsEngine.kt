@@ -84,7 +84,22 @@ internal class LineLyricsEngine : LyricsEngine {
 
     @Composable
     private fun IOSContent(config: LyricsEngineConfig) {
-
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = currentText,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                ),
+                color = Colors(config.textColor),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
+            )
+        }
     }
 
     @Composable

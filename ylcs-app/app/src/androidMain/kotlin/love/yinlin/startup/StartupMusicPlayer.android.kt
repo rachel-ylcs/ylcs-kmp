@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.compose.runtime.*
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -211,7 +212,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
 
     private val MusicInfo.asMediaItem: MediaItem get() = MediaItem.Builder()
         .setMediaId(this.id)
-        .setUri(android.net.Uri.parse(this.path(ModResourceType.Audio).toString()))
+        .setUri(this.path(ModResourceType.Audio).toString().toUri())
         .setMediaMetadata(
             MediaMetadata.Builder()
                 .setTitle(this.name)

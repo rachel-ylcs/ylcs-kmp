@@ -21,7 +21,6 @@ import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.platform.platform
 import love.yinlin.platform.setWindowClickThrough
 
 @Composable

@@ -1,26 +1,30 @@
 package love.yinlin.screen.music
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.app
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.input.Switch
-import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.ProgressSlider
+import love.yinlin.compose.ui.input.DockedColorPicker
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.fixup.FixupMacOSMouseClick
-import love.yinlin.platform.lyrics.FloatingLyrics
-
-private fun FloatingLyrics.toggle() {
-    if (isAttached) detach()
-    else attach()
-}
 
 @Composable
 actual fun ScreenFloatingLyrics.platformContent(device: Device) {
+    // TODO: 需要参照其他平台 review
+    var config by rememberRefState { app.config.lyricsEngineConfig }
+
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -28,26 +32,43 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
         .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
-        val floatingLyrics = app.mp.floatingLyrics
-
-        DisposableEffect(Unit) {
-            config = app.config.lyricsEngineConfig
-            floatingLyrics.canMove = true
-            FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
-            onDispose {
-                floatingLyrics.canMove = false
-                FixupMacOSMouseClick.setupDelay(floatingLyrics.isAttached) { floatingLyrics.toggle() }
-            }
-        }
-
         RowLayout("悬浮歌词模式") {
             Switch(
                 checked = app.config.enabledFloatingLyrics,
-                onCheckedChange = {
-                    app.config.enabledFloatingLyrics = it
-                    app.mp.floatingLyrics.check()
+                onCheckedChange = { value ->
+                    app.config.enabledFloatingLyrics = value
+                    val floatingLyrics = app.mp.floatingLyrics
+                    if (value) {
+                        if (floatingLyrics.canAttached) {
+                            floatingLyrics.attach()
+                        } else {
+                            // 模拟器和旧机型不支持
+                            slot.tip.error("该设备不支持悬浮歌词")
+                        }
+                    } else {
+                        floatingLyrics.detach()
+                    }
                 }
             )
+        }
+
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "这是一条测试歌词~",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                    ),
+                    color = Colors(config.textColor),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
+                )
+            }
         }
 
         RowLayout("字体大小") {
@@ -65,7 +86,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.lyricsEngineConfig.textColor),
+                        initialColor = Colors(config.textColor),
                         onColorChanged = { config = config.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
@@ -75,7 +96,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.lyricsEngineConfig.backgroundColor),
+                        initialColor = Colors(config.backgroundColor),
                         onColorChanged = { config = config.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()

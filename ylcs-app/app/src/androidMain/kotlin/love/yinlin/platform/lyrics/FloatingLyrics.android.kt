@@ -23,7 +23,6 @@ import love.yinlin.AndroidContext
 import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.extension.catching
-import love.yinlin.platform.platform
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
@@ -32,6 +31,7 @@ import java.util.UUID
 @Stable
 actual class FloatingLyrics {
     actual var isAttached: Boolean by mutableStateOf(false)
+        private set
 
     private lateinit var activity: ComponentActivity
     private var view: ComposeView? = null

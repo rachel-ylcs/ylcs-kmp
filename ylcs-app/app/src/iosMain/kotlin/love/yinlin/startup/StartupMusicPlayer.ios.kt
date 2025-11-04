@@ -1,121 +1,50 @@
-package love.yinlin.platform
+package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cocoapods.MobileVLCKit.*
-import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicPlayMode
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.Context
+import love.yinlin.StartupFetcher
 import love.yinlin.app
 import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.screen.music.audioPath
-import love.yinlin.screen.music.recordPath
-import kotlin.math.roundToLong
+import love.yinlin.data.mod.ModResourceType
+import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.platform.Coroutines
 import platform.darwin.*
 import platform.Foundation.*
 import platform.AVFAudio.*
 import platform.MediaPlayer.*
 import platform.UIKit.*
+import kotlin.collections.set
+import kotlin.math.roundToLong
 
+private enum class AudioSessionInterruption {
+    Began, Ended, Failed;
+}
+
+@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @OptIn(ExperimentalForeignApi::class)
-class ActualMusicFactory : MusicFactory() {
+actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
+    private var mediaPlayer: VLCMediaPlayer? by mutableStateOf(null)
     private var interruptionObserver: NSObjectProtocol? = null
-
-    private var mediaPlayer: VLCMediaPlayer? = null
     private var playerDelegate: VLCMediaPlayerDelegateProtocol? = null
     private var shuffleList = listOf<Int>()
     private var currentIndex = -1
 
-    override val isInit: Boolean get() = mediaPlayer != null
+    override val isInit: Boolean by derivedStateOf { mediaPlayer != null }
     override var error: Throwable? by mutableRefStateOf(null)
     override var playMode: MusicPlayMode by mutableStateOf(MusicPlayMode.ORDER)
     override var musicList: List<MusicInfo> by mutableRefStateOf(emptyList())
     override val isReady: Boolean by derivedStateOf { musicList.isNotEmpty() }
     override var isPlaying: Boolean by mutableStateOf(false)
-    override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentDuration: Long by mutableLongStateOf(0L)
+    override var currentPosition: Long by mutableLongStateOf(0L)
     override var currentMusic: MusicInfo? by mutableRefStateOf(null)
-
-    enum class AudioSessionInterruption {
-        Began, Ended, Failed;
-    }
-
-    override suspend fun init() {
-        if (isInit) return
-
-        AVAudioSession.sharedInstance().apply {
-            try {
-                interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
-                    AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
-                ) { notification ->
-                    notification?.userInfo?.let { userInfo ->
-                        val interruptionType = userInfo[AVAudioSessionInterruptionTypeKey] as Long
-                        when (interruptionType.toULong()) {
-                            AVAudioSessionInterruptionTypeBegan -> {
-                                handleAudioSessionInterruption(AudioSessionInterruption.Began, null)
-                            }
-                            AVAudioSessionInterruptionTypeEnded -> {
-                                val options = userInfo[AVAudioSessionInterruptionOptionKey] as Long
-                                val shouldResume = (options.toULong() and AVAudioSessionInterruptionOptionShouldResume) != 0UL
-                                handleAudioSessionInterruption(AudioSessionInterruption.Ended, shouldResume)
-                            }
-                            else -> {
-                                handleAudioSessionInterruption(AudioSessionInterruption.Failed, null)
-                            }
-                        }
-                    }
-                }
-                val options = if (app.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
-                setCategory(AVAudioSessionCategoryPlayback, options, null)
-                setActive(true, null)
-                setupNowPlayingInfoCenter()
-            } catch (e: Throwable) {
-                error = e
-            }
-        }
-
-        playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
-            override fun mediaPlayerStateChanged(aNotification: NSNotification) {
-                mediaPlayer?.let { player ->
-                    if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
-                        Coroutines.startMain {
-                            when (playMode) {
-                                MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
-                                else -> gotoNext()
-                            }
-                        }
-                    } else {
-                        isPlaying = player.playing
-                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateOpening) {
-                            currentMusic = musicList[shuffleList[currentIndex]]
-                            onMusicChanged(currentMusic)
-                        }
-                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStatePlaying) {
-                            currentDuration = player.media?.length?.intValue?.toLong() ?: 0
-                        }
-                        updatePlayingMetadata()
-                    }
-                }
-            }
-
-            override fun mediaPlayerTimeChanged(aNotification: NSNotification) {
-                mediaPlayer?.let { player ->
-                    currentPosition = player.time.intValue.toLong()
-                    updatePlayingInfo()
-                }
-            }
-        }
-
-        mediaPlayer = VLCMediaPlayer()
-        mediaPlayer!!.delegate = playerDelegate
-    }
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
         playMode = musicPlayMode
@@ -135,7 +64,7 @@ class ActualMusicFactory : MusicFactory() {
 
     override suspend fun stop(): Unit = Coroutines.main {
         musicList = emptyList()
-        currentPlaylist = null
+        playlist = null
         currentMusic = null
         currentIndex = -1
         shuffleList = listOf()
@@ -234,6 +163,76 @@ class ActualMusicFactory : MusicFactory() {
         }
     }
 
+    override suspend fun initController(context: Context) {
+        if (isInit) return
+
+        AVAudioSession.sharedInstance().apply {
+            try {
+                interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                    AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
+                ) { notification ->
+                    notification?.userInfo?.let { userInfo ->
+                        val interruptionType = userInfo[AVAudioSessionInterruptionTypeKey] as Long
+                        when (interruptionType.toULong()) {
+                            AVAudioSessionInterruptionTypeBegan -> {
+                                handleAudioSessionInterruption(AudioSessionInterruption.Began, null)
+                            }
+                            AVAudioSessionInterruptionTypeEnded -> {
+                                val options = userInfo[AVAudioSessionInterruptionOptionKey] as Long
+                                val shouldResume = (options.toULong() and AVAudioSessionInterruptionOptionShouldResume) != 0UL
+                                handleAudioSessionInterruption(AudioSessionInterruption.Ended, shouldResume)
+                            }
+                            else -> {
+                                handleAudioSessionInterruption(AudioSessionInterruption.Failed, null)
+                            }
+                        }
+                    }
+                }
+                val options = if (app.config.audioFocus) 0UL else AVAudioSessionCategoryOptionMixWithOthers
+                setCategory(AVAudioSessionCategoryPlayback, options, null)
+                setActive(true, null)
+                setupNowPlayingInfoCenter()
+            } catch (e: Throwable) {
+                error = e
+            }
+        }
+
+        playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
+            override fun mediaPlayerStateChanged(aNotification: NSNotification) {
+                mediaPlayer?.let { player ->
+                    if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
+                        Coroutines.startMain {
+                            when (playMode) {
+                                MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
+                                else -> gotoNext()
+                            }
+                        }
+                    } else {
+                        isPlaying = player.playing
+                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateOpening) {
+                            currentMusic = musicList[shuffleList[currentIndex]]
+                            onMusicChanged(currentMusic)
+                        }
+                        if (player.state == VLCMediaPlayerState.VLCMediaPlayerStatePlaying) {
+                            currentDuration = player.media?.length?.intValue?.toLong() ?: 0
+                        }
+                        updatePlayingMetadata()
+                    }
+                }
+            }
+
+            override fun mediaPlayerTimeChanged(aNotification: NSNotification) {
+                mediaPlayer?.let { player ->
+                    currentPosition = player.time.intValue.toLong()
+                    updatePlayingInfo()
+                }
+            }
+        }
+
+        mediaPlayer = VLCMediaPlayer()
+        mediaPlayer!!.delegate = playerDelegate
+    }
+
     private fun shufflePlayList(musicIndex: Int = shuffleList.getOrNull(currentIndex) ?: 0) {
         shuffleList = if (playMode == MusicPlayMode.RANDOM) {
             listOf(musicIndex) + musicList.indices.filter { it != musicIndex }.shuffled()
@@ -246,7 +245,7 @@ class ActualMusicFactory : MusicFactory() {
     private suspend fun setCurrentPlaying(index: Int, play: Boolean) = Coroutines.main {
         currentIndex = index
         val musicInfo = musicList[shuffleList[index]]
-        val url = NSURL.fileURLWithPath(musicInfo.audioPath.toString())
+        val url = NSURL.fileURLWithPath(musicInfo.path(ModResourceType.Audio).toString())
         val media = VLCMedia.mediaWithURL(url)
         mediaPlayer?.media = media
 
@@ -321,9 +320,9 @@ class ActualMusicFactory : MusicFactory() {
             nowPlayingInfoCenter.nowPlayingInfo = null
             return
         }
-        val artwork = currentMusic?.let { MPMediaItemArtwork(UIImage(contentsOfFile = it.recordPath.toString())) }
+        val artwork = currentMusic?.let { MPMediaItemArtwork(UIImage(contentsOfFile = it.path(ModResourceType.Record).toString())) }
         val nowPlayingInfo = mutableMapOf<Any?, Any?>()
-        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = NSURL.fileURLWithPath(currentMusic?.audioPath?.toString()!!)
+        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = NSURL.fileURLWithPath(currentMusic?.path(ModResourceType.Audio).toString())
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaTypeAudio
         nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = false
         nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
@@ -344,5 +343,3 @@ class ActualMusicFactory : MusicFactory() {
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 }
-
-actual fun buildMusicFactory(context: Context): MusicFactory = ActualMusicFactory()
