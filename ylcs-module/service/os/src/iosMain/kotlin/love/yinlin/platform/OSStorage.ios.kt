@@ -2,6 +2,9 @@ package love.yinlin.platform
 
 import kotlinx.io.files.Path
 import love.yinlin.Context
+import love.yinlin.extension.deleteRecursively
+import love.yinlin.extension.mkdir
+import love.yinlin.extension.size
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathDirectory
@@ -16,14 +19,12 @@ actual fun buildOSStorage(context: Context, appName: String): OSStorage = object
 
     override val dataPath: Path = searchPath(NSDocumentDirectory)
 
-    override val cachePath: Path = searchPath(NSCachesDirectory)
+    override val cachePath: Path = Path(searchPath(NSCachesDirectory), "temp")
 
-    override val cacheSize: Long get() {
-        // TODO:
-        return 0L
-    }
+    override suspend fun calcCacheSize(): Long = cachePath.parent?.size ?: 0L
 
-    override fun clearCache() {
-
+    override suspend fun clearCache() {
+        cachePath.deleteRecursively()
+        cachePath.mkdir()
     }
 }

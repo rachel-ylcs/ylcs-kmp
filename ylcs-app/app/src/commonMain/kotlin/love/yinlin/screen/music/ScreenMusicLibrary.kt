@@ -169,7 +169,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
             library[index] = item.copy(selected = !item.selected)
         }
         else {
-            // TODO:
+            // TODO: 歌曲详情页
             // navigate(ScreenMusicDetails.Args(item.id))
         }
     }
@@ -307,7 +307,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
 
         ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
             Action(Icons.Outlined.Token, "工坊") {
-                // TODO:
+                // TODO: 歌曲工坊页
                 // navigate<ScreenMusicModFactory>()
             }
             Action(Icons.Outlined.Upload, "导入") {

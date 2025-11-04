@@ -8,7 +8,7 @@ actual fun buildOSStorage(context: Context, appName: String): OSStorage = object
 
     override val cachePath: Path get() = unsupportedPlatform()
 
-    override val cacheSize: Long = 0L
+    override suspend fun calcCacheSize(): Long = 0L
 
-    override fun clearCache() {}
+    override suspend fun clearCache() { }
 }

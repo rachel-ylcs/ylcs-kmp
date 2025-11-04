@@ -11,8 +11,8 @@ import love.yinlin.extension.catchingNull
 abstract class OSStorage {
     abstract val dataPath: Path
     abstract val cachePath: Path
-    abstract val cacheSize: Long
-    abstract fun clearCache()
+    abstract suspend fun calcCacheSize(): Long
+    abstract suspend fun clearCache()
 
     suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
         val path = Path(cachePath, DateEx.CurrentLong.toString())

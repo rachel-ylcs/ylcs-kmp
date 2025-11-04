@@ -1,6 +1,7 @@
 package love.yinlin.startup
 
 import com.github.panpf.sketch.SingletonSketch
+import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
 import com.github.panpf.sketch.request.ImageOptions
@@ -20,11 +21,13 @@ import okio.Path.Companion.toPath
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 class StartupUrlImage : SyncStartup {
+    private lateinit var sketch: Sketch
+
     override fun init(context: Context, args: StartupArgs) {
         val cachePath: Path? = args.fetch(0)
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
-        SingletonSketch.setSafe { buildSketch(context).apply {
+        sketch = buildSketch(context).apply {
             logger(level = Logger.Level.Error)
             components {
                 addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
@@ -50,7 +53,15 @@ class StartupUrlImage : SyncStartup {
                 memoryCachePolicy(CachePolicy.ENABLED)
                 sizeMultiplier(imageQuality.sizeMultiplier)
             })
-        }.build() }
+        }.build()
+        SingletonSketch.setSafe { sketch }
+    }
+
+    fun clearCache() {
+        Platform.useNot(Platform.WebWasm) {
+            sketch.downloadCache.clear()
+            sketch.resultCache.clear()
+        }
     }
 }
 

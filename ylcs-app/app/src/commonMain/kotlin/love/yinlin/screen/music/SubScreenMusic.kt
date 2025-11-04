@@ -114,7 +114,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 
 	private fun openMusicComment() {
 		mp.currentMusic?.let { musicInfo ->
-			// TODO: 歌曲详情
+			// TODO: 歌曲详情页
 //			launch {
 //				val result = ClientAPI.request(
 //					route = API.User.Song.GetSong,
@@ -258,7 +258,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 						musicInfo = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f)
                             .clickable {
-								// TODO:
+								// TODO: 歌曲详情页
 								// navigate(ScreenMusicDetails.Args(it.id))
 							}.zIndex(2f)
 					)

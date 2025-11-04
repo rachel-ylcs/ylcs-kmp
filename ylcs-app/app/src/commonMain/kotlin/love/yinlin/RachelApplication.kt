@@ -126,11 +126,11 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) :
         factory = ::StartupPicker
     )
 
-    private val setupUrlImage by service(
+    val urlImage by service(
         StartupLazyFetcher {
             Platform.use(Platform.WebWasm,
                 ifTrue = { null },
-                ifFalse = { os.storage.cachePath }
+                ifFalse = { os.storage.cachePath.parent }
             )
         },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),

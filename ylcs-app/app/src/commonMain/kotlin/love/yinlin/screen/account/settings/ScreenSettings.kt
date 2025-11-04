@@ -223,11 +223,6 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private suspend fun clearCache(): String = Coroutines.io {
-        app.os.storage.clearCache()
-        app.os.storage.cacheSize.fileSizeString
-    }
-
     private suspend fun sendFeedback(content: String) {
         val result = ClientAPI.request(
             route = API.User.Info.SendFeedback,
@@ -459,12 +454,23 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
             title = "应用",
             icon = Icons.Outlined.Info
         ) {
-            var cacheSizeText by rememberState { app.os.storage.cacheSize.fileSizeString }
+            var cacheSizeText by rememberState { "" }
+
+            LaunchedEffect(Unit) {
+                cacheSizeText = app.os.storage.calcCacheSize().fileSizeString
+            }
+
             ItemExpanderSuspend(
                 title = "清理缓存",
                 icon = colorfulImageVector(icon = Icons.Outlined.DeleteSweep, background = Colors.Red4),
                 text = cacheSizeText,
-                onClick = { cacheSizeText = clearCache() }
+                onClick = {
+                    Coroutines.io {
+                        app.urlImage.clearCache()
+                        app.os.storage.clearCache()
+                        cacheSizeText = app.os.storage.calcCacheSize().fileSizeString
+                    }
+                }
             )
 
             ItemExpander(

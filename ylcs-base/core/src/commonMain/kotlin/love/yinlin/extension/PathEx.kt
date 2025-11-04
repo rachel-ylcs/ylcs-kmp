@@ -1,10 +1,8 @@
 package love.yinlin.extension
 
-import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
-import kotlinx.io.files.FileNotFoundException
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
@@ -15,9 +13,7 @@ val Path.extension: String get() = this.name.substringAfterLast('.')
 
 val Path.nameWithoutExtension: String get() = this.name.substringBeforeLast('.')
 
-val Path.exists: Boolean get() = SystemFileSystem.metadataOrNull(this) != null
-
-val Path.size: Long get() = SystemFileSystem.metadataOrNull(this)?.size ?: 0L
+val Path.exists: Boolean get() = SystemFileSystem.exists(this)
 
 val Path.isFile: Boolean get() = SystemFileSystem.metadataOrNull(this)?.isRegularFile ?: false
 
@@ -35,25 +31,41 @@ fun Path.delete(): Boolean = catchingDefault(false) {
     true
 }
 
-fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
-    if (!SystemFileSystem.exists(this)) throw FileNotFoundException("File does not exist: $this")
+val Path.size: Long get() = catchingDefault(0L) {
+    var size = 0L
     val queue = ArrayDeque<Path>()
     queue.add(this)
     while (queue.isNotEmpty()) {
-        val currentPath = queue.first()
-        val metadata = SystemFileSystem.metadataOrNull(currentPath)
+        val front = queue.removeFirst()
+        val metadata = SystemFileSystem.metadataOrNull(front)
         when {
-            metadata == null -> throw IOException("Path is neither a file nor a directory: $this")
+            metadata == null -> {}
+            metadata.isRegularFile -> size += metadata.size
+            metadata.isDirectory -> queue.addAll(SystemFileSystem.list(front))
+        }
+    }
+    size
+}
+
+fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
+    val stack = ArrayDeque<Path>()
+    stack.add(this)
+    while (stack.isNotEmpty()) {
+        val top = stack.last()
+        val metadata = SystemFileSystem.metadataOrNull(top)
+        when {
+            metadata == null -> stack.removeLast()
             metadata.isRegularFile -> {
-                SystemFileSystem.delete(currentPath, mustExist = false)
-                queue.removeFirst()
+                SystemFileSystem.delete(top, mustExist = false)
+                stack.removeLast()
             }
             metadata.isDirectory -> {
-                val list = SystemFileSystem.list(currentPath)
+                val list = SystemFileSystem.list(top)
                 if (list.isEmpty()) {
-                    SystemFileSystem.delete(currentPath, mustExist = false)
-                    queue.removeFirst()
-                } else queue.addAll(0, list)
+                    SystemFileSystem.delete(top, mustExist = false)
+                    stack.removeLast()
+                }
+                else stack.addAll(list)
             }
         }
     }

@@ -2,22 +2,19 @@ package love.yinlin.platform
 
 import kotlinx.io.files.Path
 import love.yinlin.Context
+import love.yinlin.extension.deleteRecursively
+import love.yinlin.extension.mkdir
+import love.yinlin.extension.size
 
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
     override val dataPath: Path = Path(context.application.filesDir.absolutePath)
 
-    override val cachePath: Path = Path(context.application.cacheDir.absolutePath)
+    override val cachePath: Path = Path(context.application.cacheDir.absolutePath, "temp")
 
-    override val cacheSize: Long get() {
-        return 0L
-        // TODO:
-        //	val sketch = SingletonSketch.get(appNative.context)
-        //	return sketch.downloadCache.size + sketch.resultCache.size
-    }
+    override suspend fun calcCacheSize(): Long = cachePath.parent?.size ?: 0L
 
-    override fun clearCache() {
-        //	val sketch = SingletonSketch.get(appNative.context)
-        //	sketch.downloadCache.clear()
-        //	sketch.resultCache.clear()
+    override suspend fun clearCache() {
+        cachePath.deleteRecursively()
+        cachePath.mkdir()
     }
 }
