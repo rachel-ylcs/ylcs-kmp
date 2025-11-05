@@ -21,25 +21,25 @@
 </div>
 
 ### 语言 (Language) :
-**中文** | [English](README_en.md)
+[中文](README.md) | **English**
 
-# Rachel快速开发框架
+# Rachel Rapid Development Framework
 
-`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，
-支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端，
-由银临茶舍项目组完成开发。
+`Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`.
 
-## 特性
+It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other client and server platforms, and was developed by the 银临茶舍 project team.
 
-- **跨平台**：基于Kotlin Multiplatform / Compose Multiplatform，支持六个平台客户端与服务端，具有多端一致性。
-- **原生性能**：生成平台原生二进制文件，无桥接或附加库。
-- **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
-- **快速**：三分钟便能上手构建自己的跨平台应用程序。
-- **简洁**：大量类型安全与结构化的框架DSL，无需编写过多样板代码。
-- **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
-- **高协作**：框架支持前后端协作开发，共享数据组织结构。
+## Feature
 
-## 环境
+- **Cross platform**: Based on Kotlin Multiplatform/Compose Multiplatform, it supports six platform clients and servers, with multi terminal consistency.
+- **Native performance**: Generate platform native binary files without bridging or additional libraries.
+- **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
+- **Quick**: You can start building your own cross platform application in just three minutes.
+- **Simple**: A large number of type safe and structured framework DSL, without the need to write too much template code.
+- **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
+- **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
+
+## Environment
 
 - `Gradle 9.1.0`
 - `JDK 25`
@@ -48,7 +48,7 @@
 - `MSVC v145` | `g++ 13`
 - `Windows 10 SDK` | `Windows 11 SDK`
 
-## 快速开始
+## Quick Start
 
 ```kotlin
 class MyApplication : PlatformApplication<MyApplication>(mApp) {
@@ -64,35 +64,35 @@ val app: MyApplication by mApp
 fun main() = MyApplicaiton().run()
 ```
 
-## 文档
+## Document
 
-### 见 [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+### See [Rachel Framework Development guidance](https://rachel-ylcs.github.io/ylcs-kmp)
 
-# 案例：银临茶舍跨平台 App
+# Sample: 银临茶舍 Cross-Platform App
 
 > [!IMPORTANT]
 >
->  基于`Rachel`框架开发的集资讯、听歌、美图、论坛、社交于一体的小银子聚集地应用程序
-> 
->  银临茶舍水群：`828049503`
+>  A small silver gathering application developed based on the `Rachel` framework, integrating information, music listening, beautiful pictures, forums, and social networking.
+>
+>  银临茶舍 QQ Group：`828049503`
 
 ![rachel](ylcs-docs/docs/assets/background.png)
 
-### 构建艺术
+### Build Art
 
 ![art](ylcs-docs/docs/assets/art.png)
 
-## 贡献者
+## Contributors
 
 [![Contributors](https://contrib.rocks/image?repo=rachel-ylcs/ylcs-kmp)](https://github.com/rachel-ylcs/ylcs-kmp/graphs/contributors)
 
-## 许可
+## License
 
-`银临茶舍` 是在 MIT 许可下许可的开源软件，查看[LICENSE](LICENSE)获取更多信息。
+`银临茶舍` is an open-source software licensed under the MIT license, Please refer to [LICENSE](LICENSE) for more information.
 
-## 致谢
+## Acknowledgments
 
-按作者首字母排序。
+Sort by author's first letter.
 
 |  Type   |     Author      |                                    Name                                     |
 |:-------:|:---------------:|:---------------------------------------------------------------------------:|
