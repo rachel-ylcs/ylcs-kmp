@@ -27,9 +27,9 @@ class Route(name: String) {
             }
         }
 
-        fun fetch(backStackEntry: NavBackStackEntry): List<String> {
+        fun fetch(num: Int, backStackEntry: NavBackStackEntry): List<String> {
             val handle = backStackEntry.savedStateHandle
-            return List(handle.keys().size) { index -> Uri.decodeUri(handle.get<String>(argName(index))!!) }
+            return List(num) { index -> Uri.decodeUri(handle.get<String>(argName(index))!!) }
         }
     }
 }

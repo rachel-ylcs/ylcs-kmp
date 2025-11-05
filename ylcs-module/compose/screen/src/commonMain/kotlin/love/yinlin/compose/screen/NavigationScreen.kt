@@ -41,10 +41,10 @@ abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
 
     @Composable
     override fun BasicContent() {
-        Wrapper(LocalDevice.current, pageIndex) { device ->
+        Wrapper(LocalDevice.current, pagerState.currentPage) { device ->
             HorizontalPager(
                 state = pagerState,
-                key = { subs[it].clz },
+                key = { subs[it].clz.qualifiedName!! },
                 beyondViewportPageCount = 0,
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxSize()
