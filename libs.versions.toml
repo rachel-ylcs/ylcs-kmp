@@ -47,6 +47,7 @@ gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "cmp-android" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "cmp-android" }
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp-android" }
 
 # Common

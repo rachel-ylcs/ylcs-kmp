@@ -84,21 +84,18 @@ kotlin {
             }
         }
 
-        val jvmMain by creating {
-            useSourceSet(commonMain)
-            if (C.platform != BuildPlatform.Mac) {
-                useLib(
-                    libs.ktor.okhttp,
-                )
-            }
-        }
-
         androidMain.configure {
-            useSourceSet(jvmMain)
+            useSourceSet(commonMain)
+            useApi(
+                libs.ktor.okhttp,
+            )
         }
 
         val desktopMain by getting {
-            useSourceSet(jvmMain)
+            useSourceSet(commonMain)
+            useApi(
+                libs.ktor.okhttp,
+            )
         }
 
         wasmJsMain.configure {
