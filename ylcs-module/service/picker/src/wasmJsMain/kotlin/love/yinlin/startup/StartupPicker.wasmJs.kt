@@ -63,7 +63,6 @@ actual class StartupPicker : SyncStartup {
             htmlFileInput(multiple = false, filter = MimeType.IMAGE) { files ->
                 future.catching {
                     openFileUpLoadWorker(files) { buffers ->
-                        println(buffers[0].byteLength)
                         future.send { ArrayBufferSource(buffers[0]).buffered() }
                     }
                 }
