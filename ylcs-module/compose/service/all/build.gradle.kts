@@ -10,7 +10,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.service.mmkv_kmp"
+        namespace = "${C.app.packageName}.module.compose.service.all"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -51,34 +51,12 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.startup,
+                projects.ylcsModule.compose.service.exception,
+                projects.ylcsModule.compose.service.os,
+                projects.ylcsModule.compose.service.mmkvKmp,
+                projects.ylcsModule.compose.service.config,
+                projects.ylcsModule.compose.service.picker,
             )
-        }
-
-        androidMain.configure {
-            useSourceSet(commonMain)
-            useLib(
-                libs.mmkv.android,
-            )
-        }
-
-        val iosMain = iosMain.get().apply {
-            useSourceSet(commonMain)
-        }
-
-        buildList {
-            add(iosArm64Main)
-            if (C.platform == BuildPlatform.Mac) {
-                when (C.architecture) {
-                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
-                    BuildArchitecture.X86_64 -> add(iosX64Main)
-                    else -> {}
-                }
-            }
-        }.forEach {
-            it.configure {
-                useSourceSet(iosMain)
-            }
         }
     }
 }

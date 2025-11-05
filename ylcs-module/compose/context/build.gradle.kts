@@ -10,7 +10,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.service.picker"
+        namespace = "${C.app.packageName}.module.compose.context"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -51,14 +51,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.startup,
-            )
-        }
-
-        androidMain.configure {
-            useSourceSet(commonMain)
-            useLib(
-                libs.compose.activity
+                projects.ylcsBase.composeCore,
             )
         }
 

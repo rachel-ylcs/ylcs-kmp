@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary1)
 }
 
@@ -10,7 +12,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.context"
+        namespace = "${C.app.packageName}.module.compose.service.config"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -51,27 +53,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsBase.composeCore,
+                projects.ylcsModule.compose.startup,
+                projects.ylcsModule.compose.service.mmkvKmp,
             )
-        }
-
-        val iosMain = iosMain.get().apply {
-            useSourceSet(commonMain)
-        }
-
-        buildList {
-            add(iosArm64Main)
-            if (C.platform == BuildPlatform.Mac) {
-                when (C.architecture) {
-                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
-                    BuildArchitecture.X86_64 -> add(iosX64Main)
-                    else -> {}
-                }
-            }
-        }.forEach {
-            it.configure {
-                useSourceSet(iosMain)
-            }
         }
     }
 }

@@ -41,21 +41,22 @@ include(
     /* -----------------  [2] 功能模块  ----------------- */
 
     "ylcs-module:app",
-    "ylcs-module:startup",
-    "ylcs-module:context",
 
-    "ylcs-module:service:all",
-    "ylcs-module:service:exception",
-    "ylcs-module:service:os",
-    "ylcs-module:service:mmkv-kmp",
-    "ylcs-module:service:config",
-    "ylcs-module:service:picker",
-
+    "ylcs-module:compose:context",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",
+    "ylcs-module:compose:startup",
     "ylcs-module:compose:platform-view",
     "ylcs-module:compose:ui",
     "ylcs-module:compose:screen",
+
+    "ylcs-module:compose:service:all",
+    "ylcs-module:compose:service:exception",
+    "ylcs-module:compose:service:os",
+    "ylcs-module:compose:service:mmkv-kmp",
+    "ylcs-module:compose:service:config",
+    "ylcs-module:compose:service:picker",
+
     "ylcs-module:compose:component:all",
     "ylcs-module:compose:component:pagination-layout",
     "ylcs-module:compose:component:url-image",

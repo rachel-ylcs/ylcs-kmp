@@ -10,7 +10,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.service.os"
+        namespace = "${C.app.packageName}.module.compose.service.picker"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -51,16 +51,15 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.startup,
+                projects.ylcsModule.compose.startup,
             )
         }
 
-        val jvmMain by creating {
-            useSourceSet(commonMain)
-        }
-
         androidMain.configure {
-            useSourceSet(jvmMain)
+            useSourceSet(commonMain)
+            useLib(
+                libs.compose.activity
+            )
         }
 
         val iosMain = iosMain.get().apply {
@@ -80,10 +79,6 @@ kotlin {
             it.configure {
                 useSourceSet(iosMain)
             }
-        }
-
-        val desktopMain by getting {
-            useSourceSet(jvmMain)
         }
     }
 }

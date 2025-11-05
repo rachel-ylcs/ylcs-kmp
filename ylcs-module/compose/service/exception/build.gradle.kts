@@ -10,7 +10,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.startup"
+        namespace = "${C.app.packageName}.module.compose.service.exception"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -51,8 +51,39 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
-                projects.ylcsModule.context,
+                projects.ylcsModule.compose.startup,
             )
+        }
+
+        val jvmMain by creating {
+            useSourceSet(commonMain)
+        }
+
+        androidMain.configure {
+            useSourceSet(jvmMain)
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(commonMain)
+        }
+
+        buildList {
+            add(iosArm64Main)
+            if (C.platform == BuildPlatform.Mac) {
+                when (C.architecture) {
+                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
+                    BuildArchitecture.X86_64 -> add(iosX64Main)
+                    else -> {}
+                }
+            }
+        }.forEach {
+            it.configure {
+                useSourceSet(iosMain)
+            }
+        }
+
+        val desktopMain by getting {
+            useSourceSet(jvmMain)
         }
     }
 }
