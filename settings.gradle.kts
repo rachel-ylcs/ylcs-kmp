@@ -40,8 +40,7 @@ include(
 
     /* -----------------  [2] 功能模块  ----------------- */
 
-    "ylcs-module:app",
-
+    "ylcs-module:compose:app",
     "ylcs-module:compose:context",
     "ylcs-module:compose:device",
     "ylcs-module:compose:theme",

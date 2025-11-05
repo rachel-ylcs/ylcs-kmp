@@ -12,7 +12,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.module.app"
+        namespace = "${C.app.packageName}.module.compose.app"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk

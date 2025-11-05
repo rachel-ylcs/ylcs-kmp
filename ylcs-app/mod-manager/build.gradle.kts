@@ -18,7 +18,7 @@ kotlin {
         val desktopMain by getting {
             useLib(
                 projects.ylcsApp.mod,
-                projects.ylcsModule.app,
+                projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.component.urlImage,
                 libs.compose.components.resources,

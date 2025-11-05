@@ -106,14 +106,13 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useLib(
-                // project
-                projects.ylcsModule.app,
+                projects.ylcsApp.cs,
+                projects.ylcsApp.mod,
+                projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.compose.service.all,
                 projects.ylcsModule.clientEngine,
-                projects.ylcsApp.cs,
-                projects.ylcsApp.mod,
                 libs.compose.components.resources,
                 // lottie
                 libs.lottie,
