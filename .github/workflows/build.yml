@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'ylcs-docs/**'
       - 'design/**'
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'ylcs-docs/**'
       - 'design/**'
 
 jobs:
@@ -40,7 +42,7 @@ jobs:
             common: &common
               - 'gradle/**'
               - 'buildSrc/**'
-              - 'ylcs-core/**'
+              - 'ylcs-base/**'
               - 'ylcs-app/cs/**'
               - 'gradle.properties'
               - 'settings.gradle.kts'
@@ -57,27 +59,21 @@ jobs:
               - *client
               - 'ylcs-app/app/proguard/R8Android.pro'
               - 'ylcs-app/app/src/jvmMain/**'
-              - 'ylcs-app/app/src/nonDesktopMain/**'
               - 'ylcs-app/app/src/androidMain/**'
             ios:
               - *client
               - 'iosApp/**'
               - 'ylcs-app/src/app/nativeInterop/**'
               - 'ylcs-app/src/app/appleMain/**'
-              - 'ylcs-app/src/app/nonAndroidMain/**'
-              - 'ylcs-app/src/app/nonDesktopMain/**'
               - 'ylcs-app/src/app/iosMain/**'
             desktop:
               - *client
               - 'native/**'
               - 'ylcs-app/app/proguard/R8Desktop.pro'
               - 'ylcs-app/app/src/jvmMain/**'
-              - 'ylcs-app/app/src/nonAndroidMain/**'
               - 'ylcs-app/app/src/desktopMain/**'
             web:
               - *client
-              - 'ylcs-app/app/src/nonAndroidMain/**'
-              - 'ylcs-app/app/src/nonDesktopMain/**'
               - 'ylcs-app/app/src/wasmJsMain/**'
             server:
               - *common
