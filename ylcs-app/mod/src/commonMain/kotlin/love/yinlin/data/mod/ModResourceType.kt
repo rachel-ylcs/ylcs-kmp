@@ -53,6 +53,7 @@ enum class ModResourceType(
     companion object {
         const val MOD_EXT = "rachel"
         const val RES_EXT = "${MOD_EXT}res"
+        const val BASE_RES = "base.$MOD_EXT"
 
         val BASE = entries.filter { it.base }
         val ALL = entries.toList()

@@ -2,12 +2,15 @@ package love.yinlin.mod
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
@@ -62,12 +66,15 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     private var onSearching by mutableStateOf(false)
 
+    private val leftState = LazyGridState()
+    private val rightState = LazyGridState()
+
     private suspend fun loadLibrary() {
         onSearching = false
         state = BoxState.LOADING
         val result = Coroutines.io {
-            app.modPath.list().filter { it.isDirectory }.map { folder ->
-                val id = folder.name
+            app.libraryPath.list().filter { it.isDirectory }.map { folder ->
+                var id = ""
                 var name = "未知"
                 var enabled = true
                 catchingError {
@@ -75,13 +82,15 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     require(Path(folder, ModResourceType.Background.filename).exists)
                     require(Path(folder, ModResourceType.LineLyrics.filename).exists)
                     require(Path(folder, ModResourceType.Audio.filename).exists)
-                    name = Path(folder, ModResourceType.Config.filename).readText().parseJsonValue<MusicInfo>()!!.name
+                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText().parseJsonValue<MusicInfo>()!!
+                    id = musicInfo.id
+                    name = musicInfo.name
                 }?.let {
                     it.printStackTrace()
                     enabled = false
                 }
-                ModItem(id = id, name = name, enabled = enabled)
-            }
+                ModItem(id = id, name = name, path = folder, enabled = enabled)
+            }.distinctBy { it.id }
         }
         library.replaceAll(result)
         state = if (result.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
@@ -128,10 +137,10 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
     ) {
         if (mergeMode) { // 多MOD合并
             // 检查MOD合法性
-            val paths = selectedLibrary.filter { it.enabled }.map { Path(app.modPath, it.id) }
+            val paths = selectedLibrary.filter { it.enabled }.map { it.path }
             // 生成随机名称文件
             mergeSingleMod(
-                filename = "Merge${DateEx.CurrentLong}.${ModResourceType.MOD_EXT}",
+                filename = "Merge_${paths.size}_${DateEx.CurrentLong}.${ModResourceType.MOD_EXT}",
                 paths = paths,
                 filters = filters,
                 onProcess = onProcess
@@ -142,13 +151,37 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 if (item.enabled) {
                     mergeSingleMod(
                         filename = "${item.name}.${ModResourceType.MOD_EXT}",
-                        paths = listOf(Path(app.modPath, item.id)),
+                        paths = listOf(item.path),
                         filters = filters,
                         onProcess = onProcess
                     )
                 }
             }
         }
+    }
+
+    private suspend fun deploy(items: List<ModItem>) {
+        catchingError {
+            Coroutines.io {
+                val modPath = app.modPath
+                modPath.deleteRecursively()
+                modPath.mkdir()
+                for (item in items) {
+                    val itemPath = Path(modPath, item.id)
+                    itemPath.mkdir()
+                    // 复制非基础资源
+                    for (resPath in item.path.list()) {
+                        val type = ModResourceType.fromType(resPath.nameWithoutExtension)
+                        if (type?.base == false) resPath.writeTo(Path(itemPath, resPath.name))
+                    }
+                    // 基础资源打包
+                    Path(itemPath, ModResourceType.BASE_RES).write { sink ->
+                        ModFactory.Merge(listOf(item.path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
+                    }
+                }
+            }
+            slot.tip.success("部署成功")
+        }?.let { slot.tip.error(it.message) }
     }
 
     override suspend fun initialize() {
@@ -165,7 +198,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 ContextMenuItem("删除") {
                     launch {
                         if (slot.confirm.openSuspend(content = "真的要删除 ${item.name} 吗")) {
-                            Path(app.modPath, item.id).deleteRecursively()
+                            item.path.deleteRecursively()
                             library.removeAll { it == item }
                         }
                     }
@@ -178,7 +211,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     library[index] = item.copy(selected = !item.selected)
                 }.padding(CustomTheme.padding.equalValue)) {
                     LocalFileImage(
-                        path = { Path(app.modPath, item.id, ModResourceType.Record.filename) },
+                        path = { Path(item.path, ModResourceType.Record.filename) },
                         item.id,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                         contentScale = ContentScale.Crop
@@ -238,6 +271,11 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                             Action(Icons.Outlined.Token, "打包") {
                                 packageSheet.open()
                             }
+                            ActionSuspend(Icons.Outlined.LocalAirport, "部署") {
+                                if (slot.confirm.openSuspend(content = "部署所选MOD到server目录吗?")) {
+                                    deploy(selectedLibrary)
+                                }
+                            }
                         }
                     }
                 )
@@ -247,22 +285,54 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     state = state,
                     modifier = Modifier.weight(2f).fillMaxHeight()
                 ) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(120.dp),
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        items(items = unSelectedLibrary, key = { it.id }) {
-                            ModCard(modifier = Modifier.fillMaxWidth(), item = it)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if (unSelectedLibrary.isEmpty()) {
+                            Text(
+                                text = "待选择区域",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        else {
+                            LazyVerticalGrid(
+                                columns = GridCells.Adaptive(120.dp),
+                                modifier = Modifier.fillMaxSize(),
+                                state = leftState
+                            ) {
+                                items(items = unSelectedLibrary, key = { it.id }) {
+                                    ModCard(modifier = Modifier.fillMaxWidth(), item = it)
+                                }
+                            }
                         }
                     }
                 }
-                VerticalDivider(modifier = Modifier.fillMaxHeight(), thickness = 10.dp)
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(120.dp),
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                ) {
-                    items(items = selectedLibrary, key = { it.id }) {
-                        ModCard(modifier = Modifier.fillMaxWidth(), item = it)
+                Box(modifier = Modifier.fillMaxHeight()) {
+                    VerticalDivider(modifier = Modifier.fillMaxHeight().zIndex(1f), thickness = 10.dp, color = Colors.White)
+                    VerticalScrollbar(
+                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight().zIndex(2f),
+                        adapter = rememberScrollbarAdapter(scrollState = leftState)
+                    )
+                }
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    if (selectedLibrary.isEmpty()) {
+                        Text(
+                            text = "已选择区域",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                    else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(120.dp),
+                            modifier = Modifier.fillMaxSize(),
+                            state = rightState
+                        ) {
+                            items(items = selectedLibrary, key = { it.id }) {
+                                ModCard(modifier = Modifier.fillMaxWidth(), item = it)
+                            }
+                        }
                     }
                 }
             }
@@ -495,7 +565,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
             onProcess: (index: Int, total: Int, id: String) -> Unit
         ) {
             path.read { source ->
-                ModFactory.Release(source, app.modPath).process(onProcess)
+                ModFactory.Release(source, app.libraryPath).process(onProcess)
             }
         }
 
@@ -545,7 +615,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         private var configText: String? by mutableStateOf(null)
 
         override suspend fun initialize(args: ModItem) {
-            configText = Coroutines.io { Path(app.modPath, args.id, ModResourceType.Config.filename).readText() }
+            configText = Coroutines.io { Path(args.path, ModResourceType.Config.filename).readText() }
         }
 
         @Composable
@@ -561,12 +631,12 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
-                        path = { Path(app.modPath, args.id, ModResourceType.Record.filename) },
+                        path = { Path(args.path, ModResourceType.Record.filename) },
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     LocalFileImage(
-                        path = { Path(app.modPath, args.id, ModResourceType.Background.filename) },
+                        path = { Path(args.path, ModResourceType.Background.filename) },
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(0.5625f)
                     )

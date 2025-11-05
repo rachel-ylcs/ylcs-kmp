@@ -16,11 +16,12 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
     override val actionMaximize: Boolean = false
 
     val rootPath = Path(System.getProperty("user.dir"))
-    val modPath = Path(rootPath, "mod")
+    val libraryPath = Path(rootPath, "library")
     val outputPath = Path(rootPath, "output")
+    val modPath = Path(rootPath, "mod")
 
     override fun onCreate() {
-        modPath.mkdir()
+        libraryPath.mkdir()
         outputPath.mkdir()
     }
 
