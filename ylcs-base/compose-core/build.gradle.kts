@@ -64,6 +64,7 @@ kotlin {
         }
 
         androidMain.configure {
+            useSourceSet(commonMain)
             useApi(
                 compose.preview,
                 libs.compose.activity,

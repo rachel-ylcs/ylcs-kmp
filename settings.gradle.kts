@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
-        google()
         mavenCentral()
+        google()
         gradlePluginPortal()
         maven("https://maven.aliyun.com/repository/gradle-plugin")
     }

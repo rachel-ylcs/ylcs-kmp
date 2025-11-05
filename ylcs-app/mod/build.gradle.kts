@@ -35,7 +35,7 @@ kotlin {
         }
     }
 
-    jvm {
+    jvm("desktop") {
         C.jvmTarget(this)
     }
 

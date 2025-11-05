@@ -10,12 +10,12 @@ plugins {
 kotlin {
     C.useCompilerFeatures(this)
 
-    jvm {
+    jvm("desktop") {
         C.jvmTarget(this)
     }
     
     sourceSets {
-        jvmMain.configure {
+        val desktopMain by getting {
             useLib(
                 projects.ylcsApp.mod,
                 projects.ylcsModule.app,

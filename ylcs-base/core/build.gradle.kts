@@ -75,15 +75,15 @@ kotlin {
             useSourceSet(clientMain)
         }
 
-        val iosMain = iosMain.get().apply {
-            useSourceSet(appleMain)
-        }
-
         androidMain.configure {
             useSourceSet(jvmMain)
             useApi(
                 libs.kotlinx.coroutines.android
             )
+        }
+
+        val iosMain = iosMain.get().apply {
+            useSourceSet(appleMain)
         }
 
         buildList {
