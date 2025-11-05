@@ -1,8 +1,10 @@
 package love.yinlin
 
+import androidx.compose.runtime.Stable
 import love.yinlin.platform.Coroutines
 import kotlin.jvm.JvmName
 
+@Stable
 open class Service {
     protected val startups = mutableListOf<StartupDelegate<out Startup>>()
 

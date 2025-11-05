@@ -1,8 +1,10 @@
 package love.yinlin
 
+import androidx.compose.runtime.Stable
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+@Stable
 class StartupDelegate<S : Startup> internal constructor(
     val privilege: StartupPrivilege,
     val type: StartupType,

@@ -45,6 +45,7 @@ import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
+@Stable
 class StartupAppConfig : StartupConfig() {
     /* ------------------  系统  ------------------ */
 
@@ -281,5 +282,8 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     }
 }
 
+@Stable
 private val mApp = LazyReference<RachelApplication>()
+
+@Stable
 val app: RachelApplication by mApp

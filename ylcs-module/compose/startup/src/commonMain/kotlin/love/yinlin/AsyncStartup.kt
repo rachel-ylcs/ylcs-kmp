@@ -1,5 +1,8 @@
 package love.yinlin
 
+import androidx.compose.runtime.Stable
+
+@Stable
 fun interface AsyncStartup : Startup {
     suspend fun init(context: Context, args: StartupArgs)
     suspend fun initDelay(context: Context, args: StartupArgs) { }

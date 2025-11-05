@@ -39,6 +39,7 @@ class ImageProcessor(
 
 internal expect suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>, quality: ImageQuality): Boolean
 
+@Stable
 internal data class ScaleQualityInfo(
     val width: Int,
     val height: Int,

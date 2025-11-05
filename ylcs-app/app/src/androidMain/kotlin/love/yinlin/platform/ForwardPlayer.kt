@@ -1,6 +1,7 @@
 package love.yinlin.platform
 
 import androidx.annotation.OptIn
+import androidx.compose.runtime.Stable
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -27,6 +28,7 @@ internal val Timeline.extractMediaItems: List<MediaItem> get() {
 }
 
 @OptIn(UnstableApi::class)
+@Stable
 class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
     override fun getAvailableCommands(): Player.Commands = CustomCommands.NotificationPlayerCommands
 

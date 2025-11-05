@@ -1,5 +1,6 @@
 package love.yinlin.api
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
@@ -21,7 +22,8 @@ import love.yinlin.platform.NetClient
 import love.yinlin.platform.safeGet
 import kotlin.io.encoding.Base64
 
-object QQMusicAPI {
+@Stable
+data object QQMusicAPI {
     private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, body: ByteArray): List<JsonObject> {

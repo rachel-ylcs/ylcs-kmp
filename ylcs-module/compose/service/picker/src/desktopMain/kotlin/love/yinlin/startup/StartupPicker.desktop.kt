@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.files.Path
@@ -23,6 +24,7 @@ import love.yinlin.uri.RegularUri
 
 @StartupNative
 @NativeLib
+@Stable
 actual class StartupPicker : SyncStartup {
     private lateinit var context: Context
     private val handle: Long get() = context.handle

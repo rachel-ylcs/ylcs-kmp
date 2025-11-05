@@ -24,12 +24,14 @@ import platform.UIKit.*
 import kotlin.collections.set
 import kotlin.math.roundToLong
 
+@Stable
 private enum class AudioSessionInterruption {
     Began, Ended, Failed;
 }
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @OptIn(ExperimentalForeignApi::class)
+@Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var mediaPlayer: VLCMediaPlayer? by mutableStateOf(null)
     private var interruptionObserver: NSObjectProtocol? = null

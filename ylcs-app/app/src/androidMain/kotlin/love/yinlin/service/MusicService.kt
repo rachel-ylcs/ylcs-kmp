@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.OptIn
+import androidx.compose.runtime.Stable
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -26,6 +27,7 @@ import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.platform.ForwardPlayer
 import love.yinlin.platform.mergePlayMode
 
+@Stable
 object CustomCommands {
     object Args {
         const val SET_MODE_ARG_MODE = "SET_MODE_ARG_MODE"

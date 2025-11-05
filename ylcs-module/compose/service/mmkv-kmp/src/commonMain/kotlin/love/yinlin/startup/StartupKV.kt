@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.platform.KVExpire
 import love.yinlin.Context
@@ -8,6 +9,7 @@ import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@Stable
 expect class StartupKV() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
     override fun initDelay(context: Context, args: StartupArgs)

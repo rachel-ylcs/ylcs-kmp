@@ -30,7 +30,7 @@ import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.layout.ActionScope
 
 @Stable
-private object RichEditorParser {
+private data object RichEditorParser {
     private fun RichContainer.parseStyle(args: List<String>): Boolean {
         val type = args.getOrNull(0) ?: return false
         when (type) {

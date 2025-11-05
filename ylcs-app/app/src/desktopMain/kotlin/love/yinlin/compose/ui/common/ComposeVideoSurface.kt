@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.common
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
@@ -19,6 +20,7 @@ import java.nio.ByteBuffer
 import javax.swing.SwingUtilities
 
 // From https://github.com/JetBrains/compose-multiplatform/pull/3336
+@Stable
 internal class ComposeVideoSurface : VideoSurface(null) {
 
     private val videoSurface = SkiaBitmapVideoSurface()

@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +26,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import love.yinlin.resources.*
 import love.yinlin.compose.ui.image.MiniImage
 
-private object UserLabelMeta {
+@Stable
+private data object UserLabelMeta {
     private val labelNameFromLevel = arrayOf("BUG",
         "风露婆娑", "剑心琴魄", "梦外篝火", "日暮入旧",
         "烈火胜情爱", "青山撞入怀", "雨久苔如海", "曾吻过秋槐",

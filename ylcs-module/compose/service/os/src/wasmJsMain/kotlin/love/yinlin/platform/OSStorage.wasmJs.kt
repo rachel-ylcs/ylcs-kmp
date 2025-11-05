@@ -1,8 +1,10 @@
 package love.yinlin.platform
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.Context
 
+@Stable
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
     override val appPath: Path get() = unsupportedPlatform()
 

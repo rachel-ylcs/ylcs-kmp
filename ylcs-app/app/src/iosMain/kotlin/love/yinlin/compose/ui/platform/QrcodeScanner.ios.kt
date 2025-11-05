@@ -31,6 +31,7 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIView
 
 @ExperimentalForeignApi
+@Stable
 private class QrScanView(val scanCode: SGScanCode) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     val scanView = SGScanView(frame, SGScanViewConfigure().apply {
         scanline = "scan_scanline_qq"

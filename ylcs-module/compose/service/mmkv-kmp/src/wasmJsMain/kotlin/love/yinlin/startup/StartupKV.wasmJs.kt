@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.browser.localStorage
 import kotlinx.io.files.Path
 import love.yinlin.extension.*
@@ -10,6 +11,7 @@ import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@Stable
 actual class StartupKV : SyncStartup {
     actual override fun init(context: Context, args: StartupArgs) {}
 

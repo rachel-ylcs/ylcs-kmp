@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
@@ -20,6 +21,7 @@ import okio.Path.Companion.toPath
 @StartupFetcher(index = 0, name = "cachePath", returnType = Path::class)
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
+@Stable
 class StartupUrlImage : SyncStartup {
     private lateinit var sketch: Sketch
 

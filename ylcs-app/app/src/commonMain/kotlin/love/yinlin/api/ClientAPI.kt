@@ -1,5 +1,7 @@
 package love.yinlin.api
 
+import androidx.compose.runtime.Stable
 import love.yinlin.Local
 
-object ClientAPI : ClientEngine(Local.API_BASE_URL)
+@Stable
+data object ClientAPI : ClientEngine(Local.API_BASE_URL)

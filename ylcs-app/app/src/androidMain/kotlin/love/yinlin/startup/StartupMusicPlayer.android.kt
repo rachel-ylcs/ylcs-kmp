@@ -39,6 +39,7 @@ import love.yinlin.service.MusicService
 import java.io.File
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var controller: MediaController? by mutableRefStateOf(null)
     private lateinit var androidContext: AndroidContext

@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.browser.document
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
@@ -26,6 +27,7 @@ import org.w3c.files.Blob
 import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
 
+@Stable
 actual class StartupPicker : SyncStartup {
     actual override fun init(context: Context, args: StartupArgs) {}
 

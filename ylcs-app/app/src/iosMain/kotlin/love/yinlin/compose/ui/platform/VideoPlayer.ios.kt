@@ -23,6 +23,7 @@ import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 @ExperimentalForeignApi
+@Stable
 private class VideoPlayerView(var player: VLCMediaPlayer?) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     var isPlaying by mutableStateOf(false)
     var position by mutableLongStateOf(0L)

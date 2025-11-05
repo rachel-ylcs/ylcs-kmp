@@ -33,6 +33,7 @@ private class ShuffledOrder(size: Int = 0, start: Int? = null) {
 }
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var controller: AudioPlayerComponent? by mutableRefStateOf(null)
     private var currentIndex: Int by mutableIntStateOf(-1)

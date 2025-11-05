@@ -1,5 +1,6 @@
 package love.yinlin.api
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
@@ -10,7 +11,8 @@ import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
 import love.yinlin.platform.safeGet
 
-object NetEaseCloudAPI {
+@Stable
+data object NetEaseCloudAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
     private object Container {
         fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"

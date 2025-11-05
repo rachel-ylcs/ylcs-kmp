@@ -1,5 +1,6 @@
 package love.yinlin.common
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -9,7 +10,8 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 import love.yinlin.compose.Colors
 
-object ExtraIcons {
+@Stable
+data object ExtraIcons {
     val IOS: ImageVector by lazy {
         ImageVector.Builder(
             name = "IOS",

@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.data.MimeType
@@ -9,6 +10,7 @@ import love.yinlin.StartupArgs
 import love.yinlin.SyncStartup
 import love.yinlin.uri.ImplicitUri
 
+@Stable
 expect class StartupPicker() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
     override fun initDelay(context: Context, args: StartupArgs)

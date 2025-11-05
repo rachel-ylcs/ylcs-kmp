@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.Buffer
 import kotlinx.io.InternalIoApi
@@ -46,6 +47,7 @@ import platform.UniformTypeIdentifiers.UTTypeFolder
 import platform.UniformTypeIdentifiers.UTTypeImage
 import platform.darwin.NSObject
 
+@Stable
 actual class StartupPicker : SyncStartup {
     // 全局引用, 避免被gc
     lateinit var phPickerDelegate: PHPickerViewControllerDelegateProtocol

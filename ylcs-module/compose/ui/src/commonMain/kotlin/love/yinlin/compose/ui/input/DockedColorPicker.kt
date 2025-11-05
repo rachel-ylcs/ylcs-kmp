@@ -19,6 +19,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.ui.layout.Space
 import kotlin.math.*
 
+@Stable
 private data class HSV(val hue: Float, val saturation: Float, val brightness: Float)
 
 private val Color.hsv: HSV get() {

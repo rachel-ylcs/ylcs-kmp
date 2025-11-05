@@ -27,6 +27,7 @@ import love.yinlin.platform.lyrics.LrcLayout
 import love.yinlin.platform.lyrics.LyricsEngine
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@Stable
 abstract class StartupMusicPlayer : AsyncStartup {
     companion object {
         const val PROGRESS_UPDATE_INTERVAL = 150L

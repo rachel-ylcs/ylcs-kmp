@@ -1,9 +1,11 @@
 package love.yinlin.compose.screen
 
+import androidx.compose.runtime.Stable
 import androidx.navigation.NavBackStackEntry
 import love.yinlin.uri.Uri
 import love.yinlin.extension.toJsonString
 
+@Stable
 class Route(name: String) {
     val mBuilder = StringBuilder().append(name)
 

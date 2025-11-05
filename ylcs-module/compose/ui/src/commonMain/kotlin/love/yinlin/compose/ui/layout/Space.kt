@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.*
 
+@Stable
 private object SpaceMeasurePolicy : MeasurePolicy {
 	override fun MeasureScope.measure(
 		measurables: List<Measurable>,

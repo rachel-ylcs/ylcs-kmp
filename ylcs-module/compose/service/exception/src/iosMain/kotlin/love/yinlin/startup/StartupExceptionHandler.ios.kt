@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
@@ -20,7 +21,9 @@ import kotlin.experimental.ExperimentalNativeApi
     returnType = Unit::class,
     String::class, Throwable::class, String::class
 )
+@Stable
 actual class StartupExceptionHandler : SyncStartup {
+    @Stable
     actual fun interface Handler {
         actual fun handle(key: String, e: Throwable, error: String)
     }

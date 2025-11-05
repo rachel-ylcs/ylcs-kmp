@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.StartupFetcher
@@ -7,6 +8,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     override val isInit: Boolean = false
     override val error: Throwable? = null

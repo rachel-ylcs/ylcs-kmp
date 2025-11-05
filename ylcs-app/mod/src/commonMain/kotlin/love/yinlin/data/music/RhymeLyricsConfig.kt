@@ -5,8 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // 音符操作
-@Serializable
 @Stable
+@Serializable
 sealed interface RhymeAction {
     // 字符
     val ch: String
@@ -14,8 +14,8 @@ sealed interface RhymeAction {
     val end: Int
 
     // 单音符
-    @Serializable
     @Stable
+    @Serializable
     @SerialName("Note")
     data class Note(
         override val ch: String,
@@ -28,8 +28,8 @@ sealed interface RhymeAction {
     ) : RhymeAction
 
     // 连音符
-    @Serializable
     @Stable
+    @Serializable
     @SerialName("Slur")
     data class Slur(
         override val ch: String,
@@ -39,8 +39,8 @@ sealed interface RhymeAction {
 }
 
 // 歌词行
-@Serializable
 @Stable
+@Serializable
 data class RhymeLine(
     // 行内容
     // 仅作显示, 所以允许包含空格或符号等, 但每个音符操作的字符只能是单个字符
@@ -50,16 +50,16 @@ data class RhymeLine(
 )
 
 // 副歌段
-@Serializable
 @Stable
+@Serializable
 data class Chorus(
     val start: Long,
     val end: Long
 )
 
 // 歌词
-@Serializable
 @Stable
+@Serializable
 data class RhymeLyricsConfig(
     val id: String, // ID, 同 config 中的 ID
     val duration: Long, // 时长

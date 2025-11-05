@@ -34,7 +34,6 @@ fun EqualRow(
     }
 }
 
-
 typealias EqualColumnScope = ColumnScope
 
 @Composable

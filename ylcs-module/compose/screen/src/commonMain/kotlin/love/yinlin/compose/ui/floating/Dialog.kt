@@ -311,12 +311,14 @@ abstract class FloatingDialogChoice(
     }
 
     companion object {
+        @Stable
         fun fromItems(items: List<String>, title: String? = null) = object : ListDialogChoice(title) {
             override val num: Int = items.size
             override fun nameFactory(index: Int): String = items[index]
             override fun iconFactory(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
         }
 
+        @Stable
         fun fromIconItems(items: List<Pair<String, ImageVector>>, title: String? = null) = object : ListDialogChoice(title) {
             override val num: Int = items.size
             override fun nameFactory(index: Int): String = items[index].first

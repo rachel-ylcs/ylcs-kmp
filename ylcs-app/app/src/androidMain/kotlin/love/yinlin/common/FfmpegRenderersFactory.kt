@@ -3,6 +3,7 @@ package love.yinlin.common
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.OptIn
+import androidx.compose.runtime.Stable
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
@@ -16,6 +17,7 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import java.util.ArrayList
 
 @OptIn(UnstableApi::class)
+@Stable
 class FfmpegRenderersFactory(context: Context) : DefaultRenderersFactory(context) {
     companion object {
         fun build(context: Context, keepFocus: Boolean) = ExoPlayer.Builder(context)

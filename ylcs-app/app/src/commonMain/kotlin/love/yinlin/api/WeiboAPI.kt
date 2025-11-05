@@ -1,5 +1,6 @@
 package love.yinlin.api
 
+import androidx.compose.runtime.Stable
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
@@ -22,7 +23,8 @@ import love.yinlin.compose.ui.text.RichContainer
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.buildRichString
 
-object WeiboAPI {
+@Stable
+data object WeiboAPI {
 	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
 	private const val WEIBO_PROXY_HOST: String = "web.${Local.MAIN_HOST}/weibo"
 
