@@ -41,6 +41,7 @@ jobs:
               - 'gradle/**'
               - 'buildSrc/**'
               - 'ylcs-base/**'
+              - 'ylcs-module/**'
               - 'ylcs-app/cs/**'
               - 'gradle.properties'
               - 'settings.gradle.kts'
