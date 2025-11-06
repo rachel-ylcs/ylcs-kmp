@@ -18,8 +18,7 @@ actual class StartupKV : SyncStartup() {
     var nativeHandle: Long = 0
 
     actual override fun init(context: Context, args: StartupArgs) {
-        val path: Path? = args.fetch(0)
-        if (path != null) nativeHandle = nativeInit(path.toString())
+        nativeHandle = nativeInit(args.fetch<Path>(0).toString())
     }
     actual fun set(key: String, value: Boolean, expire: Int) = nativeSetBoolean(nativeHandle, key, value, expire)
     actual fun set(key: String, value: Int, expire: Int) = nativeSetInt(nativeHandle, key, value, expire)

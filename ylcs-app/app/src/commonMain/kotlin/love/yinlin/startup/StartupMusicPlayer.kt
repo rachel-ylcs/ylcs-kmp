@@ -71,12 +71,10 @@ abstract class StartupMusicPlayer : AsyncStartup() {
         protected set
 
     private suspend fun initLibrary() {
-        Platform.useNot(Platform.WebWasm) {
-            rootPath.list().map { it.name }.forEach { id ->
-                val configPath = Path(rootPath, id, ModResourceType.Config.filename)
-                val info = configPath.readText()?.parseJsonValue<MusicInfo>()
-                if (info != null) library[info.id] = info
-            }
+        rootPath.list().map { it.name }.forEach { id ->
+            val configPath = Path(rootPath, id, ModResourceType.Config.filename)
+            val info = configPath.readText()?.parseJsonValue<MusicInfo>()
+            if (info != null) library[info.id] = info
         }
     }
 
@@ -129,12 +127,14 @@ abstract class StartupMusicPlayer : AsyncStartup() {
     protected fun MusicInfo.path(type: ModResourceType) = this.path(rootPath, type)
 
     final override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
-        rootPath = args.fetch(0)
-        awaitAll(
-            async(ioContext) { initLibrary() },
-            async { initController(context) }
-        )
-        if (isInit) initLastStatus()
+        args.fetch<Path?>(0)?.let {
+            rootPath = it
+            awaitAll(
+                async(ioContext) { initLibrary() },
+                async { initController(context) }
+            )
+            if (isInit) initLastStatus()
+        }
     }
 
     override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) {
@@ -159,5 +159,5 @@ abstract class StartupMusicPlayer : AsyncStartup() {
     }
 }
 
-@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class, nullable = true)
 expect fun buildMusicPlayer() : StartupMusicPlayer

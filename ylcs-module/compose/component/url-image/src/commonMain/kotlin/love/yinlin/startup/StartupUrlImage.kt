@@ -18,7 +18,7 @@ import love.yinlin.data.compose.ImageQuality
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
 
-@StartupFetcher(index = 0, name = "cachePath", returnType = Path::class)
+@StartupFetcher(index = 0, name = "cachePath", returnType = Path::class, nullable = true)
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable

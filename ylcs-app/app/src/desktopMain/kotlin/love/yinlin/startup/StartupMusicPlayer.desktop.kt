@@ -32,7 +32,7 @@ private class ShuffledOrder(size: Int = 0, start: Int? = null) {
     override fun toString(): String = "ShuffledOrder($begin) [${indices.joinToString(",")}]"
 }
 
-@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class, nullable = true)
 @Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var controller: AudioPlayerComponent? by mutableRefStateOf(null)

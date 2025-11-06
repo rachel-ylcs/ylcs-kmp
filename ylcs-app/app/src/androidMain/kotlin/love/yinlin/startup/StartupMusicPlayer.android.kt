@@ -38,7 +38,7 @@ import love.yinlin.service.CustomCommands
 import love.yinlin.service.MusicService
 import java.io.File
 
-@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class, nullable = true)
 @Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {
     private var controller: MediaController? by mutableRefStateOf(null)

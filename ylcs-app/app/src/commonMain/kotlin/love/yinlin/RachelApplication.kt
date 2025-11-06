@@ -128,12 +128,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     )
 
     val urlImage by service(
-        StartupLazyFetcher {
-            Platform.use(Platform.WebWasm,
-                ifTrue = { null },
-                ifFalse = { os.storage.cachePath.parent }
-            )
-        },
+        useNotPlatformStartupLazyFetcher(Platform.WebWasm) { os.storage.cachePath.parent!! },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
         factory = ::StartupUrlImage
@@ -141,12 +136,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
     @StartupNative
     val kv by service(
-        StartupLazyFetcher {
-            Platform.use(*Platform.Desktop,
-                ifTrue = { Path(os.storage.dataPath, "config") },
-                ifFalse = { null }
-            )
-        },
+        usePlatformStartupLazyFetcher(*Platform.Desktop) { Path(os.storage.dataPath, "config") },
         factory = ::StartupKV
     )
 
@@ -165,7 +155,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     )
 
     val mp by service(
-        StartupLazyFetcher { Paths.modPath },
+        useNotPlatformStartupLazyFetcher(Platform.WebWasm) { Paths.modPath },
         factory = ::buildMusicPlayer
     )
 

@@ -29,7 +29,7 @@ private enum class AudioSessionInterruption {
     Began, Ended, Failed;
 }
 
-@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
+@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class, nullable = true)
 @OptIn(ExperimentalForeignApi::class)
 @Stable
 actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer() {

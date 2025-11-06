@@ -23,7 +23,7 @@ annotation class StartupHandler(val index: Int, val name: String, val handlerTyp
 @MustBeDocumented
 @Repeatable
 @Retention(AnnotationRetention.SOURCE)
-annotation class StartupFetcher(val index: Int, val name: String, val returnType: KClass<*>)
+annotation class StartupFetcher(val index: Int, val name: String, val returnType: KClass<*>, val nullable: Boolean = false)
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 @MustBeDocumented
