@@ -62,8 +62,7 @@ abstract class StartupMusicPlayer : AsyncStartup() {
     // 歌词引擎
     val lyrics = LrcLayout()
     var engine by mutableRefStateOf(LyricsEngine.Default)
-    lateinit var floatingLyrics: FloatingLyrics
-        private set
+    val floatingLyrics: FloatingLyrics = FloatingLyrics()
 
     // 公共
     protected lateinit var rootPath: Path
@@ -131,7 +130,6 @@ abstract class StartupMusicPlayer : AsyncStartup() {
 
     final override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
         rootPath = args.fetch(0)
-        floatingLyrics = FloatingLyrics()
         awaitAll(
             async(ioContext) { initLibrary() },
             async { initController(context) }

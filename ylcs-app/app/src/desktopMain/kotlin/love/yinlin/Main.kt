@@ -72,9 +72,9 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
     }
 
     @StartupNative
-    private val setupSingleInstance by sync(priority = StartupDelegate.HIGH8) { singleInstance(Local.info.name) }
+    private val setupSingleInstance by sync(priority = StartupDelegate.HIGH7) { singleInstance(Local.info.name) }
 
-    private val setComposeRender by service(priority = StartupDelegate.HIGH8, factory = ::StartupComposeSwingRender)
+    private val setComposeRender by service(factory = ::StartupComposeSwingRender)
 
     private val setupMacOSDeepLink by service(
         StartupMacOSDeepLink.Handler { uri ->

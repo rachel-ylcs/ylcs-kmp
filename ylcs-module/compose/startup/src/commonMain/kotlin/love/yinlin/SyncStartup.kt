@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Stable
 abstract class SyncStartup : Startup() {
-    override fun toString(): String = "($privilege|Sync|${this::class.qualifiedName})"
+    override fun toString(): String = "(Sync|${this::class.qualifiedName})"
 
     override fun initLater(context: Context, args: StartupArgs) {}
 

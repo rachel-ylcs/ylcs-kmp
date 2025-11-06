@@ -7,11 +7,11 @@ abstract class ComposeApplication : Application() {
 
     final override fun onCreate() {
         super.onCreate()
-        instance.openService()
+        instance.openService(later = false, immediate = false)
     }
 
     override fun onTerminate() {
-        instance.closeService()
+        instance.closeService(before = false, immediate = false)
         super.onTerminate()
     }
 }

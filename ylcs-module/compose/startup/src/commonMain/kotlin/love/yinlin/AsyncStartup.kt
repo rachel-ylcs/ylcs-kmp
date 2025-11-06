@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Stable
 abstract class AsyncStartup : Startup() {
-    override fun toString(): String = "($privilege|Async|${this::class.qualifiedName})"
+    override fun toString(): String = "(Async|${this::class.qualifiedName})"
 
     override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) { }
 

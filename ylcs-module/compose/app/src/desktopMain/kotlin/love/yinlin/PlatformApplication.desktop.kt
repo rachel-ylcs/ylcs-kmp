@@ -94,7 +94,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun ApplicationScope.MultipleWindow() {}
 
     fun run() {
-        openService()
+        openService(later = false, immediate = false)
 
         var windowVisible by mutableStateOf(true)
         var alwaysOnTop by mutableStateOf(false)
@@ -111,7 +111,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         application(exitProcessOnExit = false) {
             Window(
                 onCloseRequest = {
-                    closeServiceBefore()
+                    closeService(before = true, immediate = false)
                     exitApplication()
                 },
                 title = title,
@@ -128,7 +128,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     context.bindWindow(window)
 
                     windowStarter {
-                        openServiceLater()
+                        openService(later = true, immediate = false)
                     }
                 }
 
@@ -217,7 +217,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             MultipleWindow()
         }
 
-        closeService()
+        closeService(before = false, immediate = false)
 
         exitProcess(0)
     }

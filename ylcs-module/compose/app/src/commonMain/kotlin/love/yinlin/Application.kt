@@ -96,28 +96,23 @@ abstract class Application<out A : Application<A>>(
         }
     }
 
-    internal fun openService() {
-        @Suppress("UNCHECKED_CAST")
-        self.init(this as A)
-
-        createService()
-
-        initService(context, false)
-        onCreate()
+    internal fun openService(later: Boolean, immediate: Boolean) {
+        if (later) {
+            initService(context, later = later, immediate = false)
+            onCreateLater()
+        }
+        else {
+            @Suppress("UNCHECKED_CAST")
+            self.init(this as A)
+            initService(context, later = later, immediate = immediate)
+            onCreate()
+        }
     }
 
-    internal fun openServiceLater() {
-        initService(context, true)
-        onCreateLater()
-    }
-
-    internal fun closeServiceBefore() {
-        destroyService(context, true)
-        onDestroyBefore()
-    }
-
-    internal fun closeService() {
-        destroyService(context, false)
-        onDestroy()
+    internal fun closeService(before: Boolean, immediate: Boolean) {
+        destroyService(context, before)
+        if (before) onDestroyBefore()
+        else onDestroy()
+        if (immediate && before) closeService(before = false, immediate = false)
     }
 }

@@ -7,6 +7,7 @@ import kotlin.reflect.KProperty
 
 @Stable
 class StartupDelegate<S : Startup>(
+    type: StartupType,
     val priority: Int,
     private val factory: () -> S,
     args: Array<Any?>,
@@ -44,9 +45,8 @@ class StartupDelegate<S : Startup>(
         return startup
     }
 
-    val privilege: StartupPrivilege get() = startup.privilege
-    val isSync: Boolean get() = startup is SyncStartup
-    val isAsync: Boolean get() = startup is AsyncStartup
+    val isSync: Boolean = type == StartupType.Sync
+    val isAsync: Boolean = type == StartupType.Async
 
     override fun toString(): String = when {
         !::startup.isInitialized -> "uninitialized"
@@ -55,19 +55,19 @@ class StartupDelegate<S : Startup>(
         else -> startup.toString().replace("null", "unnamed")
     }
 
-    fun createStartup() {
-        startup = factory()
-    }
-
     fun initStartup(context: Context, later: Boolean) {
         if (later) startup.initLater(context, startupArgs)
-        else startup.init(context, startupArgs)
+        else {
+            startup = factory()
+            startup.init(context, startupArgs)
+        }
     }
 
     suspend fun CoroutineScope.initStartup(context: Context, later: Boolean) {
-        with(startup) {
-            if (later) this@initStartup.initLater(context, startupArgs)
-            else this@initStartup.init(context, startupArgs)
+        if (later) with(startup) { this@initStartup.initLater(context, startupArgs) }
+        else {
+            startup = factory()
+            with(startup) { this@initStartup.init(context, startupArgs) }
         }
     }
 

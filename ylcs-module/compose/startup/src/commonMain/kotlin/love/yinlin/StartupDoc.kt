@@ -28,9 +28,4 @@ annotation class StartupFetcher(val index: Int, val name: String, val returnType
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
-annotation class StartupSystem
-
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
-@MustBeDocumented
-@Retention(AnnotationRetention.SOURCE)
 annotation class StartupNative(vararg val libs: String)

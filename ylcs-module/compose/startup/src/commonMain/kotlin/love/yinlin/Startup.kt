@@ -5,9 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Stable
 abstract class Startup {
-    open val privilege: StartupPrivilege get() = StartupPrivilege.User
-
-    override fun toString(): String = "($privilege|${this::class.qualifiedName})"
+    override fun toString(): String = "(${this::class.qualifiedName})"
 
     abstract fun init(context: Context, args: StartupArgs)
     abstract fun initLater(context: Context, args: StartupArgs)

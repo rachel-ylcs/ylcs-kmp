@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
+import kotlinx.browser.window
 import love.yinlin.extension.LazyReference
 
 @Stable
@@ -17,16 +18,12 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
-        openService()
-
-        openServiceLater()
+        openService(later = false, immediate = true)
 
         // 有待考证
-//        window.onclose = {
-//            closeServiceBefore()
-//
-//            closeService()
-//        }
+        window.onclose = {
+            closeService(before = true, immediate = true)
+        }
 
         ComposeViewport(viewportContainer = document.body!!) {
             Layout {

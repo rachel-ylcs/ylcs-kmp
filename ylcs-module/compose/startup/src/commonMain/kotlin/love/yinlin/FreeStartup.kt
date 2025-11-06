@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Stable
 abstract class FreeStartup : Startup() {
-    override fun toString(): String = "($privilege|Free|${this::class.qualifiedName})"
+    override fun toString(): String = "(Free|${this::class.qualifiedName})"
 
     override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) { }
 
