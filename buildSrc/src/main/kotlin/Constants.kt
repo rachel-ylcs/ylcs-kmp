@@ -129,7 +129,6 @@ class Constants(project: Project) {
         environment = environment,
         mainHost = "yinlin.love",
         mainPort = 1211,
-        webUseProxy = "webRun" in project.currentTaskName,
         webServerPort = 8000
     )
 
@@ -217,7 +216,6 @@ class HostConfig(
     environment: BuildEnvironment,
     val mainHost: String,
     val mainPort: Int,
-    val webUseProxy: Boolean,
     val webServerPort: Int
 ) {
     val apiHost: String = "api.$mainHost"

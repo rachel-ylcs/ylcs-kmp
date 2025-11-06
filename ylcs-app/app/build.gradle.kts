@@ -90,13 +90,11 @@ kotlin {
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     port = C.host.webServerPort
                     client?.overlay = false
-                    if (C.host.webUseProxy) {
-                        proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
-                            context = mutableListOf("/public", "/user", "/test"),
-                            target = C.host.apiUrl,
-                            secure = false
-                        ))
-                    }
+                    proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
+                        context = mutableListOf("/public", "/user", "/test"),
+                        target = C.host.apiUrl,
+                        secure = false
+                    ))
                 }
             }
         }
