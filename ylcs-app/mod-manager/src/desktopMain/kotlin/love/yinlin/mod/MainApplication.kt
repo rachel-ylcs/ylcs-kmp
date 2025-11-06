@@ -32,4 +32,4 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
 }
 
 private val appReference = LazyReference<MainApplication>()
-val app: MainApplication by appReference
+val app by appReference
