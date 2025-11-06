@@ -32,8 +32,8 @@ class LazyReference<T : Any> : ReadOnlyProperty<Any?, T> {
 // lazyName
 
 inline fun <T : Any> lazyName(crossinline initializer: (String) -> T) = object : ReadOnlyProperty<Any?, T> {
-    private lateinit var name: String
-    private val instance by lazy { initializer(name) }
+    lateinit var name: String
+    val instance by lazy { initializer(name) }
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         name = property.name
         return instance
