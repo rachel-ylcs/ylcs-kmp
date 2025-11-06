@@ -22,7 +22,7 @@ import okio.Path.Companion.toPath
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable
-class StartupUrlImage : SyncStartup {
+class StartupUrlImage : SyncStartup() {
     private lateinit var sketch: Sketch
 
     override fun init(context: Context, args: StartupArgs) {

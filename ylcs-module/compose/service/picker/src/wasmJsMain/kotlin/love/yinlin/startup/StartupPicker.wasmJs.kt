@@ -28,7 +28,7 @@ import org.w3c.files.BlobPropertyBag
 import org.w3c.files.FileList
 
 @Stable
-actual class StartupPicker : SyncStartup {
+actual class StartupPicker : SyncStartup() {
     actual override fun init(context: Context, args: StartupArgs) {}
 
     private fun htmlFileInput(

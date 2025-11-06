@@ -18,7 +18,7 @@ import love.yinlin.extension.lazyName
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
 @Stable
-open class StartupConfig : SyncStartup {
+open class StartupConfig : SyncStartup() {
     lateinit var kv: StartupKV
 
     override fun init(context: Context, args: StartupArgs) {

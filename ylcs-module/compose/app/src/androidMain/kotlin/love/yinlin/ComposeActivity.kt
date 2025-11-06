@@ -18,7 +18,7 @@ abstract class ComposeActivity : ComponentActivity() {
 
         instance.context.bindActivity(this)
 
-        instance.initialize(delay = true)
+        instance.openServiceLater()
 
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
@@ -38,7 +38,7 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.destroy(delay = true)
+        instance.closeServiceBefore()
 
         super.onDestroy()
     }

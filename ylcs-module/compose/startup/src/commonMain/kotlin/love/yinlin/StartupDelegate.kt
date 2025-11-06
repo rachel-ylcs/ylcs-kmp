@@ -1,19 +1,16 @@
 package love.yinlin
 
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 @Stable
-class StartupDelegate<S : Startup> internal constructor(
-    val privilege: StartupPrivilege,
-    val type: StartupType,
+class StartupDelegate<S : Startup>(
+    val priority: Int,
     private val factory: () -> S,
     args: Array<Any?>,
-    val priority: Int,
 ) : ReadOnlyProperty<Any?, Startup> {
-    constructor(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) : this(StartupPrivilege.User, type, factory, args, priority)
-
     companion object {
         const val HIGH10 = 1000
         const val HIGH9 = 900
@@ -36,53 +33,46 @@ class StartupDelegate<S : Startup> internal constructor(
         const val LOW8 = -800
         const val LOW9 = -900
         const val LOW10 = -1000
-
-        fun <S : Startup> system(type: StartupType, factory: () -> S, args: Array<Any?>, priority: Int) = StartupDelegate(StartupPrivilege.System, type, factory, args, priority)
     }
 
     private val startupArgs = StartupArgs(args)
     private lateinit var startup: S
+    private var serviceName: String? = null
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): S = startup
+    override fun getValue(thisRef: Any?, property: KProperty<*>): S {
+        serviceName = property.name.ifEmpty { null }
+        return startup
+    }
 
-    override fun toString(): String = "<$type>${if (::startup.isInitialized) startup::class.qualifiedName else null}"
+    val privilege: StartupPrivilege get() = startup.privilege
+    val isSync: Boolean get() = startup is SyncStartup
+    val isAsync: Boolean get() = startup is AsyncStartup
 
-    fun create() {
+    override fun toString(): String = when {
+        !::startup.isInitialized -> "uninitialized"
+        startup::class.qualifiedName != null -> startup.toString()
+        serviceName != null -> startup.toString().replace("null", serviceName!!)
+        else -> startup.toString().replace("null", "unnamed")
+    }
+
+    fun createStartup() {
         startup = factory()
     }
 
-    fun initSync(context: Context, delay: Boolean) {
-        (startup as? SyncStartup)?.let {
-            if (delay) it.initDelay(context, startupArgs)
-            else it.init(context, startupArgs)
+    fun initStartup(context: Context, later: Boolean) {
+        if (later) startup.initLater(context, startupArgs)
+        else startup.init(context, startupArgs)
+    }
+
+    suspend fun CoroutineScope.initStartup(context: Context, later: Boolean) {
+        with(startup) {
+            if (later) this@initStartup.initLater(context, startupArgs)
+            else this@initStartup.init(context, startupArgs)
         }
     }
 
-    suspend fun initAsync(context: Context, delay: Boolean) {
-        (startup as? AsyncStartup)?.let {
-            if (delay) it.initDelay(context, startupArgs)
-            else it.init(context, startupArgs)
-        }
-    }
-
-    suspend fun initFree(context: Context, delay: Boolean) {
-        (startup as? FreeStartup)?.let {
-            if (delay) it.initDelay(context, startupArgs)
-            else it.init(context, startupArgs)
-        }
-    }
-
-    fun destroy(context: Context, delay: Boolean) {
-        when (val v = startup) {
-            is SyncStartup -> {
-                if (delay) v.destroyDelay(context, startupArgs)
-                else v.destroy(context, startupArgs)
-            }
-            is AsyncStartup -> {
-                if (delay) v.destroyDelay(context, startupArgs)
-                else v.destroy(context, startupArgs)
-            }
-            is FreeStartup -> {}
-        }
+    fun destroyStartup(context: Context, before: Boolean) {
+        if (before) startup.destroy(context, startupArgs)
+        else startup.destroyBefore(context, startupArgs)
     }
 }

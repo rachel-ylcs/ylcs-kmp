@@ -22,7 +22,7 @@ import kotlin.experimental.ExperimentalNativeApi
     String::class, Throwable::class, String::class
 )
 @Stable
-actual class StartupExceptionHandler : SyncStartup {
+actual class StartupExceptionHandler : SyncStartup() {
     @Stable
     actual fun interface Handler {
         actual fun handle(key: String, e: Throwable, error: String)

@@ -102,12 +102,12 @@ class StartupAppConfig : StartupConfig() {
 
 @Stable
 abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<RachelApplication>(mApp, delegate), DeepLink {
-    private val loadNativeLibrary by system(
+    private val loadNativeLibrary by service(
         NativeLibrary("ylcs_native", *Platform.Desktop),
         factory = ::StartupNativeLibrary
     )
 
-    val os by system(
+    val os by service(
         Local.info.appName,
         factory = ::StartupOS
     )
@@ -286,4 +286,4 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 private val mApp = LazyReference<RachelApplication>()
 
 @Stable
-val app: RachelApplication by mApp
+val app by mApp

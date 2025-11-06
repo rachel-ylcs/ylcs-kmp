@@ -17,15 +17,15 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
-        initialize(delay = false)
+        openService()
 
-        initialize(delay = true)
+        openServiceLater()
 
         // 有待考证
 //        window.onclose = {
-//            destroy(delay = true)
+//            closeServiceBefore()
 //
-//            destroy(delay = false)
+//            closeService()
 //        }
 
         ComposeViewport(viewportContainer = document.body!!) {

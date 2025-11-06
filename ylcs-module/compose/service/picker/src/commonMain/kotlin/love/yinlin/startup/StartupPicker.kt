@@ -13,9 +13,7 @@ import love.yinlin.uri.ImplicitUri
 @Stable
 expect class StartupPicker() : SyncStartup {
     override fun init(context: Context, args: StartupArgs)
-    override fun initDelay(context: Context, args: StartupArgs)
-    override fun destroy(context: Context, args: StartupArgs)
-    override fun destroyDelay(context: Context, args: StartupArgs)
+    override fun initLater(context: Context, args: StartupArgs)
 
     suspend fun pickPicture(): Source?
     suspend fun pickPicture(maxNum: Int): Sources<Source>?

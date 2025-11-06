@@ -2,6 +2,7 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -28,7 +29,7 @@ import love.yinlin.platform.lyrics.LyricsEngine
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @Stable
-abstract class StartupMusicPlayer : AsyncStartup {
+abstract class StartupMusicPlayer : AsyncStartup() {
     companion object {
         const val PROGRESS_UPDATE_INTERVAL = 150L
     }
@@ -128,22 +129,18 @@ abstract class StartupMusicPlayer : AsyncStartup {
 
     protected fun MusicInfo.path(type: ModResourceType) = this.path(rootPath, type)
 
-    final override suspend fun init(context: Context, args: StartupArgs) {
+    final override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
         rootPath = args.fetch(0)
         floatingLyrics = FloatingLyrics()
-        Coroutines.startCurrent {
-            awaitAll(
-                async(ioContext) { initLibrary() },
-                async { initController(context) }
-            )
-            if (isInit) initLastStatus()
-        }
+        awaitAll(
+            async(ioContext) { initLibrary() },
+            async { initController(context) }
+        )
+        if (isInit) initLastStatus()
     }
 
-    override suspend fun initDelay(context: Context, args: StartupArgs) {
-        Coroutines.startCurrent {
-            launch { floatingLyrics.initDelay(context) }
-        }
+    override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) {
+        launch { floatingLyrics.initDelay(context) }
     }
 
     // 回调

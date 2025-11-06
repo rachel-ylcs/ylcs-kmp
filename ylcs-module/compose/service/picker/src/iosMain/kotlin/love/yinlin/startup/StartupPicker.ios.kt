@@ -48,7 +48,7 @@ import platform.UniformTypeIdentifiers.UTTypeImage
 import platform.darwin.NSObject
 
 @Stable
-actual class StartupPicker : SyncStartup {
+actual class StartupPicker : SyncStartup() {
     // 全局引用, 避免被gc
     lateinit var phPickerDelegate: PHPickerViewControllerDelegateProtocol
     lateinit var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol

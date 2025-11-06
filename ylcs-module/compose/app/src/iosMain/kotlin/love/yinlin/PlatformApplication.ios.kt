@@ -18,9 +18,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun buildDelegate(uiViewController: UIViewController): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
 
     fun run(): UIViewController {
-        initialize(delay = false)
+        openService()
 
-        initialize(delay = true)
+        openServiceLater()
 
         val uiViewController = ComposeUIViewController(
             configure = {

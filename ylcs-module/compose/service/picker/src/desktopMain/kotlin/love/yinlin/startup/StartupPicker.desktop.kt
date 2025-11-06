@@ -25,7 +25,7 @@ import love.yinlin.uri.RegularUri
 @StartupNative
 @NativeLib
 @Stable
-actual class StartupPicker : SyncStartup {
+actual class StartupPicker : SyncStartup() {
     private lateinit var context: Context
     private val handle: Long get() = context.handle
 

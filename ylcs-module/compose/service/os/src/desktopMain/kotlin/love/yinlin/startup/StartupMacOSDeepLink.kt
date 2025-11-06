@@ -12,7 +12,7 @@ import java.awt.Desktop
 
 @StartupHandler(index = 0, name = "onDeepLinkOpen", handlerType = StartupMacOSDeepLink.Handler::class, returnType = Unit::class, Uri::class)
 @Stable
-class StartupMacOSDeepLink : SyncStartup {
+class StartupMacOSDeepLink : SyncStartup() {
     fun interface Handler {
         fun handle(uri: Uri)
     }

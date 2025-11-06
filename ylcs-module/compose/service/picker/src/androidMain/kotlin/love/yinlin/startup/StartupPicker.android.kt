@@ -27,14 +27,14 @@ import love.yinlin.uri.ImplicitUri
 import java.util.UUID
 
 @Stable
-actual class StartupPicker : SyncStartup {
+actual class StartupPicker : SyncStartup() {
     private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver
     private lateinit var activityResultRegistry: ActivityResultRegistry
 
     actual override fun init(context: Context, args: StartupArgs) {}
 
-    actual override fun initDelay(context: Context, args: StartupArgs) {
+    actual override fun initLater(context: Context, args: StartupArgs) {
         activity = context.activity
         resolver = activity.contentResolver
         activityResultRegistry = activity.activityResultRegistry

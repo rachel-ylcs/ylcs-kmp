@@ -59,7 +59,7 @@ class MyApplication : PlatformApplication<MyApplication>(mApp) {
 }
 
 private val mApp = LazyReference<MyApplication>()
-val app: MyApplication by mApp
+val app by mApp
 
 fun main() = MyApplicaiton().run()
 ```

@@ -34,9 +34,9 @@ abstract class Application<out A : Application<A>>(
     protected open val localProvider: Array<ProvidedValue<*>> = emptyArray()
 
     protected open fun onCreate() { }
-    protected open fun onCreateDelay() { }
+    protected open fun onCreateLater() { }
+    protected open fun onDestroyBefore() { }
     protected open fun onDestroy() { }
-    protected open fun onDestroyDelay() { }
 
     @Composable
     abstract fun Content()
@@ -96,18 +96,28 @@ abstract class Application<out A : Application<A>>(
         }
     }
 
-    internal fun initialize(delay: Boolean) {
+    internal fun openService() {
         @Suppress("UNCHECKED_CAST")
         self.init(this as A)
 
-        initService(context, delay)
-        if (delay) onCreateDelay()
-        else onCreate()
+        createService()
+
+        initService(context, false)
+        onCreate()
     }
 
-    internal fun destroy(delay: Boolean) {
-        destroyService(context, delay)
-        if (delay) onDestroyDelay()
-        else onDestroy()
+    internal fun openServiceLater() {
+        initService(context, true)
+        onCreateLater()
+    }
+
+    internal fun closeServiceBefore() {
+        destroyService(context, true)
+        onDestroyBefore()
+    }
+
+    internal fun closeService() {
+        destroyService(context, false)
+        onDestroy()
     }
 }

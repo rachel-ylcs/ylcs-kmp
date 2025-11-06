@@ -14,7 +14,7 @@ import love.yinlin.platform.*
 @StartupNative
 @NativeLib
 @Stable
-actual class StartupKV : SyncStartup {
+actual class StartupKV : SyncStartup() {
     var nativeHandle: Long = 0
 
     actual override fun init(context: Context, args: StartupArgs) {

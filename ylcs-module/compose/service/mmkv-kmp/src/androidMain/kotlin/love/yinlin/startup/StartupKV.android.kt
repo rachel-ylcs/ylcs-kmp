@@ -11,7 +11,7 @@ import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 @Stable
-actual class StartupKV : SyncStartup {
+actual class StartupKV : SyncStartup() {
     lateinit var mmkv: MMKV
 
     actual override fun init(context: Context, args: StartupArgs) {

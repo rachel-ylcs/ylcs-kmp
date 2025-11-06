@@ -27,7 +27,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.extension.LazyReference
 import love.yinlin.fixup.Fixup
 import org.jetbrains.compose.resources.*
-import java.awt.Dimension
 import kotlin.system.exitProcess
 
 @Stable
@@ -95,7 +94,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun ApplicationScope.MultipleWindow() {}
 
     fun run() {
-        initialize(delay = false)
+        openService()
 
         var windowVisible by mutableStateOf(true)
         var alwaysOnTop by mutableStateOf(false)
@@ -112,7 +111,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         application(exitProcessOnExit = false) {
             Window(
                 onCloseRequest = {
-                    destroy(delay = true)
+                    closeServiceBefore()
                     exitApplication()
                 },
                 title = title,
@@ -129,7 +128,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     context.bindWindow(window)
 
                     windowStarter {
-                        initialize(delay = true)
+                        openServiceLater()
                     }
                 }
 
@@ -218,7 +217,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             MultipleWindow()
         }
 
-        destroy(delay = false)
+        closeService()
 
         exitProcess(0)
     }

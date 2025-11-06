@@ -22,7 +22,7 @@ class Reference<T>(var value: T) : ReadWriteProperty<Any?, T> {
 }
 
 class LazyReference<T : Any> : ReadOnlyProperty<Any?, T> {
-    lateinit var mValue: T
+    private lateinit var mValue: T
     fun init(value: T) {
         if (!::mValue.isInitialized) mValue = value
     }
