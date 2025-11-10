@@ -112,22 +112,6 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	private var sleepJob: Job? by mutableRefStateOf(null)
 	private var sleepRemainSeconds: Int by mutableIntStateOf(0)
 
-	private fun openMusicComment() {
-		mp.currentMusic?.let { musicInfo ->
-			// TODO: 歌曲详情页
-//			launch {
-//				val result = ClientAPI.request(
-//					route = API.User.Song.GetSong,
-//					data = musicInfo.id
-//				)
-//				when (result) {
-//					is Success -> navigate(ScreenSongDetails.Args(song = result.data))
-//					is Failure -> slot.tip.error(result.message)
-//				}
-//			}
-		}
-	}
-
 	@Composable
 	private fun Modifier.hazeBlur(radius: Dp): Modifier = hazeEffect(
 		state = blurState,
@@ -257,10 +241,8 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 					MusicRecord(
 						musicInfo = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f)
-                            .clickable {
-								// TODO: 歌曲详情页
-								// navigate(ScreenMusicDetails.Args(it.id))
-							}.zIndex(2f)
+                            .clickable { navigate(::ScreenMusicDetails, it.id) }
+							.zIndex(2f)
 					)
 				}
 			}
@@ -528,18 +510,14 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			}
 			EqualItem {
 				ClickIcon(
-					icon = ExtraIcons.ShowLyrics,
-                    tip = "歌词",
-					color = Colors.White,
-					onClick = {}
-				)
-			}
-			EqualItem {
-				ClickIcon(
 					icon = Icons.AutoMirrored.Outlined.Comment,
                     tip = "评论",
 					color = Colors.White,
-					onClick = { openMusicComment() }
+					onClick = {
+						mp.currentMusic?.let { musicInfo ->
+							navigate(::ScreenMusicDetails, musicInfo.id)
+						}
+					}
 				)
 			}
 		}

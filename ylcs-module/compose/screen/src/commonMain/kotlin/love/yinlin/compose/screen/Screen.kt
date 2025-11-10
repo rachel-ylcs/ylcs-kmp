@@ -21,7 +21,10 @@ import love.yinlin.compose.ui.layout.SplitActionLayout
 
 @Stable
 abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
-    protected abstract val title: String?
+    @Composable
+    protected abstract fun Content(device: Device)
+
+    protected open val title: String? = null
 
     protected open fun onBack() = pop()
 
@@ -36,9 +39,6 @@ abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
 
     @Composable
     protected open fun BottomBar() { }
-
-    @Composable
-    protected abstract fun Content(device: Device)
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Composable

@@ -165,13 +165,8 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
 
     private fun onCardClick(index: Int) {
         val item = library[index]
-        if (isManaging) {
-            library[index] = item.copy(selected = !item.selected)
-        }
-        else {
-            // TODO: 歌曲详情页
-            // navigate(ScreenMusicDetails.Args(item.id))
-        }
+        if (isManaging) library[index] = item.copy(selected = !item.selected)
+        else navigate(::ScreenMusicDetails, item.id)
     }
 
     private fun onCardLongClick(index: Int) {
@@ -307,8 +302,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
 
         ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
             Action(Icons.Outlined.Token, "工坊") {
-                // TODO: 歌曲工坊页
-                // navigate<ScreenMusicModFactory>()
+                navigate(::ScreenModCenter)
             }
             Action(Icons.Outlined.Upload, "导入") {
                 pop()

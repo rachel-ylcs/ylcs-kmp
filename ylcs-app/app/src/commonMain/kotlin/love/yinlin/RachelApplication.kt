@@ -212,11 +212,8 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlaylistLibrary)
             screen(::ScreenFloatingLyrics)
-//            screen(::ScreenMusicDetails)
-//
-//            screen(::ScreenMusicModFactory)
-//            screen(::ScreenSongDetails, type<Song>())
-//
+            screen(::ScreenMusicDetails)
+            screen(::ScreenModCenter)
             screen(::ScreenImportMusic)
             screen(::ScreenCreateMusic)
             screen(::ScreenPlatformMusic)
