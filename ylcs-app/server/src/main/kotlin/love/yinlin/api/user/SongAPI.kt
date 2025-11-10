@@ -45,7 +45,6 @@ fun Routing.songAPI(implMap: ImplMap){
     }
 
     api(API.User.Song.GetSongComments) { (sid, cid, num) ->
-        VN.throwId(sid)
         val songComment = DB.throwQuerySQL("""
             SELECT cid, user.uid, ts, content, name, label, exp
             FROM song_comment
@@ -58,8 +57,7 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(songComment.to())
     }
 
-    api(API.User.Song.SendSongComment) { (token, sid, content)->
-        VN.throwId(sid)
+    api(API.User.Song.SendSongComment) { (token, sid, content) ->
         VN.throwEmpty(content)
         val uid = AN.throwExpireToken(token)
         val cid = DB.throwInsertSQLGeneratedKey("""
