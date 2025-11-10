@@ -37,6 +37,7 @@ data class ImmersivePadding(
     val withoutEnd: ImmersivePadding get() = this.copy(end = 0.dp)
     val withoutTop: ImmersivePadding get() = this.copy(top = 0.dp)
     val withoutBottom: ImmersivePadding get() = this.copy(bottom = 0.dp)
+    val withoutHorizontal: ImmersivePadding get() = this.copy(start = 0.dp, end = 0.dp)
     val withoutVertical: ImmersivePadding get() = this.copy(top = 0.dp, bottom = 0.dp)
 }
 
