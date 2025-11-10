@@ -96,12 +96,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     private var windowVisible by mutableStateOf(true)
     private var alwaysOnTop by mutableStateOf(false)
 
-    private val windowState = WindowState(
-        placement = WindowPlacement.Floating,
-        isMinimized = false,
-        position = WindowPosition.Aligned(Alignment.Center),
-        size = initSize
-    )
+    private val windowState by derivedStateOf {
+        WindowState(
+            placement = WindowPlacement.Floating,
+            isMinimized = false,
+            position = WindowPosition.Aligned(Alignment.Center),
+            size = initSize
+        )
+    }
 
     private val windowStarter = LaunchFlag()
 
