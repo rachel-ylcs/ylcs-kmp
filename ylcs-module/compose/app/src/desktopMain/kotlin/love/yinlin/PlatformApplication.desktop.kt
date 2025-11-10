@@ -93,20 +93,20 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun ApplicationScope.MultipleWindow() {}
 
+    private var windowVisible by mutableStateOf(true)
+    private var alwaysOnTop by mutableStateOf(false)
+
+    private val windowState = WindowState(
+        placement = WindowPlacement.Floating,
+        isMinimized = false,
+        position = WindowPosition.Aligned(Alignment.Center),
+        size = initSize
+    )
+
+    private val windowStarter = LaunchFlag()
+
     fun run() {
         openService(later = false, immediate = false)
-
-        var windowVisible by mutableStateOf(true)
-        var alwaysOnTop by mutableStateOf(false)
-
-        val windowState = WindowState(
-            placement = WindowPlacement.Floating,
-            isMinimized = false,
-            position = WindowPosition.Aligned(Alignment.Center),
-            size = initSize
-        )
-
-        val windowStarter = LaunchFlag()
 
         application(exitProcessOnExit = false) {
             Window(
