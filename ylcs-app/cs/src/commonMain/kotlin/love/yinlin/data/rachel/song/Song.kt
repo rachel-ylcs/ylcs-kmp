@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Stable
 @Serializable
 data class Song(
-    val id: String,
+    val sid: String,
     val version: String,
     val name: String,
     val singer: String,
