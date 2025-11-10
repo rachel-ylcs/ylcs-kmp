@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
@@ -65,6 +66,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
     private val status by derivedStateOf { "曲库总数: ${library.size}  |  已搜索: ${searchLibrary.size}  |  未选择: ${unSelectedLibrary.size}  |  已选择 ${selectedLibrary.size}" }
 
     private var onSearching by mutableStateOf(false)
+
+    private val isSelectAll by derivedStateOf { unSelectedLibrary.isEmpty() && selectedLibrary.isNotEmpty() }
 
     private val leftState = LazyGridState()
     private val rightState = LazyGridState()
@@ -169,10 +172,9 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 for (item in items) {
                     val itemPath = Path(modPath, item.id)
                     itemPath.mkdir()
-                    // 复制非基础资源
+                    // 复制基础资源
                     for (resPath in item.path.list()) {
-                        val type = ModResourceType.fromType(resPath.nameWithoutExtension)
-                        if (type?.base == false) resPath.writeTo(Path(itemPath, resPath.name))
+                        resPath.writeTo(Path(itemPath, resPath.name))
                     }
                     // 基础资源打包
                     Path(itemPath, ModResourceType.BASE_RES).write { sink ->
@@ -259,6 +261,12 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                                 }
                             }
                         }
+                        Action(Icons.Outlined.SelectAll, if (isSelectAll) "取消全选" else "全选") {
+                            val v = isSelectAll
+                            library.fastForEachIndexed { index, item ->
+                                if (item.selected == v) library[index] = item.copy(selected = !v)
+                            }
+                        }
                     },
                     right = {
                         ActionSuspend(Icons.Outlined.Preview, "预览") {
@@ -272,7 +280,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                                 packageSheet.open()
                             }
                             ActionSuspend(Icons.Outlined.LocalAirport, "部署") {
-                                if (slot.confirm.openSuspend(content = "部署所选MOD到server目录吗?")) {
+                                if (slot.confirm.openSuspend(content = "部署所选MOD到mod目录吗?")) {
                                     deploy(selectedLibrary)
                                 }
                             }

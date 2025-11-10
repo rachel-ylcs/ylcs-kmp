@@ -1,10 +1,13 @@
 package love.yinlin.screen.music
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,22 +25,31 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import kotlinx.io.files.Path
+import love.yinlin.Local
+import love.yinlin.api.API
 import love.yinlin.api.APIConfig
+import love.yinlin.api.ClientAPI
+import love.yinlin.api.ServerRes
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
+import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
+import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
@@ -45,9 +57,10 @@ import love.yinlin.extension.exists
 import love.yinlin.screen.community.UserBar
 
 @Stable
-class ScreenMusicDetails(manager: ScreenManager, private val id: String) : Screen(manager) {
-    private var clientSong: Song? by mutableStateOf(updateClientSong())
+class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Screen(manager) {
+    private var clientSong: Song? by mutableStateOf(requestClientSong())
     private var remoteSong: Song? by mutableStateOf(null)
+    private var isClient: Boolean by mutableStateOf(true)
 
     private val pageComments = object : Pagination<SongComment, Long, Long>(
         default = 0L,
@@ -59,11 +72,14 @@ class ScreenMusicDetails(manager: ScreenManager, private val id: String) : Scree
 
     private val listState = LazyListState()
 
-    override val title: String by derivedStateOf { clientSong?.name ?: remoteSong?.name ?: "未知歌曲" }
+    override val title: String by derivedStateOf { (if (isClient) clientSong else remoteSong)?.name ?: "未知歌曲" }
 
-    private fun updateClientSong(): Song? = app.mp.library[id]?.let { musicInfo ->
+    private fun Song.clientPath(type: ModResourceType): Path = Path(Paths.modPath, this.sid, type.filename)
+    private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(type.filename)}"
+
+    private fun requestClientSong(): Song? = app.mp.library[sid]?.let { musicInfo ->
         Song(
-            id = musicInfo.id,
+            sid = musicInfo.id,
             version = musicInfo.version,
             name = musicInfo.name,
             singer = musicInfo.singer,
@@ -76,20 +92,67 @@ class ScreenMusicDetails(manager: ScreenManager, private val id: String) : Scree
         )
     }
 
-    private suspend fun requestNewSongComments() {
+    private suspend fun requestRemoteSong(): Song? = (ClientAPI.request(
+        route = API.User.Song.GetSong,
+        data = sid
+    ) as? Data.Success)?.data
 
+    private suspend fun requestNewSongComments() {
+        val result = ClientAPI.request(
+            route = API.User.Song.GetSongComments,
+            data = API.User.Song.GetSongComments.Request(
+                sid = sid,
+                num = pageComments.pageNum
+            )
+        )
+        when (result) {
+            is Data.Success -> pageComments.newData(result.data)
+            is Data.Failure -> slot.tip.error(result.message)
+        }
     }
 
     private suspend fun requestMoreSongComments() {
-
+        val result = ClientAPI.request(
+            route = API.User.Song.GetSongComments,
+            data = API.User.Song.GetSongComments.Request(
+                sid = sid,
+                cid = pageComments.offset,
+                num = pageComments.pageNum
+            )
+        )
+        if (result is Data.Success) pageComments.moreData(result.data)
     }
 
     override suspend fun initialize() {
-
+        launch { remoteSong = requestRemoteSong() }
+        launch { requestNewSongComments() }
     }
 
     @Composable
     private fun DetailsLayout(modifier: Modifier = Modifier) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val currentSong by rememberDerivedState { if (isClient) clientSong else remoteSong }
+            Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(Colors.Black)) {
+                currentSong?.let { song ->
+                    if (isClient) {
+                        LocalFileImage(
+                            path = { song.clientPath(ModResourceType.Record) },
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    else {
+                        WebImage(
+                            uri = remember(song) { song.remotePath(ModResourceType.Record) },
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
+        }
         Surface(
             modifier = modifier,
             shadowElevation = CustomTheme.shadow.surface
@@ -99,8 +162,6 @@ class ScreenMusicDetails(manager: ScreenManager, private val id: String) : Scree
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
             ) {
                 val song by rememberDerivedState { clientSong ?: remoteSong }
-
-                
             }
         }
     }
@@ -112,7 +173,17 @@ class ScreenMusicDetails(manager: ScreenManager, private val id: String) : Scree
 
     @Composable
     override fun ActionScope.RightActions() {
+        if (remoteSong != null) {
+            Action(
+                icon = if (isClient) Icons.Outlined.CloudDone else Icons.Outlined.AudioFile,
+                tip = if (isClient) "云端版本" else "本地版本"
+            ) {
+                isClient = !isClient
+            }
+        }
+        Action(Icons.Outlined.Share, "分享") {
 
+        }
     }
 
     @Composable

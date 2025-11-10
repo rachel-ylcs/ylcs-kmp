@@ -128,6 +128,8 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     private val isManaging by derivedStateOf { library.any { it.selected } }
     private var isSearching by mutableStateOf(false)
 
+    private val isSelectAll by derivedStateOf { library.fastAll { it.selected } }
+
     private val gridState = LazyGridState()
 
     private fun resetLibrary() {
@@ -256,7 +258,6 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     @Composable
     override fun ActionScope.LeftActions() {
         if (isManaging) {
-            val isSelectAll = library.fastAll { it.selected }
             Action(Icons.Outlined.SelectAll, if (isSelectAll) "取消全选" else "全选") {
                 if (isSelectAll) exitManagement()
                 else selectAll()
