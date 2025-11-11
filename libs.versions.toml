@@ -91,7 +91,7 @@ lottie = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "lo
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.6.10" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.0" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
@@ -99,7 +99,7 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0-beta01" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0-rc01" }
 skiko-android = { module = "org.jetbrains.skiko:skiko-android", version = "0.9.4.1" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -133,7 +133,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.20" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.21" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "7.0.0" }
