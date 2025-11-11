@@ -35,6 +35,11 @@ fun Path.delete(): Boolean = catchingDefault(false) {
     true
 }
 
+fun Path.move(dest: Path): Boolean = catchingDefault(false) {
+    SystemFileSystem.atomicMove(this, dest)
+    true
+}
+
 fun Path.rename(filename: String): Path? = catchingNull {
     val parent = this.parent
     val newPath = if (parent == null) Path(this.toString().replace(this.name, filename)) else Path(parent, filename)

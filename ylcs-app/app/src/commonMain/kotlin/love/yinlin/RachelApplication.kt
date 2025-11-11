@@ -54,7 +54,7 @@ class StartupAppConfig : StartupConfig() {
     // 动画速度
     var animationSpeed by intState(DefaultAnimationSpeed)
     // 字体大小
-    var fontScale by floatState(1f, "20250518")
+    var fontScale by floatState(1f, version = "20250518")
     // 悬浮提示
     var enabledTip by booleanState(true)
 
@@ -69,7 +69,7 @@ class StartupAppConfig : StartupConfig() {
     var audioFocus by booleanState(true)
 
     // 歌单
-    val playlistLibrary by mapState<String, MusicPlaylist>()
+    val playlistLibrary by mapState<String, MusicPlaylist>(version = "20251112")
     // 上次播放列表
     var lastPlaylist by stringState("")
     // 上次播放歌曲

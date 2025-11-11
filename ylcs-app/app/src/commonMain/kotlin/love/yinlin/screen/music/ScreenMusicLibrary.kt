@@ -43,8 +43,19 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.delete
+import love.yinlin.extension.exists
+import love.yinlin.extension.list
+import love.yinlin.extension.move
+import love.yinlin.extension.readText
+import love.yinlin.extension.rename
+import love.yinlin.extension.writeText
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.Platform
+import love.yinlin.platform.UnsupportedPlatformText
+import love.yinlin.platform.platform
 import love.yinlin.screen.music.loader.ScreenCreateMusic
 import love.yinlin.screen.music.loader.ScreenImportMusic
 import love.yinlin.screen.music.loader.ScreenPlatformMusic
@@ -314,6 +325,13 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
                 pop()
                 navigate(::ScreenCreateMusic)
             }
+            Action(Icons.Outlined.ChangeCircle, "从旧版迁移") {
+                launch {
+                    if (slot.confirm.openSuspend(content = "迁移时请耐心等待, 不可重复迁移")) {
+                        migrateOldVersion()
+                    }
+                }
+            }
             Action(ExtraIcons.QQMusic, "QQ音乐", useImage = true) {
                 pop()
                 navigate(::ScreenPlatformMusic, null, PlatformMusicType.QQMusic)
@@ -394,4 +412,64 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     private val searchDialog = this land FloatingDialogInput(hint = "歌曲名", maxLength = 32)
 
     private val addMusicDialog = this land FloatingDialogDynamicChoice("添加到歌单")
+
+    private suspend fun migrateOldVersion() {
+        val idMap = arrayOf(1052, 1054, 1051, 1060, 1057, 1058, 1055, 1056, 1059, 1061, 1053, 1108, 1105, 1106, 1107, 1102, 1101, 1104, 1103, 1109, 1111, 1110, 2001, 2002, 2003, 1001, 1002, 1003, 1004, 2004, 2006, 2007, 3001, 4001, 4002, 3002, 3003, 1151, 1152, 1153, 1154, 1201, 1203, 1202, 1204, 1205, 1208, 1206, 1209, 1207, 1210, 1211, 2008, 4003, 2009, 3004, 3005, 2005, 2010, 2011, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 3006, 3007, 4004, 2012, 2013, 2014, 2015, 2016, 1305, 1301, 1310, 1302, 1303, 1311, 1306, 1307, 1308, 1304, 3008, 1309, 2017, 2018, 4005, 4006, 2019, 4007, 2020, 4008, 2021, 2022, 2023, 2024, 2025, 4009, 2026, 4010, 2027, 2028, 2029, 2030, 4011, 3009, 2031, 4012, 2032, 2033, 2034, 2035, 4013, 2036, 4014, 4015, 4016, 2037, 2038, 2039, 2040, 2041, 4017, 4018, 4019, 2042, 4020, 2043, 2044, 4021, 4022, 2045, 3010, 4023, 2046, 4024, 4025, 3011, 4026, 4027, 4028, 3012, 3013, 2047, 3014, 3015, 2048, 3016, 3017, 3018, 2049, 2050, 3019, 3020, 3021, 3022, 2051, 3023, 4029, 4030, 3024, 3025, 3026, 4031, 3027, 4032, 4033, 4034, 3028, 4035, 2052, 4036, 2053, 1312, 3029)
+
+        slot.loading.openSuspend()
+        catchingError {
+            require(platform != Platform.WebWasm) { UnsupportedPlatformText }
+            // 检查是否存在music目录
+            val oldMusicPath = Path(app.os.storage.dataPath, "music")
+            require(oldMusicPath.exists) { "不存在旧版MOD需要迁移" }
+            // 遍历每一个旧版 MOD
+            var count = 0
+            Coroutines.io {
+                val moveList = mutableListOf<String>()
+                for (modPath in oldMusicPath.list()) {
+                    catching {
+                        val oldId = modPath.name
+                        val newId = idMap[oldId.toInt() - 1].toString()
+                        // 重命名所有资源
+                        for (resPath in modPath.list()) {
+                            val resName = resPath.name
+                            when (resName) {
+                                "0-config" -> {
+                                    val oldConfig = resPath.readText()!!
+                                    val newConfig = oldConfig.replace("\"${oldId}\"", "\"${newId}\"")
+                                    resPath.writeText(newConfig)
+                                    resPath.rename(ModResourceType.Config.filename)
+                                }
+                                "10-flac" -> resPath.rename(ModResourceType.Audio.filename)
+                                "20-record" -> resPath.rename(ModResourceType.Record.filename)
+                                "21-background" -> resPath.rename(ModResourceType.Background.filename)
+                                "22-animation" -> resPath.rename(ModResourceType.Animation.filename)
+                                "30-lrc" -> resPath.rename(ModResourceType.LineLyrics.filename)
+                                "40-pv" -> resPath.rename(ModResourceType.Video.filename)
+                                "50-rhyme" -> resPath.rename(ModResourceType.Rhyme.filename)
+                                else -> resPath.delete() // 未知资源删除
+                            }
+                        }
+                        // 重命名目录
+                        modPath.rename(newId)
+                        moveList += newId
+                    }
+                }
+                // 目录移动
+                for (newId in moveList) {
+                    val newModPath = Path(Paths.modPath, newId)
+                    if (!newModPath.exists) {
+                        if (Path(oldMusicPath, newId).move(newModPath)) ++count
+                    }
+                }
+                // 清空旧版 MOD 目录
+                oldMusicPath.deleteRecursively()
+                if (moveList.isNotEmpty()) mp.updateMusicLibraryInfo(moveList)
+            }
+            slot.tip.success("已成功迁移${count}个旧版MOD")
+        }?.let {
+            slot.tip.error("迁移失败: ${it.message}")
+        }
+        slot.loading.close()
+    }
 }
