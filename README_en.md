@@ -90,7 +90,7 @@ fun main() = MyApplicaiton().run()
 
 `银临茶舍` is an open-source software licensed under the MIT license, Please refer to [LICENSE](LICENSE) for more information.
 
-## Acknowledgments
+## Credits
 
 Sort by author's first letter.
 
