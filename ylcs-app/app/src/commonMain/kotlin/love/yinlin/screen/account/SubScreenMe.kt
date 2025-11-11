@@ -231,26 +231,12 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             title = "推广"
         ) {
             Item("抽奖", ExtraIcons.Gift) {
-                
+
             }
             Item("水群", ExtraIcons.QQ) {
                 launch {
-                    Platform.use(
-                        *Platform.Phone,
-                        ifTrue = {
-                            if (!app.os.application.startAppIntent(UriGenerator.qqGroup("828049503"))) slot.tip.warning(
-                                "未安装QQ"
-                            )
-                        },
-                        ifFalse = {
-                            app.os.application.startAppIntent(
-                                UriGenerator.qqGroup(
-                                    "0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E",
-                                    "%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R"
-                                )
-                            )
-                        }
-                    )
+                    val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
+                    if (!app.os.application.startAppIntent(uri)) slot.tip.warning("未安装QQ")
                 }
             }
             Item("店铺", ExtraIcons.Taobao) {

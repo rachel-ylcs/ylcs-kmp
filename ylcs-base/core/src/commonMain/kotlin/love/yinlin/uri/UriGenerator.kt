@@ -17,11 +17,10 @@ object UriGenerator {
         query = "src_type=internal&version=1&uin=$id&card_type=group&source=qrcode"
     )
 
-    fun qqGroup(k: String, authKey: String) = Uri(
+    fun qqGroupLink(q: String) = Uri(
         scheme = Scheme.Https,
         host = "qm.qq.com",
-        path = "/cgi-bin/qm/qr",
-        query = "k=$k&authKey=$authKey"
+        path = "/q/${q}"
     )
 
     fun taobao(shopId: String): Uri = Platform.use(
