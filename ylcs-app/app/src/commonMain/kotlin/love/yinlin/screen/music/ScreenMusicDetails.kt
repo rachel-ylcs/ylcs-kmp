@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
@@ -25,7 +24,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -47,7 +45,6 @@ import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.OffsetLayout
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
@@ -90,18 +87,18 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     @Stable
     private data class ResourceItem(
         val type: ModResourceType,
-        val size: Int?,
+        val size: Int?
     ) {
-        val color: Brush get() = when (type) {
-            ModResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
-            ModResourceType.Audio -> Brush.linearGradient(listOf(Colors.Pink3, Colors.Pink4, Colors.Pink5))
-            ModResourceType.Record -> Brush.linearGradient(listOf(Colors.Purple3, Colors.Purple4, Colors.Purple5))
-            ModResourceType.Background -> Brush.linearGradient(listOf(Colors.Blue3, Colors.Blue4, Colors.Blue5))
-            ModResourceType.LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
-            ModResourceType.Animation -> Brush.linearGradient(listOf(Colors.Orange3, Colors.Orange4, Colors.Orange5))
-            ModResourceType.Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
-            ModResourceType.Rhyme -> Brush.linearGradient(listOf(Colors.Cyan3, Colors.Cyan4, Colors.Cyan5))
-        }
+        fun brush(alpha: Float): Brush = Brush.linearGradient(when (type) {
+            ModResourceType.Config -> listOf(Colors.Yellow5, Colors.Yellow3, Colors.Yellow5)
+            ModResourceType.Audio -> listOf(Colors.Pink4, Colors.Pink2, Colors.Pink4)
+            ModResourceType.Record -> listOf(Colors.Purple4, Colors.Purple2, Colors.Purple4)
+            ModResourceType.Background -> listOf(Colors.Blue5, Colors.Blue3, Colors.Blue5)
+            ModResourceType.LineLyrics -> listOf(Colors.Green7, Colors.Green5, Colors.Green7)
+            ModResourceType.Animation -> listOf(Colors.Orange5, Colors.Orange3, Colors.Orange5)
+            ModResourceType.Video -> listOf(Colors.Green5, Colors.Green3, Colors.Green5)
+            ModResourceType.Rhyme -> listOf(Colors.Cyan5, Colors.Cyan3, Colors.Cyan5)
+        }.map { it.copy(alpha = alpha) })
 
         val icon: ImageVector get() = when (type) {
             ModResourceType.Config -> Icons.Outlined.Construction
@@ -316,74 +313,82 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     @Composable
+    private fun ActionScope.ResourceItemActionLayout(type: ModResourceType, remote: Boolean) {
+        when (type) {
+            ModResourceType.Config -> {
+
+            }
+            ModResourceType.Audio -> {
+
+            }
+            ModResourceType.Record -> {
+
+            }
+            ModResourceType.Background -> {
+
+            }
+            ModResourceType.LineLyrics -> {
+
+            }
+            ModResourceType.Animation -> {
+
+            }
+            ModResourceType.Video -> {
+
+            }
+            ModResourceType.Rhyme -> {
+
+            }
+        }
+    }
+
+    @Composable
+    private fun ResourceItemLayout(item: ResourceItem, remote: Boolean) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .background(brush = remember(item, remote) { item.brush(if (remote) 0.5f else 1f) })
+            .clickable {}
+            .padding(CustomTheme.padding.equalValue)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                MiniIcon(
+                    icon = if (remote) Icons.Outlined.Download else item.icon,
+                    color = if (remote) Colors.Gray4 else Colors.White
+                )
+                Text(
+                    text = item.type.description,
+                    color = if (remote) Colors.Gray4 else Colors.White,
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = remember(item) { item.size?.toLong()?.fileSizeString ?: "" },
+                    color = if (remote) Colors.Gray4 else Colors.White,
+                    style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
+                ResourceItemActionLayout(item.type, remote)
+            }
+        }
+    }
+
+    @Composable
     private fun ResourceLayout(modifier: Modifier = Modifier) {
         Column(modifier = modifier) {
-            Text(
-                text = "资源",
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
-            )
             for (item in clientResources) {
-                Box(
-                    modifier = Modifier.width(CustomTheme.size.cellWidth)
-                        .shadow(
-                            elevation = CustomTheme.shadow.surface,
-                            shape = MaterialTheme.shapes.extraLarge
-                        )
-                        .background(
-                            brush = remember(item) { item.color },
-                            shape = MaterialTheme.shapes.extraLarge
-                        )
-                        .clickable {}
-                        .padding(CustomTheme.padding.equalValue)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            MiniIcon(
-                                icon = item.icon,
-                                color = Colors.White
-                            )
-                            Text(
-                                text = item.type.description,
-                                color = Colors.White,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                        Text(
-                            text = item.type.name,
-                            color = Colors.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Text(
-                            text = remember(item) { item.size?.toLong()?.fileSizeString ?: "" },
-                            color = Colors.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End)
-                        ) {
-
-                        }
-                    }
-                }
+                ResourceItemLayout(item = item, remote = false)
+            }
+            for (item in remoteResources) {
+                ResourceItemLayout(item = item, remote = true)
             }
         }
     }
@@ -463,7 +468,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             header = {
                 DetailsLayout(modifier = Modifier.fillMaxWidth())
                 HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
-                ResourceLayout(modifier = Modifier.fillMaxWidth())
+                ResourceLayout(modifier = Modifier.fillMaxWidth().background(Colors.Black))
                 HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
                 Text(
                     text = "评论",
@@ -500,6 +505,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     .padding(immersivePadding.withoutHorizontal)
                     .weight(1f)
                     .fillMaxHeight()
+                    .background(Colors.Black)
                     .verticalScroll(rememberScrollState())
             )
             VerticalDivider()
