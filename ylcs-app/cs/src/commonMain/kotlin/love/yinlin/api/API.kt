@@ -16,6 +16,7 @@ import love.yinlin.data.rachel.photo.PhotoAlbumList
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.song.SongComment
+import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.TopicDetails
@@ -354,14 +355,14 @@ object API : APINode(null, "") {
 		}
 
 		object Song: APINode(this, "song") {
-			object GetSongs : APIPost<GetSongs.Request, List<love.yinlin.data.rachel.song.Song>>(this, "getSongs") {
+			object GetSongs : APIPost<GetSongs.Request, List<SongPreview>>(this, "getSongs") {
 				@Serializable
 				data class Request(val sid: String = "0", val num: Int = APIConfig.MAX_PAGE_NUM)
 			}
 
 			object GetSong : APIPost<String, love.yinlin.data.rachel.song.Song>(this, "getSong")
 
-			object SearchSongs : APIPost<String, List<love.yinlin.data.rachel.song.Song>>(this, "searchSongs")
+			object SearchSongs : APIPost<String, List<SongPreview>>(this, "searchSongs")
 
 			object GetSongComments : APIPost<GetSongComments.Request, List<SongComment>>(this, "getSongComments") {
 				@Serializable

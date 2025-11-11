@@ -16,7 +16,7 @@ import love.yinlin.server.values
 fun Routing.songAPI(implMap: ImplMap){
     api(API.User.Song.GetSongs) { (sid, num) ->
         val songs = DB.throwQuerySQL("""
-			SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme
+			SELECT sid, version, name
 			FROM song
             WHERE sid > ?
 			ORDER BY sid ASC
@@ -36,7 +36,7 @@ fun Routing.songAPI(implMap: ImplMap){
 
     api(API.User.Song.SearchSongs) { key ->
         val songs = DB.throwQuerySQL("""
-			SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme
+			SELECT sid, version, name
 			FROM song
             WHERE name LIKE ?
 			ORDER BY sid ASC
