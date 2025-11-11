@@ -100,7 +100,7 @@ private fun PlayingMusicStatusCard(
 
 @Stable
 class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
-	private val mp = app.mp
+	private val mp get() = app.mp
 
 	private var isAnimationBackground by mutableStateOf(false)
 	private val blurState = HazeState()
