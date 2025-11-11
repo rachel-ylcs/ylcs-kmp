@@ -17,7 +17,9 @@ kotlin {
     C.useCompilerFeatures(this)
 
     androidTarget {
-        C.jvmTarget(this)
+        compilerOptions {
+            jvmTarget.set(C.jvm.androidTarget)
+        }
     }
 
     buildList {

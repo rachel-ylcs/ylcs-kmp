@@ -18,7 +18,7 @@ kotlin {
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions {
-                    jvmTarget.set(C.jvm.target)
+                    jvmTarget.set(C.jvm.androidTarget)
                 }
             }
         }

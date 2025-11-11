@@ -79,7 +79,8 @@ class Constants(project: Project) {
     val jvm = JvmConfig(
         version = 25,
         target = JvmTarget.JVM_25,
-        compatibility = JavaVersion.VERSION_25
+        androidTarget = JvmTarget.JVM_21,
+        compatibility = JavaVersion.VERSION_21
     )
 
     // Android 配置
@@ -178,6 +179,7 @@ data class Application(
 data class JvmConfig(
     val version: Int,
     val target: JvmTarget,
+    val androidTarget: JvmTarget,
     val compatibility: JavaVersion
 )
 
