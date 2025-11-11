@@ -39,6 +39,7 @@ import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
@@ -54,11 +55,18 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.catchingError
+import love.yinlin.extension.delete
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.read
 import love.yinlin.extension.readText
 import love.yinlin.extension.size
+import love.yinlin.mod.ModFactory
 import love.yinlin.platform.Coroutines
+import love.yinlin.platform.Platform
+import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.platform.lyrics.LrcParser
+import love.yinlin.platform.platform
 import love.yinlin.screen.community.UserBar
 
 @Stable
@@ -83,6 +91,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     private fun Song.clientPath(type: ModResourceType): Path = Path(Paths.modPath, this.sid, type.filename)
     private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(type.filename)}"
+    private val remoteModPath: String get() = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES)}"
 
     @Stable
     private data class ResourceItem(
@@ -173,6 +182,41 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         if (result is Data.Success) pageComments.moreData(result.data)
     }
 
+    private fun downloadMod() {
+        launch {
+            // 下载MOD
+            val path = Coroutines.io {
+                app.os.storage.createTempFile { sink ->
+                    downloadDialog.openSuspend(remoteModPath, sink) { }
+                }
+            }
+            // 安装MOD
+            if (path != null) {
+                slot.loading.openSuspend()
+                catchingError {
+                    Coroutines.io {
+                        // 解压
+                        path.read { source ->
+                            val result = ModFactory.Release(source, Paths.modPath).process { _, _, _ ->  }
+                            require(result.metadata.version == ModFactory.VERSION) { "不匹配的MOD版本" }
+                        }
+                        // 删除临时文件
+                        path.delete()
+                    }
+                    slot.loading.close()
+                    // 通知
+                    app.mp.updateMusicLibraryInfo(listOf(sid))
+                    slot.tip.success("安装成功")
+                }?.let { slot.tip.error("安装失败: ${it.message}") }
+            }
+            else slot.tip.error("下载失败")
+        }
+    }
+
+    private fun downloadModResource(item: ResourceItem) {
+
+    }
+
     override suspend fun initialize() {
         clientSong = requestClientSong()
         launch { remoteSong = requestRemoteSong() }
@@ -183,25 +227,38 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     private fun DetailsLayout(modifier: Modifier = Modifier) {
         Box(modifier = modifier) {
             val song by rememberDerivedState { clientSong ?: remoteSong }
+            val deviceType = LocalDevice.current.type
 
-            Box(modifier = Modifier.padding(bottom = 48.dp).matchParentSize().shadow(CustomTheme.shadow.surface).background(Colors.Black).zIndex(1f)) {
+            Box(
+                modifier = Modifier
+                    .padding(bottom = if (deviceType == Device.Type.PORTRAIT) 48.dp else 0.dp)
+                    .matchParentSize()
+                    .shadow(CustomTheme.shadow.surface)
+                    .background(Colors.Black)
+                    .zIndex(1f)
+            ) {
                 clientSong?.let {
                     LocalFileImage(
                         path = { it.clientPath(ModResourceType.Background) },
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                } ?: remoteSong.let {
+                } ?: remoteSong?.let {
                     WebImage(
-                        uri = remember(song) { it?.remotePath(ModResourceType.Background) ?: "" },
+                        uri = remember(song) { it.remotePath(ModResourceType.Background) },
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
-                }
+                } ?: Box(modifier = Modifier.fillMaxSize())
             }
 
             Column(modifier = Modifier.fillMaxWidth().zIndex(2f)) {
-                Box(modifier = Modifier.fillMaxWidth().aspectRatio(3f))
+                if (deviceType == Device.Type.PORTRAIT) {
+                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(3f))
+                }
+                else {
+                    Box(modifier = Modifier.fillMaxWidth().height(96.dp))
+                }
                 Column(
                     modifier = Modifier.padding(
                         horizontal = CustomTheme.padding.horizontalExtraSpace,
@@ -223,11 +280,16 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                         horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        NormalText(
-                            text = song?.sid ?: "0",
-                            icon = Icons.Outlined.Loyalty,
-                            style = MaterialTheme.typography.labelMedium
-                        )
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            NormalText(
+                                text = song?.sid ?: "0",
+                                icon = Icons.Outlined.Loyalty,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
                         OffsetLayout(y = (-48).dp) {
                             Box(
                                 modifier = Modifier.size(96.dp)
@@ -247,21 +309,26 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                                         circle = true,
                                         contentScale = ContentScale.Crop
                                     )
-                                } ?: remoteSong.let {
+                                } ?: remoteSong?.let {
                                     WebImage(
-                                        uri = remember(song) { it?.remotePath(ModResourceType.Record) ?: "" },
+                                        uri = remember(song) { it.remotePath(ModResourceType.Record) },
                                         modifier = Modifier.fillMaxSize(),
                                         circle = true,
                                         contentScale = ContentScale.Crop
                                     )
-                                }
+                                } ?: Box(modifier = Modifier.fillMaxSize().clip(CircleShape).background(Colors.Black))
                             }
                         }
-                        NormalText(
-                            text = "v${song?.version ?: "?.?"}",
-                            icon = ExtraIcons.Artist,
-                            style = MaterialTheme.typography.labelMedium
-                        )
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            NormalText(
+                                text = "v${song?.version ?: "?.?"}",
+                                icon = ExtraIcons.Artist,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
                     }
 
                     Text(
@@ -313,7 +380,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     @Composable
-    private fun ActionScope.ResourceItemActionLayout(type: ModResourceType, remote: Boolean) {
+    private fun ActionScope.ResourceItemActionLayout(type: ModResourceType) {
         when (type) {
             ModResourceType.Config -> {
 
@@ -347,7 +414,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         Column(modifier = Modifier
             .fillMaxWidth()
             .background(brush = remember(item, remote) { item.brush(if (remote) 0.5f else 1f) })
-            .clickable {}
+            .clickable {
+                if (remote) downloadModResource(item)
+            }
             .padding(CustomTheme.padding.equalValue)
         ) {
             Row(
@@ -375,26 +444,48 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
-                ResourceItemActionLayout(item.type, remote)
+            if (!remote) {
+                ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
+                    ResourceItemActionLayout(item.type)
+                }
             }
         }
     }
 
     @Composable
     private fun ResourceLayout(modifier: Modifier = Modifier) {
-        Column(modifier = modifier) {
-            for (item in clientResources) {
-                ResourceItemLayout(item = item, remote = false)
+        Box(modifier = modifier) {
+            if (clientResources.isEmpty()) {
+                Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) {
+                    SimpleEmptyBox()
+                }
             }
-            for (item in remoteResources) {
-                ResourceItemLayout(item = item, remote = true)
+            else {
+                Column(modifier = Modifier.fillMaxWidth().background(Colors.Black)) {
+                    val downloadResources by rememberDerivedState {
+                        remoteResources.filter { item -> clientResources.find { it.type == item.type } == null }
+                    }
+
+                    for (item in clientResources) {
+                        ResourceItemLayout(item = item, remote = false)
+                    }
+
+                    for (item in downloadResources) {
+                        ResourceItemLayout(item = item, remote = true)
+                    }
+                }
             }
         }
     }
 
     @Composable
     override fun ActionScope.RightActions() {
+        if (clientResources.isEmpty() && remoteSong != null) {
+            ActionSuspend(Icons.Outlined.Download, "下载") {
+                if (platform == Platform.WebWasm) slot.tip.warning(UnsupportedPlatformText)
+                else if (slot.confirm.openSuspend(content = "下载该MOD?")) downloadMod()
+            }
+        }
         Action(Icons.Outlined.Share, "分享") {
 
         }
@@ -468,7 +559,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             header = {
                 DetailsLayout(modifier = Modifier.fillMaxWidth())
                 HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
-                ResourceLayout(modifier = Modifier.fillMaxWidth().background(Colors.Black))
+                ResourceLayout(modifier = Modifier.fillMaxWidth())
                 HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
                 Text(
                     text = "评论",
@@ -505,7 +596,6 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     .padding(immersivePadding.withoutHorizontal)
                     .weight(1f)
                     .fillMaxHeight()
-                    .background(Colors.Black)
                     .verticalScroll(rememberScrollState())
             )
             VerticalDivider()
@@ -548,4 +638,6 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             Device.Type.LANDSCAPE -> Landscape()
         }
     }
+
+    private val downloadDialog = this land FloatingDownloadDialog()
 }

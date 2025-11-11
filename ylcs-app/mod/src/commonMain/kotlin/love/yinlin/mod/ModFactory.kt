@@ -46,7 +46,7 @@ object ModFactory {
 
         private suspend fun Sink.writeResource(resourcePath: Path, resource: ModResourceType) {
             Coroutines.io {
-                writeLengthString(resource.type) // 写资源名称
+                writeLengthString(resource.type)
                 val resLength = resourcePath.size.toInt()
                 require(resLength > 0) { "资源长度非法 $resourcePath Length: $resLength" }
                 val times = resLength / INTERVAL
@@ -122,7 +122,7 @@ object ModFactory {
     @Stable
     class Release(
         source: Source,
-        private val savePath: Path
+        private val savePath: Path,
     ): BaseRelease(source) {
         @Stable
         data class ReleaseResult(
