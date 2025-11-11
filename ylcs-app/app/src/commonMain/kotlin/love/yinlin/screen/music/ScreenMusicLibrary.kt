@@ -303,6 +303,7 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
 
         ActionScope.Left.ActionLayout(modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace)) {
             Action(Icons.Outlined.Token, "工坊") {
+                pop()
                 navigate(::ScreenModCenter)
             }
             Action(Icons.Outlined.Upload, "导入") {

@@ -60,7 +60,9 @@ import love.yinlin.extension.delete
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.read
 import love.yinlin.extension.readText
+import love.yinlin.extension.replaceAll
 import love.yinlin.extension.size
+import love.yinlin.extension.write
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
@@ -125,7 +127,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         val musicInfo = app.mp.library[sid]
         return if (musicInfo != null) {
             val items = ModResourceType.entries.associateWith { musicInfo.path(Paths.modPath, it).size.toInt() }
-            clientResources.addAll(items.filter { it.value > 0 }.map { ResourceItem(it.key, it.value) })
+            clientResources.replaceAll(items.filter { it.value > 0 }.map { ResourceItem(it.key, it.value) })
             Song(
                 sid = musicInfo.id,
                 version = musicInfo.version,
@@ -148,7 +150,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         )
         return if (result is Data.Success) {
             val data = result.data
-            remoteResources.addAll(ModResourceType.BASE.map { ResourceItem(it, null) })
+            remoteResources.replaceAll(ModResourceType.BASE.map { ResourceItem(it, null) })
             if (data.animation) remoteResources.add(ResourceItem(ModResourceType.Animation, null))
             if (data.video) remoteResources.add(ResourceItem(ModResourceType.Video, null))
             if (data.rhyme) remoteResources.add(ResourceItem(ModResourceType.Rhyme, null))
@@ -206,6 +208,8 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     slot.loading.close()
                     // 通知
                     app.mp.updateMusicLibraryInfo(listOf(sid))
+                    // 更新状态
+                    clientSong = requestClientSong()
                     slot.tip.success("安装成功")
                 }?.let { slot.tip.error("安装失败: ${it.message}") }
             }
@@ -213,8 +217,24 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         }
     }
 
-    private fun downloadModResource(item: ResourceItem) {
-
+    private fun downloadModResource(item: ResourceItem, song: Song) {
+        launch {
+            if (slot.confirm.openSuspend(content = "下载资源: ${item.type.description}?")) {
+                // 下载资源
+                catchingError {
+                    Coroutines.io {
+                        Path(Paths.modPath, sid, item.type.filename).write { sink ->
+                            require(downloadDialog.openSuspend(song.remotePath(item.type), sink) {})
+                        }
+                    }
+                    // 通知
+                    app.mp.updateMusicLibraryInfo(listOf(sid))
+                    // 更新状态
+                    clientSong = requestClientSong()
+                    slot.tip.success("下载成功")
+                }?.let { slot.tip.error("下载失败: ${it.message}") }
+            }
+        }
     }
 
     override suspend fun initialize() {
@@ -415,7 +435,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             .fillMaxWidth()
             .background(brush = remember(item, remote) { item.brush(if (remote) 0.5f else 1f) })
             .clickable {
-                if (remote) downloadModResource(item)
+                if (remote) remoteSong?.let { downloadModResource(item, it) }
             }
             .padding(CustomTheme.padding.equalValue)
         ) {
@@ -437,7 +457,10 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = remember(item) { item.size?.toLong()?.fileSizeString ?: "" },
+                    text = remember(item, remote) {
+                        if (remote) "下载"
+                        else item.size?.toLong()?.fileSizeString ?: ""
+                    },
                     color = if (remote) Colors.Gray4 else Colors.White,
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
