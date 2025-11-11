@@ -1,4 +1,4 @@
-package love.yinlin.mod
+package love.yinlin
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -30,7 +30,6 @@ import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
-import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.screen.resources.Res
@@ -54,6 +53,7 @@ import love.yinlin.data.mod.ModItem
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
+import love.yinlin.mod.ModFactory
 import love.yinlin.mod.ModFactory.Preview.PreviewResult
 import love.yinlin.platform.Coroutines
 import org.jetbrains.compose.resources.stringResource
@@ -176,7 +176,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     itemPath.mkdir()
                     // 复制基础资源
                     for (resPath in item.path.list()) {
-                        resPath.writeTo(Path(itemPath, resPath.name))
+                        val type = ModResourceType.fromType(resPath.nameWithoutExtension)!!
+                        if (type in ModResourceType.DEPLOYMENT) resPath.writeTo(Path(itemPath, resPath.name))
                     }
                     // 基础资源打包
                     Path(itemPath, ModResourceType.BASE_RES).write { sink ->

@@ -1,14 +1,13 @@
-package love.yinlin.mod
+package love.yinlin
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
-import love.yinlin.PlatformApplication
-import love.yinlin.PlatformContextDelegate
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.extension.LazyReference
 import love.yinlin.extension.mkdir
+import love.yinlin.mod.ModFactory
 
 class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate) {
     override val title: String = "MOD管理器 第${ModFactory.VERSION}版"
