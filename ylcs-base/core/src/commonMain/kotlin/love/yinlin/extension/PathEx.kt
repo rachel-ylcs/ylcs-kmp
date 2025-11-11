@@ -35,6 +35,13 @@ fun Path.delete(): Boolean = catchingDefault(false) {
     true
 }
 
+fun Path.rename(filename: String): Path? = catchingNull {
+    val parent = this.parent
+    val newPath = if (parent == null) Path(this.toString().replace(this.name, filename)) else Path(parent, filename)
+    SystemFileSystem.atomicMove(this, newPath)
+    newPath
+}
+
 val Path.size: Long get() = catchingDefault(0L) {
     var size = 0L
     val queue = ArrayDeque<Path>()

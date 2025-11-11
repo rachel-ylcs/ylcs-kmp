@@ -65,7 +65,11 @@ object ModFactory {
 
         private suspend fun Sink.writeMedia(mediaPath: Path, filters: List<ModResourceType>) {
             Coroutines.io {
-                writeLengthString(mediaPath.name) // 写媒体ID
+                // 先读 config
+                val configPath = Path(mediaPath, ModResourceType.Config.filename)
+                val musicInfo = configPath.readText().parseJsonValue<MusicInfo>()!!
+                writeLengthString(musicInfo.id) // 写媒体ID
+
                 val resourcePaths = mutableListOf<Pair<Path, ModResourceType>>()
                 for (path in mediaPath.list()) {
                     val type = ModResourceType.fromType(path.nameWithoutExtension)
@@ -74,6 +78,7 @@ object ModFactory {
                     }
                 }
                 writeInt(resourcePaths.size) // 写资源数
+
                 // 写资源
                 for ((path, type) in resourcePaths) {
                     writeResource(path, type)
@@ -122,7 +127,7 @@ object ModFactory {
     @Stable
     class Release(
         source: Source,
-        private val savePath: Path,
+        private val savePath: Path
     ): BaseRelease(source) {
         @Stable
         data class ReleaseResult(

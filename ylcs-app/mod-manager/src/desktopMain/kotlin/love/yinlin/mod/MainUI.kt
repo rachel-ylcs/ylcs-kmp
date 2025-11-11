@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
@@ -29,6 +30,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
+import love.yinlin.compose.rememberDerivedState
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.screen.resources.Res
@@ -192,20 +194,29 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
 
     @Composable
     private fun ModCard(modifier: Modifier = Modifier, item: ModItem) {
+        val needRename = remember(item) { item.path.name != item.name }
+
         ContextMenuArea(items = {
-            listOf(
-                ContextMenuItem("预览") {
+            buildList {
+                add(ContextMenuItem("预览") {
                     modDetailsSheet.open(item)
-                },
-                ContextMenuItem("删除") {
+                })
+                add(ContextMenuItem("删除") {
                     launch {
                         if (slot.confirm.openSuspend(content = "真的要删除 ${item.name} 吗")) {
                             item.path.deleteRecursively()
                             library.removeAll { it == item }
                         }
                     }
+                })
+                if (needRename) {
+                    add(ContextMenuItem("重命名") {
+                        launch {
+                            item.path.rename(item.name)?.let { loadLibrary() }
+                        }
+                    })
                 }
-            )
+            }
         }) {
             Box(modifier = modifier) {
                 Column(modifier = Modifier.fillMaxWidth().clickable {
@@ -218,6 +229,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                         contentScale = ContentScale.Crop
                     )
+
                     Text(
                         text = item.name,
                         color = when {
@@ -225,6 +237,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                             item.selected -> MaterialTheme.colorScheme.onPrimaryContainer
                             else -> MaterialTheme.colorScheme.onSurface
                         },
+                        style = if (needRename) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
+                        textDecoration = if (needRename) TextDecoration.LineThrough else null,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
