@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Comment
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -39,11 +40,13 @@ import love.yinlin.common.Paths
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.OffsetLayout
@@ -54,6 +57,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.delete
@@ -69,6 +73,7 @@ import love.yinlin.platform.Platform
 import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.platform.platform
+import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.screen.community.UserBar
 
 @Stable
@@ -237,6 +242,52 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         }
     }
 
+    private suspend fun onSendComment(content: String): Boolean {
+        app.config.userProfile?.let { user ->
+            val result = ClientAPI.request(
+                route = API.User.Song.SendSongComment,
+                data = API.User.Song.SendSongComment.Request(
+                    token = app.config.userToken,
+                    sid = sid,
+                    content = content
+                )
+            )
+            when (result) {
+                is Data.Success -> {
+                    pageComments.items += SongComment(
+                        cid = result.data,
+                        uid = user.uid,
+                        ts = DateEx.CurrentString,
+                        content = content,
+                        name = user.name,
+                        label = user.label,
+                        exp = user.exp
+                    )
+                    listState.animateScrollToItem(pageComments.items.size - 1)
+                    return true
+                }
+                is Data.Failure -> slot.tip.error(result.message)
+            }
+        }
+        return false
+    }
+
+    private suspend fun onDeleteComment(cid: Long) {
+        if (slot.confirm.openSuspend(content = "删除评论")) {
+            val result = ClientAPI.request(
+                route = API.User.Song.DeleteSongComment,
+                data = API.User.Song.DeleteSongComment.Request(
+                    token = app.config.userToken,
+                    cid = cid
+                )
+            )
+            when (result) {
+                is Data.Success -> pageComments.items.removeAll { it.cid == cid }
+                is Data.Failure -> slot.tip.error(result.message)
+            }
+        }
+    }
+
     override suspend fun initialize() {
         clientSong = requestClientSong()
         launch { remoteSong = requestRemoteSong() }
@@ -401,6 +452,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     @Composable
     private fun ActionScope.ResourceItemActionLayout(type: ModResourceType) {
+        // TODO: 等待重做
         when (type) {
             ModResourceType.Config -> {
 
@@ -510,14 +562,25 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             }
         }
         Action(Icons.Outlined.Share, "分享") {
-
+            slot.tip.info("敬请期待")
         }
     }
 
     @Composable
-    override fun BottomBar() {
-        if (app.config.userProfile != null) {
-
+    private fun SongCommentHeader() {
+        LoadingClickText(
+            text = "写歌评",
+            icon = Icons.AutoMirrored.Outlined.Comment,
+            enabled = app.config.userProfile != null,
+            onClick = {
+                commentDialog.openSuspend()?.let { input ->
+                    onSendComment(input)
+                }
+            },
+            modifier = Modifier.padding(bottom = CustomTheme.padding.verticalSpace)
+        )
+        if (pageComments.items.isEmpty()) {
+            Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) { SimpleEmptyBox() }
         }
     }
 
@@ -536,9 +599,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                 time = comment.ts,
                 label = comment.label,
                 level = comment.level,
-                onAvatarClick = {
-
-                }
+                onAvatarClick = { navigate(::ScreenUserCard, comment.uid) }
             )
             SelectionContainer {
                 Text(
@@ -557,7 +618,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                             text = "删除",
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.clickable {
-
+                                launch { onDeleteComment(comment.cid) }
                             }.padding(CustomTheme.padding.littleValue)
                         )
                     }
@@ -583,15 +644,8 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                 DetailsLayout(modifier = Modifier.fillMaxWidth())
                 HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
                 ResourceLayout(modifier = Modifier.fillMaxWidth())
-                HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
-                Text(
-                    text = "评论",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace, bottom = CustomTheme.padding.verticalExtraSpace)
-                )
-                if (pageComments.items.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) { SimpleEmptyBox() }
-                }
+                HorizontalDivider(modifier = Modifier.padding(top = CustomTheme.padding.verticalExtraSpace * 2))
+                SongCommentHeader()
             }
         ) {
             SongCommentLayout(
@@ -636,14 +690,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     .fillMaxHeight()
                     .padding(CustomTheme.padding.value),
                 header = {
-                    Text(
-                        text = "评论",
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace)
-                    )
-                    if (pageComments.items.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) { SimpleEmptyBox() }
-                    }
+                    SongCommentHeader()
                 }
             ) {
                 SongCommentLayout(
@@ -661,6 +708,14 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             Device.Type.LANDSCAPE -> Landscape()
         }
     }
+
+    private val commentDialog = this land FloatingDialogInput(
+        hint = "留下你的足迹...",
+        maxLength = 1024,
+        maxLines = 5,
+        minLines = 1,
+        clearButton = false
+    )
 
     private val downloadDialog = this land FloatingDownloadDialog()
 }

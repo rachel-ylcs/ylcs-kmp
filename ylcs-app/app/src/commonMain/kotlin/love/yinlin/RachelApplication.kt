@@ -247,15 +247,9 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
                         }
                     }
                     "/openSong" -> {
-//                        uri.params["id"]?.let { id ->
-//                            manager.top.launch {
-//                                val result = ClientAPI.request(
-//                                    route = API.User.Song.GetSong,
-//                                    data = id
-//                                )
-//                                if (result is Data.Success) manager.navigate(ScreenSongDetails.Args(result.data))
-//                            }
-//                        }
+                        uri.params["id"]?.let { id ->
+                            manager.navigate(::ScreenMusicDetails, id)
+                        }
                     }
                 }
             }
