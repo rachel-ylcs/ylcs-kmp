@@ -230,6 +230,9 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             shape = shape,
             title = "推广"
         ) {
+            Item("抽奖", ExtraIcons.Gift) {
+                
+            }
             Item("水群", ExtraIcons.QQ) {
                 launch {
                     Platform.use(

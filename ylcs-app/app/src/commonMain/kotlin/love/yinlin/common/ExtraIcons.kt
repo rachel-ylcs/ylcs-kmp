@@ -1905,7 +1905,53 @@ data object ExtraIcons {
             moveToRelative(0f, 320f)
         }.build()
     }
-    
+
+    val Gift by lazy {
+        ImageVector.Builder(
+            name = "Gift",
+            defaultWidth = 16.dp,
+            defaultHeight = 16.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).path(
+            stroke = SolidColor(Colors.Black),
+            strokeLineWidth = 1.5f,
+            strokeLineCap = StrokeCap.Round,
+            strokeLineJoin = StrokeJoin.Round
+        ) {
+            moveTo(21f, 11.25f)
+            verticalLineTo(19.5f)
+            curveTo(21f, 20.3284f, 20.3284f, 21f, 19.5f, 21f)
+            horizontalLineTo(5.25f)
+            curveTo(4.42157f, 21f, 3.75f, 20.3284f, 3.75f, 19.5f)
+            verticalLineTo(11.25f)
+            moveTo(12f, 4.875f)
+            curveTo(12f, 3.42525f, 10.8247f, 2.25f, 9.375f, 2.25f)
+            curveTo(7.92525f, 2.25f, 6.75f, 3.42525f, 6.75f, 4.875f)
+            curveTo(6.75f, 6.32475f, 7.92525f, 7.5f, 9.375f, 7.5f)
+            curveTo(10.1095f, 7.5f, 12f, 7.5f, 12f, 7.5f)
+            moveTo(12f, 4.875f)
+            curveTo(12f, 5.59024f, 12f, 7.5f, 12f, 7.5f)
+            moveTo(12f, 4.875f)
+            curveTo(12f, 3.42525f, 13.1753f, 2.25f, 14.625f, 2.25f)
+            curveTo(16.0747f, 2.25f, 17.25f, 3.42525f, 17.25f, 4.875f)
+            curveTo(17.25f, 6.32475f, 16.0747f, 7.5f, 14.625f, 7.5f)
+            curveTo(13.8905f, 7.5f, 12f, 7.5f, 12f, 7.5f)
+            moveTo(12f, 7.5f)
+            verticalLineTo(21f)
+            moveTo(3.375f, 11.25f)
+            horizontalLineTo(21.375f)
+            curveTo(21.9963f, 11.25f, 22.5f, 10.7463f, 22.5f, 10.125f)
+            verticalLineTo(8.625f)
+            curveTo(22.5f, 8.00368f, 21.9963f, 7.5f, 21.375f, 7.5f)
+            horizontalLineTo(3.375f)
+            curveTo(2.75368f, 7.5f, 2.25f, 8.00368f, 2.25f, 8.625f)
+            verticalLineTo(10.125f)
+            curveTo(2.25f, 10.7463f, 2.75368f, 11.25f, 3.375f, 11.25f)
+            close()
+        }.build()
+    }
+
     val QQ by lazy {
         ImageVector.Builder(
             name = "QQ",
