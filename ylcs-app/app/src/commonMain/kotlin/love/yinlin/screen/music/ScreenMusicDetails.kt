@@ -1,23 +1,18 @@
 package love.yinlin.screen.music
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,7 +20,15 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.Local
 import love.yinlin.api.API
@@ -35,32 +38,39 @@ import love.yinlin.api.ServerRes
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
-import love.yinlin.compose.Colors
-import love.yinlin.compose.CustomTheme
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberDerivedState
+import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.OffsetLayout
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
+import love.yinlin.compose.ui.layout.SimpleEmptyBox
 import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
-import love.yinlin.extension.exists
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.readText
+import love.yinlin.extension.size
+import love.yinlin.platform.Coroutines
+import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.screen.community.UserBar
 
 @Stable
 class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Screen(manager) {
-    private var clientSong: Song? by mutableStateOf(requestClientSong())
+    private val clientResources = mutableStateListOf<ResourceItem>()
+    private val remoteResources = mutableStateListOf<ResourceItem>()
+
+    private var clientSong: Song? by mutableStateOf(null)
     private var remoteSong: Song? by mutableStateOf(null)
-    private var isClient: Boolean by mutableStateOf(true)
 
     private val pageComments = object : Pagination<SongComment, Long, Long>(
         default = 0L,
@@ -72,30 +82,73 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     private val listState = LazyListState()
 
-    override val title: String by derivedStateOf { (if (isClient) clientSong else remoteSong)?.name ?: "未知歌曲" }
+    override val title: String by derivedStateOf { clientSong?.name ?: remoteSong?.name ?: "未知歌曲" }
 
     private fun Song.clientPath(type: ModResourceType): Path = Path(Paths.modPath, this.sid, type.filename)
     private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(type.filename)}"
 
-    private fun requestClientSong(): Song? = app.mp.library[sid]?.let { musicInfo ->
-        Song(
-            sid = musicInfo.id,
-            version = musicInfo.version,
-            name = musicInfo.name,
-            singer = musicInfo.singer,
-            lyricist = musicInfo.lyricist,
-            composer = musicInfo.composer,
-            album = musicInfo.album,
-            animation = musicInfo.path(Paths.modPath, ModResourceType.Animation).exists,
-            video = musicInfo.path(Paths.modPath, ModResourceType.Video).exists,
-            rhyme = musicInfo.path(Paths.modPath, ModResourceType.Rhyme).exists
-        )
+    @Stable
+    private data class ResourceItem(
+        val type: ModResourceType,
+        val size: Int?,
+    ) {
+        val color: Brush get() = when (type) {
+            ModResourceType.Config -> Brush.linearGradient(listOf(Colors.Yellow4, Colors.Yellow5, Colors.Yellow6))
+            ModResourceType.Audio -> Brush.linearGradient(listOf(Colors.Pink3, Colors.Pink4, Colors.Pink5))
+            ModResourceType.Record -> Brush.linearGradient(listOf(Colors.Purple3, Colors.Purple4, Colors.Purple5))
+            ModResourceType.Background -> Brush.linearGradient(listOf(Colors.Blue3, Colors.Blue4, Colors.Blue5))
+            ModResourceType.LineLyrics -> Brush.linearGradient(listOf(Colors.Green5, Colors.Green6, Colors.Green7))
+            ModResourceType.Animation -> Brush.linearGradient(listOf(Colors.Orange3, Colors.Orange4, Colors.Orange5))
+            ModResourceType.Video -> Brush.linearGradient(listOf(Colors.Green3, Colors.Green4, Colors.Green5))
+            ModResourceType.Rhyme -> Brush.linearGradient(listOf(Colors.Cyan3, Colors.Cyan4, Colors.Cyan5))
+        }
+
+        val icon: ImageVector get() = when (type) {
+            ModResourceType.Config -> Icons.Outlined.Construction
+            ModResourceType.Audio -> Icons.Outlined.AudioFile
+            ModResourceType.Record -> Icons.Outlined.Album
+            ModResourceType.Background -> Icons.Outlined.Image
+            ModResourceType.LineLyrics -> Icons.Outlined.Lyrics
+            ModResourceType.Animation -> Icons.Outlined.GifBox
+            ModResourceType.Video -> Icons.Outlined.Movie
+            ModResourceType.Rhyme -> Icons.Outlined.MusicNote
+        }
     }
 
-    private suspend fun requestRemoteSong(): Song? = (ClientAPI.request(
-        route = API.User.Song.GetSong,
-        data = sid
-    ) as? Data.Success)?.data
+    private fun requestClientSong(): Song? {
+        val musicInfo = app.mp.library[sid]
+        return if (musicInfo != null) {
+            val items = ModResourceType.entries.associateWith { musicInfo.path(Paths.modPath, it).size.toInt() }
+            clientResources.addAll(items.filter { it.value > 0 }.map { ResourceItem(it.key, it.value) })
+            Song(
+                sid = musicInfo.id,
+                version = musicInfo.version,
+                name = musicInfo.name,
+                singer = musicInfo.singer,
+                lyricist = musicInfo.lyricist,
+                composer = musicInfo.composer,
+                album = musicInfo.album,
+                animation = (items[ModResourceType.Animation] ?: 0) > 0,
+                video = (items[ModResourceType.Video] ?: 0) > 0,
+                rhyme = (items[ModResourceType.Rhyme] ?: 0) > 0
+            )
+        } else null
+    }
+
+    private suspend fun requestRemoteSong(): Song? {
+        val result = ClientAPI.request(
+            route = API.User.Song.GetSong,
+            data = sid
+        )
+        return if (result is Data.Success) {
+            val data = result.data
+            remoteResources.addAll(ModResourceType.BASE.map { ResourceItem(it, null) })
+            if (data.animation) remoteResources.add(ResourceItem(ModResourceType.Animation, null))
+            if (data.video) remoteResources.add(ResourceItem(ModResourceType.Video, null))
+            if (data.rhyme) remoteResources.add(ResourceItem(ModResourceType.Rhyme, null))
+            data
+        } else null
+    }
 
     private suspend fun requestNewSongComments() {
         val result = ClientAPI.request(
@@ -124,63 +177,219 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     override suspend fun initialize() {
+        clientSong = requestClientSong()
         launch { remoteSong = requestRemoteSong() }
         launch { requestNewSongComments() }
     }
 
     @Composable
     private fun DetailsLayout(modifier: Modifier = Modifier) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            val currentSong by rememberDerivedState { if (isClient) clientSong else remoteSong }
-            Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f).background(Colors.Black)) {
-                currentSong?.let { song ->
-                    if (isClient) {
-                        LocalFileImage(
-                            path = { song.clientPath(ModResourceType.Record) },
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+        Box(modifier = modifier) {
+            val song by rememberDerivedState { clientSong ?: remoteSong }
+
+            Box(modifier = Modifier.padding(bottom = 48.dp).matchParentSize().shadow(CustomTheme.shadow.surface).background(Colors.Black).zIndex(1f)) {
+                clientSong?.let {
+                    LocalFileImage(
+                        path = { it.clientPath(ModResourceType.Background) },
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } ?: remoteSong.let {
+                    WebImage(
+                        uri = remember(song) { it?.remotePath(ModResourceType.Background) ?: "" },
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.fillMaxWidth().zIndex(2f)) {
+                Box(modifier = Modifier.fillMaxWidth().aspectRatio(3f))
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = CustomTheme.padding.horizontalExtraSpace,
+                        vertical = CustomTheme.padding.verticalExtraSpace
+                    ).fillMaxWidth().shadow(
+                        elevation = CustomTheme.shadow.surface,
+                        shape = MaterialTheme.shapes.extraLarge.copy(topStart = CornerSize(0), topEnd = CornerSize(0)),
+                        clip = false
+                    ).background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.extraLarge.copy(topStart = CornerSize(0), topEnd = CornerSize(0))
+                    ).padding(CustomTheme.padding.equalValue),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
+                ) {
+                    var showLyrics by rememberFalse()
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        NormalText(
+                            text = song?.sid ?: "0",
+                            icon = Icons.Outlined.Loyalty,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                        OffsetLayout(y = (-48).dp) {
+                            Box(
+                                modifier = Modifier.size(96.dp)
+                                    .clip(CircleShape)
+                                    .border(
+                                        width = CustomTheme.border.medium,
+                                        shape = CircleShape,
+                                        color = MaterialTheme.colorScheme.surface
+                                    ).clickable(enabled = clientSong != null) {
+                                        showLyrics = !showLyrics
+                                    }
+                            ) {
+                                clientSong?.let {
+                                    LocalFileImage(
+                                        path = { it.clientPath(ModResourceType.Record) },
+                                        modifier = Modifier.fillMaxSize(),
+                                        circle = true,
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } ?: remoteSong.let {
+                                    WebImage(
+                                        uri = remember(song) { it?.remotePath(ModResourceType.Record) ?: "" },
+                                        modifier = Modifier.fillMaxSize(),
+                                        circle = true,
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                        }
+                        NormalText(
+                            text = "v${song?.version ?: "?.?"}",
+                            icon = ExtraIcons.Artist,
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
+
+                    Text(
+                        text = if (showLyrics) "歌词" else song?.name ?: "未知歌曲",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(CustomTheme.padding.extraValue).align(Alignment.CenterHorizontally)
+                    )
+
+                    if (showLyrics) {
+                        var lyrics by rememberState { "" }
+
+                        LaunchedEffect(Unit) {
+                            lyrics = Coroutines.io {
+                                catchingDefault("") { LrcParser(clientSong!!.clientPath(ModResourceType.LineLyrics).readText()!!).plainText }
+                            }
+                        }
+
+                        SelectionContainer {
+                            Text(
+                                text = lyrics,
+                                modifier = Modifier.fillMaxWidth().aspectRatio(2f).verticalScroll(rememberScrollState())
+                            )
+                        }
+                    }
                     else {
-                        WebImage(
-                            uri = remember(song) { song.remotePath(ModResourceType.Record) },
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                        NormalText(
+                            text = "演唱: ${song?.singer ?: "未知"}",
+                            icon = ExtraIcons.Artist
+                        )
+                        NormalText(
+                            text = "作词: ${song?.lyricist ?: "未知"}",
+                            icon = Icons.Outlined.Lyrics
+                        )
+                        NormalText(
+                            text = "作曲: ${song?.composer ?: "未知"}",
+                            icon = Icons.Outlined.Lyrics
+                        )
+                        NormalText(
+                            text = "专辑: ${song?.album ?: "未知"}",
+                            icon = Icons.Outlined.Album
                         )
                     }
                 }
-            }
-        }
-        Surface(
-            modifier = modifier,
-            shadowElevation = CustomTheme.shadow.surface
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue),
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
-            ) {
-                val song by rememberDerivedState { clientSong ?: remoteSong }
             }
         }
     }
 
     @Composable
     private fun ResourceLayout(modifier: Modifier = Modifier) {
+        Column(modifier = modifier) {
+            Text(
+                text = "资源",
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.extraValue),
+            )
+            for (item in clientResources) {
+                Box(
+                    modifier = Modifier.width(CustomTheme.size.cellWidth)
+                        .shadow(
+                            elevation = CustomTheme.shadow.surface,
+                            shape = MaterialTheme.shapes.extraLarge
+                        )
+                        .background(
+                            brush = remember(item) { item.color },
+                            shape = MaterialTheme.shapes.extraLarge
+                        )
+                        .clickable {}
+                        .padding(CustomTheme.padding.equalValue)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            MiniIcon(
+                                icon = item.icon,
+                                color = Colors.White
+                            )
+                            Text(
+                                text = item.type.description,
+                                color = Colors.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Text(
+                            text = item.type.name,
+                            color = Colors.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text(
+                            text = remember(item) { item.size?.toLong()?.fileSizeString ?: "" },
+                            color = Colors.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace, Alignment.End)
+                        ) {
 
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Composable
     override fun ActionScope.RightActions() {
-        if (remoteSong != null) {
-            Action(
-                icon = if (isClient) Icons.Outlined.CloudDone else Icons.Outlined.AudioFile,
-                tip = if (isClient) "云端版本" else "本地版本"
-            ) {
-                isClient = !isClient
-            }
-        }
         Action(Icons.Outlined.Share, "分享") {
 
         }
@@ -253,7 +462,17 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
             header = {
                 DetailsLayout(modifier = Modifier.fillMaxWidth())
+                HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
                 ResourceLayout(modifier = Modifier.fillMaxWidth())
+                HorizontalDivider(modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace * 2))
+                Text(
+                    text = "评论",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace, bottom = CustomTheme.padding.verticalExtraSpace)
+                )
+                if (pageComments.items.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) { SimpleEmptyBox() }
+                }
             }
         ) {
             SongCommentLayout(
@@ -296,7 +515,17 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                     .padding(immersivePadding.withoutStart)
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(CustomTheme.padding.value)
+                    .padding(CustomTheme.padding.value),
+                header = {
+                    Text(
+                        text = "评论",
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.padding(vertical = CustomTheme.padding.verticalExtraSpace)
+                    )
+                    if (pageComments.items.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) { SimpleEmptyBox() }
+                    }
+                }
             ) {
                 SongCommentLayout(
                     comment = it,

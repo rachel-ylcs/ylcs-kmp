@@ -22,6 +22,7 @@ fun LocalFileImage(
     modifier: Modifier = Modifier,
     circle: Boolean = false,
     contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
     alpha: Float = 1f,
     animated: Boolean = true,
     onClick: (() -> Unit)? = null
@@ -34,7 +35,7 @@ fun LocalFileImage(
             uri = rememberWebImageKeyUrl(baseUri, baseKey),
             contentDescription = null,
             state = state,
-            alignment = Alignment.Center,
+            alignment = alignment,
             contentScale = contentScale,
             filterQuality = ImageQuality.Full.filterQuality,
             alpha = alpha,
