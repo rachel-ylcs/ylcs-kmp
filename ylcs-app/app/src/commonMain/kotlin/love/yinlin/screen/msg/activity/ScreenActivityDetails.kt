@@ -8,11 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddLocation
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,12 +35,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
-import love.yinlin.resources.Res
-import love.yinlin.resources.img_damai
-import love.yinlin.resources.img_maoyan
-import love.yinlin.resources.img_showstart
-import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.compose.ui.image.MiniIcon
+import love.yinlin.resources.*
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage

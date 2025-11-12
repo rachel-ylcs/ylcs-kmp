@@ -106,14 +106,14 @@ fun TextInput(
                 imeAction = imeAction
             )
         },
-        keyboardActions = remember(imeAction, onImeClick) {
+        keyboardActions = remember(imeAction, onImeClick, maxLines) {
             KeyboardActions(
-                onDone = if (imeAction == ImeAction.Done && onImeClick != null) onImeClick else null,
-                onGo = if (imeAction == ImeAction.Go && onImeClick != null) onImeClick else null,
-                onNext = if (imeAction == ImeAction.Next && onImeClick != null) onImeClick else null,
-                onPrevious = if (imeAction == ImeAction.Previous && onImeClick != null) onImeClick else null,
-                onSearch = if (imeAction == ImeAction.Search && onImeClick != null) onImeClick else null,
-                onSend = if (imeAction == ImeAction.Send && onImeClick != null) onImeClick else null,
+                onDone = if (imeAction == ImeAction.Done && onImeClick != null && maxLines == 1) onImeClick else null,
+                onGo = if (imeAction == ImeAction.Go && onImeClick != null && maxLines == 1) onImeClick else null,
+                onNext = if (imeAction == ImeAction.Next && onImeClick != null && maxLines == 1) onImeClick else null,
+                onPrevious = if (imeAction == ImeAction.Previous && onImeClick != null && maxLines == 1) onImeClick else null,
+                onSearch = if (imeAction == ImeAction.Search && onImeClick != null && maxLines == 1) onImeClick else null,
+                onSend = if (imeAction == ImeAction.Send && onImeClick != null && maxLines == 1) onImeClick else null,
             )
         },
         singleLine = maxLines.coerceAtLeast(1) == 1,
