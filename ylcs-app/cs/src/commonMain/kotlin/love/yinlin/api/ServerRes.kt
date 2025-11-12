@@ -47,7 +47,4 @@ data object ServerRes : ResNode("public") {
             }
         }
     }
-
-    val Server = ResNode(this, "server.json")
-    val Update = ResNode(this, "update.json")
 }

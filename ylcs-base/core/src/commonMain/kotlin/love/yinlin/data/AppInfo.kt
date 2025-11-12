@@ -5,5 +5,7 @@ data class AppInfo(
     val name: String,
     val version: Int,
     val versionName: String,
+    val minVersion: Int,
+    val minVersionName: String,
     val packageName: String
 )

@@ -79,6 +79,8 @@ afterEvaluate {
                     name = "${C.app.displayName}",
                     version = ${C.app.version},
                     versionName = "${C.app.versionName}",
+                    minVersion = ${C.app.minVersion},
+                    minVersionName = "${C.app.minVersionName}",
                     packageName = "${C.app.packageName}",
                 )
                 

@@ -239,7 +239,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun checkUpdate() {
-        when (val result = ClientAPI.request<ServerStatus>(route = ServerRes.Server)) {
+        when (val result = ClientAPI.request(API.Common.Status.GetServerStatus)) {
             is Data.Success -> {
                 val data = result.data
                 if (data.targetVersion > Local.info.version) slot.tip.warning("新版本${data.targetVersion}可用")

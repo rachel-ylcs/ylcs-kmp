@@ -15,6 +15,7 @@ import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.photo.PhotoAlbumList
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
+import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.data.rachel.topic.Comment
@@ -24,6 +25,10 @@ import love.yinlin.platform.Platform
 
 object API : APINode(null, "") {
 	object Common : APINode(this, "common") {
+		object Status : APINode(this, "status") {
+			object GetServerStatus : APIGetResponse<ServerStatus>(this, "getServerStatus")
+		}
+
 		object Photo : APINode(this, "photo") {
 			object SearchPhotoAlbums : APIPost<SearchPhotoAlbums.Request, PhotoAlbumList>(this, "searchPhotoAlbums") {
 				@Serializable
