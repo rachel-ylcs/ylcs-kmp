@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.files.Path
+import love.yinlin.About
 import love.yinlin.Local
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
