@@ -296,7 +296,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 				}
 			}
 
-			activity.content?.let { content ->
+			activity.content?.ifEmpty { null }?.let { content ->
 				Text(
 					text = "服务说明",
 					style = MaterialTheme.typography.labelMedium,
