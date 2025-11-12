@@ -88,7 +88,7 @@ afterEvaluate {
                 const val API_HOST: String = "${C.host.apiHost}"
                 
                 val API_BASE_URL: String = run {
-                    if (platform == Platform.WebWasm) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
+                    if (platform == Platform.WebWasm && DEVELOPMENT) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
                 }
             }
         """.trimIndent()
