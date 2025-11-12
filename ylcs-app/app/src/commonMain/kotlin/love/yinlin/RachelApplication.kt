@@ -193,7 +193,6 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
             // 活动
             screen(::ScreenActivityDetails)
-            screen(::ScreenAddActivity)
             screen(::ScreenModifyActivity)
             screen(::ScreenActivityLink)
 

@@ -1,229 +1,610 @@
 package love.yinlin.screen.msg.activity
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.ui.util.fastMap
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
+import kotlinx.datetime.LocalDate
 import kotlinx.io.files.Path
+import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.api.API
 import love.yinlin.api.ClientAPI
 import love.yinlin.app
+import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.graphics.ImageCompress
+import love.yinlin.compose.graphics.ImageCrop
 import love.yinlin.compose.graphics.ImageProcessor
+import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.Data
-import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
+import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.image.ImageAdder
+import love.yinlin.compose.ui.image.ReplaceableImage
+import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.ClickText
+import love.yinlin.compose.ui.input.DockedDatePicker
+import love.yinlin.compose.ui.input.LoadingClickText
+import love.yinlin.compose.ui.text.TextInput
+import love.yinlin.compose.ui.text.TextInputState
+import love.yinlin.data.rachel.activity.ActivityLink
+import love.yinlin.data.rachel.activity.ActivityPrice
+import love.yinlin.extension.Array
+import love.yinlin.extension.ArrayEmpty
+import love.yinlin.extension.DateEx
+import love.yinlin.extension.Object
 import love.yinlin.extension.rawSource
+import love.yinlin.extension.read
 import love.yinlin.extension.safeRawSources
+import love.yinlin.extension.to
+import love.yinlin.extension.toJson
+import love.yinlin.screen.community.BoxText
 
 @Stable
 class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Screen(manager) {
+	private val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
+	private val activity = activities.find { it.aid == aid }!!
+	private val initDate = activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }
+
+	private val inputShortTitle = TextInputState(activity.shortTitle ?: "")
+	private val inputTitle = TextInputState(activity.title ?: "")
+	private var date: LocalDate? by mutableRefStateOf(initDate)
+	private val inputTimeInfo = TextInputState(activity.tsInfo ?: "")
+	private val inputLocation = TextInputState(activity.location ?: "")
+	private val inputContent = TextInputState(activity.content ?: "")
+	private val price = activity.price.toMutableStateList()
+	private val saleTime = activity.saleTime.toMutableStateList()
+	private val lineup = activity.lineup.toMutableStateList()
+	private val playlist = activity.playlist.toMutableStateList()
+	private val inputShowstart = TextInputState(activity.link.showstart ?: "")
+	private val inputDamai = TextInputState(activity.link.damai ?: "")
+	private val inputMaoyan = TextInputState(activity.link.maoyan ?: "")
+	private val inputLink = TextInputState(activity.link.link ?: "")
+	private val inputQQGroupPhone = TextInputState(activity.link.qqGroupPhone ?: "")
+	private val inputQQGroupLink = TextInputState(activity.link.qqGroupLink ?: "")
+
+	private var photo by mutableRefStateOf(activity.photo)
+
+	private val canSubmit by derivedStateOf {
+        !inputShortTitle.overflow && !inputTitle.overflow && !inputTimeInfo.overflow && !inputLocation.overflow && !inputContent.overflow
+				&& !inputShowstart.overflow && !inputDamai.overflow && !inputMaoyan.overflow && !inputLink.overflow
+				&& !inputQQGroupPhone.overflow && !inputQQGroupLink.overflow
+    }
+
+	private suspend fun updateActivity() {
+		val ts = date?.let { DateEx.Formatter.standardDate.format(it) }
+		val tsInfo = inputTimeInfo.text
+		val location = inputLocation.text
+		val shortTitle = inputShortTitle.text
+		val title = inputTitle.text
+		val content = inputContent.text
+		val link = ActivityLink(
+			showstart = inputShowstart.text,
+			damai = inputDamai.text,
+			maoyan = inputMaoyan.text,
+			link = inputLink.text,
+			qqGroupPhone = inputQQGroupPhone.text,
+			qqGroupLink = inputQQGroupLink.text,
+		)
+		val newActivity = Activity(
+			aid = aid,
+			ts = ts,
+			tsInfo = tsInfo,
+			location = location,
+			shortTitle = shortTitle,
+			title = title,
+			content = content,
+			price = price,
+			saleTime = saleTime,
+			lineup = lineup,
+			link = link,
+			playlist = playlist
+		)
+		val result = ClientAPI.request(
+			route = API.User.Activity.UpdateActivityInfo,
+			data = API.User.Activity.UpdateActivityInfo.Request(
+				token = app.config.userToken,
+				activity = newActivity
+			)
+		)
+		when (result) {
+			is Data.Success -> {
+				activities.findAssign(predicate = { it.aid == aid }) {
+					it.copy(
+						ts = ts,
+						tsInfo = tsInfo,
+						location = location,
+						shortTitle = shortTitle,
+						title = title,
+						content = content,
+						price = price,
+						saleTime = saleTime,
+						lineup = lineup,
+						link = link,
+						playlist = playlist
+					)
+				}
+				pop()
+			}
+			is Data.Failure -> slot.tip.error(result.message)
+		}
+	}
+
+	private suspend fun updatePhoto(key: String, path: Path) {
+		slot.loading.openSuspend()
+		val result = ClientAPI.request(
+			route = API.User.Activity.UpdateActivityPhoto,
+			data = API.User.Activity.UpdateActivityPhoto.Request(
+				token = app.config.userToken,
+				aid = aid,
+				key = key
+			),
+			files = { API.User.Activity.UpdateActivityPhoto.Files(
+				pic = file(path.rawSource)
+			) }
+		)
+		when (result) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+				val newPic = result.data
+				photo = photo.toJson().Object.toMutableMap().let { map ->
+					map[key] = JsonPrimitive(newPic)
+					map.toJson().to()
+				}
+				it.copy(photo = photo)
+			}
+			is Data.Failure -> slot.tip.error(result.message)
+		}
+		slot.loading.close()
+	}
+
+	private suspend fun deletePhoto(key: String) {
+		slot.loading.openSuspend()
+		val result = ClientAPI.request(
+			route = API.User.Activity.DeleteActivityPhoto,
+			data = API.User.Activity.DeleteActivityPhoto.Request(
+				token = app.config.userToken,
+				aid = aid,
+				key = key
+			)
+		)
+		when (result) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+				photo = photo.toJson().Object.toMutableMap().let { map ->
+					map.remove(key)
+					map.toJson().to()
+				}
+				it.copy(photo = photo)
+			}
+			is Data.Failure -> slot.tip.error(result.message)
+		}
+		slot.loading.close()
+	}
+
+	private suspend fun addPhotos(key: String, files: List<Path>) {
+		slot.loading.openSuspend()
+		val result = ClientAPI.request(
+			route = API.User.Activity.AddActivityPhotos,
+			data = API.User.Activity.AddActivityPhotos.Request(
+				token = app.config.userToken,
+				aid = aid,
+				key = key
+			),
+			files = { API.User.Activity.AddActivityPhotos.Files(
+				pics = file(files.safeRawSources())
+			) }
+		)
+		when (result) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+				val newPics = result.data
+				photo = photo.toJson().Object.toMutableMap().let { map ->
+					map[key] = map[key].ArrayEmpty.toMutableList().also { list ->
+						list += newPics.map { JsonPrimitive(it) }
+					}.toJson()
+					map.toJson().to()
+				}
+				oldActivity.copy(photo = photo)
+			}
+			is Data.Failure -> slot.tip.error(result.message)
+		}
+		slot.loading.close()
+	}
+
+	private suspend fun updatePhotos(key: String, index: Int) {
+		app.picker.pickPicture()?.use { source ->
+			app.os.storage.createTempFile { sink ->
+				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
+			}
+		}?.let { path ->
+			slot.loading.openSuspend()
+			val result = ClientAPI.request(
+				route = API.User.Activity.UpdateActivityPhotos,
+				data = API.User.Activity.UpdateActivityPhotos.Request(
+					token = app.config.userToken,
+					aid = aid,
+					key = key,
+					index = index
+				),
+				files = { API.User.Activity.UpdateActivityPhotos.Files(
+					pic = file(path.rawSource)
+				) }
+			)
+			when (result) {
+				is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+					val newPic = result.data
+					photo = photo.toJson().Object.toMutableMap().let { map ->
+						map[key] = map[key].Array.toMutableList().also { list ->
+							list[index] = JsonPrimitive(newPic)
+						}.toJson()
+						map.toJson().to()
+					}
+					oldActivity.copy(photo = photo)
+				}
+				is Data.Failure -> slot.tip.error(result.message)
+			}
+			slot.loading.close()
+		}
+	}
+
+	private suspend fun deletePhotos(key: String, index: Int) {
+		slot.loading.openSuspend()
+		val result = ClientAPI.request(
+			route = API.User.Activity.DeleteActivityPhotos,
+			data = API.User.Activity.DeleteActivityPhotos.Request(
+				token = app.config.userToken,
+				aid = aid,
+				key = key,
+				index = index
+			)
+		)
+		when (result) {
+			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+				photo = photo.toJson().Object.toMutableMap().let { map ->
+					map[key] = map[key].Array.toMutableList().also { list ->
+						list.removeAt(index)
+					}.toJson()
+					map.toJson().to()
+				}
+				oldActivity.copy(photo = photo)
+			}
+			is Data.Failure -> slot.tip.error(result.message)
+		}
+		slot.loading.close()
+	}
+
+	suspend fun pickPicture(onPicAdd: suspend (Path) -> Unit) {
+		val path = app.picker.pickPicture()?.use { source ->
+			app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+		}
+		if (path != null) {
+			cropDialog.openSuspend(url = path.toString(), aspectRatio = 2f)?.let { rect ->
+				app.os.storage.createTempFile { sink ->
+					path.read { source ->
+						ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
+					}
+				}?.let { onPicAdd(it) }
+			}
+		}
+	}
+
+	suspend fun pickPictures(currentSize: Int, onPicsAdd: suspend (List<Path>) -> Unit) {
+		app.picker.pickPicture((9 - currentSize).coerceAtLeast(1))?.use { sources ->
+			val path = mutableListOf<Path>()
+			for (source in sources) {
+				app.os.storage.createTempFile { sink ->
+					ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
+				}?.let { path += it }
+			}
+			if (path.isNotEmpty()) onPicsAdd(path)
+		}
+	}
+
+	override val title: String = "修改活动"
+
+	@Composable
+	override fun ActionScope.RightActions() {
+		ActionSuspend(
+			icon = Icons.Outlined.Check,
+            tip = "提交",
+			enabled = canSubmit
+		) {
+			updateActivity()
+		}
+	}
+
 	@Composable
 	override fun Content(device: Device) {
-
+		Column(modifier = Modifier
+			.padding(LocalImmersivePadding.current)
+			.fillMaxSize()
+			.padding(CustomTheme.padding.equalValue)
+			.verticalScroll(rememberScrollState()),
+			verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
+		) {
+			TextInput(
+				state = inputShortTitle,
+				hint = "短活动名称(可空, 5字)",
+				maxLength = 5,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputTitle,
+				hint = "活动名称(可空, 32字)",
+				maxLength = 32,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			DockedDatePicker(
+				hint = "活动时间(可空)",
+				initDate = initDate,
+				onDateSelected = { date = it },
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputTimeInfo,
+				hint = "活动时间补充信息(可空, 128字)",
+				maxLength = 128,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputLocation,
+				hint = "活动地点(可空, 32字)",
+				maxLength = 32,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputContent,
+				hint = "活动内容(可空, 512字)",
+				maxLength = 512,
+				maxLines = 5,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			ClickText(
+				text = "添加票价",
+				color = MaterialTheme.colorScheme.tertiary,
+				icon = Icons.Outlined.MonetizationOn,
+				onClick = {
+					price += ActivityPrice(name = "新票种", value = 0)
+				}
+			)
+			FlowRow(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
+			) {
+				for ((index, item) in price.withIndex()) {
+					Surface {
+						Row(modifier = Modifier.padding(CustomTheme.padding.value)) {
+							BoxText(
+								text = item.name,
+								color = MaterialTheme.colorScheme.primary,
+								onClick = {
+									launch {
+										inputDialog.openSuspend()?.let { input ->
+											price[index] = item.copy(name = input)
+										}
+									}
+								}
+							)
+							BoxText(
+								text = item.value.toString(),
+								color = MaterialTheme.colorScheme.secondary,
+								onClick = {
+									launch {
+										inputDialog.openSuspend()?.let { input ->
+											val value = input.toIntOrNull()
+											if (value == null || value < 0) slot.tip.warning("票价非法")
+											else price[index] = item.copy(value = value)
+										}
+									}
+								}
+							)
+							ClickIcon(
+								icon = Icons.Outlined.Close,
+								color = MaterialTheme.colorScheme.onSurface,
+								onClick = { price.removeAt(index) }
+							)
+						}
+					}
+				}
+			}
+			LoadingClickText(
+				text = "添加开售时间",
+				icon = Icons.Outlined.Timer,
+				color = MaterialTheme.colorScheme.tertiary,
+				onClick = {
+					inputDialog.openSuspend(DateEx.TodayString)?.let { input ->
+						if (DateEx.Formatter.standardDate.parse(input) != null) saleTime += input
+						else slot.tip.warning("开售时间格式非法")
+					}
+				}
+			)
+			FlowRow(modifier = Modifier.fillMaxWidth()) {
+				for (item in saleTime) {
+					BoxText(
+						text = item,
+						color = MaterialTheme.colorScheme.primary,
+						onClick = { saleTime.remove(item) }
+					)
+				}
+			}
+			LoadingClickText(
+				text = "添加阵容艺人",
+				icon = Icons.Outlined.People,
+				color = MaterialTheme.colorScheme.tertiary,
+				onClick = {
+					inputDialog.openSuspend()?.let { input ->
+						lineup += input
+					}
+				}
+			)
+			FlowRow(modifier = Modifier.fillMaxWidth()) {
+				for (item in lineup) {
+					BoxText(
+						text = item,
+						color = MaterialTheme.colorScheme.primary,
+						onClick = { lineup.remove(item) }
+					)
+				}
+			}
+			LoadingClickText(
+				text = "添加歌单曲目",
+				icon = Icons.Outlined.MusicNote,
+				color = MaterialTheme.colorScheme.tertiary,
+				onClick = {
+					inputDialog.openSuspend()?.let { input ->
+						playlist += input
+					}
+				}
+			)
+			FlowRow(modifier = Modifier.fillMaxWidth()) {
+				for (item in playlist) {
+					BoxText(
+						text = item,
+						color = MaterialTheme.colorScheme.primary,
+						onClick = { playlist.remove(item) }
+					)
+				}
+			}
+			TextInput(
+				state = inputShowstart,
+				hint = "秀动ID(可空)",
+				maxLength = 1024,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputDamai,
+				hint = "大麦ID(可空)",
+				maxLength = 16,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputMaoyan,
+				hint = "猫眼ID(可空)",
+				maxLength = 16,
+				imeAction = ImeAction.Next,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputLink,
+				hint = "活动链接(可空)",
+				maxLength = 256,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputQQGroupPhone,
+				hint = "QQ群号(可空, 仅手机端)",
+				maxLength = 16,
+				modifier = Modifier.fillMaxWidth()
+			)
+			TextInput(
+				state = inputQQGroupLink,
+				hint = "QQ群分享链接(可空, 非手机端)",
+				maxLength = 128,
+				modifier = Modifier.fillMaxWidth()
+			)
+			Text(
+				text = "轮播图(可空)",
+				style = MaterialTheme.typography.titleMedium
+			)
+			ReplaceableImage(
+				pic = remember(photo) { photo.coverPath },
+				modifier = Modifier.fillMaxWidth().aspectRatio(2f),
+				onReplace = {
+					launch {
+						pickPicture {
+							updatePhoto("cover", it)
+						}
+					}
+				},
+				onDelete = {
+					launch { deletePhoto("cover") }
+				}
+			) { uri ->
+				WebImage(
+					uri = uri,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
+			Text(
+				text = "座位图(可空)",
+				style = MaterialTheme.typography.titleMedium
+			)
+			ReplaceableImage(
+				pic = remember(photo) { photo.seatPath },
+				modifier = Modifier.fillMaxWidth().aspectRatio(2f),
+				onReplace = {
+					launch {
+						pickPicture {
+							updatePhoto("seat", it)
+						}
+					}
+				},
+				onDelete = {
+					launch { deletePhoto("seat") }
+				}
+			) { uri ->
+				WebImage(
+					uri = uri,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
+			Text(
+				text = "活动海报",
+				style = MaterialTheme.typography.titleMedium
+			)
+			ImageAdder(
+				maxNum = 9,
+				pics = photo.posters,
+				size = CustomTheme.size.microCellWidth,
+				modifier = Modifier.fillMaxWidth(),
+				onAdd = {
+					launch {
+						pickPictures(photo.posters.size) {
+							addPhotos("posters", it)
+						}
+					}
+				},
+				onDelete = {
+					launch { deletePhotos("posters", it) }
+				},
+				onClick = { index, _ ->
+					launch { updatePhotos("posters", index) }
+				}
+			) { _, pic ->
+				WebImage(
+					uri = photo.posterPath(pic),
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.fillMaxSize()
+				)
+			}
+		}
 	}
-}
 
-//@Stable
-//class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Screen(manager) {
-//	private val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
-//	private val input = ActivityInputState(activities.find { it.aid == aid })
-//
-//	private suspend fun modifyActivity() {
-//		val ts = input.ts
-//		val title = input.titleString
-//		val content = input.contentString
-//		val showstart = input.showstartString
-//		val damai = input.damaiString
-//		val maoyan = input.maoyanString
-//		val link = input.linkString
-//		val result = ClientAPI.request(
-//			route = API.User.Activity.ModifyActivityInfo,
-//			data = API.User.Activity.ModifyActivityInfo.Request(
-//				token = app.config.userToken,
-//				activity = Activity(
-//					aid = aid,
-//					ts = ts,
-//					title = title,
-//					content = content,
-//					pic = null,
-//					pics = emptyList(),
-//					showstart = showstart,
-//					damai = damai,
-//					maoyan = maoyan,
-//					link = link
-//				)
-//			)
-//		)
-//		when (result) {
-//			is Data.Success -> {
-//				activities.findAssign(predicate = { it.aid == aid }) {
-//					it.copy(
-//						ts = ts,
-//						title = title,
-//						content = content,
-//						showstart = showstart,
-//						damai = damai,
-//						maoyan = maoyan,
-//						link = link
-//					)
-//				}
-//				slot.tip.success(result.message)
-//			}
-//			is Data.Failure -> slot.tip.error(result.message)
-//		}
-//	}
-//
-//	private suspend fun modifyPicture(path: Path) {
-//		slot.loading.openSuspend()
-//		val result = ClientAPI.request(
-//			route = API.User.Activity.ModifyActivityPicture,
-//			data = API.User.Activity.ModifyActivityPicture.Request(
-//				token = app.config.userToken,
-//				aid = aid
-//			),
-//			files = { API.User.Activity.ModifyActivityPicture.Files(
-//				pic = file(path.rawSource)
-//			) }
-//		)
-//		when (result) {
-//			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-//				val newPic = result.data
-//				input.pic = it.picPath(newPic)
-//				it.copy(pic = newPic)
-//			}
-//			is Data.Failure -> slot.tip.error(result.message)
-//		}
-//		slot.loading.close()
-//	}
-//
-//	private suspend fun deletePicture() {
-//		slot.loading.openSuspend()
-//		val result = ClientAPI.request(
-//			route = API.User.Activity.DeleteActivityPicture,
-//			data = API.User.Activity.DeleteActivityPicture.Request(
-//				token = app.config.userToken,
-//				aid = aid
-//			)
-//		)
-//		when (result) {
-//			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-//				input.pic = null
-//				it.copy(pic = null)
-//			}
-//			is Data.Failure -> slot.tip.error(result.message)
-//		}
-//		slot.loading.close()
-//	}
-//
-//	private suspend fun addPictures(files: List<Path>) {
-//		slot.loading.openSuspend()
-//		val result = ClientAPI.request(
-//			route = API.User.Activity.AddActivityPictures,
-//			data = API.User.Activity.AddActivityPictures.Request(
-//				token = app.config.userToken,
-//				aid = aid
-//			),
-//			files = { API.User.Activity.AddActivityPictures.Files(
-//				pics = file(files.safeRawSources())
-//			) }
-//		)
-//		when (result) {
-//			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-//				val newPics = result.data
-//				input.pics += newPics.fastMap { pic -> Picture(it.picPath(pic)) }
-//				it.copy(pics = it.pics + newPics)
-//			}
-//			is Data.Failure -> slot.tip.error(result.message)
-//		}
-//		slot.loading.close()
-//	}
-//
-//	private suspend fun modifyPictures(index: Int) {
-//		app.picker.pickPicture()?.use { source ->
-//			app.os.storage.createTempFile { sink ->
-//				ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
-//			}
-//		}?.let { path ->
-//			slot.loading.openSuspend()
-//			val result = ClientAPI.request(
-//				route = API.User.Activity.ModifyActivityPictures,
-//				data = API.User.Activity.ModifyActivityPictures.Request(
-//					token = app.config.userToken,
-//					aid = aid,
-//					index = index
-//				),
-//				files = { API.User.Activity.ModifyActivityPictures.Files(
-//					pic = file(path.rawSource)
-//				) }
-//			)
-//			when (result) {
-//				is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-//					val newPic = result.data
-//					input.pics[index] = Picture(it.picPath(newPic))
-//					it.copy(pics = it.pics.toMutableList().also { pics -> pics[index] = newPic })
-//				}
-//				is Data.Failure -> slot.tip.error(result.message)
-//			}
-//			slot.loading.close()
-//		}
-//	}
-//
-//	private suspend fun deletePictures(index: Int) {
-//		slot.loading.openSuspend()
-//		val result = ClientAPI.request(
-//			route = API.User.Activity.DeleteActivityPictures,
-//			data = API.User.Activity.DeleteActivityPictures.Request(
-//				token = app.config.userToken,
-//				aid = aid,
-//				index = index
-//			)
-//		)
-//		when (result) {
-//			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-//				input.pics.removeAt(index)
-//				it.copy(pics = it.pics.toMutableList().also { pics -> pics.removeAt(index) })
-//			}
-//			is Data.Failure -> slot.tip.error(result.message)
-//		}
-//		slot.loading.close()
-//	}
-//
-//	override val title: String = "修改活动"
-//
-//	@Composable
-//	override fun ActionScope.RightActions() {
-//		ActionSuspend(
-//			icon = Icons.Outlined.Check,
-//            tip = "提交",
-//			enabled = input.canSubmit
-//		) {
-//			modifyActivity()
-//		}
-//	}
-//
-//	@Composable
-//	override fun Content(device: Device) {
-//        ActivityInfoLayout(
-//            cropDialog = cropDialog,
-//            input = input,
-//            onPicAdd = { launch { modifyPicture(it) } },
-//            onPicDelete = { launch { deletePicture() } },
-//            onPicsAdd = { launch { addPictures(it) } },
-//            onPicsDelete = { launch { deletePictures(it) } },
-//            onPicsClick = { _, index -> launch { modifyPictures(index) } }
-//        )
-//	}
-//
-//	private val cropDialog = this land FloatingDialogCrop()
-//}
+	private val cropDialog = this land FloatingDialogCrop()
+	private val inputDialog = this land FloatingDialogInput(hint = "修改信息", maxLength = 64)
+}

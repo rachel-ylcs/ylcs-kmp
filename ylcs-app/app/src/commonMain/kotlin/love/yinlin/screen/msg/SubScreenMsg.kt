@@ -45,7 +45,6 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.msg.activity.ScreenActivityDetails
-import love.yinlin.screen.msg.activity.ScreenAddActivity
 import love.yinlin.screen.msg.douyin.ScreenDouyin
 import love.yinlin.screen.msg.pictures.ScreenPictures
 import love.yinlin.screen.msg.weibo.*
@@ -89,21 +88,21 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private val calendarState = CalendarState()
 
     private suspend fun requestActivity() {
-        // TODO:
-//        val result = ClientAPI.request(
-//            route = API.User.Activity.GetActivities
-//        )
-//        if (result is Data.Success) activities.replaceAll(result.data.sorted())
+        val result = ClientAPI.request(
+            route = API.User.Activity.GetActivities
+        )
+        if (result is Data.Success) activities.replaceAll(result.data.sorted())
     }
 
-    private fun showActivityDetails(aid: Int) {
-        navigate(::ScreenActivityDetails, aid)
-    }
-
-    private fun onDateClick(date: LocalDate) {
-        DateEx.Formatter.standardDate.format(date)
-            ?.findSelf(activities) { it.ts }
-            ?.let { showActivityDetails(it.aid) }
+    private suspend fun addActivity() {
+        val result = ClientAPI.request(
+			route = API.User.Activity.AddActivity,
+			data = app.config.userToken
+		)
+        when (result) {
+			is Data.Success -> requestActivity()
+			is Data.Failure -> slot.tip.error(result.message)
+		}
     }
 
     @Composable
@@ -112,29 +111,32 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
         shape: Shape,
         modifier: Modifier = Modifier
     ) {
-        // TODO:
-//        val pics by rememberDerivedState { activities.fastFilter { it.pic != null } }
-//        BoxWithConstraints(modifier = modifier) {
-//            Banner(
-//                pics = pics,
-//                interval = 5000L,
-//                gap = gap,
-//                modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
-//            ) { pic, _, scale ->
-//                Surface(
-//                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-//                    shape = shape,
-//                    shadowElevation = CustomTheme.shadow.surface
-//                ) {
-//                    WebImage(
-//                        uri = pic.picPath ?: "",
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier.fillMaxSize(),
-//                        onClick = { showActivityDetails(pic.aid) }
-//                    )
-//                }
-//            }
-//        }
+        val pics by rememberDerivedState { activities.fastFilter { it.photo.coverPath != null } }
+        BoxWithConstraints(modifier = modifier) {
+            Banner(
+                pics = pics,
+                interval = 5000L,
+                gap = gap,
+                modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
+            ) { pic, _, scale ->
+                Surface(
+                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+                    shape = shape,
+                    shadowElevation = CustomTheme.shadow.surface
+                ) {
+                    pic.photo.coverPath?.let { coverPath ->
+                        WebImage(
+                            uri = coverPath,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            onClick = {
+                                navigate(::ScreenActivityDetails, pic.aid)
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     @Composable
@@ -184,7 +186,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
             val events = mutableMapOf<LocalDate, String>()
             for (activity in activities) {
                 val ts = activity.ts
-                val title = activity.title
+                val title = activity.shortTitle ?: activity.title
                 if (ts != null && title != null) {
                     DateEx.Formatter.standardDate.parse(ts)?.let { date ->
                         events.put(date, title)
@@ -204,7 +206,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
                 events = events,
                 actions = actions,
                 modifier = Modifier.fillMaxWidth(),
-                onEventClick = { onDateClick(it) }
+                onEventClick = { date ->
+                    DateEx.Formatter.standardDate.format(date)
+                        ?.findSelf(activities) { it.ts }
+                        ?.let { navigate(::ScreenActivityDetails, it.aid) }
+                }
             )
         }
     }
@@ -219,11 +225,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
             if (date != null) DateEx.Today.until(date, DateTimeUnit.DAY) else null
         }
         val intervalString = remember(interval) { when {
-            interval == null -> ""
+            interval == null -> "未知时间"
             interval == 0L -> "进行中"
             interval > 0L -> ">> ${interval}天"
             interval < 0L -> "<< ${abs(interval)}天"
-            else -> ""
+            else -> "未知时间"
         } }
         val intervalColor = when {
             interval == null -> MaterialTheme.colorScheme.onSurface
@@ -251,7 +257,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
                 },
                 right = {
                     Text(
-                        text = remember(activity) { "${activity.title} / ${activity.ts}" },
+                        text = remember(activity) { "${activity.title ?: "未知活动"} / ${activity.ts ?: "?"}" },
                         style = if (LocalDevice.current.type == Device.Type.PORTRAIT) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -264,8 +270,8 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     @Composable
     private fun ActionScope.ToolBarLayout() {
         if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-            Action(Icons.Outlined.Add, "添加") {
-                navigate(::ScreenAddActivity)
+            ActionSuspend(Icons.Outlined.Add, "添加") {
+                addActivity()
             }
         }
         ActionSuspend(Icons.Outlined.Refresh, "刷新") {
@@ -300,9 +306,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
             ) { activity ->
                 CalendarBarItem(
                     modifier = Modifier.fillMaxWidth().clickable {
-                        activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
-                            onDateClick(it)
-                        }
+                        navigate(::ScreenActivityDetails, activity.aid)
                     },
                     activity = activity
                 )
@@ -349,9 +353,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
                 ) { activity ->
                     CalendarBarItem(
                         modifier = Modifier.fillMaxWidth().clickable {
-                            activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.let {
-                                onDateClick(it)
-                            }
+                            navigate(::ScreenActivityDetails, activity.aid)
                         },
                         activity = activity
                     )

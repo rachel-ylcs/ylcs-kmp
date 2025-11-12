@@ -65,6 +65,7 @@ fun ClickText(
     text: String,
     icon: ImageVector? = null,
     color: Color = MaterialTheme.colorScheme.primary,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
@@ -92,7 +93,7 @@ fun ClickText(
             Text(
                 text = text,
                 color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.labelMedium,
+                style = style,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

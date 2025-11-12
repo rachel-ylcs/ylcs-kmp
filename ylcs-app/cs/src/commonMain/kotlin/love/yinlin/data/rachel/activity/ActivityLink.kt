@@ -12,4 +12,6 @@ data class ActivityLink(
     val link: String? = null, // [网页链接]
     val qqGroupPhone: String? = null, // [手机端QQ官群链接]
     val qqGroupLink: String? = null, // [网页端QQ官群链接]
-)
+) {
+    val enabled: Boolean by lazy { showstart != null || damai != null || maoyan != null || link != null || qqGroupPhone != null || qqGroupLink != null }
+}
