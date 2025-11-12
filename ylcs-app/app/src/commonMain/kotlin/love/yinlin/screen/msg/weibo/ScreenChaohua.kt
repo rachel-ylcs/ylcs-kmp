@@ -45,7 +45,7 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
             canLoading = false
 
             // 微博需要获取subCookie
-            if (WeiboAPI.subCookie == null) WeiboAPI.subCookie = WeiboAPI.generateWeiboSubCookie()
+            if (WeiboAPI.weiboCookie == null) WeiboAPI.weiboCookie = WeiboAPI.generateWeiboCookie()
 
             val result = WeiboAPI.extractChaohua(0L)
             state = if (result is Data.Success) {
@@ -56,7 +56,7 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
                 if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
             }
             else {
-                WeiboAPI.subCookie = null
+                WeiboAPI.weiboCookie = null
                 BoxState.NETWORK_ERROR
             }
         }
@@ -70,7 +70,7 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
             canLoading = newSinceId != 0L
             items += data
         }
-        else WeiboAPI.subCookie = null
+        else WeiboAPI.weiboCookie = null
     }
 
     override val title: String = "超话"

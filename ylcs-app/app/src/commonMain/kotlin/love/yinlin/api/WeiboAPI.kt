@@ -5,8 +5,13 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
+import io.ktor.client.request.accept
+import io.ktor.client.request.prepareGet
 import io.ktor.http.ContentType
+import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
+import io.ktor.http.headers
+import io.ktor.http.setCookie
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.Local
@@ -22,6 +27,7 @@ import love.yinlin.platform.safePost
 import love.yinlin.compose.ui.text.RichContainer
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.buildRichString
+import love.yinlin.platform.safeCall
 
 @Stable
 data object WeiboAPI {
@@ -34,7 +40,14 @@ data object WeiboAPI {
 		ifFalse = { WEIBO_SOURCE_HOST }
 	)
 
-	var subCookie: String? = null
+	@Stable
+	data class WeiboCookie(
+		val sub: String,
+		val subp: String,
+		val xsrfToken: String
+	)
+
+	var weiboCookie: WeiboCookie? = null
 
 	private fun transferWeiboImageUrl(src: String): String = Platform.use(
         Platform.WebWasm,
@@ -225,8 +238,15 @@ data object WeiboAPI {
 		)
 	}
 
-	suspend fun generateWeiboSubCookie(): String? {
-		val result = NetClient.common.safePost(
+	suspend fun generateWeiboCookie(): WeiboCookie? {
+		val result1 = NetClient.common.safeCall { client ->
+			client.prepareGet("https://m.weibo.cn/api/config") {
+				headers { accept(ContentType.Any) }
+			}.execute { response ->
+                response.setCookie().filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { it.value != "deleted" }.value
+            }
+		}
+		val result2 = NetClient.common.safePost(
 			url = "https://visitor.passport.weibo.cn/visitor/genvisitor2",
 			data = "cb=visitor_gray_callback",
 			headers = {
@@ -234,18 +254,28 @@ data object WeiboAPI {
 			}
 		) { str: String ->
 			val json = str.substringAfter("(").substringBeforeLast(")").parseJson.Object
-			json.obj("data")["sub"].String
+			val data = json.obj("data")
+			data["sub"].String to data["subp"].String
 		}
-		return (result as? Data.Success<String>)?.data
+		return if (result1 is Data.Success && result2 is Data.Success) {
+			val xsrfToken = result1.data
+			val (sub, subp) = result2.data
+			WeiboCookie(sub, subp, xsrfToken)
+		} else null
+	}
+
+	private fun HeadersBuilder.buildWeiboCookieHeader() {
+		weiboCookie?.let { cookie ->
+			append(HttpHeaders.Cookie, "SUB=${cookie.sub};SUBP=${cookie.subp};XSRF-TOKEN=${cookie.xsrfToken}")
+			append(HttpHeaders.Referrer, "https://m.weibo.cn")
+		}
 	}
 
 	suspend fun getUserWeibo(
 		uid: String
 	): Data<List<Weibo>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userDetails(uid)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<Weibo>()
@@ -261,9 +291,7 @@ data object WeiboAPI {
 		id: String
 	): Data<List<WeiboComment>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.weiboDetails(id)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("data")
 		val items = mutableListOf<WeiboComment>()
@@ -275,9 +303,7 @@ data object WeiboAPI {
 		uid: String
 	): Data<WeiboUser> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userInfo(uid)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].String
@@ -300,9 +326,7 @@ data object WeiboAPI {
 		uid: String
 	): Data<List<WeiboAlbum>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.userAlbum(uid)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboAlbum>()
@@ -333,9 +357,7 @@ data object WeiboAPI {
 		limit: Int
 	): Data<Pair<List<Picture>, Int>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val data = json.obj("data")
 		val cards = data.arr("cards")
@@ -357,9 +379,7 @@ data object WeiboAPI {
 		key: String
 	): Data<List<WeiboUserInfo>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.searchUser(key)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
 		val items = mutableListOf<WeiboUserInfo>()
@@ -386,9 +406,7 @@ data object WeiboAPI {
 		sinceId: Long
 	): Data<Pair<List<Weibo>, Long>> = NetClient.common.safeGet(
 		url = "https://$WEIBO_HOST/${Container.chaohua(sinceId)}",
-		headers = {
-			append(HttpHeaders.Cookie, "SUB=$subCookie")
-		}
+		headers = { buildWeiboCookieHeader() }
 	) { json: JsonObject ->
 		val data = json.obj("data")
 		val newSinceId = data.obj("pageInfo")["since_id"].Long

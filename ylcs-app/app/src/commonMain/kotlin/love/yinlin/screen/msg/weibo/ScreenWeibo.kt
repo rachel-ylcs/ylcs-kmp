@@ -44,7 +44,7 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
                 state = BoxState.LOADING
 
                 // 微博需要获取subCookie
-                if (WeiboAPI.subCookie == null) WeiboAPI.subCookie = WeiboAPI.generateWeiboSubCookie()
+                if (WeiboAPI.weiboCookie == null) WeiboAPI.weiboCookie = WeiboAPI.generateWeiboCookie()
 
                 items.clear()
                 for (id in users) {
@@ -57,7 +57,7 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
                     }
                 }
                 if (state == BoxState.LOADING) {
-                    WeiboAPI.subCookie = null
+                    WeiboAPI.weiboCookie = null
                     state = BoxState.NETWORK_ERROR
                 }
             }
