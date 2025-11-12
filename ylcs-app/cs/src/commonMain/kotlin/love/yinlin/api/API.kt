@@ -61,59 +61,52 @@ object API : APINode(null, "") {
 			}
 		}
 
-		object Activity : APINode(this, "activity") {
-			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.activity.Activity>>(this, "getActivities")
-
-			object AddActivity : APIForm<AddActivity.Request, AddActivity.Response, AddActivity.Files>(this, "addActivity") {
-				@Serializable
-				data class Request(val token: String, val activity: love.yinlin.data.rachel.activity.Activity)
-				@Serializable
-				data class Files(val pic: APIFile?, val pics: APIFiles)
-				@Serializable
-				data class Response(val aid: Int, val pic: String?, val pics: List<String>)
-			}
-
-			object ModifyActivityInfo : APIPostRequest<ModifyActivityInfo.Request>(this, "modifyActivityInfo") {
-				@Serializable
-				data class Request(val token: String, val activity: love.yinlin.data.rachel.activity.Activity)
-			}
-
-			object ModifyActivityPicture : APIForm<ModifyActivityPicture.Request, String, ModifyActivityPicture.Files>(this, "modifyActivityPicture") {
-				@Serializable
-				data class Request(val token: String, val aid: Int)
-				@Serializable
-				data class Files(val pic: APIFile)
-			}
-
-			object DeleteActivityPicture : APIPostRequest<DeleteActivityPicture.Request>(this, "deleteActivityPicture") {
-				@Serializable
-				data class Request(val token: String, val aid: Int)
-			}
-
-			object AddActivityPictures : APIForm<AddActivityPictures.Request, List<String>, AddActivityPictures.Files>(this, "addActivityPictures") {
-				@Serializable
-				data class Request(val token: String, val aid: Int)
-				@Serializable
-				data class Files(val pics: APIFiles)
-			}
-
-			object ModifyActivityPictures : APIForm<ModifyActivityPictures.Request, String, ModifyActivityPictures.Files>(this, "modifyActivityPictures") {
-				@Serializable
-				data class Request(val token: String, val aid: Int, val index: Int)
-				@Serializable
-				data class Files(val pic: APIFile)
-			}
-
-			object DeleteActivityPictures : APIPostRequest<DeleteActivityPictures.Request>(this, "deleteActivityPictures") {
-				@Serializable
-				data class Request(val token: String, val aid: Int, val index: Int)
-			}
-
-			object DeleteActivity : APIPostRequest<DeleteActivity.Request>(this, "deleteActivity") {
-				@Serializable
-				data class Request(val token: String, val aid: Int)
-			}
-		}
+//		object Activity : APINode(this, "activity") {
+//			object GetActivities : APIPostResponse<List<love.yinlin.data.rachel.activity.Activity>>(this, "getActivities")
+//
+//			object AddActivity : APIPostRequest<String>(this, "addActivity")
+//
+//			object ModifyActivityInfo : APIPostRequest<ModifyActivityInfo.Request>(this, "modifyActivityInfo") {
+//				@Serializable
+//				data class Request(val token: String, val activity: love.yinlin.data.rachel.activity.Activity)
+//			}
+//
+//			object UpdateActivityPhoto : APIForm<UpdateActivityPhoto.Request, String, UpdateActivityPhoto.Files>(this, "updateActivityPhoto") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int, val key: String)
+//				@Serializable
+//				data class Files(val pic: APIFile)
+//			}
+//
+//			object DeleteActivityPicture : APIPostRequest<DeleteActivityPicture.Request>(this, "deleteActivityPicture") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int)
+//			}
+//
+//			object AddActivityPictures : APIForm<AddActivityPictures.Request, List<String>, AddActivityPictures.Files>(this, "addActivityPictures") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int)
+//				@Serializable
+//				data class Files(val pics: APIFiles)
+//			}
+//
+//			object ModifyActivityPictures : APIForm<ModifyActivityPictures.Request, String, ModifyActivityPictures.Files>(this, "modifyActivityPictures") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int, val index: Int)
+//				@Serializable
+//				data class Files(val pic: APIFile)
+//			}
+//
+//			object DeleteActivityPictures : APIPostRequest<DeleteActivityPictures.Request>(this, "deleteActivityPictures") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int, val index: Int)
+//			}
+//
+//			object DeleteActivity : APIPostRequest<DeleteActivity.Request>(this, "deleteActivity") {
+//				@Serializable
+//				data class Request(val token: String, val aid: Int)
+//			}
+//		}
 
 		object Backup : APINode(this, "backup") {
 			object UploadPlaylist : APIPostRequest<UploadPlaylist.Request>(this, "uploadPlaylist") {

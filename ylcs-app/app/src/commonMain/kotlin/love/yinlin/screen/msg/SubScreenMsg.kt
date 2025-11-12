@@ -89,10 +89,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private val calendarState = CalendarState()
 
     private suspend fun requestActivity() {
-        val result = ClientAPI.request(
-            route = API.User.Activity.GetActivities
-        )
-        if (result is Data.Success) activities.replaceAll(result.data.sorted())
+        // TODO:
+//        val result = ClientAPI.request(
+//            route = API.User.Activity.GetActivities
+//        )
+//        if (result is Data.Success) activities.replaceAll(result.data.sorted())
     }
 
     private fun showActivityDetails(aid: Int) {
@@ -111,28 +112,29 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
         shape: Shape,
         modifier: Modifier = Modifier
     ) {
-        val pics by rememberDerivedState { activities.fastFilter { it.pic != null } }
-        BoxWithConstraints(modifier = modifier) {
-            Banner(
-                pics = pics,
-                interval = 5000L,
-                gap = gap,
-                modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
-            ) { pic, _, scale ->
-                Surface(
-                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
-                    shape = shape,
-                    shadowElevation = CustomTheme.shadow.surface
-                ) {
-                    WebImage(
-                        uri = pic.picPath ?: "",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        onClick = { showActivityDetails(pic.aid) }
-                    )
-                }
-            }
-        }
+        // TODO:
+//        val pics by rememberDerivedState { activities.fastFilter { it.pic != null } }
+//        BoxWithConstraints(modifier = modifier) {
+//            Banner(
+//                pics = pics,
+//                interval = 5000L,
+//                gap = gap,
+//                modifier = Modifier.fillMaxWidth().heightIn(min = maxWidth * (0.5f - gap))
+//            ) { pic, _, scale ->
+//                Surface(
+//                    modifier = Modifier.fillMaxWidth().aspectRatio(2f).scale(scale),
+//                    shape = shape,
+//                    shadowElevation = CustomTheme.shadow.surface
+//                ) {
+//                    WebImage(
+//                        uri = pic.picPath ?: "",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier.fillMaxSize(),
+//                        onClick = { showActivityDetails(pic.aid) }
+//                    )
+//                }
+//            }
+//        }
     }
 
     @Composable

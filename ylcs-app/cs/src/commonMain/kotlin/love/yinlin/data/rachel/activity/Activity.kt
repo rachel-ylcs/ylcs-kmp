@@ -11,14 +11,17 @@ import love.yinlin.extension.DateEx
 data class Activity(
 	val aid: Int, // [活动 ID]
 	val ts: String?, // [活动时间]
+	val tsInfo: String?, // [活动时间补充]
+	val location: String?, // [活动地点]
+	val shortTitle: String?, // [活动短标题]
 	val title: String?, // [活动标题]
-	val content: String, // [活动内容]
-	val pic: String?, // [活动大屏]
-	val pics: List<String>, // [活动海报]
-	val showstart: String?, // [秀动链接]
-	val damai: String?, // [大麦链接]
-	val maoyan: String?, // [猫眼链接]
-	val link: String? // [活动链接]
+	val content: String?, // [活动内容]
+	val price: List<ActivityPrice>, // [活动票价]
+	val saleTime: List<String>, // [开票时间]
+	val lineup: List<String>, // [演出阵容]
+	val photo: ActivityPhoto, // [活动照片]
+	val link: ActivityLink, // [活动链接]
+	val playlist: List<String>, // [歌单]
 ) : Comparable<Activity> {
 	override fun compareTo(other: Activity): Int {
 		val today = DateEx.Today.toEpochDays()
@@ -32,7 +35,9 @@ data class Activity(
 		}
 	}
 
-	val picPath: String? by lazy { pic?.let { "${Local.API_BASE_URL}/${ServerRes.Activity.activity(it)}" } }
+	val coverPath: String? by lazy { photo.cover?.let { "${Local.API_BASE_URL}/${ServerRes.Activity.activity(it)}" } }
 
-	fun picPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes.Activity.activity(key)}"
+	val seatPath: String? by lazy { photo.seat?.let { "${Local.API_BASE_URL}/${ServerRes.Activity.activity(it)}" } }
+
+	fun posterPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes.Activity.activity(key)}"
 }

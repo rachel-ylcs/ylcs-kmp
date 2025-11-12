@@ -24,74 +24,82 @@ import love.yinlin.extension.safeRawSources
 
 @Stable
 class ScreenAddActivity(manager: ScreenManager) : Screen(manager) {
-	val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
-
-	private val input = ActivityInputState()
-
-	private suspend fun addActivity() {
-		val activity = Activity(
-			aid = 0,
-			ts = input.ts,
-			title = input.titleString,
-			content = input.contentString,
-			pic = null,
-			pics = emptyList(),
-			showstart = input.showstartString,
-			damai = input.damaiString,
-			maoyan = input.maoyanString,
-			link = input.linkString
-		)
-
-		val result = ClientAPI.request(
-			route = API.User.Activity.AddActivity,
-			data = API.User.Activity.AddActivity.Request(
-				token = app.config.userToken,
-				activity = activity
-			),
-			files = { API.User.Activity.AddActivity.Files(
-				pic = file(input.pic?.let { Path(it).rawSource }) ,
-				pics = file(input.pics.map { Path(it.image) }.safeRawSources())
-			) }
-		)
-		when (result) {
-			is Data.Success -> {
-				val (aid, serverPic, serverPics) = result.data
-				activities.add(0, activity.copy(
-					aid = aid,
-					pic = serverPic,
-					pics = serverPics
-				))
-				pop()
-			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
-	}
-
-	override val title: String = "添加活动"
-
-	@Composable
-	override fun ActionScope.RightActions() {
-		ActionSuspend(
-			icon = Icons.Outlined.Check,
-            tip = "提交",
-			enabled = input.canSubmit
-		) {
-			addActivity()
-		}
-	}
-
 	@Composable
 	override fun Content(device: Device) {
-        ActivityInfoLayout(
-            cropDialog = cropDialog,
-            input = input,
-            onPicAdd = { input.pic = it.toString() },
-            onPicDelete = { input.pic = null },
-            onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
-            onPicsDelete = { input.pics.removeAt(it) },
-            onPicsClick = { items, current -> navigate(::ScreenImagePreview, items, current) }
-        )
-	}
 
-	private val cropDialog = this land FloatingDialogCrop()
+	}
 }
+
+//@Stable
+//class ScreenAddActivity(manager: ScreenManager) : Screen(manager) {
+//	val activities = manager.get<ScreenMain>().get<SubScreenMsg>().activities
+//
+//	private val input = ActivityInputState()
+//
+//	private suspend fun addActivity() {
+//		val activity = Activity(
+//			aid = 0,
+//			ts = input.ts,
+//			title = input.titleString,
+//			content = input.contentString,
+//			pic = null,
+//			pics = emptyList(),
+//			showstart = input.showstartString,
+//			damai = input.damaiString,
+//			maoyan = input.maoyanString,
+//			link = input.linkString
+//		)
+//
+//		val result = ClientAPI.request(
+//			route = API.User.Activity.AddActivity,
+//			data = API.User.Activity.AddActivity.Request(
+//				token = app.config.userToken,
+//				activity = activity
+//			),
+//			files = { API.User.Activity.AddActivity.Files(
+//				pic = file(input.pic?.let { Path(it).rawSource }) ,
+//				pics = file(input.pics.map { Path(it.image) }.safeRawSources())
+//			) }
+//		)
+//		when (result) {
+//			is Data.Success -> {
+//				val (aid, serverPic, serverPics) = result.data
+//				activities.add(0, activity.copy(
+//					aid = aid,
+//					pic = serverPic,
+//					pics = serverPics
+//				))
+//				pop()
+//			}
+//			is Data.Failure -> slot.tip.error(result.message)
+//		}
+//	}
+//
+//	override val title: String = "添加活动"
+//
+//	@Composable
+//	override fun ActionScope.RightActions() {
+//		ActionSuspend(
+//			icon = Icons.Outlined.Check,
+//            tip = "提交",
+//			enabled = input.canSubmit
+//		) {
+//			addActivity()
+//		}
+//	}
+//
+//	@Composable
+//	override fun Content(device: Device) {
+//        ActivityInfoLayout(
+//            cropDialog = cropDialog,
+//            input = input,
+//            onPicAdd = { input.pic = it.toString() },
+//            onPicDelete = { input.pic = null },
+//            onPicsAdd = { for (file in it) input.pics += Picture(file.toString()) },
+//            onPicsDelete = { input.pics.removeAt(it) },
+//            onPicsClick = { items, current -> navigate(::ScreenImagePreview, items, current) }
+//        )
+//	}
+//
+//	private val cropDialog = this land FloatingDialogCrop()
+//}
