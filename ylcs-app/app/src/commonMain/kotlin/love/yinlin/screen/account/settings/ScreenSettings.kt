@@ -25,7 +25,9 @@ import kotlinx.io.files.Path
 import love.yinlin.About
 import love.yinlin.Local
 import love.yinlin.api.API2
+import love.yinlin.api.ApiCommonGetServerStatus
 import love.yinlin.api.ClientAPI2
+import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.Uri
@@ -237,15 +239,11 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun checkUpdate() {
-        when (val result = ClientAPI2.request(API2.Common.Status.GetServerStatus)) {
-            is Data.Success -> {
-                val data = result.data
-                if (data.targetVersion > Local.info.version) slot.tip.warning("新版本${data.targetVersion}可用")
-                else if (data.minVersion > Local.info.version) slot.tip.error("当前版本不满足服务器最低兼容版本${data.minVersion}")
-                else slot.tip.success("当前已是最新版本")
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiCommonGetServerStatus.request { status ->
+            if (status.targetVersion > Local.info.version) slot.tip.warning("新版本${status.targetVersion}可用")
+            else if (status.minVersion > Local.info.version) slot.tip.error("当前版本不满足服务器最低兼容版本${status.minVersion}")
+            else slot.tip.success("当前已是最新版本")
+        }?.let { slot.tip.error(it.message) }
     }
 
     @Composable

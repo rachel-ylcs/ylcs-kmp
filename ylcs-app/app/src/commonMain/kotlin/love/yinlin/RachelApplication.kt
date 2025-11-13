@@ -2,7 +2,7 @@ package love.yinlin
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
-import love.yinlin.api.API2
+import love.yinlin.api.ClientEngineBaseUrl
 import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
 import love.yinlin.compose.LocalAnimationSpeed
@@ -121,6 +121,10 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             os.storage.cachePath.mkdir()
             Paths.modPath.mkdir()
         }
+    }
+
+    private val initClientBaseUrl by sync {
+        ClientEngineBaseUrl = Local.API_BASE_URL
     }
 
     @StartupNative
