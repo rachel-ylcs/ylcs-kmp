@@ -1,9 +1,9 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.ImplMap
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 import love.yinlin.api.api
 import love.yinlin.api.failureData
 import love.yinlin.api.successData
@@ -33,7 +33,7 @@ private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> 
 }
 
 fun Routing.profileAPI(implMap: ImplMap) {
-	api(API.User.Profile.GetProfile) { token ->
+	api(API2.User.Profile.GetProfile) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwQuerySQLSingle("""
             SELECT
@@ -61,7 +61,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		Data.Success(profile)
 	}
 
-	api(API.User.Profile.GetPublicProfile) { (token, uid2) ->
+	api(API2.User.Profile.GetPublicProfile) { (token, uid2) ->
 		VN.throwId(uid2)
 		val uid1 = token?.let { AN.throwExpireToken(it) }
 		val user = DB.throwQuerySQLSingle("""
@@ -85,7 +85,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		}.to())
 	}
 
-	api(API.User.Profile.UpdateName) { (token, name) ->
+	api(API2.User.Profile.UpdateName) { (token, name) ->
 		VN.throwName(name)
 		val uid = AN.throwExpireToken(token)
 		if (DB.querySQLSingle("SELECT 1 FROM user WHERE name = ?", name) != null)
@@ -96,36 +96,36 @@ fun Routing.profileAPI(implMap: ImplMap) {
 		else "你的银币不够哦".failureData
 	}
 
-	api(API.User.Profile.UpdateAvatar) { token, (avatar) ->
+	api(API2.User.Profile.UpdateAvatar) { token, (avatar) ->
 		val uid = AN.throwExpireToken(token)
 		// 保存头像
-		avatar.copy(ServerRes.Users.User(uid).avatar)
+		avatar.copy(ServerRes2.Users.User(uid).avatar)
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.UpdateSignature) { (token, signature) ->
+	api(API2.User.Profile.UpdateSignature) { (token, signature) ->
 		VN.throwEmpty(signature)
 		val uid = AN.throwExpireToken(token)
 		DB.throwExecuteSQL("UPDATE user SET signature = ? WHERE uid = ?", signature, uid)
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.UpdateWall) { token, (wall) ->
+	api(API2.User.Profile.UpdateWall) { token, (wall) ->
 		val uid = AN.throwExpireToken(token)
 		// 保存背景墙
-		wall.copy(ServerRes.Users.User(uid).wall)
+		wall.copy(ServerRes2.Users.User(uid).wall)
 		"更新成功".successData
 	}
 
-	api(API.User.Profile.ResetPicture) { token ->
+	api(API2.User.Profile.ResetPicture) { token ->
 		val uid = AN.throwExpireToken(token)
-		val userPath = ServerRes.Users.User(uid)
-		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
-		ServerRes.Assets.DefaultWall.copy(userPath.wall)
+		val userPath = ServerRes2.Users.User(uid)
+		ServerRes2.Assets.DefaultAvatar.copy(userPath.avatar)
+		ServerRes2.Assets.DefaultWall.copy(userPath.wall)
 		"重置成功".successData
 	}
 
-	api(API.User.Profile.Signin) { token ->
+	api(API2.User.Profile.Signin) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "signin")
 		// 查询是否签到 ... 签到记录46字节(368位)
@@ -136,7 +136,7 @@ fun Routing.profileAPI(implMap: ImplMap) {
 				signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
 				DB.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
 			}
-			Data.Success(API.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
+			Data.Success(API2.User.Profile.Signin.Response(isSignin, byteValue, bitIndex))
 		}
 	}
 }

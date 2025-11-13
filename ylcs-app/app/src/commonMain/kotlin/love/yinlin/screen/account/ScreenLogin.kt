@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.Serializable
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -67,9 +67,9 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("昵称或密码不合规范")
 			return
 		}
-		val result = ClientAPI.request(
-			route = API.User.Account.Login,
-			data = API.User.Account.Login.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Account.Login,
+			data = API2.User.Account.Login.Request(
 				name = id,
 				pwd = pwd,
 				platform = platform
@@ -103,9 +103,9 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("两次输入的密码不相同")
 			return
 		}
-		val result = ClientAPI.request(
-			route = API.User.Account.Register,
-			data = API.User.Account.Register.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Account.Register,
+			data = API2.User.Account.Register.Request(
 				name = id,
 				pwd = pwd,
 				inviterName = inviter
@@ -129,9 +129,9 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("昵称或密码不合规范")
 			return
 		}
-		val result = ClientAPI.request(
-			route = API.User.Account.ForgotPassword,
-			data = API.User.Account.ForgotPassword.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Account.ForgotPassword,
+			data = API2.User.Account.ForgotPassword.Request(
 				name = id,
 				pwd = pwd
 			)
@@ -400,7 +400,7 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 	}
 
 	override suspend fun initialize() {
-		val result = ClientAPI.request(route = API.User.Account.GetInviters)
+		val result = ClientAPI2.request(route = API2.User.Account.GetInviters)
 		if (result is Data.Success) inviters = result.data
 	}
 

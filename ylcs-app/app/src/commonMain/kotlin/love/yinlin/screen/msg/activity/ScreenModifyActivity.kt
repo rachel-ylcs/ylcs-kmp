@@ -15,8 +15,8 @@ import androidx.compose.ui.text.input.ImeAction
 import kotlinx.datetime.LocalDate
 import kotlinx.io.files.Path
 import kotlinx.serialization.json.JsonPrimitive
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
@@ -118,9 +118,9 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			link = link,
 			playlist = playlist
 		)
-		val result = ClientAPI.request(
-			route = API.User.Activity.UpdateActivityInfo,
-			data = API.User.Activity.UpdateActivityInfo.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.UpdateActivityInfo,
+			data = API2.User.Activity.UpdateActivityInfo.Request(
 				token = app.config.userToken,
 				activity = newActivity
 			)
@@ -150,14 +150,14 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 
 	private suspend fun updatePhoto(key: String, path: Path) {
 		slot.loading.openSuspend()
-		val result = ClientAPI.request(
-			route = API.User.Activity.UpdateActivityPhoto,
-			data = API.User.Activity.UpdateActivityPhoto.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.UpdateActivityPhoto,
+			data = API2.User.Activity.UpdateActivityPhoto.Request(
 				token = app.config.userToken,
 				aid = aid,
 				key = key
 			),
-			files = { API.User.Activity.UpdateActivityPhoto.Files(
+			files = { API2.User.Activity.UpdateActivityPhoto.Files(
 				pic = file(path.rawSource)
 			) }
 		)
@@ -177,9 +177,9 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 
 	private suspend fun deletePhoto(key: String) {
 		slot.loading.openSuspend()
-		val result = ClientAPI.request(
-			route = API.User.Activity.DeleteActivityPhoto,
-			data = API.User.Activity.DeleteActivityPhoto.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.DeleteActivityPhoto,
+			data = API2.User.Activity.DeleteActivityPhoto.Request(
 				token = app.config.userToken,
 				aid = aid,
 				key = key
@@ -200,14 +200,14 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 
 	private suspend fun addPhotos(key: String, files: List<Path>) {
 		slot.loading.openSuspend()
-		val result = ClientAPI.request(
-			route = API.User.Activity.AddActivityPhotos,
-			data = API.User.Activity.AddActivityPhotos.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.AddActivityPhotos,
+			data = API2.User.Activity.AddActivityPhotos.Request(
 				token = app.config.userToken,
 				aid = aid,
 				key = key
 			),
-			files = { API.User.Activity.AddActivityPhotos.Files(
+			files = { API2.User.Activity.AddActivityPhotos.Files(
 				pics = file(files.safeRawSources())
 			) }
 		)
@@ -234,15 +234,15 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			}
 		}?.let { path ->
 			slot.loading.openSuspend()
-			val result = ClientAPI.request(
-				route = API.User.Activity.UpdateActivityPhotos,
-				data = API.User.Activity.UpdateActivityPhotos.Request(
+			val result = ClientAPI2.request(
+				route = API2.User.Activity.UpdateActivityPhotos,
+				data = API2.User.Activity.UpdateActivityPhotos.Request(
 					token = app.config.userToken,
 					aid = aid,
 					key = key,
 					index = index
 				),
-				files = { API.User.Activity.UpdateActivityPhotos.Files(
+				files = { API2.User.Activity.UpdateActivityPhotos.Files(
 					pic = file(path.rawSource)
 				) }
 			)
@@ -265,9 +265,9 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 
 	private suspend fun deletePhotos(key: String, index: Int) {
 		slot.loading.openSuspend()
-		val result = ClientAPI.request(
-			route = API.User.Activity.DeleteActivityPhotos,
-			data = API.User.Activity.DeleteActivityPhotos.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.DeleteActivityPhotos,
+			data = API2.User.Activity.DeleteActivityPhotos.Request(
 				token = app.config.userToken,
 				aid = aid,
 				key = key,

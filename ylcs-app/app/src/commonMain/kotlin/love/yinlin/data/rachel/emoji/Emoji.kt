@@ -2,16 +2,16 @@ package love.yinlin.data.rachel.emoji
 
 import androidx.compose.runtime.Stable
 import love.yinlin.Local
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 
 @Stable
 data class Emoji(
     val id: Int,
     val type: EmojiType
 ) {
-    private val webpPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Emoji.webp(id)}" }
+    private val webpPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Emoji.webp(id)}" }
 
-    private val lottiePath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Emoji.lottie(id)}" }
+    private val lottiePath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Emoji.lottie(id)}" }
 
     val previewPath: String by lazy { webpPath }
 

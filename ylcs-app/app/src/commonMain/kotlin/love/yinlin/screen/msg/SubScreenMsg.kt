@@ -21,8 +21,8 @@ import androidx.compose.ui.util.fastFilter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.until
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
@@ -88,15 +88,15 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private val calendarState = CalendarState()
 
     private suspend fun requestActivity() {
-        val result = ClientAPI.request(
-            route = API.User.Activity.GetActivities
+        val result = ClientAPI2.request(
+            route = API2.User.Activity.GetActivities
         )
         if (result is Data.Success) activities.replaceAll(result.data.sorted())
     }
 
     private suspend fun addActivity() {
-        val result = ClientAPI.request(
-			route = API.User.Activity.AddActivity,
+        val result = ClientAPI2.request(
+			route = API2.User.Activity.AddActivity,
 			data = app.config.userToken
 		)
         when (result) {

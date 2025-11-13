@@ -23,10 +23,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.Local
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ServerRes2
 import love.yinlin.app
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
@@ -57,9 +57,9 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     private val gridState = LazyGridState()
 
     private suspend fun requestNewData() {
-        val result = ClientAPI.request(
-            route = API.User.Song.GetSongs,
-            data = API.User.Song.GetSongs.Request(num = pageSongs.pageNum)
+        val result = ClientAPI2.request(
+            route = API2.User.Song.GetSongs,
+            data = API2.User.Song.GetSongs.Request(num = pageSongs.pageNum)
         )
         when (result) {
             is Data.Success -> {
@@ -71,9 +71,9 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun requestMoreData() {
-        val result = ClientAPI.request(
-            route = API.User.Song.GetSongs,
-            data = API.User.Song.GetSongs.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Song.GetSongs,
+            data = API2.User.Song.GetSongs.Request(
                 sid = pageSongs.offset,
                 num = pageSongs.pageNum
             )
@@ -82,8 +82,8 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun searchNewData(key: String) {
-        val result = ClientAPI.request(
-            route = API.User.Song.SearchSongs,
+        val result = ClientAPI2.request(
+            route = API2.User.Song.SearchSongs,
             data = key
         )
         when (result) {
@@ -123,7 +123,7 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             WebImage(
-                uri = remember(song) { "${Local.API_BASE_URL}/${ServerRes.Mod.Song(song.sid).res(ModResourceType.Record.filename)}" },
+                uri = remember(song) { "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(song.sid).res(ModResourceType.Record.filename)}" },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(CustomTheme.size.image).clip(MaterialTheme.shapes.large)
             )

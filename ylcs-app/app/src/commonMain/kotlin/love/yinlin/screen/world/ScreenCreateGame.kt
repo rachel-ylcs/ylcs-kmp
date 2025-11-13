@@ -15,8 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -141,9 +141,9 @@ class ScreenCreateGame(manager: ScreenManager, private val type: Game) : Screen(
                 val reward = reward.cast(config.minReward, config.maxReward)
                 val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
                 if (profile.coin >= actionCoin) {
-                    val result = ClientAPI.request(
-                        route = API.User.Game.CreateGame,
-                        data = API.User.Game.CreateGame.Request(
+                    val result = ClientAPI2.request(
+                        route = API2.User.Game.CreateGame,
+                        data = API2.User.Game.CreateGame.Request(
                             token = app.config.userToken,
                             title = titleState.text,
                             type = type,

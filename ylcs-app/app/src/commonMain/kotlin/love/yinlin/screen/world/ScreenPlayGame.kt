@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import love.yinlin.Local
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -59,9 +59,9 @@ class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
     private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
 
     private suspend fun preflight() {
-        val result = ClientAPI.request(
-            route = API.User.Game.PreflightGame,
-            data = API.User.Game.PreflightGame.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Game.PreflightGame,
+            data = API2.User.Game.PreflightGame.Request(
                 token = app.config.userToken,
                 gid = game?.gid ?: 0
             )
@@ -233,9 +233,9 @@ class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
                 enabled = canSubmit
             ) {
                 preflightResult?.let { preflight ->
-                    val result = ClientAPI.request(
-                        route = API.User.Game.VerifyGame,
-                        data = API.User.Game.VerifyGame.Request(
+                    val result = ClientAPI2.request(
+                        route = API2.User.Game.VerifyGame,
+                        data = API2.User.Game.VerifyGame.Request(
                             token = app.config.userToken,
                             gid = game.gid,
                             rid = preflight.rid,

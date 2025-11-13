@@ -15,9 +15,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -53,9 +53,9 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI.request(
-                route = API.User.Game.GetUserGames,
-                data = API.User.Game.GetUserGames.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Game.GetUserGames,
+                data = API2.User.Game.GetUserGames.Request(
                     token = app.config.userToken,
                     num = page.pageNum
                 )
@@ -67,9 +67,9 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun requestMoreGames() {
-        val result = ClientAPI.request(
-            route = API.User.Game.GetUserGames,
-            data = API.User.Game.GetUserGames.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Game.GetUserGames,
+            data = API2.User.Game.GetUserGames.Request(
                 token = app.config.userToken,
                 gid = page.offset,
                 isCompleted = page.arg1,
@@ -80,9 +80,9 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun deleteGame(gid: Int) {
-        val result = ClientAPI.request(
-            route = API.User.Game.DeleteGame,
-            data = API.User.Game.DeleteGame.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Game.DeleteGame,
+            data = API2.User.Game.DeleteGame.Request(
                 token = app.config.userToken,
                 gid = gid
             )

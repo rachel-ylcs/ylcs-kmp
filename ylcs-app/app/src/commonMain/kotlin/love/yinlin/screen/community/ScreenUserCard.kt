@@ -19,9 +19,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -55,9 +55,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun requestUserProfile() {
-        val result = ClientAPI.request(
-            route = API.User.Profile.GetPublicProfile,
-            data = API.User.Profile.GetPublicProfile.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Profile.GetPublicProfile,
+            data = API2.User.Profile.GetPublicProfile.Request(
                 token = app.config.userToken.ifEmpty { null },
                 uid = uid
             )
@@ -66,9 +66,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun requestNewTopics() {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopics,
-            data = API.User.Topic.GetTopics.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopics,
+            data = API2.User.Topic.GetTopics.Request(
                 uid = uid,
                 num = page.pageNum
             )
@@ -77,9 +77,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun requestMoreTopics() {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopics,
-            data = API.User.Topic.GetTopics.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopics,
+            data = API2.User.Topic.GetTopics.Request(
                 uid = uid,
                 isTop = page.arg1,
                 tid = page.offset,
@@ -90,9 +90,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun followUser(profile: UserPublicProfile) {
-        val result = ClientAPI.request(
-            route = API.User.Follows.FollowUser,
-            data = API.User.Follows.FollowUser.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Follows.FollowUser,
+            data = API2.User.Follows.FollowUser.Request(
                 token = app.config.userToken,
                 uid = profile.uid
             )
@@ -107,9 +107,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun unfollowUser(profile: UserPublicProfile) {
-        val result = ClientAPI.request(
-            route = API.User.Follows.UnfollowUser,
-            data = API.User.Follows.UnfollowUser.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Follows.UnfollowUser,
+            data = API2.User.Follows.UnfollowUser.Request(
                 token = app.config.userToken,
                 uid = profile.uid
             )
@@ -124,9 +124,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     private suspend fun blockUser(profile: UserPublicProfile) {
-        val result = ClientAPI.request(
-            route = API.User.Follows.BlockUser,
-            data = API.User.Follows.BlockUser.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Follows.BlockUser,
+            data = API2.User.Follows.BlockUser.Request(
                 token = app.config.userToken,
                 uid = profile.uid
             )

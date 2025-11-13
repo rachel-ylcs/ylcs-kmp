@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -278,8 +278,8 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun downloadCloudPlaylist(): Data<Map<String, List<PlaylistPreviewItem>>> {
-        val result = ClientAPI.request(
-            route = API.User.Backup.DownloadPlaylist,
+        val result = ClientAPI2.request(
+            route = API2.User.Backup.DownloadPlaylist,
             data = app.config.userToken
         )
         return when (result) {
@@ -397,9 +397,9 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                         icon = Icons.Outlined.CloudUpload,
                         onClick = {
                             if (slot.confirm.openSuspend(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
-                                val result = ClientAPI.request(
-                                    route = API.User.Backup.UploadPlaylist,
-                                    data = API.User.Backup.UploadPlaylist.Request(
+                                val result = ClientAPI2.request(
+                                    route = API2.User.Backup.UploadPlaylist,
+                                    data = API2.User.Backup.UploadPlaylist.Request(
                                         token = app.config.userToken,
                                         playlist = playlistLibrary.items.toJson().Object
                                     )

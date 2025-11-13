@@ -1,7 +1,7 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 import love.yinlin.api.failureData
@@ -14,7 +14,7 @@ import love.yinlin.extension.toJsonString
 import love.yinlin.server.DB
 
 fun Routing.backupAPI(implMap: ImplMap) {
-	api(API.User.Backup.UploadPlaylist) { (token, playlist) ->
+	api(API2.User.Backup.UploadPlaylist) { (token, playlist) ->
 		val uid = AN.throwExpireToken(token)
 		if (DB.updateSQL("""
             UPDATE user SET playlist = ? WHERE uid = ? AND (privilege & ${UserPrivilege.BACKUP}) != 0
@@ -22,7 +22,7 @@ fun Routing.backupAPI(implMap: ImplMap) {
 		else "无权限".failureData
 	}
 
-	api(API.User.Backup.DownloadPlaylist) { token ->
+	api(API2.User.Backup.DownloadPlaylist) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege, playlist")
 		if (UserPrivilege.backup(user["privilege"].Int))

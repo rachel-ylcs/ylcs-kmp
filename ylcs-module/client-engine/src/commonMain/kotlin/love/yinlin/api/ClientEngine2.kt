@@ -33,15 +33,15 @@ import kotlin.collections.component2
 import kotlin.collections.iterator
 import kotlin.jvm.JvmName
 
-open class ClientEngine(val baseUrl: String) {
+open class ClientEngine2(val baseUrl: String) {
     suspend inline fun <reified Response : Any> baseProcessResponse(response: HttpResponse): Data<Response> {
         val json = response.body<JsonObject>()
         val code = json["code"].Int
         val msg = json["msg"].StringNull
         return when (code) {
-            APICode.SUCCESS -> Data.Success(json["data"]!!.to(), msg)
-            APICode.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
-            APICode.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
+            APICode2.SUCCESS -> Data.Success(json["data"]!!.to(), msg)
+            APICode2.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
+            APICode2.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
             else -> Data.Failure(RequestError.ClientError, msg)
         }
     }
@@ -51,9 +51,9 @@ open class ClientEngine(val baseUrl: String) {
         val code = json["code"].Int
         val msg = json["msg"].StringNull
         return when (code) {
-            APICode.SUCCESS -> Data.Success(Response.Default, msg)
-            APICode.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
-            APICode.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
+            APICode2.SUCCESS -> Data.Success(Response.Default, msg)
+            APICode2.FAILED -> Data.Failure(RequestError.InvalidArgument, msg)
+            APICode2.UNAUTHORIZED -> Data.Failure(RequestError.Unauthorized, msg)
             else -> Data.Failure(RequestError.ClientError, msg)
         }
     }
@@ -67,7 +67,7 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestGet")
     suspend inline fun <reified Request : Any, reified Response : Any> request(
-        route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
+        route: APIRoute2<Request, Response, NoFiles, APIMethod2.Get>,
         data: Request
     ): Data<Response> = NetClient.common.safeCallData { client ->
         client.prepareGet(urlString = "$baseUrl$route${baseBuildGetParameters(data.toJson().Object)}")
@@ -76,7 +76,7 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestGetRequest")
     suspend inline fun <reified Request : Any> request(
-        route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
+        route: APIRoute2<Request, Response.Default, NoFiles, APIMethod2.Get>,
         data: Request
     ) : Data<Response.Default> = NetClient.common.safeCallData { client ->
         client.prepareGet(urlString = "$baseUrl$route${baseBuildGetParameters(data.toJson().Object)}")
@@ -85,7 +85,7 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestGetResponse")
     suspend inline fun <reified Response : Any> request(
-        route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>
+        route: APIRoute2<Request.Default, Response, NoFiles, APIMethod2.Get>
     ): Data<Response> = NetClient.common.safeCallData { client ->
         client.prepareGet(urlString = "$baseUrl$route")
             .execute { baseProcessResponse<Response>(it) }
@@ -93,7 +93,7 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestPost")
     suspend inline fun <reified Request : Any, reified Response : Any> request(
-        route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
+        route: APIRoute2<Request, Response, NoFiles, APIMethod2.Post>,
         data: Request
     ): Data<Response> = NetClient.common.safeCallData { client ->
         client.preparePost(urlString = "$baseUrl$route") { setBody(data) }
@@ -102,7 +102,7 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestPostRequest")
     suspend inline fun <reified Request : Any> request(
-        route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
+        route: APIRoute2<Request, Response.Default, NoFiles, APIMethod2.Post>,
         data: Request
     ): Data<Response.Default> = NetClient.common.safeCallData { client ->
         client.preparePost(urlString = "$baseUrl$route") { setBody(data) }
@@ -111,17 +111,17 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestPostResponse")
     suspend inline fun <reified Response : Any> request(
-        route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>
+        route: APIRoute2<Request.Default, Response, NoFiles, APIMethod2.Post>
     ): Data<Response> = NetClient.common.safeCallData { client ->
         client.preparePost(urlString = "$baseUrl$route") { setBody(Request.Default) }
             .execute { baseProcessResponse<Response>(it) }
     }
 
     interface APIFileScope {
-        fun file(value: Nothing?): APIFile
-        fun file(value: ByteArray?): APIFile
-        fun file(value: RawSource?): APIFile
-        fun file(values: Sources<RawSource>?): APIFiles
+        fun file(value: Nothing?): APIFile2
+        fun file(value: ByteArray?): APIFile2
+        fun file(value: RawSource?): APIFile2
+        fun file(values: Sources<RawSource>?): APIFiles2
     }
 
     fun FormBuilder.addByteArrayFile(key: String, file: ByteArray) = this.append(
@@ -145,19 +145,19 @@ open class ClientEngine(val baseUrl: String) {
         val map = mutableMapOf<String, Any?>()
         val sources = Sources<RawSource>()
 
-        private fun addFile(value: Any?): APIFile {
+        private fun addFile(value: Any?): APIFile2 {
             val key = "#${index++}#"
             map[key] = value
             return key
         }
 
-        override fun file(value: Nothing?): APIFile = addFile(value)
-        override fun file(value: ByteArray?): APIFile = addFile(value)
-        override fun file(value: RawSource?): APIFile {
+        override fun file(value: Nothing?): APIFile2 = addFile(value)
+        override fun file(value: ByteArray?): APIFile2 = addFile(value)
+        override fun file(value: RawSource?): APIFile2 {
             if (value != null) sources += value
             return addFile(value)
         }
-        override fun file(values: Sources<RawSource>?): APIFiles = listOf(addFile(values?.let { v ->
+        override fun file(values: Sources<RawSource>?): APIFiles2 = listOf(addFile(values?.let { v ->
             v.forEach { sources += it }
             if (v.isEmpty()) null else v
         }))
@@ -195,7 +195,7 @@ open class ClientEngine(val baseUrl: String) {
     }
 
     suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> buildFormAndClean(
-        route: APIRoute<Request, Response, Files, APIMethod.Form>,
+        route: APIRoute2<Request, Response, Files, APIMethod2.Form>,
         data: Request?,
         crossinline files: APIFileScope.() -> Files,
         crossinline responseBuilder: suspend (HttpResponse) -> Data<Response>
@@ -214,26 +214,26 @@ open class ClientEngine(val baseUrl: String) {
 
     @JvmName("requestForm")
     suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> request(
-        route: APIRoute<Request, Response, Files, APIMethod.Form>,
+        route: APIRoute2<Request, Response, Files, APIMethod2.Form>,
         data: Request,
         crossinline files: APIFileScope.() -> Files
     ): Data<Response> = buildFormAndClean(route = route, data = data, files = files) { baseProcessResponse<Response>(it) }
 
     @JvmName("requestFormRequest")
     suspend inline fun <reified Request : Any, reified Files : Any> request(
-        route: APIRoute<Request, Response.Default, Files, APIMethod.Form>,
+        route: APIRoute2<Request, Response.Default, Files, APIMethod2.Form>,
         data: Request,
         crossinline files: APIFileScope.() -> Files
     ): Data<Response.Default> = buildFormAndClean(route = route, data = data, files = files) { baseProcessResponseDefault(it) }
 
     @JvmName("requestFormResponse")
     suspend inline fun <reified Response : Any, reified Files : Any> request(
-        route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
+        route: APIRoute2<Request.Default, Response, Files, APIMethod2.Form>,
         crossinline files: APIFileScope.() -> Files
     ): Data<Response> = buildFormAndClean(route = route, data = null, files = files) { baseProcessResponse<Response>(it) }
 
     @JvmName("requestServerResource")
-    suspend inline fun <reified Response : Any> request(route: ResNode): Data<Response> = NetClient.common.safeCall { client ->
+    suspend inline fun <reified Response : Any> request(route: ResNode2): Data<Response> = NetClient.common.safeCall { client ->
         client.prepareGet(urlString = "$baseUrl/$route").execute { it.body() }
     }
 }

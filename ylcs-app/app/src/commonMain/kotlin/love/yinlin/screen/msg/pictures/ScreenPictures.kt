@@ -19,9 +19,9 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -58,9 +58,9 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewPhotos() {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
-            val result = ClientAPI.request(
-                route = API.Common.Photo.SearchPhotoAlbums,
-                data = API.Common.Photo.SearchPhotoAlbums.Request(
+            val result = ClientAPI2.request(
+                route = API2.Common.Photo.SearchPhotoAlbums,
+                data = API2.Common.Photo.SearchPhotoAlbums.Request(
                     keyword = keyword,
                     num = page.pageNum
                 )
@@ -72,9 +72,9 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun requestMorePhotos() {
-        val result = ClientAPI.request(
-            route = API.Common.Photo.SearchPhotoAlbums,
-            data = API.Common.Photo.SearchPhotoAlbums.Request(
+        val result = ClientAPI2.request(
+            route = API2.Common.Photo.SearchPhotoAlbums,
+            data = API2.Common.Photo.SearchPhotoAlbums.Request(
                 keyword = keyword,
                 ts = page.offset,
                 aid = page.arg1,

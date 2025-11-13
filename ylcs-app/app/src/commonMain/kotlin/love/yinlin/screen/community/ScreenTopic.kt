@@ -25,10 +25,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import love.yinlin.Local
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ServerRes2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -119,7 +119,7 @@ private data class AtInfo(val uid: Int, val name: String) {
     override fun equals(other: Any?): Boolean = other is AtInfo && other.uid == uid
     override fun hashCode(): Int = uid
 
-    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
 }
 
 @Composable
@@ -206,17 +206,17 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun requestTopic() {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopicDetails,
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopicDetails,
             data = topic.tid
         )
         if (result is Data.Success) details = result.data
     }
 
     private suspend fun requestNewComments() {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopicComments,
-            data = API.User.Topic.GetTopicComments.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopicComments,
+            data = API2.User.Topic.GetTopicComments.Request(
                 tid = topic.tid,
                 rawSection = topic.rawSection,
                 num = pageComments.pageNum
@@ -226,9 +226,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun requestMoreComments() {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopicComments,
-            data = API.User.Topic.GetTopicComments.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopicComments,
+            data = API2.User.Topic.GetTopicComments.Request(
                 tid = topic.tid,
                 rawSection = topic.rawSection,
                 cid = pageComments.offset,
@@ -239,9 +239,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
-        val result = ClientAPI.request(
-            route = API.User.Topic.GetTopicSubComments,
-            data = API.User.Topic.GetTopicSubComments.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.GetTopicSubComments,
+            data = API2.User.Topic.GetTopicSubComments.Request(
                 pid = pid,
                 rawSection = topic.rawSection,
                 cid = cid,
@@ -260,9 +260,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun onChangeTopicIsTop(value: Boolean) {
-        val result = ClientAPI.request(
-            route = API.User.Topic.UpdateTopicTop,
-            data = API.User.Topic.UpdateTopicTop.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.UpdateTopicTop,
+            data = API2.User.Topic.UpdateTopicTop.Request(
                 token = app.config.userToken,
                 tid = topic.tid,
                 isTop = value
@@ -276,9 +276,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     private suspend fun onDeleteTopic() {
         if (slot.confirm.openSuspend(content = "删除主题?")) {
-            val result = ClientAPI.request(
-                route = API.User.Topic.DeleteTopic,
-                data =  API.User.Topic.DeleteTopic.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Topic.DeleteTopic,
+                data =  API2.User.Topic.DeleteTopic.Request(
                     token = app.config.userToken,
                     tid = topic.tid
                 )
@@ -302,9 +302,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                     slot.tip.warning("不能与原板块相同哦")
                     return@let
                 }
-                val result = ClientAPI.request(
-                    route = API.User.Topic.MoveTopic,
-                    data = API.User.Topic.MoveTopic.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Topic.MoveTopic,
+                    data = API2.User.Topic.MoveTopic.Request(
                         token = app.config.userToken,
                         tid = topic.tid,
                         section = newSection
@@ -327,9 +327,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
             slot.tip.warning("不能给自己投币哦")
             return
         }
-        val result = ClientAPI.request(
-            route = API.User.Topic.SendCoin,
-            data = API.User.Topic.SendCoin.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.SendCoin,
+            data = API2.User.Topic.SendCoin.Request(
                 token = app.config.userToken,
                 uid = topic.uid,
                 tid = topic.tid,
@@ -355,9 +355,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
             // 回复主题
             val target = currentSendComment
             if (target == null) {
-                val result = ClientAPI.request(
-                    route = API.User.Topic.SendComment,
-                    data = API.User.Topic.SendComment.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Topic.SendComment,
+                    data = API2.User.Topic.SendComment.Request(
                         token = app.config.userToken,
                         tid = topic.tid,
                         rawSection = topic.rawSection,
@@ -387,9 +387,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                 }
             }
             else { // 回复评论
-                val result = ClientAPI.request(
-                    route = API.User.Topic.SendSubComment,
-                    data = API.User.Topic.SendSubComment.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Topic.SendSubComment,
+                    data = API2.User.Topic.SendSubComment.Request(
                         token = app.config.userToken,
                         tid = topic.tid,
                         cid = target.cid,
@@ -413,9 +413,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun onChangeCommentIsTop(cid: Int, isTop: Boolean) {
-        val result = ClientAPI.request(
-            route = API.User.Topic.UpdateCommentTop,
-            data = API.User.Topic.UpdateCommentTop.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.UpdateCommentTop,
+            data = API2.User.Topic.UpdateCommentTop.Request(
                 token = app.config.userToken,
                 tid = topic.tid,
                 cid = cid,
@@ -437,9 +437,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     private suspend fun onDeleteComment(cid: Int) {
         if (slot.confirm.openSuspend(content = "删除回复(楼中楼会同步删除)")) {
-            val result = ClientAPI.request(
-                route = API.User.Topic.DeleteComment,
-                data = API.User.Topic.DeleteComment.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Topic.DeleteComment,
+                data = API2.User.Topic.DeleteComment.Request(
                     token = app.config.userToken,
                     tid = topic.tid,
                     cid = cid,
@@ -460,9 +460,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     private suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
         if (slot.confirm.openSuspend(content = "删除回复")) {
-            val result = ClientAPI.request(
-                route = API.User.Topic.DeleteSubComment,
-                data = API.User.Topic.DeleteSubComment.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Topic.DeleteSubComment,
+                data = API2.User.Topic.DeleteSubComment.Request(
                     token = app.config.userToken,
                     tid = topic.tid,
                     pid = pid,

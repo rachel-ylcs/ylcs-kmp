@@ -8,7 +8,6 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
-import love.yinlin.extension.ObjectEmpty
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
@@ -18,7 +17,7 @@ import love.yinlin.server.currentUniqueId
 import love.yinlin.server.values
 
 fun Routing.activityAPI(implMap: ImplMap) {
-	api(API.User.Activity.GetActivities) { ->
+	api(API2.User.Activity.GetActivities) { ->
 		Data.Success(
 			DB.throwQuerySQL("""
 			SELECT aid, ts, tsInfo, location, shortTitle, title, content, price, saleTime, lineup, photo, link, playlist
@@ -27,7 +26,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		""").to())
 	}
 
-	api(API.User.Activity.AddActivity) { token ->
+	api(API2.User.Activity.AddActivity) { token ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
@@ -36,7 +35,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		Data.Success(aid)
 	}
 
-	api(API.User.Activity.UpdateActivityInfo) { (token, activity) ->
+	api(API2.User.Activity.UpdateActivityInfo) { (token, activity) ->
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
@@ -50,7 +49,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		"修改成功".successData
 	}
 
-	api(API.User.Activity.UpdateActivityPhoto) { (token, aid, key), (pic) ->
+	api(API2.User.Activity.UpdateActivityPhoto) { (token, aid, key), (pic) ->
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
@@ -59,11 +58,11 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		val picName = currentUniqueId()
 		photo[key] = JsonPrimitive(picName)
 		DB.throwExecuteSQL("UPDATE activity SET photo = ? WHERE aid = ?", photo.toJsonString(), aid)
-		pic.copy(ServerRes.Activity.activity(picName))
+		pic.copy(ServerRes2.Activity.activity(picName))
 		Data.Success(picName)
 	}
 
-	api(API.User.Activity.DeleteActivityPhoto) { (token, aid, key) ->
+	api(API2.User.Activity.DeleteActivityPhoto) { (token, aid, key) ->
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
@@ -74,7 +73,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Activity.AddActivityPhotos) { (token, aid, key), (pics) ->
+	api(API2.User.Activity.AddActivityPhotos) { (token, aid, key), (pics) ->
 		VN.throwId(aid)
 		val ngp = NineGridProcessor(pics)
 		val uid = AN.throwExpireToken(token)
@@ -86,11 +85,11 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		oldPics += ngp.actualPics
 		photo[key] = oldPics.toJson()
 		DB.throwExecuteSQL("UPDATE activity SET photo = ? WHERE aid = ?", photo.toJsonString(), aid)
-		ngp.copy { ServerRes.Activity.activity(it) }
+		ngp.copy { ServerRes2.Activity.activity(it) }
 		Data.Success(ngp.actualPics)
 	}
 
-	api(API.User.Activity.UpdateActivityPhotos) { (token, aid, key, index), (pic) ->
+	api(API2.User.Activity.UpdateActivityPhotos) { (token, aid, key, index), (pic) ->
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
@@ -102,11 +101,11 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		oldPics[index] = picName
 		photo[key] = oldPics.toJson()
 		DB.throwExecuteSQL("UPDATE activity SET photo = ? WHERE aid = ?", photo.toJsonString(), aid)
-		pic.copy(ServerRes.Activity.activity(picName))
+		pic.copy(ServerRes2.Activity.activity(picName))
 		Data.Success(picName)
 	}
 
-	api(API.User.Activity.DeleteActivityPhotos) { (token, aid, key, index) ->
+	api(API2.User.Activity.DeleteActivityPhotos) { (token, aid, key, index) ->
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")
@@ -120,7 +119,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Activity.DeleteActivity) { (token, aid) ->
+	api(API2.User.Activity.DeleteActivity) { (token, aid) ->
 		VN.throwId(aid)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "privilege")

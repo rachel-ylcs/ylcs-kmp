@@ -1,7 +1,7 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
@@ -14,7 +14,7 @@ import love.yinlin.server.DB
 import love.yinlin.server.values
 
 fun Routing.songAPI(implMap: ImplMap){
-    api(API.User.Song.GetSongs) { (sid, num) ->
+    api(API2.User.Song.GetSongs) { (sid, num) ->
         val songs = DB.throwQuerySQL("""
 			SELECT sid, version, name
 			FROM song
@@ -25,7 +25,7 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(songs.to())
     }
 
-    api(API.User.Song.GetSong) { sid ->
+    api(API2.User.Song.GetSong) { sid ->
         val song = DB.querySQLSingle("""
             SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme
 			FROM song
@@ -34,7 +34,7 @@ fun Routing.songAPI(implMap: ImplMap){
         if (song == null) "此歌曲未收录".failureData else Data.Success(song.to())
     }
 
-    api(API.User.Song.SearchSongs) { key ->
+    api(API2.User.Song.SearchSongs) { key ->
         val songs = DB.throwQuerySQL("""
 			SELECT sid, version, name
 			FROM song
@@ -44,7 +44,7 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(songs.to())
     }
 
-    api(API.User.Song.GetSongComments) { (sid, cid, num) ->
+    api(API2.User.Song.GetSongComments) { (sid, cid, num) ->
         val songComment = DB.throwQuerySQL("""
             SELECT cid, user.uid, ts, content, name, label, exp
             FROM song_comment
@@ -57,7 +57,7 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(songComment.to())
     }
 
-    api(API.User.Song.SendSongComment) { (token, sid, content) ->
+    api(API2.User.Song.SendSongComment) { (token, sid, content) ->
         VN.throwEmpty(content)
         val uid = AN.throwExpireToken(token)
         val cid = DB.throwInsertSQLGeneratedKey("""
@@ -66,7 +66,7 @@ fun Routing.songAPI(implMap: ImplMap){
         Data.Success(cid,"评论发送成功")
     }
 
-    api(API.User.Song.DeleteSongComment) { (token, cid) ->
+    api(API2.User.Song.DeleteSongComment) { (token, cid) ->
         VN.throwId( cid)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，超管

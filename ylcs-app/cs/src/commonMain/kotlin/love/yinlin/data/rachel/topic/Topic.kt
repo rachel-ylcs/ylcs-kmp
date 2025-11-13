@@ -3,7 +3,7 @@ package love.yinlin.data.rachel.topic
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 
 @Stable
 @Serializable
@@ -25,7 +25,7 @@ data class Topic(
 ) {
 	val picPath: String by lazy { pic?.let { picPath(it) } ?: "" }
 
-	fun picPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).Pics().pic(key)}"
+	fun picPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).Pics().pic(key)}"
 
-	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
 }

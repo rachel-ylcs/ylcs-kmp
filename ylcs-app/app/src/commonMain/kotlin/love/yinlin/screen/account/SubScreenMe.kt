@@ -30,8 +30,8 @@ import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.uri.Scheme
@@ -131,8 +131,8 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         val duration = currentTime - app.config.userShortToken
         if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
             isUpdateToken.compareAndSet(expect = false, update = true)) {
-            val result = ClientAPI.request(
-                route = API.User.Account.UpdateToken,
+            val result = ClientAPI2.request(
+                route = API2.User.Account.UpdateToken,
                 data = token
             )
             isUpdateToken.value = false
@@ -153,8 +153,8 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
     suspend fun updateUserProfile() {
         val token = app.config.userToken
         if (token.isNotEmpty() && !isUpdateToken.value) {
-            val result = ClientAPI.request(
-                route = API.User.Profile.GetProfile,
+            val result = ClientAPI2.request(
+                route = API2.User.Profile.GetProfile,
                 data = token
             )
             if (result is Data.Success) app.config.userProfile = result.data
@@ -457,8 +457,8 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             signinData = BooleanArray(8) { false }
             todayIndex = -1
             todaySignin = true
-            val result = ClientAPI.request(
-                route = API.User.Profile.Signin,
+            val result = ClientAPI2.request(
+                route = API2.User.Profile.Signin,
                 data = app.config.userToken
             )
             if (result is Data.Success) {

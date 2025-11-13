@@ -24,9 +24,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.files.Path
 import love.yinlin.About
 import love.yinlin.Local
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.Uri
@@ -49,7 +48,6 @@ import love.yinlin.compose.ui.text.rememberTextInputState
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
-import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.*
 import love.yinlin.resources.*
@@ -91,11 +89,11 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserAvatar() {
         pickPicture(1f)?.let { path ->
-            val result = ClientAPI.request(
-                route = API.User.Profile.UpdateAvatar,
+            val result = ClientAPI2.request(
+                route = API2.User.Profile.UpdateAvatar,
                 data = app.config.userToken,
                 files = {
-                    API.User.Profile.UpdateAvatar.Files(
+                    API2.User.Profile.UpdateAvatar.Files(
                         avatar = file(path.rawSource)
                     )
                 }
@@ -109,11 +107,11 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserWall() {
         pickPicture(1.77777f)?.let { path ->
-            val result = ClientAPI.request(
-                route = API.User.Profile.UpdateWall,
+            val result = ClientAPI2.request(
+                route = API2.User.Profile.UpdateWall,
                 data = app.config.userToken,
                 files = {
-                    API.User.Profile.UpdateWall.Files(
+                    API2.User.Profile.UpdateWall.Files(
                         wall = file(path.rawSource)
                     )
                 }
@@ -129,9 +127,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         idModifyDialog.openSuspend(initText)?.let { text ->
             val profile = app.config.userProfile
             if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) launch {
-                val result = ClientAPI.request(
-                    route = API.User.Profile.UpdateName,
-                    data = API.User.Profile.UpdateName.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Profile.UpdateName,
+                    data = API2.User.Profile.UpdateName.Request(
                         token = app.config.userToken,
                         name = text
                     )
@@ -153,9 +151,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         signatureModifyDialog.openSuspend(initText)?.let { text ->
             val profile = app.config.userProfile
             if (profile != null) launch {
-                val result = ClientAPI.request(
-                    route = API.User.Profile.UpdateSignature,
-                    data = API.User.Profile.UpdateSignature.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Profile.UpdateSignature,
+                    data = API2.User.Profile.UpdateSignature.Request(
                         token = app.config.userToken,
                         signature = text
                     )
@@ -173,9 +171,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     private suspend fun modifyPassword(oldPwd: String, newPwd: String) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
-            val result = ClientAPI.request(
-                route = API.User.Account.ChangePassword,
-                data = API.User.Account.ChangePassword.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Account.ChangePassword,
+                data = API2.User.Account.ChangePassword.Request(
                     token = token,
                     oldPwd = oldPwd,
                     newPwd = newPwd
@@ -195,8 +193,8 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "重置默认头像与背景墙")) {
-                val result = ClientAPI.request(
-                    route = API.User.Profile.ResetPicture,
+                val result = ClientAPI2.request(
+                    route = API2.User.Profile.ResetPicture,
                     data = token
                 )
                 when (result) {
@@ -214,8 +212,8 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "退出登录")) {
-                ClientAPI.request(
-                    route = API.User.Account.Logoff,
+                ClientAPI2.request(
+                    route = API2.User.Account.Logoff,
                     data = token
                 )
                 // 不论是否成功均从本地设备退出登录
@@ -225,9 +223,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun sendFeedback(content: String) {
-        val result = ClientAPI.request(
-            route = API.User.Info.SendFeedback,
-            data = API.User.Info.SendFeedback.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Info.SendFeedback,
+            data = API2.User.Info.SendFeedback.Request(
                 token = app.config.userToken,
                 content = content
             )
@@ -239,7 +237,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun checkUpdate() {
-        when (val result = ClientAPI.request(API.Common.Status.GetServerStatus)) {
+        when (val result = ClientAPI2.request(API2.Common.Status.GetServerStatus)) {
             is Data.Success -> {
                 val data = result.data
                 if (data.targetVersion > Local.info.version) slot.tip.warning("新版本${data.targetVersion}可用")

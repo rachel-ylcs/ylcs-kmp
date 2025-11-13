@@ -28,22 +28,22 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 val String.successObject: JsonObject get() = makeObject {
-    "code" with APICode.SUCCESS
+    "code" with APICode2.SUCCESS
     "msg" with this@successObject
 }
 
 val String.failedObject: JsonObject get() = makeObject {
-    "code" with APICode.FAILED
+    "code" with APICode2.FAILED
     "msg" with this@failedObject
 }
 
 val String.expireObject: JsonObject get() = makeObject {
-    "code" with APICode.UNAUTHORIZED
+    "code" with APICode2.UNAUTHORIZED
     "msg" with this@expireObject
 }
 
 val String.forbiddenObject: JsonObject get() = makeObject {
-    "code" with APICode.FORBIDDEN
+    "code" with APICode2.FORBIDDEN
     "msg" with this@forbiddenObject
 }
 
@@ -62,7 +62,7 @@ inline fun <reified Response: Any> Route.safeAPI(
         try {
             when (val result = Coroutines.io { body(call) }) {
                 is Data.Success -> call.respond(makeObject {
-                    "code" with APICode.SUCCESS
+                    "code" with APICode2.SUCCESS
                     result.message?.let { "msg" with it }
                     "data" with result.data.toJson()
                 })
@@ -93,37 +93,37 @@ fun RoutingCall.params() = makeObject {
 
 @JvmName("apiGet")
 inline fun <reified Request : Any, reified Response : Any> Route.api(
-    route: APIRoute<Request, Response, NoFiles, APIMethod.Get>,
+    route: APIRoute2<Request, Response, NoFiles, APIMethod2.Get>,
     crossinline body: suspend (Request) -> Data<Response>
 ): Route = safeAPI(HttpMethod.Get, route.toString()) { body(it.params().to()) }
 
 @JvmName("apiGetRequest")
 inline fun <reified Request : Any> Route.api(
-    route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Get>,
+    route: APIRoute2<Request, Response.Default, NoFiles, APIMethod2.Get>,
     crossinline body: suspend (Request) -> Data<Response.Default>
 ): Route = safeAPI(HttpMethod.Get, route.toString()) { body(it.params().to()) }
 
 @JvmName("apiGetResponse")
 inline fun <reified Response : Any> Route.api(
-    route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Get>,
+    route: APIRoute2<Request.Default, Response, NoFiles, APIMethod2.Get>,
     crossinline body: suspend () -> Data<Response>
 ): Route = safeAPI(HttpMethod.Get, route.toString()) { body() }
 
 @JvmName("apiPost")
 inline fun <reified Request : Any, reified Response : Any> Route.api(
-    route: APIRoute<Request, Response, NoFiles, APIMethod.Post>,
+    route: APIRoute2<Request, Response, NoFiles, APIMethod2.Post>,
     crossinline body: suspend (Request) -> Data<Response>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) { body(it.receive()) }
 
 @JvmName("apiPostRequest")
 inline fun <reified Request : Any> Route.api(
-    route: APIRoute<Request, Response.Default, NoFiles, APIMethod.Post>,
+    route: APIRoute2<Request, Response.Default, NoFiles, APIMethod2.Post>,
     crossinline body: suspend (Request) -> Data<Response.Default>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) { body(it.receive()) }
 
 @JvmName("apiPostResponse")
 inline fun <reified Response : Any> Route.api(
-    route: APIRoute<Request.Default, Response, NoFiles, APIMethod.Post>,
+    route: APIRoute2<Request.Default, Response, NoFiles, APIMethod2.Post>,
     crossinline body: suspend () -> Data<Response>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) { body() }
 
@@ -133,7 +133,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
     val form = makeObject {
         val tmpDir = System.getProperty("java.io.tmpdir")
 
-        val multiFiles = mutableMapOf<String, MutableList<APIFile>>()
+        val multiFiles = mutableMapOf<String, MutableList<APIFile2>>()
         var index = 0
         multipartData.forEachPart { part ->
             catchingError {
@@ -156,7 +156,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                         val filename = "${abs(Random.nextInt(1314520, 5201314))}-${currentUniqueId(index++)}"
                         val output = File(tmpDir, filename)
                         if (part.provider().copyAndClose(output.writeChannel()) > 0) {
-                            val file: APIFile = output.absolutePath
+                            val file: APIFile2 = output.absolutePath
                             val newName = if (name.startsWith('#') && name.contains('!')) {
                                 val fetchName = name.substringAfter('#').substringBeforeLast('!')
                                 val fetchIndex = name.substringAfter('!')
@@ -168,7 +168,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                             else {
                                 val thisFiles = multiFiles[newName]
                                 val newFiles = if (thisFiles == null) {
-                                    val files = mutableListOf<APIFile>()
+                                    val files = mutableListOf<APIFile2>()
                                     multiFiles[newName] = files
                                     files
                                 } else thisFiles
@@ -190,7 +190,7 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
 
 @JvmName("apiForm")
 inline fun <reified Request : Any, reified Response : Any, reified Files : Any> Route.api(
-    route: APIRoute<Request, Response, Files, APIMethod.Form>,
+    route: APIRoute2<Request, Response, Files, APIMethod2.Form>,
     crossinline body: suspend (Request, Files) -> Data<Response>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) {
     val (dataString, files) = it.toForm()
@@ -199,7 +199,7 @@ inline fun <reified Request : Any, reified Response : Any, reified Files : Any> 
 
 @JvmName("apiFormRequest")
 inline fun <reified Request : Any, reified Files : Any> Route.api(
-    route: APIRoute<Request, Response.Default, Files, APIMethod.Form>,
+    route: APIRoute2<Request, Response.Default, Files, APIMethod2.Form>,
     crossinline body: suspend (Request, Files) -> Data<Response.Default>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) {
     val (dataString, files) = it.toForm()
@@ -208,7 +208,7 @@ inline fun <reified Request : Any, reified Files : Any> Route.api(
 
 @JvmName("apiFormResponse")
 inline fun <reified Response : Any, reified Files : Any> Route.api(
-    route: APIRoute<Request.Default, Response, Files, APIMethod.Form>,
+    route: APIRoute2<Request.Default, Response, Files, APIMethod2.Form>,
     crossinline body: suspend (Files) -> Data<Response>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) {
     val (_, files) = it.toForm()

@@ -1,7 +1,7 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 import love.yinlin.api.failureData
@@ -27,7 +27,7 @@ fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
 }
 
 fun Routing.followsAPI(implMap: ImplMap) {
-    api(API.User.Follows.FollowUser) { (token, uid2) ->
+    api(API2.User.Follows.FollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能关注自己哦".failureData
         val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
@@ -50,7 +50,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         }
     }
 
-    api(API.User.Follows.UnfollowUser) { (token, uid2) ->
+    api(API2.User.Follows.UnfollowUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能关注自己哦".failureData
         val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
@@ -68,7 +68,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         else "未关注对方".failureData
     }
 
-    api(API.User.Follows.GetFollows) { (token, score, fid, num) ->
+    api(API2.User.Follows.GetFollows) { (token, score, fid, num) ->
         val uid1 = AN.throwExpireToken(token)
         val follows = DB.throwQuerySQL("""
             SELECT fid, uid2 AS uid, name, ts, score
@@ -82,7 +82,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         Data.Success(follows.to())
     }
 
-    api(API.User.Follows.GetFollowers) { (token, score, fid, num) ->
+    api(API2.User.Follows.GetFollowers) { (token, score, fid, num) ->
         val uid1 = AN.throwExpireToken(token)
         val followers = DB.throwQuerySQL("""
             SELECT fid, uid1 AS uid, name, score
@@ -96,7 +96,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         Data.Success(followers.to())
     }
 
-    api(API.User.Follows.BlockUser) { (token, uid2) ->
+    api(API2.User.Follows.BlockUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) return@api "不能拉黑自己哦".failureData
         val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
@@ -116,7 +116,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         }
     }
 
-    api(API.User.Follows.UnblockUser) { (token, uid2) ->
+    api(API2.User.Follows.UnblockUser) { (token, uid2) ->
         val uid1 = AN.throwExpireToken(token)
         VN.throwIf(uid1 == uid2)
         val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
@@ -124,7 +124,7 @@ fun Routing.followsAPI(implMap: ImplMap) {
         "已取消拉黑".successData
     }
 
-    api(API.User.Follows.GetBlockedUsers) { (token, fid, num) ->
+    api(API2.User.Follows.GetBlockedUsers) { (token, fid, num) ->
         val uid1 = AN.throwExpireToken(token)
         val follows = DB.throwQuerySQL("""
             SELECT fid, uid1 AS uid, name

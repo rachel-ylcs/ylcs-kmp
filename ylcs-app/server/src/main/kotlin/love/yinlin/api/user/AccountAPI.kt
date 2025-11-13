@@ -1,10 +1,10 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.EmptySuccessData
 import love.yinlin.api.ImplMap
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 import love.yinlin.api.api
 import love.yinlin.api.failureData
 import love.yinlin.api.failedObject
@@ -26,12 +26,12 @@ import love.yinlin.server.mkdir
 import love.yinlin.server.values
 
 fun Routing.accountAPI(implMap: ImplMap) {
-	api(API.User.Account.GetInviters) { ->
+	api(API2.User.Account.GetInviters) { ->
 		val inviters = DB.throwQuerySQL("SELECT name FROM user WHERE (privilege & ${UserPrivilege.VIP_ACCOUNT}) != 0")
 		Data.Success(inviters.map { it.Object["name"].String })
 	}
 
-	api(API.User.Account.Login) { (name, pwd, platform) ->
+	api(API2.User.Account.Login) { (name, pwd, platform) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
 		val user = DB.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: return@api "ID未注册".failureData
@@ -42,16 +42,16 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		Data.Success(AN.throwGenerateToken(token))
 	}
 
-	api(API.User.Account.Logoff) { token ->
+	api(API2.User.Account.Logoff) { token ->
 		AN.removeToken(token)
 		EmptySuccessData
 	}
 
-	api(API.User.Account.UpdateToken) { token ->
+	api(API2.User.Account.UpdateToken) { token ->
 		Data.Success(AN.throwReGenerateToken(token))
 	}
 
-	api(API.User.Account.Register) { (name, pwd, inviterName) ->
+	api(API2.User.Account.Register) { (name, pwd, inviterName) ->
 		VN.throwName(name, inviterName)
 		VN.throwPassword(pwd)
 
@@ -91,7 +91,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		).toInt()
 		if (registerID == 0) return@ImplContext "\"${registerName}\"已注册".failedObject
 		// 处理用户目录
-		val userPath = ServerRes.Users.User(registerID)
+		val userPath = ServerRes2.Users.User(registerID)
 		// 如果用户目录存在则先删除
 		userPath.deleteRecursively()
 		// 创建用户目录
@@ -99,12 +99,12 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		// 创建用户图片目录
 		userPath.Pics().mkdir()
 		// 复制初始资源
-		ServerRes.Assets.DefaultAvatar.copy(userPath.avatar)
-		ServerRes.Assets.DefaultWall.copy(userPath.wall)
+		ServerRes2.Assets.DefaultAvatar.copy(userPath.avatar)
+		ServerRes2.Assets.DefaultWall.copy(userPath.wall)
 		"注册用户\"${registerName}\"成功".successObject
 	}
 
-	api(API.User.Account.ForgotPassword) { (name, pwd) ->
+	api(API2.User.Account.ForgotPassword) { (name, pwd) ->
 		VN.throwName(name)
 		VN.throwPassword(pwd)
 
@@ -141,7 +141,7 @@ fun Routing.accountAPI(implMap: ImplMap) {
 		"\"${name}\"修改密码成功".successObject
 	}
 
-	api(API.User.Account.ChangePassword) { (token, oldPwd, newPwd) ->
+	api(API2.User.Account.ChangePassword) { (token, oldPwd, newPwd) ->
 		VN.throwPassword(oldPwd, newPwd)
 		val uid = AN.throwExpireToken(token)
 		val user = DB.throwGetUser(uid, "pwd")

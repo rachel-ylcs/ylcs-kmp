@@ -1,11 +1,11 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.ImplMap
 import love.yinlin.api.NineGridProcessor
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 import love.yinlin.api.api
 import love.yinlin.api.failureData
 import love.yinlin.api.successData
@@ -21,7 +21,7 @@ import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 
 fun Routing.topicAPI(implMap: ImplMap) {
-	api(API.User.Topic.GetTopics) { (uid, isTop, tid, num) ->
+	api(API2.User.Topic.GetTopics) { (uid, isTop, tid, num) ->
 		VN.throwId(uid)
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
@@ -38,7 +38,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetLatestTopics) { (tid, num) ->
+	api(API2.User.Topic.GetLatestTopics) { (tid, num) ->
 		val topics = DB.throwQuerySQL("""
             SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
             FROM topic
@@ -51,7 +51,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
+	api(API2.User.Topic.GetLatestTopicsByComment) { (tid, num) ->
 		val topics = DB.throwQuerySQL(
 			"""
         WITH
@@ -111,7 +111,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 	}
 
 
-	api(API.User.Topic.GetHotTopics) { (score, tid, num) ->
+	api(API2.User.Topic.GetHotTopics) { (score, tid, num) ->
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
 			FROM topic
@@ -124,7 +124,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetSectionTopics) { (section, tid, num) ->
+	api(API2.User.Topic.GetSectionTopics) { (section, tid, num) ->
 		val topics = DB.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
 			FROM topic
@@ -137,7 +137,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetTopicDetails) { tid ->
+	api(API2.User.Topic.GetTopicDetails) { tid ->
 		VN.throwId(tid)
 		val topics = DB.throwQuerySQLSingle("""
 			SELECT tid, user.uid, ts, title, content, pics, isTop, coinNum, commentNum, section, rawSection, name, label, exp
@@ -149,7 +149,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(topics.to())
 	}
 
-	api(API.User.Topic.GetTopicComments) { (tid, rawSection, isTop, cid, num) ->
+	api(API2.User.Topic.GetTopicComments) { (tid, rawSection, isTop, cid, num) ->
 		VN.throwId(tid)
 		val tableName = VN.throwSection(rawSection)
 		val comments = DB.throwQuerySQL("""
@@ -167,7 +167,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(comments.to())
 	}
 
-	api(API.User.Topic.GetTopicSubComments) { (pid, rawSection, cid, num) ->
+	api(API2.User.Topic.GetTopicSubComments) { (pid, rawSection, cid, num) ->
 		VN.throwId(pid)
 		val tableName = VN.throwSection(rawSection)
 		val subComments = DB.throwQuerySQL("""
@@ -182,7 +182,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(subComments.to())
 	}
 
-	api(API.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
+	api(API2.User.Topic.SendTopic) { (token, title, content, section), (pics) ->
 		VN.throwEmpty(title, content)
 		VN.throwSection(section)
 		val ngp = NineGridProcessor(pics)
@@ -195,12 +195,12 @@ fun Routing.topicAPI(implMap: ImplMap) {
             INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
         """, uid, title, content, ngp.jsonString, section, section).toInt()
 		// 复制主题图片
-		val userPics = ServerRes.Users.User(uid).Pics()
+		val userPics = ServerRes2.Users.User(uid).Pics()
 		val pic = ngp.copy { userPics.pic(it) }
-		Data.Success(API.User.Topic.SendTopic.Response(tid, pic), "发表成功")
+		Data.Success(API2.User.Topic.SendTopic.Response(tid, pic), "发表成功")
 	}
 
-	api(API.User.Topic.UpdateTopicTop) { (token, tid, isTop) ->
+	api(API2.User.Topic.UpdateTopicTop) { (token, tid, isTop) ->
 		VN.throwId(tid)
 		val uid = AN.throwExpireToken(token)
 		// 权限：主题本人
@@ -210,7 +210,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		else "无权限".failureData
 	}
 
-	api(API.User.Topic.DeleteTopic) { (token, tid) ->
+	api(API2.User.Topic.DeleteTopic) { (token, tid) ->
 		VN.throwId(tid)
 		val uid = AN.throwExpireToken(token)
 		// 权限：主题本人，超管
@@ -224,7 +224,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Topic.MoveTopic) { (token, tid, section) ->
+	api(API2.User.Topic.MoveTopic) { (token, tid, section) ->
 		VN.throwId(tid)
 		VN.throwSection(section)
 		val uid = AN.throwExpireToken(token)
@@ -236,7 +236,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		"移动成功".successData
 	}
 
-	api(API.User.Topic.SendCoin) { (token, uid, tid, value) ->
+	api(API2.User.Topic.SendCoin) { (token, uid, tid, value) ->
 		VN.throwId(uid, tid)
 		VN.throwIf(value <= 0, value > UserConstraint.MIN_COIN_REWARD)
 		val srcUid = AN.throwExpireToken(token)
@@ -264,7 +264,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		"投币成功".successData
 	}
 
-	api(API.User.Topic.SendComment) { (token, tid, rawSection, content) ->
+	api(API2.User.Topic.SendComment) { (token, tid, rawSection, content) ->
 		VN.throwId(tid)
 		VN.throwEmpty(content)
 		val tableName = VN.throwSection(rawSection)
@@ -282,7 +282,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(cid, "发送成功")
 	}
 
-	api(API.User.Topic.SendSubComment) { (token, tid, cid, rawSection, content) ->
+	api(API2.User.Topic.SendSubComment) { (token, tid, cid, rawSection, content) ->
 		VN.throwId(tid, cid)
 		VN.throwEmpty(content)
 		val tableName = VN.throwSection(rawSection)
@@ -300,7 +300,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		Data.Success(cid, "发送成功")
 	}
 
-	api(API.User.Topic.UpdateCommentTop) { (token, tid, cid, rawSection, isTop) ->
+	api(API2.User.Topic.UpdateCommentTop) { (token, tid, cid, rawSection, isTop) ->
 		VN.throwId(tid, cid)
 		val tableName = VN.throwSection(rawSection)
 		val uid = AN.throwExpireToken(token)
@@ -314,7 +314,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		"${if (isTop) "" else "取消"}置顶成功".successData
 	}
 
-	api(API.User.Topic.DeleteComment) { (token, tid, cid, rawSection) ->
+	api(API2.User.Topic.DeleteComment) { (token, tid, cid, rawSection) ->
 		VN.throwId(tid, cid)
 		val tableName = VN.throwSection(rawSection)
 		val uid = AN.throwExpireToken(token)
@@ -335,7 +335,7 @@ fun Routing.topicAPI(implMap: ImplMap) {
 		"删除成功".successData
 	}
 
-	api(API.User.Topic.DeleteSubComment) { (token, tid, pid, cid, rawSection) ->
+	api(API2.User.Topic.DeleteSubComment) { (token, tid, pid, cid, rawSection) ->
 		VN.throwId(tid, pid, cid)
 		val tableName = VN.throwSection(rawSection)
 		val uid = AN.throwExpireToken(token)

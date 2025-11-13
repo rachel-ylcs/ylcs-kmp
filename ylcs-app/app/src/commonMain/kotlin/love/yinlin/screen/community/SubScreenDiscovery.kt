@@ -20,9 +20,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
@@ -83,27 +83,27 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
             val result = when (val section = currentSection) {
-                DiscoveryItem.LatestTopic.id -> ClientAPI.request(
-                    route = API.User.Topic.GetLatestTopics,
-                    data = API.User.Topic.GetLatestTopics.Request(
+                DiscoveryItem.LatestTopic.id -> ClientAPI2.request(
+                    route = API2.User.Topic.GetLatestTopics,
+                    data = API2.User.Topic.GetLatestTopics.Request(
                         num = page.pageNum
                     )
                 )
-                DiscoveryItem.LatestComment.id -> ClientAPI.request(
-                    route = API.User.Topic.GetLatestTopicsByComment,
-                    data = API.User.Topic.GetLatestTopicsByComment.Request(
+                DiscoveryItem.LatestComment.id -> ClientAPI2.request(
+                    route = API2.User.Topic.GetLatestTopicsByComment,
+                    data = API2.User.Topic.GetLatestTopicsByComment.Request(
                         num = page.pageNum
                     )
                 )
-                DiscoveryItem.Hot.id -> ClientAPI.request(
-                    route = API.User.Topic.GetHotTopics,
-                    data = API.User.Topic.GetHotTopics.Request(
+                DiscoveryItem.Hot.id -> ClientAPI2.request(
+                    route = API2.User.Topic.GetHotTopics,
+                    data = API2.User.Topic.GetHotTopics.Request(
                         num = page.pageNum
                     )
                 )
-                else -> ClientAPI.request(
-                    route = API.User.Topic.GetSectionTopics,
-                    data = API.User.Topic.GetSectionTopics.Request(
+                else -> ClientAPI2.request(
+                    route = API2.User.Topic.GetSectionTopics,
+                    data = API2.User.Topic.GetSectionTopics.Request(
                         section = section,
                         num = page.pageNum
                     )
@@ -119,31 +119,31 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
 
     private suspend fun requestMoreData() {
         val result = when (val section = currentSection) {
-            DiscoveryItem.LatestTopic.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestTopics,
-                data = API.User.Topic.GetLatestTopics.Request(
+            DiscoveryItem.LatestTopic.id -> ClientAPI2.request(
+                route = API2.User.Topic.GetLatestTopics,
+                data = API2.User.Topic.GetLatestTopics.Request(
                     tid = page.offset,
                     num = page.pageNum
                 )
             )
-            DiscoveryItem.LatestComment.id -> ClientAPI.request(
-                route = API.User.Topic.GetLatestTopicsByComment,
-                data = API.User.Topic.GetLatestTopicsByComment.Request(
+            DiscoveryItem.LatestComment.id -> ClientAPI2.request(
+                route = API2.User.Topic.GetLatestTopicsByComment,
+                data = API2.User.Topic.GetLatestTopicsByComment.Request(
                     tid = page.offset,
                     num = page.pageNum
                 )
             )
-            DiscoveryItem.Hot.id -> ClientAPI.request(
-                route = API.User.Topic.GetHotTopics,
-                data = API.User.Topic.GetHotTopics.Request(
+            DiscoveryItem.Hot.id -> ClientAPI2.request(
+                route = API2.User.Topic.GetHotTopics,
+                data = API2.User.Topic.GetHotTopics.Request(
                     score = page.arg1,
                     tid = page.offset,
                     num = page.pageNum
                 )
             )
-            else -> ClientAPI.request(
-                route = API.User.Topic.GetSectionTopics,
-                data = API.User.Topic.GetSectionTopics.Request(
+            else -> ClientAPI2.request(
+                route = API2.User.Topic.GetSectionTopics,
+                data = API2.User.Topic.GetSectionTopics.Request(
                     section = section,
                     tid = page.offset,
                     num = page.pageNum

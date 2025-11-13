@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
@@ -76,16 +76,16 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
     private suspend fun addTopic(profile: UserProfile) {
         val title = input.title.text
         val section = input.section
-        val result = ClientAPI.request(
-            route = API.User.Topic.SendTopic,
-            data = API.User.Topic.SendTopic.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Topic.SendTopic,
+            data = API2.User.Topic.SendTopic.Request(
                 token = app.config.userToken,
                 title = title,
                 content = input.content.richString.toString(),
                 section = section
             ),
             files = {
-                API.User.Topic.SendTopic.Files(
+                API2.User.Topic.SendTopic.Files(
                     pics = file(input.pics.map { Path(it.image) }.safeRawSources())
                 )
             }

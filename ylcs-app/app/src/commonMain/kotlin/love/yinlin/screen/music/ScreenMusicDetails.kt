@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.Local
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ServerRes2
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
@@ -97,8 +97,8 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     override val title: String by derivedStateOf { clientSong?.name ?: remoteSong?.name ?: "未知歌曲" }
 
     private fun Song.clientPath(type: ModResourceType): Path = Path(Paths.modPath, this.sid, type.filename)
-    private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(type.filename)}"
-    private val remoteModPath: String get() = "${Local.API_BASE_URL}/${ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES)}"
+    private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(sid).res(type.filename)}"
+    private val remoteModPath: String get() = "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(sid).res(ModResourceType.BASE_RES)}"
 
     @Stable
     private data class ResourceItem(
@@ -149,8 +149,8 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private suspend fun requestRemoteSong(): Song? {
-        val result = ClientAPI.request(
-            route = API.User.Song.GetSong,
+        val result = ClientAPI2.request(
+            route = API2.User.Song.GetSong,
             data = sid
         )
         return if (result is Data.Success) {
@@ -164,9 +164,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private suspend fun requestNewSongComments() {
-        val result = ClientAPI.request(
-            route = API.User.Song.GetSongComments,
-            data = API.User.Song.GetSongComments.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Song.GetSongComments,
+            data = API2.User.Song.GetSongComments.Request(
                 sid = sid,
                 num = pageComments.pageNum
             )
@@ -178,9 +178,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private suspend fun requestMoreSongComments() {
-        val result = ClientAPI.request(
-            route = API.User.Song.GetSongComments,
-            data = API.User.Song.GetSongComments.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Song.GetSongComments,
+            data = API2.User.Song.GetSongComments.Request(
                 sid = sid,
                 cid = pageComments.offset,
                 num = pageComments.pageNum
@@ -244,9 +244,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     private suspend fun onSendComment(content: String): Boolean {
         app.config.userProfile?.let { user ->
-            val result = ClientAPI.request(
-                route = API.User.Song.SendSongComment,
-                data = API.User.Song.SendSongComment.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Song.SendSongComment,
+                data = API2.User.Song.SendSongComment.Request(
                     token = app.config.userToken,
                     sid = sid,
                     content = content
@@ -274,9 +274,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     private suspend fun onDeleteComment(cid: Long) {
         if (slot.confirm.openSuspend(content = "删除评论")) {
-            val result = ClientAPI.request(
-                route = API.User.Song.DeleteSongComment,
-                data = API.User.Song.DeleteSongComment.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Song.DeleteSongComment,
+                data = API2.User.Song.DeleteSongComment.Request(
                     token = app.config.userToken,
                     cid = cid
                 )

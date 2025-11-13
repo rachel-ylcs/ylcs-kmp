@@ -24,7 +24,7 @@ import love.yinlin.server.updateSQL
 import love.yinlin.server.values
 
 fun Routing.gameAPI(implMap: ImplMap) {
-    api(API.User.Game.CreateGame) { (token, title, type, reward, num, cost, info, question, answer) ->
+    api(API2.User.Game.CreateGame) { (token, title, type, reward, num, cost, info, question, answer) ->
         val uid = AN.throwExpireToken(token)
         // 检查游戏奖励与名额
         VN.throwEmpty(title)
@@ -45,7 +45,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         }
     }
 
-    api(API.User.Game.DeleteGame) { (token, gid) ->
+    api(API2.User.Game.DeleteGame) { (token, gid) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
         DB.throwTransaction {
@@ -67,7 +67,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         }
     }
 
-    api(API.User.Game.GetGames) { (type, gid, num) ->
+    api(API2.User.Game.GetGames) { (type, gid, num) ->
         val games = DB.throwQuerySQL("""
             SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.info,
                 IFNULL((
@@ -84,7 +84,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(games.to())
     }
 
-    api(API.User.Game.GetUserGames) { (token, gid, isCompleted, num) ->
+    api(API2.User.Game.GetUserGames) { (token, gid, isCompleted, num) ->
         val uid = AN.throwExpireToken(token)
         val games = DB.throwQuerySQL("""
             SELECT gid, ts, title, type, reward, num, cost, info, question, answer, isCompleted,
@@ -104,7 +104,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(games.to())
     }
 
-    api(API.User.Game.GetUserGameRecords) { (token, rid, num) ->
+    api(API2.User.Game.GetUserGameRecords) { (token, rid, num) ->
         val uid = AN.throwExpireToken(token)
         val records = DB.throwQuerySQL("""
             SELECT record.rid, record.gid, record.ts, user.name, game.title, game.type, record.answer, record.result
@@ -118,7 +118,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(records.to())
     }
 
-    api(API.User.Game.GetGameRank) { game ->
+    api(API2.User.Game.GetGameRank) { game ->
         val ranks = DB.throwQuerySQL("""
             SELECT uid, name, cnt
             FROM game_rank
@@ -128,7 +128,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
         Data.Success(ranks.to())
     }
 
-    api(API.User.Game.PreflightGame) { (token, gid) ->
+    api(API2.User.Game.PreflightGame) { (token, gid) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
         val details = DB.throwQuerySQLSingle("""
@@ -142,7 +142,7 @@ fun Routing.gameAPI(implMap: ImplMap) {
             else details.type.manager.preflight(uid, details).map { it.copy(info = details.info, question = details.question) }
     }
 
-    api(API.User.Game.VerifyGame) { (token, gid, rid, answer) ->
+    api(API2.User.Game.VerifyGame) { (token, gid, rid, answer) ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid, rid)
         val record = DB.throwQuerySQLSingle("""

@@ -22,8 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.uri.Uri
@@ -90,9 +90,9 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 	private val activity: Activity? by derivedStateOf { activities.find { it.aid == aid } }
 
 	private suspend fun deleteActivity() {
-		val result = ClientAPI.request(
-			route = API.User.Activity.DeleteActivity,
-			data = API.User.Activity.DeleteActivity.Request(
+		val result = ClientAPI2.request(
+			route = API2.User.Activity.DeleteActivity,
+			data = API2.User.Activity.DeleteActivity.Request(
 				token = app.config.userToken,
 				aid = aid
 			)

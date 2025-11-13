@@ -16,10 +16,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ServerRes2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -54,7 +54,7 @@ enum class FollowTabItem(val title: String) {
 @Stable
 @Serializable
 private data class FollowItem(val fid: Long, val uid: Int, val name: String) {
-    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
 }
 
 @Composable
@@ -135,9 +135,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
     private suspend fun requestNewData() {
         when (tab) {
             FollowTabItem.FOLLOWS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetFollows,
-                    data = API.User.Follows.GetFollows.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetFollows,
+                    data = API2.User.Follows.GetFollows.Request(
                         token = app.config.userToken,
                         num = pageFollows.pageNum
                     )
@@ -151,9 +151,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                 }
             }
             FollowTabItem.FOLLOWERS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetFollowers,
-                    data = API.User.Follows.GetFollowers.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetFollowers,
+                    data = API2.User.Follows.GetFollowers.Request(
                         token = app.config.userToken,
                         num = pageFollowers.pageNum
                     )
@@ -167,9 +167,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                 }
             }
             FollowTabItem.BLOCK_USERS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetBlockedUsers,
-                    data = API.User.Follows.GetBlockedUsers.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetBlockedUsers,
+                    data = API2.User.Follows.GetBlockedUsers.Request(
                         token = app.config.userToken,
                         num = pageBlockUsers.pageNum
                     )
@@ -188,9 +188,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
     private suspend fun requestMoreData() {
         when (tab) {
             FollowTabItem.FOLLOWS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetFollows,
-                    data = API.User.Follows.GetFollows.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetFollows,
+                    data = API2.User.Follows.GetFollows.Request(
                         token = app.config.userToken,
                         score = pageFollows.offset,
                         fid = pageFollows.arg1,
@@ -200,9 +200,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                 if (result is Data.Success) pageFollows.moreData(result.data)
             }
             FollowTabItem.FOLLOWERS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetFollowers,
-                    data = API.User.Follows.GetFollowers.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetFollowers,
+                    data = API2.User.Follows.GetFollowers.Request(
                         token = app.config.userToken,
                         score = pageFollowers.offset,
                         fid = pageFollowers.arg1,
@@ -212,9 +212,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                 if (result is Data.Success) pageFollowers.moreData(result.data)
             }
             FollowTabItem.BLOCK_USERS -> {
-                val result = ClientAPI.request(
-                    route = API.User.Follows.GetBlockedUsers,
-                    data = API.User.Follows.GetBlockedUsers.Request(
+                val result = ClientAPI2.request(
+                    route = API2.User.Follows.GetBlockedUsers,
+                    data = API2.User.Follows.GetBlockedUsers.Request(
                         token = app.config.userToken,
                         fid = pageBlockUsers.offset,
                         num = pageBlockUsers.pageNum
@@ -226,9 +226,9 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
     }
 
     private suspend fun unBlockUser(item: FollowItem) {
-        val result = ClientAPI.request(
-            route = API.User.Follows.UnblockUser,
-            data = API.User.Follows.UnblockUser.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Follows.UnblockUser,
+            data = API2.User.Follows.UnblockUser.Request(
                 token = app.config.userToken,
                 uid = item.uid
             )

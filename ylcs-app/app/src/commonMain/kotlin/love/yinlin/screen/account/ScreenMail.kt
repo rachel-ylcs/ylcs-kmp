@@ -22,9 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -62,9 +62,9 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewMails(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI.request(
-                route = API.User.Mail.GetMails,
-                data = API.User.Mail.GetMails.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Mail.GetMails,
+                data = API2.User.Mail.GetMails.Request(
                     token = app.config.userToken,
                     num = page.pageNum
                 )
@@ -76,9 +76,9 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun requestMoreMails() {
-        val result = ClientAPI.request(
-            route = API.User.Mail.GetMails,
-            data = API.User.Mail.GetMails.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Mail.GetMails,
+            data = API2.User.Mail.GetMails.Request(
                 token = app.config.userToken,
                 isProcessed = page.arg1,
                 mid = page.offset,
@@ -91,9 +91,9 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
         if (slot.confirm.openSuspend(content = text)) {
             slot.loading.openSuspend()
-            val result = ClientAPI.request(
-                route = API.User.Mail.ProcessMail,
-                data = API.User.Mail.ProcessMail.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Mail.ProcessMail,
+                data = API2.User.Mail.ProcessMail.Request(
                     token = app.config.userToken,
                     mid = mid,
                     confirm = value
@@ -115,9 +115,9 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun onDeleteMail(mid: Long) {
         if (slot.confirm.openSuspend(content = "删除此邮件?")) {
             slot.loading.openSuspend()
-            val result = ClientAPI.request(
-                route = API.User.Mail.DeleteMail,
-                data = API.User.Mail.DeleteMail.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Mail.DeleteMail,
+                data = API2.User.Mail.DeleteMail.Request(
                     token = app.config.userToken,
                     mid = mid
                 )

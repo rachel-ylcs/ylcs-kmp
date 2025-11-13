@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
-import love.yinlin.api.ServerRes
+import love.yinlin.api.ServerRes2
 import love.yinlin.api.Sockets
 
 object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
@@ -16,7 +16,7 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
     @Stable
     @Serializable
     data class PlayerInfo(val uid: Int, val name: String) {
-        val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+        val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
     }
 
     @Stable

@@ -18,9 +18,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.Local
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.ClientAPI2
 import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.*
@@ -63,9 +63,9 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGameRecords(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI.request(
-                route = API.User.Game.GetUserGameRecords,
-                data = API.User.Game.GetUserGameRecords.Request(
+            val result = ClientAPI2.request(
+                route = API2.User.Game.GetUserGameRecords,
+                data = API2.User.Game.GetUserGameRecords.Request(
                     token = app.config.userToken,
                     num = page.pageNum
                 )
@@ -77,9 +77,9 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun requestMoreGameRecords() {
-        val result = ClientAPI.request(
-            route = API.User.Game.GetUserGameRecords,
-            data = API.User.Game.GetUserGameRecords.Request(
+        val result = ClientAPI2.request(
+            route = API2.User.Game.GetUserGameRecords,
+            data = API2.User.Game.GetUserGameRecords.Request(
                 token = app.config.userToken,
                 rid = page.offset,
                 num = page.pageNum

@@ -1,7 +1,7 @@
 package love.yinlin.api.common
 
 import io.ktor.server.routing.Routing
-import love.yinlin.api.API
+import love.yinlin.api.API2
 import love.yinlin.api.ImplMap
 import love.yinlin.api.api
 import love.yinlin.data.Data
@@ -9,7 +9,7 @@ import love.yinlin.extension.to
 import love.yinlin.server.DB
 
 fun Routing.photoAPI(implMap: ImplMap) {
-    api(API.Common.Photo.SearchPhotoAlbums) { (keyword, ts, aid, num) ->
+    api(API2.Common.Photo.SearchPhotoAlbums) { (keyword, ts, aid, num) ->
         val photos = if (keyword == null) DB.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo

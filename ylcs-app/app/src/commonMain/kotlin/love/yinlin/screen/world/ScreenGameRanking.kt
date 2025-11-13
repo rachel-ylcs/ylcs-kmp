@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
-import love.yinlin.api.API
-import love.yinlin.api.ClientAPI
+import love.yinlin.api.API2
+import love.yinlin.api.ClientAPI2
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -36,8 +36,8 @@ class ScreenGameRanking(manager: ScreenManager, private val type: Game) : Screen
     private var items by mutableRefStateOf(emptyList<GameRank>())
 
     private suspend fun requestRank() {
-        val result = ClientAPI.request(
-            route = API.User.Game.GetGameRank,
+        val result = ClientAPI2.request(
+            route = API2.User.Game.GetGameRank,
             data = type
         )
         if (result is Data.Success) items = result.data
