@@ -16,7 +16,9 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 import love.yinlin.io.Sources
 
-class ClientAPIFile internal constructor(val value: Any) : APIFile(emptyList())
+class ClientAPIFile internal constructor(val value: Any) : APIFile {
+    override val files: List<String> = emptyList()
+}
 
 fun apiFile(data: ByteArray) = ClientAPIFile(value = data)
 fun apiFile(data: RawSource) = ClientAPIFile(value = data)

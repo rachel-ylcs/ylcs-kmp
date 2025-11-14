@@ -95,7 +95,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         pickPicture(1f)?.let { path ->
             ApiUserUpdateAvatar.request(app.config.userToken, apiFile(path.rawSource)) {
                 app.config.cacheUserAvatar = CacheState.UPDATE
-            }?.let { slot.tip.error(it.message) }
+            }?.let { slot.tip.error("更新失败") }
         }
     }
 

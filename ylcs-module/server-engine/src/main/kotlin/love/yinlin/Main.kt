@@ -11,6 +11,8 @@ import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
+import love.yinlin.api.APIScope
+import love.yinlin.api.ServerEngine
 import love.yinlin.extension.Json
 import love.yinlin.server.Database
 import love.yinlin.server.Redis
@@ -21,8 +23,14 @@ import java.io.File
 import kotlin.reflect.full.declaredFunctions
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: 迁移升级
+
 @Suppress("unused")
 fun Application.module() {
+    val engine = Class.forName("love.yinlin.api.MainServerEngine").kotlin.objectInstance as ServerEngine
+
+    copyResources(Application::class.java.classLoader, "public")
+
     install(ContentNegotiation) { json(Json) }
     install(WebSockets) {
         pingPeriod = 15.seconds
@@ -34,7 +42,9 @@ fun Application.module() {
     install(IPMonitor)
 
     routing {
-        staticFiles("/public", File("public"))
+        staticFiles("public", File("public"))
+
+        with(engine) { APIScope(this@routing).run() }
 
         val clz = Class.forName("love.yinlin.api.ServerStartup").kotlin
         val serverStartup = clz.objectInstance
@@ -46,9 +56,7 @@ fun Application.module() {
 }
 
 fun main(args: Array<String>) {
-    copyResources(Application::class.java.classLoader, "public")
     EngineMain.main(args)
-
     Redis.close()
     Database.close()
 }

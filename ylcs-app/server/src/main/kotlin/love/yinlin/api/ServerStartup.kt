@@ -16,11 +16,6 @@ val implMap = mutableMapOf<String, ImplFunc>()
 object ServerStartup {
     fun run(route: Routing) {
         with(route) {
-            APIScope(this).apply {
-                apiCommon(implMap)
-                apiUser(implMap)
-            }
-            
             // TODO: 迁移升级
             commonAPI(implMap)
             userAPI(implMap)

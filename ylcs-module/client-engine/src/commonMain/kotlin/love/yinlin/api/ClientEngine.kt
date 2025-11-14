@@ -8,10 +8,18 @@ import io.ktor.http.HttpStatusCode
 import love.yinlin.extension.catchingError
 import love.yinlin.platform.NetClient
 
-var ClientEngineBaseUrl = ""
+data object ClientEngine {
+    var baseUrl = ""
+
+    fun init(baseUrl: String) {
+        this.baseUrl = baseUrl
+    }
+}
+
+
 
 suspend inline fun API<out APIType>.internalRequest(builder: HttpRequestBuilder.() -> Unit, crossinline block: suspend (HttpResponse) -> Unit): Throwable? = catchingError {
-    val url = "$ClientEngineBaseUrl$route"
+    val url = "${ClientEngine.baseUrl}$route"
     NetClient.common.preparePost(urlString = url, block = builder).execute { response ->
         when (response.status) {
             HttpStatusCode.OK -> block(response)
