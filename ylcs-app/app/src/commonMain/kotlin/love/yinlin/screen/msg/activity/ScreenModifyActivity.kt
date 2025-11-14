@@ -14,7 +14,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.datetime.LocalDate
 import kotlinx.io.files.Path
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.api.API2
 import love.yinlin.api.ClientAPI2
 import love.yinlin.app
@@ -51,6 +50,7 @@ import love.yinlin.extension.Array
 import love.yinlin.extension.ArrayEmpty
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Object
+import love.yinlin.extension.json
 import love.yinlin.extension.rawSource
 import love.yinlin.extension.read
 import love.yinlin.extension.safeRawSources
@@ -165,7 +165,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
 				val newPic = result.data
 				photo = photo.toJson().Object.toMutableMap().let { map ->
-					map[key] = JsonPrimitive(newPic)
+					map[key] = newPic.json
 					map.toJson().to()
 				}
 				it.copy(photo = photo)
@@ -216,7 +216,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				val newPics = result.data
 				photo = photo.toJson().Object.toMutableMap().let { map ->
 					map[key] = map[key].ArrayEmpty.toMutableList().also { list ->
-						list += newPics.map { JsonPrimitive(it) }
+						list += newPics.map { it.json }
 					}.toJson()
 					map.toJson().to()
 				}
@@ -251,7 +251,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 					val newPic = result.data
 					photo = photo.toJson().Object.toMutableMap().let { map ->
 						map[key] = map[key].Array.toMutableList().also { list ->
-							list[index] = JsonPrimitive(newPic)
+							list[index] = newPic.json
 						}.toJson()
 						map.toJson().to()
 					}

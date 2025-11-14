@@ -78,7 +78,7 @@ class StartupAppConfig : StartupConfig() {
     // 播放模式
     var musicPlayMode by enumState(MusicPlayMode.ORDER)
     // 开启悬浮歌词
-    var enabledFloatingLyrics by booleanState(true)
+    var enabledFloatingLyrics by booleanState(false)
     // 歌词引擎配置
     var lyricsEngineConfig by jsonState { LyricsEngineConfig() }
     // 歌词引擎类型

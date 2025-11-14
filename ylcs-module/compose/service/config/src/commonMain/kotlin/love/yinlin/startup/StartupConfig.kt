@@ -29,7 +29,7 @@ open class StartupConfig : SyncStartup() {
         default: T,
         version: String? = null
     ) = object : ValueState<T>(version) {
-        override fun kvGet(key: String): T = kv.get<String>(key, default.toJsonString()).parseJsonValue() ?: default
+        override fun kvGet(key: String): T = kv.get<String>(key, default.toJsonString()).parseJsonValue<T?>() ?: default
         override fun kvSet(key: String, value: T) = kv.set(key, value.toJsonString())
     }
 

@@ -8,7 +8,8 @@ interface API<T : APIType> {
     val route: String
 
     companion object {
-        val post = APIChainHead<APIType.Post>()
+        val post = APIChainPost()
+        val form = APIChainForm()
     }
 }
 
@@ -49,109 +50,122 @@ interface API35<T : APIType, I1, I2, I3, O1, O2, O3, O4, O5> : API<T>
 interface API45<T : APIType, I1, I2, I3, I4, O1, O2, O3, O4, O5> : API<T>
 interface API55<T : APIType, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5> : API<T>
 
-class APIChainHead<T : APIType> internal constructor() {
+class APIChainPost internal constructor() {
     @JvmName("i0")
-    fun i() = APIChain0<T>()
+    fun i() = APIChain0<APIType.Post>()
     @JvmName("i1")
-    fun <I1> i() = APIChain1<T, I1>()
+    fun <I1> i(s1: String? = null) = APIChain1<APIType.Post, I1>()
     @JvmName("i2")
-    fun <I1, I2> i() = APIChain2<T, I1, I2>()
+    fun <I1, I2> i(s1: String? = null, s2: String? = null) = APIChain2<APIType.Post, I1, I2>()
     @JvmName("i3")
-    fun <I1, I2, I3> i() = APIChain3<T, I1, I2, I3>()
+    fun <I1, I2, I3> i(s1: String? = null, s2: String? = null, s3: String? = null) = APIChain3<APIType.Post, I1, I2, I3>()
     @JvmName("i4")
-    fun <I1, I2, I3, I4> i() = APIChain4<T, I1, I2, I3, I4>()
+    fun <I1, I2, I3, I4> i(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIChain4<APIType.Post, I1, I2, I3, I4>()
     @JvmName("i5")
-    fun <I1, I2, I3, I4, I5> i() = APIChain5<T, I1, I2, I3, I4, I5>()
+    fun <I1, I2, I3, I4, I5> i(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIChain5<APIType.Post, I1, I2, I3, I4, I5>()
+}
+
+class APIChainForm internal constructor() {
+    @JvmName("i1")
+    fun <I1> i(s1: String? = null) = APIChain1<APIType.Form, I1>()
+    @JvmName("i2")
+    fun <I1, I2> i(s1: String? = null, s2: String? = null) = APIChain2<APIType.Form, I1, I2>()
+    @JvmName("i3")
+    fun <I1, I2, I3> i(s1: String? = null, s2: String? = null, s3: String? = null) = APIChain3<APIType.Form, I1, I2, I3>()
+    @JvmName("i4")
+    fun <I1, I2, I3, I4> i(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIChain4<APIType.Form, I1, I2, I3, I4>()
+    @JvmName("i5")
+    fun <I1, I2, I3, I4, I5> i(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIChain5<APIType.Form, I1, I2, I3, I4, I5>()
 }
 
 class APIChain0<T : APIType> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API00<T> { override val route: String = it }}
+    fun o() = APIDelegate { object : API00<T> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API01<T, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API01<T, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API02<T, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API02<T, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API03<T, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API03<T, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API04<T, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API04<T, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API05<T, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API05<T, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIChain1<T : APIType, I1> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API10<T, I1> { override val route: String = it }}
+    fun o() = APIDelegate { object : API10<T, I1> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API11<T, I1, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API11<T, I1, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API12<T, I1, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API12<T, I1, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API13<T, I1, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API13<T, I1, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API14<T, I1, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API14<T, I1, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API15<T, I1, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API15<T, I1, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIChain2<T : APIType, I1, I2> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API20<T, I1, I2> { override val route: String = it }}
+    fun o() = APIDelegate { object : API20<T, I1, I2> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API21<T, I1, I2, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API21<T, I1, I2, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API22<T, I1, I2, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API22<T, I1, I2, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API23<T, I1, I2, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API23<T, I1, I2, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API24<T, I1, I2, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API24<T, I1, I2, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API25<T, I1, I2, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API25<T, I1, I2, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIChain3<T : APIType, I1, I2, I3> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API30<T, I1, I2, I3> { override val route: String = it }}
+    fun o() = APIDelegate { object : API30<T, I1, I2, I3> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API31<T, I1, I2, I3, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API31<T, I1, I2, I3, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API32<T, I1, I2, I3, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API32<T, I1, I2, I3, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API33<T, I1, I2, I3, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API33<T, I1, I2, I3, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API34<T, I1, I2, I3, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API34<T, I1, I2, I3, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API35<T, I1, I2, I3, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API35<T, I1, I2, I3, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIChain4<T : APIType, I1, I2, I3, I4> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API40<T, I1, I2, I3, I4> { override val route: String = it }}
+    fun o() = APIDelegate { object : API40<T, I1, I2, I3, I4> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API41<T, I1, I2, I3, I4, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API41<T, I1, I2, I3, I4, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API42<T, I1, I2, I3, I4, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API42<T, I1, I2, I3, I4, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API43<T, I1, I2, I3, I4, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API43<T, I1, I2, I3, I4, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API44<T, I1, I2, I3, I4, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API44<T, I1, I2, I3, I4, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API45<T, I1, I2, I3, I4, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API45<T, I1, I2, I3, I4, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIChain5<T : APIType, I1, I2, I3, I4, I5> internal constructor() {
     @JvmName("o0")
-    fun o() = APIDelegate { object : API50<T, I1, I2, I3, I4, I5> { override val route: String = it }}
+    fun o() = APIDelegate { object : API50<T, I1, I2, I3, I4, I5> { override val route: String = it } }
     @JvmName("o1")
-    fun <O1> o() = APIDelegate { object : API51<T, I1, I2, I3, I4, I5, O1> { override val route: String = it }}
+    fun <O1> o(s1: String? = null) = APIDelegate { object : API51<T, I1, I2, I3, I4, I5, O1> { override val route: String = it } }
     @JvmName("o2")
-    fun <O1, O2> o() = APIDelegate { object : API52<T, I1, I2, I3, I4, I5, O1, O2> { override val route: String = it }}
+    fun <O1, O2> o(s1: String? = null, s2: String? = null) = APIDelegate { object : API52<T, I1, I2, I3, I4, I5, O1, O2> { override val route: String = it } }
     @JvmName("o3")
-    fun <O1, O2, O3> o() = APIDelegate { object : API53<T, I1, I2, I3, I4, I5, O1, O2, O3> { override val route: String = it }}
+    fun <O1, O2, O3> o(s1: String? = null, s2: String? = null, s3: String? = null) = APIDelegate { object : API53<T, I1, I2, I3, I4, I5, O1, O2, O3> { override val route: String = it } }
     @JvmName("o4")
-    fun <O1, O2, O3, O4> o() = APIDelegate { object : API54<T, I1, I2, I3, I4, I5, O1, O2, O3, O4> { override val route: String = it }}
+    fun <O1, O2, O3, O4> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null) = APIDelegate { object : API54<T, I1, I2, I3, I4, I5, O1, O2, O3, O4> { override val route: String = it } }
     @JvmName("o5")
-    fun <O1, O2, O3, O4, O5> o() = APIDelegate { object : API55<T, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5> { override val route: String = it }}
+    fun <O1, O2, O3, O4, O5> o(s1: String? = null, s2: String? = null, s3: String? = null, s4: String? = null, s5: String? = null) = APIDelegate { object : API55<T, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5> { override val route: String = it } }
 }
 
 class APIDelegate<A : API<out APIType>> internal constructor(private val factory: (String) -> A) : ReadOnlyProperty<Any?, A> {

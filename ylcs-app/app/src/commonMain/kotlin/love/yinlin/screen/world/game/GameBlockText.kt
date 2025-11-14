@@ -24,7 +24,6 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.data.rachel.game.GameConfig
@@ -41,6 +40,7 @@ import love.yinlin.extension.toJson
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.floating.FloatingDialogInput
+import love.yinlin.extension.json
 import kotlin.jvm.JvmInline
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -337,17 +337,17 @@ class BlockTextCreateGameState(val slot: ScreenSlot) : CreateGameState {
 
     override val submitInfo: JsonElement = Unit.toJson()
 
-    override val submitQuestion: JsonElement get() = JsonPrimitive(buildString(gridSize * gridSize) {
+    override val submitQuestion: JsonElement get() = buildString(gridSize * gridSize) {
         data.take(gridSize * gridSize).fastForEach {
             append(it.decode { ch, hide -> if (hide) BTConfig.CHAR_BLOCK else ch })
         }
-    })
+    }.json
 
-    override val submitAnswer: JsonElement get() = JsonPrimitive(buildString(gridSize * gridSize) {
+    override val submitAnswer: JsonElement get() = buildString(gridSize * gridSize) {
         data.take(gridSize * gridSize).fastForEach {
             append(it.ch)
         }
-    })
+    }.json
 
     @Composable
     override fun ColumnScope.Content() {
@@ -411,11 +411,11 @@ class BlockTextPlayGameState(val slot: ScreenSlot) : PlayGameState {
 
     override val submitAnswer: JsonElement get() {
         val gridSize = preflight?.gridSize ?: BTConfig.minBlockSize
-        return JsonPrimitive(buildString(gridSize * gridSize) {
+        return buildString(gridSize * gridSize) {
             data.take(gridSize * gridSize).fastForEach {
                 append(it.ch)
             }
-        })
+        }.json
     }
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {

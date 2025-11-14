@@ -33,6 +33,8 @@ import kotlin.collections.component2
 import kotlin.collections.iterator
 import kotlin.jvm.JvmName
 
+// TODO: 迁移升级
+
 open class ClientEngine2(val baseUrl: String) {
     suspend inline fun <reified Response : Any> baseProcessResponse(response: HttpResponse): Data<Response> {
         val json = response.body<JsonObject>()
@@ -117,14 +119,7 @@ open class ClientEngine2(val baseUrl: String) {
             .execute { baseProcessResponse<Response>(it) }
     }
 
-    interface APIFileScope {
-        fun file(value: Nothing?): APIFile2
-        fun file(value: ByteArray?): APIFile2
-        fun file(value: RawSource?): APIFile2
-        fun file(values: Sources<RawSource>?): APIFiles2
-    }
-
-    fun FormBuilder.addByteArrayFile(key: String, file: ByteArray) = this.append(
+    fun FormBuilder.addByteArrayFile2(key: String, file: ByteArray) = this.append(
         key = key,
         value = file,
         headers = Headers.build {
@@ -132,7 +127,7 @@ open class ClientEngine2(val baseUrl: String) {
         }
     )
 
-    fun FormBuilder.addFormFile(key: String, source: RawSource) = this.append(
+    fun FormBuilder.addFormFile2(key: String, source: RawSource) = this.append(
         key = key,
         value = InputProvider { source.buffered() },
         headers = Headers.build {
@@ -140,7 +135,45 @@ open class ClientEngine2(val baseUrl: String) {
         }
     )
 
-    class ActualAPIFileScope : APIFileScope {
+    inline fun <reified Files : Any> buildFormFiles(
+        fileScope: ActualAPIFileScope2,
+        builder: FormBuilder,
+        crossinline files: APIFileScope2.() -> Files
+    ) {
+        val ignoreFile = mutableListOf<String>()
+        val ignoreFiles = mutableListOf<String>()
+
+        val keys = fileScope.files().toJson().Object
+        for ((name, item) in keys) {
+            if (item is JsonArray) {
+                val value = fileScope.map[item.first().String]
+                if (value == null) ignoreFiles += name
+                else (value as? Sources<*>)?.forEachIndexed { index, item ->
+                    builder.addFormFile2("#$name!$index", item)
+                }
+            }
+            else {
+                val value = fileScope.map[item.String]
+                if (value == null) ignoreFile += name
+                else {
+                    if (value is RawSource) builder.addFormFile2(name, value)
+                    else if (value is ByteArray) builder.addByteArrayFile2(name, value)
+                }
+            }
+        }
+
+        if (ignoreFile.isNotEmpty()) builder.append(key = "#ignoreFile#", value = ignoreFile.toJsonString())
+        if (ignoreFiles.isNotEmpty()) builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
+    }
+
+    interface APIFileScope2 {
+        fun file(value: Nothing?): APIFile2
+        fun file(value: ByteArray?): APIFile2
+        fun file(value: RawSource?): APIFile2
+        fun file(values: Sources<RawSource>?): APIFiles2
+    }
+
+    class ActualAPIFileScope2 : APIFileScope2 {
         private var index = 0
         val map = mutableMapOf<String, Any?>()
         val sources = Sources<RawSource>()
@@ -163,44 +196,13 @@ open class ClientEngine2(val baseUrl: String) {
         }))
     }
 
-    inline fun <reified Files : Any> buildFormFiles(
-        fileScope: ActualAPIFileScope,
-        builder: FormBuilder,
-        crossinline files: APIFileScope.() -> Files
-    ) {
-        val ignoreFile = mutableListOf<String>()
-        val ignoreFiles = mutableListOf<String>()
-
-        val keys = fileScope.files().toJson().Object
-        for ((name, item) in keys) {
-            if (item is JsonArray) {
-                val value = fileScope.map[item.first().String]
-                if (value == null) ignoreFiles += name
-                else (value as? Sources<*>)?.forEachIndexed { index, item ->
-                    builder.addFormFile("#$name!$index", item)
-                }
-            }
-            else {
-                val value = fileScope.map[item.String]
-                if (value == null) ignoreFile += name
-                else {
-                    if (value is RawSource) builder.addFormFile(name, value)
-                    else if (value is ByteArray) builder.addByteArrayFile(name, value)
-                }
-            }
-        }
-
-        if (ignoreFile.isNotEmpty()) builder.append(key = "#ignoreFile#", value = ignoreFile.toJsonString())
-        if (ignoreFiles.isNotEmpty()) builder.append(key = "#ignoreFiles#", value = ignoreFiles.toJsonString())
-    }
-
     suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> buildFormAndClean(
         route: APIRoute2<Request, Response, Files, APIMethod2.Form>,
         data: Request?,
-        crossinline files: APIFileScope.() -> Files,
+        crossinline files: APIFileScope2.() -> Files,
         crossinline responseBuilder: suspend (HttpResponse) -> Data<Response>
     ): Data<Response> = NetClient.file.safeCallData { client ->
-        val fileScope = ActualAPIFileScope()
+        val fileScope = ActualAPIFileScope2()
         fileScope.sources.use {
             val formParts = formData {
                 buildFormFiles(fileScope, this, files)
@@ -216,20 +218,20 @@ open class ClientEngine2(val baseUrl: String) {
     suspend inline fun <reified Request : Any, reified Response : Any, reified Files : Any> request(
         route: APIRoute2<Request, Response, Files, APIMethod2.Form>,
         data: Request,
-        crossinline files: APIFileScope.() -> Files
+        crossinline files: APIFileScope2.() -> Files
     ): Data<Response> = buildFormAndClean(route = route, data = data, files = files) { baseProcessResponse<Response>(it) }
 
     @JvmName("requestFormRequest")
     suspend inline fun <reified Request : Any, reified Files : Any> request(
         route: APIRoute2<Request, Response.Default, Files, APIMethod2.Form>,
         data: Request,
-        crossinline files: APIFileScope.() -> Files
+        crossinline files: APIFileScope2.() -> Files
     ): Data<Response.Default> = buildFormAndClean(route = route, data = data, files = files) { baseProcessResponseDefault(it) }
 
     @JvmName("requestFormResponse")
     suspend inline fun <reified Response : Any, reified Files : Any> request(
         route: APIRoute2<Request.Default, Response, Files, APIMethod2.Form>,
-        crossinline files: APIFileScope.() -> Files
+        crossinline files: APIFileScope2.() -> Files
     ): Data<Response> = buildFormAndClean(route = route, data = null, files = files) { baseProcessResponse<Response>(it) }
 
     @JvmName("requestServerResource")

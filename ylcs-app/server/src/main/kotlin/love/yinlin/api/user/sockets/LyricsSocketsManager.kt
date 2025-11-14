@@ -60,7 +60,7 @@ object LyricsSocketsManager {
     private val library = run {
         val classLoader = LyricsSocketsManager::class.java.classLoader
         val stream = classLoader.getResourceAsStream("lyrics_game.json")!!
-        val lyrics = stream.readAllBytes().decodeToString().parseJsonValue<List<Lyrics>>()!!
+        val lyrics = stream.readAllBytes().decodeToString().parseJsonValue<List<Lyrics>>()
         stream.close()
         lyrics
     }
@@ -178,7 +178,7 @@ object LyricsSocketsManager {
         catchingError {
             for (frame in session.incoming) {
                 if (frame !is Frame.Text) continue
-                when (val msg = frame.readText().parseJsonValue<LyricsSockets.CM>()!!) {
+                when (val msg = frame.readText().parseJsonValue<LyricsSockets.CM>()) {
                     is LyricsSockets.CM.Login -> {
                         val tokenUid = Coroutines.io { AN.throwExpireToken(msg.token) }
                         val (uid, name) = msg.info

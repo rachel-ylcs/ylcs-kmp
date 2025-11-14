@@ -372,7 +372,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                             if (!mp.isReady) {
                                 if (slot.confirm.openSuspend(content = "导入会覆盖整个本地歌单且无法撤销!")) {
                                     catchingError {
-                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()!!
+                                        val items = state.text.parseJsonValue<Map<String, MusicPlaylist>>()
                                         playlistLibrary.replaceAll(items)
                                         if (items.isNotEmpty()) currentPage = 0
                                         slot.tip.success("导入成功")

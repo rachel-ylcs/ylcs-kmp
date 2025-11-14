@@ -26,7 +26,9 @@ import love.yinlin.About
 import love.yinlin.Local
 import love.yinlin.api.API2
 import love.yinlin.api.ApiCommonGetServerStatus
+import love.yinlin.api.ApiUserUpdateAvatar
 import love.yinlin.api.ClientAPI2
+import love.yinlin.api.apiFile
 import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.common.*
@@ -91,19 +93,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserAvatar() {
         pickPicture(1f)?.let { path ->
-            val result = ClientAPI2.request(
-                route = API2.User.Profile.UpdateAvatar,
-                data = app.config.userToken,
-                files = {
-                    API2.User.Profile.UpdateAvatar.Files(
-                        avatar = file(path.rawSource)
-                    )
-                }
-            )
-            when (result) {
-                is Data.Success -> app.config.cacheUserAvatar = CacheState.UPDATE
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiUserUpdateAvatar.request(app.config.userToken, apiFile(path.rawSource)) {
+                app.config.cacheUserAvatar = CacheState.UPDATE
+            }?.let { slot.tip.error(it.message) }
         }
     }
 
@@ -454,7 +446,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
             var cacheSizeText by rememberState { "" }
 
             LaunchedEffect(Unit) {
-                cacheSizeText = app.os.storage.calcCacheSize().fileSizeString
+                cacheSizeText = Coroutines.io {
+                    app.os.storage.calcCacheSize().fileSizeString
+                }
             }
 
             ItemExpanderSuspend(

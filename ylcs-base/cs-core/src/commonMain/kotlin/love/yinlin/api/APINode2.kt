@@ -18,6 +18,9 @@ sealed interface APIMethod2 {
     data object Form : APIMethod2
 }
 
+typealias APIFile2 = String
+typealias APIFiles2 = List<APIFile2>
+
 abstract class APIPath2<Request : Any, Response : Any, Files: Any, Method : APIMethod2> protected constructor(
     private val path: String
 ) {
@@ -33,9 +36,6 @@ abstract class APIRoute2<Request : Any, Response : Any, Files: Any, Method : API
     parent: APINode2,
     name: String
 ) : APIPath2<Request, Response, Files, Method>("$parent/$name")
-
-typealias APIFile2 = String
-typealias APIFiles2 = List<APIFile2>
 
 typealias APIGet2<Request, Response> = APIRoute2<Request, Response, NoFiles, APIMethod2.Get>
 typealias APIPost2<Request, Response> = APIRoute2<Request, Response, NoFiles, APIMethod2.Post>

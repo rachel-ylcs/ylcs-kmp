@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.compose.ui.text.TextInput
@@ -41,6 +40,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.Space
+import love.yinlin.extension.json
 import kotlin.to
 
 @Composable
@@ -140,9 +140,9 @@ class FlowersOrderCreateGameState(val slot: ScreenSlot) : CreateGameState {
 
     override val submitInfo: JsonElement get() = FOInfo(tryCount.cast(FOConfig.minTryCount, FOConfig.maxTryCount)).toJson()
 
-    override val submitQuestion: JsonElement get() = JsonPrimitive(content.text.length)
+    override val submitQuestion: JsonElement get() = content.text.length.json
 
-    override val submitAnswer: JsonElement get() = JsonPrimitive(content.text)
+    override val submitAnswer: JsonElement get() = content.text.json
 
     @Composable
     override fun ColumnScope.Content() {
@@ -200,7 +200,7 @@ class FlowersOrderPlayGameState(val slot: ScreenSlot) : PlayGameState {
 
     override val canSubmit: Boolean by derivedStateOf { inputState.text.length == preflight?.length }
 
-    override val submitAnswer: JsonElement get() = JsonPrimitive(inputState.text)
+    override val submitAnswer: JsonElement get() = inputState.text.json
 
     override fun init(scope: CoroutineScope, preflightResult: PreflightResult) {
         preflight = catchingNull {

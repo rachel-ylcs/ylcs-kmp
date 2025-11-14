@@ -166,7 +166,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
             send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(uid, name)))
             newSession.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) {
-                    val msg = frame.readText().parseJsonValue<LyricsSockets.SM>()
+                    val msg = frame.readText().parseJsonValue<LyricsSockets.SM?>()
                     if (msg != null) dispatchMessage(msg)
                 }
             }

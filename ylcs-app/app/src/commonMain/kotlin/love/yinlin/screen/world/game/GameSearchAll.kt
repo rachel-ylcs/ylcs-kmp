@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.compose.ui.text.TextInput
@@ -42,6 +41,7 @@ import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.compose.ui.input.NormalText
+import love.yinlin.extension.json
 import love.yinlin.screen.community.BoxText
 
 @Composable
@@ -143,7 +143,7 @@ class SearchAllCreateGameState(val slot: ScreenSlot) : CreateGameState {
         timeLimit = timeLimit.cast(SAConfig.minTimeLimit, SAConfig.maxTimeLimit)
     ).toJson()
 
-    override val submitQuestion: JsonElement get() = JsonPrimitive(items.size)
+    override val submitQuestion: JsonElement get() = items.size.json
 
     override val submitAnswer: JsonElement get() = items.toSet().toJson()
 

@@ -21,7 +21,6 @@ import love.yinlin.extension.list
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.readText
 import love.yinlin.platform.Coroutines
-import love.yinlin.platform.Platform
 import love.yinlin.platform.ioContext
 import love.yinlin.platform.lyrics.FloatingLyrics
 import love.yinlin.platform.lyrics.LrcLayout
@@ -73,7 +72,7 @@ abstract class StartupMusicPlayer : AsyncStartup() {
     private suspend fun initLibrary() {
         rootPath.list().map { it.name }.forEach { id ->
             val configPath = Path(rootPath, id, ModResourceType.Config.filename)
-            val info = configPath.readText()?.parseJsonValue<MusicInfo>()
+            val info = configPath.readText()?.parseJsonValue<MusicInfo?>()
             if (info != null) library[info.id] = info
         }
     }
@@ -96,7 +95,7 @@ abstract class StartupMusicPlayer : AsyncStartup() {
             for (id in ids) {
                 val modification = library[id]?.modification ?: 0
                 val configPath = Path(rootPath, id, ModResourceType.Config.filename)
-                val info = configPath.readText()?.parseJsonValue<MusicInfo>()
+                val info = configPath.readText()?.parseJsonValue<MusicInfo?>()
                 if (info != null) library[id] = info.copy(modification = modification + 1)
             }
         }

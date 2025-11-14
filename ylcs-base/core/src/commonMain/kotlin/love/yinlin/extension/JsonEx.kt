@@ -30,9 +30,6 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 val Json = kotlinx.serialization.json.Json {
     prettyPrint = false
@@ -63,12 +60,12 @@ fun JsonObject.arr(key: String): JsonArray = (this[key] as? JsonArray) ?: error(
 
 // Json <-> Value
 
-inline fun <reified T> T?.toJson(): JsonElement = if (this == null) JsonNull else Json.encodeToJsonElement(this)
-fun <T> T?.toJson(serializer: SerializationStrategy<T>): JsonElement = if (this == null) JsonNull else Json.encodeToJsonElement(serializer, this)
+inline fun <reified T> T.toJson(): JsonElement = Json.encodeToJsonElement(this)
+fun <T> T.toJson(serializer: SerializationStrategy<T>): JsonElement = Json.encodeToJsonElement(serializer, this)
 val Boolean?.json: JsonElement get() = JsonPrimitive(this)
 val Number?.json: JsonElement get() = JsonPrimitive(this)
 val String?.json: JsonElement get() = JsonPrimitive(this)
-val ByteArray?.json: JsonElement get() = this.toJson(JsonConverter.ByteArray)
+val ByteArray?.json: JsonElement get() = this?.toJson(JsonConverter.ByteArray) ?: JsonNull
 
 inline fun <reified T> JsonElement.to(): T = Json.decodeFromJsonElement(this)
 fun <T> JsonElement.to(deserializer: DeserializationStrategy<T>): T = Json.decodeFromJsonElement(deserializer, this)
@@ -79,11 +76,11 @@ val String?.parseJson: JsonElement get() = if (this == null) JsonNull else Json.
 
 // Value <-> String
 
-inline fun <reified T> T?.toJsonString(): String = if (this == null) "null" else Json.encodeToString(this)
-fun <T> T?.toJsonString(serializer: SerializationStrategy<T>): String = if (this == null) "null" else Json.encodeToString(serializer, this)
+inline fun <reified T> T.toJsonString(): String = Json.encodeToString(this)
+fun <T> T.toJsonString(serializer: SerializationStrategy<T>): String = Json.encodeToString(serializer, this)
 
-inline fun <reified T> String?.parseJsonValue(): T? = if (this == null) null else Json.decodeFromString(this)
-fun <T> String?.parseJsonValue(deserializer: DeserializationStrategy<T>): T? = if (this == null) null else Json.decodeFromString(deserializer, this)
+inline fun <reified T> String.parseJsonValue(): T = Json.decodeFromString(this)
+fun <T> String.parseJsonValue(deserializer: DeserializationStrategy<T>): T = Json.decodeFromString(deserializer, this)
 
 // JsonConverter
 

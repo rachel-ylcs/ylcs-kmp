@@ -178,7 +178,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
                         onClick = {
                             catchingError {
                                 val localUsers = app.config.weiboUsers
-                                val items = state.text.parseJsonValue<List<WeiboUserInfo>>()!!
+                                val items = state.text.parseJsonValue<List<WeiboUserInfo>>()
                                 for (item in items) {
                                     if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
                                 }

@@ -12,7 +12,7 @@ class ScreenBuilder(
     val builder: NavGraphBuilder,
     val manager: ScreenManager
 ) {
-    inline fun <reified T : Any> List<String>.a(index: Int): T = this[index].parseJsonValue()!!
+    inline fun <reified T : Any> List<String>.a(index: Int): T = this[index].parseJsonValue()
     inline fun <reified T> List<String>.n(index: Int): T? = this[index].parseJsonValue()
 
     inline fun <reified S : BasicScreen> registerAndLaunch(num: Int, crossinline block: (args: List<String>) -> S) {

@@ -223,6 +223,10 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private fun downloadModResource(item: ResourceItem, song: Song) {
+        if (app.config.userProfile == null) {
+            slot.tip.warning("请先登录")
+            return
+        }
         launch {
             if (slot.confirm.openSuspend(content = "下载资源: ${item.type.description}?")) {
                 // 下载资源

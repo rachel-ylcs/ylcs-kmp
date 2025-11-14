@@ -143,11 +143,11 @@ suspend fun RoutingCall.toForm(): Pair<String?, JsonObject> {
                         when (name) {
                             "#data#" -> dataString = part.value
                             "#ignoreFile#" -> {
-                                val ignoreFile = part.value.parseJsonValue<List<String>>()!!
+                                val ignoreFile = part.value.parseJsonValue<List<String>>()
                                 for (file in ignoreFile) file with null
                             }
                             "#ignoreFiles#" -> {
-                                val ignoreFiles = part.value.parseJsonValue<List<String>>()!!
+                                val ignoreFiles = part.value.parseJsonValue<List<String>>()
                                 for (file in ignoreFiles) multiFiles[file] = mutableListOf()
                             }
                         }
@@ -194,7 +194,7 @@ inline fun <reified Request : Any, reified Response : Any, reified Files : Any> 
     crossinline body: suspend (Request, Files) -> Data<Response>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) {
     val (dataString, files) = it.toForm()
-    body(dataString.parseJsonValue()!!, files.to())
+    body(dataString!!.parseJsonValue(), files.to())
 }
 
 @JvmName("apiFormRequest")
@@ -203,7 +203,7 @@ inline fun <reified Request : Any, reified Files : Any> Route.api(
     crossinline body: suspend (Request, Files) -> Data<Response.Default>
 ): Route = safeAPI(HttpMethod.Post, route.toString()) {
     val (dataString, files) = it.toForm()
-    body(dataString.parseJsonValue()!!, files.to())
+    body(dataString!!.parseJsonValue(), files.to())
 }
 
 @JvmName("apiFormResponse")

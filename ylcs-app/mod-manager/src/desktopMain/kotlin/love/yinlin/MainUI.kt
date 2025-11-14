@@ -87,7 +87,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     require(Path(folder, ModResourceType.Background.filename).exists)
                     require(Path(folder, ModResourceType.LineLyrics.filename).exists)
                     require(Path(folder, ModResourceType.Audio.filename).exists)
-                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText().parseJsonValue<MusicInfo>()!!
+                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     id = musicInfo.id
                     name = musicInfo.name
                 }?.let {

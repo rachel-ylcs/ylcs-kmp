@@ -1,13 +1,13 @@
 package love.yinlin.api.user
 
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.JsonPrimitive
 import love.yinlin.api.*
 import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
+import love.yinlin.extension.json
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
@@ -56,7 +56,7 @@ fun Routing.activityAPI(implMap: ImplMap) {
 		if (!UserPrivilege.vipCalendar(user["privilege"].Int)) return@api "无权限".failureData
 		val photo = DB.throwQuerySQLSingle("SELECT photo FROM activity WHERE aid = ?", aid)["photo"].Object.toMutableMap()
 		val picName = currentUniqueId()
-		photo[key] = JsonPrimitive(picName)
+		photo[key] = picName.json
 		DB.throwExecuteSQL("UPDATE activity SET photo = ? WHERE aid = ?", photo.toJsonString(), aid)
 		pic.copy(ServerRes2.Activity.activity(picName))
 		Data.Success(picName)

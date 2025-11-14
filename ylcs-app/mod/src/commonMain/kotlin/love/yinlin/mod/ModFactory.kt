@@ -67,7 +67,7 @@ object ModFactory {
             Coroutines.io {
                 // 先读 config
                 val configPath = Path(mediaPath, ModResourceType.Config.filename)
-                val musicInfo = configPath.readText().parseJsonValue<MusicInfo>()!!
+                val musicInfo = configPath.readText()!!.parseJsonValue<MusicInfo>()
                 writeLengthString(musicInfo.id) // 写媒体ID
 
                 val resourcePaths = mutableListOf<Pair<Path, ModResourceType>>()
@@ -118,7 +118,7 @@ object ModFactory {
             require(version == VERSION) { "不兼容的MOD版本 APP: $VERSION, MOD: $version" }
             val mediaNum = readInt() // 读媒体数
             require(mediaNum >= 0) { "MOD文件已破坏" }
-            val info = readLengthString().parseJsonValue<ModInfo>()
+            val info = readLengthString().parseJsonValue<ModInfo?>()
             require(info != null) { "MOD文件已破坏" }
             ModMetadata(version, mediaNum, info)
         }
