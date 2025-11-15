@@ -19,13 +19,13 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiPhotoSearchPhotoAlbums
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
@@ -58,30 +58,14 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewPhotos() {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
-            val result = ClientAPI2.request(
-                route = API2.Common.Photo.SearchPhotoAlbums,
-                data = API2.Common.Photo.SearchPhotoAlbums.Request(
-                    keyword = keyword,
-                    num = page.pageNum
-                )
-            )
-            state = if (result is Data.Success) {
-                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            } else BoxState.NETWORK_ERROR
+            ApiPhotoSearchPhotoAlbums.request(keyword, page.default, page.default1,page.pageNum) {
+                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
+            }?.let { state = BoxState.NETWORK_ERROR }
         }
     }
 
     private suspend fun requestMorePhotos() {
-        val result = ClientAPI2.request(
-            route = API2.Common.Photo.SearchPhotoAlbums,
-            data = API2.Common.Photo.SearchPhotoAlbums.Request(
-                keyword = keyword,
-                ts = page.offset,
-                aid = page.arg1,
-                num = page.pageNum,
-            )
-        )
-        if (result is Data.Success) page.moreData(result.data)
+        ApiPhotoSearchPhotoAlbums.request(keyword, page.offset, page.arg1, page.pageNum) { page.moreData(it) }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -141,14 +125,14 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
                     modifier = Modifier.fillMaxWidth().clipToBounds()
                 ) { index ->
                     WebImage(
-                        uri = album.thumbPath(index),
+                        uri = remember(album) { album.thumbPath(index).url },
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.width(CustomTheme.size.cellWidth)
                             .aspectRatio(0.66667f)
                             .maskClip(MaterialTheme.shapes.large),
                         onClick = {
                             val pics = List(album.picNum) {
-                                Picture(album.thumbPath(it), album.picPath(it))
+                                Picture(album.thumbPath(it).url, album.picPath(it).url)
                             }
                             navigate(::ScreenImagePreview, pics, index)
                         }

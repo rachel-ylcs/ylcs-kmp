@@ -25,7 +25,6 @@ import love.yinlin.compose.*
 import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
@@ -195,7 +194,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
                             val picker = app.picker
                             picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                 val result = sink.use {
-                                    val result = NetClient.file.safeDownload(
+                                    val result = NetClient.download(
                                         url = url,
                                         sink = it,
                                         isCancel = { false },
@@ -360,22 +359,20 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
 
     override suspend fun initialize() {
         launch {
-            val data = WeiboAPI.getWeiboUser(userId)
-            user = if (data is Data.Success) data.data else null
+            user = WeiboAPI.getWeiboUser(userId)
             user?.info?.id?.let { id ->
                 if (state != BoxState.LOADING) {
                     state = BoxState.LOADING
                     val newItems = mutableMapOf<String, Weibo>()
                     val result = WeiboAPI.getUserWeibo(id)
-                    if (result is Data.Success) newItems += result.data.associateBy { it.id }
+                    if (result != null) newItems += result.associateBy { it.id }
                     items = newItems.map { it.value }.sortedDescending()
                     state = if (newItems.isEmpty()) BoxState.NETWORK_ERROR else BoxState.CONTENT
                 }
             }
         }
         launch {
-            val data = WeiboAPI.getWeiboUserAlbum(userId)
-            albums = if (data is Data.Success) data.data else null
+            albums = WeiboAPI.getWeiboUserAlbum(userId)
         }
     }
 

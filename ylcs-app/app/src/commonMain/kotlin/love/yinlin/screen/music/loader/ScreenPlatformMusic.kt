@@ -27,15 +27,12 @@ import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
-import love.yinlin.data.map
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.safeDownload
 import love.yinlin.resources.Res
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.TextInput
@@ -44,12 +41,8 @@ import love.yinlin.compose.ui.input.Radio
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
-import love.yinlin.extension.catchingError
-import love.yinlin.extension.mkdir
-import love.yinlin.extension.size
-import love.yinlin.extension.writeByteArray
-import love.yinlin.extension.writeText
-import love.yinlin.extension.writeTo
+import love.yinlin.extension.*
+import love.yinlin.platform.download
 import love.yinlin.platform.lyrics.LrcParser
 
 @Composable
@@ -103,7 +96,7 @@ private fun PlatformMusicInfoCard(
 }
 
 private interface PlatformMusicParser {
-    suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>>
+    suspend fun parseLink(link: String): List<PlatformMusicInfo>?
 
     companion object {
         fun build(type: PlatformMusicType): PlatformMusicParser = when (type) {
@@ -115,27 +108,26 @@ private interface PlatformMusicParser {
 }
 
 private class QQMusicParser : PlatformMusicParser {
-    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
         // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
         link.contains("c6.y.qq.com") -> Coroutines.io {
-            when (val tmp = QQMusicAPI.requestMusicId(link)) {
-                is Data.Success -> QQMusicAPI.requestMusic(tmp.data)
-                is Data.Failure -> tmp
+            QQMusicAPI.requestMusicId(link)?.let {
+                QQMusicAPI.requestMusic(it)
             }
-        }.map { listOf(it) }
+        }?.let { listOf(it) }
         // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
         link.contains("y.qq.com") && link.contains("songDetail") -> Coroutines.io {
             QQMusicAPI.requestMusic(link.substringAfterLast("/"))
-        }.map { listOf(it) }
+        }?.let { listOf(it) }
         // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
         link.contains("i2.y.qq.com") && link.contains("playlist") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Failure()
+            if (id != null) QQMusicAPI.requestPlaylist(id) else null
         }
         // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
         link.contains("i.y.qq.com") && link.contains("taoge") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) QQMusicAPI.requestPlaylist(id) else Data.Failure()
+            if (id != null) QQMusicAPI.requestPlaylist(id) else null
         }
         // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
         link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
@@ -144,40 +136,37 @@ private class QQMusicParser : PlatformMusicParser {
         // 歌曲 003yJ3Ba1bDVJc
         else -> Coroutines.io {
             QQMusicAPI.requestMusic(link)
-        }.map { listOf(it) }
+        }?.let { listOf(it) }
     }
 }
 
 private class NetEaseCloudParser : PlatformMusicParser {
-    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> = when {
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
         // 歌曲 http://163cn.tv/EElG0jr
         link.contains("163cn.tv") -> Coroutines.io {
-            when (val tmp = NetEaseCloudAPI.requestMusicId(link)) {
-                is Data.Success -> NetEaseCloudAPI.requestMusic(tmp.data)
-                is Data.Failure -> tmp
+            NetEaseCloudAPI.requestMusicId(link)?.let {
+                NetEaseCloudAPI.requestMusic(it)
             }
-        }.map { listOf(it) }
+        }?.let { listOf(it) }
         // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
         link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) NetEaseCloudAPI.requestPlaylist(id) else Data.Failure()
+            if (id != null) NetEaseCloudAPI.requestPlaylist(id) else null
         }
         // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
         link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
             val id = Uri.parse(link)?.params["id"]
-            if (id != null) NetEaseCloudAPI.requestMusic(id) else Data.Failure()
-        }.map { listOf(it) }
+            if (id != null) NetEaseCloudAPI.requestMusic(id) else null
+        }?.let { listOf(it) }
         // 歌曲 504686858
         else -> Coroutines.io {
             NetEaseCloudAPI.requestMusic(link)
-        }.map { listOf(it) }
+        }?.let { listOf(it) }
     }
 }
 
 private class KugouParser : PlatformMusicParser {
-    override suspend fun parseLink(link: String): Data<List<PlatformMusicInfo>> {
-        return Data.Failure()
-    }
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = null
 }
 
 @Stable
@@ -194,7 +183,7 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
                 for (item in items) {
                     // 1. 下载音频
                     val audioFile = app.os.storage.createTempFile { sink ->
-                        NetClient.file.safeDownload(
+                        NetClient.download(
                             url = item.audioUrl,
                             sink = sink,
                             isCancel = { false },
@@ -204,7 +193,7 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
                     }
                     // 2. 下载封面
                     val recordFile = app.os.storage.createTempFile { sink ->
-                        NetClient.file.safeDownload(
+                        NetClient.download(
                             url = item.pic,
                             sink = sink,
                             isCancel = { false },
@@ -273,10 +262,9 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
             enabled = linkState.text.isNotEmpty()
         ) {
             val parser = PlatformMusicParser.build(platformType)
-            when (val result = parser.parseLink(linkState.text)) {
-                is Data.Success -> items = result.data
-                is Data.Failure -> slot.tip.warning("解析失败")
-            }
+            val result = parser.parseLink(linkState.text)
+            if (result != null) items = result
+            else slot.tip.warning("解析失败")
         }
         ActionSuspend(
             icon = Icons.Outlined.Download,

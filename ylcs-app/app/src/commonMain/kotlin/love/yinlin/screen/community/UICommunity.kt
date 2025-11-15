@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.data.rachel.profile.UserProfile
@@ -143,7 +144,7 @@ internal fun UserProfileInfo(
         ) {
             Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
                 WebImage(
-                    uri = profile.avatarPath,
+                    uri = remember(profile) { profile.avatarPath.url },
                     key = if (owner) app.config.cacheUserAvatar else remember { DateEx.TodayString },
                     contentScale = ContentScale.Crop,
                     circle = true,
@@ -188,7 +189,7 @@ internal fun UserProfileCard(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             WebImage(
-                uri = profile.wallPath,
+                uri = remember(profile) { profile.wallPath.url },
                 key = app.config.cacheUserWall,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
             )
@@ -261,7 +262,7 @@ internal fun UserPublicProfileCard(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             WebImage(
-                uri = profile.wallPath,
+                uri = remember(profile) { profile.wallPath.url },
                 key = remember { DateEx.TodayString },
                 modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
             )

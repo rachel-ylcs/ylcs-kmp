@@ -18,13 +18,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewModelScope
 import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiGamePreflightGame
+import love.yinlin.api.ApiGameVerifyGame
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
@@ -59,21 +60,11 @@ class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
     private val canSubmit by derivedStateOf { status == Status.Playing && preflightResult != null && state.canSubmit }
 
     private suspend fun preflight() {
-        val result = ClientAPI2.request(
-            route = API2.User.Game.PreflightGame,
-            data = API2.User.Game.PreflightGame.Request(
-                token = app.config.userToken,
-                gid = game?.gid ?: 0
-            )
-        )
-        when (result) {
-            is Data.Success -> {
-                preflightResult = result.data
-                state.init(viewModelScope, result.data)
-                status = Status.Playing
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiGamePreflightGame.request(app.config.userToken, game?.gid ?: 0) {
+            preflightResult = it
+            state.init(viewModelScope, it)
+            status = Status.Playing
+        }.errorTip
     }
 
     @Composable
@@ -233,24 +224,12 @@ class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
                 enabled = canSubmit
             ) {
                 preflightResult?.let { preflight ->
-                    val result = ClientAPI2.request(
-                        route = API2.User.Game.VerifyGame,
-                        data = API2.User.Game.VerifyGame.Request(
-                            token = app.config.userToken,
-                            gid = game.gid,
-                            rid = preflight.rid,
-                            answer = state.submitAnswer
-                        )
-                    )
-                    when (result) {
-                        is Data.Success -> {
-                            gameResult = result.data
-                            state.settle(result.data)
-                            preflightResult = null
-                            status = Status.Settling
-                        }
-                        is Data.Failure -> slot.tip.error(result.message)
-                    }
+                    ApiGameVerifyGame.request(app.config.userToken, game.gid, preflight.rid, state.submitAnswer) {
+                        gameResult = it
+                        state.settle(it)
+                        preflightResult = null
+                        status = Status.Settling
+                    }.errorTip
                 }
             }
         }
@@ -263,7 +242,7 @@ class ScreenPlayGame(manager: ScreenManager) : Screen(manager) {
                 val deviceType = LocalDevice.current.type
 
                 WebImage(
-                    uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT) },
+                    uri = remember(deviceType) { game.type.xyPath(deviceType != Device.Type.PORTRAIT).url },
                     key = Local.info.version,
                     contentScale = ContentScale.Crop,
                     alpha = 0.75f,

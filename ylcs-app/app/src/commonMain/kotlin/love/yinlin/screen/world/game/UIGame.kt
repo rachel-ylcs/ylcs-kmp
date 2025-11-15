@@ -19,6 +19,7 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.Local
+import love.yinlin.api.url
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.data.rachel.game.*
@@ -190,7 +191,7 @@ fun GameItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 WebImage(
-                    uri = remember { game.type.yPath },
+                    uri = remember { game.type.yPath.url },
                     key = Local.info.version,
                     contentScale = ContentScale.Crop,
                     circle = true,

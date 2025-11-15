@@ -19,9 +19,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -31,7 +29,6 @@ import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.EmptyBox
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Topic
@@ -54,87 +51,26 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
         override fun arg1(item: Topic): Boolean = item.isTop
     }
 
-    private suspend fun requestUserProfile() {
-        val result = ClientAPI2.request(
-            route = API2.User.Profile.GetPublicProfile,
-            data = API2.User.Profile.GetPublicProfile.Request(
-                token = app.config.userToken.ifEmpty { null },
-                uid = uid
-            )
-        )
-        if (result is Data.Success) profile = result.data
-    }
-
-    private suspend fun requestNewTopics() {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopics,
-            data = API2.User.Topic.GetTopics.Request(
-                uid = uid,
-                num = page.pageNum
-            )
-        )
-        if (result is Data.Success) page.newData(result.data)
-    }
-
     private suspend fun requestMoreTopics() {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopics,
-            data = API2.User.Topic.GetTopics.Request(
-                uid = uid,
-                isTop = page.arg1,
-                tid = page.offset,
-                num = page.pageNum
-            )
-        )
-        if (result is Data.Success) page.moreData(result.data)
+        ApiTopicGetTopics.request(uid, page.arg1, page.offset, page.pageNum) { page.moreData(it) }
     }
 
     private suspend fun followUser(profile: UserPublicProfile) {
-        val result = ClientAPI2.request(
-            route = API2.User.Follows.FollowUser,
-            data = API2.User.Follows.FollowUser.Request(
-                token = app.config.userToken,
-                uid = profile.uid
-            )
-        )
-        when (result) {
-            is Data.Success -> this.profile = profile.copy(
-                status = FollowStatus.FOLLOW,
-                followers = profile.followers + 1
-            )
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiFollowsFollowUser.request(app.config.userToken, profile.uid) {
+            this.profile = profile.copy(status = FollowStatus.FOLLOW, followers = profile.followers + 1)
+        }.errorTip
     }
 
     private suspend fun unfollowUser(profile: UserPublicProfile) {
-        val result = ClientAPI2.request(
-            route = API2.User.Follows.UnfollowUser,
-            data = API2.User.Follows.UnfollowUser.Request(
-                token = app.config.userToken,
-                uid = profile.uid
-            )
-        )
-        when (result) {
-            is Data.Success -> this.profile = profile.copy(
-                status = FollowStatus.UNFOLLOW,
-                followers = profile.followers - 1
-            )
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiFollowsUnfollowUser.request(app.config.userToken, profile.uid) {
+            this.profile = profile.copy(status = FollowStatus.UNFOLLOW, followers = profile.followers - 1)
+        }.errorTip
     }
 
     private suspend fun blockUser(profile: UserPublicProfile) {
-        val result = ClientAPI2.request(
-            route = API2.User.Follows.BlockUser,
-            data = API2.User.Follows.BlockUser.Request(
-                token = app.config.userToken,
-                uid = profile.uid
-            )
-        )
-        when (result) {
-            is Data.Success -> this.profile = profile.copy(status = FollowStatus.BLOCK)
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiFollowsBlockUser.request(app.config.userToken, profile.uid) {
+            this.profile = profile.copy(status = FollowStatus.BLOCK)
+        }.errorTip
     }
 
     private fun onTopicClick(topic: Topic) {
@@ -157,9 +93,9 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
                     .heightIn(min = cardWidth * 0.777777f)
                     .clickable { onTopicClick(topic) }
             ) {
-                if (topic.pic != null) {
+                topic.picPath?.url?.let {
                     WebImage(
-                        uri = topic.picPath,
+                        uri = it,
                         modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
                         contentScale = ContentScale.Crop
                     )
@@ -318,8 +254,8 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     }
 
     override suspend fun initialize() {
-        requestUserProfile()
-        requestNewTopics()
+        launch { ApiProfileGetPublicProfile.request(app.config.userToken.ifEmpty { null }, uid) { profile = it } }
+        launch { ApiTopicGetTopics.request(uid, page.default1, page.default, page.pageNum) { page.newData(it) } }
     }
 
     override val title: String = "主页"

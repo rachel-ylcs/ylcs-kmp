@@ -18,7 +18,6 @@ import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
@@ -48,9 +47,8 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
 
                 items.clear()
                 for (id in users) {
-                    val result = WeiboAPI.getUserWeibo(id)
-                    if (result is Data.Success) {
-                        items += result.data
+                    WeiboAPI.getUserWeibo(id)?.let { result ->
+                        items += result
                         items.sortDescending()
                         if (state == BoxState.LOADING) state = BoxState.CONTENT
                         gridState.scrollToItem(0)
@@ -103,7 +101,7 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
                                             val picker = app.picker
                                             picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                 val result = sink.use {
-                                                    val result = NetClient.file.safeDownload(
+                                                    val result = NetClient.download(
                                                         url = url,
                                                         sink = it,
                                                         isCancel = { false },

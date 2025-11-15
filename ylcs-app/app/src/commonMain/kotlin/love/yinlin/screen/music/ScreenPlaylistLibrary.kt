@@ -21,13 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiBackupDownloadPlaylist
+import love.yinlin.api.ApiBackupUploadPlaylist
+import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.*
@@ -277,22 +277,12 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private suspend fun downloadCloudPlaylist(): Data<Map<String, List<PlaylistPreviewItem>>> {
-        val result = ClientAPI2.request(
-            route = API2.User.Backup.DownloadPlaylist,
-            data = app.config.userToken
-        )
-        return when (result) {
-            is Data.Success -> {
-                catchingDefault({
-                    Data.Failure(message = "云端歌单存在异常", throwable = it)
-                }) {
-                    val playlists: Map<String, MusicPlaylist> = result.data.to()
-                    Data.Success(decodePlaylist(playlists))
-                }
-            }
-            is Data.Failure -> result
-        }
+    private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? {
+        var data: Map<String, List<PlaylistPreviewItem>>? = null
+        ApiBackupDownloadPlaylist.request(app.config.userToken) { obj ->
+            catchingError { data = decodePlaylist(obj.to()) }?.let { error("云端歌单存在异常") }
+        }.errorTip
+        return data
     }
 
     override val title: String = "歌单"
@@ -330,7 +320,7 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         override suspend fun initialize() {
             playlists = emptyMap()
             val result = downloadCloudPlaylist()
-            if (result is Data.Success) playlists = result.data
+            if (result != null) playlists = result
         }
 
         @Composable
@@ -397,20 +387,10 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                         icon = Icons.Outlined.CloudUpload,
                         onClick = {
                             if (slot.confirm.openSuspend(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
-                                val result = ClientAPI2.request(
-                                    route = API2.User.Backup.UploadPlaylist,
-                                    data = API2.User.Backup.UploadPlaylist.Request(
-                                        token = app.config.userToken,
-                                        playlist = playlistLibrary.items.toJson().Object
-                                    )
-                                )
-                                when (result) {
-                                    is Data.Success -> {
-                                        playlists = decodePlaylist(playlistLibrary.items)
-                                        slot.tip.success(result.message)
-                                    }
-                                    is Data.Failure -> slot.tip.error(result.message)
-                                }
+                                ApiBackupUploadPlaylist.request(app.config.userToken, playlistLibrary.items.toJson().Object) {
+                                    playlists = decodePlaylist(playlistLibrary.items)
+                                    slot.tip.success("备份成功")
+                                }.errorTip
                             }
                         }
                     )

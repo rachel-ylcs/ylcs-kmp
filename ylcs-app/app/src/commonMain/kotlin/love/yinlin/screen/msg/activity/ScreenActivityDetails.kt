@@ -22,8 +22,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiActivityDeleteActivity
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.uri.Uri
@@ -31,7 +32,6 @@ import love.yinlin.compose.*
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
@@ -90,20 +90,10 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 	private val activity: Activity? by derivedStateOf { activities.find { it.aid == aid } }
 
 	private suspend fun deleteActivity() {
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.DeleteActivity,
-			data = API2.User.Activity.DeleteActivity.Request(
-				token = app.config.userToken,
-				aid = aid
-			)
-		)
-		when (result) {
-            is Data.Success -> {
-				activities.findModify(predicate = { it.aid == aid }) { this -= it }
-                pop()
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+		ApiActivityDeleteActivity.request(app.config.userToken, aid) {
+			activities.findModify(predicate = { it.aid == aid }) { this -= it }
+			pop()
+		}.errorTip
 	}
 
 	@Composable
@@ -111,7 +101,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 		activity: Activity,
 		modifier: Modifier = Modifier
 	) {
-		val coverPath = remember(activity) { activity.photo.coverPath ?: activity.photo.posters.firstOrNull()?.let { activity.photo.posterPath(it) } }
+		val coverPath = remember(activity) { activity.photo.coverPath?.url ?: activity.photo.posters.firstOrNull()?.let { activity.photo.posterPath(it) }?.url }
 
 		Column(
 			modifier = modifier,
@@ -334,7 +324,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 				}
 			}
 
-			val seatPath = remember(activity) { activity.photo.seatPath }
+			val seatPath = remember(activity) { activity.photo.seatPath?.url }
 			Text(
 				text = "座位图",
 				style = MaterialTheme.typography.labelMedium,
@@ -352,7 +342,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 			}
 
 			val pics = remember(activity) {
-				activity.photo.posters.fastMap { Picture(activity.photo.posterPath(it)) }
+				activity.photo.posters.fastMap { Picture(activity.photo.posterPath(it).url) }
 			}
 			Text(
 				text = "海报",

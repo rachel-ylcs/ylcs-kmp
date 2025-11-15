@@ -14,8 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.datetime.LocalDate
 import kotlinx.io.files.Path
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
@@ -27,7 +26,6 @@ import love.yinlin.compose.graphics.ImageProcessor
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.layout.ActionScope
@@ -46,16 +44,7 @@ import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.activity.ActivityLink
 import love.yinlin.data.rachel.activity.ActivityPrice
-import love.yinlin.extension.Array
-import love.yinlin.extension.ArrayEmpty
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.Object
-import love.yinlin.extension.json
-import love.yinlin.extension.rawSource
-import love.yinlin.extension.read
-import love.yinlin.extension.safeRawSources
-import love.yinlin.extension.to
-import love.yinlin.extension.toJson
+import love.yinlin.extension.*
 import love.yinlin.screen.community.BoxText
 
 @Stable
@@ -118,111 +107,70 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			link = link,
 			playlist = playlist
 		)
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.UpdateActivityInfo,
-			data = API2.User.Activity.UpdateActivityInfo.Request(
-				token = app.config.userToken,
-				activity = newActivity
-			)
-		)
-		when (result) {
-			is Data.Success -> {
-				activities.findAssign(predicate = { it.aid == aid }) {
-					it.copy(
-						ts = ts,
-						tsInfo = tsInfo,
-						location = location,
-						shortTitle = shortTitle,
-						title = title,
-						content = content,
-						price = price,
-						saleTime = saleTime,
-						lineup = lineup,
-						link = link,
-						playlist = playlist
-					)
-				}
-				pop()
+		ApiActivityUpdateActivityInfo.request(app.config.userToken, newActivity) {
+			activities.findAssign(predicate = { it.aid == aid }) {
+				it.copy(
+					ts = ts,
+					tsInfo = tsInfo,
+					location = location,
+					shortTitle = shortTitle,
+					title = title,
+					content = content,
+					price = price,
+					saleTime = saleTime,
+					lineup = lineup,
+					link = link,
+					playlist = playlist
+				)
 			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+			pop()
+		}.errorTip
 	}
 
 	private suspend fun updatePhoto(key: String, path: Path) {
 		slot.loading.openSuspend()
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.UpdateActivityPhoto,
-			data = API2.User.Activity.UpdateActivityPhoto.Request(
-				token = app.config.userToken,
-				aid = aid,
-				key = key
-			),
-			files = { API2.User.Activity.UpdateActivityPhoto.Files(
-				pic = file(path.rawSource)
-			) }
-		)
-		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
-				val newPic = result.data
-				photo = photo.toJson().Object.toMutableMap().let { map ->
-					map[key] = newPic.json
-					map.toJson().to()
+		catching {
+			ApiActivityUpdateActivityPhoto.request(app.config.userToken, aid, key, apiFile(path.rawSource)) { newPic ->
+				activities.findAssign(predicate = { it.aid == aid }) {
+					photo = photo.toJson().Object.toMutableMap().let { map ->
+						map[key] = newPic.json
+						map.toJson().to()
+					}
+					it.copy(photo = photo)
 				}
-				it.copy(photo = photo)
-			}
-			is Data.Failure -> slot.tip.error(result.message)
+			}.errorTip
 		}
 		slot.loading.close()
 	}
 
 	private suspend fun deletePhoto(key: String) {
 		slot.loading.openSuspend()
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.DeleteActivityPhoto,
-			data = API2.User.Activity.DeleteActivityPhoto.Request(
-				token = app.config.userToken,
-				aid = aid,
-				key = key
-			)
-		)
-		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) {
+		ApiActivityDeleteActivityPhoto.request(app.config.userToken, aid, key) {
+			activities.findAssign(predicate = { it.aid == aid }) {
 				photo = photo.toJson().Object.toMutableMap().let { map ->
 					map.remove(key)
 					map.toJson().to()
 				}
 				it.copy(photo = photo)
 			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+		}.errorTip
 		slot.loading.close()
 	}
 
 	private suspend fun addPhotos(key: String, files: List<Path>) {
 		slot.loading.openSuspend()
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.AddActivityPhotos,
-			data = API2.User.Activity.AddActivityPhotos.Request(
-				token = app.config.userToken,
-				aid = aid,
-				key = key
-			),
-			files = { API2.User.Activity.AddActivityPhotos.Files(
-				pics = file(files.safeRawSources())
-			) }
-		)
-		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
-				val newPics = result.data
-				photo = photo.toJson().Object.toMutableMap().let { map ->
-					map[key] = map[key].ArrayEmpty.toMutableList().also { list ->
-						list += newPics.map { it.json }
-					}.toJson()
-					map.toJson().to()
+		catching {
+			ApiActivityAddActivityPhotos.request(app.config.userToken, aid, key, apiFile(files)!!) { newPics ->
+				activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+					photo = photo.toJson().Object.toMutableMap().let { map ->
+						map[key] = map[key].ArrayEmpty.toMutableList().also { list ->
+							list += newPics.map { it.json }
+						}.toJson()
+						map.toJson().to()
+					}
+					oldActivity.copy(photo = photo)
 				}
-				oldActivity.copy(photo = photo)
-			}
-			is Data.Failure -> slot.tip.error(result.message)
+			}.errorTip
 		}
 		slot.loading.close()
 	}
@@ -234,30 +182,18 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			}
 		}?.let { path ->
 			slot.loading.openSuspend()
-			val result = ClientAPI2.request(
-				route = API2.User.Activity.UpdateActivityPhotos,
-				data = API2.User.Activity.UpdateActivityPhotos.Request(
-					token = app.config.userToken,
-					aid = aid,
-					key = key,
-					index = index
-				),
-				files = { API2.User.Activity.UpdateActivityPhotos.Files(
-					pic = file(path.rawSource)
-				) }
-			)
-			when (result) {
-				is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
-					val newPic = result.data
-					photo = photo.toJson().Object.toMutableMap().let { map ->
-						map[key] = map[key].Array.toMutableList().also { list ->
-							list[index] = newPic.json
-						}.toJson()
-						map.toJson().to()
+			catching {
+				ApiActivityUpdateActivityPhotos.request(app.config.userToken, aid, key, index, apiFile(path.rawSource)) { newPic ->
+					activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+						photo = photo.toJson().Object.toMutableMap().let { map ->
+							map[key] = map[key].Array.toMutableList().also { list ->
+								list[index] = newPic.json
+							}.toJson()
+							map.toJson().to()
+						}
+						oldActivity.copy(photo = photo)
 					}
-					oldActivity.copy(photo = photo)
-				}
-				is Data.Failure -> slot.tip.error(result.message)
+				}.errorTip
 			}
 			slot.loading.close()
 		}
@@ -265,17 +201,8 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 
 	private suspend fun deletePhotos(key: String, index: Int) {
 		slot.loading.openSuspend()
-		val result = ClientAPI2.request(
-			route = API2.User.Activity.DeleteActivityPhotos,
-			data = API2.User.Activity.DeleteActivityPhotos.Request(
-				token = app.config.userToken,
-				aid = aid,
-				key = key,
-				index = index
-			)
-		)
-		when (result) {
-			is Data.Success -> activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
+		ApiActivityDeleteActivityPhotos.request(app.config.userToken, aid, key, index) {
+			activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
 				photo = photo.toJson().Object.toMutableMap().let { map ->
 					map[key] = map[key].Array.toMutableList().also { list ->
 						list.removeAt(index)
@@ -284,8 +211,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				}
 				oldActivity.copy(photo = photo)
 			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+		}.errorTip
 		slot.loading.close()
 	}
 
@@ -530,7 +456,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				style = MaterialTheme.typography.titleMedium
 			)
 			ReplaceableImage(
-				pic = remember(photo) { photo.coverPath },
+				pic = remember(photo) { photo.coverPath?.url },
 				modifier = Modifier.fillMaxWidth().aspectRatio(2f),
 				onReplace = {
 					launch {
@@ -554,7 +480,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				style = MaterialTheme.typography.titleMedium
 			)
 			ReplaceableImage(
-				pic = remember(photo) { photo.seatPath },
+				pic = remember(photo) { photo.seatPath?.url },
 				modifier = Modifier.fillMaxWidth().aspectRatio(2f),
 				onReplace = {
 					launch {
@@ -597,7 +523,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				}
 			) { _, pic ->
 				WebImage(
-					uri = photo.posterPath(pic),
+					uri = photo.posterPath(pic).url,
 					contentScale = ContentScale.Crop,
 					modifier = Modifier.fillMaxSize()
 				)

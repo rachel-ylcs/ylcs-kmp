@@ -21,24 +21,17 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.url
-import io.ktor.http.HttpMethod
-import io.ktor.http.URLProtocol
-import io.ktor.websocket.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.consumeAsFlow
-import love.yinlin.Local
-import love.yinlin.api.ServerRes
+import love.yinlin.api.SocketsConnection
+import love.yinlin.api.sockets.LyricsSockets
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.rachel.game.Game
-import love.yinlin.data.rachel.sockets.LyricsSockets
 import love.yinlin.extension.*
-import love.yinlin.platform.NetClient
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.WebImage
@@ -50,6 +43,7 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
+import love.yinlin.platform.Coroutines
 
 @Composable
 private fun UserItem(
@@ -66,9 +60,8 @@ private fun UserItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
-            // TODO: ServerRes
             WebImage(
-                uri = remember(info) { ServerRes.Users.User(info.uid).avatar.path },
+                uri = remember(info) { info.userAvatar.url },
                 key = remember { DateEx.TodayString },
                 circle = true,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f)
@@ -96,9 +89,8 @@ private fun GameResultUserItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
-        // TODO: ServerRes
         WebImage(
-            uri = remember(result) { ServerRes.Users.User(result.player.uid).avatar.path },
+            uri = remember(result) { result.userAvatar.url },
             key = remember { DateEx.TodayString },
             circle = true,
             modifier = Modifier.size(CustomTheme.size.mediumImage)
@@ -155,38 +147,64 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
     }
 
     private var currentStatus: Status by mutableRefStateOf(Status.Hall)
-    private var session: DefaultClientWebSocketSession? by mutableRefStateOf(null)
-    private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
-    private suspend fun sessionLoop() {
-        catchingError {
-            session?.close()
-            val newSession = NetClient.sockets.webSocketSession {
-                method = HttpMethod.Get
-                url(scheme = URLProtocol.WSS.name, host = Local.API_HOST, port = URLProtocol.WSS.defaultPort, path = LyricsSockets.path)
-            }
-            session = newSession
-            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(uid, name)))
-            newSession.incoming.consumeAsFlow().collect { frame ->
-                if (frame is Frame.Text) {
-                    val msg = frame.readText().parseJsonValue<LyricsSockets.SM?>()
-                    if (msg != null) dispatchMessage(msg)
-                }
-            }
-        }?.let {
-            slot.tip.error("断开连接 ${it.message}")
+    private var isConnected by mutableStateOf(false)
+    private val connection = object : SocketsConnection() {
+        suspend inline fun <reified T> send(data: T) {
+            if (!super.send(data.toJsonString())) slot.tip.error("无法连接到服务器")
         }
-        session?.close()
-        session = null
+
+        override suspend fun onConnect() {
+            isConnected = true
+            send(LyricsSockets.CM.Login(app.config.userToken, LyricsSockets.PlayerInfo(uid, name)))
+        }
+
+        override suspend fun onError(err: Throwable) {
+            slot.tip.error("断开连接 ${err.message}")
+        }
+
+        override suspend fun onDisconnect() {
+            isConnected = false
+        }
+
+        override suspend fun onMessage(msg: String) {
+            when (val data = msg.parseJsonValue<LyricsSockets.SM?>()) {
+                is LyricsSockets.SM.Error -> slot.tip.warning(data.message)
+                is LyricsSockets.SM.PlayerList -> players.replaceAll(data.players)
+                is LyricsSockets.SM.InviteReceived -> handleInvitation(data.player)
+                is LyricsSockets.SM.RefuseInvitation -> {
+                    slot.tip.warning("${data.player.name}拒绝了你的对战邀请")
+                    currentStatus = Status.Hall
+                }
+                is LyricsSockets.SM.GamePrepare -> handlePreparing(data.player1, data.player2)
+                is LyricsSockets.SM.GameStart -> {
+                    require(data.questions.size == LyricsSockets.QUESTION_COUNT)
+                    (currentStatus as? Status.Preparing)?.let { status ->
+                        handlePlaying(info1 = status.info1, info2 = status.info2, questions = data.questions)
+                    }
+                }
+                is LyricsSockets.SM.AnswerUpdated -> {
+                    (currentStatus as? Status.Playing)?.let { status ->
+                        currentStatus = status.copy(count1 = data.count1, count2 = data.count2)
+                    }
+                }
+                is LyricsSockets.SM.SendResult -> currentStatus = Status.Settling(data.result1, data.result2)
+                null -> {}
+            }
+        }
     }
 
-    private suspend inline fun send(data: LyricsSockets.CM) {
-        session?.sendSerialized(data) ?: slot.tip.error("无法连接到服务器")
+    private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
+
+    private suspend fun openSockets() {
+        Coroutines.io {
+            connection.connect(LyricsSockets)
+        }
     }
 
     private suspend fun sendInvite(info: LyricsSockets.PlayerInfo) {
         if (currentStatus == Status.Hall && slot.confirm.openSuspend(content = "邀请${info.name}对战")) {
-            send(LyricsSockets.CM.InvitePlayer(info.uid))
+            connection.send(LyricsSockets.CM.InvitePlayer(info.uid))
             currentStatus = Status.InviteLoading(info, LyricsSockets.INVITE_TIME)
             launch {
                 for (i in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
@@ -203,7 +221,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
 
     private suspend fun onInviteResult(info: LyricsSockets.PlayerInfo, accept: Boolean) {
         if (!accept) currentStatus = Status.Hall
-        send(LyricsSockets.CM.InviteResponse(info.uid, accept))
+        connection.send(LyricsSockets.CM.InviteResponse(info.uid, accept))
     }
 
     private fun handleInvitation(info: LyricsSockets.PlayerInfo) {
@@ -249,31 +267,6 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
                     currentStatus = status.copy(time = time)
                 } ?: break
             }
-        }
-    }
-
-    private fun dispatchMessage(msg: LyricsSockets.SM) {
-        when (msg) {
-            is LyricsSockets.SM.Error -> slot.tip.warning(msg.message)
-            is LyricsSockets.SM.PlayerList -> players.replaceAll(msg.players)
-            is LyricsSockets.SM.InviteReceived -> handleInvitation(msg.player)
-            is LyricsSockets.SM.RefuseInvitation -> {
-                slot.tip.warning("${msg.player.name}拒绝了你的对战邀请")
-                currentStatus = Status.Hall
-            }
-            is LyricsSockets.SM.GamePrepare -> handlePreparing(msg.player1, msg.player2)
-            is LyricsSockets.SM.GameStart -> {
-                require(msg.questions.size == LyricsSockets.QUESTION_COUNT)
-                (currentStatus as? Status.Preparing)?.let { status ->
-                    handlePlaying(info1 = status.info1, info2 = status.info2, questions = msg.questions)
-                }
-            }
-            is LyricsSockets.SM.AnswerUpdated -> {
-                (currentStatus as? Status.Playing)?.let { status ->
-                    currentStatus = status.copy(count1 = msg.count1, count2 = msg.count2)
-                }
-            }
-            is LyricsSockets.SM.SendResult -> currentStatus = Status.Settling(msg.result1, msg.result2)
         }
     }
 
@@ -492,7 +485,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
                     newAnswers[index] = newAnswer
                     currentStatus = status.copy(answers = newAnswers)
                     launch {
-                        send(LyricsSockets.CM.SaveAnswer(index, newAnswer))
+                        connection.send(LyricsSockets.CM.SaveAnswer(index, newAnswer))
                     }
                 }
             },
@@ -554,7 +547,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
                                 val blankCount = status.answers.count { it == null }
                                 val submit = if (blankCount > 0) slot.confirm.openSuspend(content = "还有${blankCount}题未填写, 是否提交?") else true
                                 if (submit) {
-                                    send(LyricsSockets.CM.Submit)
+                                    connection.send(LyricsSockets.CM.Submit)
                                     currentStatus = Status.Waiting(status.info2)
                                 }
                             }
@@ -650,7 +643,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
                     icon = Icons.AutoMirrored.Outlined.Reply,
                     onClick = {
                         currentStatus = Status.Hall
-                        send(LyricsSockets.CM.GetPlayers)
+                        connection.send(LyricsSockets.CM.GetPlayers)
                     }
                 )
             }
@@ -666,7 +659,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
     }
 
     override suspend fun initialize() {
-        launch { sessionLoop() }
+        launch { openSockets() }
     }
 
     @Composable
@@ -688,20 +681,20 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
     }
 
     override val fabIcon: ImageVector? by derivedStateOf {
-        if (session != null) {
+        if (isConnected) {
             if (currentStatus == Status.Hall) Icons.Outlined.Refresh else null
         }
         else ExtraIcons.Disconnect
     }
 
     override suspend fun onFabClick() {
-        if (session != null) {
-            if (currentStatus == Status.Hall) send(LyricsSockets.CM.GetPlayers)
+        if (isConnected) {
+            if (currentStatus == Status.Hall) connection.send(LyricsSockets.CM.GetPlayers)
         }
         else launch {
             players.clear()
             currentStatus = Status.Hall
-            sessionLoop()
+            openSockets()
         }
     }
 }

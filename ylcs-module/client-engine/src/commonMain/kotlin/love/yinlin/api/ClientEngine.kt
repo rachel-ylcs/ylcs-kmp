@@ -1,11 +1,13 @@
 package love.yinlin.api
 
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.preparePost
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import love.yinlin.extension.catchingError
+import kotlinx.coroutines.currentCoroutineContext
+import love.yinlin.extension.catchingDefault
+import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
 
 data object ClientEngine {
@@ -16,17 +18,25 @@ data object ClientEngine {
     }
 }
 
-
-
-suspend inline fun API<out APIType>.internalRequest(builder: HttpRequestBuilder.() -> Unit, crossinline block: suspend (HttpResponse) -> Unit): Throwable? = catchingError {
+suspend inline fun API<out APIType>.internalRequest(
+    noinline builder: HttpRequestBuilder.() -> Unit,
+    uploadFile: Boolean = false,
+    crossinline block: suspend (HttpResponse) -> Unit
+): Throwable? = catchingDefault(IllegalStateException("非法异常")) {
+    val context = currentCoroutineContext()
     val url = "${ClientEngine.baseUrl}$route"
-    NetClient.common.preparePost(urlString = url, block = builder).execute { response ->
-        when (response.status) {
-            HttpStatusCode.OK -> block(response)
-            HttpStatusCode(1211, "") -> throw FailureException(response.bodyAsText())
-            HttpStatusCode.Unauthorized -> throw UnauthorizedException("登录认证已过期")
-            HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> throw RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp)
-            else -> throw IllegalArgumentException("非法异常")
+    Coroutines.io {
+        NetClient.internalPrepareStatement(HttpMethod.Post, uploadFile, url, builder).execute { response ->
+            when (response.status) {
+                HttpStatusCode.OK -> {
+                    Coroutines.with(context) { block(response) }
+                    null
+                }
+                HttpStatusCode(1211, "") -> FailureException(response.bodyAsText())
+                HttpStatusCode.Unauthorized -> UnauthorizedException("登录验证已过期")
+                HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp)
+                else -> IllegalArgumentException()
+            }
         }
     }
 }

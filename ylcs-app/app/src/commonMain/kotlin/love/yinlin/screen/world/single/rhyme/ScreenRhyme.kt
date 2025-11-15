@@ -38,6 +38,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.Paths
 import love.yinlin.common.Shaders
@@ -285,7 +286,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private fun GameOverlayStart() {
         Box(modifier = Modifier.fillMaxSize()) {
             WebImage(
-                uri = remember { Game.Rhyme.resPath("start") },
+                uri = remember { Game.Rhyme.resPath("start").url },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
@@ -411,7 +412,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         if (state is GameState.Playing) {
             ShaderBox(Shaders.GradientFlow, modifier = Modifier.fillMaxSize()) {
                 WebImage(
-                    uri = remember { Game.Rhyme.resPath("background") },
+                    uri = remember { Game.Rhyme.resPath("background").url },
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )

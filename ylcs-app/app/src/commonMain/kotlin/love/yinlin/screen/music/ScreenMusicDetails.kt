@@ -29,11 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
-import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.common.Paths
@@ -53,7 +49,6 @@ import love.yinlin.compose.ui.layout.OffsetLayout
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
 import love.yinlin.compose.ui.layout.SimpleEmptyBox
-import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
@@ -97,8 +92,8 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     override val title: String by derivedStateOf { clientSong?.name ?: remoteSong?.name ?: "未知歌曲" }
 
     private fun Song.clientPath(type: ModResourceType): Path = Path(Paths.modPath, this.sid, type.filename)
-    private fun Song.remotePath(type: ModResourceType): String = "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(sid).res(type.filename)}"
-    private val remoteModPath: String get() = "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(sid).res(ModResourceType.BASE_RES)}"
+    private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
+    private val remoteModPath: String get() = ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES).url
 
     @Stable
     private data class ResourceItem(
@@ -149,44 +144,27 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private suspend fun requestRemoteSong(): Song? {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.GetSong,
-            data = sid
-        )
-        return if (result is Data.Success) {
-            val data = result.data
+        var song: Song? = null
+        ApiSongGetSong.request(sid) { data ->
             remoteResources.replaceAll(ModResourceType.BASE.map { ResourceItem(it, null) })
             if (data.animation) remoteResources.add(ResourceItem(ModResourceType.Animation, null))
             if (data.video) remoteResources.add(ResourceItem(ModResourceType.Video, null))
             if (data.rhyme) remoteResources.add(ResourceItem(ModResourceType.Rhyme, null))
-            data
-        } else null
+            song = data
+        }
+        return song
     }
 
     private suspend fun requestNewSongComments() {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.GetSongComments,
-            data = API2.User.Song.GetSongComments.Request(
-                sid = sid,
-                num = pageComments.pageNum
-            )
-        )
-        when (result) {
-            is Data.Success -> pageComments.newData(result.data)
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiSongGetSongComments.request(sid, pageComments.default, pageComments.pageNum) {
+            pageComments.newData(it)
+        }.errorTip
     }
 
     private suspend fun requestMoreSongComments() {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.GetSongComments,
-            data = API2.User.Song.GetSongComments.Request(
-                sid = sid,
-                cid = pageComments.offset,
-                num = pageComments.pageNum
-            )
-        )
-        if (result is Data.Success) pageComments.moreData(result.data)
+        ApiSongGetSongComments.request(sid, pageComments.offset, pageComments.pageNum) {
+            pageComments.moreData(it)
+        }
     }
 
     private fun downloadMod() {
@@ -246,49 +224,26 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         }
     }
 
-    private suspend fun onSendComment(content: String): Boolean {
-        app.config.userProfile?.let { user ->
-            val result = ClientAPI2.request(
-                route = API2.User.Song.SendSongComment,
-                data = API2.User.Song.SendSongComment.Request(
-                    token = app.config.userToken,
-                    sid = sid,
-                    content = content
-                )
+    private suspend fun onSendComment(content: String): Boolean = app.config.userProfile?.let { user ->
+        ApiSongSendSongComment.request(app.config.userToken, sid, content) {
+            pageComments.items += SongComment(
+                cid = it,
+                uid = user.uid,
+                ts = DateEx.CurrentString,
+                content = content,
+                name = user.name,
+                label = user.label,
+                exp = user.exp
             )
-            when (result) {
-                is Data.Success -> {
-                    pageComments.items += SongComment(
-                        cid = result.data,
-                        uid = user.uid,
-                        ts = DateEx.CurrentString,
-                        content = content,
-                        name = user.name,
-                        label = user.label,
-                        exp = user.exp
-                    )
-                    listState.animateScrollToItem(pageComments.items.size - 1)
-                    return true
-                }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
-        }
-        return false
-    }
+            listState.animateScrollToItem(pageComments.items.size - 1)
+        }.errorTip == null
+    } ?: false
 
     private suspend fun onDeleteComment(cid: Long) {
         if (slot.confirm.openSuspend(content = "删除评论")) {
-            val result = ClientAPI2.request(
-                route = API2.User.Song.DeleteSongComment,
-                data = API2.User.Song.DeleteSongComment.Request(
-                    token = app.config.userToken,
-                    cid = cid
-                )
-            )
-            when (result) {
-                is Data.Success -> pageComments.items.removeAll { it.cid == cid }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiSongDeleteSongComment.request(app.config.userToken, cid) {
+                pageComments.items.removeAll { it.cid == cid }
+            }.errorTip
         }
     }
 
@@ -598,7 +553,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
-                avatar = comment.avatarPath,
+                avatar = remember(comment) { comment.avatarPath.url },
                 name = comment.name,
                 time = comment.ts,
                 label = comment.label,

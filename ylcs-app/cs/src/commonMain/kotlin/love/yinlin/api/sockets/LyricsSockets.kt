@@ -3,6 +3,7 @@ package love.yinlin.api.sockets
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import love.yinlin.api.ServerRes
 import love.yinlin.api.Sockets
 
 object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
@@ -13,11 +14,15 @@ object LyricsSockets : Sockets("/lyricsGame", "歌词默写") {
 
     @Stable
     @Serializable
-    data class PlayerInfo(val uid: Int, val name: String)
+    data class PlayerInfo(val uid: Int, val name: String) {
+        val userAvatar by lazy { ServerRes.Users.User(uid).avatar }
+    }
 
     @Stable
     @Serializable
-    data class GameResult(val player: PlayerInfo, val count: Int, val duration: Long)
+    data class GameResult(val player: PlayerInfo, val count: Int, val duration: Long) {
+        val userAvatar by lazy { ServerRes.Users.User(player.uid).avatar }
+    }
 
     @Stable
     @Serializable

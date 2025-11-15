@@ -8,7 +8,7 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
 suspend inline fun API00<APIType.Post>
-        .request(crossinline block: () -> Unit): Throwable? =
+        .request(crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -16,7 +16,7 @@ suspend inline fun API00<APIType.Post>
     }
 
 suspend inline fun <reified I1> API10<APIType.Post, I1>
-        .request(i1: I1, crossinline block: () -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -24,7 +24,7 @@ suspend inline fun <reified I1> API10<APIType.Post, I1>
     }
 
 suspend inline fun <reified I1, reified I2> API20<APIType.Post, I1, I2>
-        .request(i1: I1, i2: I2, crossinline block: () -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -33,7 +33,7 @@ suspend inline fun <reified I1, reified I2> API20<APIType.Post, I1, I2>
     }
 
 suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Post, I1, I2, I3>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: () -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -43,7 +43,7 @@ suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Post, I1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Post, I1, I2, I3, I4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: () -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -54,7 +54,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APITyp
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Post, I1, I2, I3, I4, I5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: () -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend () -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -66,7 +66,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> 
     }
 
 suspend inline fun <reified O1> API01<APIType.Post, O1>
-        .request(crossinline block: (O1) -> Unit): Throwable? =
+        .request(crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -75,7 +75,7 @@ suspend inline fun <reified O1> API01<APIType.Post, O1>
     }
 
 suspend inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
-        .request(i1: I1, crossinline block: (O1) -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -84,7 +84,7 @@ suspend inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
     }
 
 suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, I2, O1>
-        .request(i1: I1, i2: I2, crossinline block: (O1) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -94,7 +94,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Post, I1, I2, I3, O1>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -105,7 +105,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Post, I1, I2, I3, I4, O1>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -117,7 +117,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Post, I1, I2, I3, I4, I5, O1>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -130,7 +130,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     }
 
 suspend inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
-        .request(crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -139,7 +139,7 @@ suspend inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
     }
 
 suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, O1, O2>
-        .request(i1: I1, crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -148,7 +148,7 @@ suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Post, I1, I2, O1, O2>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -158,7 +158,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Post, I1, I2, I3, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -169,7 +169,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Post, I1, I2, I3, I4, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -181,7 +181,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Post, I1, I2, I3, I4, I5, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -194,7 +194,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     }
 
 suspend inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, O2, O3>
-        .request(crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -203,7 +203,7 @@ suspend inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, 
     }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Post, I1, O1, O2, O3>
-        .request(i1: I1, crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -212,7 +212,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APITyp
     }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Post, I1, I2, O1, O2, O3>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -222,7 +222,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Post, I1, I2, I3, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -233,7 +233,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Post, I1, I2, I3, I4, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -245,7 +245,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -258,7 +258,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     }
 
 suspend inline fun <reified O1, reified O2, reified O3, reified O4> API04<APIType.Post, O1, O2, O3, O4>
-        .request(crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -267,7 +267,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4> API04<APITyp
     }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Post, I1, O1, O2, O3, O4>
-        .request(i1: I1, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -276,7 +276,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> 
     }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Post, I1, I2, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -286,7 +286,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Post, I1, I2, I3, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -297,7 +297,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -309,7 +309,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -322,7 +322,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     }
 
 suspend inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> API05<APIType.Post, O1, O2, O3, O4, O5>
-        .request(crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
 
     }) }) {
@@ -331,7 +331,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> 
     }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Post, I1, O1, O2, O3, O4, O5>
-        .request(i1: I1, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
@@ -340,7 +340,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, 
     }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Post, I1, I2, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -350,7 +350,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Post, I1, I2, I3, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -361,7 +361,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Post, I1, I2, I3, I4, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())
@@ -373,7 +373,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Post, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? =
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? =
     internalRequest({ setBody(makeArray {
         add(i1.toJson())
         add(i2.toJson())

@@ -12,5 +12,5 @@ data class GameRank(
     val name: String,
     val cnt: Int
 ) {
-    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+    val avatarPath by lazy { ServerRes.Users.User(uid).avatar }
 }

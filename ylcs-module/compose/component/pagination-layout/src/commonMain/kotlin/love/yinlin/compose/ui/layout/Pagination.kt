@@ -12,7 +12,7 @@ import love.yinlin.extension.replaceAll
 // 分页数据实现
 @Stable
 abstract class Pagination<E, K, out T>(
-    private val default: T,
+    val default: T,
     val pageNum: Int
 ) {
     val items = mutableStateListOf<E>()

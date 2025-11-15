@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiTopicSendTopic
+import love.yinlin.api.apiFile
+import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
@@ -25,7 +26,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
@@ -39,7 +39,6 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
-import love.yinlin.extension.safeRawSources
 
 @Stable
 class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
@@ -76,42 +75,25 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
     private suspend fun addTopic(profile: UserProfile) {
         val title = input.title.text
         val section = input.section
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.SendTopic,
-            data = API2.User.Topic.SendTopic.Request(
-                token = app.config.userToken,
-                title = title,
-                content = input.content.richString.toString(),
-                section = section
-            ),
-            files = {
-                API2.User.Topic.SendTopic.Files(
-                    pics = file(input.pics.map { Path(it.image) }.safeRawSources())
-                )
+        ApiTopicSendTopic.request(app.config.userToken, title, input.content.richString.toString(), section,
+            apiFile(input.pics.map { Path(it.image) })) { tid, pic ->
+            val currentSection = subScreenDiscovery.currentSection
+            if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
+                subScreenDiscovery.page.items.add(0, Topic(
+                    tid = tid,
+                    uid = profile.uid,
+                    title = title,
+                    pic = pic,
+                    isTop = false,
+                    coinNum = 0,
+                    commentNum = 0,
+                    rawSection = section,
+                    name = profile.name
+                ))
             }
-        )
-        when (result) {
-            is Data.Success -> {
-                val (tid, pic) = result.data
-                val currentSection = subScreenDiscovery.currentSection
-                if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
-                    subScreenDiscovery.page.items.add(0, Topic(
-                        tid = tid,
-                        uid = profile.uid,
-                        title = title,
-                        pic = pic,
-                        isTop = false,
-                        coinNum = 0,
-                        commentNum = 0,
-                        rawSection = section,
-                        name = profile.name
-                    ))
-                }
-                app.config.editedTopic = null
-                pop()
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+            app.config.editedTopic = null
+            pop()
+        }.errorTip
     }
 
     override val title: String = "发表主题"

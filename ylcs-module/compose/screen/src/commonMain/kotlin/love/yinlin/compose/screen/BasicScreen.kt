@@ -114,4 +114,14 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
     fun pop() = manager.pop()
 
     fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
+
+    val Throwable?.warningTip: Throwable? get() {
+        if (this != null) slot.tip.warning(this.message)
+        return this
+    }
+
+    val Throwable?.errorTip: Throwable? get() {
+        if (this != null) slot.tip.error(this.message)
+        return this
+    }
 }

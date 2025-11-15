@@ -14,13 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastForEach
 import kotlinx.serialization.Serializable
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.platform
@@ -67,23 +65,11 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("昵称或密码不合规范")
 			return
 		}
-		val result = ClientAPI2.request(
-			route = API2.User.Account.Login,
-			data = API2.User.Account.Login.Request(
-				name = id,
-				pwd = pwd,
-				platform = platform
-			)
-		)
-		when (result) {
-			is Data.Success -> {
-				val token = result.data
-				app.config.userShortToken = DateEx.CurrentLong
-				app.config.userToken = token
-				pop()
-			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+		ApiAccountLogin.request(id, pwd, platform) { token ->
+			app.config.userShortToken = DateEx.CurrentLong
+			app.config.userToken = token
+			pop()
+		}.errorTip
 	}
 
 	private suspend fun register() {
@@ -103,23 +89,12 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("两次输入的密码不相同")
 			return
 		}
-		val result = ClientAPI2.request(
-			route = API2.User.Account.Register,
-			data = API2.User.Account.Register.Request(
-				name = id,
-				pwd = pwd,
-				inviterName = inviter
-			)
-		)
-		when (result) {
-			is Data.Success -> {
-				mode = Mode.Login
-				loginId.text = id
-				loginPwd.text = ""
-				slot.tip.success(result.message)
-			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+		ApiAccountRegister.request(id, pwd, inviter) {
+			mode = Mode.Login
+			loginId.text = id
+			loginPwd.text = ""
+			slot.tip.success("提交申请成功, 请等待管理员审核")
+		}.errorTip
 	}
 
 	private suspend fun forgotPassword() {
@@ -129,22 +104,12 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 			slot.tip.error("昵称或密码不合规范")
 			return
 		}
-		val result = ClientAPI2.request(
-			route = API2.User.Account.ForgotPassword,
-			data = API2.User.Account.ForgotPassword.Request(
-				name = id,
-				pwd = pwd
-			)
-		)
-		when (result) {
-			is Data.Success -> {
-				mode = Mode.Login
-				loginId.text = id
-				loginPwd.text = ""
-				slot.tip.success(result.message)
-			}
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+		ApiAccountForgotPassword.request(id, pwd) {
+			mode = Mode.Login
+			loginId.text = id
+			loginPwd.text = ""
+			slot.tip.success("提交申请成功, 请等待管理员审核")
+		}.errorTip
 	}
 
 	@Composable
@@ -400,8 +365,7 @@ class ScreenLogin(manager: ScreenManager) : Screen(manager) {
 	}
 
 	override suspend fun initialize() {
-		val result = ClientAPI2.request(route = API2.User.Account.GetInviters)
-		if (result is Data.Success) inviters = result.data
+		ApiAccountGetInviters.request { inviters = it }
 	}
 
 	@Composable

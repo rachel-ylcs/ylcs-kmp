@@ -15,17 +15,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
@@ -54,7 +49,7 @@ enum class FollowTabItem(val title: String) {
 @Stable
 @Serializable
 private data class FollowItem(val fid: Long, val uid: Int, val name: String) {
-    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
+    val avatarPath: String by lazy { ServerRes.Users.User(uid).avatar.url }
 }
 
 @Composable
@@ -134,109 +129,39 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
 
     private suspend fun requestNewData() {
         when (tab) {
-            FollowTabItem.FOLLOWS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetFollows,
-                    data = API2.User.Follows.GetFollows.Request(
-                        token = app.config.userToken,
-                        num = pageFollows.pageNum
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        pageFollows.newData(result.data)
-                        gridState.scrollToItem(0)
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
-            }
-            FollowTabItem.FOLLOWERS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetFollowers,
-                    data = API2.User.Follows.GetFollowers.Request(
-                        token = app.config.userToken,
-                        num = pageFollowers.pageNum
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        pageFollowers.newData(result.data)
-                        gridState.scrollToItem(0)
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
-            }
-            FollowTabItem.BLOCK_USERS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetBlockedUsers,
-                    data = API2.User.Follows.GetBlockedUsers.Request(
-                        token = app.config.userToken,
-                        num = pageBlockUsers.pageNum
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        pageBlockUsers.newData(result.data)
-                        gridState.scrollToItem(0)
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
-            }
+            FollowTabItem.FOLLOWS -> ApiFollowsGetFollows.request(app.config.userToken, pageFollows.default, pageFollows.default1, pageFollows.pageNum) {
+                pageFollows.newData(it)
+                gridState.scrollToItem(0)
+            }.errorTip
+            FollowTabItem.FOLLOWERS -> ApiFollowsGetFollowers.request(app.config.userToken, pageFollowers.default, pageFollowers.default1, pageFollowers.pageNum) {
+                pageFollowers.newData(it)
+                gridState.scrollToItem(0)
+            }.errorTip
+            FollowTabItem.BLOCK_USERS -> ApiFollowsGetBlockedUsers.request(app.config.userToken, pageBlockUsers.default, pageBlockUsers.pageNum) {
+                pageBlockUsers.newData(it)
+                gridState.scrollToItem(0)
+            }.errorTip
         }
     }
 
     private suspend fun requestMoreData() {
         when (tab) {
-            FollowTabItem.FOLLOWS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetFollows,
-                    data = API2.User.Follows.GetFollows.Request(
-                        token = app.config.userToken,
-                        score = pageFollows.offset,
-                        fid = pageFollows.arg1,
-                        num = pageFollows.pageNum
-                    )
-                )
-                if (result is Data.Success) pageFollows.moreData(result.data)
+            FollowTabItem.FOLLOWS -> ApiFollowsGetFollows.request(app.config.userToken, pageFollows.offset, pageFollows.arg1, pageFollows.pageNum) {
+                pageFollows.moreData(it)
             }
-            FollowTabItem.FOLLOWERS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetFollowers,
-                    data = API2.User.Follows.GetFollowers.Request(
-                        token = app.config.userToken,
-                        score = pageFollowers.offset,
-                        fid = pageFollowers.arg1,
-                        num = pageFollowers.pageNum
-                    )
-                )
-                if (result is Data.Success) pageFollowers.moreData(result.data)
+            FollowTabItem.FOLLOWERS -> ApiFollowsGetFollowers.request(app.config.userToken, pageFollowers.offset, pageFollowers.arg1, pageFollowers.pageNum) {
+                pageFollowers.moreData(it)
             }
-            FollowTabItem.BLOCK_USERS -> {
-                val result = ClientAPI2.request(
-                    route = API2.User.Follows.GetBlockedUsers,
-                    data = API2.User.Follows.GetBlockedUsers.Request(
-                        token = app.config.userToken,
-                        fid = pageBlockUsers.offset,
-                        num = pageBlockUsers.pageNum
-                    )
-                )
-                if (result is Data.Success) pageBlockUsers.moreData(result.data)
+            FollowTabItem.BLOCK_USERS -> ApiFollowsGetBlockedUsers.request(app.config.userToken, pageBlockUsers.offset, pageBlockUsers.pageNum) {
+                pageBlockUsers.moreData(it)
             }
         }
     }
 
     private suspend fun unBlockUser(item: FollowItem) {
-        val result = ClientAPI2.request(
-            route = API2.User.Follows.UnblockUser,
-            data = API2.User.Follows.UnblockUser.Request(
-                token = app.config.userToken,
-                uid = item.uid
-            )
-        )
-        when (result) {
-            is Data.Success -> pageBlockUsers.items.removeAll { it.fid == item.fid }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiFollowsUnblockUser.request(app.config.userToken, item.uid) {
+            pageBlockUsers.items.removeAll { it.fid == item.fid }
+        }.errorTip
     }
 
     override val title: String? by derivedStateOf { tab.title }

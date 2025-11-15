@@ -8,11 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,14 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.input.ClickText
@@ -62,52 +55,26 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewMails(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI2.request(
-                route = API2.User.Mail.GetMails,
-                data = API2.User.Mail.GetMails.Request(
-                    token = app.config.userToken,
-                    num = page.pageNum
-                )
-            )
-            state = if (result is Data.Success) {
-                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            } else BoxState.NETWORK_ERROR
+            ApiMailGetMails.request(app.config.userToken, page.default1, page.default, page.pageNum) {
+                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
+            }?.let { state = BoxState.NETWORK_ERROR }
         }
     }
 
     private suspend fun requestMoreMails() {
-        val result = ClientAPI2.request(
-            route = API2.User.Mail.GetMails,
-            data = API2.User.Mail.GetMails.Request(
-                token = app.config.userToken,
-                isProcessed = page.arg1,
-                mid = page.offset,
-                num = page.pageNum
-            )
-        )
-        if (result is Data.Success) page.moreData(result.data)
+        ApiMailGetMails.request(app.config.userToken, page.arg1, page.offset, page.pageNum) {
+            page.moreData(it)
+        }
     }
 
     private suspend fun onProcessMail(text: String, mid: Long, value: Boolean) {
         if (slot.confirm.openSuspend(content = text)) {
             slot.loading.openSuspend()
-            val result = ClientAPI2.request(
-                route = API2.User.Mail.ProcessMail,
-                data = API2.User.Mail.ProcessMail.Request(
-                    token = app.config.userToken,
-                    mid = mid,
-                    confirm = value
-                )
-            )
-            when (result) {
-                is Data.Success -> {
-                    page.items.findAssign(predicate = { it.mid == mid }) {
-                        it.copy(processed = true)
-                    }
-                    mailDetailsSheet.close()
-                }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiMailProcessMail.request(app.config.userToken, mid, value) { message ->
+                page.items.findAssign(predicate = { it.mid == mid }) { it.copy(processed = true) }
+                mailDetailsSheet.close()
+                slot.tip.info(message)
+            }.errorTip
             slot.loading.close()
         }
     }
@@ -115,20 +82,10 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun onDeleteMail(mid: Long) {
         if (slot.confirm.openSuspend(content = "删除此邮件?")) {
             slot.loading.openSuspend()
-            val result = ClientAPI2.request(
-                route = API2.User.Mail.DeleteMail,
-                data = API2.User.Mail.DeleteMail.Request(
-                    token = app.config.userToken,
-                    mid = mid
-                )
-            )
-            when (result) {
-                is Data.Success -> {
-                    page.items.removeAll { it.mid == mid }
-                    mailDetailsSheet.close()
-                }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiMailDeleteMail.request(app.config.userToken, mid) {
+                page.items.removeAll { it.mid == mid }
+                mailDetailsSheet.close()
+            }.errorTip
             slot.loading.close()
         }
     }

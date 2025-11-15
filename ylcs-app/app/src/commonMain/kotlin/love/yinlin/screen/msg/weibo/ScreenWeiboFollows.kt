@@ -19,7 +19,6 @@ import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJsonValue
@@ -78,7 +77,7 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
         for ((index, user) in weiboUsers.withIndex()) {
             if (user.avatar.isEmpty()) {
                 val data = WeiboAPI.getWeiboUser(user.id)
-                if (data is Data.Success) weiboUsers[index] = data.data.info
+                if (data != null) weiboUsers[index] = data.info
             }
         }
         isLocal = true
@@ -88,10 +87,9 @@ class ScreenWeiboFollows(manager: ScreenManager) : Screen(manager) {
         searchDialog.openSuspend()?.let { key ->
             state = BoxState.LOADING
             val result = WeiboAPI.searchWeiboUser(key)
-            if (result is Data.Success) {
-                val data = result.data
-                searchResult = data
-                state = if (data.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+            if (result != null) {
+                searchResult = result
+                state = if (result.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
             }
             else state = BoxState.NETWORK_ERROR
             isLocal = false

@@ -24,11 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
-import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -36,7 +32,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingSheet
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
@@ -119,7 +114,7 @@ private data class AtInfo(val uid: Int, val name: String) {
     override fun equals(other: Any?): Boolean = other is AtInfo && other.uid == uid
     override fun hashCode(): Int = uid
 
-    val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Users.User(uid).avatar}" }
+    val avatarPath: String by lazy { ServerRes.Users.User(uid).avatar.url }
 }
 
 @Composable
@@ -205,50 +200,16 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         }
     }
 
-    private suspend fun requestTopic() {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopicDetails,
-            data = topic.tid
-        )
-        if (result is Data.Success) details = result.data
-    }
-
-    private suspend fun requestNewComments() {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopicComments,
-            data = API2.User.Topic.GetTopicComments.Request(
-                tid = topic.tid,
-                rawSection = topic.rawSection,
-                num = pageComments.pageNum
-            )
-        )
-        if (result is Data.Success) pageComments.newData(result.data)
-    }
-
     private suspend fun requestMoreComments() {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopicComments,
-            data = API2.User.Topic.GetTopicComments.Request(
-                tid = topic.tid,
-                rawSection = topic.rawSection,
-                cid = pageComments.offset,
-                isTop = pageComments.arg1
-            )
-        )
-        if (result is Data.Success) pageComments.moreData(result.data)
+        ApiTopicGetTopicComments.request(topic.tid, topic.rawSection, pageComments.arg1, pageComments.offset, pageComments.pageNum) {
+            pageComments.moreData(it)
+        }
     }
 
     private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.GetTopicSubComments,
-            data = API2.User.Topic.GetTopicSubComments.Request(
-                pid = pid,
-                rawSection = topic.rawSection,
-                cid = cid,
-                num = num
-            )
-        )
-        return if (result is Data.Success) result.data else null
+        var data: List<SubComment>? = null
+        ApiTopicGetTopicSubComments.request(pid, topic.rawSection, cid, num) { data = it }
+        return data
     }
 
     private fun onAvatarClick(uid: Int) {
@@ -260,36 +221,17 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     }
 
     private suspend fun onChangeTopicIsTop(value: Boolean) {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.UpdateTopicTop,
-            data = API2.User.Topic.UpdateTopicTop.Request(
-                token = app.config.userToken,
-                tid = topic.tid,
-                isTop = value
-            )
-        )
-        when (result) {
-            is Data.Success -> topic = topic.copy(isTop = value)
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiTopicUpdateTopicTop.request(app.config.userToken, topic.tid, value) {
+            topic = topic.copy(isTop = value)
+        }.errorTip
     }
 
     private suspend fun onDeleteTopic() {
         if (slot.confirm.openSuspend(content = "删除主题?")) {
-            val result = ClientAPI2.request(
-                route = API2.User.Topic.DeleteTopic,
-                data =  API2.User.Topic.DeleteTopic.Request(
-                    token = app.config.userToken,
-                    tid = topic.tid
-                )
-            )
-            when (result) {
-                is Data.Success -> {
-                    subScreenDiscovery.page.items.removeAll { it.tid == topic.tid }
-                    pop()
-                }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiTopicDeleteTopic.request(app.config.userToken, topic.tid) {
+                subScreenDiscovery.page.items.removeAll { it.tid == topic.tid }
+                pop()
+            }.errorTip
         }
     }
 
@@ -302,22 +244,11 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                     slot.tip.warning("不能与原板块相同哦")
                     return@let
                 }
-                val result = ClientAPI2.request(
-                    route = API2.User.Topic.MoveTopic,
-                    data = API2.User.Topic.MoveTopic.Request(
-                        token = app.config.userToken,
-                        tid = topic.tid,
-                        section = newSection
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        if (subScreenDiscovery.currentSection == oldSection) subScreenDiscovery.page.items.removeAll { it.tid == topic.tid }
-                        details = oldDetails.copy(section = newSection)
-                        slot.tip.success(result.message)
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
+                ApiTopicMoveTopic.request(app.config.userToken, topic.tid, newSection) {
+                    if (subScreenDiscovery.currentSection == oldSection) subScreenDiscovery.page.items.removeAll { it.tid == topic.tid }
+                    details = oldDetails.copy(section = newSection)
+                    slot.tip.success("移动成功")
+                }.errorTip
             }
         }
     }
@@ -327,153 +258,76 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
             slot.tip.warning("不能给自己投币哦")
             return
         }
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.SendCoin,
-            data = API2.User.Topic.SendCoin.Request(
-                token = app.config.userToken,
-                uid = topic.uid,
-                tid = topic.tid,
-                value = num
-            )
-        )
-        when (result) {
-            is Data.Success -> {
-                subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
-                    it.copy(coinNum = it.coinNum + num)
-                }
-                app.config.userProfile?.let {
-                    app.config.userProfile = it.copy(coin = it.coin - num)
-                }
-                slot.tip.success(result.message)
+        ApiTopicSendCoin.request(app.config.userToken, topic.uid, topic.tid, num) {
+            subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
+                it.copy(coinNum = it.coinNum + num)
             }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+            app.config.userProfile?.let {
+                app.config.userProfile = it.copy(coin = it.coin - num)
+            }
+            slot.tip.success("投币成功")
+        }.errorTip
     }
 
     private suspend fun onSendComment(content: String): Boolean {
-        app.config.userProfile?.let { user ->
+        val user = app.config.userProfile
+        return if (user != null) {
             // 回复主题
             val target = currentSendComment
             if (target == null) {
-                val result = ClientAPI2.request(
-                    route = API2.User.Topic.SendComment,
-                    data = API2.User.Topic.SendComment.Request(
-                        token = app.config.userToken,
-                        tid = topic.tid,
-                        rawSection = topic.rawSection,
-                        content = content
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
-                            it.copy(commentNum = it.commentNum + 1)
-                        }
-                        pageComments.items += Comment(
-                            cid = result.data,
-                            uid = user.uid,
-                            ts = DateEx.CurrentString,
-                            content = content,
-                            isTop = false,
-                            subCommentNum = 0,
-                            name = user.name,
-                            label = user.label,
-                            exp = user.exp
-                        )
-                        listState.animateScrollToItem(pageComments.items.size - 1)
-                        return true
+                ApiTopicSendComment.request(app.config.userToken, topic.tid, topic.rawSection, content) { cid ->
+                    subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
+                        it.copy(commentNum = it.commentNum + 1)
                     }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
+                    pageComments.items += Comment(
+                        cid = cid,
+                        uid = user.uid,
+                        ts = DateEx.CurrentString,
+                        content = content,
+                        isTop = false,
+                        subCommentNum = 0,
+                        name = user.name,
+                        label = user.label,
+                        exp = user.exp
+                    )
+                    listState.animateScrollToItem(pageComments.items.size - 1)
+                }.errorTip == null
             }
             else { // 回复评论
-                val result = ClientAPI2.request(
-                    route = API2.User.Topic.SendSubComment,
-                    data = API2.User.Topic.SendSubComment.Request(
-                        token = app.config.userToken,
-                        tid = topic.tid,
-                        cid = target.cid,
-                        rawSection = topic.rawSection,
-                        content = content
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        pageComments.items.findAssign(predicate = { it.cid == target.cid }) {
-                            it.copy(subCommentNum = it.subCommentNum + 1)
-                        }
-                        currentSendComment = null
-                        return true
+                ApiTopicSendSubComment.request(app.config.userToken, topic.tid, target.cid, topic.rawSection, content) {
+                    pageComments.items.findAssign(predicate = { it.cid == target.cid }) {
+                        it.copy(subCommentNum = it.subCommentNum + 1)
                     }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
+                    currentSendComment = null
+                }.errorTip == null
             }
-        }
-        return false
+        } else false
     }
 
     private suspend fun onChangeCommentIsTop(cid: Int, isTop: Boolean) {
-        val result = ClientAPI2.request(
-            route = API2.User.Topic.UpdateCommentTop,
-            data = API2.User.Topic.UpdateCommentTop.Request(
-                token = app.config.userToken,
-                tid = topic.tid,
-                cid = cid,
-                rawSection = topic.rawSection,
-                isTop = isTop
-            )
-        )
-        when (result) {
-            is Data.Success -> {
-                pageComments.items.findAssign(predicate = { it.cid == cid }) {
-                    it.copy(isTop = isTop)
-                }
-                pageComments.items.sort()
-                listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
+        ApiTopicUpdateCommentTop.request(app.config.userToken, topic.tid, cid, topic.rawSection, isTop) {
+            pageComments.items.findAssign(predicate = { it.cid == cid }) {
+                it.copy(isTop = isTop)
             }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+            pageComments.items.sort()
+            listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
+        }.errorTip
     }
 
     private suspend fun onDeleteComment(cid: Int) {
         if (slot.confirm.openSuspend(content = "删除回复(楼中楼会同步删除)")) {
-            val result = ClientAPI2.request(
-                route = API2.User.Topic.DeleteComment,
-                data = API2.User.Topic.DeleteComment.Request(
-                    token = app.config.userToken,
-                    tid = topic.tid,
-                    cid = cid,
-                    rawSection = topic.rawSection
-                )
-            )
-            when (result) {
-                is Data.Success -> {
-                    subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
-                        it.copy(commentNum = it.commentNum - 1)
-                    }
-                    pageComments.items.removeAll { it.cid == cid }
+            ApiTopicDeleteComment.request(app.config.userToken, topic.tid, cid, topic.rawSection) {
+                subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
+                    it.copy(commentNum = it.commentNum - 1)
                 }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+                pageComments.items.removeAll { it.cid == cid }
+            }.errorTip
         }
     }
 
-    private suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: () -> Unit) {
+    private suspend fun onDeleteSubComment(pid: Int, cid: Int, onDelete: suspend () -> Unit) {
         if (slot.confirm.openSuspend(content = "删除回复")) {
-            val result = ClientAPI2.request(
-                route = API2.User.Topic.DeleteSubComment,
-                data = API2.User.Topic.DeleteSubComment.Request(
-                    token = app.config.userToken,
-                    tid = topic.tid,
-                    pid = pid,
-                    rawSection = topic.rawSection,
-                    cid = cid
-                )
-            )
-            when (result) {
-                is Data.Success -> onDelete()
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiTopicDeleteSubComment.request(app.config.userToken, topic.tid, pid, topic.rawSection, cid, onDelete).errorTip
         }
     }
 
@@ -494,14 +348,14 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     @Composable
     private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
-        val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it)) } }
+        val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it).url) } }
 
         Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
             UserBar(
-                avatar = topic.avatarPath,
+                avatar = remember(topic) { topic.avatarPath.url },
                 name = topic.name,
                 time = details.ts,
                 label = details.label,
@@ -545,7 +399,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
-                avatar = comment.avatarPath,
+                avatar = remember(comment) { comment.avatarPath.url },
                 name = comment.name,
                 time = comment.ts,
                 label = comment.label,
@@ -615,14 +469,14 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         subComment: SubComment,
         parentComment: Comment,
         modifier: Modifier = Modifier,
-        onDelete: () -> Unit
+        onDelete: suspend () -> Unit
     ) {
         Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
         ) {
             UserBar(
-                avatar = subComment.avatarPath,
+                avatar = remember(subComment) { subComment.avatarPath.url },
                 name = subComment.name,
                 time = subComment.ts,
                 label = subComment.label,
@@ -786,8 +640,16 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
     override val title: String = "主题"
 
     override suspend fun initialize() {
-        requestTopic()
-        requestNewComments()
+        launch {
+            ApiTopicGetTopicDetails.request(topic.tid) {
+                details = it
+            }
+        }
+        launch {
+            ApiTopicGetTopicComments.request(topic.tid, topic.rawSection, pageComments.default1, pageComments.default, pageComments.pageNum) {
+                pageComments.newData(it)
+            }
+        }
     }
 
     override fun onBack() {

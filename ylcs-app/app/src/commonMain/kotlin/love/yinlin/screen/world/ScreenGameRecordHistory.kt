@@ -18,15 +18,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.Local
-import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiGameGetUserGameRecords
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.extension.Array
@@ -63,29 +63,16 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGameRecords(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI2.request(
-                route = API2.User.Game.GetUserGameRecords,
-                data = API2.User.Game.GetUserGameRecords.Request(
-                    token = app.config.userToken,
-                    num = page.pageNum
-                )
-            )
-            state = if (result is Data.Success) {
-                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            } else BoxState.NETWORK_ERROR
+            ApiGameGetUserGameRecords.request(app.config.userToken, page.default, page.pageNum) {
+                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
+            }?.let { state = BoxState.NETWORK_ERROR }
         }
     }
 
     private suspend fun requestMoreGameRecords() {
-        val result = ClientAPI2.request(
-            route = API2.User.Game.GetUserGameRecords,
-            data = API2.User.Game.GetUserGameRecords.Request(
-                token = app.config.userToken,
-                rid = page.offset,
-                num = page.pageNum
-            )
-        )
-        if (result is Data.Success) page.moreData(result.data)
+        ApiGameGetUserGameRecords.request(app.config.userToken, page.offset, page.pageNum) {
+            page.moreData(it)
+        }
     }
 
     @Composable
@@ -111,7 +98,7 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WebImage(
-                        uri = remember { record.type.yPath },
+                        uri = remember { record.type.yPath.url },
                         key = Local.info.version,
                         contentScale = ContentScale.Crop,
                         circle = true,

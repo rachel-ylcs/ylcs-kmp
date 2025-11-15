@@ -1,15 +1,15 @@
 package love.yinlin.api
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.platform.lyrics.LrcParser
-import love.yinlin.data.Data
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.safeGet
+import love.yinlin.platform.request
 
 @Stable
 data object NetEaseCloudAPI {
@@ -21,8 +21,8 @@ data object NetEaseCloudAPI {
         fun mp3(id: String) = "song/media/outer/url?id=${id}"
     }
 
-    suspend fun requestMusicId(url: String): Data<String> = NetClient.common.safeGet(url) { body: ByteArray ->
-        "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(body.decodeToString())!!.groupValues[1]
+    suspend fun requestMusicId(url: String): String? = NetClient.request(url) { text: String ->
+        "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(text)!!.groupValues[1]
     }
 
     private fun getCloudMusic(json: JsonObject): PlatformMusicInfo = PlatformMusicInfo(
@@ -35,47 +35,26 @@ data object NetEaseCloudAPI {
         lyrics = ""
     )
 
-    private suspend fun requestLyrics(id: String): Data<String> = NetClient.common.safeGet(
-        url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
-    ) { json: JsonObject ->
+    private suspend fun requestLyrics(id: String): String? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.lyrics(id)}") { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
         LrcParser(text).toString()
     }
 
-    suspend fun requestMusic(id: String): Data<PlatformMusicInfo> {
-        val result1 = NetClient.common.safeGet(
-            url = "https://$NETEASECLOUD_HOST/${Container.detail(id)}"
-        ) { json: JsonObject ->
-            getCloudMusic(json.arr("songs")[0].Object)
-        }
-        return when (result1) {
-            is Data.Success -> when (val result2 = requestLyrics(id)) {
-                is Data.Success -> Data.Success(result1.data.copy(lyrics = result2.data))
-                is Data.Failure -> Data.Failure()
-            }
-            is Data.Failure -> result1
-        }
+    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.detail(id)}") { json: JsonObject ->
+        getCloudMusic(json.arr("songs")[0].Object)
+    }?.let { musicInfo ->
+        requestLyrics(id)?.let { musicInfo.copy(lyrics = it) }
     }
 
-    suspend fun requestPlaylist(id: String): Data<List<PlatformMusicInfo>> {
-        val result1 = NetClient.common.safeGet(
-            url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
-        ) { json: JsonObject ->
-            json.obj("result").arr("tracks").fastMap {
-                getCloudMusic(it.Object)
-            }
+    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.playlist(id)}") { json: JsonObject ->
+        json.obj("result").arr("tracks").fastMap {
+            getCloudMusic(it.Object)
+        }.toMutableList()
+    }?.let { musicInfos ->
+        musicInfos.fastForEachIndexed { i, info ->
+            requestLyrics(info.id)?.let { musicInfos[i] = info.copy(lyrics = it) }
         }
-        return when (result1) {
-            is Data.Success -> {
-                val data = result1.data.toMutableList()
-                for (i in data.indices) {
-                    val result2 = requestLyrics(data[i].id)
-                    if (result2 is Data.Success) data[i] = data[i].copy(lyrics = result2.data)
-                }
-                data.removeAll { it.lyrics.isEmpty() }
-                if (data.isEmpty()) Data.Failure() else Data.Success(data)
-            }
-            is Data.Failure -> result1
-        }
+        musicInfos.removeAll { it.lyrics.isEmpty() }
+        musicInfos.ifEmpty { null }
     }
 }

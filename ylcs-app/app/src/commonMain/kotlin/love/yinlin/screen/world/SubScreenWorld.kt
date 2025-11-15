@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.compose.*
@@ -66,7 +67,7 @@ private fun GameCard(
 		verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
 	) {
 		WebImage(
-			uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
+			uri = remember(game, isLandscape) { game.xyPath(isLandscape).url },
 			key = Local.info.version,
 			contentScale = ContentScale.Crop,
 			circle = true,
@@ -144,7 +145,7 @@ class SubScreenWorld(parent: BasicScreen) : SubScreen(parent) {
 			val game = Game.entries[currentPage]
 
 			WebImage(
-				uri = remember(game, isLandscape) { game.xyPath(isLandscape) },
+				uri = remember(game, isLandscape) { game.xyPath(isLandscape).url },
 				key = Local.info.version,
 				contentScale = ContentScale.Crop,
 				alignment = Alignment.TopCenter,

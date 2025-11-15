@@ -30,8 +30,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.uri.Scheme
@@ -54,8 +53,6 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.config.CacheState
-import love.yinlin.data.Data
-import love.yinlin.data.RequestError
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.DateEx
@@ -131,33 +128,25 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         val duration = currentTime - app.config.userShortToken
         if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
             isUpdateToken.compareAndSet(expect = false, update = true)) {
-            val result = ClientAPI2.request(
-                route = API2.User.Account.UpdateToken,
-                data = token
-            )
-            isUpdateToken.value = false
-            when (result) {
-                is Data.Success -> {
-                    app.config.userShortToken = currentTime
-                    app.config.userToken = result.data
-                }
-                is Data.Failure if result.type == RequestError.Unauthorized -> {
+            ApiAccountUpdateToken.request(token) {
+                app.config.userShortToken = currentTime
+                app.config.userToken = it
+            }?.let {
+                if (it is UnauthorizedException) {
                     cleanUserToken()
                     navigate(::ScreenLogin)
                 }
-                else -> {}
             }
+            isUpdateToken.value = false
         }
     }
 
     suspend fun updateUserProfile() {
         val token = app.config.userToken
         if (token.isNotEmpty() && !isUpdateToken.value) {
-            val result = ClientAPI2.request(
-                route = API2.User.Profile.GetProfile,
-                data = token
-            )
-            if (result is Data.Success) app.config.userProfile = result.data
+            ApiProfileGetProfile.request(token) {
+                app.config.userProfile = it
+            }
         }
     }
 
@@ -400,7 +389,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
                 WebImage(
-                    uri = args.avatarPath,
+                    uri = remember(args) { args.avatarPath.url },
                     key = app.config.cacheUserAvatar,
                     contentScale = ContentScale.Crop,
                     circle = true,
@@ -457,16 +446,10 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             signinData = BooleanArray(8) { false }
             todayIndex = -1
             todaySignin = true
-            val result = ClientAPI2.request(
-                route = API2.User.Profile.Signin,
-                data = app.config.userToken
-            )
-            if (result is Data.Success) {
-                with(result.data) {
-                    todaySignin = status
-                    todayIndex = index
-                    signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
-                }
+            ApiProfileSignin.request(app.config.userToken) { status, value, index ->
+                todaySignin = status
+                todayIndex = index
+                signinData = BooleanArray(8) { ((value shr it) and 1) == 1 }
                 if (!todaySignin) app.config.userProfile = args.copy(
                     coin = args.coin + 1,
                     exp = args.exp + 1,

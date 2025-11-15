@@ -186,7 +186,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 }
             }
             slot.tip.success("部署成功")
-        }?.let { slot.tip.error(it.message) }
+        }.errorTip
     }
 
     override suspend fun initialize() {

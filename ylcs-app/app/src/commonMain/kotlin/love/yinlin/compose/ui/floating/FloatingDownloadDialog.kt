@@ -4,14 +4,14 @@ import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import love.yinlin.extension.fileSizeString
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.safeDownload
+import love.yinlin.platform.download
 
 @Stable
 class FloatingDownloadDialog : FloatingDialogProgress() {
     suspend fun openSuspend(url: String, sink: Sink, onSave: suspend () -> Unit): Boolean {
         super.openSuspend()
         val result = sink.use {
-            val result = NetClient.file.safeDownload(
+            val result = NetClient.download(
                 url = url,
                 sink = it,
                 isCancel = { !this.isOpen },

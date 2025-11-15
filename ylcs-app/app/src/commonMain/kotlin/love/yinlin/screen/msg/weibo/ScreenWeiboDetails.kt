@@ -20,7 +20,6 @@ import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.ui.layout.Space
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
 import love.yinlin.screen.common.ScreenMain
@@ -165,8 +164,7 @@ class ScreenWeiboDetails(manager: ScreenManager) : Screen(manager) {
 
     override suspend fun initialize() {
         weibo?.let {
-            val data = WeiboAPI.getWeiboDetails(it.id)
-            comments = if (data is Data.Success) data.data else emptyList()
+            comments = WeiboAPI.getWeiboDetails(it.id) ?: emptyList()
         }
     }
 

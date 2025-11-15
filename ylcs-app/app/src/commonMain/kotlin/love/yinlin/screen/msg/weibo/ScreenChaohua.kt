@@ -20,7 +20,6 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.data.Data
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.platform.*
@@ -48,8 +47,8 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
             if (WeiboAPI.weiboCookie == null) WeiboAPI.weiboCookie = WeiboAPI.generateWeiboCookie()
 
             val result = WeiboAPI.extractChaohua(0L)
-            state = if (result is Data.Success) {
-                val (data, newSinceId) = result.data
+            state = if (result != null) {
+                val (data, newSinceId) = result
                 sinceId = newSinceId
                 canLoading = newSinceId != 0L
                 items = data
@@ -64,8 +63,8 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun requestMoreData() {
         val result = WeiboAPI.extractChaohua(sinceId)
-        if (result is Data.Success) {
-            val (data, newSinceId) = result.data
+        if (result != null) {
+            val (data, newSinceId) = result
             sinceId = newSinceId
             canLoading = newSinceId != 0L
             items += data
@@ -118,7 +117,7 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
                                                 val picker = app.picker
                                                 picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                                                     val result = sink.use {
-                                                        val result = NetClient.file.safeDownload(
+                                                        val result = NetClient.download(
                                                             url = url,
                                                             sink = it,
                                                             isCancel = { false },

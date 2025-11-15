@@ -3,7 +3,8 @@ package love.yinlin.api
 import love.yinlin.extension.toJsonString
 import love.yinlin.server.currentUniqueId
 
-class NineGridProcessor(val sourcePics: APIFile) {
+class NineGridProcessor(pics: APIFile?) {
+    val sourcePics: APIFile = pics ?: EmptyAPIFile
     val actualPics: List<String> = if (sourcePics.files.size > 9) throw error("NineGrid invalid num") else List(sourcePics.files.size) { currentUniqueId(it) }
     val jsonString: String = actualPics.toJsonString()
 

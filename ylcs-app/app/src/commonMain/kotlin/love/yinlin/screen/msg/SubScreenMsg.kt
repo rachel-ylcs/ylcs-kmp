@@ -21,8 +21,10 @@ import androidx.compose.ui.util.fastFilter
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.until
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiActivityAddActivity
+import love.yinlin.api.ApiActivityGetActivities
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
@@ -33,7 +35,6 @@ import love.yinlin.compose.ui.image.IconText
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.weibo.Weibo
@@ -88,21 +89,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private val calendarState = CalendarState()
 
     private suspend fun requestActivity() {
-        val result = ClientAPI2.request(
-            route = API2.User.Activity.GetActivities
-        )
-        if (result is Data.Success) activities.replaceAll(result.data.sorted())
+        ApiActivityGetActivities.request { activities.replaceAll(it.sorted()) }
     }
 
     private suspend fun addActivity() {
-        val result = ClientAPI2.request(
-			route = API2.User.Activity.AddActivity,
-			data = app.config.userToken
-		)
-        when (result) {
-			is Data.Success -> requestActivity()
-			is Data.Failure -> slot.tip.error(result.message)
-		}
+        ApiActivityAddActivity.request(app.config.userToken) { requestActivity() }.errorTip
     }
 
     @Composable
@@ -124,7 +115,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
                     shape = shape,
                     shadowElevation = CustomTheme.shadow.surface
                 ) {
-                    pic.photo.coverPath?.let { coverPath ->
+                    pic.photo.coverPath?.url?.let { coverPath ->
                         WebImage(
                             uri = coverPath,
                             contentScale = ContentScale.Crop,

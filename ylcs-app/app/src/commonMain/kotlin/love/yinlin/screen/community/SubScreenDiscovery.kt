@@ -20,9 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.api.API2
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
@@ -32,7 +30,6 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
@@ -82,35 +79,15 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
     private suspend fun requestNewData(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = when (val section = currentSection) {
-                DiscoveryItem.LatestTopic.id -> ClientAPI2.request(
-                    route = API2.User.Topic.GetLatestTopics,
-                    data = API2.User.Topic.GetLatestTopics.Request(
-                        num = page.pageNum
-                    )
-                )
-                DiscoveryItem.LatestComment.id -> ClientAPI2.request(
-                    route = API2.User.Topic.GetLatestTopicsByComment,
-                    data = API2.User.Topic.GetLatestTopicsByComment.Request(
-                        num = page.pageNum
-                    )
-                )
-                DiscoveryItem.Hot.id -> ClientAPI2.request(
-                    route = API2.User.Topic.GetHotTopics,
-                    data = API2.User.Topic.GetHotTopics.Request(
-                        num = page.pageNum
-                    )
-                )
-                else -> ClientAPI2.request(
-                    route = API2.User.Topic.GetSectionTopics,
-                    data = API2.User.Topic.GetSectionTopics.Request(
-                        section = section,
-                        num = page.pageNum
-                    )
-                )
+            var data: List<Topic>? = null
+            when (val section = currentSection) {
+                DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.request(page.default, page.pageNum) { data = it }
+                DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.request(page.default, page.pageNum) { data = it }
+                DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.request(page.default1, page.default, page.pageNum) { data = it }
+                else -> ApiTopicGetSectionTopics.request(section, page.default, page.pageNum) { data = it }
             }
-            if (result is Data.Success) {
-                state = if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
+            if (data != null) {
+                state = if (page.newData(data)) BoxState.CONTENT else BoxState.EMPTY
                 gridState.scrollToItem(0)
             }
             else state = BoxState.NETWORK_ERROR
@@ -118,39 +95,14 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
     }
 
     private suspend fun requestMoreData() {
-        val result = when (val section = currentSection) {
-            DiscoveryItem.LatestTopic.id -> ClientAPI2.request(
-                route = API2.User.Topic.GetLatestTopics,
-                data = API2.User.Topic.GetLatestTopics.Request(
-                    tid = page.offset,
-                    num = page.pageNum
-                )
-            )
-            DiscoveryItem.LatestComment.id -> ClientAPI2.request(
-                route = API2.User.Topic.GetLatestTopicsByComment,
-                data = API2.User.Topic.GetLatestTopicsByComment.Request(
-                    tid = page.offset,
-                    num = page.pageNum
-                )
-            )
-            DiscoveryItem.Hot.id -> ClientAPI2.request(
-                route = API2.User.Topic.GetHotTopics,
-                data = API2.User.Topic.GetHotTopics.Request(
-                    score = page.arg1,
-                    tid = page.offset,
-                    num = page.pageNum
-                )
-            )
-            else -> ClientAPI2.request(
-                route = API2.User.Topic.GetSectionTopics,
-                data = API2.User.Topic.GetSectionTopics.Request(
-                    section = section,
-                    tid = page.offset,
-                    num = page.pageNum
-                )
-            )
+        var data: List<Topic>? = null
+        when (val section = currentSection) {
+            DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.request(page.offset, page.pageNum) { data = it }
+            DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.request(page.offset, page.pageNum) { data = it }
+            DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.request(page.arg1, page.offset, page.pageNum) { data = it }
+            else -> ApiTopicGetSectionTopics.request(section, page.offset, page.pageNum) { data = it }
         }
-        if (result is Data.Success) page.moreData(result.data)
+        if (data != null) page.moreData(data)
     }
 
     private fun onTopicClick(topic: Topic) {
@@ -176,9 +128,9 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
                 .heightIn(min = cardWidth * 0.777777f)
                 .clickable { onTopicClick(topic) }
             ) {
-                if (topic.pic != null) {
+                topic.picPath?.url?.let {
                     WebImage(
-                        uri = topic.picPath,
+                        uri = it,
                         modifier = Modifier.fillMaxWidth().height(cardWidth * 1.333333f),
                         contentScale = ContentScale.Crop
                     )
@@ -197,7 +149,7 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
                 ) {
                     Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f)) {
                         WebImage(
-                            uri = topic.avatarPath,
+                            uri = remember(topic) { topic.avatarPath.url },
                             key = remember { DateEx.TodayString },
                             contentScale = ContentScale.Crop,
                             circle = true,

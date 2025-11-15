@@ -17,13 +17,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiGameGetGameRank
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.compose.ui.image.MiniImage
@@ -36,11 +36,7 @@ class ScreenGameRanking(manager: ScreenManager, private val type: Game) : Screen
     private var items by mutableRefStateOf(emptyList<GameRank>())
 
     private suspend fun requestRank() {
-        val result = ClientAPI2.request(
-            route = API2.User.Game.GetGameRank,
-            data = type
-        )
-        if (result is Data.Success) items = result.data
+        ApiGameGetGameRank.request(type) { items = it }
     }
 
     @Composable
@@ -78,7 +74,7 @@ class ScreenGameRanking(manager: ScreenManager, private val type: Game) : Screen
                     }
                 }
                 WebImage(
-                    uri = remember(rank) { rank.avatarPath },
+                    uri = remember(rank) { rank.avatarPath.url },
                     circle = true,
                     modifier = Modifier.fillMaxHeight().aspectRatio(1f)
                 )
@@ -120,7 +116,7 @@ class ScreenGameRanking(manager: ScreenManager, private val type: Game) : Screen
             val isLandscape = LocalDevice.current.type != Device.Type.PORTRAIT
 
             WebImage(
-                uri = remember(isLandscape) { type.xyPath(isLandscape) },
+                uri = remember(isLandscape) { type.xyPath(isLandscape).url },
                 key = Local.info.version,
                 contentScale = ContentScale.Crop,
                 alpha = 0.75f,

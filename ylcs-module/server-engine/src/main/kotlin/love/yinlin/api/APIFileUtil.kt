@@ -4,6 +4,10 @@ import kotlinx.io.files.Path
 import love.yinlin.extension.deleteRecursively
 import java.io.File
 
+val EmptyAPIFile = object : APIFile {
+    override val files: List<String> = emptyList()
+}
+
 private class SingleAPIFile(path: String) : APIFile {
     override val files: List<String> = listOf(path)
 }

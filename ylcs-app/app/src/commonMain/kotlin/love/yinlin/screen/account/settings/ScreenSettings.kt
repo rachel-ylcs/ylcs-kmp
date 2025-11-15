@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Login
-import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,12 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.files.Path
 import love.yinlin.About
 import love.yinlin.Local
-import love.yinlin.api.API2
-import love.yinlin.api.ApiCommonGetServerStatus
-import love.yinlin.api.ApiUserUpdateAvatar
-import love.yinlin.api.ClientAPI2
-import love.yinlin.api.apiFile
-import love.yinlin.api.request
+import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.common.*
 import love.yinlin.uri.Uri
@@ -49,7 +43,6 @@ import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.compose.ui.text.InputType
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.fileSizeString
@@ -93,50 +86,27 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserAvatar() {
         pickPicture(1f)?.let { path ->
-            ApiUserUpdateAvatar.request(app.config.userToken, apiFile(path.rawSource)) {
+            ApiProfileUpdateAvatar.request(app.config.userToken, apiFile(path.rawSource)) {
                 app.config.cacheUserAvatar = CacheState.UPDATE
-            }?.let { slot.tip.error("更新失败") }
+            }.errorTip
         }
     }
 
     private suspend fun modifyUserWall() {
         pickPicture(1.77777f)?.let { path ->
-            val result = ClientAPI2.request(
-                route = API2.User.Profile.UpdateWall,
-                data = app.config.userToken,
-                files = {
-                    API2.User.Profile.UpdateWall.Files(
-                        wall = file(path.rawSource)
-                    )
-                }
-            )
-            when (result) {
-                is Data.Success -> app.config.cacheUserWall = CacheState.UPDATE
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiProfileUpdateWall.request(app.config.userToken, apiFile(path.rawSource)) {
+                app.config.cacheUserWall = CacheState.UPDATE
+            }.errorTip
         }
     }
 
     private suspend fun modifyUserId(initText: String) {
         idModifyDialog.openSuspend(initText)?.let { text ->
             val profile = app.config.userProfile
-            if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) launch {
-                val result = ClientAPI2.request(
-                    route = API2.User.Profile.UpdateName,
-                    data = API2.User.Profile.UpdateName.Request(
-                        token = app.config.userToken,
-                        name = text
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        app.config.userProfile = profile.copy(
-                            name = text,
-                            coin = profile.coin - UserConstraint.RENAME_COIN_COST
-                        )
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
+            if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) {
+                ApiProfileUpdateName.request(app.config.userToken, text) {
+                    app.config.userProfile = profile.copy(name = text, coin = profile.coin - UserConstraint.RENAME_COIN_COST)
+                }.errorTip
             }
         }
     }
@@ -144,20 +114,10 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     private suspend fun modifyUserSignature(initText: String) {
         signatureModifyDialog.openSuspend(initText)?.let { text ->
             val profile = app.config.userProfile
-            if (profile != null) launch {
-                val result = ClientAPI2.request(
-                    route = API2.User.Profile.UpdateSignature,
-                    data = API2.User.Profile.UpdateSignature.Request(
-                        token = app.config.userToken,
-                        signature = text
-                    )
-                )
-                when (result) {
-                    is Data.Success -> {
-                        app.config.userProfile = profile.copy(signature = text)
-                    }
-                    is Data.Failure -> slot.tip.error(result.message)
-                }
+            if (profile != null) {
+                ApiProfileUpdateSignature.request(app.config.userToken, text) {
+                    app.config.userProfile = profile.copy(signature = text)
+                }.errorTip
             }
         }
     }
@@ -165,21 +125,10 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     private suspend fun modifyPassword(oldPwd: String, newPwd: String) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
-            val result = ClientAPI2.request(
-                route = API2.User.Account.ChangePassword,
-                data = API2.User.Account.ChangePassword.Request(
-                    token = token,
-                    oldPwd = oldPwd,
-                    newPwd = newPwd
-                )
-            )
-            when (result) {
-                is Data.Success -> {
-                    slot.tip.success("修改密码成功, 请重新登录")
-                    subScreenMe.cleanUserToken()
-                }
-                is Data.Failure -> slot.tip.error(result.message)
-            }
+            ApiAccountChangePassword.request(token, oldPwd, newPwd) {
+                slot.tip.success("修改密码成功, 请重新登录")
+                subScreenMe.cleanUserToken()
+            }.errorTip
         }
     }
 
@@ -187,17 +136,10 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "重置默认头像与背景墙")) {
-                val result = ClientAPI2.request(
-                    route = API2.User.Profile.ResetPicture,
-                    data = token
-                )
-                when (result) {
-                    is Data.Success -> {
-                        app.config.cacheUserAvatar = CacheState.UPDATE
-                        app.config.cacheUserWall = CacheState.UPDATE
-                    }
-                    is Data.Failure-> slot.tip.error(result.message)
-                }
+                ApiProfileResetPicture.request(token) {
+                    app.config.cacheUserAvatar = CacheState.UPDATE
+                    app.config.cacheUserWall = CacheState.UPDATE
+                }.errorTip
             }
         }
     }
@@ -206,10 +148,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         val token = app.config.userToken
         if (token.isNotEmpty()) {
             if (slot.confirm.openSuspend(content = "退出登录")) {
-                ClientAPI2.request(
-                    route = API2.User.Account.Logoff,
-                    data = token
-                )
+                ApiAccountLogOff.request(token) { }
                 // 不论是否成功均从本地设备退出登录
                 subScreenMe.cleanUserToken()
             }
@@ -217,17 +156,9 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     private suspend fun sendFeedback(content: String) {
-        val result = ClientAPI2.request(
-            route = API2.User.Info.SendFeedback,
-            data = API2.User.Info.SendFeedback.Request(
-                token = app.config.userToken,
-                content = content
-            )
-        )
-        when (result) {
-            is Data.Success -> feedbackSheet.close()
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiCommonSendFeedback.request(app.config.userToken, content) {
+            feedbackSheet.close()
+        }.errorTip
     }
 
     private suspend fun checkUpdate() {
@@ -235,7 +166,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
             if (status.targetVersion > Local.info.version) slot.tip.warning("新版本${status.targetVersion}可用")
             else if (status.minVersion > Local.info.version) slot.tip.error("当前版本不满足服务器最低兼容版本${status.minVersion}")
             else slot.tip.success("当前已是最新版本")
-        }?.let { slot.tip.error(it.message) }
+        }.errorTip
     }
 
     @Composable
@@ -269,7 +200,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                     onClick = { launch { modifyUserAvatar() } }
                 ) {
                     WebImage(
-                        uri = userProfile.avatarPath,
+                        uri = remember(userProfile) { userProfile.avatarPath.url },
                         key = app.config.cacheUserAvatar,
                         contentScale = ContentScale.Crop,
                         circle = true,
@@ -293,7 +224,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                     onClick = { launch { modifyUserWall() } }
                 ) {
                     WebImage(
-                        uri = userProfile.wallPath,
+                        uri = remember(userProfile) { userProfile.wallPath.url },
                         key = app.config.cacheUserWall,
                         modifier = Modifier.width(CustomTheme.size.largeImage).aspectRatio(1.77778f)
                             .shadow(CustomTheme.shadow.icon)

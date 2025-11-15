@@ -70,4 +70,7 @@ abstract class SubScreen(val parent: BasicScreen) {
     fun pop() = parent.pop()
 
 	fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = parent.monitor(state, action)
+
+	val Throwable?.warningTip: Throwable? get() = with(parent) { this@warningTip.warningTip }
+	val Throwable?.errorTip: Throwable? get() = with(parent) { this@errorTip.errorTip }
 }

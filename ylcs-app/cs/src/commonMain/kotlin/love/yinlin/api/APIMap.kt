@@ -310,7 +310,7 @@ val ApiTopicGetTopicSubComments by API.post.i<Int, Int, Int, Int>().o<List<SubCo
 @APIParam("pics")
 @APIReturn("tid")
 @APIReturn("pic")
-val ApiTopicSendTopic by API.form.i<String, String, String, Int, APIFile>().o<Int, String?>()
+val ApiTopicSendTopic by API.form.i<String, String, String, Int, APIFile?>().o<Int, String?>()
 
 @APIParam("token")
 @APIParam("tid")

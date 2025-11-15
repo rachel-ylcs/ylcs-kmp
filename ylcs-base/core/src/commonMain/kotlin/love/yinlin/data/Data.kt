@@ -4,14 +4,6 @@ interface ErrorType
 
 data object Empty : ErrorType
 
-enum class RequestError : ErrorType {
-    ClientError,
-    Timeout,
-    Canceled,
-    Unauthorized,
-    InvalidArgument,
-}
-
 sealed interface Data<out D> {
     data class Failure(val type: ErrorType = Empty, val message: String? = null, val throwable: Throwable? = null) : Data<Nothing>
     data class Success<out D>(val data: D, val message: String? = null) : Data<D>

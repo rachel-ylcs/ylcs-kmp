@@ -54,11 +54,11 @@ kotlin {
             useApi(
                 projects.ylcsBase.csCore,
                 libs.ktor.client,
-                libs.ktor.client.websockets,
             )
             useLib(
                 libs.ktor.json,
                 libs.ktor.client.negotiation,
+                libs.ktor.client.websockets,
             )
         }
 

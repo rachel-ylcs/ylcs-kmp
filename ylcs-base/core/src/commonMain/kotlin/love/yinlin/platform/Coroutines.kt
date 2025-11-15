@@ -27,6 +27,8 @@ class SyncFuture<T>(private val continuation: CancellableContinuation<T?>) {
 
 @OptIn(ExperimentalContracts::class)
 data object Coroutines {
+    suspend inline fun <T> with(context: CoroutineContext, noinline block: suspend CoroutineScope.() -> T): T = withContext(context, block)
+
     suspend inline fun <T> main(noinline block: suspend CoroutineScope.() -> T): T {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)

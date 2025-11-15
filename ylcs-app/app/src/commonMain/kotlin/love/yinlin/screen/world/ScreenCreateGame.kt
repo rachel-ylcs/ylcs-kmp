@@ -1,32 +1,24 @@
 package love.yinlin.screen.world
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import love.yinlin.api.API2
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiGameCreateGame
+import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.data.rachel.game.CreateGameArgs
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.world.game.GameSlider
 import love.yinlin.screen.world.game.cast
@@ -141,28 +133,20 @@ class ScreenCreateGame(manager: ScreenManager, private val type: Game) : Screen(
                 val reward = reward.cast(config.minReward, config.maxReward)
                 val actionCoin = (reward * GameConfig.rewardCostRatio).toInt()
                 if (profile.coin >= actionCoin) {
-                    val result = ClientAPI2.request(
-                        route = API2.User.Game.CreateGame,
-                        data = API2.User.Game.CreateGame.Request(
-                            token = app.config.userToken,
-                            title = titleState.text,
-                            type = type,
-                            reward = reward,
-                            num = num.cast(config.minRank, maxNum),
-                            cost = cost.cast(0, maxCost),
-                            info = state.submitInfo,
-                            question = state.submitQuestion,
-                            answer = state.submitAnswer,
-                        )
-                    )
-                    when (result) {
-                        is Data.Success -> {
-                            subScreenWorld.slot.tip.success(result.message)
-                            app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
-                            pop()
-                        }
-                        is Data.Failure -> slot.tip.error(result.message)
-                    }
+                    ApiGameCreateGame.request(app.config.userToken, CreateGameArgs(
+                        title = titleState.text,
+                        type = type,
+                        reward = reward,
+                        num = num.cast(config.minRank, maxNum),
+                        cost = cost.cast(0, maxCost),
+                        info = state.submitInfo,
+                        question = state.submitQuestion,
+                        answer = state.submitAnswer,
+                    )) {
+                        subScreenWorld.slot.tip.success("创建成功")
+                        app.config.userProfile = profile.copy(coin = profile.coin - actionCoin)
+                        pop()
+                    }.errorTip
                 }
                 else slot.tip.warning("银币不足够支持${(GameConfig.rewardCostRatio * 100).toInt()}%=${actionCoin}的奖励")
             }

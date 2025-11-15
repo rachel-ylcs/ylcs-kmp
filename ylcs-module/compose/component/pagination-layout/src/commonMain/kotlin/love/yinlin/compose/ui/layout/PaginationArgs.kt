@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 @Stable
 abstract class PaginationArgs<E, K, out T, out A1>(
     default: T,
-    private val default1: A1,
+    val default1: A1,
     pageNum: Int
 ) : Pagination<E, K, T>(default, pageNum) {
     abstract fun arg1(item: E): A1

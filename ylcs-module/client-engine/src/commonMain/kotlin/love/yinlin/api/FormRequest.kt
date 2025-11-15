@@ -11,7 +11,9 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import kotlinx.io.RawSource
 import kotlinx.io.buffered
+import kotlinx.io.files.Path
 import kotlinx.serialization.json.JsonArray
+import love.yinlin.extension.safeRawSources
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 import love.yinlin.io.Sources
@@ -20,9 +22,10 @@ class ClientAPIFile internal constructor(val value: Any) : APIFile {
     override val files: List<String> = emptyList()
 }
 
-fun apiFile(data: ByteArray) = ClientAPIFile(value = data)
-fun apiFile(data: RawSource) = ClientAPIFile(value = data)
-fun apiFile(data: Sources<RawSource>) = ClientAPIFile(value = data)
+fun apiFile(data: ByteArray): APIFile = ClientAPIFile(value = data)
+fun apiFile(data: RawSource): APIFile = ClientAPIFile(value = data)
+fun apiFile(data: Sources<RawSource>): APIFile = ClientAPIFile(value = data)
+fun apiFile(data: List<Path>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let { ClientAPIFile(it) }
 
 class APIFormScope {
     lateinit var builder: FormBuilder
@@ -56,15 +59,17 @@ class APIFormScope {
             factory()
         }
         return sources.use {
-            internalRequest(builder = {
-                setBody(MultiPartFormDataContent(formParts))
-            }, block = block)
+            internalRequest(
+                builder = { setBody(MultiPartFormDataContent(formParts)) },
+                uploadFile = true,
+                block = block
+            )
         }
     }
 }
 
 suspend inline fun <reified I1> API10<APIType.Form, I1>
-        .request(i1: I1, crossinline block: () -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend () -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -73,7 +78,7 @@ suspend inline fun <reified I1> API10<APIType.Form, I1>
 }
 
 suspend inline fun <reified I1, reified I2> API20<APIType.Form, I1, I2>
-        .request(i1: I1, i2: I2, crossinline block: () -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend () -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -83,7 +88,7 @@ suspend inline fun <reified I1, reified I2> API20<APIType.Form, I1, I2>
 }
 
 suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, I2, I3>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: () -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend () -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -94,7 +99,7 @@ suspend inline fun <reified I1, reified I2, reified I3> API30<APIType.Form, I1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APIType.Form, I1, I2, I3, I4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: () -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend () -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -106,7 +111,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4> API40<APITyp
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> API50<APIType.Form, I1, I2, I3, I4, I5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: () -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend () -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -119,7 +124,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> 
 }
 
 suspend inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>
-        .request(i1: I1, crossinline block: (O1) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend (O1) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -129,7 +134,7 @@ suspend inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>
 }
 
 suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, I2, O1>
-        .request(i1: I1, i2: I2, crossinline block: (O1) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -140,7 +145,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APIType.Form, I1, I2, I3, O1>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -152,7 +157,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> API41<APIType.Form, I1, I2, I3, I4, O1>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -165,7 +170,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1> API51<APIType.Form, I1, I2, I3, I4, I5, O1>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -179,7 +184,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
 }
 
 suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>
-        .request(i1: I1, crossinline block: (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -189,7 +194,7 @@ suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APIType.Form, I1, I2, O1, O2>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -200,7 +205,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> API32<APIType.Form, I1, I2, I3, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -212,7 +217,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2> API42<APIType.Form, I1, I2, I3, I4, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -225,7 +230,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2> API52<APIType.Form, I1, I2, I3, I4, I5, O1, O2>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -239,7 +244,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>
-        .request(i1: I1, crossinline block: (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -249,7 +254,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APITyp
 }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> API23<APIType.Form, I1, I2, O1, O2, O3>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -260,7 +265,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3> API33<APIType.Form, I1, I2, I3, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -272,7 +277,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3> API43<APIType.Form, I1, I2, I3, I4, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -285,7 +290,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3> API53<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -299,7 +304,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>
-        .request(i1: I1, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -309,7 +314,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> 
 }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4> API24<APIType.Form, I1, I2, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -320,7 +325,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4> API34<APIType.Form, I1, I2, I3, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -332,7 +337,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4> API44<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -345,7 +350,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4> API54<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3, O4) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -359,7 +364,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>
-        .request(i1: I1, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
     }) {
@@ -369,7 +374,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, 
 }
 
 suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, reified O4, reified O5> API25<APIType.Form, I1, I2, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -380,7 +385,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, reified O3, reified O4, reified O5> API35<APIType.Form, I1, I2, I3, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -392,7 +397,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, reified O2, reified O3, reified O4, reified O5> API45<APIType.Form, I1, I2, I3, I4, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)
@@ -405,7 +410,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
 }
 
 suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, reified O1, reified O2, reified O3, reified O4, reified O5> API55<APIType.Form, I1, I2, I3, I4, I5, O1, O2, O3, O4, O5>
-        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
+        .request(i1: I1, i2: I2, i3: I3, i4: I4, i5: I5, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit): Throwable? = with(APIFormScope()) {
     run(factory = {
         add(i1)
         add(i2)

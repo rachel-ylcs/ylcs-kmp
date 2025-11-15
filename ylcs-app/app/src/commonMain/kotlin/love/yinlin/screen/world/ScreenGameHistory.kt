@@ -15,14 +15,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
+import love.yinlin.api.ApiGameDeleteGame
+import love.yinlin.api.ApiGameGetUserGames
+import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.image.LoadingIcon
@@ -53,44 +53,22 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            val result = ClientAPI2.request(
-                route = API2.User.Game.GetUserGames,
-                data = API2.User.Game.GetUserGames.Request(
-                    token = app.config.userToken,
-                    num = page.pageNum
-                )
-            )
-            state = if (result is Data.Success) {
-                if (page.newData(result.data)) BoxState.CONTENT else BoxState.EMPTY
-            } else BoxState.NETWORK_ERROR
+            ApiGameGetUserGames.request(app.config.userToken, page.default, page.default1, page.pageNum) {
+                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
+            }?.let { state = BoxState.NETWORK_ERROR }
         }
     }
 
     private suspend fun requestMoreGames() {
-        val result = ClientAPI2.request(
-            route = API2.User.Game.GetUserGames,
-            data = API2.User.Game.GetUserGames.Request(
-                token = app.config.userToken,
-                gid = page.offset,
-                isCompleted = page.arg1,
-                num = page.pageNum
-            )
-        )
-        if (result is Data.Success) page.moreData(result.data)
+        ApiGameGetUserGames.request(app.config.userToken, page.offset, page.arg1, page.pageNum) {
+            page.moreData(it)
+        }
     }
 
     private suspend fun deleteGame(gid: Int) {
-        val result = ClientAPI2.request(
-            route = API2.User.Game.DeleteGame,
-            data = API2.User.Game.DeleteGame.Request(
-                token = app.config.userToken,
-                gid = gid
-            )
-        )
-        when (result) {
-            is Data.Success -> page.items.removeAll { it.gid == gid }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiGameDeleteGame.request(app.config.userToken, gid) {
+            page.items.removeAll { it.gid == gid }
+        }.errorTip
     }
 
     override val title: String = "我的游戏"

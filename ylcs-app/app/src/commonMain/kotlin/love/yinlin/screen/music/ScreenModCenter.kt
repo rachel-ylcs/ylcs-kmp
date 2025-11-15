@@ -22,11 +22,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.Local
-import love.yinlin.api.API2
 import love.yinlin.api.APIConfig
-import love.yinlin.api.ClientAPI2
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.ApiSongGetSongs
+import love.yinlin.api.ApiSongSearchSongs
+import love.yinlin.api.ServerRes
+import love.yinlin.api.request
+import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
@@ -40,7 +41,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationGrid
-import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.SongPreview
 
@@ -57,43 +57,24 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     private val gridState = LazyGridState()
 
     private suspend fun requestNewData() {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.GetSongs,
-            data = API2.User.Song.GetSongs.Request(num = pageSongs.pageNum)
-        )
-        when (result) {
-            is Data.Success -> {
-                pageSongs.newData(result.data)
-                gridState.scrollToItem(0)
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiSongGetSongs.request(pageSongs.default, pageSongs.pageNum) {
+            pageSongs.newData(it)
+            gridState.scrollToItem(0)
+        }.errorTip
     }
 
     private suspend fun requestMoreData() {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.GetSongs,
-            data = API2.User.Song.GetSongs.Request(
-                sid = pageSongs.offset,
-                num = pageSongs.pageNum
-            )
-        )
-        if (result is Data.Success) pageSongs.moreData(result.data)
+        ApiSongGetSongs.request(pageSongs.offset, pageSongs.pageNum) {
+            pageSongs.moreData(it)
+        }
     }
 
     private suspend fun searchNewData(key: String) {
-        val result = ClientAPI2.request(
-            route = API2.User.Song.SearchSongs,
-            data = key
-        )
-        when (result) {
-            is Data.Success -> {
-                pageSongs.newData(result.data)
-                pageSongs.canLoading = false
-                gridState.scrollToItem(0)
-            }
-            is Data.Failure -> slot.tip.error(result.message)
-        }
+        ApiSongSearchSongs.request(key) {
+            pageSongs.newData(it)
+            pageSongs.canLoading = false
+            gridState.scrollToItem(0)
+        }.errorTip
     }
 
     override val title: String = "工坊"
@@ -123,7 +104,7 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             WebImage(
-                uri = remember(song) { "${Local.API_BASE_URL}/${ServerRes2.Mod.Song(song.sid).res(ModResourceType.Record.filename)}" },
+                uri = remember(song) { ServerRes.Mod.Song(song.sid).res(ModResourceType.Record.filename).url },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(CustomTheme.size.image).clip(MaterialTheme.shapes.large)
             )

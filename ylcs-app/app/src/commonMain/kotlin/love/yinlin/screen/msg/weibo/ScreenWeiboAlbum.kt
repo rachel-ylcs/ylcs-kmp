@@ -17,7 +17,6 @@ import love.yinlin.api.WeiboAPI
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.Data
 import love.yinlin.data.compose.Picture
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.WebImage
@@ -45,8 +44,8 @@ class ScreenWeiboAlbum(manager: ScreenManager, private val containerId: String, 
         if (caches[page] == null) { // 无缓存
             state = BoxState.LOADING
             val result = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)
-            if (result is Data.Success) {
-                val (data, count) = result.data
+            if (result != null) {
+                val (data, count) = result
                 caches[page] = AlbumCache(count, data)
             }
             state = BoxState.CONTENT

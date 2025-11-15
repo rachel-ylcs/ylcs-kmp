@@ -19,5 +19,5 @@ data class SubComment(
 ) {
 	val level: Int by lazy { UserLevel.level(exp) }
 
-	val avatarPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Users.User(uid).avatar}" }
+	val avatarPath by lazy { ServerRes.Users.User(uid).avatar }
 }
