@@ -6,8 +6,6 @@ import love.yinlin.api.sockets.LyricsSocketsManager
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.api.game.manager
-import love.yinlin.data.Data
-import love.yinlin.data.map
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
@@ -143,10 +141,7 @@ fun APIScope<Mail.Filter, MailEntry, String>.gameAPI() {
         if (details.uid == uid) failure("不能参与自己创建的游戏哦")
         else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
         else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else when (val data = details.type.manager.preflight(uid, details).map { it.copy(info = details.info, question = details.question) }) {
-            is Data.Success -> result(data.data)
-            is Data.Failure -> failure(data.message)
-        }
+        else result(details.type.manager.preflight(uid, details).copy(info = details.info, question = details.question))
     }
 
     ApiGameVerifyGame.response { token, gid, rid, answer ->
@@ -165,10 +160,7 @@ fun APIScope<Mail.Filter, MailEntry, String>.gameAPI() {
         if (details.uid == uid) failure("不能参与自己创建的游戏哦")
         else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
         else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else when (val data = details.type.manager.verify(uid, details, record, answer)) {
-            is Data.Success -> result(data.data)
-            is Data.Failure -> failure(data.message)
-        }
+        else result(details.type.manager.verify(uid, details, record, answer))
     }
 
     LyricsSockets.connect { LyricsSocketsManager(it) }

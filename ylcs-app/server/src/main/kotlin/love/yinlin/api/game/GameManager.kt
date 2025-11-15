@@ -1,7 +1,6 @@
 package love.yinlin.api.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.game.*
 import love.yinlin.extension.toJsonString
 import love.yinlin.server.DB
@@ -38,7 +37,7 @@ sealed class GameManager {
     }
 
     // 预检游戏
-    abstract fun preflight(uid: Int, details: GameDetails): Data<PreflightResult>
+    abstract fun preflight(uid: Int, details: GameDetails): PreflightResult
 
     // 生成结果
     abstract fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult
@@ -69,13 +68,13 @@ sealed class GameManager {
     }
 
     // 验证游戏
-    fun verify(uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement): Data<GameResult> {
+    fun verify(uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
         val result = generateResult(details, record, userAnswer)
         DB.throwTransaction {
             it.updateReward(uid, details, result)
             it.updateRecord(record, userAnswer, result)
             it.updateRank(uid, details, result.isCompleted)
         }
-        return Data.Success(result)
+        return result
     }
 }

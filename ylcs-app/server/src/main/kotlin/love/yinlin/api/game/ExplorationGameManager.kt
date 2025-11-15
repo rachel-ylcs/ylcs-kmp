@@ -1,7 +1,7 @@
 package love.yinlin.api.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.data.Data
+import love.yinlin.api.FailureException
 import love.yinlin.data.rachel.game.ExplorationConfig
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
@@ -28,24 +28,24 @@ abstract class ExplorationGameManager : GameManager() {
         require(tryCount in config.minTryCount .. config.maxTryCount)
     }
 
-    override fun preflight(uid: Int, details: GameDetails): Data<PreflightResult> {
+    override fun preflight(uid: Int, details: GameDetails): PreflightResult {
         // 检查重试记录
         val oldRecord = DB.querySQLSingle("""
             SELECT rid, answer, result FROM game_record WHERE uid = ? AND gid = ?
         """, uid, details.gid)
         val oldAnswer = oldRecord?.get("answer").ArrayEmpty
         val oldResult = oldRecord?.get("result").ArrayEmpty
-        if (oldAnswer.size >= fetchTryCount(details.info)) return Data.Failure(message = "重试次数达到上限")
+        if (oldAnswer.size >= fetchTryCount(details.info)) throw FailureException("重试次数达到上限")
         return DB.throwTransaction {
             val rid = if (oldRecord == null) {
                 // 消费银币
-                if (!it.consumeCoin(uid, details)) return@throwTransaction Data.Failure(message = "没有足够的银币参与")
+                if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
                 // 插入游戏记录
                 it.throwInsertSQLGeneratedKey("""
                     INSERT INTO game_record(gid, uid, answer, result) ${values(4)}
                 """, details.gid, uid, "[]", "[]")
             } else oldRecord["rid"].Long
-            Data.Success(PreflightResult(rid = rid, answer = oldAnswer, result = oldResult))
+            PreflightResult(rid = rid, answer = oldAnswer, result = oldResult)
         }
     }
 

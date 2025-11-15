@@ -1,7 +1,7 @@
 package love.yinlin.api.game
 
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.data.Data
+import love.yinlin.api.FailureException
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
 import love.yinlin.data.rachel.game.GameResult
@@ -18,14 +18,14 @@ import java.sql.Connection
 abstract class RankGameManager : GameManager() {
     override val config: RankConfig = RankConfig
 
-    override fun preflight(uid: Int, details: GameDetails): Data<PreflightResult> = DB.throwTransaction {
+    override fun preflight(uid: Int, details: GameDetails): PreflightResult = DB.throwTransaction {
         // 消费银币
-        if (!it.consumeCoin(uid, details)) return@throwTransaction Data.Failure(message = "没有足够的银币参与")
+        if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
         // 插入游戏记录
         val rid = it.throwInsertSQLGeneratedKey("""
             INSERT INTO game_record(gid, uid) ${values(2)}
         """, details.gid, uid)
-        Data.Success(PreflightResult(rid))
+        PreflightResult(rid)
     }
 
     override fun Connection.updateRecord(record: GameRecord, answer: JsonElement, result: GameResult) {

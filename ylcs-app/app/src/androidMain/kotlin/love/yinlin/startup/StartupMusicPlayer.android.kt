@@ -26,7 +26,6 @@ import love.yinlin.Context
 import love.yinlin.R
 import love.yinlin.StartupFetcher
 import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
@@ -68,10 +67,10 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
     }
 
     @OptIn(UnstableApi::class)
-    private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Data<Bundle> {
-        val result = Coroutines.main { controller?.sendCustomCommand(command, args)?.get() }
-        if (result == null) return Data.Failure()
-        return if (result.resultCode == SessionResult.RESULT_SUCCESS) Data.Success(result.extras) else Data.Failure(message = "${result.sessionError}")
+    private suspend fun send(command: SessionCommand, args: Bundle = Bundle.EMPTY): Bundle? = Coroutines.main {
+        controller?.sendCustomCommand(command, args)?.get()
+    }?.let {
+        if (it.resultCode == SessionResult.RESULT_SUCCESS) it.extras else null
     }
 
     override suspend fun updatePlayMode(musicPlayMode: MusicPlayMode) {
