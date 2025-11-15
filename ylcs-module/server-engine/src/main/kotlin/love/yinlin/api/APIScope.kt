@@ -12,10 +12,16 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.route
+import io.ktor.server.websocket.webSocket
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import love.yinlin.api.sockets.SocketsManager
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJsonValue
@@ -27,7 +33,12 @@ import love.yinlin.server.logger
 import java.io.File
 import kotlin.random.Random
 
-data class APIScope(private val routing: Routing) {
+class APIScope<K : Any, I, O> {
+    private lateinit var routing: Routing
+    val callMap = buildCallBackMap<K, I, O>()
+
+    internal fun initRouting(routing: Routing) { this.routing = routing }
+
     fun API<out APIType>.internalResponse(block: suspend (RoutingCall) -> JsonElement) {
         routing.route(path = route, method = HttpMethod.Post) {
             handle {
@@ -844,6 +855,22 @@ data class APIScope(private val routing: Routing) {
             add(o3.toJson())
             add(o4.toJson())
             add(o5.toJson())
+        }
+    }
+
+    // WebSockets
+
+    fun Sockets.connect(factory: (Any) -> SocketsManager) {
+        routing.webSocket(this.path) {
+            val manager = factory(this)
+            catchingError {
+                for (frame in incoming) {
+                    if (frame !is Frame.Text) continue
+                    manager.onMessage(frame.readText())
+                }
+            }?.let { manager.onError(it) }
+            manager.onClose()
+            this.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
         }
     }
 }

@@ -26,10 +26,21 @@ data class Mail(
 		const val INPUT = 8
 	}
 
-	object Filter {
-		const val REGISTER = "user#register"
-		const val FORGOT_PASSWORD = "user#forgotPassword"
-		const val COIN_REWARD = "user#coinReward"
+	enum class Filter(val value: String) {
+		Register("user#register"),
+		ForgotPassword("user#forgotPassword"),
+		CoinReward("user#coinReward");
+
+		override fun toString(): String = value
+
+		companion object {
+			fun fromValue(value: String): Filter? = when (value) {
+				Register.value -> Register
+				ForgotPassword.value -> ForgotPassword
+				CoinReward.value -> CoinReward
+				else -> null
+			}
+		}
 	}
 
 	val typeString: String by lazy {

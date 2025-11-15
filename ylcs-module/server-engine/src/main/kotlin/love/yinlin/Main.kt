@@ -11,7 +11,6 @@ import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
-import love.yinlin.api.APIScope
 import love.yinlin.api.ServerEngine
 import love.yinlin.extension.Json
 import love.yinlin.server.Database
@@ -20,16 +19,13 @@ import love.yinlin.server.copyResources
 import love.yinlin.server.logger
 import love.yinlin.server.plugins.IPMonitor
 import java.io.File
-import kotlin.reflect.full.declaredFunctions
 import kotlin.time.Duration.Companion.seconds
-
-// TODO: 迁移升级
 
 @Suppress("unused")
 fun Application.module() {
-    val engine = Class.forName("love.yinlin.api.MainServerEngine").kotlin.objectInstance as ServerEngine
+    val engine = Class.forName("love.yinlin.MainServerEngine").kotlin.objectInstance as ServerEngine
 
-    copyResources(Application::class.java.classLoader, "public")
+    copyResources(Application::class.java.classLoader, engine.public)
 
     install(ContentNegotiation) { json(Json) }
     install(WebSockets) {
@@ -42,14 +38,12 @@ fun Application.module() {
     install(IPMonitor)
 
     routing {
-        staticFiles("public", File("public"))
-
-        with(engine) { APIScope(this@routing).run() }
-
-        val clz = Class.forName("love.yinlin.api.ServerStartup").kotlin
-        val serverStartup = clz.objectInstance
-        val runFunction = clz.declaredFunctions.find { it.name == "run" }!!
-        runFunction.call(serverStartup, this)
+        staticFiles(engine.public, File(engine.public))
+        val scope = engine.scope()
+        scope.initRouting(this@routing)
+        with(engine) {
+            for (api in scope.api) api()
+        }
     }
 
     logger.info("服务器启动")

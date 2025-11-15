@@ -29,6 +29,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.consumeAsFlow
 import love.yinlin.Local
+import love.yinlin.api.ServerRes
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
@@ -65,8 +66,9 @@ private fun UserItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
+            // TODO: ServerRes
             WebImage(
-                uri = info.avatarPath,
+                uri = remember(info) { ServerRes.Users.User(info.uid).avatar.path },
                 key = remember { DateEx.TodayString },
                 circle = true,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f)
@@ -94,8 +96,9 @@ private fun GameResultUserItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
     ) {
+        // TODO: ServerRes
         WebImage(
-            uri = result.player.avatarPath,
+            uri = remember(result) { ServerRes.Users.User(result.player.uid).avatar.path },
             key = remember { DateEx.TodayString },
             circle = true,
             modifier = Modifier.size(CustomTheme.size.mediumImage)

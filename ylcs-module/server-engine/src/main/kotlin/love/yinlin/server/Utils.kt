@@ -1,7 +1,5 @@
 package love.yinlin.server
 
-import love.yinlin.api.APIFile2
-import love.yinlin.api.ResNode2
 import love.yinlin.extension.catchingDefault
 import java.io.File
 import java.net.JarURLConnection
@@ -10,7 +8,6 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.sql.Timestamp
-import kotlin.io.deleteRecursively
 
 fun copyResources(classLoader: ClassLoader, root: String) {
     fun copyResourcesFromFile(source: File, target: File) {
@@ -43,13 +40,6 @@ fun copyResources(classLoader: ClassLoader, root: String) {
     }
     else copyResourcesFromFile(File(publicResourceUrl.toURI()), targetFile)
 }
-
-val ResNode2.exists: Boolean get() = File(this.path).exists()
-fun ResNode2.delete() = File(this.path).delete()
-fun ResNode2.deleteRecursively() = File(this.path).deleteRecursively()
-fun ResNode2.mkdir() = File(this.path).mkdirs()
-fun ResNode2.copy(other: ResNode2) = File(this.path).copyTo(File(other.path), true)
-fun APIFile2.copy(other: ResNode2) = File(this).copyTo(File(other.path), true)
 
 val String.md5: String get() = catchingDefault("") {
     val md = MessageDigest.getInstance("MD5")

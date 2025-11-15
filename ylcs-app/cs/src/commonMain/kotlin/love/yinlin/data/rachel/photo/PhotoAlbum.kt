@@ -3,7 +3,7 @@ package love.yinlin.data.rachel.photo
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.Local
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.ServerRes
 
 @Stable
 @Serializable
@@ -17,8 +17,8 @@ data class PhotoAlbum(
     val keyword: List<String>, // 关键字
     val picNum: Int, // 图片数
 ) {
-    fun picPath(index: Int) = "${Local.API_BASE_URL}/${ServerRes2.Photo.pic(name, index, false)}"
-    fun thumbPath(index: Int) = "${Local.API_BASE_URL}/${ServerRes2.Photo.pic(name, index, true)}"
+    fun picPath(index: Int) = "${Local.API_BASE_URL}/${ServerRes.Photo.pic(name, index, false)}"
+    fun thumbPath(index: Int) = "${Local.API_BASE_URL}/${ServerRes.Photo.pic(name, index, true)}"
 
     companion object {
         const val MAX_NUM = 100

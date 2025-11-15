@@ -11,10 +11,7 @@ data class APIResult4<O1, O2, O3, O4> internal constructor(val o1: O1, val o2: O
 @ConsistentCopyVisibility
 data class APIResult5<O1, O2, O3, O4, O5> internal constructor(val o1: O1, val o2: O2, val o3: O3, val o4: O4, val o5: O5)
 
-open class APIResponseScope {
-    fun expire(): Nothing = throw UnauthorizedException(null)
-    fun failure(message: String? = null): Nothing = throw FailureException(message)
-}
+open class APIResponseScope : APICallbackScope()
 
 class APIResultScope1<O1> : APIResponseScope() {
     fun result(o1: O1) = APIResult1(o1)

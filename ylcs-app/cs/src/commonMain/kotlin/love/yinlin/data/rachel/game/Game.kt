@@ -9,7 +9,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import love.yinlin.Local
-import love.yinlin.api.ServerRes2
+import love.yinlin.api.ServerRes
 
 @Stable
 @Serializable(Game.Serializer::class)
@@ -54,10 +54,10 @@ enum class Game(
         type = GameType.SINGLE
     );
 
-    val xPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Game.x(this.ordinal + 1)}" }
-    val yPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes2.Game.y(this.ordinal + 1)}" }
-    fun xyPath(isX: Boolean): String = "${Local.API_BASE_URL}/${ServerRes2.Game.xy(this.ordinal + 1, isX)}"
-    fun resPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes2.Game.res(this.ordinal + 1, key)}"
+    val xPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.x(this.ordinal + 1)}" }
+    val yPath: String by lazy { "${Local.API_BASE_URL}/${ServerRes.Game.y(this.ordinal + 1)}" }
+    fun xyPath(isX: Boolean): String = "${Local.API_BASE_URL}/${ServerRes.Game.xy(this.ordinal + 1, isX)}"
+    fun resPath(key: String): String = "${Local.API_BASE_URL}/${ServerRes.Game.res(this.ordinal + 1, key)}"
 
     object Serializer : KSerializer<Game> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Game", PrimitiveKind.INT)
