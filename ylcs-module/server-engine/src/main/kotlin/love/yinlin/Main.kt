@@ -44,6 +44,9 @@ fun Application.module() {
         with(engine) {
             for (api in scope.api) api()
         }
+        engine.proxy?.apply {
+            this@routing.listen()
+        }
     }
 
     logger.info("服务器启动")

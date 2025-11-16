@@ -7,6 +7,12 @@ import love.yinlin.data.rachel.mail.MailEntry
 @Suppress("unused", "unchecked_cast")
 data object MainServerEngine : ServerEngine() {
     override val public: String = ServerRes.toString()
+    override val proxy: Proxy = Proxy(name = APIConfig.PROXY_NAME, whitelist = listOf(
+        "(?:https?://)?m\\.weibo\\.cn.*".toRegex(),
+        "(?:https?://)?visitor\\.passport\\.weibo\\.cn.*".toRegex(),
+        "(?:https?://)?(?:wx|tvax)\\d+\\.sinaimg\\.cn.*".toRegex(),
+        "(?:https?://)?f\\.video\\.weibocdn\\.com.*".toRegex(),
+    ))
 
     override fun scope() = APIScope<Mail.Filter, MailEntry, String>()
 
