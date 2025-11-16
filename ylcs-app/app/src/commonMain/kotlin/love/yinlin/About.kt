@@ -14,8 +14,8 @@ data object About {
         platform = "Android/Windows修复更新",
         title = "新版本更新加速进行中... 与粼粼一起前进吧!",
         force = true,
-        maintenance = false,
-        date = LocalDate(2025, 11, 13),
+        maintenance = true,
+        date = LocalDate(2025, 11, 16),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
