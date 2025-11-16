@@ -205,12 +205,12 @@ data object WeiboAPI {
 	}
 
 	suspend fun generateWeiboCookie(): WeiboCookie? {
+		// TODO:
 		val xsrfToken = NetClient.request<ByteArray, String>({
 			url = Container.xsrfConfig
 		}) {
 			cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { it.value != "deleted" }.value
-		}
-		if (xsrfToken == null) return null
+		} ?: "fukyou"
 		val sub = NetClient.request(Container.genvisitor2, {
 			method = HttpMethod.Post
 			form = mapOf("cb" to "visitor_gray_callback")
@@ -221,8 +221,7 @@ data object WeiboAPI {
 			val json = text.substringAfter("(").substringBeforeLast(")").parseJson.Object
 			val data = json.obj("data")
 			data["sub"].String to data["subp"].String
-		}
-		if (sub == null) return null
+		} ?: ("_2AkMeSKrwf8NxqwJRmvwUymjlZIh3zw_EieKoFFsrJRM3HRl-yT9yqhAgtRB6NciEEb-f-w8Zld8pGpTn4blqg02DqNuH" to "0033WrSXqPxfM72-Ws9jqgMF55529P9D9WhjLXMq867aPUPiUkd8wq4Y")
 		return WeiboCookie(sub.first, sub.second, xsrfToken)
 	}
 

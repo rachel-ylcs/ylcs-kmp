@@ -91,16 +91,17 @@ object NetClient {
                 }
                 onRequest(requestScope)
             }.execute { response ->
+                val headers = response.headers
+                val cookies = response.setCookie()
                 val data = response.bodyAsBytes()
-                val responseScope = object : ResponseScope<Body> {
-                    override val headers: Headers = response.headers
-                    override val cookies: List<Cookie> = response.setCookie()
-                    override val body: Body get() = data.decodeToString().parseJsonValue<Body>()
-                    override val bodyString: String get() = data.decodeToString()
-                    override val bodyBytes: ByteArray = data
-                }
                 Coroutines.with(context) {
-                    onResponse(responseScope)
+                    onResponse(object : ResponseScope<Body> {
+                        override val headers: Headers = headers
+                        override val cookies: List<Cookie> = cookies
+                        override val body: Body get() = data.decodeToString().parseJsonValue<Body>()
+                        override val bodyString: String get() = data.decodeToString()
+                        override val bodyBytes: ByteArray = data
+                    })
                 }
             }
         }
