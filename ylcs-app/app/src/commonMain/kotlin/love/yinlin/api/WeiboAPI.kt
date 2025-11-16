@@ -11,7 +11,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.Local
 import love.yinlin.uri.Uri
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.weibo.*
@@ -21,18 +20,10 @@ import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.text.RichContainer
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.buildRichString
-import love.yinlin.platform.request
 
 @Stable
 data object WeiboAPI {
-	private const val WEIBO_SOURCE_HOST: String = "m.weibo.cn"
-	private const val WEIBO_PROXY_HOST: String = "web.${Local.MAIN_HOST}/weibo"
-
-	private val WEIBO_HOST: String = Platform.use(
-		Platform.WebWasm,
-		ifTrue = { WEIBO_PROXY_HOST },
-		ifFalse = { WEIBO_SOURCE_HOST }
-	)
+	private fun proxy(url: String) = Platform.use(Platform.WebWasm, ifTrue = { ClientEngine.proxy(APIConfig.PROXY_NAME, url) }, ifFalse = { url })
 
 	@Stable
 	data class WeiboCookie(
@@ -43,37 +34,18 @@ data object WeiboAPI {
 
 	var weiboCookie: WeiboCookie? = null
 
-	private fun transferWeiboImageUrl(src: String): String = Platform.use(
-        Platform.WebWasm,
-		ifTrue = {
-			if (src.contains("wx1.")) src.replace("wx1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("wx2.")) src.replace("wx2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("wx3.")) src.replace("wx3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("wx4.")) src.replace("wx4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("tvax1.")) src.replace("tvax1.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("tvax2.")) src.replace("tvax2.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("tvax3.")) src.replace("tvax3.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else if (src.contains("tvax4.")) src.replace("tvax4.sinaimg.cn", "$WEIBO_PROXY_HOST/image")
-			else src
-		},
-		ifFalse = { src }
-	)
-
-	private fun transferWeiboVideoUrl(src: String): String = Platform.use(
-        Platform.WebWasm,
-		ifTrue = { src.replace("f.video.weibocdn.com", "$WEIBO_PROXY_HOST/video") },
-		ifFalse = { src }
-	)
-
 	private object Container {
-		fun searchUser(key: String): String = "api/container/getIndex?containerid=100103type%3D3%26q=${Uri.encodeUri(key)}&page_type=searchall"
-		fun searchTopic(name: String): String = "search?containerid=231522type=1&q=$name"
-		fun userDetails(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107603$uid"
-		fun userInfo(uid: String): String = "api/container/getIndex?type=uid&value=$uid"
-		fun weiboDetails(uid: String): String = "comments/hotflow?id=$uid&mid=$uid"
-		fun userAlbum(uid: String): String = "api/container/getIndex?type=uid&value=$uid&containerid=107803$uid"
-		fun albumPics(containerId: String, page: Int, limit: Int): String = "api/container/getSecond?containerid=$containerId&count=$limit&page=$page"
-		fun chaohua(sinceId: Long): String = "api/container/getIndex?containerid=10080848e33cc4065cd57c5503c2419cdea983_-_sort_time&type=uid&value=2266537042&since_id=$sinceId"
+		fun searchUser(key: String): String = proxy("https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D3%26q=${Uri.encodeUri(key)}&page_type=searchall")
+		fun searchTopic(name: String): String = proxy("https://m.weibo.cn/search?containerid=231522type=1&q=$name")
+		fun userDetails(uid: String): String = proxy("https://m.weibo.cn/api/container/getIndex?type=uid&value=$uid&containerid=107603$uid")
+		fun userInfo(uid: String): String = proxy("https://m.weibo.cn/api/container/getIndex?type=uid&value=$uid")
+		fun weiboDetails(uid: String): String = proxy("https://m.weibo.cn/comments/hotflow?id=$uid&mid=$uid")
+		fun userAlbum(uid: String): String = proxy("https://m.weibo.cn/api/container/getIndex?type=uid&value=$uid&containerid=107803$uid")
+		fun albumPics(containerId: String, page: Int, limit: Int): String = proxy("https://m.weibo.cn/api/container/getSecond?containerid=$containerId&count=$limit&page=$page")
+		fun chaohua(sinceId: Long): String = proxy("https://m.weibo.cn/api/container/getIndex?containerid=10080848e33cc4065cd57c5503c2419cdea983_-_sort_time&type=uid&value=2266537042&since_id=$sinceId")
+		fun href(route: String) = proxy("https://m.weibo.cn$route")
+		val xsrfConfig: String get() = proxy("https://m.weibo.cn/api/config")
+		val genvisitor2: String get() = proxy("https://visitor.passport.weibo.cn/visitor/genvisitor2")
 	}
 
 	private fun weiboHtmlNodeTransform(node: Node, container: RichContainer) {
@@ -81,7 +53,7 @@ data object WeiboAPI {
 			val text = node.text()
 			if (text.startsWith('#') && text.endsWith('#')) { // # 话题
 				val topic = text.removePrefix("#").removeSuffix("#")
-				container.topic("https://$WEIBO_SOURCE_HOST/${Container.searchTopic(topic)}", text)
+				container.topic(Container.searchTopic(topic), text)
 			}
 			else container.text(text) // 普通文本
 		}
@@ -93,8 +65,8 @@ data object WeiboAPI {
 					val href = node.attribute("href")?.value
 					val text = (childNodes.firstOrNull() as? TextNode?)?.text()
 					if (childNodes.size == 1 && href != null && text != null) {
-						if (href.startsWith("/n/")) container.at("https://$WEIBO_SOURCE_HOST$href", text) // @ 标签
-						else if (href.startsWith("/status/")) container.link("https://$WEIBO_SOURCE_HOST$href", text)
+						if (href.startsWith("/n/")) container.at(Container.href(href), text) // @ 标签
+						else if (href.startsWith("/status/")) container.link(Container.href(href), text)
 						else container.link(href, text)
 					}
 					else weiboHtmlNodesTransform(childNodes, container)
@@ -122,7 +94,7 @@ data object WeiboAPI {
 		// 提取名称和头像
 		val userId = user["id"].String
 		val userName = user["screen_name"].String
-		val avatar = transferWeiboImageUrl(user["avatar_hd"].String)
+		val avatar = proxy(user["avatar_hd"].String)
 		return WeiboUserInfo(
 			id = userId,
 			name = userName,
@@ -155,8 +127,8 @@ data object WeiboAPI {
 			for (picItem in blogs.arr("pics")) {
 				val pic = picItem.Object
 				pictures += Picture(
-					image = transferWeiboImageUrl(pic["url"].String),
-					source = transferWeiboImageUrl(pic.obj("large")["url"].String)
+					image = proxy(pic["url"].String),
+					source = proxy(pic.obj("large")["url"].String)
 				)
 			}
 		} else if ("page_info" in blogs) {
@@ -168,9 +140,9 @@ data object WeiboAPI {
 				else urls["mp4_ld_mp4"].String
 				val videoPicUrl = pageInfo.obj("page_pic")["url"].String
 				pictures += Picture(
-					image = transferWeiboImageUrl(videoPicUrl),
-					source = transferWeiboImageUrl(videoPicUrl),
-					video = transferWeiboVideoUrl(videoUrl)
+					image = proxy(videoPicUrl),
+					source = proxy(videoPicUrl),
+					video = proxy(videoUrl)
 				)
 			}
 		}
@@ -201,8 +173,8 @@ data object WeiboAPI {
 		val pic = if ("pic" in card) {
 			card.obj("pic").let {
 				Picture(
-					image = transferWeiboImageUrl(it["url"].String),
-					source = transferWeiboImageUrl(it.obj("large")["url"].String)
+					image = proxy(it["url"].String),
+					source = proxy(it.obj("large")["url"].String)
 				)
 			}
 		} else null
@@ -234,12 +206,12 @@ data object WeiboAPI {
 
 	suspend fun generateWeiboCookie(): WeiboCookie? {
 		val xsrfToken = NetClient.request<ByteArray, String>({
-			url = "https://m.weibo.cn/api/config"
+			url = Container.xsrfConfig
 		}) {
 			cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { it.value != "deleted" }.value
 		}
 		if (xsrfToken == null) return null
-		val sub = NetClient.request("https://visitor.passport.weibo.cn/visitor/genvisitor2", {
+		val sub = NetClient.request(Container.genvisitor2, {
 			method = HttpMethod.Post
 			data = "cb=visitor_gray_callback".encodeToByteArray()
 			headers {
@@ -261,7 +233,7 @@ data object WeiboAPI {
 		}
 	}
 
-	suspend fun getUserWeibo(uid: String): List<Weibo>? = NetClient.request("https://$WEIBO_HOST/${Container.userDetails(uid)}", {
+	suspend fun getUserWeibo(uid: String): List<Weibo>? = NetClient.request(Container.userDetails(uid), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
@@ -274,7 +246,7 @@ data object WeiboAPI {
 		items
 	}
 
-	suspend fun getWeiboDetails(id: String): List<WeiboComment>? = NetClient.request("https://$WEIBO_HOST/${Container.weiboDetails(id)}", {
+	suspend fun getWeiboDetails(id: String): List<WeiboComment>? = NetClient.request(Container.weiboDetails(id), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val cards = json.obj("data").arr("data")
@@ -283,14 +255,14 @@ data object WeiboAPI {
 		items
 	}
 
-	suspend fun getWeiboUser(uid: String): WeiboUser? = NetClient.request("https://$WEIBO_HOST/${Container.userInfo(uid)}", {
+	suspend fun getWeiboUser(uid: String): WeiboUser? = NetClient.request(Container.userInfo(uid), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].String
 		val name = userInfo["screen_name"].String
-		val avatar = transferWeiboImageUrl(userInfo["avatar_hd"].String)
-		val background = transferWeiboImageUrl(userInfo["cover_image_phone"].String)
+		val avatar = proxy(userInfo["avatar_hd"].String)
+		val background = proxy(userInfo["cover_image_phone"].String)
 		val signature = userInfo["description"].String
 		val followNum = userInfo["follow_count"].String
 		val fansNum = userInfo["followers_count_str"]?.StringNull ?: userInfo["followers_count"].String
@@ -303,7 +275,7 @@ data object WeiboAPI {
 		)
 	}
 
-	suspend fun getWeiboUserAlbum(uid: String): List<WeiboAlbum>? = NetClient.request("https://$WEIBO_HOST/${Container.userAlbum(uid)}", {
+	suspend fun getWeiboUserAlbum(uid: String): List<WeiboAlbum>? = NetClient.request(Container.userAlbum(uid), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
@@ -320,7 +292,7 @@ data object WeiboAPI {
 							title = album["title_sub"].String,
 							num = album["desc1"].String,
 							time = album["desc2"].String,
-							pic = transferWeiboImageUrl(album["pic"].String)
+							pic = proxy(album["pic"].String)
 						)
 					}
 				}
@@ -331,7 +303,7 @@ data object WeiboAPI {
 
 	suspend fun getWeiboAlbumPics(
 		containerId: String, page: Int, limit: Int
-	): Pair<List<Picture>, Int>? = NetClient.request("https://$WEIBO_HOST/${Container.albumPics(containerId, page, limit)}", {
+	): Pair<List<Picture>, Int>? = NetClient.request(Container.albumPics(containerId, page, limit), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val data = json.obj("data")
@@ -342,15 +314,15 @@ data object WeiboAPI {
 			for (item2 in card.arr("pics")) {
 				val pic = item2.Object
 				pics += Picture(
-					image = transferWeiboImageUrl(pic["pic_middle"].String),
-					source = transferWeiboImageUrl(pic["pic_ori"].String)
+					image = proxy(pic["pic_middle"].String),
+					source = proxy(pic["pic_ori"].String)
 				)
 			}
 		}
 		pics.take(limit) to data["count"].Int
 	}
 
-	suspend fun searchWeiboUser(key: String): List<WeiboUserInfo>? = NetClient.request("https://$WEIBO_HOST/${Container.searchUser(key)}", {
+	suspend fun searchWeiboUser(key: String): List<WeiboUserInfo>? = NetClient.request(Container.searchUser(key), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val cards = json.obj("data").arr("cards")
@@ -365,7 +337,7 @@ data object WeiboAPI {
 						items += WeiboUserInfo(
 							id = user["id"].String,
 							name = user["screen_name"].String,
-							avatar = transferWeiboImageUrl(user["avatar_hd"].String)
+							avatar = proxy(user["avatar_hd"].String)
 						)
 					}
 				}
@@ -374,7 +346,7 @@ data object WeiboAPI {
 		items
 	}
 
-	suspend fun extractChaohua(sinceId: Long): Pair<List<Weibo>, Long>? = NetClient.request("https://$WEIBO_HOST/${Container.chaohua(sinceId)}", {
+	suspend fun extractChaohua(sinceId: Long): Pair<List<Weibo>, Long>? = NetClient.request(Container.chaohua(sinceId), {
 		headers(buildWeiboCookieHeader)
 	}) { json: JsonObject ->
 		val data = json.obj("data")

@@ -9,7 +9,6 @@ import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.request
 
 @Stable
 data object NetEaseCloudAPI {

@@ -64,7 +64,7 @@ class Proxy(
                 catchingError {
                     Coroutines.io {
                         val request = call.request
-                        val dest = Uri.decodeUri(request.queryParameters["proxy"]!!)
+                        val dest = Uri.decodeUri(request.queryParameters[name]!!)
 
                         require(whitelist.any { it.matches(dest) })
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import love.yinlin.extension.catchingDefault
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
+import love.yinlin.uri.Uri
 
 data object ClientEngine {
     var baseUrl = ""
@@ -16,6 +17,8 @@ data object ClientEngine {
     fun init(baseUrl: String) {
         this.baseUrl = baseUrl
     }
+
+    fun proxy(proxy: String, url: String): String = "$baseUrl/$proxy?$proxy=${Uri.encodeUri(url)}"
 }
 
 suspend inline fun API<out APIType>.internalRequest(

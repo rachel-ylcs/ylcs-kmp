@@ -9,7 +9,6 @@ import love.yinlin.uri.Uri
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.platform.NetClient
-import love.yinlin.platform.request
 import kotlin.io.encoding.Base64
 
 @Stable

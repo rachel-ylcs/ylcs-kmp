@@ -42,7 +42,6 @@ import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.*
-import love.yinlin.platform.download
 import love.yinlin.platform.lyrics.LrcParser
 
 @Composable
