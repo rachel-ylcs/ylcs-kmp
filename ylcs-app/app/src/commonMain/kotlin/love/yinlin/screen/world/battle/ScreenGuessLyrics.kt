@@ -150,7 +150,7 @@ class ScreenGuessLyrics(manager: ScreenManager, private val uid: Int, private va
 
     private var isConnected by mutableStateOf(false)
     private val connection = object : SocketsConnection() {
-        suspend inline fun <reified T> send(data: T) {
+        suspend fun send(data: LyricsSockets.CM) {
             if (!super.send(data.toJsonString())) slot.tip.error("无法连接到服务器")
         }
 

@@ -68,6 +68,8 @@ class LyricsSocketsManager(session: Any) : SocketsManager(session) {
 
     private var currentPlayer: Player? = null
 
+    suspend fun send(data: LyricsSockets.SM) = super.send(data.toJsonString())
+
     private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME)
         if (Coroutines.isActive()) {
