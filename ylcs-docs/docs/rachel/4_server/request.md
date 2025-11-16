@@ -48,6 +48,9 @@ val ApiTestHelloWorld by API.post.i<String>().o<String>()
 
 例如本例表示这个接口请求时需要携带一个`String`类型的参数，而响应时接受一个`String`类型的参数。
 
+!!! Tip
+    如果你需要标注更多的接口文档信息，可以按使用`@APIParam`和`@APIReturn`等注解标注。注解仅在源码层面起提示作用，不参与任何编译过程。
+
 ## HelloAPI.kt
 
 ```kotlin
