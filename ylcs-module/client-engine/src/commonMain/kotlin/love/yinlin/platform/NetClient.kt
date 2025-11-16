@@ -12,6 +12,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.accept
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.setBody
@@ -26,9 +27,11 @@ import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
+import io.ktor.http.parameters
 import io.ktor.http.setCookie
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.appendAll
 import io.ktor.utils.io.asByteWriteChannel
 import io.ktor.utils.io.copyAndClose
 import kotlinx.coroutines.currentCoroutineContext
@@ -70,6 +73,12 @@ object NetClient {
                         set(value) {
                             field = value
                             builder.setBody(value)
+                        }
+
+                    override var form: Map<String, String> = emptyMap()
+                        set(value) {
+                            field = value
+                            builder.setBody(FormDataContent(parameters { appendAll(value) }))
                         }
 
                     override fun headers(block: HeadersBuilder.() -> Unit) {

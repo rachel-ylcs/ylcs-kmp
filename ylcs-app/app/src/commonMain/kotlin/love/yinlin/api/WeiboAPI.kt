@@ -213,7 +213,7 @@ data object WeiboAPI {
 		if (xsrfToken == null) return null
 		val sub = NetClient.request(Container.genvisitor2, {
 			method = HttpMethod.Post
-			data = "cb=visitor_gray_callback".encodeToByteArray()
+			form = mapOf("cb" to "visitor_gray_callback")
 			headers {
 				append(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
 			}
