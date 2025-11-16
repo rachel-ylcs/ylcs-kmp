@@ -4,8 +4,8 @@ import love.yinlin.api.user.AN
 import love.yinlin.api.user.Token
 import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
+import love.yinlin.callMap
 import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.IntNull
@@ -16,7 +16,7 @@ import love.yinlin.server.currentTS
 import love.yinlin.server.md5
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.accountAPI() {
+fun APIScope.accountAPI() {
     ApiAccountGetInviters.response {
         val inviters = DB.throwQuerySQL("SELECT name FROM user WHERE (privilege & ${UserPrivilege.VIP_ACCOUNT}) != 0")
         result(inviters.map { it.Object["name"].String })

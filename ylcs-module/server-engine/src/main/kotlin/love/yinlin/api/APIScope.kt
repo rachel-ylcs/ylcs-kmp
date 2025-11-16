@@ -33,12 +33,7 @@ import love.yinlin.server.logger
 import java.io.File
 import kotlin.random.Random
 
-class APIScope<K : Any, I, O> {
-    private lateinit var routing: Routing
-    val callMap = buildCallBackMap<K, I, O>()
-
-    internal fun initRouting(routing: Routing) { this.routing = routing }
-
+class APIScope internal constructor(private val routing: Routing) {
     fun API<out APIType>.internalResponse(block: suspend (RoutingCall) -> JsonElement) {
         routing.route(path = route, method = HttpMethod.Post) {
             handle {

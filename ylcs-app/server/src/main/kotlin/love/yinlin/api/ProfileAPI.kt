@@ -4,8 +4,6 @@ import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
 import love.yinlin.data.rachel.follows.FollowStatus
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.JsonConverter
@@ -28,7 +26,7 @@ private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> 
     return block(isSignin, byteValue, byteIndex, bitIndex)
 }
 
-fun APIScope<Mail.Filter, MailEntry, String>.profileAPI() {
+fun APIScope.profileAPI() {
     ApiProfileGetProfile.response { token ->
         val uid = AN.throwExpireToken(token)
         val user = DB.throwQuerySQLSingle("""

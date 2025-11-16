@@ -4,8 +4,6 @@ import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.data.rachel.topic.Comment
@@ -16,7 +14,7 @@ import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.topicAPI() {
+fun APIScope.topicAPI() {
     ApiTopicGetTopics.response { uid, isTop, tid, num ->
         VN.throwId(uid)
         val topics = DB.throwQuerySQL("""

@@ -3,14 +3,12 @@ package love.yinlin.api
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.to
 import love.yinlin.server.DB
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.songAPI() {
+fun APIScope.songAPI() {
     ApiSongGetSongs.response { sid, num ->
         val songs = DB.throwQuerySQL("""
 			SELECT sid, version, name

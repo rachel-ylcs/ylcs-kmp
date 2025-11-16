@@ -11,6 +11,7 @@ import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
+import love.yinlin.api.APIScope
 import love.yinlin.api.ServerEngine
 import love.yinlin.extension.Json
 import love.yinlin.server.Database
@@ -39,14 +40,9 @@ fun Application.module() {
 
     routing {
         staticFiles(engine.public, File(engine.public))
-        val scope = engine.scope()
-        scope.initRouting(this@routing)
-        with(engine) {
-            for (api in scope.api) api()
-        }
-        engine.proxy?.apply {
-            this@routing.listen()
-        }
+        val scope = APIScope(this)
+        with(engine) { scope.api.forEach { it() } }
+        engine.proxy?.apply { this@routing.listen() }
     }
 
     logger.info("服务器启动")

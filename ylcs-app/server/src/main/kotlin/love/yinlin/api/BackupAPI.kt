@@ -2,15 +2,13 @@ package love.yinlin.api
 
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.throwGetUser
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
 import love.yinlin.extension.Object
 import love.yinlin.extension.toJsonString
 import love.yinlin.server.DB
 
-fun APIScope<Mail.Filter, MailEntry, String>.backupAPI() {
+fun APIScope.backupAPI() {
     ApiBackupUploadPlaylist.response { token, playlist ->
         val uid = AN.throwExpireToken(token)
         if (!DB.updateSQL("""

@@ -9,8 +9,6 @@ import love.yinlin.api.game.manager
 import love.yinlin.data.rachel.game.GameConfig
 import love.yinlin.data.rachel.game.GameDetails
 import love.yinlin.data.rachel.game.GameRecord
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Array
 import love.yinlin.extension.Int
@@ -25,7 +23,7 @@ import love.yinlin.server.throwQuerySQLSingle
 import love.yinlin.server.updateSQL
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.gameAPI() {
+fun APIScope.gameAPI() {
     ApiGameCreateGame.response { token, args ->
         val (title, type, reward, num, cost, info, question, answer) = args
         val uid = AN.throwExpireToken(token)

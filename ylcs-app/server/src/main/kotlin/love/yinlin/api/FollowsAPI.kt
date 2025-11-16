@@ -2,8 +2,6 @@ package love.yinlin.api
 
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.Boolean
 import love.yinlin.extension.Int
 import love.yinlin.extension.Long
@@ -23,7 +21,7 @@ fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
     return relationship1 to relationship2
 }
 
-fun APIScope<Mail.Filter, MailEntry, String>.followsAPI() {
+fun APIScope.followsAPI() {
     ApiFollowsFollowUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能关注自己哦")

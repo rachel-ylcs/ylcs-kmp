@@ -3,13 +3,13 @@ package love.yinlin.api
 import love.yinlin.Local
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
+import love.yinlin.callMap
 import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.server.DB
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.commonAPI() {
+fun APIScope.commonAPI() {
     ApiCommonGetServerStatus.response {
         result(ServerStatus(
             targetVersion = Local.info.version,

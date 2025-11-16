@@ -3,12 +3,13 @@ package love.yinlin.api
 import love.yinlin.api.APIConfig.coercePageNum
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
+import love.yinlin.callMap
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.to
 import love.yinlin.server.DB
 
-fun APIScope<Mail.Filter, MailEntry, String>.mailAPI() {
+fun APIScope.mailAPI() {
     ApiMailGetMails.response { token, isProcessed, mid, num ->
         val uid = AN.throwExpireToken(token)
         val mails = DB.throwQuerySQL("""

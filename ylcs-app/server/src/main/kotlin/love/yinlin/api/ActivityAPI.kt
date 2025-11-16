@@ -3,8 +3,6 @@ package love.yinlin.api
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
@@ -17,7 +15,7 @@ import love.yinlin.server.DB
 import love.yinlin.server.currentUniqueId
 import love.yinlin.server.values
 
-fun APIScope<Mail.Filter, MailEntry, String>.activityAPI() {
+fun APIScope.activityAPI() {
     ApiActivityGetActivities.response {
         result(DB.throwQuerySQL("""
 			SELECT aid, ts, tsInfo, location, shortTitle, title, content, price, saleTime, lineup, photo, link, playlist

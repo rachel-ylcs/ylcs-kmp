@@ -1,11 +1,9 @@
 package love.yinlin.api
 
-import love.yinlin.data.rachel.mail.Mail
-import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.to
 import love.yinlin.server.DB
 
-fun APIScope<Mail.Filter, MailEntry, String>.photoAPI() {
+fun APIScope.photoAPI() {
     ApiPhotoSearchPhotoAlbums.response { keyword, ts, aid, num ->
         val photos = if (keyword == null) DB.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
