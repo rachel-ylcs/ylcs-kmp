@@ -104,8 +104,10 @@ actual class FloatingLyrics {
     @Composable
     actual fun Content() {
         app.Layout(modifier = Modifier.fillMaxWidth()) {
-            with(app.mp.engine) {
-                Content(config = app.config.lyricsEngineConfig)
+            if (app.mp.isReady) {
+                with(app.mp.engine) {
+                    Content(config = app.config.lyricsEngineConfig)
+                }
             }
         }
     }

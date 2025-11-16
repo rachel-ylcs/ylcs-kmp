@@ -88,8 +88,10 @@ actual class FloatingLyrics {
 
             DragArea(enabled = canMove) {
                 app.Layout(modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.3f)) }) {
-                    with(app.mp.engine) {
-                        Content(config = config)
+                    if (app.mp.isReady) {
+                        with(app.mp.engine) {
+                            Content(config = config)
+                        }
                     }
                 }
             }

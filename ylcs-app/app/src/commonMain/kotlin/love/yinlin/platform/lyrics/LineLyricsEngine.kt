@@ -129,13 +129,11 @@ internal class LineLyricsEngine : LyricsEngine {
     @Composable
     override fun Content(config: LyricsEngineConfig) {
         CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
-            if (currentText.isNotEmpty()) {
-                when (platform) {
-                    Platform.Android -> AndroidContent(config)
-                    Platform.IOS -> IOSContent(config)
-                    Platform.Windows, Platform.Linux, Platform.MacOS -> DesktopContent(config)
-                    Platform.WebWasm -> WebContent(config)
-                }
+            when (platform) {
+                Platform.Android -> AndroidContent(config)
+                Platform.IOS -> IOSContent(config)
+                Platform.Windows, Platform.Linux, Platform.MacOS -> DesktopContent(config)
+                Platform.WebWasm -> WebContent(config)
             }
         }
     }

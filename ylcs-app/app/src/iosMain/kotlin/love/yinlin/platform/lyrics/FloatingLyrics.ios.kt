@@ -89,8 +89,10 @@ actual class FloatingLyrics {
     @Composable
     actual fun Content() {
         app.Layout {
-            with(app.mp.engine) {
-                Content(config = app.config.lyricsEngineConfig)
+            if (app.mp.isReady) {
+                with(app.mp.engine) {
+                    Content(config = app.config.lyricsEngineConfig)
+                }
             }
         }
     }
