@@ -28,6 +28,7 @@ import io.ktor.util.flattenForEach
 import love.yinlin.extension.Json
 import love.yinlin.extension.catchingError
 import love.yinlin.platform.Coroutines
+import love.yinlin.uri.Uri
 import java.net.Proxy
 
 class Proxy(
@@ -63,7 +64,7 @@ class Proxy(
                 catchingError {
                     Coroutines.io {
                         val request = call.request
-                        val dest = request.headers["Proxy"]!!
+                        val dest = Uri.decodeUri(request.queryParameters["proxy"]!!)
 
                         require(whitelist.any { it.matches(dest) })
 
