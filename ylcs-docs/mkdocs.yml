@@ -1,4 +1,132 @@
+nav:
+    - 主页: index.md
+    - 快速开始:
+        - 1. hello world: rachel/1_start/hello_world.md
+        - 2. 编译环境: rachel/1_start/environment.md
+        - 3. 核心: rachel/1_start/core.md
+    - 跨平台UI:
+        - 1. 程序入口: rachel/2_ui/entry.md
+        - 2. 上下文环境: rachel/2_ui/context.md
+        - 3. 设备: rachel/2_ui/device.md
+        - 4. 主题: rachel/2_ui/theme.md
+        - 5. 导航: rachel/2_ui/navigation.md
+        - 6. 服务: rachel/2_ui/service.md
+        - 7. 组件: rachel/2_ui/component.md
+        - 8. 网络: rachel/2_ui/network.md
+    - 客户端引擎:
+        - 1. 配置入口: rachel/3_client/entry.md
+        - 2. HTTP请求: rachel/3_client/request.md
+        - 3. 文件上传: rachel/3_client/file.md
+        - 4. Sockets: rachel/3_client/sockets.md
+    - 服务端引擎:
+        - 1. 配置入口: rachel/4_server/entry.md
+        - 2. HTTP请求: rachel/4_server/request.md
+        - 3. 文件上传: rachel/4_server/file.md
+        - 4. Sockets: rachel/4_server/sockets.md
+        - 5. 代理: rachel/4_server/proxy.md
+        - 6. 回调: rachel/4_server/callback.md
+    - 模块:
+        - 1. 单实例: rachel/5_module/single_instance.md
+        - 2. 一键更新: rachel/5_module/auto_update.md
+
+
 site_name: Rachel框架开发向导
 site_url: https://rachel-ylcs.github.io/ylcs-kmp
+site_author: 银临茶舍项目组
+site_description: 于万人中万幸得以相逢
+
+
 theme:
-  name: material
+    palette:
+        primary: indigo
+    name: material
+    custom_dir: docs/overrides
+    favicon: https://yinlin.love/favicon.ico
+    features:
+        - announce.dismiss
+        - navigation.tracking
+        - navigation.tabs
+        - navigation.sections
+        - navigation.top
+        - navigation.footer
+        - search.suggest
+        - search.highlight
+        - search.share
+        - navigation.expand
+        - navigation.indexes
+        - content.tooltips
+        - content.code.copy
+        - content.code.annotate
+    language: zh
+    icon:
+        repo: fontawesome/brands/github
+        logo: logo
+
+repo_url: https://github.com/rachel-ylcs/ylcs-kmp
+repo_name: 银临茶舍 ylcs-kmp
+copyright: 银临茶舍 是在 MIT 许可下许可的开源软件。
+
+extra:
+    generator: false
+    social:
+        - icon: fontawesome/brands/qq
+          link: https://qm.qq.com/cgi-bin/qm/qr?k=0tJOqsYAaonMEq6dFqmg8Zb0cfXYzk8E&authKey=%2BchwTB02SMM8pDjJVgLN4hZysG0%2BXRWT4GAIGs6RqGazJ2NCqdkYETWvtTPrd69R
+          name: QQ
+        - icon: fontawesome/brands/github
+          link: https://github.com/rachel-ylcs/ylcs-kmp
+          name: Github
+
+plugins:
+    - search
+    - glightbox:
+          enabled: true
+          touchNavigation: true
+          loop: false
+          effect: fade
+          slide_effect: slide
+          width: 100%
+          height: auto
+          zoomable: true
+          draggable: true
+          skip_classes:
+              - custom-skip-class-name
+          auto_caption: false
+          caption_position: bottom
+          background: white
+          shadow: true
+          manual: false
+
+markdown_extensions:
+    - abbr
+    - attr_list
+    - admonition
+    - def_list
+    - footnotes
+    - md_in_html
+    - pymdownx.caret
+    - pymdownx.betterem
+    - pymdownx.critic
+    - pymdownx.details
+    - pymdownx.inlinehilite
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.snippets
+    - pymdownx.smartsymbols
+    - pymdownx.tilde
+    - pymdownx.superfences:
+          custom_fences:
+              - name: mermaid
+                class: mermaid
+                format:
+                    !!python/name:pymdownx.superfences.fence_code_format
+    - pymdownx.highlight:
+          anchor_linenums: true
+          linenums: true
+          auto_title: true
+    - pymdownx.emoji:
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.tasklist:
+          custom_checkbox: true
