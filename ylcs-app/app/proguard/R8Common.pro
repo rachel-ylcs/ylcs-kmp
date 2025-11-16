@@ -114,3 +114,7 @@
 
 -keep class io.ktor.** { *; }
 -keepclassmembers class io.ktor.** { volatile <fields>; }
+
+# ----------------------------------------- App ----------------------------------------------- #
+
+-keep class * extends love.yinlin.api.APIRes
