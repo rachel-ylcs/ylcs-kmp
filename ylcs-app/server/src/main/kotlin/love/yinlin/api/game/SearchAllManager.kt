@@ -10,10 +10,11 @@ import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.Database
 import love.yinlin.server.SQLConverter
 
 // 词寻
-data object SearchAllManager : SpeedGameManager() {
+class SearchAllManager(db: Database) : SpeedGameManager(db) {
     override val config: SAConfig = SAConfig
 
     override fun fetchTimeLimit(info: JsonElement): Int = info.to<SAInfo>().timeLimit

@@ -1,21 +1,33 @@
 package love.yinlin.server
 
+import kotlinx.serialization.Serializable
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import redis.clients.jedis.Connection
 import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.JedisPooled
 
-data object Redis {
+class Redis internal constructor(config: Config) {
+    @Serializable
+    data class Config(
+        val host: String = "localhost",
+        val port: Int = 6379,
+        val password: String = "",
+        val timeoutMillis: Int = 3000,
+        val maxTotal: Int = 20,
+        val maxIdle: Int = 20,
+        val minIdle: Int = 5,
+    )
+
     private val dataSource = JedisPooled.builder()
-        .hostAndPort(Config.Redis.host, Config.Redis.port)
+        .hostAndPort(config.host, config.port)
         .clientConfig(DefaultJedisClientConfig.builder()
-            .password(Config.Redis.password)
-            .timeoutMillis(Config.Redis.timeoutMillis)
+            .password(config.password)
+            .timeoutMillis(config.timeoutMillis)
             .build()
         ).poolConfig(GenericObjectPoolConfig<Connection>().apply {
-            maxTotal = Config.Redis.maxTotal
-            maxIdle = Config.Redis.maxIdle
-            minIdle = Config.Redis.minIdle
+            maxTotal = config.maxTotal
+            maxIdle = config.maxIdle
+            minIdle = config.minIdle
         })
         .build()
 

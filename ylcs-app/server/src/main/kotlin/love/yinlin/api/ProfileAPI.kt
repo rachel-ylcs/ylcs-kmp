@@ -10,7 +10,6 @@ import love.yinlin.extension.JsonConverter
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.server.DB
 import love.yinlin.server.currentTS
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -29,7 +28,7 @@ private inline fun <R> ByteArray.checkSignin(block: (Boolean, Int, Int, Int) -> 
 fun APIScope.profileAPI() {
     ApiProfileGetProfile.response { token ->
         val uid = AN.throwExpireToken(token)
-        val user = DB.throwQuerySQLSingle("""
+        val user = db.throwQuerySQLSingle("""
             SELECT
 				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.signin, u1.follows, u1.followers, u2.name AS inviterName,
 				JSON_OBJECT(
@@ -51,20 +50,20 @@ fun APIScope.profileAPI() {
             )
         }
         // 更新最后上线时间
-        DB.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", currentTS, uid)
+        db.throwExecuteSQL("UPDATE user SET lastTime = ? WHERE uid = ?", currentTS, uid)
         result(profile)
     }
 
     ApiProfileGetPublicProfile.response { token, uid2 ->
         VN.throwId(uid2)
         val uid1 = token?.let { AN.throwExpireToken(it) }
-        val user = DB.throwQuerySQLSingle("""
+        val user = db.throwQuerySQLSingle("""
 			SELECT uid, name, signature, label, exp, follows, followers FROM user WHERE uid = ?
 		""", uid2)
         val status: FollowStatus = if (uid1 == null) FollowStatus.UNAUTHORIZE
         else if (uid1 == uid2) FollowStatus.SELF
         else {
-            val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
+            val (relationship1, relationship2) = db.queryRelationship(uid1, uid2)
             if (relationship2 != true) when (relationship1) {
                 null -> FollowStatus.UNFOLLOW
                 true -> FollowStatus.BLOCKED
@@ -82,8 +81,8 @@ fun APIScope.profileAPI() {
     ApiProfileUpdateName.response { token, name ->
         VN.throwName(name)
         val uid = AN.throwExpireToken(token)
-        if (DB.querySQLSingle("SELECT 1 FROM user WHERE name = ?", name) != null) failure("ID\"${name}\"已被注册")
-        if (!DB.updateSQL("""
+        if (db.querySQLSingle("SELECT 1 FROM user WHERE name = ?", name) != null) failure("ID\"${name}\"已被注册")
+        if (!db.updateSQL("""
             UPDATE user SET name = ? , coin = coin - ? WHERE uid = ? AND coin >= ?
         """, name, UserConstraint.RENAME_COIN_COST, uid, UserConstraint.RENAME_COIN_COST)) failure("你的银币不够哦")
     }
@@ -91,7 +90,7 @@ fun APIScope.profileAPI() {
     ApiProfileUpdateSignature.response { token, signature ->
         VN.throwEmpty(signature)
         val uid = AN.throwExpireToken(token)
-        DB.throwExecuteSQL("UPDATE user SET signature = ? WHERE uid = ?", signature, uid)
+        db.throwExecuteSQL("UPDATE user SET signature = ? WHERE uid = ?", signature, uid)
     }
 
     ApiProfileUpdateAvatar.response { token, avatar ->
@@ -113,14 +112,14 @@ fun APIScope.profileAPI() {
 
     ApiProfileSignin.response { token ->
         val uid = AN.throwExpireToken(token)
-        val user = DB.throwGetUser(uid, "signin")
+        val user = db.throwGetUser(uid, "signin")
         // 查询是否签到 ... 签到记录46字节(368位)
         val signin = user["signin"]!!.to(JsonConverter.ByteArray)
         signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
             if (!isSignin) {
                 // 更新签到值，银币增加
                 signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
-                DB.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
+                db.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
             }
             result(isSignin, byteValue, bitIndex)
         }

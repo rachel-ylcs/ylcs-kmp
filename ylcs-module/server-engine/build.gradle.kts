@@ -11,9 +11,10 @@ kotlin {
         main.configure {
             useApi(
                 projects.ylcsBase.csCore,
+                libs.logback,
+                libs.ktor.server,
             )
             useLib(
-                libs.logback,
                 libs.mysql,
                 libs.mysql.pool,
                 libs.redis,
@@ -21,7 +22,6 @@ kotlin {
                 libs.ktor.client,
                 libs.ktor.okhttp,
                 libs.ktor.client.negotiation,
-                libs.ktor.server,
                 libs.ktor.server.negotiation,
                 libs.ktor.server.netty,
                 libs.ktor.server.config,

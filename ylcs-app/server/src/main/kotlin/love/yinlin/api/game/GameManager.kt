@@ -3,21 +3,21 @@ package love.yinlin.api.game
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.data.rachel.game.*
 import love.yinlin.extension.toJsonString
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.updateSQL
 import java.sql.Connection
 
-internal val Game.manager: GameManager get() = when (this) {
-    Game.AnswerQuestion -> AnswerQuestionManager
-    Game.BlockText -> BlockTextManager
-    Game.FlowersOrder -> FlowersOrderManager
-    Game.SearchAll -> SearchAllManager
-    Game.Pictionary -> PictionaryManager
+internal fun Game.manager(db: Database): GameManager = when (this) {
+    Game.AnswerQuestion -> AnswerQuestionManager(db)
+    Game.BlockText -> BlockTextManager(db)
+    Game.FlowersOrder -> FlowersOrderManager(db)
+    Game.SearchAll -> SearchAllManager(db)
+    Game.Pictionary -> PictionaryManager(db)
     Game.GuessLyrics, Game.Rhyme -> error("Unknown game: $this")
 }
 
-sealed class GameManager {
+sealed class GameManager(protected val db: Database) {
     open val config: GameConfig = GameConfig
 
     // 检查题目
@@ -70,7 +70,7 @@ sealed class GameManager {
     // 验证游戏
     fun verify(uid: Int, details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
         val result = generateResult(details, record, userAnswer)
-        DB.throwTransaction {
+        db.throwTransaction {
             it.updateReward(uid, details, result)
             it.updateRecord(record, userAnswer, result)
             it.updateRank(uid, details, result.isCompleted)

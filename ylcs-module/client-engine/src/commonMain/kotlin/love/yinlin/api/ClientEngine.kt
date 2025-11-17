@@ -38,7 +38,7 @@ suspend inline fun API<out APIType>.internalRequest(
                 HttpStatusCode(1211, "") -> FailureException(response.bodyAsText())
                 HttpStatusCode.Unauthorized -> UnauthorizedException("登录验证已过期")
                 HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp)
-                else -> IllegalArgumentException()
+                else -> IllegalArgumentException("非法异常")
             }
         }
     }

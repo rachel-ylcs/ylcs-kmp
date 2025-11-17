@@ -9,7 +9,7 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.sql.Timestamp
 
-fun copyResources(classLoader: ClassLoader, root: String) {
+internal fun copyResources(classLoader: ClassLoader, root: String) {
     fun copyResourcesFromFile(source: File, target: File) {
         if (!target.exists()) target.mkdirs()
         source.listFiles()?.forEach { file ->

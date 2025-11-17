@@ -11,13 +11,13 @@ import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.values
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
-class LyricsSocketsManager(session: Any) : SocketsManager(session) {
+class LyricsSocketsManager(private val db: Database, session: Any) : SocketsManager(session) {
     companion object {
         private val library = run {
             val classLoader = LyricsSocketsManager::class.java.classLoader
@@ -162,7 +162,7 @@ class LyricsSocketsManager(session: Any) : SocketsManager(session) {
             val winnerAnswer = if (isWinner1) answers1 else answers2
             if (winnerResult.count >= (LyricsSockets.QUESTION_COUNT * 0.6f).toInt()) {
                 runCatching {
-                    DB.throwInsertSQLGeneratedKey("INSERT INTO game_alone_record (type, uid, question, answer, result) ${values(5)}",
+                    db.throwInsertSQLGeneratedKey("INSERT INTO game_alone_record (type, uid, question, answer, result) ${values(5)}",
                         Game.GuessLyrics.ordinal, winnerResult.player.uid,
                         room.questions.toJsonString(), winnerAnswer.toJsonString(),
                         LyricsSockets.StorageResult(winnerResult.count, winnerResult.duration).toJsonString()

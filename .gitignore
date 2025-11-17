@@ -40,5 +40,6 @@ native/libs/
 
 # 本地配置
 *.jks
+**/config.json
 *.properties
 !**/gradle-wrapper.properties

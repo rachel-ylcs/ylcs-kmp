@@ -9,7 +9,6 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.extension.Int
 import love.yinlin.extension.to
-import love.yinlin.server.DB
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
@@ -17,7 +16,7 @@ import love.yinlin.server.values
 fun APIScope.topicAPI() {
     ApiTopicGetTopics.response { uid, isTop, tid, num ->
         VN.throwId(uid)
-        val topics = DB.throwQuerySQL("""
+        val topics = db.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
             FROM topic
             LEFT JOIN user
@@ -33,7 +32,7 @@ fun APIScope.topicAPI() {
     }
 
     ApiTopicGetLatestTopics.response { tid, num ->
-        val topics = DB.throwQuerySQL("""
+        val topics = db.throwQuerySQL("""
             SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
             FROM topic
             LEFT JOIN user
@@ -46,7 +45,7 @@ fun APIScope.topicAPI() {
     }
 
     ApiTopicGetLatestTopicsByComment.response { tid, num ->
-        val topics = DB.throwQuerySQL(
+        val topics = db.throwQuerySQL(
             """
         WITH
         -- 1. 先把 base_ts 算出来
@@ -105,7 +104,7 @@ fun APIScope.topicAPI() {
     }
 
     ApiTopicGetHotTopics.response { score, tid, num ->
-        val topics = DB.throwQuerySQL("""
+        val topics = db.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name, score
 			FROM topic
 			LEFT JOIN user
@@ -118,7 +117,7 @@ fun APIScope.topicAPI() {
     }
 
     ApiTopicGetSectionTopics.response { section, tid, num ->
-        val topics = DB.throwQuerySQL("""
+        val topics = db.throwQuerySQL("""
 			SELECT tid, user.uid, title, pics->>'$[0]' AS pic, isTop, coinNum, commentNum, rawSection, name
 			FROM topic
 			LEFT JOIN user
@@ -132,7 +131,7 @@ fun APIScope.topicAPI() {
 
     ApiTopicGetTopicDetails.response { tid ->
         VN.throwId(tid)
-        val topics = DB.throwQuerySQLSingle("""
+        val topics = db.throwQuerySQLSingle("""
 			SELECT tid, user.uid, ts, title, content, pics, isTop, coinNum, commentNum, section, rawSection, name, label, exp
 			FROM topic
 			LEFT JOIN user
@@ -145,7 +144,7 @@ fun APIScope.topicAPI() {
     ApiTopicGetTopicComments.response { tid, rawSection, isTop, cid, num ->
         VN.throwId(tid)
         val tableName = VN.throwSection(rawSection)
-        val comments = DB.throwQuerySQL("""
+        val comments = db.throwQuerySQL("""
 			SELECT cid, user.uid, ts, content, isTop, subCommentNum, name, label, exp
             FROM $tableName
             LEFT JOIN user
@@ -163,7 +162,7 @@ fun APIScope.topicAPI() {
     ApiTopicGetTopicSubComments.response { pid, rawSection, cid, num ->
         VN.throwId(pid)
         val tableName = VN.throwSection(rawSection)
-        val subComments = DB.throwQuerySQL("""
+        val subComments = db.throwQuerySQL("""
 			SELECT cid, user.uid, ts, content, name, label, exp
 			FROM $tableName
 			LEFT JOIN user
@@ -180,9 +179,9 @@ fun APIScope.topicAPI() {
         VN.throwSection(section)
         val ngp = NineGridProcessor(pics)
         val uid = AN.throwExpireToken(token)
-        val privilege = DB.throwGetUser(uid, "privilege")["privilege"].Int
+        val privilege = db.throwGetUser(uid, "privilege")["privilege"].Int
         if (!UserPrivilege.topic(privilege) || (section == Comment.Section.NOTIFICATION && !UserPrivilege.vipTopic(privilege))) failure("无权限")
-        val tid = DB.throwInsertSQLGeneratedKey("""
+        val tid = db.throwInsertSQLGeneratedKey("""
             INSERT INTO topic(uid, title, content, pics, section, rawSection) ${values(6)}
         """, uid, title, content, ngp.jsonString, section, section).toInt()
         // 复制主题图片
@@ -195,7 +194,7 @@ fun APIScope.topicAPI() {
         VN.throwId(tid)
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人
-        if (!DB.updateSQL("""
+        if (!db.updateSQL("""
 			UPDATE topic SET isTop = ? WHERE uid = ? AND tid = ? AND isDeleted = 0
 		""", isTop, uid, tid)) failure("无权限")
     }
@@ -204,13 +203,13 @@ fun APIScope.topicAPI() {
         VN.throwId(tid)
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人，超管
-        if (DB.querySQLSingle("""
+        if (db.querySQLSingle("""
             SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
 			SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
         """, uid, tid, uid) == null) failure("无权限")
         // 逻辑删除
-        DB.throwExecuteSQL("UPDATE topic SET isDeleted = 1 WHERE tid = ? AND isDeleted = 0", tid)
+        db.throwExecuteSQL("UPDATE topic SET isDeleted = 1 WHERE tid = ? AND isDeleted = 0", tid)
     }
 
     ApiTopicMoveTopic.response { token, tid, section ->
@@ -218,10 +217,10 @@ fun APIScope.topicAPI() {
         VN.throwSection(section)
         val uid = AN.throwExpireToken(token)
         // 权限：超管
-        val user = DB.throwGetUser(uid, "privilege")
+        val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.vipTopic(user["privilege"].Int)) failure("无权限")
         // 移动主题
-        DB.throwExecuteSQL("UPDATE topic SET section = ? WHERE tid = ? AND isDeleted = 0", section, tid)
+        db.throwExecuteSQL("UPDATE topic SET section = ? WHERE tid = ? AND isDeleted = 0", section, tid)
     }
 
     ApiTopicSendCoin.response { token, uid, tid, value ->
@@ -229,10 +228,10 @@ fun APIScope.topicAPI() {
         VN.throwIf(value <= 0, value > UserConstraint.MIN_COIN_REWARD)
         val srcUid = AN.throwExpireToken(token)
         if (srcUid == uid) failure("不能给自己投币哦")
-        val user = DB.throwGetUser(srcUid, "coin, privilege")
+        val user = db.throwGetUser(srcUid, "coin, privilege")
         if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
         if ((user["coin"].Int) < value) failure("你的银币不够哦")
-        DB.throwTransaction {
+        db.throwTransaction {
             // 更新主题投币数
             it.throwExecuteSQL("""
                 UPDATE topic SET coinNum = coinNum + ? WHERE tid = ? AND uid = ? AND isDeleted = 0
@@ -256,9 +255,9 @@ fun APIScope.topicAPI() {
         VN.throwEmpty(content)
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
-        val user = DB.throwGetUser(uid, "privilege")
+        val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
-        val cid = DB.throwTransaction {
+        val cid = db.throwTransaction {
             it.throwExecuteSQL("""
 				UPDATE topic SET commentNum = commentNum + 1 WHERE tid = ? AND isDeleted = 0
 			""", tid)
@@ -274,9 +273,9 @@ fun APIScope.topicAPI() {
         VN.throwEmpty(content)
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
-        val user = DB.throwGetUser(uid, "privilege")
+        val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.topic(user["privilege"].Int)) failure("无权限")
-        val cid = DB.throwTransaction {
+        val cid = db.throwTransaction {
             it.throwExecuteSQL("""
 				UPDATE $tableName SET subCommentNum = subCommentNum + 1 WHERE cid = ? AND isDeleted = 0
 			""", cid)
@@ -292,12 +291,12 @@ fun APIScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人，超管
-        if (DB.querySQLSingle("""
+        if (db.querySQLSingle("""
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
         """, uid, tid, uid) == null) failure("无权限")
-        DB.throwExecuteSQL("UPDATE $tableName SET isTop = ? WHERE cid = ? AND isDeleted = 0", isTop, cid)
+        db.throwExecuteSQL("UPDATE $tableName SET isTop = ? WHERE cid = ? AND isDeleted = 0", isTop, cid)
     }
 
     ApiTopicDeleteComment.response { token, tid, cid, rawSection ->
@@ -305,14 +304,14 @@ fun APIScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
-        if (DB.querySQLSingle("""
+        if (db.querySQLSingle("""
 			SELECT 1 FROM $tableName WHERE uid = ? AND tid = ? AND cid = ? AND isDeleted = 0
 			UNION
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
         """, uid, tid, cid, uid, tid, uid) == null) failure("无权限")
-        DB.throwTransaction {
+        db.throwTransaction {
             // 逻辑删除
             it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE cid = ? AND isDeleted = 0", cid)
             // 更新主题评论数
@@ -325,14 +324,14 @@ fun APIScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
-        if (DB.querySQLSingle("""
+        if (db.querySQLSingle("""
 			SELECT 1 FROM $tableName WHERE uid = ? AND tid = ? AND pid = ? AND cid = ? AND isDeleted = 0
 			UNION
 			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
 			UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
         """, uid, tid, pid, cid, uid, tid, uid) == null) failure("无权限")
-        DB.throwTransaction {
+        db.throwTransaction {
             // 逻辑删除
             it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE pid = ? AND cid = ? AND isDeleted = 0", pid, cid)
             // 更新评论楼中楼数

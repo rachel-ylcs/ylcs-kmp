@@ -9,9 +9,10 @@ import love.yinlin.data.rachel.game.info.PictionaryQuestion
 import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.Database
 
 // 你画我猜
-data object PictionaryManager : RankGameManager() {
+class PictionaryManager(db: Database) : RankGameManager(db) {
     override val config: PConfig = PConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {

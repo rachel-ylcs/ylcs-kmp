@@ -3,7 +3,7 @@
         <encoder>
             <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
         </encoder>
-        <filter class="love.yinlin.server.WorkFilter" />
+        <filter class="love.yinlin.LoggerWorkFilter" />
     </appender>
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -13,7 +13,7 @@
         <encoder>
             <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
         </encoder>
-        <filter class="love.yinlin.server.WorkFilter" />
+        <filter class="love.yinlin.LoggerWorkFilter" />
     </appender>
     <appender name="REQUEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -23,9 +23,9 @@
         <encoder>
             <pattern>[%d{HH:mm:ss} %level] %msg%n</pattern>
         </encoder>
-        <filter class="love.yinlin.server.RequestFilter" />
+        <filter class="love.yinlin.LoggerRequestFilter" />
     </appender>
-    <logger name="love.yinlin.server.LoggerBase" level="DEBUG" additivity="false">
+    <logger name="love.yinlin.MainLogger" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="ROLLING" />
         <appender-ref ref="REQUEST" />

@@ -15,7 +15,6 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
-import love.yinlin.server.DB
 import love.yinlin.server.querySQLSingle
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
@@ -31,10 +30,10 @@ fun APIScope.gameAPI() {
         VN.throwEmpty(title)
         VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
-        catchingError { type.manager.check(info, question, answer) }?.let { failure("数据配置非法") }
+        catchingError { type.manager(db).check(info, question, answer) }?.let { failure("数据配置非法") }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
-        DB.throwTransaction {
+        db.throwTransaction {
             if (it.updateSQL("UPDATE user SET coin = coin - ? WHERE uid = ? AND coin >= ?", actualCoin, uid, actualCoin)) {
                 val gid = it.throwInsertSQLGeneratedKey("""
                     INSERT INTO game(uid, title, type, reward, num, cost, winner, info, question, answer) ${values(10)}
@@ -49,7 +48,7 @@ fun APIScope.gameAPI() {
     ApiGameDeleteGame.response { token, gid ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
-        DB.throwTransaction {
+        db.throwTransaction {
             val result = it.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ?", gid)
             val userUid = result["uid"].Int
             if (userUid != uid) {
@@ -68,7 +67,7 @@ fun APIScope.gameAPI() {
     }
 
     ApiGameGetGames.response { type, gid, num ->
-        val games = DB.throwQuerySQL("""
+        val games = db.throwQuerySQL("""
             SELECT game.gid, user.name, game.ts, game.title, game.type, game.reward, game.num, game.cost, game.info,
                 IFNULL((
                     SELECT JSON_ARRAYAGG(COALESCE(u.name, 'Unknown'))
@@ -86,7 +85,7 @@ fun APIScope.gameAPI() {
 
     ApiGameGetUserGames.response { token, gid, isCompleted, num ->
         val uid = AN.throwExpireToken(token)
-        val games = DB.throwQuerySQL("""
+        val games = db.throwQuerySQL("""
             SELECT gid, ts, title, type, reward, num, cost, info, question, answer, isCompleted,
                 IFNULL((
                     SELECT JSON_ARRAYAGG(COALESCE(u.name, 'Unknown'))
@@ -106,7 +105,7 @@ fun APIScope.gameAPI() {
 
     ApiGameGetUserGameRecords.response { token, rid, num ->
         val uid = AN.throwExpireToken(token)
-        val records = DB.throwQuerySQL("""
+        val records = db.throwQuerySQL("""
             SELECT record.rid, record.gid, record.ts, user.name, game.title, game.type, record.answer, record.result
             FROM game_record AS record
             LEFT JOIN game ON record.gid = game.gid
@@ -119,7 +118,7 @@ fun APIScope.gameAPI() {
     }
 
     ApiGameGetGameRank.response { game ->
-        val ranks = DB.throwQuerySQL("""
+        val ranks = db.throwQuerySQL("""
             SELECT uid, name, cnt
             FROM game_rank
             WHERE type = ?
@@ -131,7 +130,7 @@ fun APIScope.gameAPI() {
     ApiGamePreflightGame.response { token, gid ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
-        val details = DB.throwQuerySQLSingle("""
+        val details = db.throwQuerySQLSingle("""
             SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0
@@ -139,18 +138,18 @@ fun APIScope.gameAPI() {
         if (details.uid == uid) failure("不能参与自己创建的游戏哦")
         else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
         else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else result(details.type.manager.preflight(uid, details).copy(info = details.info, question = details.question))
+        else result(details.type.manager(db).preflight(uid, details).copy(info = details.info, question = details.question))
     }
 
     ApiGameVerifyGame.response { token, gid, rid, answer ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid, rid)
-        val record = DB.throwQuerySQLSingle("""
+        val record = db.throwQuerySQLSingle("""
             SELECT rid, gid, uid, ts, answer, result
             FROM game_record
             WHERE rid = ? AND gid = ? AND uid = ?
         """, rid, gid, uid).to<GameRecord>()
-        val details = DB.throwQuerySQLSingle("""
+        val details = db.throwQuerySQLSingle("""
             SELECT gid, uid, type, reward, num, cost, winner, info, question, answer, isCompleted
             FROM game
             WHERE gid = ? AND isDeleted = 0
@@ -158,8 +157,8 @@ fun APIScope.gameAPI() {
         if (details.uid == uid) failure("不能参与自己创建的游戏哦")
         else if (details.isCompleted) failure("不能参与已经结算的游戏哦")
         else if (uid in details.winner) failure("不能参与完成过的游戏哦")
-        else result(details.type.manager.verify(uid, details, record, answer))
+        else result(details.type.manager(db).verify(uid, details, record, answer))
     }
 
-    LyricsSockets.connect { LyricsSocketsManager(it) }
+    LyricsSockets.connect { LyricsSocketsManager(db, it) }
 }

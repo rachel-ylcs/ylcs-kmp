@@ -8,17 +8,17 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.RankConfig
 import love.yinlin.extension.toJsonString
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 import java.sql.Connection
 
 // 排位
-abstract class RankGameManager : GameManager() {
+abstract class RankGameManager(db: Database) : GameManager(db) {
     override val config: RankConfig = RankConfig
 
-    override fun preflight(uid: Int, details: GameDetails): PreflightResult = DB.throwTransaction {
+    override fun preflight(uid: Int, details: GameDetails): PreflightResult = db.throwTransaction {
         // 消费银币
         if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
         // 插入游戏记录

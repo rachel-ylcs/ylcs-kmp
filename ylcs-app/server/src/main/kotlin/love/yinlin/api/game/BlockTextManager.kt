@@ -8,10 +8,11 @@ import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
 import love.yinlin.extension.toJson
+import love.yinlin.server.Database
 import kotlin.math.sqrt
 
 // 网格填词
-data object BlockTextManager : RankGameManager() {
+class BlockTextManager(db: Database) : RankGameManager(db) {
     override val config: BTConfig = BTConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {

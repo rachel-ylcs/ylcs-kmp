@@ -56,9 +56,13 @@ object AN {
     private const val TOKEN_SECRET_KEY = "token_secret_key"
     private const val KEY_ALGORITHM = "AES"
 
-    private val AES_KEY: SecretKey = run {
-        val keyString = Redis[TOKEN_SECRET_KEY]
-        if (keyString != null) {
+    private lateinit var AES_KEY: SecretKey
+    private lateinit var redis: Redis
+
+    fun initAESKey(redis: Redis) {
+        this.redis = redis
+        val keyString = redis[TOKEN_SECRET_KEY]
+        AES_KEY = if (keyString != null) {
             val bis = ByteArrayInputStream(Base64.getDecoder().decode(keyString))
             val ois = ObjectInputStream(bis)
             val secretKey = ois.readObject() as SecretKey
@@ -74,7 +78,7 @@ object AN {
             oos.writeObject(secretKey)
             oos.flush()
             oos.close()
-            Redis[TOKEN_SECRET_KEY] = Base64.getEncoder().encodeToString(bos.toByteArray())
+            redis[TOKEN_SECRET_KEY] = Base64.getEncoder().encodeToString(bos.toByteArray())
             secretKey
         }
     }
@@ -85,7 +89,7 @@ object AN {
         cipher.init(Cipher.ENCRYPT_MODE, AES_KEY)
         val encryptedBytes = cipher.doFinal(token.bytes)
         val tokenString = Base64.getEncoder().encodeToString(encryptedBytes)
-        Redis.setex(token.key, tokenString, 30 * 24 * 60 * 60L)
+        redis.setex(token.key, tokenString, 30 * 24 * 60 * 60L)
         return tokenString
     }
 
@@ -101,7 +105,7 @@ object AN {
     fun throwExpireToken(tokenString: String): Int {
         val token = parseToken(tokenString)
         // keyToken 可能是 null 或 已经失效的 token
-        val saveTokenString = Redis[token.key]
+        val saveTokenString = redis[token.key]
         return if (saveTokenString == tokenString) token.uid
         else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
         else throw UnauthorizedException("token ${token.uid} unauthorized")
@@ -109,7 +113,7 @@ object AN {
 
     fun throwReGenerateToken(tokenString: String): String {
         val token = parseToken(tokenString)
-        val saveTokenString = Redis[token.key]
+        val saveTokenString = redis[token.key]
         return if (saveTokenString == tokenString) throwGenerateToken(Token(uid = token.uid, platform = token.platform))
         else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
         else throw UnauthorizedException("token ${token.uid} unauthorized")
@@ -117,15 +121,15 @@ object AN {
 
     fun removeToken(tokenString: String) {
         val token = parseToken(tokenString)
-        val saveTokenString = Redis[token.key]
-        if (saveTokenString == tokenString) Redis.remove(token.key)
+        val saveTokenString = redis[token.key]
+        if (saveTokenString == tokenString) redis.remove(token.key)
         else if (saveTokenString.isNullOrEmpty() && tokenString.isEmpty()) error("")
         else throw UnauthorizedException("token ${token.uid} unauthorized")
     }
 
     fun removeAllTokens(uid: Int) {
         if (uid > 0) {
-            for (tokenString in Token.keys(uid)) Redis.remove(tokenString)
+            for (tokenString in Token.keys(uid)) redis.remove(tokenString)
         }
     }
 }

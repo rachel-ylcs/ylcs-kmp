@@ -7,12 +7,12 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.Long
 import love.yinlin.extension.Object
 import love.yinlin.extension.to
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 
-fun DB.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
+fun Database.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
     val follow = querySQL("""
             SELECT uid1, isBlocked FROM follows WHERE (uid1 = ? AND uid2 = ?) OR (uid1 = ? AND uid2 = ?)
         """, uid1, uid2, uid2, uid1)?.map { it.Object } ?: emptyList()
@@ -25,9 +25,9 @@ fun APIScope.followsAPI() {
     ApiFollowsFollowUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能关注自己哦")
-        val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
+        val (relationship1, relationship2) = db.queryRelationship(uid1, uid2)
         when (relationship1) {
-            null if relationship2 != true -> DB.throwTransaction {
+            null if relationship2 != true -> db.throwTransaction {
                 it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
                 it.throwExecuteSQL(
                     """
@@ -47,8 +47,8 @@ fun APIScope.followsAPI() {
     ApiFollowsUnfollowUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能关注自己哦")
-        val (relationship1, relationship2) = DB.queryRelationship(uid1, uid2)
-        if (relationship1 == false && relationship2 != true) DB.throwTransaction {
+        val (relationship1, relationship2) = db.queryRelationship(uid1, uid2)
+        if (relationship1 == false && relationship2 != true) db.throwTransaction {
             it.throwExecuteSQL("DELETE FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
             it.throwExecuteSQL("""
                 UPDATE user
@@ -63,7 +63,7 @@ fun APIScope.followsAPI() {
 
     ApiFollowsGetFollows.response { token, score, fid, num ->
         val uid1 = AN.throwExpireToken(token)
-        val follows = DB.throwQuerySQL("""
+        val follows = db.throwQuerySQL("""
             SELECT fid, uid2 AS uid, name, ts, score
             FROM follows
             LEFT JOIN user
@@ -77,7 +77,7 @@ fun APIScope.followsAPI() {
 
     ApiFollowsGetFollowers.response { token, score, fid, num ->
         val uid1 = AN.throwExpireToken(token)
-        val followers = DB.throwQuerySQL("""
+        val followers = db.throwQuerySQL("""
             SELECT fid, uid1 AS uid, name, score
             FROM follows
             LEFT JOIN user
@@ -92,8 +92,8 @@ fun APIScope.followsAPI() {
     ApiFollowsBlockUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能拉黑自己哦")
-        val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
-        DB.throwTransaction {
+        val follow = db.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
+        db.throwTransaction {
             if (follow == null) it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2, isBlocked) ${values(3)}", uid2, uid1, true)
             else if (!follow["isBlocked"].Boolean) {
                 it.throwExecuteSQL("UPDATE follows SET isBlocked = 1 WHERE fid = ?", follow["fid"].Long)
@@ -111,13 +111,13 @@ fun APIScope.followsAPI() {
     ApiFollowsUnblockUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         VN.throwIf(uid1 == uid2)
-        val follow = DB.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
-        if (follow != null && follow["isBlocked"].Boolean) DB.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
+        val follow = db.querySQLSingle("SELECT fid, isBlocked FROM follows WHERE uid1 = ? AND uid2 = ?", uid2, uid1)
+        if (follow != null && follow["isBlocked"].Boolean) db.throwExecuteSQL("DELETE FROM follows WHERE fid = ?", follow["fid"].Long)
     }
 
     ApiFollowsGetBlockedUsers.response { token, fid, num ->
         val uid1 = AN.throwExpireToken(token)
-        val follows = DB.throwQuerySQL("""
+        val follows = db.throwQuerySQL("""
             SELECT fid, uid1 AS uid, name
             FROM follows
             LEFT JOIN user

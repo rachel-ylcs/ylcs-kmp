@@ -11,14 +11,14 @@ import love.yinlin.extension.ArrayEmpty
 import love.yinlin.extension.Long
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 import java.sql.Connection
 
 // 探索
-abstract class ExplorationGameManager : GameManager() {
+abstract class ExplorationGameManager(db: Database) : GameManager(db) {
     override val config: ExplorationConfig = ExplorationConfig
 
     abstract fun fetchTryCount(info: JsonElement): Int
@@ -30,13 +30,13 @@ abstract class ExplorationGameManager : GameManager() {
 
     override fun preflight(uid: Int, details: GameDetails): PreflightResult {
         // 检查重试记录
-        val oldRecord = DB.querySQLSingle("""
+        val oldRecord = db.querySQLSingle("""
             SELECT rid, answer, result FROM game_record WHERE uid = ? AND gid = ?
         """, uid, details.gid)
         val oldAnswer = oldRecord?.get("answer").ArrayEmpty
         val oldResult = oldRecord?.get("result").ArrayEmpty
         if (oldAnswer.size >= fetchTryCount(details.info)) throw FailureException("重试次数达到上限")
-        return DB.throwTransaction {
+        return db.throwTransaction {
             val rid = if (oldRecord == null) {
                 // 消费银币
                 if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")

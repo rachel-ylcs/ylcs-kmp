@@ -7,12 +7,11 @@ import love.yinlin.callMap
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.to
-import love.yinlin.server.DB
 
 fun APIScope.mailAPI() {
     ApiMailGetMails.response { token, isProcessed, mid, num ->
         val uid = AN.throwExpireToken(token)
-        val mails = DB.throwQuerySQL("""
+        val mails = db.throwQuerySQL("""
 			SELECT mid, uid, ts, type, processed, title, content
 			FROM mail
 			WHERE uid = ? AND ${
@@ -28,7 +27,7 @@ fun APIScope.mailAPI() {
     ApiMailProcessMail.response { token, mid, confirm ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(mid)
-        val mailEntry = DB.throwQuerySQLSingle("""
+        val mailEntry = db.throwQuerySQLSingle("""
 			SELECT uid, processed, filter, param1, param2, param3, info
 			FROM mail
 			WHERE mid = ? AND uid = ?
@@ -41,13 +40,13 @@ fun APIScope.mailAPI() {
         }
         else "已拒绝此邮件"
         // 处理成功后将processed置为 1
-        DB.throwExecuteSQL("UPDATE mail SET processed = 1 WHERE mid = ?", mid)
+        db.throwExecuteSQL("UPDATE mail SET processed = 1 WHERE mid = ?", mid)
         result(ret)
     }
 
     ApiMailDeleteMail.response { token, mid ->
         val uid = AN.throwExpireToken(token)
         VN.throwId(mid)
-        DB.throwExecuteSQL("DELETE FROM mail WHERE mid = ? AND uid = ?", mid, uid)
+        db.throwExecuteSQL("DELETE FROM mail WHERE mid = ? AND uid = ?", mid, uid)
     }
 }

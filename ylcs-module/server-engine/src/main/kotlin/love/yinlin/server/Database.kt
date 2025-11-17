@@ -2,6 +2,7 @@ package love.yinlin.server
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -24,51 +25,77 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-data object Database {
+class Database internal constructor(config: Config) {
+    @Serializable
+    data class Config(
+        val host: String = "localhost",
+        val port: Int = 3306,
+        val name: String = "mysql",
+        val username: String = "root",
+        val password: String = "",
+        val maximumPoolSize: Int = 10,
+        val minimumIdle: Int = 2,
+        val idleTimeout: Long = 30000L,
+        val connectionTimeout: Long = 30000L,
+        val maxLifetime: Long = 1800000L,
+    )
+
     private val dataSource = HikariDataSource(HikariConfig().apply {
-        jdbcUrl = "jdbc:mysql://${Config.Mysql.host}:${Config.Mysql.port}/${Config.Mysql.name}"
-        username = Config.Mysql.username
-        password = Config.Mysql.password
+        jdbcUrl = "jdbc:mysql://${config.host}:${config.port}/${config.name}"
+        username = config.username
+        password = config.password
         isAutoCommit = true
-        maximumPoolSize = Config.Mysql.maximumPoolSize
-        minimumIdle = Config.Mysql.minimumIdle
-        idleTimeout = Config.Mysql.idleTimeout
-        connectionTimeout = Config.Mysql.connectionTimeout
-        maxLifetime = Config.Mysql.maxLifetime
+        maximumPoolSize = config.maximumPoolSize
+        minimumIdle = config.minimumIdle
+        idleTimeout = config.idleTimeout
+        connectionTimeout = config.connectionTimeout
+        maxLifetime = config.maxLifetime
     })
 
-    val connection: Connection get() = dataSource.connection
+    private val connection: Connection get() = dataSource.connection
 
     fun close() = dataSource.close()
-}
 
-data object SQLConverter {
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-    private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    fun throwQuerySQL(sql: String, vararg args: Any?) = connection.use { it.throwQuerySQL(sql, *args) }
 
-    fun convert(type: String, value: Any?): JsonElement {
-        if (value == null) return JsonNull
-        return when (type) {
-            "BIGINT" -> (value as Long).json
-            "BINARY", "BLOB", "LONGBLOB", "MEDIUMBLOB", "TINYBLOB", "VARBINARY" -> (value as ByteArray).json
-            "BIT" -> (value as Boolean).json
-            "CHAR", "TEXT", "VARCHAR", "TINYTEXT", "LONGTEXT" -> (value as String).json
-            "DATE" -> catchingDefault(JsonNull) { (value as Date).toLocalDate().format(dateFormatter).json }
-            "DATETIME" -> catchingDefault(JsonNull) { (value as LocalDateTime).format(dateTimeFormatter).json }
-            "DECIMAL" -> (value as BigDecimal).json
-            "DOUBLE" -> (value as Double).json
-            "FLOAT" -> (value as Float).json
-            "INT", "TINYINT", "MEDIUMINT", "SMALLINT" -> (value as Int).json
-            "JSON" -> (value as String).parseJson
-            "TIME" -> catchingDefault(JsonNull) { (value as Time).toLocalTime().format(timeFormatter).json }
-            "TIMESTAMP" -> catchingDefault(JsonNull) { (value as Timestamp).toLocalDateTime().format(dateTimeFormatter).json }
-            else -> "$type ${value::class.qualifiedName} $value".json
+    fun querySQL(sql: String, vararg args: Any?) = connection.use { it.querySQL(sql, *args) }
+
+    fun throwQuerySQLSingle(sql: String, vararg args: Any?) = connection.use { it.throwQuerySQLSingle(sql, *args) }
+
+    fun querySQLSingle(sql: String, vararg args: Any?) = connection.use { it.querySQLSingle(sql, *args) }
+
+    fun throwExecuteSQL(sql: String, vararg args: Any?) = connection.use { it.throwExecuteSQL(sql, *args) }
+
+    fun updateSQL(sql: String, vararg args: Any?): Boolean = connection.use { it.updateSQL(sql, *args) }
+
+    fun deleteSQL(sql: String, vararg args: Any?): Boolean = updateSQL(sql, *args)
+
+    fun throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = connection.use { it.throwInsertSQLDuplicateKey(sql, *args) }
+
+    fun throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long = connection.use { it.throwInsertSQLGeneratedKey(sql, *args) }
+
+    fun <R : Any> throwTransaction(call: (Connection) -> R): R = connection.use {
+        it.autoCommit = false
+        catchingThrow(
+            clean = { it.autoCommit = true },
+            onError = { _ ->
+                it.rollback()
+                null
+            }
+        ) {
+            val result = call(it)
+            it.commit()
+            result
         }
     }
-
-    fun convertTime(ts: String): Long = catchingDefault(0L) { LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli() }
 }
+
+fun values(count: Int): String = if (count > 0) buildString {
+    append(" VALUES(")
+    repeat(count - 1) { append("?, ") }
+    append("?) ")
+}
+else " VALUES() "
 
 fun Connection.throwQuerySQL(sql: String, vararg args: Any?): JsonArray {
     val statement = prepareStatement(sql)
@@ -143,44 +170,30 @@ fun Connection.throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long 
     return keys.getLong(1)
 }
 
-object DB {
-    fun throwQuerySQL(sql: String, vararg args: Any?) = Database.connection.use { it.throwQuerySQL(sql, *args) }
+data object SQLConverter {
+    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+    private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    fun querySQL(sql: String, vararg args: Any?) = Database.connection.use { it.querySQL(sql, *args) }
-
-    fun throwQuerySQLSingle(sql: String, vararg args: Any?) = Database.connection.use { it.throwQuerySQLSingle(sql, *args) }
-
-    fun querySQLSingle(sql: String, vararg args: Any?) = Database.connection.use { it.querySQLSingle(sql, *args) }
-
-    fun throwExecuteSQL(sql: String, vararg args: Any?) = Database.connection.use { it.throwExecuteSQL(sql, *args) }
-
-    fun updateSQL(sql: String, vararg args: Any?): Boolean = Database.connection.use { it.updateSQL(sql, *args) }
-
-    fun deleteSQL(sql: String, vararg args: Any?): Boolean = updateSQL(sql, *args)
-
-    fun throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = Database.connection.use { it.throwInsertSQLDuplicateKey(sql, *args) }
-
-    fun throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long = Database.connection.use { it.throwInsertSQLGeneratedKey(sql, *args) }
-
-    fun <R : Any> throwTransaction(call: (Connection) -> R): R = Database.connection.use {
-        it.autoCommit = false
-        catchingThrow(
-            clean = { it.autoCommit = true },
-            onError = { _ ->
-                it.rollback()
-                null
-            }
-        ) {
-            val result = call(it)
-            it.commit()
-            result
+    fun convert(type: String, value: Any?): JsonElement {
+        if (value == null) return JsonNull
+        return when (type) {
+            "BIGINT" -> (value as Long).json
+            "BINARY", "BLOB", "LONGBLOB", "MEDIUMBLOB", "TINYBLOB", "VARBINARY" -> (value as ByteArray).json
+            "BIT" -> (value as Boolean).json
+            "CHAR", "TEXT", "VARCHAR", "TINYTEXT", "LONGTEXT" -> (value as String).json
+            "DATE" -> catchingDefault(JsonNull) { (value as Date).toLocalDate().format(dateFormatter).json }
+            "DATETIME" -> catchingDefault(JsonNull) { (value as LocalDateTime).format(dateTimeFormatter).json }
+            "DECIMAL" -> (value as BigDecimal).json
+            "DOUBLE" -> (value as Double).json
+            "FLOAT" -> (value as Float).json
+            "INT", "TINYINT", "MEDIUMINT", "SMALLINT" -> (value as Int).json
+            "JSON" -> (value as String).parseJson
+            "TIME" -> catchingDefault(JsonNull) { (value as Time).toLocalTime().format(timeFormatter).json }
+            "TIMESTAMP" -> catchingDefault(JsonNull) { (value as Timestamp).toLocalDateTime().format(dateTimeFormatter).json }
+            else -> "$type ${value::class.qualifiedName} $value".json
         }
     }
-}
 
-fun values(count: Int): String = if (count > 0) buildString {
-    append(" VALUES(")
-    repeat(count - 1) { append("?, ") }
-    append("?) ")
+    fun convertTime(ts: String): Long = catchingDefault(0L) { LocalDateTime.parse(ts, dateTimeFormatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli() }
 }
-else " VALUES() "

@@ -5,12 +5,11 @@ import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.to
-import love.yinlin.server.DB
 import love.yinlin.server.values
 
 fun APIScope.songAPI() {
     ApiSongGetSongs.response { sid, num ->
-        val songs = DB.throwQuerySQL("""
+        val songs = db.throwQuerySQL("""
 			SELECT sid, version, name
 			FROM song
             WHERE sid > ?
@@ -21,7 +20,7 @@ fun APIScope.songAPI() {
     }
 
     ApiSongGetSong.response { sid ->
-        val song = DB.querySQLSingle("""
+        val song = db.querySQLSingle("""
             SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme
 			FROM song
             WHERE sid = ?
@@ -30,7 +29,7 @@ fun APIScope.songAPI() {
     }
 
     ApiSongSearchSongs.response { key ->
-        val songs = DB.throwQuerySQL("""
+        val songs = db.throwQuerySQL("""
 			SELECT sid, version, name
 			FROM song
             WHERE name LIKE ?
@@ -40,7 +39,7 @@ fun APIScope.songAPI() {
     }
 
     ApiSongGetSongComments.response { sid, cid, num ->
-        val songComment = DB.throwQuerySQL("""
+        val songComment = db.throwQuerySQL("""
             SELECT cid, user.uid, ts, content, name, label, exp
             FROM song_comment
             LEFT JOIN user
@@ -55,7 +54,7 @@ fun APIScope.songAPI() {
     ApiSongSendSongComment.response { token, sid, content ->
         VN.throwEmpty(content)
         val uid = AN.throwExpireToken(token)
-        val cid = DB.throwInsertSQLGeneratedKey("""
+        val cid = db.throwInsertSQLGeneratedKey("""
             INSERT INTO song_comment(sid, uid, content) ${values(3)}
         """, sid, uid, content)
         result(cid)
@@ -65,12 +64,12 @@ fun APIScope.songAPI() {
         VN.throwId( cid)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，超管
-        if (DB.querySQLSingle("""
+        if (db.querySQLSingle("""
             SELECT 1 FROM song_comment WHERE uid = ? AND cid = ? AND isDeleted = 0
             UNION
             SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
         """, uid, cid, uid) == null) failure("无权限")
         // 逻辑删除
-        DB.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
+        db.throwExecuteSQL("UPDATE song_comment SET isDeleted = 1 WHERE cid = ?", cid)
     }
 }

@@ -8,14 +8,14 @@ import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
 import love.yinlin.data.rachel.game.SpeedConfig
 import love.yinlin.extension.toJsonString
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
 import love.yinlin.server.values
 import java.sql.Connection
 
 // 竞速
-abstract class SpeedGameManager : GameManager() {
+abstract class SpeedGameManager(db: Database) : GameManager(db) {
     override val config: SpeedConfig = SpeedConfig
 
     abstract fun fetchTimeLimit(info: JsonElement): Int
@@ -25,7 +25,7 @@ abstract class SpeedGameManager : GameManager() {
         require(timeLimit in config.minTimeLimit .. config.maxTimeLimit)
     }
 
-    override fun preflight(uid: Int, details: GameDetails): PreflightResult = DB.throwTransaction {
+    override fun preflight(uid: Int, details: GameDetails): PreflightResult = db.throwTransaction {
         // 消费银币
         if (!it.consumeCoin(uid, details)) throw FailureException("没有足够的银币参与")
         // 插入游戏记录

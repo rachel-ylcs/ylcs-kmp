@@ -2,7 +2,7 @@ package love.yinlin.api.user
 
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
-import love.yinlin.server.DB
+import love.yinlin.server.Database
 
 object VN {
     class ValidationError(source: String, data: Any? = null) : Throwable() {
@@ -23,4 +23,4 @@ object VN {
         throw ValidationError("Section", section) else Comment.Section.commentTable(section)
 }
 
-fun DB.throwGetUser(uid: Int, col: String = "uid") = this.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
+fun Database.throwGetUser(uid: Int, col: String = "uid") = this.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)

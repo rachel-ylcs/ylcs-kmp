@@ -28,12 +28,23 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.platform.Coroutines
+import love.yinlin.server.Database
+import love.yinlin.server.Redis
 import love.yinlin.server.currentUniqueId
-import love.yinlin.server.logger
+import org.slf4j.Logger
 import java.io.File
 import kotlin.random.Random
 
-class APIScope internal constructor(private val routing: Routing) {
+abstract class APIScope internal constructor(
+    private val routing: Routing,
+    val logger: Logger,
+) {
+    lateinit var db: Database
+        internal set
+
+    lateinit var redis: Redis
+        internal set
+
     fun API<out APIType>.internalResponse(block: suspend (RoutingCall) -> JsonElement) {
         routing.route(path = route, method = HttpMethod.Post) {
             handle {
@@ -509,8 +520,6 @@ class APIScope internal constructor(private val routing: Routing) {
                         }
                         else -> { }
                     }
-                }?.let { err ->
-                    logger.error("RoutingCall.FormResult - {}", err.stackTraceToString())
                 }
                 part.dispose()
             }

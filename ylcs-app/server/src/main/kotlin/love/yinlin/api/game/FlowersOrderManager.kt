@@ -11,9 +11,10 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.Database
 
 // 寻花令
-data object FlowersOrderManager : ExplorationGameManager() {
+class FlowersOrderManager(db: Database) : ExplorationGameManager(db) {
     override val config: FOConfig = FOConfig
 
     override fun fetchTryCount(info: JsonElement): Int = info.to<FOInfo>().tryCount

@@ -12,9 +12,10 @@ import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.data.rachel.game.info.AQUserAnswer
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.server.Database
 
 // 答题
-data object AnswerQuestionManager : RankGameManager() {
+class AnswerQuestionManager(db: Database) : RankGameManager(db) {
     override val config: AQConfig = AQConfig
 
     override fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
