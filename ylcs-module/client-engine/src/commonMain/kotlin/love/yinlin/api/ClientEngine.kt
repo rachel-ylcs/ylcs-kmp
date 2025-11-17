@@ -25,7 +25,7 @@ suspend inline fun API<out APIType>.internalRequest(
     noinline builder: HttpRequestBuilder.() -> Unit,
     uploadFile: Boolean = false,
     crossinline block: suspend (HttpResponse) -> Unit
-): Throwable? = catchingDefault(IllegalStateException("非法异常")) {
+): Throwable? = catchingDefault(IllegalStateException("出现错误了呀")) {
     val context = currentCoroutineContext()
     val url = "${ClientEngine.baseUrl}$route"
     Coroutines.io {
@@ -35,10 +35,10 @@ suspend inline fun API<out APIType>.internalRequest(
                     Coroutines.with(context) { block(response) }
                     null
                 }
-                HttpStatusCode(1211, "") -> FailureException(response.bodyAsText())
+                HttpStatusCode.Accepted -> FailureException(response.bodyAsText())
                 HttpStatusCode.Unauthorized -> UnauthorizedException("登录验证已过期")
                 HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp)
-                else -> IllegalArgumentException("非法异常")
+                else -> IllegalArgumentException("出现错误了呀")
             }
         }
     }

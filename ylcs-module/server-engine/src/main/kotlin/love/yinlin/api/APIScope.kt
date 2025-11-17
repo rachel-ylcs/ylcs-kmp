@@ -56,7 +56,7 @@ abstract class APIScope internal constructor(
                     logger.error("CallDie - {}", err.stackTraceToString())
                     when (err) {
                         is UnauthorizedException -> call.respond(status = HttpStatusCode.Unauthorized, message = makeArray { })
-                        is FailureException -> call.respondText(status = HttpStatusCode(1211, ""), text = err.message ?: "未知错误")
+                        is FailureException -> call.respondText(status = HttpStatusCode.Accepted, text = err.message ?: "未知错误")
                         else -> call.respond(status = HttpStatusCode.Forbidden, message = makeArray { })
                     }
                 }
