@@ -677,7 +677,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 )
                 TextInput(
                     state = newPassword1,
-                    hint = "确认旧密码",
+                    hint = "新密码",
                     inputType = InputType.PASSWORD,
                     maxLength = UserConstraint.MAX_PWD_LENGTH,
                     imeAction = ImeAction.Next,
@@ -685,7 +685,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 )
                 TextInput(
                     state = newPassword2,
-                    hint = "新密码",
+                    hint = "确认新密码",
                     inputType = InputType.PASSWORD,
                     maxLength = UserConstraint.MAX_PWD_LENGTH,
                     onImeClick = {
