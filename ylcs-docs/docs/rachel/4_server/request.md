@@ -1,7 +1,5 @@
 让我们来看第一节中的示例，仔细分解代码。
 
-## MainServerEngine.kt
-
 ```kotlin
 fun main() = object : ServerEngine() {
     override val port = 1211
@@ -70,7 +68,7 @@ fun APIScope.helloAPI() {
 
 通常把相关功能的接口统一放在一个API文件下，在这个API文件中你可以定义多个请求响应处理函数。
 
-只需要将对`APIMap`中定义的委托调用`response`并搭配`DSL`即可写出漂亮的响应。
+只需要对`APIMap`中定义的委托调用`response`并搭配`DSL`即可写出漂亮的响应。
 
 `lambda`中的参数会由编译器自动检查并提示类型，返回值你可以通过`result`成功传递回去，或者`failure`等异常处理函数返回错误信息，同样`result`能接受的参数类型与个数也与委托定义相同。
 
