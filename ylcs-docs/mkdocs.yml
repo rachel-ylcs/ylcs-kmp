@@ -21,10 +21,13 @@ nav:
     - 服务端引擎:
         - 1. 配置入口: rachel/4_server/entry.md
         - 2. HTTP请求: rachel/4_server/request.md
-        - 3. 文件上传: rachel/4_server/file.md
-        - 4. Sockets: rachel/4_server/sockets.md
-        - 5. 代理: rachel/4_server/proxy.md
-        - 6. 回调: rachel/4_server/callback.md
+        - 3. 资源: rachel/4_server/resource.md
+        - 4. 文件上传: rachel/4_server/file.md
+        - 5. Sockets: rachel/4_server/sockets.md
+        - 6. 代理: rachel/4_server/proxy.md
+        - 7. 回调: rachel/4_server/callback.md
+        - 8. 服务: rachel/4_server/service.md
+        - 9. 插件: rachel/4_server/plugin.md
     - 模块:
         - 1. 单实例: rachel/5_module/single_instance.md
         - 2. 一键更新: rachel/5_module/auto_update.md
