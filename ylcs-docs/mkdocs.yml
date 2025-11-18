@@ -16,8 +16,9 @@ nav:
     - 客户端引擎:
         - 1. 配置入口: rachel/3_client/entry.md
         - 2. HTTP请求: rachel/3_client/request.md
-        - 3. 文件上传: rachel/3_client/file.md
-        - 4. Sockets: rachel/3_client/sockets.md
+        - 3. 资源: rachel/3_client/resource.md
+        - 4. 文件上传: rachel/3_client/file.md
+        - 5. Sockets: rachel/3_client/sockets.md
     - 服务端引擎:
         - 1. 配置入口: rachel/4_server/entry.md
         - 2. HTTP请求: rachel/4_server/request.md
