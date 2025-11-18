@@ -55,9 +55,9 @@ class ScreenMail(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewMails(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            ApiMailGetMails.request(app.config.userToken, page.default1, page.default, page.pageNum) {
-                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
-            }?.let { state = BoxState.NETWORK_ERROR }
+            state = ApiMailGetMails.requestNull(app.config.userToken, page.default1, page.default, page.pageNum)?.let {
+                if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
+            } ?: BoxState.NETWORK_ERROR
         }
     }
 

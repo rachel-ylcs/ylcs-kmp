@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ApiPhotoSearchPhotoAlbums
 import love.yinlin.api.request
+import love.yinlin.api.requestNull
 import love.yinlin.api.url
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -58,9 +59,9 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewPhotos() {
         if (state != BoxState.LOADING) {
             state = BoxState.LOADING
-            ApiPhotoSearchPhotoAlbums.request(keyword, page.default, page.default1,page.pageNum) {
-                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
-            }?.let { state = BoxState.NETWORK_ERROR }
+            state = ApiPhotoSearchPhotoAlbums.requestNull(keyword, page.default, page.default1,page.pageNum)?.let {
+                if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
+            } ?: BoxState.NETWORK_ERROR
         }
     }
 

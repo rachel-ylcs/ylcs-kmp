@@ -19,6 +19,7 @@ import love.yinlin.api.APIConfig
 import love.yinlin.api.ApiGameDeleteGame
 import love.yinlin.api.ApiGameGetUserGames
 import love.yinlin.api.request
+import love.yinlin.api.requestNull
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
@@ -53,9 +54,9 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGames(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            ApiGameGetUserGames.request(app.config.userToken, page.default, page.default1, page.pageNum) {
-                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
-            }?.let { state = BoxState.NETWORK_ERROR }
+            state = ApiGameGetUserGames.requestNull(app.config.userToken, page.default, page.default1, page.pageNum)?.let {
+                if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
+            } ?: BoxState.NETWORK_ERROR
         }
     }
 

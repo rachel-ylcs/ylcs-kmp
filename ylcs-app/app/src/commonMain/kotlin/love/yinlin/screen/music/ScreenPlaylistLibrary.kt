@@ -42,6 +42,7 @@ import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingSheet
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.data.Data
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -277,12 +278,14 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? {
-        var data: Map<String, List<PlaylistPreviewItem>>? = null
-        ApiBackupDownloadPlaylist.request(app.config.userToken) { obj ->
-            catchingError { data = decodePlaylist(obj.to()) }?.let { error("云端歌单存在异常") }
-        }.errorTip
-        return data
+    private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? = when (val result = ApiBackupDownloadPlaylist.request(app.config.userToken)) {
+        is Data.Success -> catchingNull { decodePlaylist(result.data.o1.to()) }.also {
+            if (it == null) slot.tip.error("云端歌单存在异常")
+        }
+        is Data.Failure -> {
+            slot.tip.error(result.throwable.message)
+            null
+        }
     }
 
     override val title: String = "歌单"

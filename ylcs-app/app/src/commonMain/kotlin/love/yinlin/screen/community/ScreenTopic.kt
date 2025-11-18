@@ -206,11 +206,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         }
     }
 
-    private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? {
-        var data: List<SubComment>? = null
-        ApiTopicGetTopicSubComments.request(pid, topic.rawSection, cid, num) { data = it }
-        return data
-    }
+    private suspend fun requestSubComments(pid: Int, cid: Int, num: Int): List<SubComment>? = ApiTopicGetTopicSubComments.requestNull(pid, topic.rawSection, cid, num)?.o1
 
     private fun onAvatarClick(uid: Int) {
         subScreenDiscovery.onUserAvatarClick(uid)

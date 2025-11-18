@@ -1,16 +1,5 @@
 package love.yinlin.api
 
-@ConsistentCopyVisibility
-data class APIResult1<O1> internal constructor(val o1: O1)
-@ConsistentCopyVisibility
-data class APIResult2<O1, O2> internal constructor(val o1: O1, val o2: O2)
-@ConsistentCopyVisibility
-data class APIResult3<O1, O2, O3> internal constructor(val o1: O1, val o2: O2, val o3: O3)
-@ConsistentCopyVisibility
-data class APIResult4<O1, O2, O3, O4> internal constructor(val o1: O1, val o2: O2, val o3: O3, val o4: O4)
-@ConsistentCopyVisibility
-data class APIResult5<O1, O2, O3, O4, O5> internal constructor(val o1: O1, val o2: O2, val o3: O3, val o4: O4, val o5: O5)
-
 open class APIResponseScope : APICallbackScope()
 
 class APIResultScope1<O1> : APIResponseScope() {

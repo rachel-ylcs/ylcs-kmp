@@ -21,6 +21,7 @@ import love.yinlin.Local
 import love.yinlin.api.APIConfig
 import love.yinlin.api.ApiGameGetUserGameRecords
 import love.yinlin.api.request
+import love.yinlin.api.requestNull
 import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.compose.Device
@@ -63,9 +64,9 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewGameRecords(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            ApiGameGetUserGameRecords.request(app.config.userToken, page.default, page.pageNum) {
-                state = if (page.newData(it)) BoxState.CONTENT else BoxState.EMPTY
-            }?.let { state = BoxState.NETWORK_ERROR }
+            state = ApiGameGetUserGameRecords.requestNull(app.config.userToken, page.default, page.pageNum)?.let {
+                if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
+            } ?: BoxState.NETWORK_ERROR
         }
     }
 

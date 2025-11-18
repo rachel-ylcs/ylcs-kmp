@@ -75,8 +75,7 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
     private suspend fun addTopic(profile: UserProfile) {
         val title = input.title.text
         val section = input.section
-        ApiTopicSendTopic.request(app.config.userToken, title, input.content.richString.toString(), section,
-            apiFile(input.pics.map { Path(it.image) })) { tid, pic ->
+        ApiTopicSendTopic.request(app.config.userToken, title, input.content.richString.toString(), section, apiFile(input.pics.map { Path(it.image) })) { tid, pic ->
             val currentSection = subScreenDiscovery.currentSection
             if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
                 subScreenDiscovery.page.items.add(0, Topic(

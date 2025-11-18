@@ -79,30 +79,25 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
     private suspend fun requestNewData(loading: Boolean) {
         if (state != BoxState.LOADING) {
             if (loading) state = BoxState.LOADING
-            var data: List<Topic>? = null
-            when (val section = currentSection) {
-                DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.request(page.default, page.pageNum) { data = it }
-                DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.request(page.default, page.pageNum) { data = it }
-                DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.request(page.default1, page.default, page.pageNum) { data = it }
-                else -> ApiTopicGetSectionTopics.request(section, page.default, page.pageNum) { data = it }
-            }
-            if (data != null) {
-                state = if (page.newData(data)) BoxState.CONTENT else BoxState.EMPTY
+            state = when (val section = currentSection) {
+                DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.requestNull(page.default, page.pageNum)
+                DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.requestNull(page.default, page.pageNum)
+                DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.default1, page.default, page.pageNum)
+                else -> ApiTopicGetSectionTopics.requestNull(section, page.default, page.pageNum)
+            }?.let {
                 gridState.scrollToItem(0)
-            }
-            else state = BoxState.NETWORK_ERROR
+                if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
+            } ?: BoxState.NETWORK_ERROR
         }
     }
 
     private suspend fun requestMoreData() {
-        var data: List<Topic>? = null
         when (val section = currentSection) {
-            DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.request(page.offset, page.pageNum) { data = it }
-            DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.request(page.offset, page.pageNum) { data = it }
-            DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.request(page.arg1, page.offset, page.pageNum) { data = it }
-            else -> ApiTopicGetSectionTopics.request(section, page.offset, page.pageNum) { data = it }
-        }
-        if (data != null) page.moreData(data)
+            DiscoveryItem.LatestTopic.id -> ApiTopicGetLatestTopics.requestNull(page.offset, page.pageNum)
+            DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.requestNull(page.offset, page.pageNum)
+            DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.arg1, page.offset, page.pageNum)
+            else -> ApiTopicGetSectionTopics.requestNull(section, page.offset, page.pageNum)
+        }?.let { page.moreData(it.o1) }
     }
 
     private fun onTopicClick(topic: Topic) {
