@@ -17,6 +17,7 @@ import love.yinlin.data.Data
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.rawSource
 import love.yinlin.extension.safeRawSources
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
@@ -26,9 +27,11 @@ class ClientAPIFile internal constructor(val value: Any) : APIFile {
     override val files: List<String> = emptyList()
 }
 
+fun apiFile(data: String): APIFile = ClientAPIFile(value = data.encodeToByteArray())
 fun apiFile(data: ByteArray): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: RawSource): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: Sources<RawSource>): APIFile = ClientAPIFile(value = data)
+fun apiFile(data: Path): APIFile = ClientAPIFile(data.rawSource)
 fun apiFile(data: List<Path>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let { ClientAPIFile(it) }
 
 class APIFormScope {

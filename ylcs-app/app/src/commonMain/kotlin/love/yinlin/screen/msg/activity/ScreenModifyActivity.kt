@@ -130,7 +130,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 	private suspend fun updatePhoto(key: String, path: Path) {
 		slot.loading.openSuspend()
 		catching {
-			ApiActivityUpdateActivityPhoto.request(app.config.userToken, aid, key, apiFile(path.rawSource)) { newPic ->
+			ApiActivityUpdateActivityPhoto.request(app.config.userToken, aid, key, apiFile(path)) { newPic ->
 				activities.findAssign(predicate = { it.aid == aid }) {
 					photo = photo.toJson().Object.toMutableMap().let { map ->
 						map[key] = newPic.json
@@ -183,7 +183,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 		}?.let { path ->
 			slot.loading.openSuspend()
 			catching {
-				ApiActivityUpdateActivityPhotos.request(app.config.userToken, aid, key, index, apiFile(path.rawSource)) { newPic ->
+				ApiActivityUpdateActivityPhotos.request(app.config.userToken, aid, key, index, apiFile(path)) { newPic ->
 					activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
 						photo = photo.toJson().Object.toMutableMap().let { map ->
 							map[key] = map[key].Array.toMutableList().also { list ->

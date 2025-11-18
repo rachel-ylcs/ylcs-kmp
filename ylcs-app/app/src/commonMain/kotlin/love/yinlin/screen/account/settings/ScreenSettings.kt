@@ -61,7 +61,6 @@ import love.yinlin.screen.account.SubScreenMe
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
-import love.yinlin.extension.rawSource
 import love.yinlin.extension.read
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -86,7 +85,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserAvatar() {
         pickPicture(1f)?.let { path ->
-            ApiProfileUpdateAvatar.request(app.config.userToken, apiFile(path.rawSource)) {
+            ApiProfileUpdateAvatar.request(app.config.userToken, apiFile(path)) {
                 app.config.cacheUserAvatar = CacheState.UPDATE
             }.errorTip
         }
@@ -94,7 +93,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
 
     private suspend fun modifyUserWall() {
         pickPicture(1.77777f)?.let { path ->
-            ApiProfileUpdateWall.request(app.config.userToken, apiFile(path.rawSource)) {
+            ApiProfileUpdateWall.request(app.config.userToken, apiFile(path)) {
                 app.config.cacheUserWall = CacheState.UPDATE
             }.errorTip
         }

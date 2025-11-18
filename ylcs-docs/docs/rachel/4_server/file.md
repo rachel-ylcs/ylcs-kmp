@@ -25,7 +25,7 @@ ApiProfileUpdateAvatar.response { uid, avatar ->
 }
 ```
 
-我们可以看出，文件和数据类型具有相同的身份，与常规`HTTP`请求写起来并无二样。
+我们可以看出，文件和数据类型具有相同的地位，与常规`HTTP`请求写起来并无二样。
 
 我们可以直接从`lambda`的参数处获取`String`类型的`uid`，以及`APIFile`类型的`avatar`。
 
