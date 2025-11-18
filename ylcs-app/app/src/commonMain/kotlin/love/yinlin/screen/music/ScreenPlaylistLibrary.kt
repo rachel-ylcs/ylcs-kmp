@@ -278,7 +278,11 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
         }
     }
 
-    private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? = when (val result = ApiBackupDownloadPlaylist.request(app.config.userToken)) {
+    private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? = if (app.config.userToken.isEmpty()) {
+        slot.tip.warning("请先登录")
+        null
+    }
+    else when (val result = ApiBackupDownloadPlaylist.request(app.config.userToken)) {
         is Data.Success -> catchingNull { decodePlaylist(result.data.o1.to()) }.also {
             if (it == null) slot.tip.error("云端歌单存在异常")
         }
@@ -389,7 +393,8 @@ class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
                         text = "云备份",
                         icon = Icons.Outlined.CloudUpload,
                         onClick = {
-                            if (slot.confirm.openSuspend(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
+                            if (app.config.userToken.isEmpty()) slot.tip.warning("请先登录")
+                            else if (slot.confirm.openSuspend(content = "云备份会用本地歌单覆盖整个云端歌单且无法撤销!")) {
                                 ApiBackupUploadPlaylist.request(app.config.userToken, playlistLibrary.items.toJson().Object) {
                                     playlists = decodePlaylist(playlistLibrary.items)
                                     slot.tip.success("备份成功")
