@@ -11,18 +11,35 @@ import love.yinlin.extension.toJsonString
 import love.yinlin.platform.getJson
 import love.yinlin.platform.setJson
 import love.yinlin.Context
+import love.yinlin.StartupArg
 import love.yinlin.StartupArgs
 import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
+import love.yinlin.config.Patches
 import love.yinlin.extension.lazyName
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
+@StartupArg(index = 1, name = "version", type = Int::class)
+@StartupArg(index = 2, name = "patches", type = Patches::class)
 @Stable
 open class StartupConfig : SyncStartup() {
     lateinit var kv: StartupKV
+        private set
+    var version: Int = 0
+        private set
+    lateinit var patches: Patches
+        private set
 
     override fun init(context: Context, args: StartupArgs) {
         kv = args.fetch(0)
+        version = args[1]
+        patches = args[2]
+        for (patch in patches) {
+            val key = "#patch#${patch.name}"
+            if (!kv.get(key, false) && (patch.version == null || patch.version >= version) && patch.enabled) {
+                if (patch.attach()) kv.set(key, true)
+            }
+        }
     }
 
     inline fun <reified T : Enum<T>> enumState(

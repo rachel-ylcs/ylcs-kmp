@@ -12,6 +12,9 @@ import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
+import love.yinlin.config.Patch
+import love.yinlin.config.Patches
+import love.yinlin.config.patches
 import love.yinlin.data.NativeLibrary
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
@@ -46,6 +49,8 @@ import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.FontResource
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
+@StartupArg(index = 1, name = "version", type = Int::class)
+@StartupArg(index = 2, name = "patches", type = Patches::class)
 @Stable
 class StartupAppConfig : StartupConfig() {
     /* ------------------  系统  ------------------ */
@@ -147,6 +152,8 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 
     val config by service(
         StartupLazyFetcher { kv },
+        Local.info.version,
+        patches(),
         factory = ::StartupAppConfig,
     )
 
