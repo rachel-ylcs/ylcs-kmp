@@ -346,7 +346,7 @@ afterEvaluate {
     val assembleRelease = tasks.named("assembleRelease")
 
     val androidCopyAPK by tasks.registering {
-        val flavors = arrayOf("skikoNative" to "13", "skikoLib" to "10-12")
+        val flavors = arrayOf("skikoNative" to "Android13", "skikoLib" to "Android10-12")
 
         mustRunAfter(assembleRelease)
         doLast {
@@ -354,7 +354,7 @@ afterEvaluate {
                 copy {
                     from(C.root.app.androidOriginOutputDir.dir(flavor).dir("release").file("app-$flavor-release.apk"))
                     into(C.root.outputs)
-                    rename { _ -> "${C.app.name}-$type.apk" }
+                    rename { _ -> "[$type]${C.app.displayName}${C.app.versionName}.APK" }
                 }
             }
         }
