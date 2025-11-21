@@ -89,12 +89,15 @@ extern "C" {
 		}
 		jclass cls = env->GetObjectClass(title);
 		auto arr = env->NewObjectArray((jsize)numPaths, cls, nullptr);
+		env->DeleteLocalRef(cls);
 		if (numPaths > 0) {
 			for (nfdpathsetsize_t i = 0; i < numPaths && i < static_cast<nfdpathsetsize_t>(maxNum); i++) {
 				NFD::UniquePathSetPath path;
 				NFD::PathSet::GetPath(outPaths, i, path);
 				auto pathStr = std::string{ path.get() };
-				env->SetObjectArrayElement(arr, i, s2j(env, pathStr));
+				auto jPath = s2j(env, pathStr);
+				env->SetObjectArrayElement(arr, i, jPath);
+				env->DeleteLocalRef(jPath);
 			}
 		}
 		return arr;

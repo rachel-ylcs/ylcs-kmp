@@ -130,10 +130,7 @@ extern "C" {
 		{
 			std::string value;
 			bool hasValue = kv->getString(j2s(env, key), value);
-			if (hasValue)
-			{
-				return env->NewStringUTF(value.data());
-			}
+			if (hasValue) return s2j(env, value);
 		}
 		return def;
 	}
