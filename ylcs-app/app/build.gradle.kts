@@ -346,7 +346,7 @@ afterEvaluate {
     val assembleRelease = tasks.named("assembleRelease")
 
     val androidCopyAPK by tasks.registering {
-        val flavors = arrayOf("skikoNative" to "Android13", "skikoLib" to "Android10-12")
+        val flavors = arrayOf("skikoNative" to "Android13-16", "skikoLib" to "Android10-12")
 
         mustRunAfter(assembleRelease)
         doLast {
