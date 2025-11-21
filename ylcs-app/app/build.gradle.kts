@@ -410,25 +410,29 @@ afterEvaluate {
                 from(C.root.app.desktopOriginOutput)
                 into(C.root.outputs)
             }
-        }
-    }
-
-    val desktopCopyLibs by tasks.registering {
-        mustRunAfter(desktopCopyDir)
-        doLast {
             copy {
                 from(C.root.native.libs)
                 into(C.root.app.desktopLibOutput)
             }
-        }
-    }
-
-    val desktopCopyPackages by tasks.registering {
-        mustRunAfter(desktopCopyLibs)
-        doLast {
             copy {
                 from(C.root.config.currentPackages)
                 into(C.root.app.desktopPackagesOutput)
+            }
+            val platformName = when (C.platform) {
+                BuildPlatform.Windows -> "[Windows]"
+                BuildPlatform.Linux -> "[Linux]"
+                BuildPlatform.Mac -> "[MacOS]"
+            }
+            zip {
+                from(C.root.outputs.dir(C.app.name).dir("app"))
+                to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
+            }
+            zip {
+                from(C.root.outputs.dir(C.app.name))
+                to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
+            }
+            delete {
+                delete(C.root.outputs.dir(C.app.name))
             }
         }
     }
@@ -437,8 +441,6 @@ afterEvaluate {
     val desktopPublish by tasks.registering {
         dependsOn(createReleaseDistributable)
         dependsOn(desktopCopyDir)
-        dependsOn(desktopCopyLibs)
-        dependsOn(desktopCopyPackages)
     }
 
     val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")
