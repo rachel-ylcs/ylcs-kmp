@@ -55,7 +55,7 @@ internal class LineLyricsEngine : LyricsEngine {
     private fun AndroidContent(config: LyricsEngineConfig) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val start = remember(maxWidth, config) { maxWidth * config.android.left.coerceIn(0f, 1f) }
-            val end = remember(maxWidth, config) {maxWidth * (1 - config.android.right).coerceIn(0f, 1f)  }
+            val end = remember(maxWidth, config) { maxWidth * (1 - config.android.right).coerceIn(0f, 1f)  }
 
             Box(
                 modifier = Modifier.padding(
