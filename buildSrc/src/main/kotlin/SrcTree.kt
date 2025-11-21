@@ -46,7 +46,7 @@ class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs
     private val build = dir("build")
     val composeCompilerReport = build.dir("composeCompiler")
 
-    val androidOriginOutput = build.dir("outputs").dir("apk").dir("release").file("app-release.apk")
+    val androidOriginOutputDir = build.dir("outputs").dir("apk")
 
     val desktopWorkSpace = build.dir("desktopRun")
     val desktopOriginOutput = build.dir("compose").dir("binaries").dir("main-release").dir("app")

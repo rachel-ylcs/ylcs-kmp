@@ -215,6 +215,23 @@ android {
         }
     }
 
+    flavorDimensions("skiko")
+    productFlavors {
+        create("skikoNative").apply {
+            dimension = "skiko"
+        }
+        create("skikoLib").apply {
+            dimension = "skiko"
+            minSdk = 33
+        }
+    }
+
+    sourceSets {
+        getByName("skikoLib") {
+            jniLibs.srcDir("libs/skikoLib")
+        }
+    }
+
     val androidSigningConfig = try {
         val localProperties = Properties().also { p ->
             C.root.localProperties.asFile.inputStream().use { p.load(it) }
@@ -329,12 +346,16 @@ afterEvaluate {
     val assembleRelease = tasks.named("assembleRelease")
 
     val androidCopyAPK by tasks.registering {
+        val flavors = arrayOf("skikoNative" to "13", "skikoLib" to "10-12")
+
         mustRunAfter(assembleRelease)
         doLast {
-            copy {
-                from(C.root.app.androidOriginOutput)
-                into(C.root.outputs)
-                rename { _ -> C.android.outputName }
+            for ((flavor, type) in flavors) {
+                copy {
+                    from(C.root.app.androidOriginOutputDir.dir(flavor).dir("release").file("app-$flavor-release.apk"))
+                    into(C.root.outputs)
+                    rename { _ -> "${C.app.name}-$type.apk" }
+                }
             }
         }
     }

@@ -90,8 +90,7 @@ class Constants(project: Project) {
         minSdk = 29,
         compileSdk = 36,
         targetSdk = 36,
-        ndkAbi = arrayOf("arm64-v8a"),
-        outputName = "ylcs.apk"
+        ndkAbi = arrayOf("arm64-v8a")
     )
 
     // iOS 配置
@@ -191,8 +190,7 @@ class AndroidConfig(
     val minSdk: Int,
     val compileSdk: Int,
     val targetSdk: Int,
-    val ndkAbi: Array<String>,
-    val outputName: String
+    val ndkAbi: Array<String>
 )
 
 data class IosConfig(
