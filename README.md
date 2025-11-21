@@ -25,13 +25,15 @@
 
 # Rachel快速开发框架
 
-`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，
-支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端，
-由银临茶舍项目组完成开发。
+`Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，由银临茶舍项目组完成开发。
+
+涵盖跨平台入口、共享UI、依赖服务启动、客户端和服务端交互引擎、自由屏幕导航、平台原生组件、自定义主题、响应式布局、MDI配置一致性、分页加载、服务端路由等领域。
+
+支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端。
 
 ## 特性
 
-- **跨平台**：基于Kotlin Multiplatform / Compose Multiplatform，支持六个平台客户端与服务端，具有多端一致性。
+- **跨平台**：基于`KMP` / `CMP`，支持六个平台客户端与服务端，具有多端一致性。
 - **原生性能**：生成平台原生二进制文件，无桥接或附加库。
 - **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
 - **快速**：三分钟便能上手构建自己的跨平台应用程序。
@@ -39,34 +41,7 @@
 - **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
 - **高协作**：框架支持前后端协作开发，共享数据组织结构。
 
-## 环境
-
-- `Gradle 9.1.0`
-- `JDK 25`
-- `IntelliJ IDEA 2025.3`
-- `Xcode 16.3`
-- `MSVC v145` | `g++ 13`
-- `Windows 10 SDK` | `Windows 11 SDK`
-
-## 快速开始
-
-```kotlin
-class MyApplication : PlatformApplication<MyApplication>(mApp) {
-    @Composable
-    override fun Content() {
-        Text("hello world!")
-    }
-}
-
-private val mApp = LazyReference<MyApplication>()
-val app by mApp
-
-fun main() = MyApplicaiton().run()
-```
-
-## 文档
-
-### 见 [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+## 文档： [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
 
 # 案例：银临茶舍跨平台 App
 
@@ -100,7 +75,6 @@ fun main() = MyApplicaiton().run()
 | Library | alexzhirkevich  |              [qrose](https://github.com/alexzhirkevich/qrose)               |
 | Library | brettwooldridge |           [HikariCP](https://github.com/brettwooldridge/HikariCP)           |
 | Library |    Calvin-LL    |           [reorderable](https://github.com/Calvin-LL/Reorderable)           |
-| Library |     caprica     |                   [vlcj](https://github.com/caprica/vlcj)                   |
 | Library |   chrisbanes    |                 [haze](https://github.com/chrisbanes/haze)                  |
 | Library |    fleeksoft    |                 [ksoup](https://github.com/fleeksoft/ksoup)                 |
 | Library |     Google      |                 [media3](https://github.com/androidx/media)                 |

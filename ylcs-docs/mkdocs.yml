@@ -1,7 +1,7 @@
 nav:
     - 主页: index.md
     - 快速开始:
-        - 1. hello world: rachel/1_start/hello_world.md
+        - 1. hello world: rachel/1_start/entry.md
         - 2. 编译环境: rachel/1_start/environment.md
         - 3. 核心: rachel/1_start/core.md
     - 跨平台UI:
@@ -11,8 +11,10 @@ nav:
         - 4. 主题: rachel/2_ui/theme.md
         - 5. 导航: rachel/2_ui/navigation.md
         - 6. 服务: rachel/2_ui/service.md
-        - 7. 组件: rachel/2_ui/component.md
-        - 8. 网络: rachel/2_ui/network.md
+        - 7. 网络: rachel/2_ui/network.md
+        - 8. 组件: rachel/2_ui/component.md
+        - 9. 浮窗: rachel/2_ui/floating.md
+        - 10. 平台组件: rachel/2_ui/platform_component.md
     - 客户端引擎:
         - 1. 配置入口: rachel/3_client/entry.md
         - 2. HTTP请求: rachel/3_client/request.md
@@ -30,8 +32,9 @@ nav:
         - 8. 服务: rachel/4_server/service.md
         - 9. 插件: rachel/4_server/plugin.md
     - 模块:
-        - 1. 单实例: rachel/5_module/single_instance.md
-        - 2. 一键更新: rachel/5_module/auto_update.md
+        - 1. 模块库: rachel/5_module/entry.md
+        - 2. 单实例: rachel/5_module/single_instance.md
+        - 3. 一键更新: rachel/5_module/auto_update.md
 
 
 site_name: Rachel框架开发向导

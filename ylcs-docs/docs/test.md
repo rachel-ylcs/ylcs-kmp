@@ -1,20 +1,4 @@
-### First Rachel App
 
-```kotlin
-
-fun main() = MyApplicaiton().run()
-
-class MyApplication : PlatformApplication<MyApplication>(mApp) {
-    @Composable
-    override fun Content() {
-        Text("hello world!")
-    }
-}
-
-private val mApp = LazyReference<RachelApplication>()
-val app: RachelApplication by mApp
-
-```
 
 ### Screen Pages and Navigation
 

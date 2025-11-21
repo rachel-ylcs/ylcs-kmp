@@ -25,13 +25,15 @@
 
 # Rachel Rapid Development Framework
 
-`Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`.
+`Rachel` is cross-platform rapid development framework that integrates logic, services, and UI based on `Kotlin Multiplatform` and `Compose Multiplatform`, and was developed by the 银临茶舍 project team.
 
-It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other client and server platforms, and was developed by the 银临茶舍 project team.
+Covering cross-platform entry, shared UI, dependent service startup, client and server interaction engines, free screen navigation, platform native components, custom themes, responsive layout, MDI configuration consistency, page loading, server routing, and other fields.
+
+It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other client and server platforms.
 
 ## Feature
 
-- **Cross platform**: Based on Kotlin Multiplatform/Compose Multiplatform, it supports six platform clients and servers, with multi terminal consistency.
+- **Cross platform**: Based on `KMP` / `CMP`, it supports six platform clients and servers, with multi terminal consistency.
 - **Native performance**: Generate platform native binary files without bridging or additional libraries.
 - **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
 - **Quick**: You can start building your own cross platform application in just three minutes.
@@ -39,34 +41,7 @@ It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other
 - **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
 - **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
 
-## Environment
-
-- `Gradle 9.1.0`
-- `JDK 25`
-- `IntelliJ IDEA 2025.3`
-- `Xcode 16.3`
-- `MSVC v145` | `g++ 13`
-- `Windows 10 SDK` | `Windows 11 SDK`
-
-## Quick Start
-
-```kotlin
-class MyApplication : PlatformApplication<MyApplication>(mApp) {
-    @Composable
-    override fun Content() {
-        Text("hello world!")
-    }
-}
-
-private val mApp = LazyReference<MyApplication>()
-val app: MyApplication by mApp
-
-fun main() = MyApplicaiton().run()
-```
-
-## Document
-
-### See [Rachel Framework Development guidance](https://rachel-ylcs.github.io/ylcs-kmp)
+## Document： [Rachel Framework Development guidance](https://rachel-ylcs.github.io/ylcs-kmp)
 
 # Sample: 银临茶舍 Cross-Platform App
 
@@ -92,7 +67,7 @@ fun main() = MyApplicaiton().run()
 
 ## Credits
 
-Sort by author's first letter.
+Sort by first letter.
 
 |  Type   |     Author      |                                    Name                                     |
 |:-------:|:---------------:|:---------------------------------------------------------------------------:|
@@ -100,7 +75,6 @@ Sort by author's first letter.
 | Library | alexzhirkevich  |              [qrose](https://github.com/alexzhirkevich/qrose)               |
 | Library | brettwooldridge |           [HikariCP](https://github.com/brettwooldridge/HikariCP)           |
 | Library |    Calvin-LL    |           [reorderable](https://github.com/Calvin-LL/Reorderable)           |
-| Library |     caprica     |                   [vlcj](https://github.com/caprica/vlcj)                   |
 | Library |   chrisbanes    |                 [haze](https://github.com/chrisbanes/haze)                  |
 | Library |    fleeksoft    |                 [ksoup](https://github.com/fleeksoft/ksoup)                 |
 | Library |     Google      |                 [media3](https://github.com/androidx/media)                 |

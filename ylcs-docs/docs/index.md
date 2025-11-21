@@ -25,3 +25,6 @@
 `Rachel`是基于`Kotlin Multiplatform`与`Compose Multiplatform`集成逻辑、服务、UI的跨平台快速开发框架，
 支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端，
 由银临茶舍项目组完成开发。
+
+
+## 文档正在抓紧建设中...
