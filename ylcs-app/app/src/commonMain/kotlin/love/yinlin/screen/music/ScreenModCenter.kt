@@ -59,8 +59,8 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     private suspend fun requestNewData() {
         ApiSongGetSongs.request(pageSongs.default, pageSongs.pageNum) {
             pageSongs.newData(it)
-            gridState.scrollToItem(0)
         }.errorTip
+        gridState.scrollToItem(0)
     }
 
     private suspend fun requestMoreData() {
@@ -73,8 +73,8 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
         ApiSongSearchSongs.request(key) {
             pageSongs.newData(it)
             pageSongs.canLoading = false
-            gridState.scrollToItem(0)
         }.errorTip
+        gridState.scrollToItem(0)
     }
 
     override val title: String = "工坊"

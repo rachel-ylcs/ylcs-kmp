@@ -85,9 +85,9 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
                 DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.default1, page.default, page.pageNum)
                 else -> ApiTopicGetSectionTopics.requestNull(section, page.default, page.pageNum)
             }?.let {
-                gridState.scrollToItem(0)
                 if (page.newData(it.o1)) BoxState.CONTENT else BoxState.EMPTY
             } ?: BoxState.NETWORK_ERROR
+            gridState.scrollToItem(0)
         }
     }
 

@@ -51,8 +51,8 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
                         items += result
                         items.sortDescending()
                         if (state == BoxState.LOADING) state = BoxState.CONTENT
-                        gridState.scrollToItem(0)
                     }
+                    gridState.scrollToItem(0)
                 }
                 if (state == BoxState.LOADING) {
                     WeiboAPI.weiboCookie = null

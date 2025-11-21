@@ -271,7 +271,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
             // 回复主题
             val target = currentSendComment
             if (target == null) {
-                ApiTopicSendComment.request(app.config.userToken, topic.tid, topic.rawSection, content) { cid ->
+                val err = ApiTopicSendComment.request(app.config.userToken, topic.tid, topic.rawSection, content) { cid ->
                     subScreenDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
                         it.copy(commentNum = it.commentNum + 1)
                     }
@@ -286,8 +286,9 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                         label = user.label,
                         exp = user.exp
                     )
-                    listState.animateScrollToItem(pageComments.items.size - 1)
-                }.errorTip == null
+                }.errorTip
+                listState.animateScrollToItem(pageComments.items.size - 1)
+                err == null
             }
             else { // 回复评论
                 ApiTopicSendSubComment.request(app.config.userToken, topic.tid, target.cid, topic.rawSection, content) {
@@ -306,8 +307,8 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                 it.copy(isTop = isTop)
             }
             pageComments.items.sort()
-            listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
         }.errorTip
+        listState.scrollToItem(pageComments.items.indexOfFirst { it.cid == cid })
     }
 
     private suspend fun onDeleteComment(cid: Int) {

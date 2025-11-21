@@ -131,17 +131,15 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
         when (tab) {
             FollowTabItem.FOLLOWS -> ApiFollowsGetFollows.request(app.config.userToken, pageFollows.default, pageFollows.default1, pageFollows.pageNum) {
                 pageFollows.newData(it)
-                gridState.scrollToItem(0)
             }.errorTip
             FollowTabItem.FOLLOWERS -> ApiFollowsGetFollowers.request(app.config.userToken, pageFollowers.default, pageFollowers.default1, pageFollowers.pageNum) {
                 pageFollowers.newData(it)
-                gridState.scrollToItem(0)
             }.errorTip
             FollowTabItem.BLOCK_USERS -> ApiFollowsGetBlockedUsers.request(app.config.userToken, pageBlockUsers.default, pageBlockUsers.pageNum) {
                 pageBlockUsers.newData(it)
-                gridState.scrollToItem(0)
             }.errorTip
         }
+        gridState.scrollToItem(0)
     }
 
     private suspend fun requestMoreData() {

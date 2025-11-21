@@ -225,7 +225,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private suspend fun onSendComment(content: String): Boolean = app.config.userProfile?.let { user ->
-        ApiSongSendSongComment.request(app.config.userToken, sid, content) {
+        val err = ApiSongSendSongComment.request(app.config.userToken, sid, content) {
             pageComments.items += SongComment(
                 cid = it,
                 uid = user.uid,
@@ -235,8 +235,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                 label = user.label,
                 exp = user.exp
             )
-            listState.animateScrollToItem(pageComments.items.size - 1)
-        }.errorTip == null
+        }.errorTip
+        listState.animateScrollToItem(pageComments.items.size - 1)
+        err == null
     } ?: false
 
     private suspend fun onDeleteComment(cid: Long) {
