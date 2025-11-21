@@ -16,6 +16,7 @@ ktor = "3.3.2"
 sketch = "4.4.0-alpha01"
 mmkv = "2.2.4"
 lottie = "2.0.2"
+skiko = "0.9.36"
 
 # Android
 cmp-android = "1.9.5"
@@ -51,7 +52,7 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp-android" }
 
 # Common
-skiko = { module = "org.jetbrains.skiko:skiko", version = "0.9.35-glibc-compat" }
+skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -100,7 +101,7 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0" }
-skiko-android = { module = "org.jetbrains.skiko:skiko-android", version = "0.9.4.1" }
+skiko-android = { module = "org.jetbrains.skiko:skiko-android", version.ref = "skiko" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
