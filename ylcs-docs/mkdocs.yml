@@ -4,6 +4,8 @@ nav:
         - 1. hello world: rachel/1_start/entry.md
         - 2. 编译环境: rachel/1_start/environment.md
         - 3. 核心: rachel/1_start/core.md
+        - 4. Compose 核心: rachel/1_start/compose_core.md
+        - 5. C/S 核心: rachel/1_start/cs_core.md
     - 跨平台UI:
         - 1. 程序入口: rachel/2_ui/entry.md
         - 2. 上下文环境: rachel/2_ui/context.md
