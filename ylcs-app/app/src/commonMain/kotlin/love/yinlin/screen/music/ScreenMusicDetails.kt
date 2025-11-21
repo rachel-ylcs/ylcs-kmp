@@ -168,6 +168,10 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     private fun downloadMod() {
+        if (app.config.userProfile == null) {
+            slot.tip.warning("请先登录")
+            return
+        }
         launch {
             // 下载MOD
             val path = Coroutines.io {

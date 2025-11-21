@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.decodeToImageBitmap
 import androidx.compose.ui.graphics.drawscope.scale
@@ -424,7 +425,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private fun GameCanvas() {
         if (state is GameState.Playing) {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / 1920
+                val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / Size.Game.width
                 val fontFamilyResolver = LocalFontFamilyResolver.current
                 val font = mainFont()
                 val textManager = remember(font, fontFamilyResolver) { RhymeTextManager(font, fontFamilyResolver) }
@@ -503,9 +504,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         if (app.mp.isInit) {
             coroutineScope {
                 awaitAll(
-                    async {
-                        musicPlayer.init()
-                    },
+                    async { musicPlayer.init() },
                     async(ioContext) {
                         // 检查包含游戏配置文件的 MOD
                         library = app.mp.library.values.map { info ->

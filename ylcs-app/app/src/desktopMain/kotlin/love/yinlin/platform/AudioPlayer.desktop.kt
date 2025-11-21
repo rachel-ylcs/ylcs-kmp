@@ -34,7 +34,7 @@ actual class AudioPlayer actual constructor(context: Context) {
     }
 
     actual fun pause() {
-         nativeAudioPlayer.pause()
+        nativeAudioPlayer.pause()
     }
 
     actual fun stop() {

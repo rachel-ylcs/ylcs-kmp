@@ -56,11 +56,7 @@ internal class MissEnvironment : RhymeDynamic(), RhymeContainer.Rectangle {
     override fun DrawScope.onDraw(textManager: RhymeTextManager) {
         for (corner in corners) {
             corner.data.getOrNull(stateFrame)?.let { (radius, brush) ->
-                circle(
-                    brush = brush,
-                    position = corner.position,
-                    radius = radius
-                )
+                if (radius > 0) circle(brush = brush, position = corner.position, radius = radius)
             }
         }
     }
