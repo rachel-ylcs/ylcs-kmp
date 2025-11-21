@@ -451,6 +451,18 @@ afterEvaluate {
                 from(C.root.app.webOriginOutput)
                 into(C.root.app.webOutput)
             }
+            delete {
+                delete(*C.root.app.webOutput.asFile.listFiles {
+                    it.extension == "map" || it.extension == "txt"
+                }.map { C.root.app.webOutput.file(it.name) }.toTypedArray())
+            }
+            zip {
+                from(C.root.app.webOutput)
+                to(C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
+            }
+            delete {
+                delete(C.root.app.webOutput)
+            }
         }
     }
 
