@@ -56,6 +56,19 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
     private var updateProgressJob: Job? = null
     private val updateProgressJobLock = SynchronizedObject()
 
+    override suspend fun initController(context: Context) {
+        Coroutines.main {
+            androidContext = context.application
+            val mediaController = Coroutines.io {
+                val sessionToken = SessionToken(androidContext, ComponentName(androidContext, MusicService::class.java))
+                MediaController.Builder(androidContext, sessionToken).buildAsync().get()
+            }
+            mediaController.removeListener(listener)
+            mediaController.addListener(listener)
+            controller = mediaController
+        }
+    }
+
     private suspend inline fun withMainPlayer(crossinline block: (player: MediaController) -> Unit) {
         controller?.let {
             Coroutines.main { block(it) }
@@ -233,18 +246,5 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         val duration = player.duration
         currentPosition = if (position == C.TIME_UNSET) 0L else position
         currentDuration = if (duration == C.TIME_UNSET) 0L else duration
-    }
-
-    override suspend fun initController(context: Context) {
-        Coroutines.main {
-            androidContext = context.application
-            val mediaController = Coroutines.io {
-                val sessionToken = SessionToken(androidContext, ComponentName(androidContext, MusicService::class.java))
-                MediaController.Builder(androidContext, sessionToken).buildAsync().get()
-            }
-            mediaController.removeListener(listener)
-            mediaController.addListener(listener)
-            controller = mediaController
-        }
     }
 }

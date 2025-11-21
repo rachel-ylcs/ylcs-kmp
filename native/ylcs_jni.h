@@ -7,6 +7,38 @@
 #include <string_view>
 #include <stdexcept>
 
+namespace JVM {
+    inline JavaVM* vm = nullptr;
+
+    struct JniEnvGuard {
+        JNIEnv* env = nullptr;
+        JniEnvGuard() {
+            if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_EDETACHED) {
+                vm->AttachCurrentThread((void**)&env, nullptr);
+            }
+        }
+
+        ~JniEnvGuard() {
+            if (env) vm->DetachCurrentThread();
+        }
+
+        JNIEnv* operator -> () {
+            return env;
+        }
+
+        explicit operator bool() const {
+            return env != nullptr;
+        }
+
+        void checkException() const {
+            if (env && env->ExceptionCheck()) {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+        }
+    };
+}
+
 inline std::string j2s(JNIEnv* env, jstring str) {
     if (!str) return "";
     char const* p{ env->GetStringUTFChars(str, nullptr) };

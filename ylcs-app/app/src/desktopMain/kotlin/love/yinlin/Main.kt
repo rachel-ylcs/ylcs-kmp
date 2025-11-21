@@ -7,7 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.runBlocking
-import kotlinx.io.files.Path
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.MimeType
@@ -59,16 +58,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
         mp.floatingLyrics.let {
             if (it.isAttached) it.Content()
         }
-    }
-
-    private val setupVLC by sync(priority = StartupDelegate.HIGH3) {
-        val vlcPath = when (platform) {
-            Platform.Windows -> "vlc"
-            Platform.Linux -> "bin/vlc"
-            Platform.MacOS -> "MacOS/vlc"
-            else -> ""
-        }
-        System.setProperty("jna.library.path", Path(os.storage.appPath, vlcPath).toString())
     }
 
     @StartupNative

@@ -8,41 +8,40 @@ import love.yinlin.extension.NativeLib
 @Stable
 @NativeLib
 actual class AudioPlayer actual constructor(context: Context) {
-    private var handle: Long = 0L
+    private val nativeAudioPlayer = WindowsNativeAudioPlayer()
 
-    actual val isInit: Boolean get() = handle != 0L
+    actual val isInit: Boolean get() = nativeAudioPlayer.isInit
 
-    actual val isPlaying: Boolean get() = nativeIsPlaying(handle)
+    actual val isPlaying: Boolean get() = nativeAudioPlayer.playbackState == WindowsNativePlaybackState.Playing
 
-    actual val position: Long get() = nativeGetPosition(handle)
+    actual val position: Long get() = nativeAudioPlayer.position
 
-    actual val duration: Long get() = nativeGetDuration(handle)
+    actual val duration: Long get() = nativeAudioPlayer.duration
 
     actual suspend fun init() {
-        handle = nativeCreatePlayer()
+        nativeAudioPlayer.create()
     }
 
     actual suspend fun load(path: Path) {
         Coroutines.io {
-            nativeLoad(handle, path.toString())
-            nativePlay(handle)
+            nativeAudioPlayer.load(path.toString())
+            nativeAudioPlayer.play()
         }
     }
 
     actual fun play() {
-        nativePlay(handle)
+        nativeAudioPlayer.play()
     }
 
     actual fun pause() {
-        nativePause(handle)
+         nativeAudioPlayer.pause()
     }
 
     actual fun stop() {
-        nativeStop(handle)
+        nativeAudioPlayer.stop()
     }
 
     actual fun release() {
-        nativeReleasePlayer(handle)
-        handle = 0L
+        nativeAudioPlayer.release()
     }
 }

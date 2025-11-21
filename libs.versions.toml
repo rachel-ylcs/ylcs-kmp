@@ -118,10 +118,6 @@ ktor-apple = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 # Desktop
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version = "coroutines" }
 
-jna-core = { module = "net.java.dev.jna:jna", version = "5.18.1" }
-jna-platform = { module = "net.java.dev.jna:jna-platform", version = "5.18.1" }
-vlcj = { module = "uk.co.caprica:vlcj", version = "4.11.0" }
-
 # Web
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 

@@ -10,65 +10,75 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.*
-import love.yinlin.compose.ui.common.ComposeVideoSurface
 import love.yinlin.compose.ui.image.ClickIcon
-import uk.co.caprica.vlcj.factory.MediaPlayerFactory
-import uk.co.caprica.vlcj.media.Media
-import uk.co.caprica.vlcj.media.MediaEventAdapter
-import uk.co.caprica.vlcj.player.base.MediaPlayer
-import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
-import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
-import javax.swing.SwingUtilities
-
-internal val PLAYER_ARGS = arrayOf(
-    "--video-title=ylcs video output",
-    "--no-snapshot-preview",
-    "--quiet",
-    "--intf=dummy"
-)
+import love.yinlin.platform.WindowsNativePlaybackState
+import love.yinlin.platform.WindowsNativeVideoPlayer
 
 @Stable
 private class VideoPlayerState(val url: String) {
-    var playerFactory by mutableRefStateOf<MediaPlayerFactory?>(null)
-    var player by mutableRefStateOf<EmbeddedMediaPlayer?>(null)
-    var surface by mutableRefStateOf<ComposeVideoSurface?>(null)
+    private val controller = WindowsNativeVideoPlayer()
 
     var isPlaying by mutableStateOf(false)
+        private set
     var position by mutableLongStateOf(0L)
+        private set
     var duration by mutableLongStateOf(0L)
+        private set
+    var bitmap: ImageBitmap? by mutableRefStateOf(null)
+        private set
 
-    val eventListener = object : MediaEventAdapter() {
-        override fun mediaDurationChanged(media: Media?, newDuration: Long) {
-            duration = newDuration
-        }
-    }
-
-    val playerListener = object : MediaPlayerEventAdapter() {
-        override fun playing(mediaPlayer: MediaPlayer) { isPlaying = true }
-        override fun paused(mediaPlayer: MediaPlayer) { isPlaying = false }
-        override fun timeChanged(mediaPlayer: MediaPlayer, newTime: Long) { position = newTime }
-        override fun stopped(mediaPlayer: MediaPlayer) {
-            SwingUtilities.invokeLater {
-                mediaPlayer.media().play(url)
+    fun init() {
+        controller.create(object : WindowsNativeVideoPlayer.Listener() {
+            override fun onPositionChange(position: Long) {
+                this@VideoPlayerState.position = position
             }
+
+            override fun onDurationChange(duration: Long) {
+                this@VideoPlayerState.duration = duration
+            }
+
+            override fun onPlaybackStateChange(state: WindowsNativePlaybackState) {
+                when (state) {
+                    WindowsNativePlaybackState.Playing -> isPlaying = true
+                    WindowsNativePlaybackState.Paused, WindowsNativePlaybackState.None -> isPlaying = false
+                    WindowsNativePlaybackState.Opening -> controller.play()
+                    else -> {}
+                }
+            }
+
+            override fun onMediaEnded() {
+                controller.load(url)
+            }
+
+            override fun onFrame(bitmap: ImageBitmap) {
+                this@VideoPlayerState.bitmap = bitmap
+            }
+        })
+        controller.load(url)
+    }
+
+    fun release() {
+        controller.release()
+        bitmap = null
+    }
+
+    fun play() {
+        if (controller.isInit && controller.playbackState != WindowsNativePlaybackState.Playing) controller.play()
+    }
+
+    fun pause() {
+        if (controller.isInit && controller.playbackState == WindowsNativePlaybackState.Playing) controller.pause()
+    }
+
+    fun seekTo(value: Long) {
+        if (controller.isInit) {
+            controller.seek(value)
+            controller.play()
         }
-        override fun error(mediaPlayer: MediaPlayer) { mediaPlayer.controls().stop() }
-    }
-
-    fun play() = player?.let { player ->
-        if (!player.status().isPlaying) player.controls().play()
-    }
-
-    fun pause() = player?.let { player ->
-        if (player.status().isPlaying) player.controls().pause()
-    }
-
-    fun seekTo(value: Long) = player?.let { player ->
-        player.controls().setTime(value)
-        play()
     }
 }
 
@@ -81,29 +91,8 @@ actual fun VideoPlayer(
     val state by rememberRefState { VideoPlayerState(url) }
 
     DisposableEffect(Unit) {
-        state.playerFactory = MediaPlayerFactory(*PLAYER_ARGS)
-        state.player = state.playerFactory
-                            ?.mediaPlayers()
-                            ?.newEmbeddedMediaPlayer()
-        state.surface = ComposeVideoSurface()
-        state.player?.apply {
-            videoSurface().set(state.surface)
-            SwingUtilities.invokeLater {
-                events().apply {
-                    addMediaEventListener(state.eventListener)
-                    addMediaPlayerEventListener(state.playerListener)
-                }
-                media().play(url)
-            }
-        }
-        onDispose {
-            state.player?.events()?.apply {
-                removeMediaEventListener(state.eventListener)
-                removeMediaPlayerEventListener(state.playerListener)
-            }
-            state.player?.release()
-            state.playerFactory?.release()
-        }
+        state.init()
+        onDispose { state.release() }
     }
 
     OffScreenEffect { isForeground ->
@@ -112,7 +101,7 @@ actual fun VideoPlayer(
     }
 
     Box(modifier = modifier) {
-        state.surface?.bitmap?.value?.let { bitmap ->
+        state.bitmap?.let { bitmap ->
             Image(
                 bitmap,
                 modifier = Modifier.fillMaxSize().background(Color.Black).zIndex(1f),

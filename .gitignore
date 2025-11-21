@@ -25,7 +25,7 @@ iosApp/Configuration/Version.xcconfig
 **/ylcs-app.podspec
 
 # native
-native/**/.vs/
+native/**/vs/
 native/**/build/
 native/**/cmake-build-debug/
 native/**/cmake-build-release/
