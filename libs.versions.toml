@@ -16,7 +16,7 @@ ktor = "3.3.2"
 sketch = "4.4.0-alpha01"
 mmkv = "2.2.4"
 lottie = "2.0.2"
-skiko = "0.9.36"
+skiko = "0.9.37"
 
 # Android
 cmp-android = "1.9.5"
@@ -70,7 +70,7 @@ compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
-kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.0" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.1" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.30.0-beta" }
