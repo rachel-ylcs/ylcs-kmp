@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -214,26 +213,6 @@ android {
         }
     }
 
-    configurations.all {
-        exclude(group = "org.jetbrains.skiko", module = "skiko-awt")
-    }
-
-    flavorDimensions += C.android.flavors.dimension
-    productFlavors {
-        for (flavor in C.android.flavors.items) {
-            register(flavor.name) {
-                dimension = C.android.flavors.dimension
-                minSdk = flavor.minSdk
-            }
-        }
-    }
-
-    sourceSets {
-        getByName("skiaLib") {
-            jniLibs.srcDir("libs/skiaLib")
-        }
-    }
-
     val androidSigningConfig = try {
         val localProperties = Properties().also { p ->
             C.root.localProperties.asFile.inputStream().use { p.load(it) }
@@ -350,12 +329,10 @@ afterEvaluate {
     val androidCopyAPK by tasks.registering {
         mustRunAfter(assembleRelease)
         doLast {
-            for ((name, filename, _) in C.android.flavors.items) {
-                copy {
-                    from(C.root.app.androidOriginOutputDir.dir(name).dir("release").file("app-$name-release.apk"))
-                    into(C.root.outputs)
-                    rename { _ -> "[$filename]${C.app.displayName}${C.app.versionName}.APK" }
-                }
+            copy {
+                from(C.root.app.androidOriginOutputDir.dir("release").file("app-release.apk"))
+                into(C.root.outputs)
+                rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
             }
         }
     }

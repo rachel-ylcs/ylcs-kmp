@@ -90,14 +90,7 @@ class Constants(project: Project) {
         minSdk = 29,
         compileSdk = 36,
         targetSdk = 36,
-        ndkAbi = arrayOf("arm64-v8a"),
-        flavors = AndroidFlavors(
-            dimension = "skia",
-            items = listOf(
-                AndroidFlavor("skiaNative", "Android13-16", 33),
-                AndroidFlavor("skiaLib", "Android10-12", 29),
-            )
-        )
+        ndkAbi = arrayOf("arm64-v8a")
     )
 
     // iOS 配置
@@ -193,23 +186,11 @@ data class JvmConfig(
     val compatibility: JavaVersion
 )
 
-data class AndroidFlavor(
-    val name: String,
-    val filename: String,
-    val minSdk: Int
-)
-
-data class AndroidFlavors(
-    val dimension: String,
-    val items: List<AndroidFlavor>
-)
-
 class AndroidConfig(
     val minSdk: Int,
     val compileSdk: Int,
     val targetSdk: Int,
     val ndkAbi: Array<String>,
-    val flavors: AndroidFlavors,
 )
 
 data class IosConfig(

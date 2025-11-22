@@ -57,7 +57,6 @@ kotlin {
 
         androidMain.configure {
             useSourceSet(commonMain)
-            useLib(libs.skiko.android)
         }
 
         val skikoMain by creating {
