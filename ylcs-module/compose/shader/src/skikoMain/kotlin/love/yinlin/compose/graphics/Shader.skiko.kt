@@ -1,5 +1,6 @@
 package love.yinlin.compose.graphics
 
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ShaderBrush
 import org.jetbrains.skia.RuntimeEffect
@@ -15,5 +16,7 @@ actual fun makeShaderEffect(shader: Shader): ShaderEffect? = object : ShaderEffe
         setFloatUniform("uResolution", width, height, width / height)
         setFloatUniform("uTime", time)
     }
-    override fun build(): Brush = ShaderBrush(mShader.makeShader())
+    override fun build(): Brush = object : ShaderBrush() {
+        override fun createShader(size: Size): androidx.compose.ui.graphics.Shader = mShader.makeShader()
+    }
 }

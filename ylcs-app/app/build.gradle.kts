@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -112,6 +113,7 @@ kotlin {
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.compose.service.all,
+                projects.ylcsModule.compose.shader,
                 projects.ylcsModule.clientEngine,
                 libs.compose.components.resources,
                 // lottie
@@ -129,24 +131,21 @@ kotlin {
             useSourceSet(commonMain)
             useLib(
                 // local
-                fileTree(mapOf("dir" to "libs/jar/jvm", "include" to listOf("*.jar")))
+                fileTree(mapOf("dir" to "libs/jvm", "include" to listOf("*.jar")))
             )
         }
 
         androidMain.configure {
             useSourceSet(jvmMain)
             useLib(
-                // media3
                 libs.media3.ui,
                 libs.media3.session,
                 libs.media3.player,
-                // mmkv
                 libs.mmkv.android,
-                // scan
                 libs.scan.android,
                 libs.scan.camera.android,
-                // local
-                fileTree(mapOf("dir" to "libs/jar/android", "include" to listOf("*.aar", "*.jar")))
+
+                fileTree(mapOf("dir" to "libs/android", "include" to listOf("*.aar", "*.jar")))
             )
         }
 
@@ -174,7 +173,7 @@ kotlin {
             useLib(
                 projects.ylcsModule.autoUpdate,
                 projects.ylcsModule.singleInstance,
-                fileTree(mapOf("dir" to "libs/jar/desktop", "include" to listOf("*.jar")))
+                fileTree(mapOf("dir" to "libs/desktop", "include" to listOf("*.jar")))
             )
         }
 
@@ -215,20 +214,23 @@ android {
         }
     }
 
-    flavorDimensions("skiko")
+    configurations.all {
+        exclude(group = "org.jetbrains.skiko", module = "skiko-awt")
+    }
+
+    flavorDimensions += C.android.flavors.dimension
     productFlavors {
-        create("skikoNative").apply {
-            dimension = "skiko"
-        }
-        create("skikoLib").apply {
-            dimension = "skiko"
-            minSdk = 33
+        for (flavor in C.android.flavors.items) {
+            register(flavor.name) {
+                dimension = C.android.flavors.dimension
+                minSdk = flavor.minSdk
+            }
         }
     }
 
     sourceSets {
-        getByName("skikoLib") {
-            jniLibs.srcDir("libs/skikoLib")
+        getByName("skiaLib") {
+            jniLibs.srcDir("libs/skiaLib")
         }
     }
 
@@ -346,15 +348,13 @@ afterEvaluate {
     val assembleRelease = tasks.named("assembleRelease")
 
     val androidCopyAPK by tasks.registering {
-        val flavors = arrayOf("skikoNative" to "Android13-16", "skikoLib" to "Android10-12")
-
         mustRunAfter(assembleRelease)
         doLast {
-            for ((flavor, type) in flavors) {
+            for ((name, filename, _) in C.android.flavors.items) {
                 copy {
-                    from(C.root.app.androidOriginOutputDir.dir(flavor).dir("release").file("app-$flavor-release.apk"))
+                    from(C.root.app.androidOriginOutputDir.dir(name).dir("release").file("app-$name-release.apk"))
                     into(C.root.outputs)
-                    rename { _ -> "[$type]${C.app.displayName}${C.app.versionName}.APK" }
+                    rename { _ -> "[$filename]${C.app.displayName}${C.app.versionName}.APK" }
                 }
             }
         }
