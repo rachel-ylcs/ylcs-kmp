@@ -7,6 +7,6 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.ui.platform.UnsupportedPlatformComponent
 
 @Composable
-actual fun ScreenFloatingLyrics.platformContent(device: Device) {
+actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
     UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
 }

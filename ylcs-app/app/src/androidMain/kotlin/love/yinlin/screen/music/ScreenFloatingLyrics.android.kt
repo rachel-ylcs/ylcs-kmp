@@ -7,12 +7,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.input.ProgressSlider
@@ -21,9 +25,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
 
 @Composable
-actual fun ScreenFloatingLyrics.platformContent(device: Device) {
-    var config by rememberRefState { app.config.lyricsEngineConfig }
-
+actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -50,17 +52,19 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
                 ).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "这是一条测试歌词~",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
-                    ),
-                    color = Colors(config.textColor),
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
-                )
+                CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
+                    Text(
+                        text = "这是一条测试歌词~",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontSize = MaterialTheme.typography.labelLarge.fontSize * config.textSize
+                        ),
+                        color = Colors(config.textColor),
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(CustomTheme.padding.value)
+                    )
+                }
             }
         }
 
@@ -106,7 +110,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(config.textColor),
+                        initialColor = remember { Colors(config.textColor) },
                         onColorChanged = { config = config.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
@@ -116,7 +120,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(config.backgroundColor),
+                        initialColor = remember { Colors(config.backgroundColor) },
                         onColorChanged = { config = config.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()

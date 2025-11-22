@@ -19,7 +19,7 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 @Composable
-expect fun ScreenFloatingLyrics.platformContent(device: Device)
+expect fun ScreenFloatingLyrics.PlatformContent(device: Device)
 
 @Stable
 class ScreenFloatingLyrics(manager: ScreenManager) : Screen(manager) {
@@ -39,7 +39,7 @@ class ScreenFloatingLyrics(manager: ScreenManager) : Screen(manager) {
     }
 
     @Composable
-    override fun Content(device: Device) = platformContent(device)
+    override fun Content(device: Device) = PlatformContent(device)
 
     @Composable
     internal fun RowLayout(

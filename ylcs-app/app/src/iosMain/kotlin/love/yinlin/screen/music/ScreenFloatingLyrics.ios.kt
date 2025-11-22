@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +22,8 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
 
 @Composable
-actual fun ScreenFloatingLyrics.platformContent(device: Device) {
+actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
     // TODO: 需要参照其他平台 review
-    var config by rememberRefState { app.config.lyricsEngineConfig }
-
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -86,7 +85,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(config.textColor),
+                        initialColor = remember { Colors(config.textColor) },
                         onColorChanged = { config = config.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
@@ -96,7 +95,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(config.backgroundColor),
+                        initialColor = remember { Colors(config.backgroundColor) },
                         onColorChanged = { config = config.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()

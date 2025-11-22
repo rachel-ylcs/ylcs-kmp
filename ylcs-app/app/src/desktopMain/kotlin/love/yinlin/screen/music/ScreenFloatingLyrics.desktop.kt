@@ -20,7 +20,7 @@ private fun FloatingLyrics.toggle() {
 }
 
 @Composable
-actual fun ScreenFloatingLyrics.platformContent(device: Device) {
+actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -65,7 +65,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             left = {
                 ColumnLayout("字体颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.lyricsEngineConfig.textColor),
+                        initialColor = remember { Colors(app.config.lyricsEngineConfig.textColor) },
                         onColorChanged = { config = config.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
@@ -75,7 +75,7 @@ actual fun ScreenFloatingLyrics.platformContent(device: Device) {
             right = {
                 ColumnLayout("背景颜色") {
                     DockedColorPicker(
-                        initialColor = Colors(app.config.lyricsEngineConfig.backgroundColor),
+                        initialColor = remember { Colors(app.config.lyricsEngineConfig.backgroundColor) },
                         onColorChanged = { config = config.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.widthIn(max = CustomTheme.size.cellWidth).fillMaxWidth()
