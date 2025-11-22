@@ -1,7 +1,14 @@
 package love.yinlin.platform.lyrics
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.Modifier
 import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -88,10 +95,13 @@ actual class FloatingLyrics {
 
     @Composable
     actual fun Content() {
-        app.Layout {
-            if (app.mp.isReady) {
-                with(app.mp.engine) {
-                    Content(config = app.config.lyricsEngineConfig)
+        if (app.mp.isPlaying) {
+            app.Layout {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    app.mp.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.labelLarge)
                 }
             }
         }

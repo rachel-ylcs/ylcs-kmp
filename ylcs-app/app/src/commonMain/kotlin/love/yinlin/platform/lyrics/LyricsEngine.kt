@@ -2,6 +2,8 @@ package love.yinlin.platform.lyrics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import kotlinx.io.files.Path
 
 @Stable
@@ -13,7 +15,7 @@ interface LyricsEngine {
     fun update(position: Long)
 
     @Composable
-    fun Content(config: LyricsEngineConfig)
+    fun LyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle)
 
     companion object {
         private val Line = LineLyricsEngine()

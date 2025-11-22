@@ -1,9 +1,12 @@
 package love.yinlin.platform.lyrics
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -86,11 +89,14 @@ actual class FloatingLyrics {
                 }.launchIn(this)
             }
 
-            DragArea(enabled = canMove) {
-                app.Layout(modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.3f)) }) {
-                    if (app.mp.isReady) {
-                        with(app.mp.engine) {
-                            Content(config = config)
+            if (app.mp.isPlaying) {
+                DragArea(enabled = canMove) {
+                    app.Layout(modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.3f)) }) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            app.mp.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.displayLarge)
                         }
                     }
                 }

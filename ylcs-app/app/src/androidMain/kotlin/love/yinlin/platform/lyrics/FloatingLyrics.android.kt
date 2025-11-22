@@ -8,12 +8,18 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -22,6 +28,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.AndroidContext
 import love.yinlin.Context
 import love.yinlin.app
+import love.yinlin.compose.CustomTheme
 import love.yinlin.extension.catching
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
@@ -103,10 +110,18 @@ actual class FloatingLyrics {
 
     @Composable
     actual fun Content() {
-        app.Layout(modifier = Modifier.fillMaxWidth()) {
-            if (app.mp.isReady) {
-                with(app.mp.engine) {
-                    Content(config = app.config.lyricsEngineConfig)
+        if (app.mp.isPlaying) {
+            app.Layout(modifier = Modifier.fillMaxWidth()) {
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val config = app.config.lyricsEngineConfig
+                    val start = remember(maxWidth, config) { maxWidth * config.android.left.coerceIn(0f, 1f) }
+                    val end = remember(maxWidth, config) { maxWidth * (1 - config.android.right).coerceIn(0f, 1f) }
+                    Box(
+                        modifier = Modifier.padding(start = start, end = end, top = CustomTheme.padding.verticalExtraSpace * 4f * config.android.top).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        app.mp.engine.LyricsCanvas(config = config, textStyle = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

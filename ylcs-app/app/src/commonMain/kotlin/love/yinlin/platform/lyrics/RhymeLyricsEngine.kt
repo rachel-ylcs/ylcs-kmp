@@ -2,6 +2,8 @@ package love.yinlin.platform.lyrics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import kotlinx.io.files.Path
 
 @Stable
@@ -21,7 +23,7 @@ internal class RhymeLyricsEngine : LyricsEngine {
     }
 
     @Composable
-    override fun Content(config: LyricsEngineConfig) {
+    override fun LyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle) {
 
     }
 }
