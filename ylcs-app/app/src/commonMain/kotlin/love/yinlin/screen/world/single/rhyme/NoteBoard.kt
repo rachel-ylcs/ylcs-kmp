@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastForEach
+import love.yinlin.compose.Colors
+import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
 import love.yinlin.compose.roundToIntOffset
 import love.yinlin.compose.translate
@@ -228,7 +230,16 @@ private class NoteQueue(
             }
 
             override fun DrawScope.draw(imageSet: ImageSet, position: Long) {
-
+                val progress = ((position - appearance) / duration.toFloat()).coerceIn(0f, 1f)
+                val bottomStart = Track.Tracks[trackIndex].end
+                val bottomEnd = Track.Tracks[trackIndex + 1].end
+                val p0 = bottomStart.onCenter(bottomEnd)
+                val p1 = bottomStart.onCenter(p0)
+                val p2 = bottomStart.onCenter(p1)
+                val p3 = bottomEnd.onCenter(p0)
+                val p4 = bottomEnd.onCenter(p3)
+                val bar = arrayOf(Track.Start, Track.Start.onLine(p1, progress), Track.Start.onLine(p3, progress))
+                quadrilateral(Colors.Red4, bar)
             }
 
             override fun checkTrackIndex(index: Int): Boolean = index == trackIndex

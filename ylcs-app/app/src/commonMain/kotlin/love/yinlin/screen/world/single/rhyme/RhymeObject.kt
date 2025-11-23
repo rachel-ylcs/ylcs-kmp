@@ -197,12 +197,6 @@ internal sealed class RhymeObject : RhymeContainer {
         }
     }
 
-    fun DrawScope.line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
-
-    fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
-
     fun DrawScope.circle(color: Color, position: Offset = center, radius: Float = max(size.width, size.height) / 2, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
         this.drawCircle(color = color, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
 
@@ -214,18 +208,6 @@ internal sealed class RhymeObject : RhymeContainer {
 
     fun DrawScope.rect(brush: Brush, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
         this.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
-
-    fun DrawScope.path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawPath(path = path, color = color, alpha = alpha, style = style, blendMode = blendMode)
-
-    fun DrawScope.path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
-
-    fun DrawScope.quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawPath(path = Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
-
-    fun DrawScope.quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
-        this.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
 
     fun DrawScope.roundRect(color: Color, radius: Float, position: Offset = Offset.Zero, size: Size = this@RhymeObject.size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
         this.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, blendMode = blendMode)
@@ -266,6 +248,24 @@ internal sealed class RhymeObject : RhymeContainer {
     inline fun DrawScope.clip(path: Path, block: DrawScope.() -> Unit) =
         this.clipPath(path, block = block)
 }
+
+fun DrawScope.line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
+
+fun DrawScope.line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
+
+fun DrawScope.path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawPath(path = path, color = color, alpha = alpha, style = style, blendMode = blendMode)
+
+fun DrawScope.path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
+
+fun DrawScope.quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawPath(path = Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
+
+fun DrawScope.quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) =
+    this.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
 
 // 动态实体
 @Stable

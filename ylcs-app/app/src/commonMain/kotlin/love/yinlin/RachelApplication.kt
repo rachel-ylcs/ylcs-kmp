@@ -12,7 +12,6 @@ import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.config.Patch
 import love.yinlin.config.Patches
 import love.yinlin.config.patches
 import love.yinlin.data.NativeLibrary

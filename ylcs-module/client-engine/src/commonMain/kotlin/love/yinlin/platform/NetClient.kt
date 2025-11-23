@@ -47,6 +47,36 @@ expect val internalCommon: HttpClient
 expect val internalFile: HttpClient
 expect val internalSockets: HttpClient
 
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useJson() {
+    defaultRequest {
+        contentType(ContentType.Application.Json)
+    }
+
+    install(ContentNegotiation) {
+        json(Json)
+    }
+}
+
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useWebSockets() {
+    install(WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+    }
+}
+
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useCommonTimeout() {
+    install(HttpTimeout) {
+        connectTimeoutMillis = 5000L
+        requestTimeoutMillis = 10000L
+    }
+}
+
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
+    install(HttpTimeout) {
+        connectTimeoutMillis = 5000L
+        requestTimeoutMillis = 180000L
+    }
+}
+
 object NetClient {
     suspend inline fun <reified Body : Any, reified Output : Any> request(
         crossinline onRequest: RequestScope.() -> Unit,
@@ -185,34 +215,14 @@ object NetClient {
             }
         }
     }
-}
 
-internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useJson() {
-    defaultRequest {
-        contentType(ContentType.Application.Json)
-    }
-
-    install(ContentNegotiation) {
-        json(Json)
-    }
-}
-
-internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useWebSockets() {
-    install(WebSockets) {
-        contentConverter = KotlinxWebsocketSerializationConverter(Json)
-    }
-}
-
-internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useCommonTimeout() {
-    install(HttpTimeout) {
-        connectTimeoutMillis = 5000L
-        requestTimeoutMillis = 10000L
-    }
-}
-
-internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
-    install(HttpTimeout) {
-        connectTimeoutMillis = 5000L
-        requestTimeoutMillis = 180000L
+    suspend inline fun simpleDownload(url: String, sink: Sink): Boolean = catchingDefault(false) {
+        Coroutines.io {
+            internalPrepareStatement(HttpMethod.Get, true, url) {
+                this.headers { accept(ContentType.Any) }
+            }.execute { response ->
+                response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+            }
+        }
     }
 }

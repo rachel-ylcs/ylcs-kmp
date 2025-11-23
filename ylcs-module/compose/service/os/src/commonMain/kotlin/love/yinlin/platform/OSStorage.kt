@@ -17,19 +17,19 @@ abstract class OSStorage {
     abstract suspend fun calcCacheSize(): Long
     abstract suspend fun clearCache()
 
-    suspend inline fun createTempFile(crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
-        Path(cachePath, DateEx.CurrentLong.toString()).apply {
+    suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
+        val name = filename ?: DateEx.CurrentLong.toString()
+        Path(cachePath, name).apply {
             Coroutines.io {
                 write { require(block(it)) }
             }
         }
     }
 
-    suspend fun createTempFolder(): Path? = catchingNull {
-        Path(cachePath, DateEx.CurrentLong.toString()).apply {
-            Coroutines.io {
-                mkdir()
-            }
+    suspend fun createTempFolder(filename: String? = null): Path? = catchingNull {
+        val name = filename ?: DateEx.CurrentLong.toString()
+        Path(cachePath, name).apply {
+            Coroutines.io { mkdir() }
         }
     }
 }
