@@ -5,8 +5,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.fastForEach
 import love.yinlin.compose.Colors
@@ -24,7 +22,6 @@ private class NoteQueue(
     lyrics: List<RhymeLine>,
     private val imageSet: ImageSet,
     private val trackMap: TrackMap,
-    private val animations: Animations,
     private val missEnvironment: MissEnvironment,
     private val scoreBoard: ScoreBoard,
     private val comboBoard: ComboBoard
@@ -47,7 +44,6 @@ private class NoteQueue(
         open fun onPointerUp(queue: NoteQueue, currentTrackIndex: Int, isClick: Boolean, startTime: Long, endTime: Long) { }
         open fun onDismiss(queue: NoteQueue) { }
         open fun isFiniteAnimation(): Boolean = false
-        abstract fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int)
 
         var state: State by mutableStateOf(State.Normal)
         var stateFrame: Int by mutableIntStateOf(0)
@@ -186,7 +182,6 @@ private class NoteQueue(
                 if (result != null) {
                     state = if (result == ComboBoard.ActionResult.MISS) State.Miss else State.Completed
                     stateFrame = 0
-                    queue.animations.updateAnimation(trackIndex, this)
                     queue.updateResult(result)
                 }
             }
@@ -194,16 +189,6 @@ private class NoteQueue(
             override fun onDismiss(queue: NoteQueue) {
                 // 超出屏幕的音符将自动触发 MISS
                 if (state == State.Normal) queue.updateResult(ComboBoard.ActionResult.MISS)
-            }
-
-            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
-                drawImage(
-                    image = imageSet.clickAnimationNote,
-                    srcOffset = IntOffset(frame * 256, 0),
-                    srcSize = IntSize(256, 256),
-                    dstOffset = info.center.translate(x = -275f, y = -275f).roundToIntOffset(),
-                    dstSize = IntSize(550, 550)
-                )
             }
         }
 
@@ -245,10 +230,6 @@ private class NoteQueue(
             override fun checkTrackIndex(index: Int): Boolean = index == trackIndex
 
             override fun isFiniteAnimation(): Boolean = true
-
-            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
-
-            }
         }
 
         @Stable
@@ -269,10 +250,6 @@ private class NoteQueue(
             override fun checkTrackIndex(index: Int): Boolean = index in trackIndex
 
             override fun isFiniteAnimation(): Boolean = true
-
-            override fun DrawScope.drawAnimation(imageSet: ImageSet, info: TrackAnimationInfo, frame: Int) {
-
-            }
         }
     }
 
@@ -391,60 +368,6 @@ private class NoteQueue(
     }
 }
 
-@Stable
-private data class TrackAnimationInfo(
-    val trackIndex: Int,
-    val center: Offset
-)
-
-// 交互特效
-@Stable
-private class Animations(
-    private val imageSet: ImageSet
-) : RhymeDynamic(), RhymeContainer.Rectangle {
-    @Stable
-    private class TrackAnimation(val info: TrackAnimationInfo) {
-        var action by mutableStateOf<NoteQueue.DynamicAction?>(null)
-        var frame by mutableIntStateOf(0)
-    }
-
-    override val position: Offset = Offset.Zero
-    override val size: Size = Size.Game
-
-    private val animations = TrackArea.Areas.mapIndexed { index, area ->
-        TrackAnimation(TrackAnimationInfo(
-            trackIndex = index,
-            center = area.tipCenter
-        ))
-    }
-
-    fun updateAnimation(trackIndex: Int, action: NoteQueue.DynamicAction?) {
-        animations.getOrNull(trackIndex)?.let { animation ->
-            animation.action = action
-            animation.frame = 0
-        }
-    }
-
-    override fun onUpdate(position: Long) {
-        for (animation in animations) {
-            animation.action?.let { action ->
-                val frame = animation.frame
-                animation.frame = if (frame < 16) frame + 1 else {
-                    // 非持续性动画播放完毕后将重置动画帧
-                    if (!action.isFiniteAnimation()) animation.action = null
-                    0
-                }
-            }
-        }
-    }
-
-    override fun DrawScope.onDraw(textManager: RhymeTextManager) {
-        for (animation in animations) {
-            animation.action?.run { drawAnimation(imageSet, animation.info, animation.frame) }
-        }
-    }
-}
-
 // 音符板
 @Stable
 internal class NoteBoard(
@@ -459,13 +382,11 @@ internal class NoteBoard(
 
     private val tipAreaMap = TipAreaMap()
     private val trackMap = TrackMap(lyrics.chorus)
-    private val animations = Animations(imageSet)
-    private val noteQueue = NoteQueue(lyrics.lyrics, imageSet, trackMap, animations, missEnvironment, scoreBoard, comboBoard)
+    private val noteQueue = NoteQueue(lyrics.lyrics, imageSet, trackMap, missEnvironment, scoreBoard, comboBoard)
 
     override fun onUpdate(position: Long) {
         trackMap.onUpdate(position)
         noteQueue.onUpdate(position)
-        animations.onUpdate(position)
     }
 
     override fun onEvent(pointer: Pointer): Boolean = noteQueue.onEvent(pointer)
@@ -474,6 +395,5 @@ internal class NoteBoard(
         tipAreaMap.run { draw(textManager) }
         noteQueue.run { draw(textManager) }
         trackMap.run { draw(textManager) }
-        animations.run { draw(textManager) }
     }
 }

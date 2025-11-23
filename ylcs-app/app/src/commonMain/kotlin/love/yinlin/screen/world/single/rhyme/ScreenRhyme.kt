@@ -127,7 +127,6 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     ImageSet(
                         record = info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap(),
                         noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap(),
-                        clickAnimationNote = getDrawableResourceBytes(environment, Res.drawable.click_animation_note).decodeToImageBitmap(),
                     )
                 }
             }

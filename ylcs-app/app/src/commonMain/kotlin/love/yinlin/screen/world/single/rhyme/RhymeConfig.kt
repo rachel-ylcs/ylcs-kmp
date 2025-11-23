@@ -19,5 +19,4 @@ internal val Size.Companion.Game get() = Size(1920f, 1080f)
 internal data class ImageSet(
     val record: ImageBitmap,
     val noteLayoutMap: ImageBitmap,
-    val clickAnimationNote: ImageBitmap,
 )
