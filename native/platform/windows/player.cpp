@@ -51,7 +51,9 @@ extern "C" {
 				}
 				else player.Source(nullptr);
 			}
-			catch (...) {}
+			catch (...) {
+				player.Source(nullptr);
+			}
 		}
 
 		void play() { player.Play(); }
@@ -59,21 +61,21 @@ extern "C" {
 		void seek(jlong position) { player.PlaybackSession().Position(ms_cast(position)); }
 	};
 
-	static jmethodID g_method_nativeAudioPositionChange = nullptr;
 	static jmethodID g_method_nativeAudioDurationChange = nullptr;
 	static jmethodID g_method_nativeAudioPlaybackStateChange = nullptr;
 	static jmethodID g_method_nativeAudioSourceChange = nullptr;
 	static jmethodID g_method_nativeAudioMediaEnded = nullptr;
+	static jmethodID g_method_nativeAudioOnError = nullptr;
 
 	inline NativePlayer* mp_cast(jlong handle) { return reinterpret_cast<NativePlayer*>(handle); }
 
 	void JNICALL Initialize_AudioPlayer(JavaVM* vm, JNIEnv* env) {
 		jclass clz = env->FindClass("love/yinlin/platform/WindowsNativeAudioPlayer");
-		g_method_nativeAudioPositionChange = env->GetMethodID(clz, "nativePositionChange", "(J)V");
 		g_method_nativeAudioDurationChange = env->GetMethodID(clz, "nativeDurationChange", "(J)V");
 		g_method_nativeAudioPlaybackStateChange = env->GetMethodID(clz, "nativePlaybackStateChange", "(I)V");
 		g_method_nativeAudioSourceChange = env->GetMethodID(clz, "nativeSourceChange", "()V");
 		g_method_nativeAudioMediaEnded = env->GetMethodID(clz, "nativeMediaEnded", "()V");
+		g_method_nativeAudioOnError = env->GetMethodID(clz, "nativeOnError", "(Ljava/lang/String;)V");
 		env->DeleteLocalRef(clz);
 	}
 
@@ -86,13 +88,6 @@ extern "C" {
 		player.AudioCategory(Playback::MediaPlayerAudioCategory::Media);
 
 		auto session = player.PlaybackSession();
-
-		session.PositionChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
-			JVM::JniEnvGuard guard;
-			auto position = ms_cast(sender.Position());
-			guard->CallVoidMethod(instance, g_method_nativeAudioPositionChange, position);
-			guard.checkException();
-		});
 
 		session.NaturalDurationChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
@@ -118,6 +113,14 @@ extern "C" {
 			JVM::JniEnvGuard guard;
 			guard->CallVoidMethod(instance, g_method_nativeAudioMediaEnded);
 			guard.checkException();
+		});
+
+		player.MediaFailed([instance](Playback::MediaPlayer const& sender, Playback::MediaPlayerFailedEventArgs const& args) {
+			JVM::JniEnvGuard guard;
+			auto message = s2j(guard.env, winrt::to_string(args.ErrorMessage()));
+			guard->CallVoidMethod(instance, g_method_nativeAudioOnError, message);
+			guard.checkException();
+			guard->DeleteLocalRef(message);
 		});
 
 		return reinterpret_cast<jlong>(nativePlayer);
@@ -198,11 +201,11 @@ extern "C" {
 		}
 	};
 
-	static jmethodID g_method_nativeVideoPositionChange = nullptr;
 	static jmethodID g_method_nativeVideoDurationChange = nullptr;
 	static jmethodID g_method_nativeVideoPlaybackStateChange = nullptr;
 	static jmethodID g_method_nativeVideoSourceChange = nullptr;
 	static jmethodID g_method_nativeVideoMediaEnded = nullptr;
+	static jmethodID g_method_nativeVideoOnError = nullptr;
 	static jmethodID g_method_nativeVideoIsUpdateFrame = nullptr;
 	static jmethodID g_method_nativeVideoFrameAvailable = nullptr;
 
@@ -210,11 +213,11 @@ extern "C" {
 
 	void JNICALL Initialize_VideoPlayer(JavaVM* vm, JNIEnv* env) {
 		jclass clz = env->FindClass("love/yinlin/platform/WindowsNativeVideoPlayer");
-		g_method_nativeVideoPositionChange = env->GetMethodID(clz, "nativePositionChange", "(J)V");
 		g_method_nativeVideoDurationChange = env->GetMethodID(clz, "nativeDurationChange", "(J)V");
 		g_method_nativeVideoPlaybackStateChange = env->GetMethodID(clz, "nativePlaybackStateChange", "(I)V");
 		g_method_nativeVideoSourceChange = env->GetMethodID(clz, "nativeSourceChange", "()V");
 		g_method_nativeVideoMediaEnded = env->GetMethodID(clz, "nativeMediaEnded", "()V");
+		g_method_nativeVideoOnError = env->GetMethodID(clz, "nativeOnError", "(Ljava/lang/String;)V");
 		g_method_nativeVideoFrameAvailable = env->GetMethodID(clz, "nativeVideoFrameAvailable", "(II[B)V");
 		g_method_nativeVideoIsUpdateFrame = env->GetMethodID(clz, "isUpdateFrame", "()Z");
 		env->DeleteLocalRef(clz);
@@ -231,38 +234,39 @@ extern "C" {
 
 		auto session = player.PlaybackSession();
 
-		session.PositionChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
-			JVM::JniEnvGuard guard;
-			auto position = ms_cast(sender.Position());
-			guard->CallVoidMethod(instance, g_method_nativeVideoPositionChange, position);
-			guard.checkException();
-			});
-
 		session.NaturalDurationChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
 			auto duration = ms_cast(sender.NaturalDuration());
 			guard->CallVoidMethod(instance, g_method_nativeVideoDurationChange, duration);
 			guard.checkException();
-			});
+		});
 
 		player.CurrentStateChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
 			auto state = static_cast<jint>(sender.PlaybackSession().PlaybackState());
 			guard->CallVoidMethod(instance, g_method_nativeVideoPlaybackStateChange, state);
 			guard.checkException();
-			});
+		});
 
 		player.SourceChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
 			guard->CallVoidMethod(instance, g_method_nativeVideoSourceChange);
 			guard.checkException();
-			});
+		});
 
 		player.MediaEnded([instance](Playback::MediaPlayer const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
 			guard->CallVoidMethod(instance, g_method_nativeVideoMediaEnded);
 			guard.checkException();
-			});
+		});
+
+		player.MediaFailed([instance](Playback::MediaPlayer const& sender, Playback::MediaPlayerFailedEventArgs const& args) {
+			JVM::JniEnvGuard guard;
+			auto message = s2j(guard.env, winrt::to_string(args.ErrorMessage()));
+			guard->CallVoidMethod(instance, g_method_nativeVideoOnError, message);
+			guard.checkException();
+			guard->DeleteLocalRef(message);
+		});
 
 		player.VideoFrameAvailable([nativePlayer](Playback::MediaPlayer const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;

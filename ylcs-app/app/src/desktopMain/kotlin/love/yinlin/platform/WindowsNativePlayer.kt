@@ -24,11 +24,11 @@ enum class WindowsNativePlaybackState {
 
 class WindowsNativeAudioPlayer {
     open class Listener {
-        open fun onPositionChange(position: Long) { }
         open fun onDurationChange(duration: Long) { }
         open fun onPlaybackStateChange(state: WindowsNativePlaybackState) { }
         open fun onSourceChange() { }
         open fun onMediaEnded() { }
+        open fun onError(message: String) { }
     }
 
     private var nativeHandle: Long = 0
@@ -75,8 +75,6 @@ class WindowsNativeAudioPlayer {
 
     // Callback
     @Suppress("unused")
-    private fun nativePositionChange(position: Long) { listener?.onPositionChange(position) }
-    @Suppress("unused")
     private fun nativeDurationChange(duration: Long) { listener?.onDurationChange(duration) }
     @Suppress("unused")
     private fun nativePlaybackStateChange(value: Int) { listener?.onPlaybackStateChange(WindowsNativePlaybackState.fromInt(value)) }
@@ -84,6 +82,8 @@ class WindowsNativeAudioPlayer {
     private fun nativeSourceChange() { listener?.onSourceChange() }
     @Suppress("unused")
     private fun nativeMediaEnded() { listener?.onMediaEnded() }
+    @Suppress("unused")
+    private fun nativeOnError(message: String) { listener?.onError(message) }
 
     // Native
     private external fun nativeCreate(): Long
@@ -99,11 +99,11 @@ class WindowsNativeAudioPlayer {
 
 class WindowsNativeVideoPlayer {
     open class Listener {
-        open fun onPositionChange(position: Long) { }
         open fun onDurationChange(duration: Long) { }
         open fun onPlaybackStateChange(state: WindowsNativePlaybackState) { }
         open fun onSourceChange() { }
         open fun onMediaEnded() { }
+        open fun onError(message: String) { }
         open fun onFrame(bitmap: ImageBitmap) { }
     }
 
@@ -155,8 +155,6 @@ class WindowsNativeVideoPlayer {
 
     // Callback
     @Suppress("unused")
-    private fun nativePositionChange(position: Long) { listener?.onPositionChange(position) }
-    @Suppress("unused")
     private fun nativeDurationChange(duration: Long) { listener?.onDurationChange(duration) }
     @Suppress("unused")
     private fun nativePlaybackStateChange(value: Int) { listener?.onPlaybackStateChange(WindowsNativePlaybackState.fromInt(value)) }
@@ -164,6 +162,8 @@ class WindowsNativeVideoPlayer {
     private fun nativeSourceChange() { listener?.onSourceChange() }
     @Suppress("unused")
     private fun nativeMediaEnded() { listener?.onMediaEnded() }
+    @Suppress("unused")
+    private fun nativeOnError(message: String) { listener?.onError(message) }
 
     @Suppress("unused")
     fun isUpdateFrame(): Boolean = lock.isLocked

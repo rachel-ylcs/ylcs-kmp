@@ -33,10 +33,6 @@ private class VideoPlayerState(val url: String) {
 
     fun init() {
         controller.create(object : WindowsNativeVideoPlayer.Listener() {
-            override fun onPositionChange(position: Long) {
-                this@VideoPlayerState.position = position
-            }
-
             override fun onDurationChange(duration: Long) {
                 this@VideoPlayerState.duration = duration
             }
@@ -56,6 +52,7 @@ private class VideoPlayerState(val url: String) {
 
             override fun onFrame(bitmap: ImageBitmap) {
                 this@VideoPlayerState.bitmap = bitmap
+                this@VideoPlayerState.position = controller.position
             }
         })
         controller.load(url)

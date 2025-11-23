@@ -1,6 +1,10 @@
 package love.yinlin.startup
 
 import androidx.compose.runtime.*
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.StartupFetcher
@@ -169,22 +173,39 @@ private class WindowsMusicPlayer : PlatformMusicPlayer() {
     private val controller = WindowsNativeAudioPlayer()
     private var shouldImmediatePlay: Boolean = false
 
+    private var updateProgressJob: Job? = null
+    private val updateProgressJobLock = SynchronizedObject()
+
     override var isInit: Boolean by mutableStateOf(false)
         private set
 
     private val listener = object : WindowsNativeAudioPlayer.Listener() {
-        override fun onPositionChange(position: Long) {
-            currentPosition = position
-        }
-
         override fun onDurationChange(duration: Long) {
             currentDuration = duration
         }
 
         override fun onPlaybackStateChange(state: WindowsNativePlaybackState) {
             when (state) {
-                WindowsNativePlaybackState.Playing -> isPlaying = true
-                WindowsNativePlaybackState.Paused, WindowsNativePlaybackState.None -> isPlaying = false
+                WindowsNativePlaybackState.Playing -> {
+                    isPlaying = true
+                    synchronized(updateProgressJobLock) {
+                        updateProgressJob?.cancel()
+                        updateProgressJob = Coroutines.startCPU {
+                            while (true) {
+                                if (!Coroutines.isActive()) break
+                                currentPosition = controller.position
+                                delay(PROGRESS_UPDATE_INTERVAL)
+                            }
+                        }
+                    }
+                }
+                WindowsNativePlaybackState.Paused, WindowsNativePlaybackState.None -> {
+                    isPlaying = false
+                    synchronized(updateProgressJobLock) {
+                        updateProgressJob?.cancel()
+                        updateProgressJob = null
+                    }
+                }
                 WindowsNativePlaybackState.Opening -> {
                     if (shouldImmediatePlay) controller.play()
                 }
@@ -208,6 +229,10 @@ private class WindowsMusicPlayer : PlatformMusicPlayer() {
                 MusicPlayMode.LOOP -> currentIndex
                 MusicPlayMode.RANDOM -> randomNextIndex ?: reshuffled()
             })
+        }
+
+        override fun onError(message: String) {
+            error = IllegalStateException(message)
         }
     }
 
