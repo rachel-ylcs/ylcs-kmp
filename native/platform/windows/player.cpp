@@ -194,6 +194,7 @@ extern "C" {
 
 		void release(JNIEnv* env) {
 			NativePlayer::release(env);
+			d3dSurface = nullptr;
 			if (buffer) {
 				env->DeleteGlobalRef(buffer);
 				buffer = nullptr;
@@ -218,7 +219,7 @@ extern "C" {
 		g_method_nativeVideoSourceChange = env->GetMethodID(clz, "nativeSourceChange", "()V");
 		g_method_nativeVideoMediaEnded = env->GetMethodID(clz, "nativeMediaEnded", "()V");
 		g_method_nativeVideoOnError = env->GetMethodID(clz, "nativeOnError", "(Ljava/lang/String;)V");
-		g_method_nativeVideoFrameAvailable = env->GetMethodID(clz, "nativeVideoFrameAvailable", "(II[B)V");
+		g_method_nativeVideoFrameAvailable = env->GetMethodID(clz, "nativeVideoFrameAvailable", "(III[B)V");
 		g_method_nativeVideoIsUpdateFrame = env->GetMethodID(clz, "isUpdateFrame", "()Z");
 		env->DeleteLocalRef(clz);
 	}
@@ -271,6 +272,7 @@ extern "C" {
 		player.VideoFrameAvailable([nativePlayer](Playback::MediaPlayer const& sender, auto&& args) {
 			JVM::JniEnvGuard guard;
 			
+			if (sender.PlaybackSession().PlaybackState() != Playback::MediaPlaybackState::Playing) return;
 			if (guard->CallBooleanMethod(nativePlayer->obj, g_method_nativeVideoIsUpdateFrame)) return;
 
 			if (!d3dDevice) {
@@ -310,18 +312,26 @@ extern "C" {
 				nativePlayer->deleteBuffer(guard);
 			}
 
-			sender.CopyFrameToVideoSurface(nativePlayer->d3dSurface);
-			SoftwareBitmap bitmap = SoftwareBitmap::CreateCopyFromSurfaceAsync(nativePlayer->d3dSurface).get();
-			auto buffer = bitmap.LockBuffer(BitmapBufferAccessMode::Read);
-			auto reference = buffer.CreateReference();
-			int frameWidth = bitmap.PixelWidth();
-			int frameHeight = bitmap.PixelHeight();
-			int bufferSize = reference.Capacity();
-			
-			if (!nativePlayer->buffer) nativePlayer->createBuffer(guard, bufferSize);
-			guard->SetByteArrayRegion(nativePlayer->buffer, 0, bufferSize, reinterpret_cast<const jbyte*>(reference.data()));
-			guard->CallVoidMethod(nativePlayer->obj, g_method_nativeVideoFrameAvailable, frameWidth, frameHeight, nativePlayer->buffer);
-			guard.checkException();
+			if (nativePlayer->d3dSurface) {
+				sender.CopyFrameToVideoSurface(nativePlayer->d3dSurface);
+				SoftwareBitmap bitmap = SoftwareBitmap::CreateCopyFromSurfaceAsync(nativePlayer->d3dSurface).get();
+				auto buffer = bitmap.LockBuffer(BitmapBufferAccessMode::Read);
+				auto reference = buffer.CreateReference();
+				int frameWidth = bitmap.PixelWidth();
+				int frameHeight = bitmap.PixelHeight();
+				int bufferSize = reference.Capacity();
+
+				if (!nativePlayer->buffer) nativePlayer->createBuffer(guard, bufferSize);
+				if (nativePlayer->buffer && frameWidth > 0 && frameHeight > 0 && bufferSize > 0) {
+					guard->SetByteArrayRegion(nativePlayer->buffer, 0, bufferSize, reinterpret_cast<const jbyte*>(reference.data()));
+					guard->CallVoidMethod(nativePlayer->obj, g_method_nativeVideoFrameAvailable, frameWidth, frameHeight, bufferSize, nativePlayer->buffer);
+					guard.checkException();
+				}
+
+				reference.Close();
+				buffer.Close();
+				bitmap.Close();
+			}
 		});
 
 		return reinterpret_cast<jlong>(nativePlayer);

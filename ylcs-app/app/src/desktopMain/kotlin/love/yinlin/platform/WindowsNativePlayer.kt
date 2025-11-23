@@ -169,16 +169,20 @@ class WindowsNativeVideoPlayer {
     fun isUpdateFrame(): Boolean = lock.isLocked
 
     @Suppress("unused")
-    private fun nativeVideoFrameAvailable(width: Int, height: Int, data: ByteArray) {
+    private fun nativeVideoFrameAvailable(width: Int, height: Int, bufferSize: Int, data: ByteArray) {
         listener?.let { callback ->
             if (!lock.tryLock()) return
             Coroutines.startMain {
-                // rowBytes = width * byte { ColorType.BGRA_8888 } = width * 4
-                skiaBitmap.installPixels(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL), data, width * 4)
-                callback.onFrame(skiaBitmap.asComposeImageBitmap())
+                if (!skiaBitmap.isClosed) {
+                    if (skiaBitmap.imageInfo.width != width || skiaBitmap.imageInfo.height != height) {
+                        skiaBitmap.setImageInfo(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL), width * 4)
+                    }
+                    skiaBitmap.installPixels(data)
+                    callback.onFrame(skiaBitmap.asComposeImageBitmap())
+                }
                 lock.unlock()
             }
-        } ?: lock.unlock()
+        }
     }
 
     // Native
