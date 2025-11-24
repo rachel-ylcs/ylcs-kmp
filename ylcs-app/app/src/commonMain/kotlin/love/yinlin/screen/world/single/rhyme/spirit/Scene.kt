@@ -1,21 +1,28 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import love.yinlin.compose.game.BoxBody
+import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.Drawer
-import love.yinlin.compose.game.Manager
 import love.yinlin.compose.game.Spirit
+import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.data.music.RhymeLyricsConfig
+import love.yinlin.screen.world.single.rhyme.RhymeManager
 
+@Stable
 class Scene(
-    manager: Manager,
+    rhymeManager: RhymeManager,
     lyrics: RhymeLyricsConfig,
-    record: ImageBitmap,
-) : Spirit(manager) {
-    override val box = BoxBody(Offset.Zero, manager.size)
+    recordImage: ImageBitmap,
+) : Spirit(rhymeManager), BoxBody, Dynamic {
+    override val size: Size = manager.size
 
-    private val leftUI = LeftUI(manager, record)
+    private val leftUI = LeftUI(rhymeManager, recordImage)
+
+    override fun onUpdate(tick: Long) {
+        leftUI.onUpdate(tick)
+    }
 
     override fun Drawer.onDraw() {
         leftUI.apply { draw() }

@@ -33,6 +33,7 @@ class RhymeManager(
     private val mp = AudioPlayer(context)
 
     val isInit: Boolean get() = mp.isInit
+    val duration: Long get() = mp.duration
 
     suspend fun init() = mp.init()
 
@@ -40,14 +41,14 @@ class RhymeManager(
 
     suspend fun CoroutineScope.start(
         lyrics: RhymeLyricsConfig,
-        record: ImageBitmap,
+        recordImage: ImageBitmap,
         audio: Path
     ) {
         mp.load(audio)
         onSceneCreate(Scene(
-            manager = this@RhymeManager,
+            rhymeManager = this@RhymeManager,
             lyrics = lyrics,
-            record = record
+            recordImage = recordImage
         ))
         resume()
     }

@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.Path
@@ -99,6 +100,10 @@ class Drawer(
 
     inline fun clip(path: Path, block: Drawer.() -> Unit) {
         scope.clipPath(path) { block() }
+    }
+
+    inline fun rotate(degrees: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope.rotate(degrees, pivot) { block() }
     }
 
     inline fun perspective(matrix: Matrix, block: Drawer.() -> Unit) {

@@ -120,7 +120,7 @@ abstract class Manager {
             }) {
                 val drawer = Drawer(this, textDrawer)
                 scale(scale = canvasScale, pivot = Offset.Zero) {
-                    scene?.apply { drawer.onDraw() }
+                    scene?.apply { drawer.draw() }
                 }
             }
         }

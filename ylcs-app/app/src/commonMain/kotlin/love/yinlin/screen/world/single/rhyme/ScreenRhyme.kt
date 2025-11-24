@@ -96,12 +96,12 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 }
             }
             val lyrics = task1.await()
-            val record = task2.await()
+            val recordImage = task2.await()
             catchingError {
                 require(lyrics != null)
-                require(record != null)
+                require(recordImage != null)
                 rhymeManager.apply {
-                    start(lyrics, record, info.path(Paths.modPath, ModResourceType.Audio))
+                    start(lyrics, recordImage, info.path(Paths.modPath, ModResourceType.Audio))
                 }
                 state = GameState.Playing
             }?.let { slot.tip.error("部分资源丢失") }
