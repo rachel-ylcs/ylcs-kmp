@@ -49,6 +49,7 @@ include(
     "ylcs-module:compose:ui",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:shader",
+    "ylcs-module:compose:game",
 
     "ylcs-module:compose:service:all",
     "ylcs-module:compose:service:exception",

@@ -1,7 +1,5 @@
 package love.yinlin.screen.world.single.rhyme
 
-import androidx.collection.mutableLongObjectMapOf
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,21 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.decodeToImageBitmap
-import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -52,8 +40,6 @@ import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.platform.AudioPlayer
-import love.yinlin.resources.*
 import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
 import love.yinlin.compose.ui.image.MiniIcon
@@ -70,9 +56,6 @@ import love.yinlin.extension.exists
 import love.yinlin.extension.readByteArray
 import love.yinlin.extension.readText
 import love.yinlin.platform.ioContext
-import org.jetbrains.compose.resources.getDrawableResourceBytes
-import org.jetbrains.compose.resources.getSystemResourceEnvironment
-import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
@@ -82,10 +65,8 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val musicPlayer = AudioPlayer(app.context)
-    private val stage = RhymeStage()
+    private val rhymeManager = RhymeManager(app.context, ::completeGame)
 
-    private var canvasFrameJob: Job? = null
     private var resumePauseJob: Job? = null
 
     private val orientationStarter = LaunchFlag()
@@ -101,19 +82,6 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         else pauseGame(GameLockState.PortraitLock)
     }
 
-    private fun monitorGamePosition(): Job = launch {
-        val delayDuration = (1000 / RhymeConfig.FPS).milliseconds
-        var lastPosition = 0L
-        while (true) {
-            val position = musicPlayer.position
-            if (position == 0L && lastPosition != 0L) break
-            lastPosition = position
-            stage.onUpdate(position)
-            delay(delayDuration)
-        }
-        completeGame()
-    }
-
     private fun startGame(info: MusicInfo) {
         launch {
             val task1 = async(ioContext) {
@@ -123,47 +91,33 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             }
             val task2 = async(ioContext) {
                 catchingNull {
-                    val environment = getSystemResourceEnvironment()
-                    ImageSet(
-                        record = info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap(),
-                        noteLayoutMap = getDrawableResourceBytes(environment, Res.drawable.note_map).decodeToImageBitmap(),
-                    )
+                    info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap()
                 }
             }
             val lyrics = task1.await()
-            val imageSet = task2.await()
-            if (lyrics != null && imageSet != null && canvasFrameJob == null) {
-                stage.onInitialize(lyrics, imageSet)
-                musicPlayer.load(info.path(Paths.modPath, ModResourceType.Audio))
-                canvasFrameJob = monitorGamePosition()
+            val record = task2.await()
+            if (lyrics != null && record != null) {
+                rhymeManager.apply {
+                    start(lyrics, record, info.path(Paths.modPath, ModResourceType.Audio))
+                }
                 state = GameState.Playing
             }
         }
     }
 
     private fun stopGame() {
-        musicPlayer.stop()
-        canvasFrameJob?.cancel()
-        canvasFrameJob = null
-        stage.onClear()
+        rhymeManager.stop()
         state = GameState.Start
     }
 
     private fun completeGame() {
-        canvasFrameJob = null
-        val result = stage.onResult()
-        stage.onClear()
-        state = GameState.Settling(result)
+        state = GameState.Settling(RhymeResult(0))
     }
 
     private fun pauseGame(newState: GameLockState) {
         resumePauseJob?.cancel()
         resumePauseJob = null
-        if (state is GameState.Playing) {
-            musicPlayer.pause()
-            canvasFrameJob?.cancel()
-            canvasFrameJob = null
-        }
+        if (state is GameState.Playing) rhymeManager.pause()
         lockState = newState
     }
 
@@ -177,8 +131,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                         delay(1000L)
                     }
                     lockState = GameLockState.Normal
-                    musicPlayer.play()
-                    if (canvasFrameJob == null) canvasFrameJob = monitorGamePosition()
+                    rhymeManager.apply { resume() }
                 }
                 resumePauseJob = null
             }
@@ -423,40 +376,10 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun GameCanvas() {
         if (state is GameState.Playing) {
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val rhymeScale = with(LocalDensity.current) { maxWidth.toPx() } / Size.Game.width
-                val fontFamilyResolver = LocalFontFamilyResolver.current
-                val font = mainFont()
-                val textManager = remember(font, fontFamilyResolver) { RhymeTextManager(font, fontFamilyResolver) }
-
-                val pointers = remember { mutableLongObjectMapOf<Pointer>() }
-
-                Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(rhymeScale) {
-                    awaitPointerEventScope {
-                        while (true) {
-                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                            for (change in event.changes) {
-                                val id = change.id.value
-                                val position = change.position / rhymeScale
-                                val time = musicPlayer.position
-                                when {
-                                    change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
-                                        pointers[id] = pointer
-                                        stage.onEvent(pointer)
-                                    }
-                                    change.changedToUp() -> pointers.remove(id)?.let { pointer ->
-                                        stage.onEvent(pointer.copy(endTime = time))
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }) {
-                    scale(scale = rhymeScale, pivot = Offset.Zero) {
-                        stage.onDraw(scope = this, textManager = textManager)
-                    }
-                }
-            }
+            rhymeManager.SceneContent(
+                modifier = Modifier.fillMaxSize(),
+                font = mainFont()
+            )
         }
     }
 
@@ -500,27 +423,27 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     override val title: String? = null
 
     override suspend fun initialize() {
-        if (app.mp.isInit) {
-            coroutineScope {
-                awaitAll(
-                    async { musicPlayer.init() },
-                    async(ioContext) {
-                        // 检查包含游戏配置文件的 MOD
-                        library = app.mp.library.values.map { info ->
-                            RhymeMusic(
-                                musicInfo = info,
-                                enabled = info.path(Paths.modPath, ModResourceType.Rhyme).exists
-                            )
-                        }
+        if (app.mp.isInit) coroutineScope {
+            awaitAll(
+                async {
+                    rhymeManager.init()
+                },
+                async(ioContext) {
+                    // 检查包含游戏配置文件的 MOD
+                    library = app.mp.library.values.map { info ->
+                        RhymeMusic(
+                            musicInfo = info,
+                            enabled = info.path(Paths.modPath, ModResourceType.Rhyme).exists
+                        )
                     }
-                )
-            }
+                }
+            )
         }
         state = GameState.Start
     }
 
     override fun finalize() {
-        musicPlayer.release()
+        rhymeManager.release()
     }
 
     override fun onBack() {

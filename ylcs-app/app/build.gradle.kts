@@ -113,6 +113,7 @@ kotlin {
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.compose.service.all,
                 projects.ylcsModule.compose.shader,
+                projects.ylcsModule.compose.game,
                 projects.ylcsModule.clientEngine,
                 libs.compose.components.resources,
                 // lottie

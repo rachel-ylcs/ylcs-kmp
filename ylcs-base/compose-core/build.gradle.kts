@@ -56,6 +56,7 @@ kotlin {
                 projects.ylcsBase.core,
                 libs.compose.runtime,
                 libs.compose.foundation,
+                libs.compose.collection,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
