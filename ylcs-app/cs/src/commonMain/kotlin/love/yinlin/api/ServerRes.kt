@@ -20,6 +20,9 @@ object ServerRes : APIRes("public") {
         fun y(id: Int) = APIRes(this, "game${id}y.webp")
         fun xy(id: Int, isX: Boolean) = if (isX) x(id) else y(id)
         fun res(id: Int, key: String) = APIRes(this, "game$id$key.webp")
+        object Rhyme : APIRes(this) {
+            fun res(key: String) = APIRes(this, "$key.webp")
+        }
     }
 
     object Photo : APIRes(this) {

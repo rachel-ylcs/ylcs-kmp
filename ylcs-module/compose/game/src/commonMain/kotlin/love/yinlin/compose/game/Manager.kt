@@ -36,6 +36,8 @@ abstract class Manager {
     abstract val currentTick: Long
     abstract fun onSceneComplete()
 
+    val assets = Assets() // 资源
+
     private var scene: Spirit? = null // 主场景
     private val pointers = mutableLongObjectMapOf<Pointer>() // 指针集
 
@@ -116,8 +118,9 @@ abstract class Manager {
                     }
                 }
             }) {
+                val drawer = Drawer(this, textDrawer)
                 scale(scale = canvasScale, pivot = Offset.Zero) {
-                    scene?.apply { onDraw(textDrawer) }
+                    scene?.apply { drawer.onDraw() }
                 }
             }
         }

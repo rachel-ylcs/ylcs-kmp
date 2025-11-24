@@ -3,12 +3,20 @@ package love.yinlin.screen.world.single.rhyme
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.decodeToImageBitmap
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.io.files.Path
 import love.yinlin.Context
+import love.yinlin.api.ServerRes
+import love.yinlin.api.url
+import love.yinlin.common.downloadCache
+import love.yinlin.compose.game.Asset
 import love.yinlin.compose.game.Manager
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
+import love.yinlin.platform.NetClient
 import love.yinlin.screen.world.single.rhyme.spirit.Scene
 
 @Stable
@@ -24,6 +32,12 @@ class RhymeManager(
 
     private val mp = AudioPlayer(context)
 
+    val isInit: Boolean get() = mp.isInit
+
+    suspend fun init() = mp.init()
+
+    fun release() = mp.release()
+
     suspend fun CoroutineScope.start(
         lyrics: RhymeLyricsConfig,
         record: ImageBitmap,
@@ -33,7 +47,7 @@ class RhymeManager(
         onSceneCreate(Scene(
             manager = this@RhymeManager,
             lyrics = lyrics,
-            record = record,
+            record = record
         ))
         resume()
     }
@@ -53,7 +67,29 @@ class RhymeManager(
         onSceneStop()
     }
 
-    suspend fun init() = mp.init()
+    suspend fun CoroutineScope.downloadAssets(): Boolean {
+        val imageKeys = arrayOf(
+            "left_ui"
+        )
 
-    fun release() = mp.release()
+        val animationKeys = arrayOf<Pair<String, Int>>(
+
+        )
+
+        val assetList = (imageKeys.map { key ->
+            async {
+                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeToImageBitmap()?.let { Asset.Image(it) }
+            }
+        } + animationKeys.map { (key, count) ->
+            async {
+                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeToImageBitmap()?.let { Asset.Animation(it, count) }
+            }
+        }).awaitAll()
+
+        for ((key, asset) in assetList) {
+            if (asset != null) assets[key] = asset
+        }
+
+        return assetList.all { it.second != null }
+    }
 }

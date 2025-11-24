@@ -52,6 +52,7 @@ import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.exists
 import love.yinlin.extension.readByteArray
 import love.yinlin.extension.readText
@@ -96,12 +97,14 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             }
             val lyrics = task1.await()
             val record = task2.await()
-            if (lyrics != null && record != null) {
+            catchingError {
+                require(lyrics != null)
+                require(record != null)
                 rhymeManager.apply {
                     start(lyrics, record, info.path(Paths.modPath, ModResourceType.Audio))
                 }
                 state = GameState.Playing
-            }
+            }?.let { slot.tip.error("部分资源丢失") }
         }
     }
 
@@ -229,7 +232,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private fun GameOverlayLoading() {
         Box(modifier = Modifier.fillMaxSize()) {
             LoadingBox(
-                text = "加载曲库中...",
+                text = "在线加载资源中...",
                 color = Colors.White
             )
         }
@@ -423,10 +426,13 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     override val title: String? = null
 
     override suspend fun initialize() {
-        if (app.mp.isInit) coroutineScope {
+        rhymeManager.init()
+        if (rhymeManager.isInit) coroutineScope {
+            var isInit = false
             awaitAll(
-                async {
-                    rhymeManager.init()
+                async(ioContext) {
+                    // 从服务器下载资源文件
+                    isInit = rhymeManager.run { downloadAssets() }
                 },
                 async(ioContext) {
                     // 检查包含游戏配置文件的 MOD
@@ -438,8 +444,9 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     }
                 }
             )
+            if (isInit) state = GameState.Start
+            else slot.tip.warning("下载资源失败")
         }
-        state = GameState.Start
     }
 
     override fun finalize() {
