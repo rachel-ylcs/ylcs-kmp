@@ -47,9 +47,7 @@ gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api
 
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "cmp-android" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "cmp-android" }
-compose-ui-android = { module = "androidx.compose.ui:ui-android", version.ref = "cmp-android" }
 
 # Common
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
@@ -93,7 +91,7 @@ lottie = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "lo
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.0" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.1" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 
