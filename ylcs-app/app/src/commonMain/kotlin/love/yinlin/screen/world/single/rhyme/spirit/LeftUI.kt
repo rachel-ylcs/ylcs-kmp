@@ -35,7 +35,9 @@ private class Record(
     private val anglePerTick = 360f / manager.fps / 18
 
     override fun onUpdate(tick: Long) {
-        angle += anglePerTick
+        var newAngle = angle + anglePerTick
+        if (newAngle >= 360f) newAngle -= 360f
+        angle = newAngle
     }
 
     override fun onPointerEvent(pointer: Pointer): Boolean {

@@ -20,6 +20,6 @@ class Scene(
     override val spirits: List<Spirit> = listOf(
         LeftUI(rhymeManager, recordImage),
         RightUI(rhymeManager, lyrics),
-        TrackUI(rhymeManager)
+        TrackUI(rhymeManager, lyrics)
     )
 }
