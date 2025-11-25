@@ -11,7 +11,7 @@ import love.yinlin.Context
 import love.yinlin.common.FfmpegRenderersFactory
 
 @Stable
-actual class AudioPlayer actual constructor(private val context: Context) {
+actual class AudioPlayer actual constructor(private val context: Context, private val onEndListener: () -> Unit) {
     private var player: ExoPlayer? = null
 
     actual val isInit: Boolean get() = player != null
@@ -29,7 +29,10 @@ actual class AudioPlayer actual constructor(private val context: Context) {
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     super.onPlaybackStateChanged(playbackState)
-                    if (playbackState == Player.STATE_ENDED) innerStop()
+                    if (playbackState == Player.STATE_ENDED) {
+                        innerStop()
+                        onEndListener()
+                    }
                 }
 
                 override fun onPlayerError(error: PlaybackException) {

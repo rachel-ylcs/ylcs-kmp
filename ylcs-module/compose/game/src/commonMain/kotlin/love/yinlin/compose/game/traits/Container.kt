@@ -56,6 +56,7 @@ abstract class Container(manager: Manager) : Spirit(manager), Dynamic, PointerTr
 
     override fun handlePointer(pointer: Pointer): Boolean {
         return internalHandlePointer(pointer) {
+            // 点击事件与绘制流程是反的, zIndex越大的先响应
             if (onPointerEvent(it)) true
             else {
                 if (queue.isNotEmpty) {
@@ -70,6 +71,7 @@ abstract class Container(manager: Manager) : Spirit(manager), Dynamic, PointerTr
 
     override fun draw(drawer: Drawer) {
         internalDraw(drawer) {
+            // 绘制流程和点击事件是反的, zIndex越小的先绘制
             it.preDraw()
             if (queue.isNotEmpty) {
                 for ((spirit, _) in queue) spirit.draw(it)

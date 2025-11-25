@@ -7,7 +7,7 @@ import love.yinlin.extension.NativeLib
 
 @Stable
 @NativeLib
-actual class AudioPlayer actual constructor(context: Context) {
+actual class AudioPlayer actual constructor(context: Context, private val onEndListener: () -> Unit) {
     private val nativeAudioPlayer = WindowsNativeAudioPlayer()
 
     actual val isInit: Boolean get() = nativeAudioPlayer.isInit
@@ -19,7 +19,11 @@ actual class AudioPlayer actual constructor(context: Context) {
     actual val duration: Long get() = nativeAudioPlayer.duration
 
     actual suspend fun init() {
-        nativeAudioPlayer.create()
+        nativeAudioPlayer.create(object : WindowsNativeAudioPlayer.Listener() {
+            override fun onMediaEnded() {
+                onEndListener()
+            }
+        })
     }
 
     actual suspend fun load(path: Path) {

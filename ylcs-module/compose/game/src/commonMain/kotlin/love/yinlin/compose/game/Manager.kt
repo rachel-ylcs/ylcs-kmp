@@ -33,7 +33,6 @@ abstract class Manager {
     abstract val fps: Int // 帧率
 
     abstract val currentTick: Long
-    abstract fun onSceneComplete()
 
     val assets = Assets() // 资源
 
@@ -56,7 +55,6 @@ abstract class Manager {
         tickJob = null
         scene = null
         pointers.clear()
-        onSceneComplete()
     }
 
     protected fun onSceneCreate(spirit: Spirit) {

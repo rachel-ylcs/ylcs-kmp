@@ -22,16 +22,17 @@ import love.yinlin.screen.world.single.rhyme.spirit.Scene
 @Stable
 class RhymeManager(
     context: Context,
-    private val onComplete: () -> Unit,
+    onComplete: () -> Unit,
     val onPause: () -> Unit
 ) : Manager() {
     override val size: Size = Size(1920f, 1080f)
     override val fps: Int = RhymeConfig.FPS
     override val currentTick: Long get() = mp.position
 
-    override fun onSceneComplete() = onComplete()
-
-    private val mp = AudioPlayer(context)
+    private val mp = AudioPlayer(context) {
+        stop()
+        onComplete()
+    }
 
     val isInit: Boolean get() = mp.isInit
     val duration: Long get() = mp.duration
