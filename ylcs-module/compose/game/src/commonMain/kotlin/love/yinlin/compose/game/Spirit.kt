@@ -7,20 +7,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.Fill
 import love.yinlin.compose.game.traits.AABB
+import love.yinlin.compose.game.traits.PreTransform
+import love.yinlin.compose.game.traits.Transform
 
 @Stable
-abstract class Spirit(val manager: Manager): AABB {
-    protected open val preOffset: Offset? = null
-    protected open val preTransform: (DrawTransform.() -> Unit)? = null
+abstract class Spirit(val manager: Manager): AABB, PreTransform {
     protected abstract fun Drawer.onDraw()
 
     fun Drawer.draw() {
         transform({
-            preOffset?.let { translate(it) }
-            preTransform?.invoke(this)
+            for (transform in preTransform) {
+                when (transform) {
+                    is Transform.Translate -> translate(transform.x, transform.y)
+                    is Transform.Scale -> scale(transform.x, transform.y, transform.pivot ?: center)
+                    is Transform.Rotate -> rotate(transform.degrees, transform.pivot ?: center)
+                }
+            }
         }) {
             onDraw()
         }

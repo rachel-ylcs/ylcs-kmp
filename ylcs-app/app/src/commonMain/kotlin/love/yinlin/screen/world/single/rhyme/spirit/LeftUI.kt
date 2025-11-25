@@ -13,16 +13,19 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.CircleBody
 import love.yinlin.compose.game.Drawer
+import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.Spirit
 import love.yinlin.compose.game.traits.Dynamic
+import love.yinlin.compose.game.traits.Transform
+import love.yinlin.compose.game.traits.Trigger
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
 private class Record(
     rhymeManager: RhymeManager,
     private val recordImage: ImageBitmap
-) : Spirit(rhymeManager), CircleBody, Dynamic {
-    override val preOffset: Offset = Offset(-28f, -44f)
+) : Spirit(rhymeManager), CircleBody, Dynamic, Trigger {
+    override val preTransform: List<Transform> = listOf(Transform.Translate(-28f, -44f))
     override val size: Size = Size(236f, 236f)
 
     // 封面旋转角
@@ -32,6 +35,8 @@ private class Record(
     override fun onUpdate(tick: Long) {
         angle += anglePerTick
     }
+
+    override fun onEvent(pointer: Pointer): Boolean = pointer.position in this
 
     override fun Drawer.onDraw() {
         rotate(angle) {
@@ -48,7 +53,7 @@ private class Record(
 private class Progress(
     private val rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody, Dynamic {
-    override val preOffset: Offset = Offset(214f, 96f)
+    override val preTransform: List<Transform> = listOf(Transform.Translate(214f, 96f))
     override val size: Size = Size(355f, 10f)
 
     // 游戏进度
@@ -76,7 +81,7 @@ private class Progress(
 class LeftUI(
     rhymeManager: RhymeManager,
     recordImage: ImageBitmap
-) : Spirit(rhymeManager), BoxBody, Dynamic {
+) : Spirit(rhymeManager), BoxBody, Dynamic, Trigger {
     override val size: Size = Size(600f, 200f)
 
     private val backgorund = manager.assets.image("left_ui")!!.image
@@ -87,6 +92,8 @@ class LeftUI(
         record.onUpdate(tick)
         progress.onUpdate(tick)
     }
+
+    override fun onEvent(pointer: Pointer) = record.handle(pointer)
 
     override fun Drawer.onDraw() {
         // 画背景

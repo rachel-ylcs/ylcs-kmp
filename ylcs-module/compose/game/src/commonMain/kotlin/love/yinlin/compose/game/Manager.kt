@@ -105,12 +105,12 @@ abstract class Manager {
                                 change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
                                     pointers[id] = pointer
                                     synchronized(lock) {
-                                        (scene as? Trigger)?.onEvent(pointer)
+                                        (scene as? Trigger)?.handle(pointer)
                                     }
                                 }
                                 change.changedToUp() -> pointers.remove(id)?.let { pointer ->
                                     synchronized(lock) {
-                                        (scene as? Trigger)?.onEvent(pointer.copy(endTime = time))
+                                        (scene as? Trigger)?.handle(pointer.copy(endTime = time))
                                     }
                                 }
                             }
