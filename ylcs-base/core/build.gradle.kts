@@ -67,12 +67,16 @@ kotlin {
             useSourceSet(commonMain)
         }
 
-        val appleMain = appleMain.get().apply {
-            useSourceSet(skikoMain, clientMain)
+        val nativeMain by creating {
+            useSourceSet(commonMain)
         }
 
         val jvmMain by creating {
             useSourceSet(clientMain)
+        }
+
+        val appleMain = appleMain.get().apply {
+            useSourceSet(skikoMain, clientMain)
         }
 
         androidMain.configure {
@@ -83,7 +87,7 @@ kotlin {
         }
 
         val iosMain = iosMain.get().apply {
-            useSourceSet(appleMain)
+            useSourceSet(appleMain, nativeMain)
         }
 
         buildList {
@@ -112,7 +116,7 @@ kotlin {
         }
 
         wasmJsMain.configure {
-            useSourceSet(skikoMain)
+            useSourceSet(skikoMain, nativeMain)
             useApi(
                 libs.kotlinx.broswer
             )
