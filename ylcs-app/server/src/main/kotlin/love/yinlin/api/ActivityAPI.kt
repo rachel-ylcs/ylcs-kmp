@@ -22,7 +22,7 @@ fun APIScope.activityAPI() {
             UserPrivilege.vipCalendar(user["privilege"].Int)
         } else false
         result(db.throwQuerySQL("""
-			SELECT aid, ts, tsInfo, location, shortTitle, title, content, price, saleTime, lineup, photo, link, playlist
+			SELECT aid, ts, tsInfo, location, shortTitle, title, content, price, saleTime, lineup, photo, link, playlist, hide
 			FROM activity
             ${if (showHide) "" else "WHERE hide = 0"}
 			ORDER BY aid DESC
@@ -46,11 +46,11 @@ fun APIScope.activityAPI() {
         if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
         db.throwExecuteSQL("""
 			UPDATE activity
-			SET ts = ? , tsInfo = ? , location = ? , shortTitle = ? , title = ? , content = ? , price = ? , saleTime = ? , lineup = ? , link = ? , playlist = ?
+			SET ts = ? , tsInfo = ? , location = ? , shortTitle = ? , title = ? , content = ? , price = ? , saleTime = ? , lineup = ? , link = ? , playlist = ? , hide = ?
 			WHERE aid = ?
 		""",activity.ts, activity.tsInfo, activity.location, activity.shortTitle, activity.title, activity.content,
             activity.price.toJsonString(), activity.saleTime.toJsonString(), activity.lineup.toJsonString(), activity.link.toJsonString(), activity.playlist.toJsonString(),
-            activity.aid)
+            activity.hide, activity.aid)
     }
 
     ApiActivityUpdateActivityPhoto.response { token, aid, key, pic ->

@@ -40,6 +40,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.input.DockedDatePicker
 import love.yinlin.compose.ui.input.LoadingClickText
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.activity.ActivityLink
@@ -69,6 +70,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 	private val inputLink = TextInputState(activity.link.link ?: "")
 	private val inputQQGroupPhone = TextInputState(activity.link.qqGroupPhone ?: "")
 	private val inputQQGroupLink = TextInputState(activity.link.qqGroupLink ?: "")
+	private var hide: Boolean by mutableStateOf(activity.hide)
 
 	private var photo by mutableRefStateOf(activity.photo)
 
@@ -105,7 +107,8 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			saleTime = saleTime,
 			lineup = lineup,
 			link = link,
-			playlist = playlist
+			playlist = playlist,
+			hide = hide
 		)
 		ApiActivityUpdateActivityInfo.request(app.config.userToken, newActivity) {
 			activities.findAssign(predicate = { it.aid == aid }) {
@@ -306,6 +309,16 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				imeAction = ImeAction.Next,
 				modifier = Modifier.fillMaxWidth()
 			)
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace)
+			) {
+				Text(text = "隐藏活动")
+				Switch(
+					checked = hide,
+					onCheckedChange = { hide = it }
+				)
+			}
 			ClickText(
 				text = "添加票价",
 				color = MaterialTheme.colorScheme.tertiary,

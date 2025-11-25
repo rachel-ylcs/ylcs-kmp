@@ -20,6 +20,7 @@ data class Activity(
 	val photo: ActivityPhoto = ActivityPhoto(), // [活动照片]
 	val link: ActivityLink = ActivityLink(), // [活动链接]
 	val playlist: List<String> = emptyList(), // [歌单]
+	val hide: Boolean = false, // [私密活动]
 ) : Comparable<Activity> {
 	override fun compareTo(other: Activity): Int {
 		val today = DateEx.Today.toEpochDays()
