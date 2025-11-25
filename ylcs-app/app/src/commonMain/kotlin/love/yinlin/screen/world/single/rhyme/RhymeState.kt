@@ -28,7 +28,7 @@ internal sealed interface GameState {
 
 // 游戏锁状态
 @Stable
-internal sealed interface GameLockState {
+sealed interface GameLockState {
     @Stable
     data object Normal : GameLockState // 正常
     @Stable

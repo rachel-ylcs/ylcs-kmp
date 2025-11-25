@@ -13,4 +13,5 @@ expect class PriorityQueue<E : Any>(comparator: Comparator<E>) {
     fun clear()
 
     operator fun iterator(): Iterator<E>
+    fun reverse(): Iterator<E>
 }

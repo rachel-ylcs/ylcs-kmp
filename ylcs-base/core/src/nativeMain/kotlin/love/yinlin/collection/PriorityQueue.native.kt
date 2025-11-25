@@ -50,4 +50,6 @@ actual class PriorityQueue<E : Any> actual constructor(private val comparator: C
     actual fun clear() { heap.clear() }
 
     actual operator fun iterator(): Iterator<E> = heap.iterator()
+
+    actual fun reverse(): Iterator<E> = heap.reversed().iterator()
 }

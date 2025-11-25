@@ -1,5 +1,8 @@
 package love.yinlin.compose.game.traits
 
-interface PreTransform {
+import androidx.compose.runtime.Stable
+
+@Stable
+interface PreTransform : Soul {
     val preTransform: List<Transform> get() = emptyList()
 }

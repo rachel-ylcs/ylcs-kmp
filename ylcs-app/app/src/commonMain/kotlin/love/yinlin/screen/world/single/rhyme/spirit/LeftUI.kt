@@ -14,17 +14,19 @@ import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.CircleBody
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Pointer
-import love.yinlin.compose.game.Spirit
+import love.yinlin.compose.game.traits.Container
+import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Dynamic
+import love.yinlin.compose.game.traits.PointerTrigger
 import love.yinlin.compose.game.traits.Transform
-import love.yinlin.compose.game.traits.Trigger
+import love.yinlin.compose.game.traits.Visible
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
 private class Record(
-    rhymeManager: RhymeManager,
+    private val rhymeManager: RhymeManager,
     private val recordImage: ImageBitmap
-) : Spirit(rhymeManager), CircleBody, Dynamic, Trigger {
+) : Spirit(rhymeManager), CircleBody, Visible, Dynamic, PointerTrigger {
     override val preTransform: List<Transform> = listOf(Transform.Translate(-28f, -44f))
     override val size: Size = Size(236f, 236f)
 
@@ -36,7 +38,11 @@ private class Record(
         angle += anglePerTick
     }
 
-    override fun onEvent(pointer: Pointer): Boolean = pointer.position in this
+    override fun onPointerEvent(pointer: Pointer): Boolean {
+        val result = pointer.position in this
+        if (result) rhymeManager.onPause()
+        return result
+    }
 
     override fun Drawer.onDraw() {
         rotate(angle) {
@@ -52,7 +58,7 @@ private class Record(
 @Stable
 private class Progress(
     private val rhymeManager: RhymeManager,
-) : Spirit(rhymeManager), BoxBody, Dynamic {
+) : Spirit(rhymeManager), BoxBody, Visible, Dynamic {
     override val preTransform: List<Transform> = listOf(Transform.Translate(214f, 96f))
     override val size: Size = Size(355f, 10f)
 
@@ -73,7 +79,7 @@ private class Progress(
     }
 
     override fun Drawer.onDraw() {
-        roundRect(Colors.Green4, position = Offset.Zero, size = Size(progress * 355, 10f), radius = 5f, alpha = 0.5f)
+        roundRect(Colors.Cyan2, position = Offset.Zero, size = Size(progress * 355, 10f), radius = 5f, alpha = 0.5f)
     }
 }
 
@@ -81,26 +87,17 @@ private class Progress(
 class LeftUI(
     rhymeManager: RhymeManager,
     recordImage: ImageBitmap
-) : Spirit(rhymeManager), BoxBody, Dynamic, Trigger {
+) : Container(rhymeManager), BoxBody {
     override val size: Size = Size(600f, 200f)
 
+    override val spirits: List<Spirit> = listOf(
+        Record(rhymeManager, recordImage),
+        Progress(rhymeManager)
+    )
+
     private val backgorund = manager.assets.image("left_ui")!!.image
-    private val record = Record(rhymeManager, recordImage)
-    private val progress = Progress(rhymeManager)
 
-    override fun onUpdate(tick: Long) {
-        record.onUpdate(tick)
-        progress.onUpdate(tick)
-    }
-
-    override fun onEvent(pointer: Pointer) = record.handle(pointer)
-
-    override fun Drawer.onDraw() {
-        // 画背景
+    override fun Drawer.preDraw() {
         image(backgorund)
-        // 画封面
-        record.apply { draw() }
-        // 画进度
-        progress.apply { draw() }
     }
 }

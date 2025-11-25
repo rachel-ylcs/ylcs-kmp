@@ -1,4 +1,4 @@
-package love.yinlin.compose.game
+package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
@@ -8,16 +8,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
-import love.yinlin.compose.game.traits.AABB
-import love.yinlin.compose.game.traits.PreTransform
-import love.yinlin.compose.game.traits.Transform
+import love.yinlin.compose.game.Drawer
 
 @Stable
-abstract class Spirit(val manager: Manager): AABB, PreTransform {
-    protected abstract fun Drawer.onDraw()
+interface Visible : Positionable, PreTransform {
+    val zIndex: Int get() = 0
+    fun Drawer.onDraw()
 
-    fun Drawer.draw() {
-        transform({
+    fun internalDraw(drawer: Drawer, block: (Drawer) -> Unit) {
+        drawer.transform({
             for (transform in preTransform) {
                 when (transform) {
                     is Transform.Translate -> translate(transform.x, transform.y)
@@ -26,7 +25,7 @@ abstract class Spirit(val manager: Manager): AABB, PreTransform {
                 }
             }
         }) {
-            onDraw()
+            block(drawer)
         }
     }
 

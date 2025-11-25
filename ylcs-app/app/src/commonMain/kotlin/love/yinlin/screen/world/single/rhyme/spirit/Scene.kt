@@ -4,11 +4,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.Drawer
-import love.yinlin.compose.game.Pointer
-import love.yinlin.compose.game.Spirit
-import love.yinlin.compose.game.traits.Dynamic
-import love.yinlin.compose.game.traits.Trigger
+import love.yinlin.compose.game.traits.Container
+import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
@@ -17,18 +14,10 @@ class Scene(
     rhymeManager: RhymeManager,
     lyrics: RhymeLyricsConfig,
     recordImage: ImageBitmap,
-) : Spirit(rhymeManager), BoxBody, Dynamic, Trigger {
+) : Container(rhymeManager), BoxBody {
     override val size: Size = manager.size
 
-    private val leftUI = LeftUI(rhymeManager, recordImage)
-
-    override fun onUpdate(tick: Long) {
-        leftUI.onUpdate(tick)
-    }
-
-    override fun onEvent(pointer: Pointer) = leftUI.handle(pointer)
-
-    override fun Drawer.onDraw() {
-        leftUI.apply { draw() }
-    }
+    override val spirits: List<Spirit> = listOf(
+        LeftUI(rhymeManager, recordImage)
+    )
 }

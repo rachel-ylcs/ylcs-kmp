@@ -25,8 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import love.yinlin.compose.game.traits.Dynamic
-import love.yinlin.compose.game.traits.Trigger
+import love.yinlin.compose.game.traits.Spirit
 
 @Stable
 abstract class Manager {
@@ -51,9 +50,7 @@ abstract class Manager {
             val tick = currentTick
             if (tick == 0L && lastTick != 0L) break
             lastTick = tick
-            synchronized(lock) {
-                (scene as? Dynamic)?.onUpdate(tick)
-            }
+            synchronized(lock) { scene?.update(tick) }
             delay(1000L / fps)
         }
         tickJob = null
@@ -104,23 +101,18 @@ abstract class Manager {
                             when {
                                 change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
                                     pointers[id] = pointer
-                                    synchronized(lock) {
-                                        (scene as? Trigger)?.handle(pointer)
-                                    }
+                                    synchronized(lock) { scene?.handlePointer(pointer) }
                                 }
                                 change.changedToUp() -> pointers.remove(id)?.let { pointer ->
-                                    synchronized(lock) {
-                                        (scene as? Trigger)?.handle(pointer.copy(endTime = time))
-                                    }
+                                    synchronized(lock) { scene?.handlePointer(pointer.copy(endTime = time)) }
                                 }
                             }
                         }
                     }
                 }
             }) {
-                val drawer = Drawer(this, textDrawer)
                 scale(scale = canvasScale, pivot = Offset.Zero) {
-                    scene?.apply { drawer.draw() }
+                    scene?.draw(Drawer(this, textDrawer))
                 }
             }
         }

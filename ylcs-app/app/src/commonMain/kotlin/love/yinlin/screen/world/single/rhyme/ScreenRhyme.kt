@@ -66,7 +66,11 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val rhymeManager = RhymeManager(app.context, ::completeGame)
+    private val rhymeManager = RhymeManager(
+        context = app.context,
+        onComplete = ::completeGame,
+        onPause = { pauseGame(GameLockState.Pause) }
+    )
 
     private var resumePauseJob: Job? = null
 
@@ -98,13 +102,13 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             val lyrics = task1.await()
             val recordImage = task2.await()
             catchingError {
-                require(lyrics != null)
-                require(recordImage != null)
+                require(lyrics != null) { "歌词资源文件丢失" }
+                require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {
                     start(lyrics, recordImage, info.path(Paths.modPath, ModResourceType.Audio))
                 }
                 state = GameState.Playing
-            }?.let { slot.tip.error("部分资源丢失") }
+            }.errorTip
         }
     }
 

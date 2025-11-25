@@ -22,7 +22,8 @@ import love.yinlin.screen.world.single.rhyme.spirit.Scene
 @Stable
 class RhymeManager(
     context: Context,
-    private val onComplete: () -> Unit
+    private val onComplete: () -> Unit,
+    val onPause: () -> Unit
 ) : Manager() {
     override val size: Size = Size(1920f, 1080f)
     override val fps: Int = RhymeConfig.FPS
@@ -44,12 +45,12 @@ class RhymeManager(
         recordImage: ImageBitmap,
         audio: Path
     ) {
-        mp.load(audio)
         onSceneCreate(Scene(
             rhymeManager = this@RhymeManager,
             lyrics = lyrics,
             recordImage = recordImage
         ))
+        mp.load(audio)
         resume()
     }
 
