@@ -77,11 +77,13 @@ val ApiAccountChangePassword by API.post.i<String, String, String>().o()
 
 // Activity
 
-val ApiActivityGetActivities by API.post.i().o<List<Activity>>()
+@APIParam("token")
+val ApiActivityGetActivities by API.post.i<String?>().o<List<Activity>>()
 
 @APIParam("token")
+@APIParam("hide")
 @APIReturn("aid")
-val ApiActivityAddActivity by API.post.i<String>().o<Int>()
+val ApiActivityAddActivity by API.post.i<String, Boolean>().o<Int>()
 
 @APIParam("token")
 @APIParam("activity")

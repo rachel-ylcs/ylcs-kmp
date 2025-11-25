@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastFilter
@@ -51,6 +52,7 @@ import love.yinlin.screen.msg.pictures.ScreenPictures
 import love.yinlin.screen.msg.weibo.*
 import love.yinlin.compose.ui.container.Calendar
 import love.yinlin.compose.ui.container.CalendarState
+import love.yinlin.compose.ui.floating.ListDialogChoice
 import love.yinlin.compose.ui.image.Banner
 import kotlin.math.abs
 
@@ -89,11 +91,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private val calendarState = CalendarState()
 
     private suspend fun requestActivity() {
-        ApiActivityGetActivities.request { activities.replaceAll(it.sorted()) }
+        ApiActivityGetActivities.request(app.config.userToken.ifEmpty { null }) { activities.replaceAll(it.sorted()) }
     }
 
-    private suspend fun addActivity() {
-        ApiActivityAddActivity.request(app.config.userToken) { requestActivity() }.errorTip
+    private suspend fun addActivity(hide: Boolean) {
+        ApiActivityAddActivity.request(app.config.userToken, hide) { requestActivity() }.errorTip
     }
 
     @Composable
@@ -262,7 +264,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
     private fun ActionScope.ToolBarLayout() {
         if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
             ActionSuspend(Icons.Outlined.Add, "添加") {
-                addActivity()
+                when (addActivityDialog.openSuspend()) {
+                    0 -> addActivity(false)
+                    1 -> addActivity(true)
+                    null -> {}
+                }
             }
         }
         ActionSuspend(Icons.Outlined.Refresh, "刷新") {
@@ -363,5 +369,11 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
             Device.Type.PORTRAIT -> Portrait()
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }
+    }
+
+    private val addActivityDialog = this land object : ListDialogChoice("添加活动") {
+        override val num: Int = 2
+        override fun nameFactory(index: Int): String = if (index == 0) "公开活动" else "私密活动"
+        override fun iconFactory(index: Int): ImageVector = if (index == 0) Icons.Outlined.Public else Icons.Outlined.Lock
     }
 }

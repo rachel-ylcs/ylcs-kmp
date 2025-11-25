@@ -15,20 +15,28 @@ import love.yinlin.server.currentUniqueId
 import love.yinlin.server.values
 
 fun APIScope.activityAPI() {
-    ApiActivityGetActivities.response {
+    ApiActivityGetActivities.response { token ->
+        val showHide = if (token != null) {
+            val uid = AN.throwExpireToken(token)
+            val user = db.throwGetUser(uid, "privilege")
+            UserPrivilege.vipCalendar(user["privilege"].Int)
+        } else false
         result(db.throwQuerySQL("""
 			SELECT aid, ts, tsInfo, location, shortTitle, title, content, price, saleTime, lineup, photo, link, playlist
 			FROM activity
+            ${if (showHide) "" else "WHERE hide = 0"}
 			ORDER BY aid DESC
 		""").to())
     }
 
-    ApiActivityAddActivity.response { token ->
+    ApiActivityAddActivity.response { token, hide ->
         val uid = AN.throwExpireToken(token)
         val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
         // 插入活动
-        val aid = db.throwInsertSQLGeneratedKey("INSERT INTO activity(title) ${values(1)}", DateEx.CurrentLong.toString()).toInt()
+        val aid = db.throwInsertSQLGeneratedKey("""
+            INSERT INTO activity(title, hide) ${values(2)}
+        """, DateEx.CurrentLong.toString(), hide).toInt()
         result(aid)
     }
 

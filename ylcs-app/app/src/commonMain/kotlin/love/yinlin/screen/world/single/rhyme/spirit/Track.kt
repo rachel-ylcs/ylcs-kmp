@@ -49,12 +49,12 @@ data class Track(
     val slopeLeft: Float = vertices.slope(left) // 左侧点斜率
     val slopeRight: Float = vertices.slope(right) // 右侧点斜率
     val area: Array<Offset> = arrayOf(vertices, left, right) // 轨道区域
-    val tipArea: Array<Offset> = arrayOf(
+    val clickArea: Array<Offset> = arrayOf(
         vertices.onLine(left, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(left, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO))
-    ) // 提示区域
+    ) // 点击区域
 }
 
 @Stable
