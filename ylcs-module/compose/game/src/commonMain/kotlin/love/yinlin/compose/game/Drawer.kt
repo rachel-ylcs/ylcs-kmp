@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.DrawTransform
@@ -20,7 +21,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.Path
 import love.yinlin.compose.roundToIntOffset
@@ -28,8 +33,10 @@ import love.yinlin.compose.roundToIntOffset
 @Stable
 class Drawer(
     val scope: DrawScope,
-    val textDrawer: TextDrawer
+    private val textDrawer: TextDrawer
 ) {
+    // 绘制形状
+
     fun line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
         scope.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
     }
@@ -86,6 +93,8 @@ class Drawer(
         scope.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
     }
 
+    // 绘制图片
+
     fun image(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
         scope.drawImage(image = image, dstOffset = position.roundToIntOffset(), dstSize = size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
     }
@@ -94,16 +103,60 @@ class Drawer(
         clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
     }
 
+    // 绘制文字
+
+    fun measureText(textCache: TextDrawer.TextCache, text: String, textHeight: Float): Paragraph = textCache.measureText(textDrawer, text, textHeight)
+
+    fun text(content: Paragraph, color: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        clip(Offset.Zero, Size(content.width, content.height)) {
+            content.paint(
+                canvas = scope.drawContext.canvas,
+                color = color,
+                shadow = shadow,
+                textDecoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
+    }
+
+    fun text(content: Paragraph, brush: Brush, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        clip(Offset.Zero, Size(content.width, content.height)) {
+            content.paint(
+                canvas = scope.drawContext.canvas,
+                brush = brush,
+                shadow = shadow,
+                textDecoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
+    }
+
+    // 转换
+
+    inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {
+        scope.translate(x, y) { block()}
+    }
+
+    inline fun translate(offset: Offset, block: Drawer.() -> Unit) {
+        scope.translate(offset.x, offset.y) { block() }
+    }
+
+    inline fun scale(x: Float, y: Float = x, pivot: Offset, block: Drawer.() -> Unit) {
+        scope.scale(x, y, pivot) { block() }
+    }
+
+    inline fun rotate(degrees: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope.rotate(degrees, pivot) { block() }
+    }
+
     inline fun clip(position: Offset, size: Size, block: Drawer.() -> Unit) {
         scope.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
     }
 
     inline fun clip(path: Path, block: Drawer.() -> Unit) {
         scope.clipPath(path) { block() }
-    }
-
-    inline fun rotate(degrees: Float, pivot: Offset, block: Drawer.() -> Unit) {
-        scope.rotate(degrees, pivot) { block() }
     }
 
     inline fun perspective(matrix: Matrix, block: Drawer.() -> Unit) {

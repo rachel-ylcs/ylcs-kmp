@@ -60,7 +60,7 @@ private class Progress(
     private val rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody, Visible, Dynamic {
     override val preTransform: List<Transform> = listOf(Transform.Translate(214f, 96f))
-    override val size: Size = Size(355f, 10f)
+    override val size: Size = Size(455f, 10f)
 
     // 游戏进度
     private var progress: Float by mutableFloatStateOf(0f)
@@ -79,7 +79,7 @@ private class Progress(
     }
 
     override fun Drawer.onDraw() {
-        roundRect(Colors.Cyan2, position = Offset.Zero, size = Size(progress * 355, 10f), radius = 5f, alpha = 0.5f)
+        roundRect(Colors.Cyan2, position = Offset.Zero, size = Size(size.width * progress, size.height), radius = 5f)
     }
 }
 
@@ -88,7 +88,7 @@ class LeftUI(
     rhymeManager: RhymeManager,
     recordImage: ImageBitmap
 ) : Container(rhymeManager), BoxBody {
-    override val size: Size = Size(600f, 200f)
+    override val size: Size = Size(700f, 200f)
 
     override val spirits: List<Spirit> = listOf(
         Record(rhymeManager, recordImage),

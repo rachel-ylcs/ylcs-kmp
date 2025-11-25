@@ -72,7 +72,8 @@ class RhymeManager(
 
     suspend fun CoroutineScope.downloadAssets(): Boolean {
         val imageKeys = arrayOf(
-            "left_ui"
+            "left_ui",
+            "right_ui",
         )
 
         val animationKeys = arrayOf<Pair<String, Int>>(

@@ -18,6 +18,8 @@ class Scene(
     override val size: Size = manager.size
 
     override val spirits: List<Spirit> = listOf(
-        LeftUI(rhymeManager, recordImage)
+        LeftUI(rhymeManager, recordImage),
+        RightUI(rhymeManager, lyrics),
+        TrackUI(rhymeManager)
     )
 }
