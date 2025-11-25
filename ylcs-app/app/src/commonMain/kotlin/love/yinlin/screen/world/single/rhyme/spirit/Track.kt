@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
@@ -49,12 +50,15 @@ data class Track(
     val slopeLeft: Float = vertices.slope(left) // 左侧点斜率
     val slopeRight: Float = vertices.slope(right) // 右侧点斜率
     val area: Array<Offset> = arrayOf(vertices, left, right) // 轨道区域
+    val areaPath: Path = Path(area) // 轨道区域路径
+    // 点击区域
     val clickArea: Array<Offset> = arrayOf(
         vertices.onLine(left, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(left, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO))
-    ) // 点击区域
+    )
+    val clickAreaPath: Path = Path(clickArea) // 点击区域路径
 }
 
 @Stable
@@ -81,7 +85,7 @@ class TrackUI(
                 scale = Track.Scales[index],
                 vertices = vertices,
                 left = left,
-                right = right,
+                right = right
             ))
             start += trackWidth
         }
@@ -132,27 +136,20 @@ class TrackUI(
 
     private fun Drawer.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
         // 光带
-        line(
-            color = Colors.Steel4,
-            start = start,
-            end = end,
-            style = Stroke(width = stroke, cap = StrokeCap.Round),
-            alpha = 0.7f
-        )
+        line(Colors.Steel4, start, end, style = Stroke(width = stroke, cap = StrokeCap.Round), alpha = 0.7f)
         // 高光
-        line(
-            color = Colors.White,
-            start = start,
-            end = end,
-            style = Stroke(width = stroke * 0.8f, cap = StrokeCap.Round),
-            alpha = 0.8f
-        )
+        line(Colors.White, start, end, style = Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), alpha = 0.8f)
     }
 
     override fun Drawer.onDraw() {
+        // 画点击区域
+        for (track in tracks) {
+            // 画区域线
+            path(Colors.White, track.clickAreaPath, style = Stroke(5f))
+        }
         // 画按下轨道高光
         repeat(7) {
-            if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = Path(tracks[it].area))
+            if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = tracks[it].areaPath)
         }
         // 画轨道射线
         for (track in tracks) drawTrackLine(vertices, track.left, 20f)
