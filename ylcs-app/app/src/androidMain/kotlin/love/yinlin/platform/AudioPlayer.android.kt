@@ -16,7 +16,7 @@ actual class AudioPlayer actual constructor(private val context: Context, privat
 
     actual val isInit: Boolean get() = player != null
 
-    actual val isPlaying: Boolean get() = player?.isPlaying == true
+    actual val isPlaying: Boolean get() = player?.isPlaying ?: false
 
     actual val position: Long get() = player?.currentPosition.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
@@ -28,7 +28,6 @@ actual class AudioPlayer actual constructor(private val context: Context, privat
             shuffleModeEnabled = false
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
-                    super.onPlaybackStateChanged(playbackState)
                     if (playbackState == Player.STATE_ENDED) {
                         innerStop()
                         onEndListener()
@@ -36,7 +35,6 @@ actual class AudioPlayer actual constructor(private val context: Context, privat
                 }
 
                 override fun onPlayerError(error: PlaybackException) {
-                    super.onPlayerError(error)
                     innerStop()
                 }
             })

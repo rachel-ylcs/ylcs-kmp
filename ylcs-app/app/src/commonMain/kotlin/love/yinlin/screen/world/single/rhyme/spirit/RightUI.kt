@@ -68,7 +68,11 @@ private class LyricsBar(
         val textWidth = content.width
         // 保持文本居中
         translate((size.width - textWidth) / 2, 0f) {
-            text(content, Colors.White, shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f))
+            text(
+                content = content,
+                color = Colors(0xffe2e6ff),
+                shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
+            )
             clip(Offset.Zero, Size(textWidth * progress, size.height)) {
                 text(content, Colors.Green4)
             }

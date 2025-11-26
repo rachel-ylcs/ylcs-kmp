@@ -120,7 +120,7 @@ private class ScoreBoard(
             text(
                 content = content,
                 color = Colors(0xffe2e6ff).copy(alpha = if (animation.isCompleted) 1f else (animation.progress + 0.3f).coerceAtMost(1f)),
-                shadow = Shadow(Colors(0x8016c57f), Offset(3f, 3f), 3f)
+                shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
             )
         }
     }

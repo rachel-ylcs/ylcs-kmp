@@ -95,18 +95,16 @@ class ActiveTrack {
 
     fun safeSet(index: Int, pointer: Pointer) {
         // 防止多指按下同一个轨道
-        pointer.handle(
-            down = { // 按下
-                if (pointers[index] == null) {
-                    pointers[index] = pointer
-                }
-            },
-            up = { isClick, endTime -> // 抬起
-                if (pointers.indexOfFirst { it?.id == pointer.id } == index) {
-                    pointers[index] = null
-                }
+        if (pointer.isDown) { // 按下
+            if (pointers[index] == null) {
+                pointers[index] = pointer
             }
-        )
+        }
+        else { // 抬起
+            if (pointers.indexOfFirst { it?.id == pointer.id } == index) {
+                pointers[index] = null
+            }
+        }
     }
 }
 

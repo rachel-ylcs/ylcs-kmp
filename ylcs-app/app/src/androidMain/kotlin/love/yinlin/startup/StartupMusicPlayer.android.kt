@@ -125,7 +125,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
 
     val listener = object : Player.Listener {
         override fun onRepeatModeChanged(repeatMode: Int) {
-            super.onRepeatModeChanged(repeatMode)
             withPlayer {
                 val newPlayMode = mergePlayMode(repeatMode, it.shuffleModeEnabled)
                 playMode = newPlayMode
@@ -134,7 +133,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-            super.onShuffleModeEnabledChanged(shuffleModeEnabled)
             withPlayer {
                 val newPlayMode = mergePlayMode(it.repeatMode, shuffleModeEnabled)
                 playMode = newPlayMode
@@ -143,7 +141,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onIsPlayingChanged(value: Boolean) {
-            super.onIsPlayingChanged(value)
             withPlayer { player ->
                 isPlaying = value
                 // 更新进度
@@ -161,7 +158,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-            super.onTimelineChanged(timeline, reason)
             withPlayer {
                 when (reason) {
                     Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED if timeline !is Timeline.RemotableTimeline -> {
@@ -174,7 +170,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            super.onPlaybackStateChanged(playbackState)
             withPlayer { player ->
                 when (playbackState) {
                     Player.STATE_IDLE -> { }
@@ -199,7 +194,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            super.onMediaItemTransition(mediaItem, reason)
             withPlayer { player ->
                 if (mediaItem == null) {
                     onMusicChanged(null)
@@ -215,7 +209,6 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
         }
 
         override fun onPlayerError(err: PlaybackException) {
-            super.onPlayerError(err)
             withPlayer { player ->
                 player.stop()
                 error = err
