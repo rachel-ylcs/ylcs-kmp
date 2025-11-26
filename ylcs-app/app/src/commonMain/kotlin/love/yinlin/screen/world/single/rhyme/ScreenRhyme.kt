@@ -103,6 +103,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             val recordImage = task2.await()
             catchingError {
                 require(lyrics != null) { "歌词资源文件丢失" }
+                require(lyrics.id == info.id) { "歌词资源文件与MOD不匹配" }
                 require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {
                     start(lyrics, recordImage, info.path(Paths.modPath, ModResourceType.Audio))
