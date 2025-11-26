@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.Path
@@ -106,7 +107,7 @@ class Drawer(
 
     // 绘制文字
 
-    fun measureText(textCache: TextDrawer.TextCache, text: String, textHeight: Float): Paragraph = textCache.measureText(textDrawer, text, textHeight)
+    fun measureText(textCache: TextDrawer.TextCache, text: String, textHeight: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph = textCache.measureText(textDrawer, text, textHeight, fontWeight)
 
     fun text(content: Paragraph, color: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
         clip(Offset.Zero, Size(content.width, content.height)) {

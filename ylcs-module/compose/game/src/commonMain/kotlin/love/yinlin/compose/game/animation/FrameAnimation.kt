@@ -9,18 +9,20 @@ import androidx.compose.runtime.setValue
 @Stable
 class FrameAnimation(
     totalFrame: Int,
-    private val isInfinite: Boolean = true
+    private val isInfinite: Boolean = false
 ) {
     companion object {
-        const val END = -1
+        private const val END = -1
     }
 
     private var total by mutableIntStateOf(totalFrame)
 
-    var frame by mutableIntStateOf(0)
+    var frame by mutableIntStateOf(END)
         private set
 
     val progress by derivedStateOf { (frame + 1f) / total }
+
+    val isCompleted by derivedStateOf { frame == END }
 
     fun update() {
         if (frame != END) {
@@ -29,8 +31,12 @@ class FrameAnimation(
         }
     }
 
-    fun reset(totalFrame: Int? = null) {
+    fun start(totalFrame: Int? = null) {
         if (totalFrame != null) total = totalFrame
+        frame = 0
+    }
+
+    fun reset() {
         frame = 0
     }
 }

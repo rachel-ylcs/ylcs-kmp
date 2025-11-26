@@ -1,18 +1,25 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.util.fastJoinToString
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.CircleBody
 import love.yinlin.compose.game.Drawer
+import love.yinlin.compose.game.TextDrawer
+import love.yinlin.compose.game.animation.FrameAnimation
 import love.yinlin.compose.game.traits.Container
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.PointerEvent
@@ -90,6 +97,41 @@ private class Progress(
 }
 
 @Stable
+private class ScoreBoard(
+    rhymeManager: RhymeManager,
+) : Spirit(rhymeManager), BoxBody {
+    override val preTransform: List<Transform> = listOf(Transform.Translate(275f, 14f))
+    override val size: Size = Size(350f, 70f)
+
+    // 游戏得分
+    private var score: Int by mutableIntStateOf(0)
+    private val scoreText: String by derivedStateOf { score.toString().padStart(4, '0').toList().fastJoinToString(" ") }
+
+    private val textCache = TextDrawer.TextCache()
+    private val animation = FrameAnimation(rhymeManager.fps / 2)
+
+    override fun onClientUpdate(tick: Long) {
+        animation.update()
+    }
+
+    override fun Drawer.onClientDraw() {
+        val content = measureText(textCache, scoreText, this@ScoreBoard.size.height, FontWeight.ExtraBold)
+        translate((size.width - content.width) / 2, 0f) {
+            text(
+                content = content,
+                color = Colors(0xffe2e6ff).copy(alpha = if (animation.isCompleted) 1f else (animation.progress + 0.3f).coerceAtMost(1f)),
+                shadow = Shadow(Colors(0x8016c57f), Offset(3f, 3f), 3f)
+            )
+        }
+    }
+
+    fun addScore(value: Int) {
+        score += value
+        animation.start()
+    }
+}
+
+@Stable
 class LeftUI(
     rhymeManager: RhymeManager,
     recordImage: ImageBitmap
@@ -98,7 +140,8 @@ class LeftUI(
 
     override val souls: List<Soul> = listOf(
         Record(rhymeManager, recordImage),
-        Progress(rhymeManager)
+        Progress(rhymeManager),
+        ScoreBoard(rhymeManager)
     )
 
     private val backgorund = manager.assets.image("left_ui")!!.image

@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 @Stable
 class ValueAnimation(
     progressStep: Float,
-    private val isInfinite: Boolean = true
+    private val isInfinite: Boolean = false
 ) {
     private var step by mutableStateOf(progressStep)
 
