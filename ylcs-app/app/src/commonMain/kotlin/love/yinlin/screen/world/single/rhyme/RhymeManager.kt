@@ -42,13 +42,13 @@ class RhymeManager(
     fun release() = mp.release()
 
     suspend fun CoroutineScope.start(
-        lyrics: RhymeLyricsConfig,
+        lyricsConfig: RhymeLyricsConfig,
         recordImage: ImageBitmap,
         audio: Path
     ) {
         onSceneCreate(Scene(
             rhymeManager = this@RhymeManager,
-            lyrics = lyrics,
+            lyricsConfig = lyricsConfig,
             recordImage = recordImage
         ))
         mp.load(audio)

@@ -22,7 +22,6 @@ import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
 import love.yinlin.compose.translate
-import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 // 可点击区域
@@ -111,16 +110,15 @@ class ActiveTrack {
 @Stable
 class TrackUI(
     rhymeManager: RhymeManager,
-    lyrics: RhymeLyricsConfig,
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
     override val size: Size = Size(1920f, 1080f * (1 + Track.VERTICES_TOP_RATIO))
 
     // 顶点
-    private val vertices = Offset(size.width / 2, 0f)
+    val vertices = Offset(size.width / 2, 0f)
 
     // 轨道
-    private val tracks = buildList {
+    val tracks = buildList {
         val trackWidth = this@TrackUI.size.width / Track.Num
         val bottom = this@TrackUI.size.height
         var start = 0f

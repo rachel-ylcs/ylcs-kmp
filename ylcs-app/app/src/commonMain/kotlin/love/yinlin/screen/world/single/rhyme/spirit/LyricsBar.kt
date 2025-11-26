@@ -22,11 +22,12 @@ import kotlin.text.ifEmpty
 @Stable
 class LyricsBar(
     rhymeManager: RhymeManager,
-    private val lyrics: RhymeLyricsConfig
+    lyricsConfig: RhymeLyricsConfig
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(50f, 22f))
     override val size: Size = Size(620f, 50f)
 
+    private val lines = lyricsConfig.lyrics
     private var currentIndex = -1
     private var text by mutableStateOf("")
     private var progress by mutableFloatStateOf(0f)
@@ -34,7 +35,6 @@ class LyricsBar(
     private val textCache = TextDrawer.Cache(16)
 
     override fun onClientUpdate(tick: Long) {
-        val lines = lyrics.lyrics
         val nextLine = lines.getOrNull(currentIndex + 1)
         if (nextLine != null && tick >= nextLine.start) {
             ++currentIndex

@@ -99,14 +99,18 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap()
                 }
             }
-            val lyrics = task1.await()
+            val lyricsConfig = task1.await()
             val recordImage = task2.await()
             catchingError {
-                require(lyrics != null) { "歌词资源文件丢失" }
-                require(lyrics.id == info.id) { "歌词资源文件与MOD不匹配" }
+                require(lyricsConfig != null) { "歌词资源文件丢失" }
+                require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
                 require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {
-                    start(lyrics, recordImage, info.path(Paths.modPath, ModResourceType.Audio))
+                    start(
+                        lyricsConfig = lyricsConfig,
+                        recordImage = recordImage,
+                        audio = info.path(Paths.modPath, ModResourceType.Audio)
+                    )
                 }
                 state = GameState.Playing
             }.errorTip

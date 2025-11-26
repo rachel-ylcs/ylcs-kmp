@@ -34,13 +34,13 @@ private class LeftUI(
 @Stable
 private class RightUI(
     rhymeManager: RhymeManager,
-    lyrics: RhymeLyricsConfig
+    lyricsConfig: RhymeLyricsConfig
 ) : Container(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(1220f, 0f))
     override val size: Size = Size(700f, 100f)
 
     override val souls: List<Soul> = listOf(
-        LyricsBar(rhymeManager, lyrics)
+        LyricsBar(rhymeManager, lyricsConfig)
     )
 
     private val backgorund = manager.assets.image("right_ui")!!.image
@@ -53,17 +53,19 @@ private class RightUI(
 @Stable
 class Scene(
     rhymeManager: RhymeManager,
-    lyrics: RhymeLyricsConfig,
+    lyricsConfig: RhymeLyricsConfig,
     recordImage: ImageBitmap,
 ) : Container(rhymeManager), BoxBody {
     override val size: Size = manager.size
 
+    private val trackUI = TrackUI(rhymeManager)
+
     override val souls: List<Soul> = listOf(
         LeftUI(rhymeManager, recordImage),
-        RightUI(rhymeManager, lyrics),
+        RightUI(rhymeManager, lyricsConfig),
         ComboBoard(rhymeManager),
-        TrackUI(rhymeManager, lyrics),
-        NoteQueue(rhymeManager, lyrics),
+        trackUI,
+        NoteQueue(rhymeManager, lyricsConfig, trackUI),
         ScreenEnvironment(rhymeManager),
     )
 }
