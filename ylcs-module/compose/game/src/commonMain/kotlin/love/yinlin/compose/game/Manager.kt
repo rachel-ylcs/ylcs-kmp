@@ -19,12 +19,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.font.FontFamily
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import love.yinlin.compose.game.traits.Event
+import love.yinlin.compose.game.traits.PointerEvent
 import love.yinlin.compose.game.traits.Spirit
 
 @Stable
@@ -37,11 +38,17 @@ abstract class Manager {
     val assets = Assets() // 资源
 
     private var scene: Spirit? = null // 主场景
+
     private val pointers = mutableLongObjectMapOf<Pointer>() // 指针集
 
-    private val lock = SynchronizedObject()
+    private val eventChannel = Channel<Event>(Channel.UNLIMITED)
+    private var tickJob: Job? = null // 帧更新协程
 
-    private var tickJob: Job? = null
+    private fun clearEventChannel() {
+        while (true) {
+            if (!eventChannel.tryReceive().isSuccess) break
+        }
+    }
 
     private fun CoroutineScope.startTickJob(): Job = launch {
         var lastTick = 0L
@@ -49,12 +56,20 @@ abstract class Manager {
             val tick = currentTick
             if (tick == 0L && lastTick != 0L) break
             lastTick = tick
-            synchronized(lock) { scene?.update(tick) }
+
+            scene?.apply {
+                // 事件处理
+                while (true) onEvent(eventChannel.tryReceive().getOrNull() ?: break)
+                // 帧更新
+                onUpdate(tick)
+            }
+
             delay(1000L / fps)
         }
         tickJob = null
         scene = null
         pointers.clear()
+        clearEventChannel()
     }
 
     protected fun onSceneCreate(spirit: Spirit) {
@@ -76,6 +91,7 @@ abstract class Manager {
         tickJob = null
         scene = null
         pointers.clear()
+        clearEventChannel()
     }
 
     @Composable
@@ -99,10 +115,10 @@ abstract class Manager {
                             when {
                                 change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
                                     pointers[id] = pointer
-                                    synchronized(lock) { scene?.handlePointer(pointer) }
+                                    eventChannel.trySend(PointerEvent(pointer))
                                 }
                                 change.changedToUp() -> pointers.remove(id)?.let { pointer ->
-                                    synchronized(lock) { scene?.handlePointer(pointer.copy(endTime = time)) }
+                                    eventChannel.trySend(PointerEvent(pointer.copy(endTime = time)))
                                 }
                             }
                         }
@@ -110,7 +126,7 @@ abstract class Manager {
                 }
             }) {
                 scale(scale = canvasScale, pivot = Offset.Zero) {
-                    scene?.draw(Drawer(this, textDrawer))
+                    scene?.apply { Drawer(this@scale, textDrawer).onDraw() }
                 }
             }
         }

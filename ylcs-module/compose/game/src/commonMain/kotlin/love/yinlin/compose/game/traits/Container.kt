@@ -5,78 +5,73 @@ import androidx.compose.ui.util.fastMap
 import love.yinlin.collection.PriorityQueue
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Manager
-import love.yinlin.compose.game.Pointer
 
 @Stable
-abstract class Container(manager: Manager) : Spirit(manager), Dynamic, PointerTrigger, Visible {
-    protected abstract val spirits: List<Spirit>
-
-    protected open fun preUpdate(tick: Long) { }
-    protected open fun Drawer.preDraw() { }
-
-    override fun onUpdate(tick: Long) { }
-    override fun onPointerEvent(pointer: Pointer): Boolean = false
-    override fun Drawer.onDraw() { }
-
+abstract class Container(manager: Manager) : Spirit(manager) {
     @Stable
-    private data class SpiritEntry(val spirit: Spirit, val addIndex: Long) {
+    private data class SoulEntry(val soul: Soul, val addIndex: Long) {
         companion object {
-            val comparator = Comparator<SpiritEntry> { entry1, entry2 ->
-                if (entry1.spirit is Visible) {
-                    if (entry2.spirit is Visible) {
-                        val result = entry1.spirit.zIndex.compareTo(entry2.spirit.zIndex)
+            val comparator = Comparator<SoulEntry> { entry1, entry2 ->
+                if (entry1.soul is Visible) {
+                    if (entry2.soul is Visible) {
+                        val result = entry1.soul.zIndex.compareTo(entry2.soul.zIndex)
                         if (result == 0) entry1.addIndex.compareTo(entry2.addIndex) else result
                     }
                     else -1
                 }
                 else {
-                    if (entry2.spirit is Visible) 1
+                    if (entry2.soul is Visible) 1
                     else entry1.addIndex.compareTo(entry2.addIndex)
                 }
             }
         }
     }
 
-    private var spiritAddIndex: Long = 0L
+    protected abstract val souls: List<Soul>
+
+    private var soulAddIndex: Long = 0L
     private val queue by lazy {
-        PriorityQueue(SpiritEntry.comparator).apply {
-            push(spirits.fastMap { spirit -> SpiritEntry(spirit, spiritAddIndex++) })
+        PriorityQueue(SoulEntry.comparator).apply {
+            push(souls.fastMap { soul -> SoulEntry(soul, soulAddIndex++) })
         }
     }
 
-    override fun update(tick: Long) {
-        internalUpdate(tick) {
-            preUpdate(it)
-            if (queue.isNotEmpty) {
-                for ((spirit, _) in queue) spirit.update(it)
-            }
-            onUpdate(it)
+    // Dynamic
+    protected open fun onClientPreUpdate(tick: Long) { }
+    protected open fun onClientPostUpdate(tick: Long) { }
+    final override fun onClientUpdate(tick: Long) {
+        onClientPreUpdate(tick)
+        if (queue.isNotEmpty) {
+            for ((soul, _) in queue) (soul as? Dynamic)?.onUpdate(tick)
         }
+        onClientPostUpdate(tick)
     }
 
-    override fun handlePointer(pointer: Pointer): Boolean {
-        return internalHandlePointer(pointer) {
+    // Trigger
+    protected open fun onClientPreEvent(): Boolean = false
+    protected open fun onClientPostEvent(): Boolean = false
+
+    final override fun onClientEvent(event: Event): Boolean {
+        // 可以拦截子元素的事件
+        if (onClientPreEvent()) return true
+        if (queue.isNotEmpty) {
             // 点击事件与绘制流程是反的, zIndex越大的先响应
-            if (onPointerEvent(it)) true
-            else {
-                if (queue.isNotEmpty) {
-                    for ((spirit, _) in queue.reverse()) {
-                        if (spirit.handlePointer(it)) return@internalHandlePointer true
-                    }
-                }
-                false
+            for ((soul, _) in queue.reverse()) {
+                if ((soul as? Trigger)?.onEvent(event) == true) return true
             }
         }
+        return onClientPostEvent()
     }
 
-    override fun draw(drawer: Drawer) {
-        internalDraw(drawer) {
-            // 绘制流程和点击事件是反的, zIndex越小的先绘制
-            it.preDraw()
-            if (queue.isNotEmpty) {
-                for ((spirit, _) in queue) spirit.draw(it)
-            }
-            it.onDraw()
+    // Visible
+    protected open fun Drawer.onClientPreDraw() { }
+    protected open fun Drawer.onClientPostDraw() { }
+
+    final override fun Drawer.onClientDraw() {
+        onClientPreDraw()
+        if (queue.isNotEmpty) {
+            for ((soul, _) in queue) (soul as? Visible)?.apply { onDraw() }
         }
+        onClientPostDraw()
     }
 }

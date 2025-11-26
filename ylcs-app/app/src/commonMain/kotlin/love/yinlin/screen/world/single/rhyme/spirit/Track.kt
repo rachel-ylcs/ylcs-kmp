@@ -15,12 +15,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
-import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.traits.PointerTrigger
+import love.yinlin.compose.game.traits.Event
+import love.yinlin.compose.game.traits.PointerEvent
 import love.yinlin.compose.game.traits.Transform
-import love.yinlin.compose.game.traits.Visible
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
 import love.yinlin.compose.translate
@@ -92,7 +91,7 @@ data class Track(
 class TrackUI(
     rhymeManager: RhymeManager,
     lyrics: RhymeLyricsConfig,
-) : Spirit(rhymeManager), BoxBody, Visible, PointerTrigger {
+) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
     override val size: Size = Size(1920f, 1080f * (1 + Track.VERTICES_TOP_RATIO))
 
@@ -154,20 +153,25 @@ class TrackUI(
         return null
     }
 
-    override fun onPointerEvent(pointer: Pointer): Boolean {
-        // 获取指针所在轨道
-        val track = calcTrackIndex(pointer.position)
-        if (track != null) {
-            pointer.handle(
-                down = { // 按下
-                    setTrackMap(track.index, true)
-                },
-                up = { isClick, endTime -> // 抬起
-                    setTrackMap(track.index, false)
+    override fun onClientEvent(event: Event): Boolean {
+        return when (event) {
+            is PointerEvent -> {
+                // 获取指针所在轨道
+                val pointer = event.pointer
+                val track = calcTrackIndex(pointer.position)
+                if (track != null) {
+                    pointer.handle(
+                        down = { // 按下
+                            setTrackMap(track.index, true)
+                        },
+                        up = { isClick, endTime -> // 抬起
+                            setTrackMap(track.index, false)
+                        }
+                    )
                 }
-            )
+                track != null
+            }
         }
-        return false
     }
 
     private fun Drawer.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
@@ -177,7 +181,7 @@ class TrackUI(
         line(Colors.White, start, end, style = Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), alpha = 0.8f)
     }
 
-    override fun Drawer.onDraw() {
+    override fun Drawer.onClientDraw() {
         // 画点击区域
         for (track in tracks) {
             // 画区域线

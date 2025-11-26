@@ -14,10 +14,9 @@ import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.TextDrawer
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Container
-import love.yinlin.compose.game.traits.Dynamic
+import love.yinlin.compose.game.traits.Soul
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
-import love.yinlin.compose.game.traits.Visible
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
@@ -25,7 +24,7 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 private class LyricsBar(
     rhymeManager: RhymeManager,
     private val lyrics: RhymeLyricsConfig
-) : Spirit(rhymeManager), BoxBody, Visible, Dynamic {
+) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(50f, 22f))
     override val size: Size = Size(620f, 50f)
 
@@ -35,7 +34,7 @@ private class LyricsBar(
 
     private val textCache = TextDrawer.TextCache(16)
 
-    override fun onUpdate(tick: Long) {
+    override fun onClientUpdate(tick: Long) {
         val lines = lyrics.lyrics
         val nextLine = lines.getOrNull(currentIndex + 1)
         if (nextLine != null && tick >= nextLine.start) {
@@ -63,7 +62,7 @@ private class LyricsBar(
         progress = (currentLength / totalLength).coerceIn(0f, 1f)
     }
 
-    override fun Drawer.onDraw() {
+    override fun Drawer.onClientDraw() {
         val line = text.ifEmpty { null } ?: return
         val content = measureText(textCache, line, size.height)
         val textWidth = content.width
@@ -85,13 +84,13 @@ class RightUI(
     override val preTransform: List<Transform> = listOf(Transform.Translate(1220f, 0f))
     override val size: Size = Size(700f, 100f)
 
-    override val spirits: List<Spirit> = listOf(
+    override val souls: List<Soul> = listOf(
         LyricsBar(rhymeManager, lyrics)
     )
 
     private val backgorund = manager.assets.image("right_ui")!!.image
 
-    override fun Drawer.preDraw() {
+    override fun Drawer.onClientPreDraw() {
         image(backgorund)
     }
 }
