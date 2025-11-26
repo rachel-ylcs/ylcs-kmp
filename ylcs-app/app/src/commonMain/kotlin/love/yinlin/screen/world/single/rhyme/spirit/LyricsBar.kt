@@ -13,15 +13,14 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.TextDrawer
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.traits.Container
-import love.yinlin.compose.game.traits.Soul
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+import kotlin.text.ifEmpty
 
 @Stable
-private class LyricsBar(
+class LyricsBar(
     rhymeManager: RhymeManager,
     private val lyrics: RhymeLyricsConfig
 ) : Spirit(rhymeManager), BoxBody {
@@ -32,7 +31,7 @@ private class LyricsBar(
     private var text by mutableStateOf("")
     private var progress by mutableFloatStateOf(0f)
 
-    private val textCache = TextDrawer.TextCache(16)
+    private val textCache = TextDrawer.Cache(16)
 
     override fun onClientUpdate(tick: Long) {
         val lines = lyrics.lyrics
@@ -77,24 +76,5 @@ private class LyricsBar(
                 text(content, Colors.Green4)
             }
         }
-    }
-}
-
-@Stable
-class RightUI(
-    rhymeManager: RhymeManager,
-    lyrics: RhymeLyricsConfig
-) : Container(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(1220f, 0f))
-    override val size: Size = Size(700f, 100f)
-
-    override val souls: List<Soul> = listOf(
-        LyricsBar(rhymeManager, lyrics)
-    )
-
-    private val backgorund = manager.assets.image("right_ui")!!.image
-
-    override fun Drawer.onClientPreDraw() {
-        image(backgorund)
     }
 }

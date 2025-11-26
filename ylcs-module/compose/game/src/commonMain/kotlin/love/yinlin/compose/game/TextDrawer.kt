@@ -19,7 +19,7 @@ class TextDrawer(
     private val fontFamilyResolver: FontFamily.Resolver
 ) {
     @Stable
-    class TextCache(maxSize: Int = 8) {
+    class Cache(maxSize: Int = 8) {
         @Stable
         private data class CacheKey(
             val text: String,
@@ -29,7 +29,7 @@ class TextDrawer(
 
         private val lruCache = lruCache<CacheKey, Paragraph>(maxSize)
 
-        fun measureText(manager: TextDrawer, text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
+        internal fun measureText(manager: TextDrawer, text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
             val cacheKey = CacheKey(text, height, fontWeight)
             val cacheResult = lruCache[cacheKey]
             if (cacheResult != null) return cacheResult

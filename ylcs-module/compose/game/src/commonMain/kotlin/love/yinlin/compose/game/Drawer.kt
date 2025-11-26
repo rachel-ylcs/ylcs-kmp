@@ -107,32 +107,28 @@ class Drawer(
 
     // 绘制文字
 
-    fun measureText(textCache: TextDrawer.TextCache, text: String, textHeight: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph = textCache.measureText(textDrawer, text, textHeight, fontWeight)
+    fun measureText(textCache: TextDrawer.Cache, text: String, textHeight: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph = textCache.measureText(textDrawer, text, textHeight, fontWeight)
 
     fun text(content: Paragraph, color: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
-        clip(Offset.Zero, Size(content.width, content.height)) {
-            content.paint(
-                canvas = scope.drawContext.canvas,
-                color = color,
-                shadow = shadow,
-                textDecoration = decoration,
-                drawStyle = drawStyle,
-                blendMode = blendMode
-            )
-        }
+        content.paint(
+            canvas = scope.drawContext.canvas,
+            color = color,
+            shadow = shadow,
+            textDecoration = decoration,
+            drawStyle = drawStyle,
+            blendMode = blendMode
+        )
     }
 
     fun text(content: Paragraph, brush: Brush, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
-        clip(Offset.Zero, Size(content.width, content.height)) {
-            content.paint(
-                canvas = scope.drawContext.canvas,
-                brush = brush,
-                shadow = shadow,
-                textDecoration = decoration,
-                drawStyle = drawStyle,
-                blendMode = blendMode
-            )
-        }
+        content.paint(
+            canvas = scope.drawContext.canvas,
+            brush = brush,
+            shadow = shadow,
+            textDecoration = decoration,
+            drawStyle = drawStyle,
+            blendMode = blendMode
+        )
     }
 
     // 转换
@@ -187,6 +183,8 @@ class Drawer(
     }
 
     fun DrawTransform.translate(offset: Offset) = translate(offset.x, offset.y)
+
+    fun DrawTransform.scale(ratio: Float, pivot: Offset) = scale(ratio, ratio, pivot)
 
     fun DrawTransform.perspective(src: Rect, dst: Array<Offset>) {
         transform(calcPerspectiveMatrix(src, dst))
