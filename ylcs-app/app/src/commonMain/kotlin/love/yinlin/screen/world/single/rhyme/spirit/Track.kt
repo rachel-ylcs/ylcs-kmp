@@ -5,7 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -22,6 +25,24 @@ import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+
+// 可点击区域
+@Stable
+class TrackClickArea(val area: Array<Offset>) {
+    val areaPath: Path = Path(area)
+    val perspectiveMatrix: Pair<Matrix, Rect> = Drawer.calcBottomPerspectiveMatrix(area)
+    val brush = Brush.radialGradient(
+        *arrayOf(
+            0f to Colors.Transparent,
+            0.3f to Colors.Steel3.copy(alpha = 0.1f),
+            0.5f to Colors.Steel3.copy(alpha = 0.2f),
+            0.75f to Colors.Steel3.copy(alpha = 0.4f),
+            1f to Colors.Steel3.copy(alpha = 0.8f)
+        ),
+        center = perspectiveMatrix.second.center,
+        radius = perspectiveMatrix.second.width * 0.707f
+    )
+}
 
 // 轨道
 @Stable
@@ -52,13 +73,12 @@ data class Track(
     val area: Array<Offset> = arrayOf(vertices, left, right) // 轨道区域
     val areaPath: Path = Path(area) // 轨道区域路径
     // 点击区域
-    val clickArea: Array<Offset> = arrayOf(
+    val clickArea = TrackClickArea(arrayOf(
         vertices.onLine(left, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(left, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
         vertices.onLine(right, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO))
-    )
-    val clickAreaPath: Path = Path(clickArea) // 点击区域路径
+    ))
 }
 
 @Stable
@@ -145,7 +165,12 @@ class TrackUI(
         // 画点击区域
         for (track in tracks) {
             // 画区域线
-            path(Colors.White, track.clickAreaPath, style = Stroke(5f))
+            path(Colors.White, track.clickArea.areaPath, style = Stroke(5f))
+            // 画区域阴影
+            val (matrix, srcRect) = track.clickArea.perspectiveMatrix
+            transform(matrix) {
+                rect(track.clickArea.brush, position = srcRect.topLeft, size = srcRect.size)
+            }
         }
         // 画按下轨道高光
         repeat(7) {

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.Path
 import love.yinlin.compose.roundToIntOffset
+import love.yinlin.compose.translate
 
 @Stable
 class Drawer(
@@ -143,7 +144,11 @@ class Drawer(
         scope.translate(offset.x, offset.y) { block() }
     }
 
-    inline fun scale(x: Float, y: Float = x, pivot: Offset, block: Drawer.() -> Unit) {
+    inline fun scale(ratio: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope.scale(ratio, ratio, pivot) { block() }
+    }
+
+    inline fun scale(x: Float, y: Float, pivot: Offset, block: Drawer.() -> Unit) {
         scope.scale(x, y, pivot) { block() }
     }
 
@@ -167,73 +172,101 @@ class Drawer(
         scope.withTransform({ perspective(src, dst) }) { block() }
     }
 
+    inline fun bottomPerspective(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x, block: Drawer.(Rect) -> Unit) {
+        var src: Rect? = null
+        scope.withTransform({
+            src = bottomPerspective(dst, height)
+        }) {
+            src?.let { block(it) }
+        }
+    }
+
     inline fun transform(transformBlock: DrawTransform.() -> Unit, block: Drawer.() -> Unit) {
         scope.withTransform(transformBlock) { block() }
     }
 
     fun DrawTransform.translate(offset: Offset) = translate(offset.x, offset.y)
 
-    // 计算透视变换(dst为左上角逆时针)
     fun DrawTransform.perspective(src: Rect, dst: Array<Offset>) {
-        fun mapUnitSquareToQuad(p0: Offset, p1: Offset, p2: Offset, p3: Offset): Matrix {
-            val (x0, y0) = p0
-            val (x1, y1) = p1
-            val (x2, y2) = p2
-            val (x3, y3) = p3
+        transform(calcPerspectiveMatrix(src, dst))
+    }
 
-            val dx1 = x1 - x2
-            val dx2 = x3 - x2
-            val dx3 = x0 - x1 + x2 - x3
-            val dy1 = y1 - y2
-            val dy2 = y3 - y2
-            val dy3 = y0 - y1 + y2 - y3
+    // 底边固定的透视变换
+    // 透视底边与源矩形底边重合
+    fun DrawTransform.bottomPerspective(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x): Rect {
+        val (matrix, src) = calcBottomPerspectiveMatrix(dst, height)
+        transform(matrix)
+        return src
+    }
 
-            val m = Matrix()
-            val values = m.values
+    companion object {
+        // 计算透视变换(dst为左上角逆时针)
+        fun calcPerspectiveMatrix(src: Rect, dst: Array<Offset>): Matrix {
+            fun mapUnitSquareToQuad(p0: Offset, p1: Offset, p2: Offset, p3: Offset): Matrix {
+                val (x0, y0) = p0
+                val (x1, y1) = p1
+                val (x2, y2) = p2
+                val (x3, y3) = p3
 
-            if (dx3 == 0f && dy3 == 0f) {
-                // Affine
-                values[Matrix.ScaleX] = x1 - x0
-                values[Matrix.SkewX]  = x3 - x0
-                values[Matrix.TranslateX] = x0
-                values[Matrix.SkewY]  = y1 - y0
-                values[Matrix.ScaleY] = y3 - y0
-                values[Matrix.TranslateY] = y0
-                values[Matrix.Perspective0] = 0f
-                values[Matrix.Perspective1] = 0f
-                values[Matrix.Perspective2] = 1f
-            } else {
-                // Perspective
-                val det1 = dx1 * dy2 - dx2 * dy1
-                if (det1 == 0f) return Matrix()
+                val dx1 = x1 - x2
+                val dx2 = x3 - x2
+                val dx3 = x0 - x1 + x2 - x3
+                val dy1 = y1 - y2
+                val dy2 = y3 - y2
+                val dy3 = y0 - y1 + y2 - y3
 
-                val g = (dx3 * dy2 - dx2 * dy3) / det1
-                val h = (dx1 * dy3 - dx3 * dy1) / det1
+                val m = Matrix()
+                val values = m.values
 
-                val a = x1 - x0 + g * x1
-                val b = x3 - x0 + h * x3
-                val c = x0
-                val d = y1 - y0 + g * y1
-                val e = y3 - y0 + h * y3
-                val f = y0
+                if (dx3 == 0f && dy3 == 0f) {
+                    // Affine
+                    values[Matrix.ScaleX] = x1 - x0
+                    values[Matrix.SkewX]  = x3 - x0
+                    values[Matrix.TranslateX] = x0
+                    values[Matrix.SkewY]  = y1 - y0
+                    values[Matrix.ScaleY] = y3 - y0
+                    values[Matrix.TranslateY] = y0
+                    values[Matrix.Perspective0] = 0f
+                    values[Matrix.Perspective1] = 0f
+                    values[Matrix.Perspective2] = 1f
+                } else {
+                    // Perspective
+                    val det1 = dx1 * dy2 - dx2 * dy1
+                    if (det1 == 0f) return Matrix()
 
-                values[Matrix.ScaleX] = a
-                values[Matrix.SkewX]  = b
-                values[Matrix.TranslateX] = c
-                values[Matrix.SkewY]  = d
-                values[Matrix.ScaleY] = e
-                values[Matrix.TranslateY] = f
-                values[Matrix.Perspective0] = g
-                values[Matrix.Perspective1] = h
-                values[Matrix.Perspective2] = 1f
+                    val g = (dx3 * dy2 - dx2 * dy3) / det1
+                    val h = (dx1 * dy3 - dx3 * dy1) / det1
+
+                    val a = x1 - x0 + g * x1
+                    val b = x3 - x0 + h * x3
+                    val c = x0
+                    val d = y1 - y0 + g * y1
+                    val e = y3 - y0 + h * y3
+                    val f = y0
+
+                    values[Matrix.ScaleX] = a
+                    values[Matrix.SkewX]  = b
+                    values[Matrix.TranslateX] = c
+                    values[Matrix.SkewY]  = d
+                    values[Matrix.ScaleY] = e
+                    values[Matrix.TranslateY] = f
+                    values[Matrix.Perspective0] = g
+                    values[Matrix.Perspective1] = h
+                    values[Matrix.Perspective2] = 1f
+                }
+                return m
             }
-            return m
+
+            val srcMatrix = mapUnitSquareToQuad(src.topLeft, src.topRight, src.bottomRight, src.bottomLeft)
+            val dstMatrix = mapUnitSquareToQuad(dst[0], dst[3], dst[2], dst[1])
+            srcMatrix.invert()
+            srcMatrix *= dstMatrix
+            return srcMatrix
         }
 
-        val srcMatrix = mapUnitSquareToQuad(src.topLeft, src.topRight, src.bottomRight, src.bottomLeft)
-        val dstMatrix = mapUnitSquareToQuad(dst[0], dst[3], dst[2], dst[1])
-        srcMatrix.invert()
-        srcMatrix *= dstMatrix
-        transform(srcMatrix)
+        fun calcBottomPerspectiveMatrix(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x): Pair<Matrix, Rect> {
+            val src = Rect(dst[1].translate(y = -height), Size(dst[2].x - dst[1].x, height))
+            return calcPerspectiveMatrix(src, dst) to src
+        }
     }
 }
