@@ -1,9 +1,7 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -15,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
+import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Event
@@ -87,6 +86,30 @@ data class Track(
     ))
 }
 
+// 激活轨道
+@Stable
+class ActiveTrack {
+    private val pointers = List<Pointer?>(Track.Num) { null }.toMutableStateList()
+
+    operator fun get(index: Int): Boolean = pointers[index] != null
+
+    fun safeSet(index: Int, pointer: Pointer) {
+        // 防止多指按下同一个轨道
+        pointer.handle(
+            down = { // 按下
+                if (pointers[index] == null) {
+                    pointers[index] = pointer
+                }
+            },
+            up = { isClick, endTime -> // 抬起
+                if (pointers.indexOfFirst { it?.id == pointer.id } == index) {
+                    pointers[index] = null
+                }
+            }
+        )
+    }
+}
+
 @Stable
 class TrackUI(
     rhymeManager: RhymeManager,
@@ -118,15 +141,7 @@ class TrackUI(
     }
 
     // 当前按下轨道
-    private var currentTrackMap: Byte by mutableStateOf(0)
-    fun getTrackMap(index: Int): Boolean = ((currentTrackMap.toInt() shr index) and 1) != 0
-    fun setTrackMap(index: Int, value: Boolean) {
-        val v = currentTrackMap.toInt()
-        if ((((v shr index) and 1) != 0) == !value) {
-            val mask = 1 shl index
-            currentTrackMap = if (value) (v or mask).toByte() else (v and mask.inv()).toByte()
-        }
-    }
+    private val active = ActiveTrack()
 
     private fun calcTrackIndex(point: Offset): Track? {
         // 非屏幕可点击区域忽略
@@ -159,16 +174,7 @@ class TrackUI(
                 // 获取指针所在轨道
                 val pointer = event.pointer
                 val track = calcTrackIndex(pointer.position)
-                if (track != null) {
-                    pointer.handle(
-                        down = { // 按下
-                            setTrackMap(track.index, true)
-                        },
-                        up = { isClick, endTime -> // 抬起
-                            setTrackMap(track.index, false)
-                        }
-                    )
-                }
+                if (track != null) active.safeSet(track.index, pointer)
                 track != null
             }
         }
@@ -194,7 +200,7 @@ class TrackUI(
         }
         // 画按下轨道高光
         repeat(7) {
-            if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = tracks[it].areaPath)
+            if (active[it]) path(color = Colors.Steel3.copy(alpha = 0.2f), path = tracks[it].areaPath)
         }
         // 画轨道射线
         for (track in tracks) drawTrackLine(vertices, track.left, Track.LINE_STROKE_WIDTH)
