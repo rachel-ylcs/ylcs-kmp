@@ -62,6 +62,8 @@ class Scene(
         LeftUI(rhymeManager, recordImage),
         RightUI(rhymeManager, lyrics),
         ComboBoard(rhymeManager),
-        TrackUI(rhymeManager, lyrics)
+        TrackUI(rhymeManager, lyrics),
+        NoteQueue(rhymeManager, lyrics),
+        ScreenEnvironment(rhymeManager),
     )
 }
