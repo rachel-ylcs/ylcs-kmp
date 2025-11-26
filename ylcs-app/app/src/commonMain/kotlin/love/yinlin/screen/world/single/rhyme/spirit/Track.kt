@@ -23,6 +23,7 @@ import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.game.traits.Visible
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
+import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
@@ -60,16 +61,22 @@ data class Track(
         const val VERTICES_TOP_RATIO = 0.2f
         // 数量
         val Num = Scales.size
-        // 提示区域起始
+        // 线宽
+        const val LINE_STROKE_WIDTH = 20f
+        // 屏幕可点击比率
+        const val SCREEN_CLICK_AREA_RATIO = 0.6667f
+        // 点击区域起始
         const val TIP_START_RATIO = 0.8f
-        // 提示区域结束
+        // 点击区域结束
         const val TIP_END_RATIO = 0.9f
-        // 提示区域区间
+        // 点击区域区间
         const val TIP_RANGE = TIP_END_RATIO - TIP_START_RATIO
     }
 
-    val slopeLeft: Float = vertices.slope(left) // 左侧点斜率
-    val slopeRight: Float = vertices.slope(right) // 右侧点斜率
+    // 左侧点斜率范围
+    val slopeLeftRange: Pair<Float, Float> = vertices.slope(left.translate(x = -LINE_STROKE_WIDTH / 2)) to vertices.slope(left.translate(x = LINE_STROKE_WIDTH / 2))
+    // 右侧点斜率范围
+    val slopeRightRange: Pair<Float, Float> = vertices.slope(right.translate(x = -LINE_STROKE_WIDTH / 2)) to vertices.slope(right.translate(x = LINE_STROKE_WIDTH / 2))
     val area: Array<Offset> = arrayOf(vertices, left, right) // 轨道区域
     val areaPath: Path = Path(area) // 轨道区域路径
     // 点击区域
@@ -123,16 +130,25 @@ class TrackUI(
     }
 
     private fun calcTrackIndex(point: Offset): Track? {
+        // 非屏幕可点击区域忽略
+        if (point.y <= size.height * Track.SCREEN_CLICK_AREA_RATIO) return null
         // 不需要计算点是否位于每个轨道三角形内，只需要计算斜率即可
         val slope = vertices.slope(point)
-        if (slope > 0f) { // 右侧
+        if (slope >= 0f) { // 右侧
             for (i in 3 .. 6) {
-                if (slope >= tracks[i].slopeRight) return tracks[i]
+                val (left, right)  = tracks[i].slopeRightRange
+                if (slope >= right) {
+                    // 点击到轨道线上的不计入
+                    return if (slope >= left) tracks[i] else null
+                }
             }
         }
         else { // 左侧
             for (i in 3 downTo 0) {
-                if (slope <= tracks[i].slopeLeft) return tracks[i]
+                val (left, right)  = tracks[i].slopeLeftRange
+                if (slope <= left) {
+                    return if (slope <= right) tracks[i] else null
+                }
             }
         }
         return null
@@ -177,8 +193,8 @@ class TrackUI(
             if (getTrackMap(it)) path(color = Colors.Steel3.copy(alpha = 0.2f), path = tracks[it].areaPath)
         }
         // 画轨道射线
-        for (track in tracks) drawTrackLine(vertices, track.left, 20f)
+        for (track in tracks) drawTrackLine(vertices, track.left, Track.LINE_STROKE_WIDTH)
         // 最后一个轨道右侧射线
-        drawTrackLine(vertices, tracks.last().right, 20f)
+        drawTrackLine(vertices, tracks.last().right, Track.LINE_STROKE_WIDTH)
     }
 }
