@@ -60,7 +60,6 @@ kotlin {
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
-                libs.compose.components.uiToolingPreview,
             )
         }
 
@@ -68,7 +67,6 @@ kotlin {
             useSourceSet(commonMain)
             useApi(
                 libs.compose.activity,
-                libs.compose.ui.tooling.preview,
                 libs.compose.ui.graphics.android
             )
         }

@@ -47,7 +47,6 @@ gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api
 
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "cmp-android" }
 
 # Common
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
@@ -57,7 +56,6 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-collection = { module = "androidx.collection:collection", version = "1.6.0-alpha01" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
-compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material3-icon-old" }
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
