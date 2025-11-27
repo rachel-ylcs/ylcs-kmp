@@ -6,8 +6,8 @@ actual class PriorityQueue<E : Any> actual constructor(private val comparator: C
     actual val size: Int get() = queue.size
     actual val isEmpty: Boolean get() = queue.isEmpty()
     actual val isNotEmpty: Boolean get() = queue.isNotEmpty()
-    actual val front: E get() = queue.peek()
-    actual val frontOrNull: E? get() = if (queue.isEmpty()) null else queue.peek()
+    actual val front: E get() = queue.peek()!!
+    actual val frontOrNull: E? get() = queue.peek()
 
     actual fun push(element: E) { queue.add(element) }
     actual fun push(elements: Collection<E>) { queue.addAll(elements) }

@@ -5,24 +5,15 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidLibrary1)
+    alias(libs.plugins.androidLibrary)
 }
 
 kotlin {
     C.useCompilerFeatures(this)
 
-    android {
-        namespace = "${C.app.packageName}.module.compose.animated_webp"
-        compileSdk = C.android.compileSdk
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(C.jvm.androidTarget)
-                }
-            }
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(C.jvm.androidTarget)
         }
     }
 
@@ -84,6 +75,28 @@ kotlin {
 
         wasmJsMain.configure {
             useSourceSet(skikoMain)
+        }
+    }
+}
+
+android {
+    namespace = "${C.app.packageName}.module.compose.animated_webp"
+    compileSdk = C.android.compileSdk
+
+    defaultConfig {
+        minSdk = C.android.minSdk
+        lint.targetSdk = C.android.targetSdk
+
+        ndk {
+            for (abi in C.android.ndkAbi) abiFilters += abi
+        }
+    }
+
+    ndkVersion = "29.0.14206865"
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/androidMain/cpp/CMakeLists.txt")
         }
     }
 }

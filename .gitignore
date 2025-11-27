@@ -30,6 +30,7 @@ native/**/build/
 native/**/cmake-build-debug/
 native/**/cmake-build-release/
 native/libs/
+**/.cxx/
 
 # 编译目录
 **/build/
