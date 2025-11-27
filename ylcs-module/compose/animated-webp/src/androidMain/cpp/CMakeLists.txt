@@ -11,4 +11,4 @@ add_library(webp_jni SHARED libwebp_jni.cpp)
 
 target_include_directories(webp_jni PRIVATE libwebp/src)
 
-target_link_libraries(webp_jni webp)
+target_link_libraries(webp_jni webpdecoder webpdemux)
