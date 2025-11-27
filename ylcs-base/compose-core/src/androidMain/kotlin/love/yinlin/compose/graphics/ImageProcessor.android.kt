@@ -27,7 +27,7 @@ actual suspend fun imageProcess(source: Source, sink: Sink, items: List<ImageOp>
             }
         }
         Coroutines.io {
-            bitmap.compress(Bitmap.CompressFormat.WEBP, quality.value, sink.asOutputStream())
+            bitmap.compress(quality.webpFormat, quality.value, sink.asOutputStream())
         }
         true
     }
