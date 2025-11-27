@@ -121,5 +121,11 @@ kotlin {
                 libs.kotlinx.broswer
             )
         }
+
+        commonTest.configure {
+            useLib(
+                libs.test
+            )
+        }
     }
 }

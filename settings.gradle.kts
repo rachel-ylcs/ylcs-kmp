@@ -79,8 +79,4 @@ include(
     "ylcs-app:app",
     "ylcs-app:server",
     "ylcs-app:mod-manager",
-
-    /* -----------------  [5] 测试模块  ----------------- */
-
-    "ylcs-test:language",
 )
