@@ -49,6 +49,9 @@ gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }
 
 # Common
+
+test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
