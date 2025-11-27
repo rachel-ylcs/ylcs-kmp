@@ -3,7 +3,6 @@ package love.yinlin.screen.world.single.rhyme
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.decodeToImageBitmap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -14,6 +13,7 @@ import love.yinlin.api.url
 import love.yinlin.common.downloadCache
 import love.yinlin.compose.game.Asset
 import love.yinlin.compose.game.Manager
+import love.yinlin.compose.graphics.decodeImage
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
@@ -82,11 +82,11 @@ class RhymeManager(
 
         val assetList = (imageKeys.map { key ->
             async {
-                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeToImageBitmap()?.let { Asset.Image(it) }
+                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeImage()?.let { Asset.Image(it) }
             }
         } + animationKeys.map { (key, count) ->
             async {
-                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeToImageBitmap()?.let { Asset.Animation(it, count) }
+                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeImage()?.let { Asset.Animation(it, count) }
             }
         }).awaitAll()
 

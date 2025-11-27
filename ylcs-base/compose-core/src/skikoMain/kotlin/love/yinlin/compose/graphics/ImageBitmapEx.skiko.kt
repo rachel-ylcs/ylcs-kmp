@@ -2,6 +2,7 @@ package love.yinlin.compose.graphics
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import love.yinlin.data.compose.ImageFormat
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingNull
@@ -16,7 +17,11 @@ val ImageFormat.encodedImageFormat: EncodedImageFormat get() = when (this) {
     ImageFormat.WEBP -> EncodedImageFormat.WEBP
 }
 
-actual fun ImageBitmap.encodeToByteArray(format: ImageFormat, quality: ImageQuality): ByteArray? {
+actual fun ByteArray.decodeImage(): ImageBitmap? = catchingNull {
+    Image.makeFromEncoded(this).toComposeImageBitmap()
+}
+
+actual fun ImageBitmap.encodeImage(format: ImageFormat, quality: ImageQuality): ByteArray? {
     var bitmap: Bitmap? = null
     val data = catchingNull {
         bitmap = this.asSkiaBitmap()

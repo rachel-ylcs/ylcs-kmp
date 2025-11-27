@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidLibrary1)
 }
 
@@ -10,7 +12,7 @@ kotlin {
     C.useCompilerFeatures(this)
 
     android {
-        namespace = "${C.app.packageName}.base.core"
+        namespace = "${C.app.packageName}.module.compose.animated_webp"
         compileSdk = C.android.compileSdk
         minSdk = C.android.minSdk
         lint.targetSdk = C.android.targetSdk
@@ -50,44 +52,15 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            useApi(
-                libs.kotlinx.atomicfu,
-                libs.kotlinx.coroutines,
-                libs.kotlinx.datetime,
-                libs.kotlinx.io,
-                libs.kotlinx.json,
-            )
+            useLib(projects.ylcsBase.composeCore)
+        }
+
+        androidMain.configure {
+            useSourceSet(commonMain)
         }
 
         val skikoMain by creating {
             useSourceSet(commonMain)
-        }
-
-        val clientMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        val nativeMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        val jvmMain by creating {
-            useSourceSet(clientMain)
-        }
-
-        val appleMain = appleMain.get().apply {
-            useSourceSet(skikoMain, clientMain)
-        }
-
-        androidMain.configure {
-            useSourceSet(jvmMain)
-            useApi(
-                libs.kotlinx.coroutines.android
-            )
-        }
-
-        val iosMain = iosMain.get().apply {
-            useSourceSet(appleMain, nativeMain)
         }
 
         buildList {
@@ -101,25 +74,16 @@ kotlin {
             }
         }.forEach {
             it.configure {
-                useSourceSet(iosMain)
+                useSourceSet(skikoMain)
             }
         }
 
         val desktopMain by getting {
-            useSourceSet(skikoMain, jvmMain)
-            if (C.platform == BuildPlatform.Mac) {
-                useSourceSet(appleMain)
-            }
-            useApi(
-                libs.kotlinx.coroutines.swing
-            )
+            useSourceSet(skikoMain)
         }
 
         wasmJsMain.configure {
-            useSourceSet(skikoMain, nativeMain)
-            useApi(
-                libs.kotlinx.broswer
-            )
+            useSourceSet(skikoMain)
         }
     }
 }

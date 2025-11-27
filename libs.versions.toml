@@ -69,6 +69,7 @@ compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewm
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.2" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.9.0" }
@@ -101,6 +102,7 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0" }
+animated-webp-android = { module = "com.aureusapps.android:webp-android", version = "1.1.2" }
 skiko-android = { module = "org.jetbrains.skiko:skiko-android", version.ref = "skiko" }
 skiko-android-runtime = { module = "org.jetbrains.skiko:skiko-android-runtime-arm64", version.ref = "skiko" }
 

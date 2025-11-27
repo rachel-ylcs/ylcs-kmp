@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.decodeToImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontStyle
@@ -33,6 +32,7 @@ import love.yinlin.common.Paths
 import love.yinlin.common.Shaders
 import love.yinlin.compose.*
 import love.yinlin.compose.graphics.ShaderBox
+import love.yinlin.compose.graphics.decodeImage
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.MusicInfo
@@ -95,9 +95,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 }
             }
             val task2 = async(ioContext) {
-                catchingNull {
-                    info.path(Paths.modPath, ModResourceType.Record).readByteArray()!!.decodeToImageBitmap()
-                }
+                info.path(Paths.modPath, ModResourceType.Record).readByteArray()?.decodeImage()
             }
             val lyricsConfig = task1.await()
             val recordImage = task2.await()

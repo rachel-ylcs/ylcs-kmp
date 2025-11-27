@@ -1,9 +1,11 @@
 package love.yinlin.compose.graphics
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import love.yinlin.data.compose.ImageFormat
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingNull
@@ -21,7 +23,9 @@ fun ImageFormat.bitmapFormat(quality: ImageQuality): Bitmap.CompressFormat = whe
     else -> quality.webpFormat
 }
 
-actual fun ImageBitmap.encodeToByteArray(format: ImageFormat, quality: ImageQuality): ByteArray? {
+actual fun ByteArray.decodeImage(): ImageBitmap? = BitmapFactory.decodeByteArray(this, 0, this.size)?.asImageBitmap()
+
+actual fun ImageBitmap.encodeImage(format: ImageFormat, quality: ImageQuality): ByteArray? {
     var bitmap: Bitmap? = null
     val data = catchingNull {
         val stream = ByteArrayOutputStream()
