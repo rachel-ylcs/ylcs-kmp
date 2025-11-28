@@ -1,6 +1,6 @@
 #include <jni.h>
-#include <webp/types.h>
 #include <webp/decode.h>
+#include <webp/demux.h>
 
 extern "C" {
     JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
