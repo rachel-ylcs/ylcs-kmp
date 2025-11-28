@@ -87,6 +87,13 @@ actual class AnimatedWebp internal constructor(
         }
     }
 
+    actual fun release() {
+        if (!paint.isClosed) paint.close()
+        if (!cacheA.isClosed) cacheA.close()
+        if (!cacheB.isClosed) cacheB.close()
+        if (!codec.isClosed) codec.close()
+    }
+
     actual companion object {
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {
             require(checkHeader(data))

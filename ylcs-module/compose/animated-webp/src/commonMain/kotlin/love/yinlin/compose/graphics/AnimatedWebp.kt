@@ -13,6 +13,7 @@ expect class AnimatedWebp {
     suspend fun nextFrame()
     fun resetFrame()
     fun DrawScope.drawFrame(dst: Rect, src: Rect? = null)
+    fun release()
 
     companion object {
         fun decode(data: ByteArray): AnimatedWebp?

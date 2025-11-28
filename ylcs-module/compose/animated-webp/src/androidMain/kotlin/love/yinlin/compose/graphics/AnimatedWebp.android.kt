@@ -23,6 +23,10 @@ actual class AnimatedWebp internal constructor(
 
     }
 
+    actual fun release() {
+
+    }
+
     actual companion object {
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {
             null

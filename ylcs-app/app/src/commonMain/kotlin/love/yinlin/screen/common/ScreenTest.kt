@@ -33,10 +33,15 @@ class ScreenTest(manager: ScreenManager) : Screen(manager) {
             Coroutines.cpu {
                 while (true) {
                     delay(100)
-                    animation!!.nextFrame()
+                    animation?.nextFrame() ?: break
                 }
             }
         }
+    }
+
+    override fun finalize() {
+        animation?.release()
+        animation = null
     }
 
     @Composable
@@ -45,7 +50,7 @@ class ScreenTest(manager: ScreenManager) : Screen(manager) {
             animation?.apply { drawFrame(Rect(Offset.Zero, Size(324f, 576f))) }
         }
         PrimaryButton("测试") {
-            animation!!.resetFrame()
+            animation?.resetFrame()
         }
     }
 }
