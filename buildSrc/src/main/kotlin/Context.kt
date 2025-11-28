@@ -28,18 +28,6 @@ fun KotlinSourceSet.useSourceSet(vararg parents: KotlinSourceSet) {
     for (parent in parents) dependsOn(parent)
 }
 
-fun Configuration.forceVersion(vararg libs: Provider<MinimalExternalModuleDependency>) {
-    resolutionStrategy {
-        eachDependency {
-            libs.find {
-                val target = it.get()
-                requested.group == target.group && requested.name == target.name
-            }?.let { useTarget(it) }
-        }
-        for (lib in libs) force(lib)
-    }
-}
-
 // 编译配置
 
 fun Constants.useCompilerFeatures(context: HasConfigurableKotlinCompilerOptions<out KotlinCommonCompilerOptions>) {

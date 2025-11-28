@@ -13,7 +13,7 @@ import love.yinlin.api.url
 import love.yinlin.common.downloadCache
 import love.yinlin.compose.game.Asset
 import love.yinlin.compose.game.Manager
-import love.yinlin.compose.graphics.decodeImage
+import love.yinlin.compose.graphics.decode
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
@@ -82,18 +82,28 @@ class RhymeManager(
 
         val assetList = (imageKeys.map { key ->
             async {
-                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeImage()?.let { Asset.Image(it) }
+                val data = NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)
+                if (data != null) {
+                    val image = ImageBitmap.decode(data)
+                    if (image != null) return@async key to Asset.Image(image)
+                }
+                null
             }
         } + animationKeys.map { (key, count) ->
             async {
-                key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.decodeImage()?.let { Asset.Animation(it, count) }
+                val data = NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)
+                if (data != null) {
+                    val image = ImageBitmap.decode(data)
+                    if (image != null) return@async key to Asset.Animation(image, count)
+                }
+                null
             }
         }).awaitAll()
 
-        for ((key, asset) in assetList) {
-            if (asset != null) assets[key] = asset
+        for (item in assetList) {
+            val (key, asset) = item ?: return false
+            assets[key] = asset
         }
-
-        return assetList.all { it.second != null }
+        return true
     }
 }

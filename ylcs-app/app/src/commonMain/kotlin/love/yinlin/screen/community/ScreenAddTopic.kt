@@ -13,14 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
+import kotlinx.io.readByteArray
 import love.yinlin.api.ApiTopicSendTopic
 import love.yinlin.api.apiFile
 import love.yinlin.api.request
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
-import love.yinlin.compose.graphics.ImageCompress
-import love.yinlin.compose.graphics.ImageProcessor
+import love.yinlin.compose.graphics.PlatformImage
+import love.yinlin.compose.graphics.decode
+import love.yinlin.compose.graphics.encode
+import love.yinlin.compose.graphics.thumbnail
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -60,7 +63,10 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
         app.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
                 app.os.storage.createTempFile { sink ->
-                    ImageProcessor(ImageCompress, quality = ImageQuality.High).process(source, sink)
+                    val image = PlatformImage.decode(source.readByteArray())!!
+                    image.thumbnail()
+                    sink.write(image.encode(quality = ImageQuality.High)!!)
+                    true
                 }?.let {
                     input.pics += Picture(it.toString())
                 }

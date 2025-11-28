@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.files.Path
+import kotlinx.io.readByteArray
 import love.yinlin.About
 import love.yinlin.Local
 import love.yinlin.api.*
@@ -30,9 +31,11 @@ import love.yinlin.uri.Uri
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.data.compose.ItemKey
-import love.yinlin.compose.graphics.ImageCompress
-import love.yinlin.compose.graphics.ImageCrop
-import love.yinlin.compose.graphics.ImageProcessor
+import love.yinlin.compose.graphics.PlatformImage
+import love.yinlin.compose.graphics.crop
+import love.yinlin.compose.graphics.decode
+import love.yinlin.compose.graphics.encode
+import love.yinlin.compose.graphics.thumbnail
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.image.LoadingIcon
@@ -62,6 +65,7 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.community.ScreenUserCard
 import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.extension.read
+import love.yinlin.extension.readByteArray
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
@@ -75,9 +79,11 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
         }?.let { path ->
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                 app.os.storage.createTempFile { sink ->
-                    path.read { source ->
-                        ImageProcessor(ImageCrop(rect), ImageCompress, quality = ImageQuality.High).process(source, sink)
-                    }
+                    val image = PlatformImage.decode(path.readByteArray()!!)!!
+                    image.crop(rect)
+                    image.thumbnail()
+                    sink.write(image.encode(quality = ImageQuality.High)!!)
+                    true
                 }
             }
         }

@@ -21,8 +21,10 @@ import love.yinlin.common.Paths
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
-import love.yinlin.compose.graphics.ImageCrop
-import love.yinlin.compose.graphics.ImageProcessor
+import love.yinlin.compose.graphics.PlatformImage
+import love.yinlin.compose.graphics.crop
+import love.yinlin.compose.graphics.decode
+import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.MimeType
@@ -40,6 +42,7 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.mkdir
 import love.yinlin.extension.read
+import love.yinlin.extension.readByteArray
 import love.yinlin.extension.write
 import love.yinlin.extension.writeText
 import love.yinlin.extension.writeTo
@@ -79,9 +82,10 @@ class ScreenCreateMusic(manager: ScreenManager) : Screen(manager) {
         if (path != null) {
             cropDialog.openSuspend(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
                 app.os.storage.createTempFile { sink ->
-                    path.read { source ->
-                        ImageProcessor(ImageCrop(rect), quality = ImageQuality.Full).process(source, sink)
-                    }
+                    val image = PlatformImage.decode(path.readByteArray()!!)!!
+                    image.crop(rect)
+                    sink.write(image.encode(quality = ImageQuality.Full)!!)
+                    true
                 }?.let { onPicAdd(it) }
             }
         }
