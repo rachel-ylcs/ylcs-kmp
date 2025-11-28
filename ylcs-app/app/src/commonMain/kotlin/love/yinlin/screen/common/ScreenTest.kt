@@ -2,11 +2,7 @@ package love.yinlin.screen.common
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -27,36 +23,32 @@ import org.jetbrains.compose.resources.getSystemResourceEnvironment
 class ScreenTest(manager: ScreenManager) : Screen(manager) {
     override val title: String = "测试页"
 
-    private var animation: AnimatedWebp? by mutableStateOf(null)
+    var webp: AnimatedWebp? by mutableStateOf(null)
+    var frame: Int by mutableIntStateOf(-1)
 
     override suspend fun initialize() {
-        launch {
-            Coroutines.io {
-                animation = AnimatedWebp.decode(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.animation))?.apply {
-                    println("$width $height")
-                }
-            }
-            Coroutines.cpu {
-                while (true) {
-                    delay(100)
-                    animation?.nextFrame() ?: break
-                }
-            }
+        Coroutines.io {
+            webp = AnimatedWebp.decode(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.animation))
         }
-    }
-
-    override fun finalize() {
-        animation?.release()
-        animation = null
     }
 
     @Composable
     override fun Content(device: Device) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            animation?.apply { drawFrame(Rect(Offset.Zero, Size(324f, 576f))) }
+            webp?.let {
+                it.apply { drawFrame(frame, Rect(Offset.Zero, Size(it.width / 2f, it.height / 2f))) }
+            }
         }
-        PrimaryButton("测试") {
-            animation?.resetFrame()
+        PrimaryButton("开始") {
+            launch {
+                while (true) {
+                    delay(100)
+                    webp?.let {
+                        if (frame >= it.frameCount - 1) frame = 0
+                        else frame++
+                    }
+                }
+            }
         }
     }
 }

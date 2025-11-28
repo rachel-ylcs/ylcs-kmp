@@ -36,7 +36,7 @@ actual fun ImageBitmap.encode(format: ImageFormat, quality: ImageQuality): ByteA
 
 // Image process
 
-actual class PlatformImage internal constructor(internal var bitmap: Bitmap) {
+actual class PlatformImage(internal var bitmap: Bitmap) {
     actual val width: Int get() = bitmap.width
     actual val height: Int get() = bitmap.height
     actual val hasAlpha: Boolean get() = bitmap.hasAlpha()
