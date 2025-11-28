@@ -50,4 +50,33 @@ extern "C" {
         if (decoder) return static_cast<jint>(WebPDemuxGetI(decoder->demux, WEBP_FF_CANVAS_HEIGHT));
         return 0;
     }
+
+    JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetFrameCount(JNIEnv* env, jclass, jlong handle) {
+        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        if (decoder) return static_cast<jint>(WebPDemuxGetI(decoder->demux, WEBP_FF_FRAME_COUNT));
+        return 0;
+    }
+
+    JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreateIterator(JNIEnv* env, jclass) {
+        return reinterpret_cast<jlong>(new WebPIterator);
+    }
+
+    JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpReleaseIterator(JNIEnv* env, jclass, jlong iterator_handle) {
+        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
+        if (iterator) {
+            WebPDemuxReleaseIterator(iterator);
+            delete iterator;
+        }
+    }
+
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpFirstFrame(JNIEnv* env, jclass, jlong handle, jlong iterator_handle) {
+        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
+        return static_cast<jboolean>(decoder && iterator ? WebPDemuxGetFrame(decoder->demux, 1, iterator) : false);
+    }
+
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpNextFrame(JNIEnv* env, jclass, jlong iterator_handle) {
+        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
+        return static_cast<jboolean>(iterator ? WebPDemuxNextFrame(iterator) : false);
+    }
 }

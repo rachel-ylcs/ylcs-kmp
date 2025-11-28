@@ -14,6 +14,8 @@ endif()
 
 project(WebP C)
 
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -DNDEBUG")
+
 # Options for coder / decoder executables.
 if(BUILD_SHARED_LIBS)
   set(WEBP_LINK_STATIC_DEFAULT OFF)

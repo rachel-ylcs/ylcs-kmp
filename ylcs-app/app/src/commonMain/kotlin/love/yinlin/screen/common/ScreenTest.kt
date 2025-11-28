@@ -35,20 +35,20 @@ class ScreenTest(manager: ScreenManager) : Screen(manager) {
     @Composable
     override fun Content(device: Device) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            webp?.let {
-                it.apply { drawFrame(frame, Rect(Offset.Zero, Size(it.width / 2f, it.height / 2f))) }
-            }
+//            webp?.let {
+//                it.apply { drawFrame(frame, Rect(Offset.Zero, Size(it.width / 2f, it.height / 2f))) }
+//            }
         }
         PrimaryButton("开始") {
-            launch {
-                while (true) {
-                    delay(100)
-                    webp?.let {
-                        if (frame >= it.frameCount - 1) frame = 0
-                        else frame++
-                    }
-                }
-            }
+//            launch {
+//                while (true) {
+//                    delay(100)
+//                    webp?.let {
+//                        if (frame >= it.frameCount - 1) frame = 0
+//                        else frame++
+//                    }
+//                }
+//            }
         }
     }
 }
