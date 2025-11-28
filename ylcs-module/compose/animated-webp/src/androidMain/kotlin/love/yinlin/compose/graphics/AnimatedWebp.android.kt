@@ -6,11 +6,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import love.yinlin.extension.catchingNull
 
 @Stable
-actual class AnimatedWebp internal constructor(
-    actual val width: Int,
-    actual val height: Int,
-    actual val frameCount: Int,
-) {
+actual class AnimatedWebp internal constructor(private val handle: Long) {
+    actual val width: Int = nativeAnimatedWebpGetWidth(handle)
+    actual val height: Int = nativeAnimatedWebpGetHeight(handle)
+    actual val frameCount: Int = 2
+
     actual suspend fun nextFrame() {
 
     }
@@ -24,12 +24,17 @@ actual class AnimatedWebp internal constructor(
     }
 
     actual fun release() {
-
+        nativeAnimatedWebpRelease(handle)
     }
 
     actual companion object {
+        init {
+            System.loadLibrary("webp_jni")
+        }
+
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {
-            null
+            val handle = nativeAnimatedWebpCreate(data)
+            return if (handle != 0L) AnimatedWebp(handle) else null
         }
     }
 }

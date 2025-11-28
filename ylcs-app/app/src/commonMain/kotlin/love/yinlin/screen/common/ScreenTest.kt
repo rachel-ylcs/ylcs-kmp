@@ -12,14 +12,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import kotlinx.coroutines.delay
-import kotlinx.io.files.Path
 import love.yinlin.compose.Device
 import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.input.PrimaryButton
-import love.yinlin.extension.readByteArray
 import love.yinlin.platform.Coroutines
+import love.yinlin.resources.Res
+import love.yinlin.resources.animation
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 
 @Stable
 class ScreenTest(manager: ScreenManager) : Screen(manager) {
@@ -28,8 +30,12 @@ class ScreenTest(manager: ScreenManager) : Screen(manager) {
     private var animation: AnimatedWebp? by mutableStateOf(null)
 
     override suspend fun initialize() {
-        animation = AnimatedWebp.decode(Path("C:\\Users\\Administrator\\Desktop\\animation.webp").readByteArray()!!)
         launch {
+            Coroutines.io {
+                animation = AnimatedWebp.decode(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.animation))?.apply {
+                    println("$width $height")
+                }
+            }
             Coroutines.cpu {
                 while (true) {
                     delay(100)
