@@ -1,5 +1,5 @@
 #include <jni.h>
-#include <webp/demux.h>
+#include <demux.h>
 
 struct AnimatedWebpDecoder {
     unsigned char* data = nullptr;
