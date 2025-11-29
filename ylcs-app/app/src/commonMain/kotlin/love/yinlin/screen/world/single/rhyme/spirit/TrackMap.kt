@@ -108,7 +108,7 @@ class ActiveTrack {
 }
 
 @Stable
-class TrackUI(
+class TrackMap(
     rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
@@ -119,8 +119,8 @@ class TrackUI(
 
     // 轨道
     val tracks = buildList {
-        val trackWidth = this@TrackUI.size.width / Track.Num
-        val bottom = this@TrackUI.size.height
+        val trackWidth = this@TrackMap.size.width / Track.Num
+        val bottom = this@TrackMap.size.height
         var start = 0f
         repeat(Track.Num) { index ->
             val left = Offset(start, bottom)
@@ -184,22 +184,23 @@ class TrackUI(
     }
 
     override fun Drawer.onClientDraw() {
-        // 画点击区域
-        for (track in tracks) {
-            // 画区域线
+        for (index in 0 ..< Track.Num) {
+            val track = tracks[index]
+            // 画点击区域线
             path(Colors.White, track.clickArea.areaPath, style = Stroke(5f))
-            // 画区域阴影
+            // 画点击区域阴影
             val (matrix, srcRect) = track.clickArea.perspectiveMatrix
             transform(matrix) {
                 rect(track.clickArea.brush, position = srcRect.topLeft, size = srcRect.size)
             }
+            // 画轨道高光
+            path(
+                color = if (active[index]) Colors.Steel6.copy(alpha = 0.3f) else Colors.Steel3.copy(alpha = 0.1f),
+                path = track.areaPath
+            )
+            // 画轨道射线
+            drawTrackLine(vertices, track.left, Track.LINE_STROKE_WIDTH)
         }
-        // 画按下轨道高光
-        repeat(7) {
-            if (active[it]) path(color = Colors.Steel3.copy(alpha = 0.2f), path = tracks[it].areaPath)
-        }
-        // 画轨道射线
-        for (track in tracks) drawTrackLine(vertices, track.left, Track.LINE_STROKE_WIDTH)
         // 最后一个轨道右侧射线
         drawTrackLine(vertices, tracks.last().right, Track.LINE_STROKE_WIDTH)
     }

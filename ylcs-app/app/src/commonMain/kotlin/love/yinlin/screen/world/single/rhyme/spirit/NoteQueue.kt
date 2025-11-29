@@ -71,15 +71,15 @@ sealed class DynamicAction {
 class NoteQueue(
     rhymeManager: RhymeManager,
     lyricsConfig: RhymeLyricsConfig,
-    trackUI: TrackUI,
+    trackMap: TrackMap,
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
     override val size: Size = Size(1920f, 1080f * (1 + Track.VERTICES_TOP_RATIO))
 
     private val lyrics = lyricsConfig.lyrics
 
-    private val vertices = trackUI.vertices
-    private val tracks = trackUI.tracks
+    private val vertices = trackMap.vertices
+    private val tracks = trackMap.tracks
 
     private val queue: List<DynamicAction> = buildList {
         lyrics.fastForEach { line ->

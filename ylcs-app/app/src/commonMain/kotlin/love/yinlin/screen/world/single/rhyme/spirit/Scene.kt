@@ -58,14 +58,14 @@ class Scene(
 ) : Container(rhymeManager), BoxBody {
     override val size: Size = manager.size
 
-    private val trackUI = TrackUI(rhymeManager)
+    private val trackMap = TrackMap(rhymeManager)
 
     override val souls: List<Soul> = listOf(
         LeftUI(rhymeManager, recordImage),
         RightUI(rhymeManager, lyricsConfig),
         ComboBoard(rhymeManager),
-        trackUI,
-        NoteQueue(rhymeManager, lyricsConfig, trackUI),
+        trackMap,
+        NoteQueue(rhymeManager, lyricsConfig, trackMap),
         ScreenEnvironment(rhymeManager),
     )
 }
