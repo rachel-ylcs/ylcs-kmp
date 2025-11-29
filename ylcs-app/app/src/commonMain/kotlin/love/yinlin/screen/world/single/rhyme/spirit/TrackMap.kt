@@ -8,10 +8,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
+import love.yinlin.compose.blend
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.traits.Spirit
@@ -32,9 +32,9 @@ class TrackClickArea(val area: Array<Offset>) {
     val brush = Brush.radialGradient(
         *arrayOf(
             0f to Colors.Transparent,
-            0.3f to Colors.Steel3.copy(alpha = 0.1f),
-            0.5f to Colors.Steel3.copy(alpha = 0.2f),
-            0.75f to Colors.Steel3.copy(alpha = 0.4f),
+            0.4f to Colors.Steel3.copy(alpha = 0.1f),
+            0.55f to Colors.Steel3.copy(alpha = 0.2f),
+            0.7f to Colors.Steel3.copy(alpha = 0.4f),
             1f to Colors.Steel3.copy(alpha = 0.8f)
         ),
         center = perspectiveMatrix.second.center,
@@ -68,14 +68,26 @@ data class Track(
         const val TIP_END_RATIO = 0.9f
         // 点击区域区间
         const val TIP_RANGE = TIP_END_RATIO - TIP_START_RATIO
+
+        // 轨道背景色
+        val BackgroundColor = Colors.Black.copy(alpha = 0.4f)
+        // 轨道激活色
+        val ActiveColor = BackgroundColor.blend(Colors.Cyan3.copy(alpha = 0.3f))
     }
 
-    // 左侧点斜率范围
-    val slopeLeftRange: Pair<Float, Float> = vertices.slope(left.translate(x = -LINE_STROKE_WIDTH / 2)) to vertices.slope(left.translate(x = LINE_STROKE_WIDTH / 2))
-    // 右侧点斜率范围
-    val slopeRightRange: Pair<Float, Float> = vertices.slope(right.translate(x = -LINE_STROKE_WIDTH / 2)) to vertices.slope(right.translate(x = LINE_STROKE_WIDTH / 2))
-    val area: Array<Offset> = arrayOf(vertices, left, right) // 轨道区域
-    val areaPath: Path = Path(area) // 轨道区域路径
+    // 轨道线
+    val leftLineArea = arrayOf(left.translate(x = -LINE_STROKE_WIDTH / 2), vertices, left.translate(x = LINE_STROKE_WIDTH / 2))
+    val leftLineAreaPath = Path(leftLineArea)
+    val leftLineHighlightPath = Path(arrayOf(left.translate(x = -LINE_STROKE_WIDTH / 4), vertices, left.translate(x = LINE_STROKE_WIDTH / 4)))
+    val rightLineArea = arrayOf(right.translate(x = -LINE_STROKE_WIDTH / 2), vertices, right.translate(x = LINE_STROKE_WIDTH / 2))
+    val rightLineAreaPath = Path(rightLineArea)
+    val rightLineHighlightPath = Path(arrayOf(right.translate(x = -LINE_STROKE_WIDTH / 4), vertices, right.translate(x = LINE_STROKE_WIDTH / 4)))
+    // 轨道线斜率范围
+    val slopeLeftRange: Pair<Float, Float> = vertices.slope(leftLineArea[0]) to vertices.slope(leftLineArea[2])
+    val slopeRightRange: Pair<Float, Float> = vertices.slope(rightLineArea[0]) to vertices.slope(rightLineArea[2])
+    // 轨道区域
+    val area: Array<Offset> = arrayOf(vertices, left, right)
+    val areaPath: Path = Path(area)
     // 点击区域
     val clickArea = TrackClickArea(arrayOf(
         vertices.onLine(left, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
@@ -136,6 +148,18 @@ class TrackMap(
         }
     }
 
+    // 轨道线画刷 (注意所有轨道左右侧线高度相同)
+    val trackLineBrush = Brush.verticalGradient(
+        colors = listOf(Colors.Steel4.copy(alpha = 0.5f), Colors.Transparent),
+        startY = this@TrackMap.size.height,
+        endY = 0f
+    )
+    val trackLineHighlightBrush = Brush.verticalGradient(
+        colors = listOf(Colors.White, Colors.Transparent),
+        startY = this@TrackMap.size.height,
+        endY = 0f
+    )
+
     // 当前按下轨道
     private val active = ActiveTrack()
 
@@ -176,16 +200,21 @@ class TrackMap(
         }
     }
 
-    private fun Drawer.drawTrackLine(start: Offset, end: Offset, stroke: Float) {
-        // 光带
-        line(Colors.Steel4, start, end, style = Stroke(width = stroke, cap = StrokeCap.Round), alpha = 0.7f)
+    private fun Drawer.drawTrackLine(track: Track, isLeft: Boolean) {
+        // 光带不使用线而是用三角形模拟, 这样能做出一个越远越细的效果
+        path(trackLineBrush, if (isLeft) track.leftLineAreaPath else track.rightLineAreaPath)
         // 高光
-        line(Colors.White, start, end, style = Stroke(width = stroke * 0.8f, cap = StrokeCap.Round), alpha = 0.8f)
+        path(trackLineHighlightBrush, if (isLeft) track.leftLineHighlightPath else track.rightLineHighlightPath)
     }
 
     override fun Drawer.onClientDraw() {
         for (index in 0 ..< Track.Num) {
             val track = tracks[index]
+            // 画轨道背景
+            path(
+                color = if (active[index]) Track.ActiveColor else Track.BackgroundColor,
+                path = track.areaPath
+            )
             // 画点击区域线
             path(Colors.White, track.clickArea.areaPath, style = Stroke(5f))
             // 画点击区域阴影
@@ -193,15 +222,10 @@ class TrackMap(
             transform(matrix) {
                 rect(track.clickArea.brush, position = srcRect.topLeft, size = srcRect.size)
             }
-            // 画轨道高光
-            path(
-                color = if (active[index]) Colors.Steel6.copy(alpha = 0.3f) else Colors.Steel3.copy(alpha = 0.1f),
-                path = track.areaPath
-            )
             // 画轨道射线
-            drawTrackLine(vertices, track.left, Track.LINE_STROKE_WIDTH)
+            drawTrackLine(track, true)
         }
         // 最后一个轨道右侧射线
-        drawTrackLine(vertices, tracks.last().right, Track.LINE_STROKE_WIDTH)
+        drawTrackLine(tracks.last(), false)
     }
 }

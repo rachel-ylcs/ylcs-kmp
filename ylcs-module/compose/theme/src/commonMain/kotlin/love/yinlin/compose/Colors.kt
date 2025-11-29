@@ -101,4 +101,17 @@ data object Colors {
     operator fun invoke(value: Int) = Color(value)
     operator fun invoke(value: Long) = Color(value)
     operator fun invoke(value: ULong) = Color(value)
+    operator fun invoke(red: Float, green: Float, blue: Float, alpha: Float = 1f) = Color(red, green, blue, alpha)
+}
+
+fun Color.blend(other: Color): Color {
+    val alpha1 = this.alpha
+    val alpha2 = other.alpha * (1f - alpha1)
+    val totalAlpha = (alpha1 + alpha2).coerceIn(0f, 1f)
+    return if (totalAlpha == 0f) Colors.Transparent else Color(
+        red = (this.red * alpha1 + other.red * alpha2) / totalAlpha,
+        green = (this.green * alpha1 + other.green * alpha2) / totalAlpha,
+        blue = (this.blue * alpha1 + other.blue * alpha2) / totalAlpha,
+        alpha = totalAlpha
+    )
 }
