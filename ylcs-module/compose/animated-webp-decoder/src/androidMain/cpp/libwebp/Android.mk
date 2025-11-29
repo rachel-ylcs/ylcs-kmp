@@ -1,10 +1,7 @@
 # Ignore this file during non-NDK builds.
 ifdef NDK_ROOT
-ENABLE_SHARED := 1
-APP_OPTIM:=release
-WEBP_CFLAGS += -O3 -DNDEBUG
-
 LOCAL_PATH := $(call my-dir)
+
 WEBP_CFLAGS := -Wall -DANDROID -DHAVE_MALLOC_H -DHAVE_PTHREAD -DWEBP_USE_THREAD
 WEBP_CFLAGS += -fvisibility=hidden
 

@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -14,6 +16,7 @@ import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.catchingThrow
 import androidx.core.graphics.createBitmap
+import java.nio.ByteBuffer
 
 @Stable
 actual class AnimatedWebp internal constructor(
@@ -26,12 +29,22 @@ actual class AnimatedWebp internal constructor(
     private val bitmap: Bitmap
 ) {
     actual fun DrawScope.drawFrame(index: Int, dst: Rect) {
-        drawIntoCanvas { canvas ->
-            val left = (index % col * width).toFloat()
-            val top = (index / col * height).toFloat()
-            val src = android.graphics.Rect(left.toInt(), top.toInt(), (left + width).toInt(), (top + height).toInt())
-            canvas.nativeCanvas.drawBitmap(bitmap, src, dst.toAndroidRectF(), paint)
+        if (index >= 0 && !bitmap.isRecycled) {
+            drawIntoCanvas { canvas ->
+                val left = index % col * width
+                val top = index / col * height
+                canvas.nativeCanvas.drawBitmap(
+                    bitmap,
+                    android.graphics.Rect(left, top, left + width, top + height),
+                    dst.toAndroidRectF(),
+                    paint
+                )
+            }
         }
+    }
+
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size) {
+        this.drawFrame(index, Rect(position, size))
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(bitmap).encode(format, quality)
@@ -43,12 +56,8 @@ actual class AnimatedWebp internal constructor(
 
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {
             var handle = 0L
-            var iteratorHandle = 0L
             catchingThrow(
-                clean = {
-                    nativeAnimatedWebpReleaseIterator(iteratorHandle)
-                    nativeAnimatedWebpRelease(handle)
-                }
+                clean = { nativeAnimatedWebpRelease(handle) }
             ) {
                 handle = nativeAnimatedWebpCreate(data)
                 require(handle != 0L)
@@ -68,18 +77,35 @@ actual class AnimatedWebp internal constructor(
                 paint.isAntiAlias = true
 
                 val canvas = Canvas(mergeBitmap)
+                val buffer = ByteBuffer.allocateDirect(width * height * 4)
+                val cacheBitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
-                var count = 0
-                iteratorHandle = nativeAnimatedWebpCreateIterator()
-                var result = nativeAnimatedWebpFirstFrame(handle, iteratorHandle)
-                require(result)
-                while (result) {
-                    ++count
-                    // do
-                    result = nativeAnimatedWebpNextFrame(iteratorHandle)
+                var frame = 0
+
+                while (nativeAnimatedWebpHasMoreFrames(handle)) {
+                    buffer.rewind()
+                    require(nativeAnimatedWebpGetNext(handle, buffer))
+                    buffer.rewind()
+                    cacheBitmap.copyPixelsFromBuffer(buffer)
+
+                    val frameRow = frame / col
+                    val frameCol = frame % col
+                    val left = frameCol * width
+                    val top = frameRow * height
+
+                    canvas.drawBitmap(
+                        cacheBitmap,
+                        null,
+                        android.graphics.Rect(left, top, left + width, top + height),
+                        paint
+                    )
+
+                    ++frame
                 }
-                require(count == frameCount)
+                nativeAnimatedWebpReset(handle)
+                require(frame == frameCount)
 
+                mergeBitmap.isMutable
                 AnimatedWebp(width, height, frameCount, row, col, paint, mergeBitmap)
             }
         }

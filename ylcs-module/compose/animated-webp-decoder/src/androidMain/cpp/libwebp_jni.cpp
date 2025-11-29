@@ -3,16 +3,17 @@
 
 struct AnimatedWebpDecoder {
     unsigned char* data = nullptr;
-    WebPDemuxer* demux = nullptr;
+    WebPAnimDecoder* decoder = nullptr;
+    int width = 0;
+    int height = 0;
+    int frameCount = 0;
 
-    AnimatedWebpDecoder(unsigned char* buffer, WebPDemuxer* instance) {
-        data = buffer;
-        demux = instance;
-    }
+    AnimatedWebpDecoder(unsigned char* data, WebPAnimDecoder* decoder, int width, int height, int frameCount) :
+        data(data), decoder(decoder), width(width), height(height), frameCount(frameCount) { }
 
     ~AnimatedWebpDecoder() {
         if (data) delete[] data;
-        if (demux) WebPDemuxDelete(demux);
+        if (decoder) WebPAnimDecoderDelete(decoder);
     }
 };
 
@@ -24,59 +25,69 @@ extern "C" {
     }
 
     JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreate(JNIEnv* env, jclass, jbyteArray data) {
+        WebPAnimDecoderOptions options;
+        WebPAnimDecoderOptionsInit(&options);
+        options.color_mode = MODE_RGBA;
+        options.use_threads = 1;
+
         auto size = env->GetArrayLength(data);
         auto* buffer = new unsigned char[size];
         env->GetByteArrayRegion(data, 0, size, reinterpret_cast<jbyte*>(buffer));
-        WebPData webpData { buffer, static_cast<size_t>(size) };
-        WebPDemuxer* demux = WebPDemux(&webpData);
-        if (demux) return reinterpret_cast<jlong>(new AnimatedWebpDecoder(buffer, demux));
+        WebPData webp_data { buffer, static_cast<size_t>(size) };
+        WebPAnimDecoder* decoder = WebPAnimDecoderNew(&webp_data, &options);
+        if (decoder) {
+            WebPAnimInfo info;
+            if (WebPAnimDecoderGetInfo(decoder, &info)) {
+                return reinterpret_cast<jlong>(new AnimatedWebpDecoder(buffer, decoder, info.canvas_width, info.canvas_height, info.frame_count));
+            }
+        }
         delete[] buffer;
         return 0L;
     }
 
     JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpRelease(JNIEnv* env, jclass, jlong handle) {
-        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
-        if (decoder) delete decoder;
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        if (instance) delete instance;
     }
 
     JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetWidth(JNIEnv* env, jclass, jlong handle) {
-        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
-        if (decoder) return static_cast<jint>(WebPDemuxGetI(decoder->demux, WEBP_FF_CANVAS_WIDTH));
-        return 0;
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        return instance ? instance->width : 0;
     }
 
     JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetHeight(JNIEnv* env, jclass, jlong handle) {
-        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
-        if (decoder) return static_cast<jint>(WebPDemuxGetI(decoder->demux, WEBP_FF_CANVAS_HEIGHT));
-        return 0;
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        return instance ? instance->height : 0;
     }
 
     JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetFrameCount(JNIEnv* env, jclass, jlong handle) {
-        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
-        if (decoder) return static_cast<jint>(WebPDemuxGetI(decoder->demux, WEBP_FF_FRAME_COUNT));
-        return 0;
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        return instance ? instance->frameCount : 0;
     }
 
-    JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreateIterator(JNIEnv* env, jclass) {
-        return reinterpret_cast<jlong>(new WebPIterator);
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpHasMoreFrames(JNIEnv* env, jclass, jlong handle) {
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        return static_cast<jboolean>(instance ? WebPAnimDecoderHasMoreFrames(instance->decoder) : false);
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpReleaseIterator(JNIEnv* env, jclass, jlong iterator_handle) {
-        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
-        if (iterator) {
-            WebPDemuxReleaseIterator(iterator);
-            delete iterator;
+    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetNext(JNIEnv* env, jclass, jlong handle, jobject directBuffer) {
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        if (instance) {
+            uint8_t* buf = nullptr;
+            int timestamp = 0;
+            WebPAnimDecoderGetNext(instance->decoder, &buf, &timestamp);
+            if (buf) {
+                auto* dst = env->GetDirectBufferAddress(directBuffer);
+                auto size = static_cast<size_t>(env->GetDirectBufferCapacity(directBuffer));
+                memcpy(dst, buf, size);
+                return true;
+            }
         }
+        return false;
     }
 
-    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpFirstFrame(JNIEnv* env, jclass, jlong handle, jlong iterator_handle) {
-        auto* decoder = reinterpret_cast<AnimatedWebpDecoder*>(handle);
-        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
-        return static_cast<jboolean>(decoder && iterator ? WebPDemuxGetFrame(decoder->demux, 1, iterator) : false);
-    }
-
-    JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpNextFrame(JNIEnv* env, jclass, jlong iterator_handle) {
-        auto* iterator = reinterpret_cast<WebPIterator*>(iterator_handle);
-        return static_cast<jboolean>(iterator ? WebPDemuxNextFrame(iterator) : false);
+    JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpReset(JNIEnv* env, jclass, jlong handle) {
+        auto* instance = reinterpret_cast<AnimatedWebpDecoder*>(handle);
+        if (instance) WebPAnimDecoderReset(instance->decoder);
     }
 }

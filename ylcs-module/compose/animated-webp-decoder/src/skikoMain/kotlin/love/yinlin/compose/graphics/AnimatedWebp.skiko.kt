@@ -1,7 +1,9 @@
 package love.yinlin.compose.graphics
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -31,21 +33,27 @@ actual class AnimatedWebp internal constructor(
     private val image: Image,
 ) {
     actual fun DrawScope.drawFrame(index: Int, dst: Rect) {
-        drawIntoCanvas { canvas ->
-            canvas.nativeCanvas.drawImageRect(
-                image = image,
-                src = org.jetbrains.skia.Rect.makeXYWH(
-                    l = (index % col * width).toFloat(),
-                    t = (index / col * height).toFloat(),
-                    w = width.toFloat(),
-                    h = height.toFloat()
-                ),
-                dst = dst.toSkiaRect(),
-                paint = paint,
-                samplingMode = SamplingMode.MITCHELL,
-                strict = true
-            )
+        if (index >= 0 && !image.isClosed) {
+            drawIntoCanvas { canvas ->
+                canvas.nativeCanvas.drawImageRect(
+                    image = image,
+                    src = org.jetbrains.skia.Rect.makeXYWH(
+                        l = (index % col * width).toFloat(),
+                        t = (index / col * height).toFloat(),
+                        w = width.toFloat(),
+                        h = height.toFloat()
+                    ),
+                    dst = dst.toSkiaRect(),
+                    paint = paint,
+                    samplingMode = SamplingMode.MITCHELL,
+                    strict = true
+                )
+            }
         }
+    }
+
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size) {
+        this.drawFrame(index, Rect(position, size))
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(image).encode(format, quality)

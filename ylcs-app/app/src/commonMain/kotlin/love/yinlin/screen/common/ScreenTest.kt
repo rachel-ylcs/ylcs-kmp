@@ -4,9 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import kotlinx.coroutines.delay
 import love.yinlin.compose.Device
 import love.yinlin.compose.graphics.AnimatedWebp
@@ -35,20 +32,20 @@ class ScreenTest(manager: ScreenManager) : Screen(manager) {
     @Composable
     override fun Content(device: Device) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-//            webp?.let {
-//                it.apply { drawFrame(frame, Rect(Offset.Zero, Size(it.width / 2f, it.height / 2f))) }
-//            }
+            webp?.let {
+                it.apply { drawFrame(frame) }
+            }
         }
-        PrimaryButton("开始") {
-//            launch {
-//                while (true) {
-//                    delay(100)
-//                    webp?.let {
-//                        if (frame >= it.frameCount - 1) frame = 0
-//                        else frame++
-//                    }
-//                }
-//            }
+        PrimaryButton("开始 ${webp != null}") {
+            launch {
+                while (true) {
+                    delay(100)
+                    webp?.let {
+                        if (frame >= it.frameCount - 1) frame = 0
+                        else frame++
+                    }
+                }
+            }
         }
     }
 }

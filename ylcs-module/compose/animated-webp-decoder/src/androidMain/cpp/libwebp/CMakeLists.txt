@@ -14,7 +14,8 @@ endif()
 
 project(WebP C)
 
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -DNDEBUG")
+set(CMAKE_BUILD_TYPE, Release)
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -DNDEBUG")
 
 # Options for coder / decoder executables.
 if(BUILD_SHARED_LIBS)
@@ -32,7 +33,7 @@ if(NOT EMSCRIPTEN)
 endif()
 option(WEBP_ENABLE_SIMD "Enable any SIMD optimization."
        ${WEBP_ENABLE_SIMD_DEFAULT})
-option(WEBP_BUILD_ANIM_UTILS "Build animation utilities." ON)
+option(WEBP_BUILD_ANIM_UTILS "Build animation utilities." OFF)
 option(WEBP_BUILD_CWEBP "Build the cwebp command line tool." OFF)
 option(WEBP_BUILD_DWEBP "Build the dwebp command line tool." OFF)
 option(WEBP_BUILD_GIF2WEBP "Build the gif2webp conversion tool." OFF)
@@ -46,7 +47,8 @@ option(WEBP_BUILD_WEBP_JS "Emscripten build of webp.js." OFF)
 option(WEBP_BUILD_FUZZTEST "Build the fuzztest tests." OFF)
 option(WEBP_USE_THREAD "Enable threading support" ON)
 option(WEBP_NEAR_LOSSLESS "Enable near-lossless encoding" ON)
-option(WEBP_ENABLE_SWAP_16BIT_CSP "Enable byte swap for 16 bit colorspaces." OFF)
+option(WEBP_ENABLE_SWAP_16BIT_CSP "Enable byte swap for 16 bit colorspaces."
+       OFF)
 set(WEBP_BITTRACE "0" CACHE STRING "Bit trace mode (0=none, 1=bit, 2=bytes)")
 set_property(CACHE WEBP_BITTRACE PROPERTY STRINGS 0 1 2)
 option(WEBP_ENABLE_WUNUSED_RESULT "Add [[nodiscard]] to some functions. \
@@ -100,12 +102,6 @@ set(SHARPYUV_DEP_LIBRARIES)
 set(SHARPYUV_DEP_INCLUDE_DIRS)
 set(WEBP_DEP_LIBRARIES)
 set(WEBP_DEP_INCLUDE_DIRS)
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release"
-      CACHE STRING "Build type: Release, Debug, MinSizeRel or RelWithDebInfo"
-            FORCE)
-endif()
 
 # Include dependencies.
 if(WEBP_BUILD_ANIM_UTILS
