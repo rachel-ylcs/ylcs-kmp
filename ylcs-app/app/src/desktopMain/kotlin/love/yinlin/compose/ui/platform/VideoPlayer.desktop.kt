@@ -1,22 +1,32 @@
 package love.yinlin.compose.ui.platform
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
+import kotlinx.atomicfu.locks.SynchronousMutex
+import kotlinx.atomicfu.locks.withLock
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.extension.catching
+import love.yinlin.platform.Coroutines
 import love.yinlin.platform.WindowsNativePlaybackState
 import love.yinlin.platform.WindowsNativeVideoPlayer
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.SamplingMode
 
 @Stable
 private class VideoPlayerState(val url: String) {
@@ -28,11 +38,15 @@ private class VideoPlayerState(val url: String) {
         private set
     var duration by mutableLongStateOf(0L)
         private set
-    var bitmap: ImageBitmap? by mutableRefStateOf(null)
-        private set
+
+    // https://github.com/coil-kt/coil/pull/2594
+    var bitmap: Bitmap? = null
+
+    var mutex = SynchronousMutex()
+    var isRelease: Boolean = false
 
     fun init() {
-        controller.create(object : WindowsNativeVideoPlayer.Listener() {
+        val isInit = controller.create(object : WindowsNativeVideoPlayer.Listener() {
             override fun onDurationChange(duration: Long) {
                 this@VideoPlayerState.duration = duration
             }
@@ -50,17 +64,35 @@ private class VideoPlayerState(val url: String) {
                 controller.load(url)
             }
 
-            override fun onFrame(bitmap: ImageBitmap) {
-                this@VideoPlayerState.bitmap = bitmap
-                this@VideoPlayerState.position = controller.position
+            override fun onFrame(width: Int, height: Int, data: ByteArray) {
+                if (mutex.tryLock() && !isRelease) {
+                    Coroutines.startMain {
+                        catching {
+                            val currentBitmap = bitmap ?: Bitmap().apply {
+                                allocPixels(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL))
+                                setImmutable()
+                                bitmap = this
+                            }
+                            currentBitmap.installPixels(data)
+                            currentBitmap.notifyPixelsChanged()
+                            position = controller.position
+                        }
+                    }
+                    mutex.unlock()
+                }
             }
         })
-        controller.load(url)
+        if (isInit) controller.load(url)
     }
 
     fun release() {
-        controller.release()
-        bitmap = null
+        mutex.withLock {
+            isRelease = true
+            controller.release()
+            val tmp = bitmap
+            bitmap = null
+            tmp?.close()
+        }
     }
 
     fun play() {
@@ -86,6 +118,7 @@ actual fun VideoPlayer(
     onBack: () -> Unit
 ) {
     val state by rememberRefState { VideoPlayerState(url) }
+    val paint = remember { Paint().apply { isAntiAlias = true } }
 
     DisposableEffect(Unit) {
         state.init()
@@ -98,14 +131,36 @@ actual fun VideoPlayer(
     }
 
     Box(modifier = modifier) {
-        state.bitmap?.let { bitmap ->
-            Image(
-                bitmap,
-                modifier = Modifier.fillMaxSize().background(Color.Black).zIndex(1f),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                alignment = Alignment.Center,
-            )
+        Canvas(modifier = Modifier.fillMaxSize().background(Colors.Black).zIndex(1f)) {
+            val bitmap = state.bitmap
+            // 必须用 state.position 变化来诱导 Compose 重组, 不能放在 && 后面
+            if (state.position > 0L && bitmap != null) {
+                val canvasWidth = this.size.width
+                val canvasHeight = this.size.height
+                val canvasRatio = canvasWidth / canvasHeight
+                val imageWidth = bitmap.width.toFloat()
+                val imageHeight = bitmap.height.toFloat()
+                val imageRatio = imageWidth / imageHeight
+                Image.makeFromBitmap(bitmap).use { image ->
+                    val dst = if (imageRatio > canvasRatio) {
+                        val dstHeight = canvasWidth / imageRatio
+                        Rect.makeXYWH(0f, (canvasHeight - dstHeight) / 2, canvasWidth, dstHeight)
+                    } else {
+                        val dstWidth = canvasHeight * imageRatio
+                        Rect.makeXYWH((canvasWidth - dstWidth) / 2, 0f, dstWidth, canvasHeight)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.nativeCanvas.drawImageRect(
+                            image = image,
+                            src = Rect.makeWH(imageWidth, imageHeight),
+                            dst = dst,
+                            samplingMode = SamplingMode.MITCHELL,
+                            paint = paint,
+                            strict = true
+                        )
+                    }
+                }
+            }
         }
 
         VideoPlayerControls(

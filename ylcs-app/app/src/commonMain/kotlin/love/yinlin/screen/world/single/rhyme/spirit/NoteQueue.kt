@@ -26,8 +26,6 @@ sealed class DynamicAction {
 
     var state: DynamicActionState by mutableStateOf(DynamicActionState.Normal)
 
-
-
     @Stable
     class Note(start: Long, override val action: RhymeAction.Note) : DynamicAction() {
         companion object {

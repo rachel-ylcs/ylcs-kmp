@@ -50,13 +50,6 @@ data object Coroutines {
         return withContext(ioContext, block)
     }
 
-    suspend inline fun <T> wait(noinline block: suspend CoroutineScope.() -> T): T {
-        contract {
-            callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-        }
-        return withContext(waitContext, block)
-    }
-
     suspend inline fun <T> timeout(limit: Int, noinline block: suspend CoroutineScope.() -> T): T {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -70,7 +63,6 @@ data object Coroutines {
     fun startMain(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(mainContext).launch(block = block)
     fun startCPU(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(cpuContext).launch(block = block)
     fun startIO(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(ioContext).launch(block = block)
-    fun startWait(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(waitContext).launch(block = block)
 
     suspend inline fun <T> sync(
         crossinline onCancel: () -> Unit = {},

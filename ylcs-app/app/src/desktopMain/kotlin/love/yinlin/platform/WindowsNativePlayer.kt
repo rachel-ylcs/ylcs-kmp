@@ -1,13 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asComposeImageBitmap
-import kotlinx.coroutines.sync.Mutex
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorType
-import org.jetbrains.skia.ImageInfo
-
 enum class WindowsNativePlaybackState {
     None, Opening, Buffering, Playing, Paused;
 
@@ -104,14 +96,11 @@ class WindowsNativeVideoPlayer {
         open fun onSourceChange() { }
         open fun onMediaEnded() { }
         open fun onError(message: String) { }
-        open fun onFrame(bitmap: ImageBitmap) { }
+        open fun onFrame(width: Int, height: Int, data: ByteArray) { }
     }
 
     private var nativeHandle: Long = 0
     private var listener: Listener? = null
-
-    private val skiaBitmap: Bitmap = Bitmap()
-    private val lock = Mutex()
 
     val isInit: Boolean get() = nativeHandle != 0L
 
@@ -129,7 +118,6 @@ class WindowsNativeVideoPlayer {
     }
 
     fun release() {
-        skiaBitmap.close()
         this.listener = null
         nativeRelease(nativeHandle)
         nativeHandle = 0L
@@ -164,26 +152,8 @@ class WindowsNativeVideoPlayer {
     private fun nativeMediaEnded() { listener?.onMediaEnded() }
     @Suppress("unused")
     private fun nativeOnError(message: String) { listener?.onError(message) }
-
     @Suppress("unused")
-    fun isUpdateFrame(): Boolean = lock.isLocked
-
-    @Suppress("unused")
-    private fun nativeVideoFrameAvailable(width: Int, height: Int, bufferSize: Int, data: ByteArray) {
-        listener?.let { callback ->
-            if (!lock.tryLock()) return
-            Coroutines.startMain {
-                if (!skiaBitmap.isClosed) {
-                    if (skiaBitmap.imageInfo.width != width || skiaBitmap.imageInfo.height != height) {
-                        skiaBitmap.setImageInfo(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL), width * 4)
-                    }
-                    skiaBitmap.installPixels(data)
-                    callback.onFrame(skiaBitmap.asComposeImageBitmap())
-                }
-                lock.unlock()
-            }
-        }
-    }
+    private fun nativeVideoFrameAvailable(width: Int, height: Int, data: ByteArray) { listener?.onFrame(width, height, data) }
 
     // Native
     private external fun nativeCreate(): Long

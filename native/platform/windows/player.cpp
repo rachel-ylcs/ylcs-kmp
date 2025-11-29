@@ -177,6 +177,7 @@ extern "C" {
 		int surfaceHeight = 0;
 		IDirect3DSurface d3dSurface;
 
+		bool isRendering = false;
 		jbyteArray buffer = nullptr;
 
 		void createBuffer(JVM::JniEnvGuard& guard, int bufferSize) {
@@ -207,7 +208,6 @@ extern "C" {
 	static jmethodID g_method_nativeVideoSourceChange = nullptr;
 	static jmethodID g_method_nativeVideoMediaEnded = nullptr;
 	static jmethodID g_method_nativeVideoOnError = nullptr;
-	static jmethodID g_method_nativeVideoIsUpdateFrame = nullptr;
 	static jmethodID g_method_nativeVideoFrameAvailable = nullptr;
 
 	inline NativeVideoPlayer* vp_cast(jlong handle) { return reinterpret_cast<NativeVideoPlayer*>(handle); }
@@ -219,8 +219,7 @@ extern "C" {
 		g_method_nativeVideoSourceChange = env->GetMethodID(clz, "nativeSourceChange", "()V");
 		g_method_nativeVideoMediaEnded = env->GetMethodID(clz, "nativeMediaEnded", "()V");
 		g_method_nativeVideoOnError = env->GetMethodID(clz, "nativeOnError", "(Ljava/lang/String;)V");
-		g_method_nativeVideoFrameAvailable = env->GetMethodID(clz, "nativeVideoFrameAvailable", "(III[B)V");
-		g_method_nativeVideoIsUpdateFrame = env->GetMethodID(clz, "isUpdateFrame", "()Z");
+		g_method_nativeVideoFrameAvailable = env->GetMethodID(clz, "nativeVideoFrameAvailable", "(II[B)V");
 		env->DeleteLocalRef(clz);
 	}
 
@@ -270,10 +269,12 @@ extern "C" {
 		});
 
 		player.VideoFrameAvailable([nativePlayer](Playback::MediaPlayer const& sender, auto&& args) {
+			if (nativePlayer->isRendering) return;
+			nativePlayer->isRendering = true;
+
 			JVM::JniEnvGuard guard;
 			
 			if (sender.PlaybackSession().PlaybackState() != Playback::MediaPlaybackState::Playing) return;
-			if (guard->CallBooleanMethod(nativePlayer->obj, g_method_nativeVideoIsUpdateFrame)) return;
 
 			if (!d3dDevice) {
 				D3D11CreateDevice(
@@ -324,7 +325,7 @@ extern "C" {
 				if (!nativePlayer->buffer) nativePlayer->createBuffer(guard, bufferSize);
 				if (nativePlayer->buffer && frameWidth > 0 && frameHeight > 0 && bufferSize > 0) {
 					guard->SetByteArrayRegion(nativePlayer->buffer, 0, bufferSize, reinterpret_cast<const jbyte*>(reference.data()));
-					guard->CallVoidMethod(nativePlayer->obj, g_method_nativeVideoFrameAvailable, frameWidth, frameHeight, bufferSize, nativePlayer->buffer);
+					guard->CallVoidMethod(nativePlayer->obj, g_method_nativeVideoFrameAvailable, frameWidth, frameHeight, nativePlayer->buffer);
 					guard.checkException();
 				}
 
@@ -332,6 +333,8 @@ extern "C" {
 				buffer.Close();
 				bitmap.Close();
 			}
+
+			nativePlayer->isRendering = false;
 		});
 
 		return reinterpret_cast<jlong>(nativePlayer);

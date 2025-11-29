@@ -16,6 +16,8 @@ import kotlinx.cinterop.autoreleasepool
 import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.compose.*
+import love.yinlin.compose.graphics.PlatformImage
+import love.yinlin.compose.graphics.encode
 import love.yinlin.extension.toNSData
 import org.jetbrains.skia.impl.use
 import platform.AVFoundation.*
@@ -78,10 +80,9 @@ actual class FloatingLyrics {
         // TODO: 这里的转换layer是long, 应该是不能转换成功的, 是否应该用native的指针
         (pipView.layer as? AVSampleBufferDisplayLayer)?.flush()
         composeScene.render().use { image ->
-            image.encodeToData()?.use { imageData ->
+            PlatformImage(image).encode()?.toNSData()?.let { imageData ->
                 autoreleasepool {
-                    val nsData = imageData.bytes.toNSData()
-                    val uiImage = UIImage.imageWithData(nsData)
+                    val uiImage = UIImage.imageWithData(imageData)
                     val buffer = uiImage?.asSampleBuffer()
                     (pipView.layer as? AVSampleBufferDisplayLayer)?.enqueueSampleBuffer(buffer)
                 }
