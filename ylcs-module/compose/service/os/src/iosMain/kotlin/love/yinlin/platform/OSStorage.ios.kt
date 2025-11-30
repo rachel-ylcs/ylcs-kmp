@@ -14,7 +14,6 @@ import platform.Foundation.NSUserDomainMask
 
 @Stable
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
-    // TODO: review
     override val appPath: Path get() = unsupportedPlatform()
 
     private fun searchPath(directory: NSSearchPathDirectory): Path {

@@ -1,4 +1,4 @@
-#include "platform.h"
+#include "ylcs_jni.h"
 
 #include "CoreFoundation/CoreFoundation.h"
 

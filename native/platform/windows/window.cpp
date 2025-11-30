@@ -1,4 +1,4 @@
-#include "../../ylcs_jni.h"
+#include "ylcs_jni.h"
 
 #include <Windows.h>
 

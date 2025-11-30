@@ -13,6 +13,7 @@ import cocoapods.YLCSCore.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.autoreleasepool
+import kotlinx.coroutines.delay
 import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.compose.*
@@ -30,7 +31,6 @@ import platform.darwin.NSObject
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 @Stable
 actual class FloatingLyrics {
-    // TODO: 需要参照其他平台 review
     private val composeScene by lazy {
         ImageComposeScene(
             width = CGRectGetWidth(pipView.frame).toInt(),
@@ -43,32 +43,28 @@ actual class FloatingLyrics {
 
     private var pipDelegate = object : NSObject(), PictureInPictureDelegateProtocol {
         override fun didFailToStartPictureInPictureWithError(error: NSError) {
-            app.config.enabledFloatingLyrics = false
+            isAttached = false
         }
 
         override fun didStartPictureInPicture() {
-            app.config.enabledFloatingLyrics = true
+            isAttached = true
         }
 
         override fun didStopPictureInPicture() {
-            app.config.enabledFloatingLyrics = false
+            isAttached = false
+            // iOS的画中画有关闭按钮
+            if (isAttached != app.config.enabledFloatingLyrics)
+                app.config.enabledFloatingLyrics = false
         }
-    }
-
-    init {
-        pipView.setHidden(true)
-        pipView.setDelegate(pipDelegate)
-        pipView.setupPIP()
-        // 需要将画中画显示的View加入到控件树上
-        controller.view.addSubview(pipView)
     }
 
     val canAttached: Boolean get() = AVPictureInPictureController.isPictureInPictureSupported()
 
-    actual val isAttached: Boolean get() = pipView.pipController()?.isPictureInPictureActive() ?: false
+    actual var isAttached: Boolean by mutableStateOf(false)
+        private set
 
     actual fun attach() {
-        updateLyrics("") // 必须先送一帧才能启动画中画
+        update() // 必须先送一帧才能启动画中画
         pipView.pipController()?.startPictureInPicture()
     }
 
@@ -76,8 +72,20 @@ actual class FloatingLyrics {
         pipView.pipController()?.stopPictureInPicture()
     }
 
-    fun updateLyrics(lyrics: String?) {
-        // TODO: 这里的转换layer是long, 应该是不能转换成功的, 是否应该用native的指针
+    actual suspend fun initDelay(context: Context) {
+        pipView.setHidden(true)
+        pipView.setDelegate(pipDelegate)
+        pipView.setupPIP()
+        // 需要将画中画显示的View加入到控件树上
+        context.controller.view.addSubview(pipView)
+
+        if (app.config.enabledFloatingLyrics && !isAttached) {
+            delay(1000L)
+            attach()
+        }
+    }
+
+    actual fun update() {
         (pipView.layer as? AVSampleBufferDisplayLayer)?.flush()
         composeScene.render().use { image ->
             PlatformImage(image).encode()?.toNSData()?.let { imageData ->
@@ -90,13 +98,10 @@ actual class FloatingLyrics {
         }
     }
 
-    actual suspend fun initDelay(context: Context) {
-
-    }
-
     @Composable
     actual fun Content() {
         if (app.mp.isPlaying) {
+            // TODO: 可不可以用app.Layout
             app.Layout {
                 Box(
                     modifier = Modifier.fillMaxSize(),

@@ -3,6 +3,8 @@
 
 #include <jni.h>
 
+#ifdef __cplusplus // objc not support c++
+
 #include <string>
 #include <string_view>
 #include <stdexcept>
@@ -74,5 +76,7 @@ inline jstring w2j(JNIEnv* env, std::wstring_view str) {
     throw std::runtime_error { "You should not use std::wstring in non Windows environments" };
 #endif
 }
+
+#endif
 
 #endif

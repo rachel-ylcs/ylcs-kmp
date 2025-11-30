@@ -14,6 +14,8 @@ actual class FloatingLyrics {
 
     actual suspend fun initDelay(context: Context) { }
 
+    actual fun update() { }
+
     @Composable
     actual fun Content() { }
 }

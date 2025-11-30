@@ -1,7 +1,10 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import kotlin.collections.set
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidLibrary1)
 }
@@ -33,6 +36,22 @@ kotlin {
         }
     }
 
+    cocoapods {
+        version = C.app.versionName
+
+        if (C.platform == BuildPlatform.Mac) {
+            pod("MMKV") {
+                version = libs.versions.mmkv.get()
+                extraOpts += listOf("-compiler-option", "-fmodules")
+            }
+        }
+
+        podfile = C.root.iosApp.podfile.asFile
+
+        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
+        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
+    }
+
     jvm("desktop") {
         C.jvmTarget(this)
     }
@@ -51,6 +70,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             useApi(
+                projects.ylcsBase.core,
                 projects.ylcsModule.compose.startup,
             )
         }

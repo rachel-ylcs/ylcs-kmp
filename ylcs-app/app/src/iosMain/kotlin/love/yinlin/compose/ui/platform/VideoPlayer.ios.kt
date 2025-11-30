@@ -80,16 +80,16 @@ actual fun VideoPlayer(
 
     if (app.config.audioFocus) {
         DisposableEffect(Unit) {
-            wasMusicPlaying = app.musicFactory.instance.isPlaying
+            wasMusicPlaying = app.mp.isPlaying
             if (wasMusicPlaying) {
                 Coroutines.startMain {
-                    app.musicFactory.instance.pause()
+                    app.mp.pause()
                 }
             }
             onDispose {
                 if (wasMusicPlaying) {
                     Coroutines.startMain {
-                        app.musicFactory.instance.play()
+                        app.mp.play()
                     }
                 }
             }

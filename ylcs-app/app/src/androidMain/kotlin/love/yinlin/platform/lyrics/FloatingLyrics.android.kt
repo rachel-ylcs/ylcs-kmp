@@ -108,6 +108,8 @@ actual class FloatingLyrics {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 
+    actual fun update() = Unit
+
     @Composable
     actual fun Content() {
         if (app.mp.isPlaying) {

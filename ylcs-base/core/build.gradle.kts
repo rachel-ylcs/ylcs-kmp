@@ -106,10 +106,8 @@ kotlin {
         }
 
         val desktopMain by getting {
+            // appleMain是原生objc，desktopMain是基于jvm的，不许在这加appleMain了:(
             useSourceSet(skikoMain, jvmMain)
-            if (C.platform == BuildPlatform.Mac) {
-                useSourceSet(appleMain)
-            }
             useApi(
                 libs.kotlinx.coroutines.swing
             )

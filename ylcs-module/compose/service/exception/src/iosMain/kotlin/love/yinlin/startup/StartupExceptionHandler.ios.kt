@@ -29,18 +29,28 @@ actual class StartupExceptionHandler : SyncStartup() {
     }
 
     private lateinit var mCrashKey: String
+    private lateinit var mHandler: Handler
 
     actual val crashKey: String get() = mCrashKey
 
+    companion object {
+        private lateinit var instance: StartupExceptionHandler
+    }
+
     @OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)
     actual override fun init(context: Context, args: StartupArgs) {
+        instance = this
         mCrashKey = args[0]
-        val handler: Handler = args[1]
+        mHandler = args[1]
         setUnhandledExceptionHook { e ->
-            handler.handle(crashKey, e, e.stackTraceToString())
+            mHandler.handle(crashKey, e, e.stackTraceToString())
         }
+        // staticCFunction must take an unbound, non-capturing function or lambda
         val exceptionHandler: CPointer<NSUncaughtExceptionHandler> = staticCFunction { e ->
-            if (e != null) handler.handle(crashKey, Throwable(e.reason), "${e.reason}\n${e.callStackSymbols.joinToString(",")}")
+            e?.let {
+                instance.mHandler.handle(instance.crashKey,
+                    Throwable(e.reason), "${e.reason}\n${e.callStackSymbols.joinToString(",")}")
+            }
         }
         NSSetUncaughtExceptionHandler(exceptionHandler)
     }
