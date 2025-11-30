@@ -24,10 +24,10 @@ private class LeftUI(
         ScoreBoard(rhymeManager)
     )
 
-    private val backgorund = manager.assets.image("left_ui")!!.image
+    private val background = manager.assets.image("left_ui")!!.image
 
     override fun Drawer.onClientPreDraw() {
-        image(backgorund)
+        image(background)
     }
 }
 
@@ -43,10 +43,10 @@ private class RightUI(
         LyricsBar(rhymeManager, lyricsConfig)
     )
 
-    private val backgorund = manager.assets.image("right_ui")!!.image
+    private val background = manager.assets.image("right_ui")!!.image
 
     override fun Drawer.onClientPreDraw() {
-        image(backgorund)
+        image(background)
     }
 }
 

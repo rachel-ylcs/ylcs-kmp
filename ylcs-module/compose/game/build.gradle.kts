@@ -55,6 +55,9 @@ kotlin {
             useApi(
                 projects.ylcsBase.composeCore,
             )
+            useLib(
+                projects.ylcsModule.compose.animatedWebpDecoder,
+            )
         }
     }
 }

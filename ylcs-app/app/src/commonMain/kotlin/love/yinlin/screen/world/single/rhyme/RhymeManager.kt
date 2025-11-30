@@ -17,7 +17,11 @@ import love.yinlin.compose.graphics.decode
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
+import love.yinlin.resources.Res
+import love.yinlin.resources.test
 import love.yinlin.screen.world.single.rhyme.spirit.Scene
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 
 @Stable
 class RhymeManager(
@@ -76,34 +80,19 @@ class RhymeManager(
             "right_ui",
         )
 
-        val animationKeys = arrayOf<Pair<String, Int>>(
+        val animationKeys = arrayOf<String>(
 
         )
 
         val assetList = (imageKeys.map { key ->
-            async {
-                val data = NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)
-                if (data != null) {
-                    val image = ImageBitmap.decode(data)
-                    if (image != null) return@async key to Asset.Image(image)
-                }
-                null
-            }
-        } + animationKeys.map { (key, count) ->
-            async {
-                val data = NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)
-                if (data != null) {
-                    val image = ImageBitmap.decode(data)
-                    if (image != null) return@async key to Asset.Animation(image, count)
-                }
-                null
-            }
+            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.decodeImage(it) } }
+        } + animationKeys.map { key ->
+            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.decodeAnimation(it) } }
         }).awaitAll()
 
-        for (item in assetList) {
-            val (key, asset) = item ?: return false
-            assets[key] = asset
-        }
+        for ((key, asset) in assetList) assets[key] = asset ?: return false
+
+        assets["body"] = Asset.decodeImage(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.test))!!
         return true
     }
 }
