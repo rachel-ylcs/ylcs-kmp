@@ -39,16 +39,13 @@ class TrackClickArea(vertices: Offset, left: Offset, right: Offset) {
 
     val slopeLeft = vertices.slope(left)
     val slopeRight = vertices.slope(right)
-    val perspectiveMatrixResult = Drawer.calcFixedPerspectiveMatrix(
+    val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(
         ratio = 2f,
         left = vertices.onLine(left, CENTER),
         right = vertices.onLine(right, CENTER),
         slopeLeft = slopeLeft,
         slopeRight = slopeRight,
     )
-    val matrix = perspectiveMatrixResult.first
-    val srcRect = perspectiveMatrixResult.second
-    val area = Path(perspectiveMatrixResult.third)
 
     val brush = Brush.radialGradient(
         *arrayOf(
@@ -56,8 +53,8 @@ class TrackClickArea(vertices: Offset, left: Offset, right: Offset) {
             0.43f to Colors.Steel1.copy(alpha = 0.1f),
             0.75f to Colors.Steel1
         ),
-        center = srcRect.center,
-        radius = srcRect.width
+        center = perspectiveMatrix.second.center,
+        radius = perspectiveMatrix.second.width
     )
 }
 
@@ -242,11 +239,14 @@ class TrackMap(
                 path = track.areaPath
             )
 
+            val (matrix, srcRect, dstArea) = track.clickArea.perspectiveMatrix
             // 画点击区域
-            transform(track.clickArea.matrix) {
-                rect(track.clickArea.brush, track.clickArea.srcRect)
+            transform(matrix) {
+                rect(track.clickArea.brush, srcRect)
             }
-            path(Colors.Ghost, track.clickArea.area, alpha = 0.5f, style = Stroke(5f))
+            // 画点击区域横线
+            line(Colors.Ghost, dstArea[0], dstArea[3], Stroke(5f), 0.6f)
+            line(Colors.Ghost, dstArea[1], dstArea[2], Stroke(5f), 0.6f)
 
             // 画轨道射线
             drawLeftTrackLine(track)

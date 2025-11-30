@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastForEach
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.BoxBody
@@ -79,6 +80,8 @@ class NoteQueue(
 
     private val vertices = trackMap.vertices
     private val tracks = trackMap.tracks
+
+    private val blockMap: ImageBitmap by manager.assets()
 
     private val queue: List<DynamicAction> = buildList {
         lyrics.fastForEach { line ->

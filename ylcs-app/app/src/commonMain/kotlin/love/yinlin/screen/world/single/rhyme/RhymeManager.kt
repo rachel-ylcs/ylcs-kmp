@@ -12,6 +12,7 @@ import love.yinlin.api.ServerRes
 import love.yinlin.api.url
 import love.yinlin.common.downloadCache
 import love.yinlin.compose.game.Asset
+import love.yinlin.compose.game.AssetKey
 import love.yinlin.compose.game.Manager
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
@@ -70,22 +71,23 @@ class RhymeManager(
     }
 
     suspend fun CoroutineScope.downloadAssets(): Boolean {
-        val imageKeys = arrayOf(
-            "leftUIBackground",
-            "rightUIBackground",
+        val imageKeys = arrayOf<AssetKey>(
+            AssetKey("leftUIBackground"),
+            AssetKey("rightUIBackground"),
+            AssetKey("blockMap"),
         )
 
-        val animationKeys = arrayOf<String>(
+        val animationKeys = arrayOf<AssetKey>(
 
         )
 
-        val assetList = (imageKeys.map { key ->
-            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.image(it) } }
-        } + animationKeys.map { key ->
-            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.animation(it) } }
+        val assetList = (imageKeys.map { (name, version) ->
+            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.res(name).url}?v=$version")?.let { Asset.image(it) } }
+        } + animationKeys.map { (name, version) ->
+            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.res(name).url}?v=$version")?.let { Asset.animation(it) } }
         }).awaitAll()
 
-        for ((key, asset) in assetList) assets[key] = asset ?: return false
+        for ((name, asset) in assetList) assets[name] = asset ?: return false
 
         return true
     }
