@@ -13,6 +13,7 @@ import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
+import love.yinlin.screen.world.single.rhyme.RhymeConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
@@ -71,8 +72,8 @@ class NoteQueue(
     lyricsConfig: RhymeLyricsConfig,
     trackMap: TrackMap,
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
-    override val size: Size = Size(1920f, 1080f * (1 + Track.VERTICES_TOP_RATIO))
+    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP))
+    override val size: Size = Size(RhymeConfig.WIDTH, Track.VIRTUAL_HEIGHT)
 
     private val lyrics = lyricsConfig.lyrics
 

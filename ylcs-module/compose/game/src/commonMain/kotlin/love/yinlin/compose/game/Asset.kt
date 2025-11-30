@@ -8,7 +8,7 @@ import love.yinlin.compose.graphics.decode
 @Stable
 class Asset private constructor(val value: Any) {
     companion object {
-        fun decodeImage(data: ByteArray): Asset? = ImageBitmap.decode(data)?.let { Asset(it) }
-        fun decodeAnimation(data: ByteArray): Asset? = AnimatedWebp.decode(data)?.let { Asset(it) }
+        fun image(data: ByteArray): Asset? = ImageBitmap.decode(data)?.let { Asset(it) }
+        fun animation(data: ByteArray): Asset? = AnimatedWebp.decode(data)?.let { Asset(it) }
     }
 }

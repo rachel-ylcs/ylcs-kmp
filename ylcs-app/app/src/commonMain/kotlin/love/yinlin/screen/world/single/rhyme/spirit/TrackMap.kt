@@ -22,6 +22,7 @@ import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
 import love.yinlin.compose.translate
+import love.yinlin.screen.world.single.rhyme.RhymeConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 // 可点击区域
@@ -54,6 +55,10 @@ class Track(
         val Scales = arrayOf(4, 3, 2, 1, 5, 6, 7)
         // 顶点偏移比率
         const val VERTICES_TOP_RATIO = 0.2f
+        // 虚拟顶点
+        const val VIRTUAL_TOP = VERTICES_TOP_RATIO * RhymeConfig.HEIGHT
+        // 虚拟画布高度
+        const val VIRTUAL_HEIGHT = RhymeConfig.HEIGHT + VIRTUAL_TOP
         // 数量
         val Num = Scales.size
         // 线宽
@@ -125,8 +130,8 @@ class ActiveTrack {
 class TrackMap(
     rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -1080f * Track.VERTICES_TOP_RATIO))
-    override val size: Size = Size(1920f, 1080f * (1 + Track.VERTICES_TOP_RATIO))
+    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP))
+    override val size: Size = Size(RhymeConfig.WIDTH, Track.VIRTUAL_HEIGHT)
 
     // 顶点
     val vertices = Offset(size.width / 2, 0f)

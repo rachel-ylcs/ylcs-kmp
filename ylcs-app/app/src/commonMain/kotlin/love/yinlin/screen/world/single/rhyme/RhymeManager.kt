@@ -13,7 +13,6 @@ import love.yinlin.api.url
 import love.yinlin.common.downloadCache
 import love.yinlin.compose.game.Asset
 import love.yinlin.compose.game.Manager
-import love.yinlin.compose.graphics.decode
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
@@ -29,7 +28,7 @@ class RhymeManager(
     onComplete: () -> Unit,
     val onPause: () -> Unit
 ) : Manager() {
-    override val size: Size = Size(1920f, 1080f)
+    override val size: Size = Size(RhymeConfig.WIDTH, RhymeConfig.HEIGHT)
     override val fps: Int = RhymeConfig.FPS
     override val currentTick: Long get() = mp.position
 
@@ -85,14 +84,14 @@ class RhymeManager(
         )
 
         val assetList = (imageKeys.map { key ->
-            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.decodeImage(it) } }
+            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.image(it) } }
         } + animationKeys.map { key ->
-            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.decodeAnimation(it) } }
+            async { key to NetClient.downloadCache(ServerRes.Game.Rhyme.res(key).url)?.let { Asset.animation(it) } }
         }).awaitAll()
 
         for ((key, asset) in assetList) assets[key] = asset ?: return false
 
-        assets["body"] = Asset.decodeImage(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.test))!!
+        assets["body"] = Asset.image(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.test))!!
         return true
     }
 }
