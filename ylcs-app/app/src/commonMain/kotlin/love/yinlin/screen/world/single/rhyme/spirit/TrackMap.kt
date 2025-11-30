@@ -3,10 +3,8 @@ package love.yinlin.screen.world.single.rhyme.spirit
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
@@ -27,17 +25,39 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 // 可点击区域
 @Stable
-class TrackClickArea(area: Array<Offset>) {
-    val areaPath: Path = Path(area)
-    val perspectiveMatrix: Pair<Matrix, Rect> = Drawer.calcBottomPerspectiveMatrix(area)
+class TrackClickArea(vertices: Offset, left: Offset, right: Offset) {
+    companion object {
+        // 点击区域起始
+        const val START_RATIO = 0.8f
+        // 点击区域结束
+        const val END_RATIO = 0.9f
+        // 点击区域中间
+        const val CENTER = (START_RATIO + END_RATIO) / 2
+        // 点击区域区间
+        const val RANGE = END_RATIO - START_RATIO
+    }
+
+    val slopeLeft = vertices.slope(left)
+    val slopeRight = vertices.slope(right)
+    val perspectiveMatrixResult = Drawer.calcFixedPerspectiveMatrix(
+        ratio = 2f,
+        left = vertices.onLine(left, CENTER),
+        right = vertices.onLine(right, CENTER),
+        slopeLeft = slopeLeft,
+        slopeRight = slopeRight,
+    )
+    val matrix = perspectiveMatrixResult.first
+    val srcRect = perspectiveMatrixResult.second
+    val area = Path(perspectiveMatrixResult.third)
+
     val brush = Brush.radialGradient(
         *arrayOf(
-            0.4f to Colors.Transparent,
-            0.5f to Colors.Steel1.copy(alpha = 0.1f),
-            0.707f to Colors.Steel1
+            0.38f to Colors.Transparent,
+            0.43f to Colors.Steel1.copy(alpha = 0.1f),
+            0.75f to Colors.Steel1
         ),
-        center = perspectiveMatrix.second.center,
-        radius = perspectiveMatrix.second.width
+        center = srcRect.center,
+        radius = srcRect.width
     )
 }
 
@@ -63,20 +83,16 @@ class Track(
         val Num = Scales.size
         // 线宽
         const val LINE_STROKE_WIDTH = 20f
-        // 屏幕可点击比率
-        const val SCREEN_CLICK_AREA_RATIO = 0.6667f
-        // 点击区域起始
-        const val TIP_START_RATIO = 0.8f
-        // 点击区域结束
-        const val TIP_END_RATIO = 0.9f
-        // 点击区域区间
-        const val TIP_RANGE = TIP_END_RATIO - TIP_START_RATIO
-
         // 轨道背景色
         val BackgroundColor = Colors.Black.copy(alpha = 0.4f)
         // 轨道激活色
         val ActiveColor = BackgroundColor.blend(Colors.Cyan3.copy(alpha = 0.2f))
     }
+
+    // 位置
+    val isLeft = index < Num / 2
+    val isRight = index > (if (Num % 2 == 0) Num / 2 - 1 else Num / 2)
+    val isCenter = index == (if (Num % 2 == 0) -1 else Num / 2)
 
     // 轨道线
     val leftLineLeft = left.translate(x = -LINE_STROKE_WIDTH / 2)
@@ -96,12 +112,7 @@ class Track(
     val area: Array<Offset> = arrayOf(vertices, left, right)
     val areaPath: Path = Path(area)
     // 点击区域
-    val clickArea = TrackClickArea(arrayOf(
-        vertices.onLine(left, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
-        vertices.onLine(left, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
-        vertices.onLine(right, (TIP_END_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO)),
-        vertices.onLine(right, (TIP_START_RATIO + VERTICES_TOP_RATIO) / (1 + VERTICES_TOP_RATIO))
-    ))
+    val clickArea = TrackClickArea(vertices, left, right)
 }
 
 // 激活轨道
@@ -130,6 +141,11 @@ class ActiveTrack {
 class TrackMap(
     rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody {
+    companion object {
+        // 屏幕不可点击比率
+        const val SCREEN_CLICK_AREA_RATIO = 0.75f
+    }
+
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP))
     override val size: Size = Size(RhymeConfig.WIDTH, Track.VIRTUAL_HEIGHT)
 
@@ -167,7 +183,7 @@ class TrackMap(
 
     private fun calcTrackIndex(point: Offset): Track? {
         // 非屏幕可点击区域忽略
-        if (point.y <= size.height * Track.SCREEN_CLICK_AREA_RATIO) return null
+        if (point.y <= size.height * SCREEN_CLICK_AREA_RATIO) return null
         // 不需要计算点是否位于每个轨道三角形内，只需要计算斜率即可
         val slope = vertices.slope(point)
         if (slope >= 0f) { // 右侧
@@ -225,13 +241,13 @@ class TrackMap(
                 color = if (active[index]) Track.ActiveColor else Track.BackgroundColor,
                 path = track.areaPath
             )
-            // 画点击区域线
-            path(Colors.Steel1.copy(alpha = 0.3f), track.clickArea.areaPath, style = Stroke(5f))
-            // 画点击区域阴影
-            val (matrix, srcRect) = track.clickArea.perspectiveMatrix
-            transform(matrix) {
-                rect(track.clickArea.brush, position = srcRect.topLeft, size = srcRect.size)
+
+            // 画点击区域
+            transform(track.clickArea.matrix) {
+                rect(track.clickArea.brush, track.clickArea.srcRect)
             }
+            path(Colors.Ghost, track.clickArea.area, alpha = 0.5f, style = Stroke(5f))
+
             // 画轨道射线
             drawLeftTrackLine(track)
         }

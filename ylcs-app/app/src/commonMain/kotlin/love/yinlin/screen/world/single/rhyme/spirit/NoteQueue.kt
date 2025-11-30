@@ -38,8 +38,8 @@ sealed class DynamicAction {
         }
 
         // 单音符时长与实际字符发音时长无关, 全部为固定值
-        override val duration: Long = (DURATION_BASE / Track.TIP_RANGE).toLong()
-        override val appearance: Long = start - (duration * Track.TIP_START_RATIO).toLong()
+        override val duration: Long = (DURATION_BASE / TrackClickArea.RANGE).toLong()
+        override val appearance: Long = start - (duration * TrackClickArea.START_RATIO).toLong()
     }
 
     @Stable

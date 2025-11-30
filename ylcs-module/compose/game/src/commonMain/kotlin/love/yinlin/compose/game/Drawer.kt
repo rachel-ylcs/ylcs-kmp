@@ -63,12 +63,28 @@ class Drawer(
         scope.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
+    fun rect(color: Color, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawRect(color = color, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
+    }
+
+    fun rect(brush: Brush, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawRect(brush = brush, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
+    }
+
     fun roundRect(color: Color, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
         scope.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
         scope.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+    }
+
+    fun roundRect(color: Color, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+    }
+
+    fun roundRect(brush: Brush, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
@@ -101,7 +117,17 @@ class Drawer(
         scope.drawImage(image = image, dstOffset = position.roundToIntOffset(), dstSize = size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
     }
 
+    fun image(image: ImageBitmap, rect: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawImage(image = image, dstOffset = rect.topLeft.roundToIntOffset(), dstSize = rect.size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
+    }
+
     fun circleImage(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
+        clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
+    }
+
+    fun circleImage(image: ImageBitmap, rect: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
+        val position = rect.topLeft
+        val size = rect.size
         clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
     }
 
@@ -157,6 +183,10 @@ class Drawer(
         scope.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
     }
 
+    inline fun clip(rect: Rect, block: Drawer.() -> Unit) {
+        clip(rect.topLeft, rect.size, block)
+    }
+
     inline fun clip(path: Path, block: Drawer.() -> Unit) {
         scope.clipPath(path) { block() }
     }
@@ -169,12 +199,12 @@ class Drawer(
         scope.withTransform({ perspective(src, dst) }) { block() }
     }
 
-    inline fun bottomPerspective(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x, block: Drawer.(Rect) -> Unit) {
-        var src: Rect? = null
+    inline fun fixedPerspective(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float, block: Drawer.(Rect, Array<Offset>) -> Unit) {
+        var result: Pair<Rect, Array<Offset>>? = null
         scope.withTransform({
-            src = bottomPerspective(dst, height)
+            result = fixedPerspective(ratio, left, right, slopeLeft, slopeRight)
         }) {
-            src?.let { block(it) }
+            result?.let { block(it.first, it.second) }
         }
     }
 
@@ -190,12 +220,13 @@ class Drawer(
         transform(calcPerspectiveMatrix(src, dst))
     }
 
-    // 底边固定的透视变换
-    // 透视底边与源矩形底边重合
-    fun DrawTransform.bottomPerspective(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x): Rect {
-        val (matrix, src) = calcBottomPerspectiveMatrix(dst, height)
+    // 固定底边的透视变换
+    // 透视边与源矩形边重合
+    // left 和 right 在同一直线上
+    fun DrawTransform.fixedPerspective(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float): Pair<Rect, Array<Offset>> {
+        val (matrix, src, dst) = calcFixedPerspectiveMatrix(ratio, left, right, slopeLeft, slopeRight)
         transform(matrix)
-        return src
+        return src to dst
     }
 
     companion object {
@@ -263,9 +294,20 @@ class Drawer(
             return srcMatrix
         }
 
-        fun calcBottomPerspectiveMatrix(dst: Array<Offset>, height: Float = dst[2].x - dst[1].x): Pair<Matrix, Rect> {
-            val src = Rect(dst[1].translate(y = -height), Size(dst[2].x - dst[1].x, height))
-            return calcPerspectiveMatrix(src, dst) to src
+        fun calcFixedPerspectiveMatrix(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float): Triple<Matrix, Rect, Array<Offset>> {
+            val width = right.x - left.x
+            val height = width / ratio
+            val leftOffset = height / 2 / slopeLeft
+            val rightOffset = height / 2 / slopeRight
+            val src = Rect(left.translate(y = -height / 2), Size(width, height))
+            val dst = arrayOf(
+                left.translate(x = -leftOffset, y = -height / 2),
+                left.translate(x = leftOffset, height / 2),
+                right.translate(x = rightOffset, y = height / 2),
+                right.translate(x = -rightOffset, y = -height / 2)
+            )
+            val matrix = calcPerspectiveMatrix(src, dst)
+            return Triple(matrix, src, dst)
         }
     }
 }

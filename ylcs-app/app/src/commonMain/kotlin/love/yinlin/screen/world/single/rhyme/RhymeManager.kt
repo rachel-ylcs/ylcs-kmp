@@ -16,11 +16,7 @@ import love.yinlin.compose.game.Manager
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
-import love.yinlin.resources.Res
-import love.yinlin.resources.test
 import love.yinlin.screen.world.single.rhyme.spirit.Scene
-import org.jetbrains.compose.resources.getDrawableResourceBytes
-import org.jetbrains.compose.resources.getSystemResourceEnvironment
 
 @Stable
 class RhymeManager(
@@ -75,8 +71,8 @@ class RhymeManager(
 
     suspend fun CoroutineScope.downloadAssets(): Boolean {
         val imageKeys = arrayOf(
-            "left_ui",
-            "right_ui",
+            "leftUIBackground",
+            "rightUIBackground",
         )
 
         val animationKeys = arrayOf<String>(
@@ -91,7 +87,6 @@ class RhymeManager(
 
         for ((key, asset) in assetList) assets[key] = asset ?: return false
 
-        assets["body"] = Asset.image(getDrawableResourceBytes(getSystemResourceEnvironment(), Res.drawable.test))!!
         return true
     }
 }
