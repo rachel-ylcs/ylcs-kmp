@@ -1,7 +1,10 @@
 package love.yinlin
 
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.platform.Coroutines
+import love.yinlin.uri.toUri
+import platform.Foundation.NSURL
 
 fun MainViewController() = object : RachelApplication(PlatformContextDelegate) {
     override fun buildDelegate(): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {
@@ -12,3 +15,5 @@ fun MainViewController() = object : RachelApplication(PlatformContextDelegate) {
         }
     }
 }.run()
+
+fun onOpenUri(uri: NSURL) = DeepLink.openUri(uri.toUri())

@@ -38,6 +38,7 @@ kotlin {
 
     cocoapods {
         version = C.app.versionName
+        ios.deploymentTarget = C.ios.target
 
         if (C.platform == BuildPlatform.Mac) {
             pod("MMKV") {
