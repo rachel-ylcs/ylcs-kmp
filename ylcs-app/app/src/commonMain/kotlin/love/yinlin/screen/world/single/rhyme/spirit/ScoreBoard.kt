@@ -49,7 +49,9 @@ class ScoreBoard(
     }
 
     fun addScore(value: Int) {
-        score += value
-        animation.start()
+        if (value != 0) {
+            score += value
+            animation.start()
+        }
     }
 }

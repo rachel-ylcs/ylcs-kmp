@@ -121,6 +121,10 @@ class Drawer(
         scope.drawImage(image = image, dstOffset = rect.topLeft.roundToIntOffset(), dstSize = rect.size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
     }
 
+    fun image(image: ImageBitmap, src: Rect, dst: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawImage(image = image, srcOffset = src.topLeft.roundToIntOffset(), srcSize = src.size.roundToIntSize(), dstOffset = dst.topLeft.roundToIntOffset(), dstSize = dst.size.roundToIntSize(), alpha = alpha, blendMode = blendMode)
+    }
+
     fun circleImage(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
         clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
     }
@@ -297,14 +301,14 @@ class Drawer(
         fun calcFixedPerspectiveMatrix(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float): Triple<Matrix, Rect, Array<Offset>> {
             val width = right.x - left.x
             val height = width / ratio
-            val leftOffset = height / 2 / slopeLeft
-            val rightOffset = height / 2 / slopeRight
-            val src = Rect(left.translate(y = -height / 2), Size(width, height))
+            val leftOffset = height / slopeLeft
+            val rightOffset = height / slopeRight
+            val src = Rect(left.translate(y = -height), Size(width, height))
             val dst = arrayOf(
-                left.translate(x = -leftOffset, y = -height / 2),
-                left.translate(x = leftOffset, height / 2),
-                right.translate(x = rightOffset, y = height / 2),
-                right.translate(x = -rightOffset, y = -height / 2)
+                left.translate(x = -leftOffset, y = -height),
+                left,
+                right,
+                right.translate(x = -rightOffset, y = -height)
             )
             val matrix = calcPerspectiveMatrix(src, dst)
             return Triple(matrix, src, dst)

@@ -71,7 +71,7 @@ class RhymeManager(
     }
 
     suspend fun CoroutineScope.downloadAssets(): Boolean {
-        val imageKeys = arrayOf<AssetKey>(
+        val imageKeys = arrayOf(
             AssetKey("leftUIBackground"),
             AssetKey("rightUIBackground"),
             AssetKey("blockMap"),

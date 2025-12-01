@@ -48,6 +48,7 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
                     }
                     else matrix.rotateZ(transform.degrees)
                 }
+                is Transform.Matrix -> matrix *= transform.matrix
             }
         }
         matrix.invert()
@@ -75,6 +76,7 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
                 is Transform.Translate -> dt.translate(transform.x, transform.y)
                 is Transform.Scale -> dt.scale(transform.x, transform.y, transform.pivot ?: center)
                 is Transform.Rotate -> dt.rotate(transform.degrees, transform.pivot ?: center)
+                is Transform.Matrix -> dt.transform(transform.matrix)
             }
         }
     }

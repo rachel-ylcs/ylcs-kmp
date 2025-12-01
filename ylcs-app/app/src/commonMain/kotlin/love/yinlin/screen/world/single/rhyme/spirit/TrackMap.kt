@@ -32,30 +32,10 @@ class TrackClickArea(vertices: Offset, left: Offset, right: Offset) {
         // 点击区域结束
         const val END_RATIO = 0.9f
         // 点击区域中间
-        const val CENTER = (START_RATIO + END_RATIO) / 2
+        const val CENTER_RATIO = (START_RATIO + END_RATIO) / 2
         // 点击区域区间
         const val RANGE = END_RATIO - START_RATIO
     }
-
-    val slopeLeft = vertices.slope(left)
-    val slopeRight = vertices.slope(right)
-    val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(
-        ratio = 2f,
-        left = vertices.onLine(left, CENTER),
-        right = vertices.onLine(right, CENTER),
-        slopeLeft = slopeLeft,
-        slopeRight = slopeRight,
-    )
-
-    val brush = Brush.radialGradient(
-        *arrayOf(
-            0.38f to Colors.Transparent,
-            0.43f to Colors.Steel1.copy(alpha = 0.1f),
-            0.75f to Colors.Steel1
-        ),
-        center = perspectiveMatrix.second.center,
-        radius = perspectiveMatrix.second.width
-    )
 }
 
 // 轨道
@@ -103,7 +83,9 @@ class Track(
     val rightLineAreaPath = Path(rightLineArea)
     val rightLineShadowAreaPath = Path(arrayOf(rightLineLeft, vertices, rightLineRight))
     // 轨道线斜率范围
+    val slopeLeft = vertices.slope(left)
     val slopeLeftRange: Pair<Float, Float> = vertices.slope(leftLineLeft) to vertices.slope(leftLineRight)
+    val slopeRight = vertices.slope(right)
     val slopeRightRange: Pair<Float, Float> = vertices.slope(rightLineLeft) to vertices.slope(rightLineRight)
     // 轨道区域
     val area: Array<Offset> = arrayOf(vertices, left, right)
@@ -239,14 +221,9 @@ class TrackMap(
                 path = track.areaPath
             )
 
-            val (matrix, srcRect, dstArea) = track.clickArea.perspectiveMatrix
-            // 画点击区域
-            transform(matrix) {
-                rect(track.clickArea.brush, srcRect)
-            }
             // 画点击区域横线
-            line(Colors.Ghost, dstArea[0], dstArea[3], Stroke(5f), 0.6f)
-            line(Colors.Ghost, dstArea[1], dstArea[2], Stroke(5f), 0.6f)
+            line(Colors.Ghost, vertices.onLine(track.left, TrackClickArea.START_RATIO), vertices.onLine(track.right, TrackClickArea.START_RATIO), Stroke(5f), 0.6f)
+            line(Colors.Ghost, vertices.onLine(track.left, TrackClickArea.END_RATIO), vertices.onLine(track.right, TrackClickArea.END_RATIO), Stroke(5f), 0.6f)
 
             // 画轨道射线
             drawLeftTrackLine(track)
