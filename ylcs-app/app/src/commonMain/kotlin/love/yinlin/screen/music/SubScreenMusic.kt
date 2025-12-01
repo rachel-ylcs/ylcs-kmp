@@ -744,7 +744,10 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
 			mp.lyrics.updateIndex(position)
-			if (mp.floatingLyrics.isAttached) mp.engine.update(position)
+			if (mp.floatingLyrics.isAttached) {
+                mp.engine.update(position)
+                mp.floatingLyrics.update()
+            }
 		}
 		monitor(state = { mp.currentMusic }) { musicInfo ->
 			mp.lyrics.reset()

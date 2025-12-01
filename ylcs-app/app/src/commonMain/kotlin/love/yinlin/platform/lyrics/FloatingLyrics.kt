@@ -14,6 +14,8 @@ expect class FloatingLyrics() {
 
     suspend fun initDelay(context: Context)
 
+    fun update()
+
     @Composable
     fun Content()
 }

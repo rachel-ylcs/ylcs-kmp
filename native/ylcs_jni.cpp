@@ -7,8 +7,10 @@ extern "C" {
         JVM::vm = vm;
         JVM::JniEnvGuard guard;
         if (guard) {
+#ifdef WIN32
             Initialize_AudioPlayer(vm, guard.env);
             Initialize_VideoPlayer(vm, guard.env);
+#endif
             return JNI_VERSION_1_6;
         }
         return -1;

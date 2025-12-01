@@ -1,4 +1,4 @@
-#include "../../ylcs_jni.h"
+#include "ylcs_jni.h"
 
 #include <winrt/windows.foundation.h>
 #include <winrt/windows.storage.h>

@@ -62,6 +62,8 @@ actual class FloatingLyrics {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 
+    actual fun update() = Unit
+
     @OptIn(FlowPreview::class)
     @Composable
     actual fun Content() {

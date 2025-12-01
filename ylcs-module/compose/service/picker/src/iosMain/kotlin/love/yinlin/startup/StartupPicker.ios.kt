@@ -192,8 +192,7 @@ actual class StartupPicker : SyncStartup() {
 
     @OptIn(InternalIoApi::class, ExperimentalForeignApi::class)
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
-        // TODO: 需要review
-        when (val origin = origin as SaveType) {
+        when (origin) {
             is SaveType.Photo -> {
                 val bytes = sink.buffer.readByteArray()
                 val data = bytes.toNSData()

@@ -15,14 +15,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun BeginContent() {}
 
-    protected open fun buildDelegate(uiViewController: UIViewController): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
+    protected open fun buildDelegate(): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
 
     fun run(): UIViewController {
         openService(later = false, immediate = true)
 
         val uiViewController = ComposeUIViewController(
             configure = {
-                delegate = buildDelegate(context.uiViewController)
+                delegate = buildDelegate()
             }
         ) {
             Layout {
@@ -30,7 +30,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Content()
             }
         }
-        context.uiViewController = uiViewController
+        context.controller = uiViewController
 
         return uiViewController
     }

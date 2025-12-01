@@ -7,9 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -23,7 +21,6 @@ import love.yinlin.compose.ui.layout.SplitLayout
 
 @Composable
 actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
-    // TODO: 需要参照其他平台 review
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()
@@ -36,16 +33,11 @@ actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
                 checked = app.config.enabledFloatingLyrics,
                 onCheckedChange = { value ->
                     app.config.enabledFloatingLyrics = value
-                    val floatingLyrics = app.mp.floatingLyrics
-                    if (value) {
-                        if (floatingLyrics.canAttached) {
-                            floatingLyrics.attach()
-                        } else {
-                            // 模拟器和旧机型不支持
-                            slot.tip.error("该设备不支持悬浮歌词")
-                        }
+                    if (app.mp.floatingLyrics.canAttached) {
+                        app.mp.floatingLyrics.check()
                     } else {
-                        floatingLyrics.detach()
+                        // 模拟器和旧机型不支持画中画能力
+                        slot.tip.error("该设备不支持悬浮歌词")
                     }
                 }
             )
