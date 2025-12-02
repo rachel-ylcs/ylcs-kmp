@@ -354,7 +354,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     onClick = {
                         val playConfig = RhymePlayConfig(
                             difficulty = RhymeDifficulty.Easy,
-                            audioDelay = 200L
+                            audioDelay = 0L
                         )
                         if (entry.enabled) startGame(entry.musicInfo, playConfig)
                         else slot.tip.warning("此MOD不支持")
