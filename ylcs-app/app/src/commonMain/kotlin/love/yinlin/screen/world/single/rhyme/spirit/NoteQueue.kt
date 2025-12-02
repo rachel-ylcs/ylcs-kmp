@@ -27,6 +27,10 @@ interface ActionCallback {
 
 @Stable
 sealed class DynamicAction {
+    companion object {
+        const val PERSPECTIVE_K = 3
+    }
+
     abstract val action: RhymeAction // 行为
     abstract val appearance: Long // 出现时刻
 
@@ -49,7 +53,7 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
 
     companion object {
         // 单音符时长与实际字符发音时长无关, 全部为固定值
-        private const val DURATION = 2500L
+        private const val DURATION = 3000L
 
         private const val PERFECT_RATIO = 0.25f
         private const val GOOD_RATIO = 0.5f
@@ -57,7 +61,7 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
         private const val MISS_RATIO = 3f
     }
 
-    override val appearance: Long = start - (DURATION * Track.CLICK_CENTER_RATIO).toLong()
+    override val appearance: Long = start - (DURATION * PERSPECTIVE_K * Track.CLICK_CENTER_RATIO / (1 + (PERSPECTIVE_K - 1) * Track.CLICK_CENTER_RATIO)).toLong()
 
     private val trackIndex = when (val v = (action.scale - 1) % 7) {
         in 5 .. 7 -> v - 1
@@ -100,8 +104,9 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
+        val actualProgress = progress / (PERSPECTIVE_K + (1 - PERSPECTIVE_K) * progress)
         transform({
-            scale(progress, progress, track.vertices)
+            scale(actualProgress, actualProgress, track.vertices)
             transform(matrix)
             if (track.isRight) scale(-1f, 1f, srcRect.center)
         }) {
