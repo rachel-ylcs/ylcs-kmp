@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
-import love.yinlin.compose.blend
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.traits.Spirit
@@ -23,21 +22,6 @@ import love.yinlin.compose.translate
 import love.yinlin.screen.world.single.rhyme.RhymeConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
-// 可点击区域
-@Stable
-class TrackClickArea(vertices: Offset, left: Offset, right: Offset) {
-    companion object {
-        // 点击区域起始
-        const val START_RATIO = 0.8f
-        // 点击区域结束
-        const val END_RATIO = 0.9f
-        // 点击区域中间
-        const val CENTER_RATIO = (START_RATIO + END_RATIO) / 2
-        // 点击区域区间
-        const val RANGE = END_RATIO - START_RATIO
-    }
-}
-
 // 轨道
 @Stable
 class Track(
@@ -49,21 +33,32 @@ class Track(
 ) {
     companion object {
         // 音阶表
-        val Scales = arrayOf(4, 3, 2, 1, 5, 6, 7)
+        val Scales = intArrayOf(4, 3, 2, 1, 5, 6, 7)
         // 顶点偏移比率
         const val VERTICES_TOP_RATIO = 0.2f
         // 虚拟顶点
-        const val VIRTUAL_TOP = VERTICES_TOP_RATIO * RhymeConfig.HEIGHT
+        const val VIRTUAL_TOP_HEIGHT = VERTICES_TOP_RATIO * RhymeConfig.HEIGHT
         // 虚拟画布高度
-        const val VIRTUAL_HEIGHT = RhymeConfig.HEIGHT + VIRTUAL_TOP
+        const val VIRTUAL_HEIGHT = RhymeConfig.HEIGHT + VIRTUAL_TOP_HEIGHT
         // 数量
         val Num = Scales.size
+        // 轨道宽
+        val maxWidth = RhymeConfig.WIDTH / Num
         // 线宽
         const val LINE_STROKE_WIDTH = 20f
         // 轨道背景色
         val BackgroundColor = Colors.Black.copy(alpha = 0.4f)
         // 轨道激活色
-        val ActiveColor = BackgroundColor.blend(Colors.Cyan3.copy(alpha = 0.2f))
+        val ActiveColor = Colors.Cyan3.copy(alpha = 0.2f)
+
+        // 点击区域起始
+        const val CLICK_START_RATIO = 0.8f
+        // 点击区域结束
+        const val CLICK_END_RATIO = 0.9f
+        // 点击区域中间
+        const val CLICK_CENTER_RATIO = (CLICK_START_RATIO + CLICK_END_RATIO) / 2
+        // 点击区域区间
+        const val CLICK_RANGE = CLICK_END_RATIO - CLICK_START_RATIO
     }
 
     // 位置
@@ -90,8 +85,8 @@ class Track(
     // 轨道区域
     val area: Array<Offset> = arrayOf(vertices, left, right)
     val areaPath: Path = Path(area)
-    // 点击区域
-    val clickArea = TrackClickArea(vertices, left, right)
+    // 透视矩阵
+    val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(3f, left, right, slopeLeft, slopeRight)
 }
 
 // 激活轨道
@@ -125,7 +120,7 @@ class TrackMap(
         const val SCREEN_CLICK_AREA_RATIO = 0.75f
     }
 
-    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP))
+    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP_HEIGHT))
     override val size: Size = Size(RhymeConfig.WIDTH, Track.VIRTUAL_HEIGHT)
 
     // 顶点
@@ -133,12 +128,10 @@ class TrackMap(
 
     // 轨道
     val tracks = buildList {
-        val trackWidth = this@TrackMap.size.width / Track.Num
-        val bottom = this@TrackMap.size.height
         var start = 0f
         repeat(Track.Num) { index ->
-            val left = Offset(start, bottom)
-            val right = Offset(start + trackWidth, bottom)
+            val left = Offset(start, Track.VIRTUAL_HEIGHT)
+            val right = left.translate(x = Track.maxWidth)
             add(Track(
                 index = index,
                 scale = Track.Scales[index],
@@ -146,14 +139,29 @@ class TrackMap(
                 left = left,
                 right = right
             ))
-            start += trackWidth
+            start += Track.maxWidth
         }
     }
+
+    // 轨道区域
+    val tracksAreaPath = Path(arrayOf(
+        tracks.first().left,
+        vertices,
+        tracks.last().right
+    ))
+
+    // 点击区域
+    val clickArea = arrayOf(
+        vertices.onLine(tracks.first().left, Track.CLICK_START_RATIO),
+        vertices.onLine(tracks.first().left, Track.CLICK_END_RATIO),
+        vertices.onLine(tracks.last().right, Track.CLICK_END_RATIO),
+        vertices.onLine(tracks.last().right, Track.CLICK_START_RATIO),
+    )
 
     // 轨道线画刷 (注意所有轨道左右侧线高度相同)
     val trackLineBrush = Brush.verticalGradient(
         colors = listOf(Colors.White, Colors.Transparent),
-        startY = this@TrackMap.size.height,
+        startY = Track.VIRTUAL_HEIGHT,
         endY = 0f
     )
 
@@ -197,38 +205,31 @@ class TrackMap(
         }
     }
 
-    private fun Drawer.drawLeftTrackLine(track: Track) {
-        // 阴影
-        path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f)
-        // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
-        path(trackLineBrush, track.leftLineAreaPath)
-        path(Colors.Steel4, track.leftLineAreaPath, 0.75f, Stroke(2f))
-    }
+    override fun Drawer.onClientDraw() {
+        // 画轨道背景
+        path(Track.BackgroundColor, tracksAreaPath)
 
-    private fun Drawer.drawLastTrackLine() {
+        // 画点击区域横线
+        line(Colors.Ghost, clickArea[0], clickArea[3], Stroke(5f), 0.6f)
+        line(Colors.Ghost, clickArea[1], clickArea[2], Stroke(5f), 0.6f)
+
+        for (index in 0 ..< Track.Num) {
+            val track = tracks[index]
+            // 画激活轨道
+            if (active[index]) path(Track.ActiveColor, track.areaPath)
+
+            // 画轨道左侧射线
+            // 阴影
+            path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f)
+            // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
+            path(trackLineBrush, track.leftLineAreaPath)
+            path(Colors.Steel4, track.leftLineAreaPath, 0.75f, Stroke(2f))
+        }
+
+        // 最后一个轨道右侧射线
         val track = tracks.last()
         path(Colors.Steel2, track.rightLineShadowAreaPath, alpha = 0.2f)
         path(trackLineBrush, track.rightLineAreaPath)
         path(Colors.Steel4, track.rightLineAreaPath, 0.75f, Stroke(2f))
-    }
-
-    override fun Drawer.onClientDraw() {
-        for (index in 0 ..< Track.Num) {
-            val track = tracks[index]
-            // 画轨道背景
-            path(
-                color = if (active[index]) Track.ActiveColor else Track.BackgroundColor,
-                path = track.areaPath
-            )
-
-            // 画点击区域横线
-            line(Colors.Ghost, vertices.onLine(track.left, TrackClickArea.START_RATIO), vertices.onLine(track.right, TrackClickArea.START_RATIO), Stroke(5f), 0.6f)
-            line(Colors.Ghost, vertices.onLine(track.left, TrackClickArea.END_RATIO), vertices.onLine(track.right, TrackClickArea.END_RATIO), Stroke(5f), 0.6f)
-
-            // 画轨道射线
-            drawLeftTrackLine(track)
-        }
-        // 最后一个轨道右侧射线
-        drawLastTrackLine()
     }
 }

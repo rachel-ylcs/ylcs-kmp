@@ -224,7 +224,7 @@ class Drawer(
         transform(calcPerspectiveMatrix(src, dst))
     }
 
-    // 固定底边的透视变换
+    // 固定中边的透视变换
     // 透视边与源矩形边重合
     // left 和 right 在同一直线上
     fun DrawTransform.fixedPerspective(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float): Pair<Rect, Array<Offset>> {
@@ -301,14 +301,14 @@ class Drawer(
         fun calcFixedPerspectiveMatrix(ratio: Float = 1f, left: Offset, right: Offset, slopeLeft: Float, slopeRight: Float): Triple<Matrix, Rect, Array<Offset>> {
             val width = right.x - left.x
             val height = width / ratio
-            val leftOffset = height / slopeLeft
-            val rightOffset = height / slopeRight
+            val leftOffset = height / 2 / slopeLeft
+            val rightOffset = height / 2 / slopeRight
             val src = Rect(left.translate(y = -height), Size(width, height))
             val dst = arrayOf(
-                left.translate(x = -leftOffset, y = -height),
-                left,
-                right,
-                right.translate(x = -rightOffset, y = -height)
+                left.translate(x = -leftOffset, y = -height / 2),
+                left.translate(x = leftOffset, y = height / 2),
+                right.translate(x = rightOffset, y = height / 2),
+                right.translate(x = -rightOffset, y = -height / 2)
             )
             val matrix = calcPerspectiveMatrix(src, dst)
             return Triple(matrix, src, dst)

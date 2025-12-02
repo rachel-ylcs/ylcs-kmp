@@ -51,20 +51,19 @@ abstract class Manager {
     }
 
     private fun CoroutineScope.startTickJob(): Job = launch {
-        var lastTick = 0L
-        while (true) {
-            val tick = currentTick
-            if (tick == 0L && lastTick != 0L) break
-            lastTick = tick
-
-            scene?.apply {
+        scene?.let { spirit ->
+            while (true) {
                 // 事件处理
-                while (true) onEvent(eventChannel.tryReceive().getOrNull() ?: break)
-                // 帧更新
-                onUpdate(tick)
-            }
+                while (true) spirit.onEvent(eventChannel.tryReceive().getOrNull() ?: break)
 
-            delay(1000L / fps)
+                val tick1 = currentTick
+                // 帧更新
+                spirit.onUpdate(tick1)
+                val tick2 = currentTick
+
+                val compensation = tick2 - tick1
+                delay(1000L / fps - compensation)
+            }
         }
         tickJob = null
         scene = null
@@ -111,6 +110,7 @@ abstract class Manager {
                         for (change in event.changes) {
                             val id = change.id.value
                             val position = change.position / canvasScale
+                            // 这里时间移动到事件处理队列中获取
                             val time = currentTick
                             when {
                                 change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->

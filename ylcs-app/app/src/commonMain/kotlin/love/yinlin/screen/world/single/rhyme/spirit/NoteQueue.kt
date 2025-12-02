@@ -10,18 +10,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
-import love.yinlin.compose.onLine
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.screen.world.single.rhyme.RhymeConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
@@ -62,14 +57,15 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
         private const val MISS_RATIO = 3f
     }
 
-    override val appearance: Long = start - (DURATION * TrackClickArea.CENTER_RATIO).toLong()
+    override val appearance: Long = start - (DURATION * Track.CLICK_CENTER_RATIO).toLong()
 
     private val trackIndex = when (val v = (action.scale - 1) % 7) {
         in 5 .. 7 -> v - 1
         else -> 4 - v
     }
     private val noteScale = (action.scale - 1) / 7
-    private val blockRect = Rect(Offset(0f, noteScale * 128f), Size(256f, 128f)) to Rect(Offset(256f, noteScale * 128f), Size(256f, 128f))
+    private val blockSize = Size(256f, 85f)
+    private val blockRect = Rect(Offset(0f, noteScale * blockSize.height), blockSize) to Rect(Offset(blockSize.width, noteScale * blockSize.height), blockSize)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
     private var progress: Float by mutableFloatStateOf(0f) // 进度
@@ -101,22 +97,15 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
         val currentState = state
         if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
+
         val track = tracks[trackIndex]
-        var srcRect: Rect? = null
-        var dstArea: Array<Offset>? = null
+        val (matrix, srcRect, _) = track.perspectiveMatrix
         transform({
-            val (rect, area) = fixedPerspective(
-                ratio = 2f,
-                left = track.vertices.onLine(track.left, progress),
-                right = track.vertices.onLine(track.right, progress),
-                slopeLeft = track.slopeLeft,
-                slopeRight = track.slopeRight
-            )
-            if (track.isRight) scale(-1f, 1f, rect.center)
-            srcRect = rect
-            dstArea = area
+            scale(progress, progress, track.vertices)
+            transform(matrix)
+            if (track.isRight) scale(-1f, 1f, srcRect.center)
         }) {
-            srcRect?.let { image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, it) }
+            image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
         }
     }
 }
@@ -171,8 +160,8 @@ class NoteQueue(
     lyricsConfig: RhymeLyricsConfig,
     trackMap: TrackMap,
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP))
-    override val size: Size = Size(RhymeConfig.WIDTH, Track.VIRTUAL_HEIGHT)
+    override val preTransform: List<Transform> = trackMap.preTransform
+    override val size: Size = trackMap.size
 
     private val lyrics = lyricsConfig.lyrics
     private val tracks = trackMap.tracks
@@ -187,14 +176,15 @@ class NoteQueue(
                 val action = theme[i]
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                 val end = action.end + line.start
-                add(when (action) {
+                val dynamicAction = when (action) {
                     is RhymeAction.Note -> NoteAction(start, end, action) // 单音
                     is RhymeAction.Slur -> {
                         val first = action.scale.firstOrNull()
                         if (action.scale.all { it == first }) FixedSlurAction(start, end, action) // 延音
                         else OffsetSlurAction(start, end, action) // 连音
                     }
-                })
+                }
+                add(dynamicAction)
             }
         }
     }
