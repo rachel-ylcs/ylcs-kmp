@@ -303,7 +303,7 @@ class Drawer(
             val height = width / ratio
             val leftOffset = height / 2 / slopeLeft
             val rightOffset = height / 2 / slopeRight
-            val src = Rect(left.translate(y = -height), Size(width, height))
+            val src = Rect(left.translate(y = -height / 2), Size(width, height))
             val dst = arrayOf(
                 left.translate(x = -leftOffset, y = -height / 2),
                 left.translate(x = leftOffset, y = height / 2),
