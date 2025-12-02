@@ -226,7 +226,7 @@ class NoteQueue(
         foreachAction { it.onUpdate(tick, callback) }
     }
 
-    override fun onClientEvent(event: Event): Boolean {
+    override fun onClientEvent(tick: Long, event: Event): Boolean {
         return false
     }
 

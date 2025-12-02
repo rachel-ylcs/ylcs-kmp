@@ -10,10 +10,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
-import love.yinlin.compose.game.Pointer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Event
+import love.yinlin.compose.game.traits.PointerDownEvent
 import love.yinlin.compose.game.traits.PointerEvent
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.onLine
@@ -92,20 +92,20 @@ class Track(
 // 激活轨道
 @Stable
 class ActiveTrack {
-    private val pointers = List<Pointer?>(Track.Num) { null }.toMutableStateList()
+    private val events = List<PointerEvent?>(Track.Num) { null }.toMutableStateList()
 
-    operator fun get(index: Int): Boolean = pointers[index] != null
+    operator fun get(index: Int): Boolean = events[index] != null
 
-    fun safeSet(index: Int, pointer: Pointer) {
+    fun safeSet(index: Int, event: PointerEvent) {
         // 防止多指按下同一个轨道
-        if (pointer.isDown) { // 按下
-            if (pointers[index] == null) {
-                pointers[index] = pointer
+        if (event is PointerDownEvent) { // 按下
+            if (events[index] == null) {
+                events[index] = event
             }
         }
         else { // 抬起
-            if (pointers.indexOfFirst { it?.id == pointer.id } == index) {
-                pointers[index] = null
+            if (events.indexOfFirst { it?.id == event.id } == index) {
+                events[index] = null
             }
         }
     }
@@ -193,15 +193,12 @@ class TrackMap(
         return null
     }
 
-    override fun onClientEvent(event: Event): Boolean {
-        return when (event) {
-            is PointerEvent -> {
-                // 获取指针所在轨道
-                val pointer = event.pointer
-                val track = calcTrackIndex(pointer.position)
-                if (track != null) active.safeSet(track.index, pointer)
-                track != null
-            }
+    override fun onClientEvent(tick: Long, event: Event): Boolean = when (event) {
+        is PointerEvent -> {
+            // 获取指针所在轨道
+            val track = calcTrackIndex(event.position)
+            if (track != null) active.safeSet(track.index, event)
+            track != null
         }
     }
 

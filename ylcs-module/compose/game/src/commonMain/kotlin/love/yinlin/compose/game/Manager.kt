@@ -25,7 +25,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.compose.game.traits.Event
-import love.yinlin.compose.game.traits.PointerEvent
+import love.yinlin.compose.game.traits.PointerDownEvent
+import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
 
 @Stable
@@ -39,7 +40,7 @@ abstract class Manager {
 
     private var scene: Spirit? = null // 主场景
 
-    private val pointers = mutableLongObjectMapOf<Pointer>() // 指针集
+    private val pointers = mutableLongObjectMapOf<Offset>() // 指针集
 
     private val eventChannel = Channel<Event>(Channel.UNLIMITED)
     private var tickJob: Job? = null // 帧更新协程
@@ -53,15 +54,17 @@ abstract class Manager {
     private fun CoroutineScope.startTickJob(): Job = launch {
         scene?.let { spirit ->
             while (true) {
-                // 事件处理
-                while (true) spirit.onEvent(eventChannel.tryReceive().getOrNull() ?: break)
-
                 val tick1 = currentTick
+
+                // 事件处理
+                while (true) spirit.onEvent(tick1, eventChannel.tryReceive().getOrNull() ?: break)
                 // 帧更新
                 spirit.onUpdate(tick1)
+
                 val tick2 = currentTick
 
                 val compensation = tick2 - tick1
+
                 delay(1000L / fps - compensation)
             }
         }
@@ -110,15 +113,16 @@ abstract class Manager {
                         for (change in event.changes) {
                             val id = change.id.value
                             val position = change.position / canvasScale
-                            // 这里时间移动到事件处理队列中获取
-                            val time = currentTick
                             when {
-                                change.changedToDown() -> Pointer(id = id, position = position, startTime = time).let { pointer ->
-                                    pointers[id] = pointer
-                                    eventChannel.trySend(PointerEvent(pointer))
+                                change.changedToDown() -> {
+                                    pointers[id] = position
+                                    eventChannel.trySend(PointerDownEvent(id = id, position = position))
                                 }
-                                change.changedToUp() -> pointers.remove(id)?.let { pointer ->
-                                    eventChannel.trySend(PointerEvent(pointer.copy(endTime = time)))
+                                change.changedToUp() -> {
+                                    pointers.remove(id)?.let { rawPosition ->
+                                        // 抬起时的位置仍然按原来按下的位置计算
+                                        eventChannel.trySend(PointerUpEvent(id = id, position = rawPosition))
+                                    }
                                 }
                             }
                         }

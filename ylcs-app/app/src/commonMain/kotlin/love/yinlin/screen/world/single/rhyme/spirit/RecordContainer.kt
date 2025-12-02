@@ -11,7 +11,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.CircleBody
 import love.yinlin.compose.game.traits.Event
-import love.yinlin.compose.game.traits.PointerEvent
+import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.screen.world.single.rhyme.RhymeManager
@@ -34,15 +34,11 @@ class RecordContainer(
         angle = newAngle
     }
 
-    override fun onClientEvent(event: Event): Boolean {
-        return when (event) {
-            is PointerEvent -> {
-                val pointer = event.pointer
-                val result = pointer.isUp && pointer.position in this
-                if (result) rhymeManager.onPause()
-                result
-            }
+    override fun onClientEvent(tick: Long, event: Event): Boolean = when (event) {
+        is PointerUpEvent -> (event.position in this).also {
+            if (it) rhymeManager.onPause()
         }
+        else -> false
     }
 
     override fun Drawer.onClientDraw() {

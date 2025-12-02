@@ -51,13 +51,13 @@ abstract class Container(manager: Manager) : Spirit(manager) {
     protected open fun onClientPreEvent(): Boolean = false
     protected open fun onClientPostEvent(): Boolean = false
 
-    final override fun onClientEvent(event: Event): Boolean {
+    final override fun onClientEvent(tick: Long, event: Event): Boolean {
         // 可以拦截子元素的事件
         if (onClientPreEvent()) return true
         if (queue.isNotEmpty) {
             // 点击事件与绘制流程是反的, zIndex越大的先响应
             for ((soul, _) in queue.reverse()) {
-                if ((soul as? Trigger)?.onEvent(event) == true) return true
+                if ((soul as? Trigger)?.onEvent(tick, event) == true) return true
             }
         }
         return onClientPostEvent()

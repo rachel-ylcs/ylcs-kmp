@@ -4,5 +4,5 @@ import androidx.compose.runtime.Stable
 
 @Stable
 interface Trigger {
-    fun onEvent(event: Event): Boolean
+    fun onEvent(tick: Long, event: Event): Boolean
 }
