@@ -88,7 +88,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         else pauseGame(GameLockState.PortraitLock)
     }
 
-    private fun startGame(info: MusicInfo) {
+    private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
         launch {
             val task1 = async(ioContext) {
                 catchingNull {
@@ -106,6 +106,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {
                     start(
+                        playConfig = playConfig,
                         lyricsConfig = lyricsConfig,
                         recordImage = recordImage,
                         audio = info.path(Paths.modPath, ModResourceType.Audio)
@@ -351,7 +352,11 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) startGame(entry.musicInfo)
+                        val playConfig = RhymePlayConfig(
+                            difficulty = RhymeDifficulty.Easy,
+                            audioDelay = 200L
+                        )
+                        if (entry.enabled) startGame(entry.musicInfo, playConfig)
                         else slot.tip.warning("此MOD不支持")
                     }
                 )

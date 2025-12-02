@@ -163,6 +163,8 @@ class NoteQueue(
     override val preTransform: List<Transform> = trackMap.preTransform
     override val size: Size = trackMap.size
 
+    private val audioDelay = rhymeManager.config.audioDelay
+
     private val lyrics = lyricsConfig.lyrics
     private val tracks = trackMap.tracks
 
@@ -174,8 +176,8 @@ class NoteQueue(
             val theme = line.theme
             for (i in theme.indices) {
                 val action = theme[i]
-                val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
-                val end = action.end + line.start
+                val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start + audioDelay
+                val end = action.end + line.start + audioDelay
                 val dynamicAction = when (action) {
                     is RhymeAction.Note -> NoteAction(start, end, action) // 单音
                     is RhymeAction.Slur -> {

@@ -34,6 +34,8 @@ class RhymeManager(
         onComplete()
     }
 
+    var config = RhymePlayConfig.Default
+
     val isInit: Boolean get() = mp.isInit
     val duration: Long get() = mp.duration
 
@@ -42,10 +44,12 @@ class RhymeManager(
     fun release() = mp.release()
 
     suspend fun CoroutineScope.start(
+        playConfig: RhymePlayConfig,
         lyricsConfig: RhymeLyricsConfig,
         recordImage: ImageBitmap,
         audio: Path
     ) {
+        config = playConfig
         onSceneCreate(Scene(
             rhymeManager = this@RhymeManager,
             lyricsConfig = lyricsConfig,
