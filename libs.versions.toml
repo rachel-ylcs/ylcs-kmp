@@ -1,20 +1,20 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.0-RC"
-cmp = "1.10.0-beta02"
+kotlin = "2.3.0-RC2"
+cmp = "1.10.0-rc01"
 agp = "8.12.3"
 
 # Libs #
 
 # Common
-lifecycle = "2.10.0-alpha05"
+lifecycle = "2.10.0-alpha06"
 material3 = "1.10.0-alpha05"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
 ktor = "3.3.3"
 sketch = "4.4.0-alpha01"
-mmkv = "2.2.4"
+mmkv = "2.3.0"
 lottie = "2.0.2"
 skiko = "0.9.38"
 
@@ -63,8 +63,8 @@ compose-material3 = { module = "org.jetbrains.compose.material3:material3", vers
 compose-material3-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material3-icon-old" }
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.1" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.0-beta02" }
-compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0-rc01" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.0-rc01" }
+compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
@@ -102,7 +102,6 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0" }
-animated-webp-android = { module = "com.aureusapps.android:webp-android", version = "1.1.2" }
 skiko-android = { module = "org.jetbrains.skiko:skiko-android", version.ref = "skiko" }
 skiko-android-runtime = { module = "org.jetbrains.skiko:skiko-android-runtime-arm64", version.ref = "skiko" }
 
