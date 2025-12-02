@@ -46,20 +46,23 @@ uint32_t AESCrypt::randomItemSizeHolder(uint32_t size) {
 
 using namespace openssl;
 
-AESCrypt::AESCrypt(const void *key, size_t keyLength, const void *iv, size_t ivLength) {
+AESCrypt::AESCrypt(const void *key, size_t keyLength, const void *iv, size_t ivLength, bool aes256)
+    : m_isAES256(aes256) {
     if (key && keyLength > 0) {
-        memcpy(m_key, key, (keyLength > AES_KEY_LEN) ? AES_KEY_LEN : keyLength);
+        auto maxKeyLen = getMaxKeyLength();
+        memcpy(m_key, key, (keyLength > maxKeyLen) ? maxKeyLen : keyLength);
 
         resetIV(iv, ivLength);
 
         m_aesKey = new AES_KEY;
         memset(m_aesKey, 0, sizeof(AES_KEY));
-        int ret = AES_set_encrypt_key(m_key, AES_KEY_BITSET_LEN, m_aesKey);
+        int ret = AES_set_encrypt_key(m_key, getMaxKeyBitLength(), m_aesKey);
         MMKV_ASSERT(ret == 0);
     }
 }
 
-AESCrypt::AESCrypt(const AESCrypt &other, const AESCryptStatus &status) : m_isClone(true), m_number(status.m_number) {
+AESCrypt::AESCrypt(const AESCrypt &other, const AESCryptStatus &status)
+    : m_isClone(true), m_isAES256(other.m_isAES256), m_number(status.m_number) {
     //memcpy(m_key, other.m_key, sizeof(m_key));
     memcpy(m_vector, status.m_vector, sizeof(m_vector));
     m_aesKey = other.m_aesKey;
@@ -75,20 +78,20 @@ AESCrypt::~AESCrypt() {
 void AESCrypt::resetIV(const void *iv, size_t ivLength) {
     m_number = 0;
     if (iv && ivLength > 0) {
-        memcpy(m_vector, iv, (ivLength > AES_KEY_LEN) ? AES_KEY_LEN : ivLength);
+        memcpy(m_vector, iv, (ivLength > AES_IV_LEN) ? AES_IV_LEN : ivLength);
     } else {
-        memcpy(m_vector, m_key, AES_KEY_LEN);
+        memcpy(m_vector, m_key, AES_IV_LEN);
     }
 }
 
 void AESCrypt::resetStatus(const AESCryptStatus &status) {
     m_number = status.m_number;
-    memcpy(m_vector, status.m_vector, AES_KEY_LEN);
+    memcpy(m_vector, status.m_vector, AES_IV_LEN);
 }
 
 void AESCrypt::getKey(void *output) const {
     if (output) {
-        memcpy(output, m_key, AES_KEY_LEN);
+        memcpy(output, m_key, getMaxKeyLength());
     }
 }
 
@@ -112,7 +115,7 @@ void AESCrypt::fillRandomIV(void *vector) {
     }
     srand((unsigned) time(nullptr));
     int *ptr = (int *) vector;
-    for (uint32_t i = 0; i < AES_KEY_LEN / sizeof(int); i++) {
+    for (uint32_t i = 0; i < AES_IV_LEN / sizeof(int); i++) {
         ptr[i] = rand();
     }
 }
@@ -160,7 +163,7 @@ void AESCrypt::statusBeforeDecrypt(const void *input, const void *output, size_t
     if (!m_aesRollbackKey) {
         m_aesRollbackKey = new AES_KEY;
         memset(m_aesRollbackKey, 0, sizeof(AES_KEY));
-        int ret = AES_set_decrypt_key(m_key, AES_KEY_BITSET_LEN, m_aesRollbackKey);
+        int ret = AES_set_decrypt_key(m_key, getMaxKeyBitLength(), m_aesRollbackKey);
         MMKV_ASSERT(ret == 0);
     }
     getCurStatus(status);
@@ -186,22 +189,19 @@ void testRandomPlaceHolder() {
 }
 
 // check if AESCrypt is encrypt-decrypt full-duplex
-void AESCrypt::testAESCrypt() {
-    testRandomPlaceHolder();
-
-    const uint8_t plainText[] = "Hello, OpenSSL-mmkv::AESCrypt::testAESCrypt() with AES CFB 128.";
-    constexpr size_t textLength = sizeof(plainText) - 1;
-
-    const uint8_t key[] = "TheAESKey";
-    constexpr size_t keyLength = sizeof(key) - 1;
-
-    uint8_t iv[AES_KEY_LEN];
-    srand((unsigned) time(nullptr));
-    for (uint32_t i = 0; i < AES_KEY_LEN; i++) {
-        iv[i] = (uint8_t) rand();
+void AESCrypt::testAESCrypt(const void *key, size_t keyLength, const uint8_t plainText[], size_t textLength) {
+    static bool hasIV = false;
+    static uint8_t iv[AES_IV_LEN];
+    if (!hasIV) {
+        hasIV = true;
+        srand((unsigned) time(nullptr));
+        for (uint32_t i = 0; i < AES_IV_LEN; i++) {
+            iv[i] = (uint8_t) rand();
+        }
     }
-    AESCrypt crypt1(key, keyLength, iv, sizeof(iv));
-    AESCrypt crypt2(key, keyLength, iv, sizeof(iv));
+    auto aes256 = (keyLength > AES_KEY_LEN);
+    AESCrypt crypt1(key, keyLength, iv, sizeof(iv), aes256);
+    AESCrypt crypt2(key, keyLength, iv, sizeof(iv), aes256);
 
     auto encryptText = new uint8_t[DEFAULT_MMAP_SIZE];
     auto decryptText = new uint8_t[DEFAULT_MMAP_SIZE];
@@ -209,13 +209,13 @@ void AESCrypt::testAESCrypt() {
     memset(decryptText, 0, DEFAULT_MMAP_SIZE);
 
     /* in-place encryption & decryption
-    memcpy(encryptText, plainText, textLength);
-    crypt1.encrypt(encryptText, encryptText, textLength);
-    crypt2.decrypt(encryptText, encryptText, textLength);
-    return;
-    */
+     memcpy(encryptText, plainText, textLength);
+     crypt1.encrypt(encryptText, encryptText, textLength);
+     crypt2.decrypt(encryptText, encryptText, textLength);
+     return;
+     */
     AES_KEY decryptKey;
-    AES_set_decrypt_key(crypt1.m_key, AES_KEY_BITSET_LEN, &decryptKey);
+    AES_set_decrypt_key(crypt1.m_key, crypt1.getMaxKeyBitLength(), &decryptKey);
 
     size_t actualSize = 0;
     bool flip = false;
@@ -262,9 +262,29 @@ void AESCrypt::testAESCrypt() {
         ptr += size;
     }
     MMKVInfo("AES CFB decode: %s", decryptText);
+    assert(memcmp(plainText, decryptText, textLength) == 0);
 
     delete[] encryptText;
     delete[] decryptText;
+}
+
+void AESCrypt::testAESCrypt() {
+    testRandomPlaceHolder();
+
+    {
+        const uint8_t plainText[] = "Hello, OpenSSL-mmkv::AESCrypt::testAESCrypt() with AES CFB 128.";
+        constexpr size_t textLength = sizeof(plainText) - 1;
+        const uint8_t key[] = "TheAESKey";
+        constexpr size_t keyLength = sizeof(key) - 1;
+        testAESCrypt(key, keyLength, plainText, textLength);
+    }
+    {
+        const uint8_t plainText256[] = "Hello, OpenSSL-mmkv::AESCrypt::testAESCrypt() with AES CFB 256.";
+        constexpr size_t textLength256 = sizeof(plainText256) - 1;
+        const uint8_t key256[] = "TheVeryLooooooooongAESKey";
+        constexpr size_t keyLength256 = sizeof(key256) - 1;
+        testAESCrypt(key256, keyLength256, plainText256, textLength256);
+    }
 }
 
 #    endif // MMKV_DEBUG

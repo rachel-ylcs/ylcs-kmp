@@ -96,7 +96,7 @@ concept MMKV_SUPPORTED_VALUE_TYPE = MMKV_SUPPORTED_PRIMITIVE_VALUE_TYPE<T> || MM
 
 class MMKV_EXPORT MMKV {
 #ifndef MMKV_ANDROID
-    MMKV(const std::string &mmapID, MMKVMode mode, const std::string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity = 0);
+    MMKV(const std::string &mmapID, MMKVMode mode, const std::string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity = 0, bool aes256 = false);
 #else // defined(MMKV_ANDROID)
 #ifndef MMKV_OHOS
     mmkv::FileLock *m_fileModeLock;
@@ -106,9 +106,9 @@ class MMKV_EXPORT MMKV {
     mmkv::FileLock *m_fileMigrationLock;
     mmkv::InterProcessLock *m_sharedMigrationLock;
 
-    MMKV(const std::string &mmapID, int size, MMKVMode mode, const std::string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity = 0);
+    MMKV(const std::string &mmapID, int size, MMKVMode mode, const std::string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity = 0, bool aes256 = false);
 
-    MMKV(const std::string &mmapID, int ashmemFD, int ashmemMetaFd, const std::string *cryptKey = nullptr);
+    MMKV(const std::string &mmapID, int ashmemFD, int ashmemMetaFd, const std::string *cryptKey = nullptr, bool aes256 = false);
 #endif // MMKV_ANDROID
 
     ~MMKV();
@@ -248,7 +248,7 @@ class MMKV_EXPORT MMKV {
     void notifyContentChanged();
 
 #if defined(MMKV_ANDROID) && !defined(MMKV_DISABLE_CRYPT)
-    void checkReSetCryptKey(int fd, int metaFD, const std::string *cryptKey);
+    void checkReSetCryptKey(int fd, int metaFD, const std::string *cryptKey, bool aes256);
 #endif
     static bool backupOneToDirectory(const std::string &mmapKey, const MMKVPath_t &dstPath, const MMKVPath_t &srcPath, bool compareFullPath);
     static size_t backupAllToDirectory(const MMKVPath_t &dstDir, const MMKVPath_t &srcDir, bool isInSpecialDir);
@@ -269,7 +269,7 @@ public:
     static void initializeMMKV(const MMKVPath_t &rootDir, MMKVLogLevel logLevel = MMKVLogInfo, mmkv::LogHandler handler = nullptr);
 
     // a generic purpose instance
-    static MMKV *defaultMMKV(MMKVMode mode = MMKV_SINGLE_PROCESS, const std::string *cryptKey = nullptr);
+    static MMKV *defaultMMKV(MMKVMode mode = MMKV_SINGLE_PROCESS, const std::string *cryptKey = nullptr, bool aes256 = false);
 
 #ifndef MMKV_ANDROID
 
@@ -280,7 +280,8 @@ public:
                             MMKVMode mode = MMKV_SINGLE_PROCESS,
                             const std::string *cryptKey = nullptr,
                             const MMKVPath_t *rootPath = nullptr,
-                            size_t expectedCapacity = 0);
+                            size_t expectedCapacity = 0,
+                            bool aes256 = false);
 
 #else // defined(MMKV_ANDROID)
 
@@ -292,9 +293,11 @@ public:
                             MMKVMode mode = MMKV_SINGLE_PROCESS,
                             const std::string *cryptKey = nullptr,
                             const MMKVPath_t *rootPath = nullptr,
-                            size_t expectedCapacity = 0);
+                            size_t expectedCapacity = 0,
+                            bool aes256 = false);
 
-    static MMKV *mmkvWithAshmemFD(const std::string &mmapID, int fd, int metaFD, const std::string *cryptKey = nullptr);
+    static MMKV *mmkvWithAshmemFD(const std::string &mmapID, int fd, int metaFD, const std::string *cryptKey = nullptr,
+                                  bool aes256 = false);
 
     int ashmemFD();
 
@@ -335,11 +338,11 @@ public:
 
     // transform plain text into encrypted text, or vice versa with empty cryptKey
     // you can change existing crypt key with different cryptKey
-    bool reKey(const std::string &cryptKey);
+    bool reKey(const std::string &cryptKey, bool aes256 = false);
 
     // just reset cryptKey (will not encrypt or decrypt anything)
     // usually you should call this method after other process reKey() the multi-process mmkv
-    void checkReSetCryptKey(const std::string *cryptKey);
+    void checkReSetCryptKey(const std::string *cryptKey, bool aes256 = false);
 #endif
 
     bool set(bool value, MMKVKey_t key);
@@ -728,7 +731,8 @@ public:
     MMKV *mmkvWithID(const std::string &mmapID,
                      MMKVMode mode = MMKV_SINGLE_PROCESS,
                      const std::string *cryptKey = nullptr,
-                     size_t expectedCapacity = 0);
+                     size_t expectedCapacity = 0,
+                     bool aes256 = false);
 
 #else // defined(MMKV_ANDROID)
 
@@ -739,7 +743,8 @@ public:
                      int size = mmkv::DEFAULT_MMAP_SIZE,
                      MMKVMode mode = MMKV_SINGLE_PROCESS,
                      const std::string *cryptKey = nullptr,
-                     size_t expectedCapacity = 0);
+                     size_t expectedCapacity = 0,
+                     bool aes256 = false);
 #endif // MMKV_ANDROID
 
     // backup one MMKV instance to dstDir

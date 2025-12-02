@@ -46,7 +46,7 @@ class CodedInputDataCrypt {
     size_t m_decryptPosition; // position of text that has beed decrypted
 
     AESCrypt &m_decrypter;
-    uint8_t *m_decryptBuffer; // internal decrypt buffer, grows by (n * AES_KEY_LEN) bytes
+    uint8_t *m_decryptBuffer; // internal decrypt buffer, grows by (n * AES_IV_LEN) bytes
     size_t m_decryptBufferSize;
     size_t m_decryptBufferPosition; // reader position in the buffer, synced with m_position
     size_t m_decryptBufferDecryptLength; // length of the buffer that has been used

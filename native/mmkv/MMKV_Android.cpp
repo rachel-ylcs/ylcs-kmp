@@ -43,7 +43,7 @@ extern ThreadLock *g_instanceLock;
 static bool g_enableProcessModeCheck = false;
 #endif
 
-MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, const string *rootPath, size_t expectedCapacity)
+MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, const string *rootPath, size_t expectedCapacity, bool aes256)
     : m_mmapID(mmapID)
     , m_mode(mode)
     , m_path(mappedKVPathWithID(m_mmapID, rootPath, mode))
@@ -81,7 +81,7 @@ MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, const string *cryptKey
 #    ifndef MMKV_DISABLE_CRYPT
     if (cryptKey && cryptKey->length() > 0) {
         m_dicCrypt = new MMKVMapCrypt();
-        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length());
+        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length(), nullptr, 0, aes256);
     } else
 #    endif
     {
@@ -103,7 +103,7 @@ MMKV::MMKV(const string &mmapID, int size, MMKVMode mode, const string *cryptKey
     }*/
 }
 
-MMKV::MMKV(const string &mmapID, int ashmemFD, int ashmemMetaFD, const string *cryptKey)
+MMKV::MMKV(const string &mmapID, int ashmemFD, int ashmemMetaFD, const string *cryptKey, bool aes256)
     : m_mmapID(mmapID)
     , m_mode(MMKV_ASHMEM)
     , m_path(mappedKVPathWithID(m_mmapID, nullptr, MMKV_ASHMEM))
@@ -142,7 +142,7 @@ MMKV::MMKV(const string &mmapID, int ashmemFD, int ashmemMetaFD, const string *c
 #    ifndef MMKV_DISABLE_CRYPT
     if (cryptKey && cryptKey->length() > 0) {
         m_dicCrypt = new MMKVMapCrypt();
-        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length());
+        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length(), nullptr, 0, aes256);
     } else
 #    endif
     {
@@ -204,7 +204,7 @@ MigrateStatus tryMigrateLegacyMMKVFile(const string &mmapID, const string *rootP
     return newExist ? MigrateStatus::NewExist : MigrateStatus::NoneExist;
 }
 
-MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, const string *rootPath, size_t expectedCapacity) {
+MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, const string *rootPath, size_t expectedCapacity, bool aes256) {
     if (mmapID.empty() || !g_instanceLock) {
         return nullptr;
     }
@@ -238,7 +238,7 @@ MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const stri
             break;
         case MigrateStatus::OldToNewMigrateFail: {
             auto legacyID = legacyMmapedKVKey(mmapID, rootPath);
-            kv = new MMKV(legacyID, size, mode, cryptKey, rootPath, expectedCapacity);
+            kv = new MMKV(legacyID, size, mode, cryptKey, rootPath, expectedCapacity, aes256);
             break;
         }
     }
@@ -248,7 +248,7 @@ MMKV *MMKV::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const stri
     return kv;
 }
 
-MMKV *MMKV::mmkvWithAshmemFD(const string &mmapID, int fd, int metaFD, const string *cryptKey) {
+MMKV *MMKV::mmkvWithAshmemFD(const string &mmapID, int fd, int metaFD, const string *cryptKey, bool aes256) {
 
     if (fd < 0 || !g_instanceLock) {
         return nullptr;
@@ -259,11 +259,11 @@ MMKV *MMKV::mmkvWithAshmemFD(const string &mmapID, int fd, int metaFD, const str
     if (itr != g_instanceDic->end()) {
         MMKV *kv = itr->second;
 #    ifndef MMKV_DISABLE_CRYPT
-        kv->checkReSetCryptKey(fd, metaFD, cryptKey);
+        kv->checkReSetCryptKey(fd, metaFD, cryptKey, aes256);
 #    endif
         return kv;
     }
-    auto kv = new MMKV(mmapID, fd, metaFD, cryptKey);
+    auto kv = new MMKV(mmapID, fd, metaFD, cryptKey, aes256);
     kv->m_mmapKey = mmapID;
     (*g_instanceDic)[mmapID] = kv;
     return kv;
@@ -278,10 +278,10 @@ int MMKV::ashmemMetaFD() {
 }
 
 #    ifndef MMKV_DISABLE_CRYPT
-void MMKV::checkReSetCryptKey(int fd, int metaFD, const string *cryptKey) {
+void MMKV::checkReSetCryptKey(int fd, int metaFD, const string *cryptKey, bool aes256) {
     SCOPED_LOCK(m_lock);
 
-    checkReSetCryptKey(cryptKey);
+    checkReSetCryptKey(cryptKey, aes256);
 
     if (m_file->m_fileType & MMFILE_TYPE_ASHMEM) {
         if (m_file->getFd() != fd) {
@@ -358,8 +358,8 @@ void MMKV::enableDisableProcessMode(bool enable) {
 
 #endif // !MMKV_OHOS
 
-MMKV *NameSpace::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, size_t expectedCapacity) {
-    return MMKV::mmkvWithID(mmapID, size, mode, cryptKey, &m_rootDir, expectedCapacity);
+MMKV *NameSpace::mmkvWithID(const string &mmapID, int size, MMKVMode mode, const string *cryptKey, size_t expectedCapacity, bool aes256) {
+    return MMKV::mmkvWithID(mmapID, size, mode, cryptKey, &m_rootDir, expectedCapacity, aes256);
 }
 
 #endif // MMKV_ANDROID

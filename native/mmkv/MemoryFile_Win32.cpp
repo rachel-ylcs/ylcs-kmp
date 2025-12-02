@@ -301,8 +301,13 @@ size_t getPageSize() {
 MMKVPath_t absolutePath(const MMKVPath_t& path) {
     fs::path relative_path(path);
     fs::path absolute_path = fs::absolute(relative_path);
-    fs::path normalized = fs::weakly_canonical(absolute_path);
-    return normalized.wstring();
+    try {
+        fs::path normalized = fs::weakly_canonical(absolute_path);
+        return normalized.wstring();
+    } catch (std::exception &e) {
+        MMKVError("fail to weakly_canonical() path %ls, error: %s", absolute_path.c_str(), e.what());
+    }
+    return absolute_path.wstring();
 }
 
 bool isFileExist(const MMKVPath_t &nsFilePath) {

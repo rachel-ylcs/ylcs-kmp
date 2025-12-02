@@ -40,7 +40,7 @@ namespace mmkv {
 
 CodedInputDataCrypt::CodedInputDataCrypt(const void *oData, size_t length, AESCrypt &crypt)
     : m_ptr((uint8_t *) oData), m_size(length), m_position(0), m_decryptPosition(0), m_decrypter(crypt) {
-    m_decryptBufferSize = AES_KEY_LEN * 2;
+    m_decryptBufferSize = AES_IV_LEN * 2;
     m_decryptBufferPosition = static_cast<size_t>(crypt.m_number);
     m_decryptBufferDiscardPosition = m_decryptBufferPosition;
     m_decryptBufferDecryptLength = m_decryptBufferPosition;
@@ -64,7 +64,7 @@ void CodedInputDataCrypt::seek(size_t addedSize) {
     if (m_position > m_size) {
         throw out_of_range("OutOfSpace");
     }
-    assert(m_position % AES_KEY_LEN == m_decrypter.m_number);
+    assert(m_position % AES_IV_LEN == m_decrypter.m_number);
 }
 
 void CodedInputDataCrypt::consumeBytes(size_t length, bool discardPreData) {
@@ -78,19 +78,19 @@ void CodedInputDataCrypt::consumeBytes(size_t length, bool discardPreData) {
     length -= decryptedBytesLeft;
 
     // if there's some data left inside m_decrypter.m_vector, use them first
-    // it will be faster when always decrypt with (n * AES_KEY_LEN) bytes
+    // it will be faster when always decrypt with (n * AES_IV_LEN) bytes
     if (m_decrypter.m_number != 0) {
-        auto alignDecrypter = AES_KEY_LEN - m_decrypter.m_number;
+        auto alignDecrypter = AES_IV_LEN - m_decrypter.m_number;
         // make sure no data left inside m_decrypter.m_vector after decrypt
         if (length < alignDecrypter) {
             length = alignDecrypter;
         } else {
             length -= alignDecrypter;
-            length = ((length + AES_KEY_LEN - 1) / AES_KEY_LEN) * AES_KEY_LEN;
+            length = ((length + AES_IV_LEN - 1) / AES_IV_LEN) * AES_IV_LEN;
             length += alignDecrypter;
         }
     } else {
-        length = ((length + AES_KEY_LEN - 1) / AES_KEY_LEN) * AES_KEY_LEN;
+        length = ((length + AES_IV_LEN - 1) / AES_IV_LEN) * AES_IV_LEN;
     }
     auto bytesLeftInSrc = m_size - m_decryptPosition;
     length = min(bytesLeftInSrc, length);
@@ -98,7 +98,7 @@ void CodedInputDataCrypt::consumeBytes(size_t length, bool discardPreData) {
     auto bytesLeftInBuffer = m_decryptBufferSize - m_decryptBufferDecryptLength;
     // try move some space
     if (bytesLeftInBuffer < length && m_decryptBufferDiscardPosition > 0) {
-        auto posToMove = (m_decryptBufferDiscardPosition / AES_KEY_LEN) * AES_KEY_LEN;
+        auto posToMove = (m_decryptBufferDiscardPosition / AES_IV_LEN) * AES_IV_LEN;
         if (posToMove) {
             auto sizeToMove = m_decryptBufferDecryptLength - posToMove;
             memmove(m_decryptBuffer, m_decryptBuffer + posToMove, sizeToMove);
@@ -136,14 +136,14 @@ void CodedInputDataCrypt::skipBytes(size_t length) {
     // if this happens, we need optimization like the alignDecrypter above
     assert(m_decrypter.m_number == 0);
 
-    size_t alignSize = ((length + AES_KEY_LEN - 1) / AES_KEY_LEN) * AES_KEY_LEN;
+    size_t alignSize = ((length + AES_IV_LEN - 1) / AES_IV_LEN) * AES_IV_LEN;
     auto bytesLeftInSrc = m_size - m_decryptPosition;
     auto size = min(alignSize, bytesLeftInSrc);
     decryptedBytesLeft = size - length;
-    for (size_t index = 0, round = size / AES_KEY_LEN; index < round; index++) {
-        m_decrypter.decrypt(m_ptr + m_decryptPosition, m_decryptBuffer, AES_KEY_LEN);
-        m_decryptPosition += AES_KEY_LEN;
-        size -= AES_KEY_LEN;
+    for (size_t index = 0, round = size / AES_IV_LEN; index < round; index++) {
+        m_decrypter.decrypt(m_ptr + m_decryptPosition, m_decryptBuffer, AES_IV_LEN);
+        m_decryptPosition += AES_IV_LEN;
+        size -= AES_IV_LEN;
     }
     if (size) {
         m_decrypter.decrypt(m_ptr + m_decryptPosition, m_decryptBuffer, size);
@@ -151,8 +151,8 @@ void CodedInputDataCrypt::skipBytes(size_t length) {
         m_decryptBufferPosition = size - decryptedBytesLeft;
         m_decryptBufferDecryptLength = size;
     } else {
-        m_decryptBufferPosition = AES_KEY_LEN - decryptedBytesLeft;
-        m_decryptBufferDecryptLength = AES_KEY_LEN;
+        m_decryptBufferPosition = AES_IV_LEN - decryptedBytesLeft;
+        m_decryptBufferDecryptLength = AES_IV_LEN;
     }
     assert(m_decryptBufferPosition <= m_decryptBufferDecryptLength);
     assert(m_decryptPosition - m_decryptBufferDecryptLength + m_decryptBufferPosition == m_position);

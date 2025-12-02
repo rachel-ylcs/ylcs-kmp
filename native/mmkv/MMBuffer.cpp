@@ -170,11 +170,8 @@ MMBuffer &MMBuffer::operator=(MMBuffer &&other) noexcept {
 #endif
             other.detach();
         } else {
-            uint8_t tmp[SmallBufferSize()];
-            memcpy(tmp, other.paddedBuffer, other.paddedSize);
-            memcpy(other.paddedBuffer, paddedBuffer, paddedSize);
-            memcpy(paddedBuffer, tmp, other.paddedSize);
-            std::swap(paddedSize, other.paddedSize);
+            paddedSize = other.paddedSize;
+            memcpy(paddedBuffer, other.paddedBuffer, other.paddedSize);
         }
     }
 

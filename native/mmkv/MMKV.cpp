@@ -73,7 +73,7 @@ bool endsWith(const MMKVPath_t &str, const MMKVPath_t &suffix);
 MMKVPath_t filename(const MMKVPath_t &path);
 
 #ifndef MMKV_ANDROID
-MMKV::MMKV(const string &mmapID, MMKVMode mode, const string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity)
+MMKV::MMKV(const string &mmapID, MMKVMode mode, const string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity, bool aes256)
     : m_mmapID(mmapID)
     , m_mode(mode)
     , m_path(mappedKVPathWithID(m_mmapID, rootPath))
@@ -96,7 +96,7 @@ MMKV::MMKV(const string &mmapID, MMKVMode mode, const string *cryptKey, const MM
 #    ifndef MMKV_DISABLE_CRYPT
     if (cryptKey && !cryptKey->empty()) {
         m_dicCrypt = new MMKVMapCrypt();
-        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length());
+        m_crypter = new AESCrypt(cryptKey->data(), cryptKey->length(), nullptr, 0, aes256);
     } else {
         m_dic = new MMKVMap();
     }
@@ -149,11 +149,11 @@ MMKV::~MMKV() {
     MMKVInfo("destruct [%s]", m_mmapID.c_str());
 }
 
-MMKV *MMKV::defaultMMKV(MMKVMode mode, const string *cryptKey) {
+MMKV *MMKV::defaultMMKV(MMKVMode mode, const string *cryptKey, bool aes256) {
 #ifndef MMKV_ANDROID
-    return mmkvWithID(DEFAULT_MMAP_ID, mode, cryptKey);
+    return mmkvWithID(DEFAULT_MMAP_ID, mode, cryptKey, nullptr, 0, aes256);
 #else
-    return mmkvWithID(DEFAULT_MMAP_ID, DEFAULT_MMAP_SIZE, mode, cryptKey);
+    return mmkvWithID(DEFAULT_MMAP_ID, DEFAULT_MMAP_SIZE, mode, cryptKey, nullptr, 0, aes256);
 #endif
 }
 
@@ -229,7 +229,7 @@ const MMKVPath_t &MMKV::getRootDir() {
 }
 
 #ifndef MMKV_ANDROID
-MMKV *MMKV::mmkvWithID(const string &mmapID, MMKVMode mode, const string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity) {
+MMKV *MMKV::mmkvWithID(const string &mmapID, MMKVMode mode, const string *cryptKey, const MMKVPath_t *rootPath, size_t expectedCapacity, bool aes256) {
 
     if (mmapID.empty() || !g_instanceLock) {
         return nullptr;
@@ -256,7 +256,7 @@ MMKV *MMKV::mmkvWithID(const string &mmapID, MMKVMode mode, const string *cryptK
     MMKVInfo("prepare to load %s (id %s) from rootPath %s", mmapID.c_str(), mmapKey.c_str(), theRootDir->c_str());
 #endif
 
-    auto kv = new MMKV(mmapID, mode, cryptKey, rootPath, expectedCapacity);
+    auto kv = new MMKV(mmapID, mode, cryptKey, rootPath, expectedCapacity, aes256);
     kv->m_mmapKey = mmapKey;
     (*g_instanceDic)[mmapKey] = kv;
     return kv;
@@ -357,14 +357,14 @@ string MMKV::cryptKey() const {
     SCOPED_LOCK(m_lock);
 
     if (m_crypter) {
-        char key[AES_KEY_LEN];
+        char key[AES256_KEY_LEN];
         m_crypter->getKey(key);
-        return {key, strnlen(key, AES_KEY_LEN)};
+        return {key, strnlen(key, AES256_KEY_LEN)};
     }
     return "";
 }
 
-void MMKV::checkReSetCryptKey(const string *cryptKey) {
+void MMKV::checkReSetCryptKey(const string *cryptKey, bool aes256) {
     SCOPED_LOCK(m_lock);
 
     if (m_crypter) {
@@ -374,7 +374,7 @@ void MMKV::checkReSetCryptKey(const string *cryptKey) {
                 MMKVInfo("setting new aes key");
                 delete m_crypter;
                 auto ptr = cryptKey->data();
-                m_crypter = new AESCrypt(ptr, cryptKey->length());
+                m_crypter = new AESCrypt(ptr, cryptKey->length(), nullptr, 0, aes256);
 
                 checkLoadData();
             } else {
@@ -391,7 +391,7 @@ void MMKV::checkReSetCryptKey(const string *cryptKey) {
         if (cryptKey && !cryptKey->empty()) {
             MMKVInfo("setting new aes key");
             auto ptr = cryptKey->data();
-            m_crypter = new AESCrypt(ptr, cryptKey->length());
+            m_crypter = new AESCrypt(ptr, cryptKey->length(), nullptr, 0, aes256);
 
             checkLoadData();
         } else {
@@ -1755,8 +1755,8 @@ NameSpace MMKV::defaultNameSpace() {
 }
 
 #ifndef MMKV_ANDROID
-MMKV *NameSpace::mmkvWithID(const string &mmapID, MMKVMode mode, const string *cryptKey, size_t expectedCapacity) {
-    return MMKV::mmkvWithID(mmapID, mode, cryptKey, &m_rootDir, expectedCapacity);
+MMKV *NameSpace::mmkvWithID(const string &mmapID, MMKVMode mode, const string *cryptKey, size_t expectedCapacity, bool aes256) {
+    return MMKV::mmkvWithID(mmapID, mode, cryptKey, &m_rootDir, expectedCapacity, aes256);
 }
 #endif
 

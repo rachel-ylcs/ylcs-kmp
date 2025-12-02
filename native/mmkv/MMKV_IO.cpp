@@ -72,6 +72,13 @@ void MMKV::loadFromFile() {
 #endif
     if (!m_file->isFileValid()) {
         m_file->reloadFromFile(m_expectedCapacity);
+    } else if (isMultiProcess()) {
+        // the file size may change by other process between instance creation and loadFromFile
+        // because we have lazy load
+        auto actualFileSize = m_file->getActualFileSize();
+        if (actualFileSize != m_file->getFileSize()) {
+            m_file->reloadFromFile(m_expectedCapacity);
+        }
     }
     if (!m_file->isFileValid()) {
         MMKVError("file [%s] not valid", m_path.c_str());
@@ -114,7 +121,7 @@ void MMKV::loadFromFile() {
             }
             m_output = new CodedOutputData(ptr + Fixed32Size, m_file->getFileSize() - Fixed32Size);
             m_output->seek(m_actualSize);
-            if (needFullWriteback) {
+            if (needFullWriteback && !isReadOnly()) {
                 fullWriteback();
             }
         } else {
@@ -122,7 +129,9 @@ void MMKV::loadFromFile() {
             SCOPED_LOCK(m_exclusiveProcessLock);
 
             m_output = new CodedOutputData(ptr + Fixed32Size, m_file->getFileSize() - Fixed32Size);
-            if (m_actualSize > 0) {
+            if (isReadOnly()) {
+                // do nothing
+            } else if (m_actualSize > 0) {
                 writeActualSize(0, 0, nullptr, IncreaseSequence);
                 sync(MMKV_SYNC);
             } else {
@@ -224,6 +233,11 @@ void MMKV::loadMetaInfoAndCheck() {
     }
 
     m_metaInfo->read(m_metaFile->getMemory());
+
+    if (isReadOnly()) {
+        return;
+    }
+
     // the meta file is in specious status
     if (m_metaInfo->m_version >= MMKVVersionHolder) {
         MMKVWarning("meta file [%s] in specious state, version %u, flags 0x%llx", m_mmapID.c_str(),
@@ -508,6 +522,10 @@ void MMKV::oldStyleWriteActualSize(size_t actualSize) {
 }
 
 bool MMKV::writeActualSize(size_t size, uint32_t crcDigest, const void *iv, bool increaseSequence) {
+    if (isReadOnly()) {
+        return false;
+    }
+
     // backward compatibility
     oldStyleWriteActualSize(size);
 
@@ -1051,7 +1069,12 @@ KVHolderRet_t MMKV::overrideDataWithKey(const MMBuffer &data, const KeyValueHold
         }
     }
     auto basePtr = (uint8_t *) m_file->getMemory() + Fixed32Size;
-    MMBuffer keyData(basePtr + kvHolder.offset, rawKeySize, MMBufferNoCopy);
+    MMBuffer keyData;
+    if (kvHolder.offset < ItemSizeHolderSize) {
+        keyData = MMBuffer(basePtr + kvHolder.offset, rawKeySize, MMBufferCopy);
+    } else {
+        keyData = MMBuffer(basePtr + kvHolder.offset, rawKeySize, MMBufferNoCopy);
+    }
 
     return doOverrideDataWithKey(data, keyData, isDataHolder, keyLength);
 }
@@ -1065,6 +1088,10 @@ bool MMKV::fullWriteback(AESCrypt *newCrypter, bool onlyWhileExpire) {
     }
     if (!isFileValid()) {
         MMKVWarning("[%s] file not valid", m_mmapID.c_str());
+        return false;
+    }
+    if (isReadOnly()) {
+        MMKVWarning("[%s] file readonly", m_mmapID.c_str());
         return false;
     }
 
@@ -1266,7 +1293,7 @@ bool MMKV::doFullWriteBack(pair<MMBuffer, size_t> prepared, AESCrypt *newCrypter
     auto ptr = (uint8_t *) m_file->getMemory();
     auto totalSize = prepared.second;
 
-    uint8_t newIV[AES_KEY_LEN];
+    uint8_t newIV[AES_IV_LEN];
     auto encrypter = (newCrypter == InvalidCryptPtr) ? nullptr : (newCrypter ? newCrypter : m_crypter);
     if (encrypter) {
         AESCrypt::fillRandomIV(newIV);
@@ -1330,7 +1357,7 @@ bool MMKV::doFullWriteBack(pair<MMBuffer, size_t> prepared, AESCrypt *, bool nee
 #endif // MMKV_DISABLE_CRYPT
 
 #ifndef MMKV_DISABLE_CRYPT
-bool MMKV::reKey(const string &cryptKey) {
+bool MMKV::reKey(const string &cryptKey, bool aes256) {
     if (isReadOnly()) {
         MMKVWarning("[%s] file readonly", m_mmapID.c_str());
         return false;
@@ -1352,7 +1379,7 @@ bool MMKV::reKey(const string &cryptKey) {
             } else {
                 // change encryption key
                 MMKVInfo("reKey with new aes key");
-                auto newCrypt = new AESCrypt(cryptKey.data(), cryptKey.length());
+                auto newCrypt = new AESCrypt(cryptKey.data(), cryptKey.length(), nullptr, 0, aes256);
                 m_hasFullWriteback = false;
                 ret = fullWriteback(newCrypt);
                 if (ret) {
@@ -1380,7 +1407,7 @@ bool MMKV::reKey(const string &cryptKey) {
             // transform plain text to encrypted text
             MMKVInfo("reKey to a aes key");
             m_hasFullWriteback = false;
-            auto newCrypt = new AESCrypt(cryptKey.data(), cryptKey.length());
+            auto newCrypt = new AESCrypt(cryptKey.data(), cryptKey.length(), nullptr, 0, aes256);
             ret = fullWriteback(newCrypt);
             if (ret) {
                 m_crypter = newCrypt;
@@ -1473,7 +1500,7 @@ void MMKV::clearAll(bool keepSpace) {
     }
 
 #ifndef MMKV_DISABLE_CRYPT
-    uint8_t newIV[AES_KEY_LEN];
+    uint8_t newIV[AES_IV_LEN];
     AESCrypt::fillRandomIV(newIV);
     if (m_crypter) {
         m_crypter->resetIV(newIV, sizeof(newIV));

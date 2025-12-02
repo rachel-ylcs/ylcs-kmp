@@ -38,12 +38,6 @@ enable_language(ASM)
 IF("${ANDROID_ABI}" STREQUAL "arm64-v8a")
     SET(ASM_OPTIONS "-x assembler-with-cpp")
     SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS} -march=armv8+crypto -D__ANDROID__")
-ELSEIF("${ANDROID_ABI}" STREQUAL "armeabi-v7a")
-    SET(ASM_OPTIONS "-x assembler-with-cpp")
-    SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS} -march=armv7a -D__ANDROID__")
-ELSEIF("${ANDROID_ABI}" STREQUAL "armeabi")
-    SET(ASM_OPTIONS "-x assembler-with-cpp")
-    SET(CMAKE_ASM_FLAGS "${CFLAGS} ${ASM_OPTIONS} -march=armv5 -D__ANDROID__")
 ENDIF()
 
 #include(CMakePrintHelpers)
@@ -62,14 +56,14 @@ ELSEIF(UNIX AND (NOT APPLE))
 ENDIF()
 
 
-project(mmkv)
+project(core)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-add_library(mmkv
+add_library(core
 
         # Sets the library as a shared library.
         STATIC
@@ -141,19 +135,19 @@ IF (MSVC OR (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
     # .S files is not supported by MSVC.
     # x86_64 asm not supported in OHOS
 ELSE()
-    target_sources(mmkv PRIVATE
+    target_sources(core PRIVATE
         aes/openssl/openssl_aesv8-armx.S)
 ENDIF()
 
-target_include_directories(mmkv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 IF (WIN32)
     # MMKV can be used only with Unicode on Windows.
-    target_compile_definitions(mmkv PUBLIC UNICODE)
-    target_compile_definitions(mmkv PUBLIC _UNICODE)
+    target_compile_definitions(core PUBLIC UNICODE)
+    target_compile_definitions(core PUBLIC _UNICODE)
 ENDIF()
 
-set_target_properties(mmkv PROPERTIES
+set_target_properties(core PROPERTIES
         CXX_STANDARD 20
         CXX_EXTENSIONS OFF
         POSITION_INDEPENDENT_CODE ON
@@ -164,9 +158,9 @@ find_library(zlib
         )
 
 IF (NOT zlib)
-    target_compile_definitions(mmkv PUBLIC MMKV_EMBED_ZLIB=1)
+    target_compile_definitions(core PUBLIC MMKV_EMBED_ZLIB=1)
 ELSE()
-    target_link_libraries(mmkv ${zlib})
+    target_link_libraries(core ${zlib})
 ENDIF()
 
 function(copy_files)
@@ -210,4 +204,4 @@ ELSE()
     file(REMOVE include/MMKV/MemoryFile.h include/MMKV/MMKVLog.h)
 ENDIF()
 
-target_include_directories(mmkv INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

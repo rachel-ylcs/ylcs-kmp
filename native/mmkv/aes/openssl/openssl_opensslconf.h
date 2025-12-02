@@ -119,8 +119,8 @@ extern "C" {
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/Users/elviswu/Desktop/compile/openssl-ios-build-shell-script-master/openssl-1.0.2k-build/armv7/lib/engines"
-#define OPENSSLDIR "/Users/elviswu/Desktop/compile/openssl-ios-build-shell-script-master/openssl-1.0.2k-build/armv7/ssl"
+#define ENGINESDIR "/compile/openssl-ios-build-shell-script-master/openssl-1.0.2k-build/armv7/lib/engines"
+#define OPENSSLDIR "/compile/openssl-ios-build-shell-script-master/openssl-1.0.2k-build/armv7/ssl"
 #endif
 #endif
 

@@ -43,7 +43,7 @@ void AES_cfb128_decrypt(const uint8_t *in, uint8_t *out, size_t length, const AE
 
 } // namespace openssl
 
-#if __ARM_MAX_ARCH__ > 7
+#if __ARM_MAX_ARCH__ > 0
 
 extern "C" int openssl_aes_arm_set_encrypt_key(const uint8_t *userKey, const int bits, void *key);
 extern "C" int openssl_aes_arm_set_decrypt_key(const uint8_t *userKey, const int bits, void *key);
@@ -80,7 +80,7 @@ extern aes_decrypt_t AES_decrypt;
 
 #endif // __linux__ && !MMKV_OHOS
 
-#else // __ARM_MAX_ARCH__ <= 7
+#else // __ARM_MAX_ARCH__ <= 0
 
 namespace openssl {
 
@@ -91,7 +91,7 @@ void AES_decrypt(const uint8_t *in, uint8_t *out, const AES_KEY *key);
 
 } // namespace openssl
 
-#endif // __ARM_MAX_ARCH__ <= 7
+#endif // __ARM_MAX_ARCH__ <= 0
 
 #endif // MMKV_DISABLE_CRYPT
 #endif // __cplusplus

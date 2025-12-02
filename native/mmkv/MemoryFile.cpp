@@ -479,8 +479,13 @@ size_t getPageSize() {
 extern MMKVPath_t absolutePath(const MMKVPath_t &path) {
     fs::path relative_path(path);
     fs::path absolute_path = fs::absolute(relative_path);
-    fs::path normalized = fs::weakly_canonical(absolute_path);
-    return normalized.string();
+    try {
+        fs::path normalized = fs::weakly_canonical(absolute_path);
+        return normalized.string();
+    } catch (std::exception &e) {
+        MMKVError("fail to weakly_canonical() path %s, error: %s", absolute_path.c_str(), e.what());
+    }
+    return absolute_path.string();
 }
 
 #ifndef MMKV_APPLE

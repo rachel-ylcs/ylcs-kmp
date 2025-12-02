@@ -62,7 +62,7 @@ target_include_directories(ylcs_native PRIVATE
 
 target_link_libraries(ylcs_native
     ${JNI_LIBRARIES}
-    mmkv
+    core
     nfd
 )
 
@@ -71,7 +71,7 @@ if(WIN32)
 endif()
 
 add_dependencies(ylcs_native
-    mmkv
+    core
     nfd
 )
 

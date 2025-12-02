@@ -182,18 +182,19 @@ using namespace std;
 namespace mmkv {
 
 void KeyValueHolderCrypt::testAESToMMBuffer() {
-    const uint8_t plainText[] = "Hello, OpenSSL-mmkv::KeyValueHolderCrypt::testAESToMMBuffer() with AES CFB 128.";
+    const uint8_t plainText[] = "Hello, OpenSSL-mmkv::KeyValueHolderCrypt::testAESToMMBuffer() with AES CFB 256.";
     constexpr size_t textLength = sizeof(plainText) - 1;
 
-    const uint8_t key[] = "TheAESKey";
+    const uint8_t key[] = "TheVeryLooooooooongAESKey";
     constexpr size_t keyLength = sizeof(key) - 1;
+    auto aes256 = (keyLength > AES_KEY_LEN);
 
-    uint8_t iv[AES_KEY_LEN];
+    uint8_t iv[AES_IV_LEN];
     srand((unsigned) time(nullptr));
-    for (uint32_t i = 0; i < AES_KEY_LEN; i++) {
+    for (uint32_t i = 0; i < AES_IV_LEN; i++) {
         iv[i] = (uint8_t) rand();
     }
-    AESCrypt crypt1(key, keyLength, iv, sizeof(iv));
+    AESCrypt crypt1(key, keyLength, iv, sizeof(iv), aes256);
 
     auto encryptText = new uint8_t[DEFAULT_MMAP_SIZE];
     memset(encryptText, 0, DEFAULT_MMAP_SIZE);
@@ -204,7 +205,7 @@ void KeyValueHolderCrypt::testAESToMMBuffer() {
     output.writeData(MMBuffer((void *) plainText, textLength, MMBufferNoCopy));
     crypt1.encrypt(encryptText, encryptText, (size_t)(output.curWritePointer() - encryptText));
 
-    AESCrypt decrypt(key, keyLength, iv, sizeof(iv));
+    AESCrypt decrypt(key, keyLength, iv, sizeof(iv), aes256);
     uint8_t smallBuffer[32];
     decrypt.decrypt(encryptText, smallBuffer, 5);
     auto keySize = CodedInputData(smallBuffer, 5).readUInt32();
