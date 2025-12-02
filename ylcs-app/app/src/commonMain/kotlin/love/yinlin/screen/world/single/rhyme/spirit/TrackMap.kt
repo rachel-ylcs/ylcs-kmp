@@ -117,7 +117,7 @@ class TrackMap(
 ) : Spirit(rhymeManager), BoxBody {
     companion object {
         // 屏幕不可点击比率
-        const val SCREEN_CLICK_AREA_RATIO = 0.75f
+        const val SCREEN_CLICK_AREA_RATIO = 0.7f
     }
 
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Track.VIRTUAL_TOP_HEIGHT))
