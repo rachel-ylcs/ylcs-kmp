@@ -4,7 +4,7 @@ PODS:
   - MMKVCore (2.2.4)
   - MobileVLCKit (3.6.1b1)
   - SGQRCode (4.1.0)
-  - ylcs-app (3.3.1):
+  - ylcs-shared (3.3.1):
     - MMKV (= 2.2.4)
     - MobileVLCKit (= 3.6.1b1)
     - SGQRCode (= 4.1.0)
@@ -12,8 +12,8 @@ PODS:
   - YLCSCore (0.0.1)
 
 DEPENDENCIES:
-  - ylcs-app (from `../ylcs-app/app`)
-  - YLCSCore (from `../iosApp/core`)
+  - ylcs_shared (from `../shared`)
+  - YLCSCore (from `core`)
 
 SPEC REPOS:
   trunk:
@@ -23,17 +23,17 @@ SPEC REPOS:
     - SGQRCode
 
 EXTERNAL SOURCES:
-  ylcs-app:
-    :path: "../ylcs-app/app"
+  ylcs-shared:
+    :path: "../shared"
   YLCSCore:
-    :path: "../iosApp/core"
+    :path: "core"
 
 SPEC CHECKSUMS:
   MMKV: 1a8e7dbce7f9cad02c52e1b1091d07bd843aefaf
   MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   MobileVLCKit: 2d9c7c373393ae43086aeeff890bf0b1afc15c5c
   SGQRCode: 6ad664d63f38f2842503bc5087812c5a3136d924
-  ylcs-app: 031a230e0bbd6173bd1de5c75483f590bbd0d530
+  ylcs-shared: 031a230e0bbd6173bd1de5c75483f590bbd0d530
   YLCSCore: ca05d5345f1c351ecfec8f32aac8eecb7975e02d
 
 PODFILE CHECKSUM: 8c63d0abfc3ea1157145f2434ecb8c1e5adfd0f8

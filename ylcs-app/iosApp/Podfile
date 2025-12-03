@@ -1,0 +1,7 @@
+use_frameworks!
+
+target 'iosApp' do
+    platform :ios, '16.0'
+    pod 'ylcs-shared', :path => '../shared'
+    pod 'YLCSCore', :path => 'core'
+end

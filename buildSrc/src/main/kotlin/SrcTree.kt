@@ -17,13 +17,6 @@ class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("c
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")
 
-class IosAppNode(root: RootProjectNode) : Directory by root.dir("iosApp") {
-    val core = dir("core")
-    val podfile = file("Podfile")
-    val configuration = dir("Configuration")
-    val configurationFile = configuration.file("Version.xcconfig")
-}
-
 class NativeNode(root: RootProjectNode) : Directory by root.dir("native") {
     val libs = dir("libs")
 }
@@ -70,6 +63,13 @@ class AndroidAppNode(root: RootProjectNode, c: Constants): Directory by root.dir
     val originOutput = build.dir("outputs").dir("apk").dir("release").file("androidApp-release.apk")
 }
 
+class IosAppNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("iosApp") {
+    val core = dir("core")
+    val podfile = file("Podfile")
+    val configuration = dir("Configuration")
+    val configurationFile = configuration.file("Version.xcconfig")
+}
+
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
     val workspace = dir("build").dir("serverRun")
     val outputs = root.outputs
@@ -85,13 +85,13 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val buildSrc = BuildSrcNode(this)
     val config = ConfigNode(this, c)
     val docs = DocsNode(this)
-    val iosApp = IosAppNode(this)
     val native = NativeNode(this)
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
     val cs = CSNode(this)
     val app = SharedNode(this, c)
     val androidApp = AndroidAppNode(this, c)
+    val iosApp = IosAppNode(this)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion = file("libs.version.toml")

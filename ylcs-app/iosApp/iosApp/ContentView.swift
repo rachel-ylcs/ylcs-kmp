@@ -1,6 +1,6 @@
 import UIKit
 import SwiftUI
-import ylcs_app
+import ylcs_shared
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {

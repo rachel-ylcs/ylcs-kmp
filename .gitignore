@@ -22,7 +22,7 @@ ylcs-app/mod-manager/output/
 xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
 Pods/
-iosApp/Configuration/Version.xcconfig
+**/Version.xcconfig
 **/**.podspec
 
 # native
