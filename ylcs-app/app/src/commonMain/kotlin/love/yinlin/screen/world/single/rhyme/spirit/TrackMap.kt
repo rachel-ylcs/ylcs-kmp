@@ -137,7 +137,7 @@ class TrackMap(
     }
 
     // 点击区域边界
-    val clickAreaBound = size.height * (1 - ActionResult.MISS.range)
+    val clickAreaBound = size.height * (1 - ActionResult.MISS.range + DynamicAction.BODY_RATIO / 2)
 
     fun calcTrackIndex(point: Offset): Track? {
         // 非屏幕可点击区域忽略
