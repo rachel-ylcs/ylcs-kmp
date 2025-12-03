@@ -70,7 +70,7 @@ afterEvaluate {
         mustRunAfter(createReleaseDistributable)
         doLast {
             copy {
-                from(C.root.modManager.desktopOriginOutput)
+                from(C.root.modManager.originOutput)
                 into(C.root.outputs)
             }
         }

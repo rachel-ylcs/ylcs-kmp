@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -119,9 +118,9 @@ kotlin {
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.service.all,
+                projects.ylcsApp.cs,
             )
             useLib(
-                projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
                 projects.ylcsModule.compose.component.all,
                 projects.ylcsModule.compose.shader,
@@ -140,7 +139,6 @@ kotlin {
         val jvmMain by creating {
             useSourceSet(commonMain)
             useLib(
-                // local
                 fileTree(mapOf("dir" to "libs/jvm", "include" to listOf("*.jar")))
             )
         }
@@ -181,8 +179,6 @@ kotlin {
         val desktopMain by getting {
             useSourceSet(jvmMain)
             useLib(
-                projects.ylcsModule.autoUpdate,
-                projects.ylcsModule.singleInstance,
                 fileTree(mapOf("dir" to "libs/desktop", "include" to listOf("*.jar")))
             )
         }
@@ -204,59 +200,6 @@ composeCompiler {
     metricsDestination = C.root.app.composeCompilerReport
 }
 
-compose.desktop {
-    application {
-        mainClass = C.app.mainClass
-
-        if ("desktopRun" in currentTaskName) {
-            val desktopWorkSpace = C.root.app.desktopWorkSpace.asFile
-            desktopWorkSpace.mkdir()
-            jvmArgs += arrayOf(
-                "-Duser.dir=$desktopWorkSpace",
-                "-Djava.library.path=${C.root.native.libs}",
-                "--enable-native-access=ALL-UNNAMED"
-            )
-        }
-
-        buildTypes.release.proguard {
-            version = C.proguard.version
-            isEnabled = true
-            optimize = true
-            obfuscate = true
-            configurationFiles.from(C.root.app.commonR8Rule, C.root.app.desktopR8Rule)
-        }
-
-        nativeDistributions {
-            packageName = C.app.name
-            packageVersion = C.app.versionName
-            description = C.app.description
-            copyright = C.app.copyright
-            vendor = C.app.vendor
-            licenseFile.set(C.root.license)
-
-            targetFormats(TargetFormat.Exe, TargetFormat.Deb, TargetFormat.Pkg)
-
-            modules(*C.desktop.modules)
-
-            windows {
-                console = false
-                exePackageVersion = C.app.versionName
-                iconFile.set(C.root.config.icon)
-            }
-
-            linux {
-                debPackageVersion = C.app.versionName
-                iconFile.set(C.root.config.icon)
-            }
-
-            macOS {
-                pkgPackageVersion = C.app.versionName
-                iconFile.set(C.root.config.icon)
-            }
-        }
-    }
-}
-
 // ----------------------------------------- 任务列表 ----------------------------------------------
 
 afterEvaluate {
@@ -275,66 +218,6 @@ afterEvaluate {
         doLast {
             configFile.writeText(content)
         }
-    }
-
-    val run = tasks.named("run")
-    val runRelease = tasks.named("runRelease")
-    val createReleaseDistributable = tasks.named("createReleaseDistributable")
-    val suggestRuntimeModules = tasks.named("suggestRuntimeModules")
-
-    // 运行 桌面程序 Debug
-    val desktopRunDebug by tasks.registering {
-        dependsOn(run)
-    }
-
-    // 运行 桌面程序 Release
-    val desktopRunRelease by tasks.registering {
-        dependsOn(runRelease)
-    }
-
-    // 检查桌面模块完整性
-    val desktopCheckModules by tasks.registering {
-        dependsOn(suggestRuntimeModules)
-    }
-
-    val desktopCopyDir by tasks.registering {
-        mustRunAfter(createReleaseDistributable)
-        doLast {
-            copy {
-                from(C.root.app.desktopOriginOutput)
-                into(C.root.outputs)
-            }
-            copy {
-                from(C.root.native.libs)
-                into(C.root.app.desktopLibOutput)
-            }
-            copy {
-                from(C.root.config.currentPackages)
-                into(C.root.app.desktopPackagesOutput)
-            }
-            val platformName = when (C.platform) {
-                BuildPlatform.Windows -> "[Windows]"
-                BuildPlatform.Linux -> "[Linux]"
-                BuildPlatform.Mac -> "[MacOS]"
-            }
-            zip {
-                from(C.root.outputs.dir(C.app.name).dir("app"))
-                to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
-            }
-            zip {
-                from(C.root.outputs.dir(C.app.name))
-                to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
-            }
-            delete {
-                delete(C.root.outputs.dir(C.app.name))
-            }
-        }
-    }
-
-    // 发布桌面应用程序
-    val desktopPublish by tasks.registering {
-        dependsOn(createReleaseDistributable)
-        dependsOn(desktopCopyDir)
     }
 
     val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")

@@ -11,7 +11,7 @@ import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.MimeType
 import love.yinlin.platform.*
-import love.yinlin.resources.*
+import love.yinlin.shared.resources.*
 import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
 import org.jetbrains.compose.resources.DrawableResource

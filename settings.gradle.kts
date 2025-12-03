@@ -80,6 +80,7 @@ include(
     "ylcs-app:shared",
 
     "ylcs-app:androidApp",
+    "ylcs-app:desktopApp",
 
     "ylcs-app:server",
     "ylcs-app:mod-manager",
