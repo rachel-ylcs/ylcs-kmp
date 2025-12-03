@@ -27,7 +27,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:app:androidPublish
+        run: ./gradlew ylcs-app:androidApp:androidPublish
 
       - name: Rename
         run: |
@@ -59,10 +59,10 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:app:generateDummyFramework
-          # xcodebuild build -workspace ./iosApp/iosApp.xcworkspace -scheme iosApp
-          xcodebuild archive -workspace ./iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
-          # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./iosApp/ExportOptions.plist
+          ./gradlew ylcs-app:shared:generateDummyFramework
+          # xcodebuild build -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp
+          xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
+          # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
           mkdir -p outputs/Payload
           cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
           cd outputs
@@ -100,7 +100,7 @@ jobs:
         run: |
           cd native && ./build.bat
           cd ..
-          ./gradlew ylcs-app:app:desktopPublish
+          ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress
         run: |
@@ -140,7 +140,7 @@ jobs:
         run: |
           cd native && ./build.sh
           cd ..
-          ./gradlew ylcs-app:app:desktopPublish
+          ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress
         run: |
@@ -174,7 +174,7 @@ jobs:
         run: |
           cd native && ./build.sh
           cd ..
-          ./gradlew ylcs-app:app:desktopPublish
+          ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress
         run: |
@@ -205,7 +205,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:app:webPublish
+        run: ./gradlew ylcs-app:webApp:webPublish
 
       - name: Compress
         run: |
