@@ -37,7 +37,8 @@ class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("cs"
     val srcGenerated = build.dir("generated").dir("kotlin")
     val generatedLocalFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
 }
-class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("app") {
+
+class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("shared") {
     private val proguard = dir("proguard")
     val commonR8Rule = proguard.file("R8Common.pro")
     val androidR8Rule = proguard.file("R8Android.pro")
@@ -45,8 +46,6 @@ class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs
 
     private val build = dir("build")
     val composeCompilerReport = build.dir("composeCompiler")
-
-    val androidOriginOutputDir = build.dir("outputs").dir("apk")
 
     val desktopWorkSpace = build.dir("desktopRun")
     val desktopOriginOutput = build.dir("compose").dir("binaries").dir("main-release").dir("app")
@@ -63,6 +62,12 @@ class AppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs
 
     val webOriginOutput = build.dir("dist").dir("wasmJs").dir("productionExecutable")
     val webOutput = root.outputs.dir("web")
+}
+
+class AndroidAppNode(root: RootProjectNode, c: Constants): Directory by root.dir("ylcs-app").dir("androidApp") {
+    private val build = dir("build")
+
+    val originOutput = build.dir("outputs").dir("apk").dir("release").file("androidApp-release.apk")
 }
 
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
@@ -85,7 +90,8 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
     val cs = CSNode(this)
-    val app = AppNode(this, c)
+    val app = SharedNode(this, c)
+    val androidApp = AndroidAppNode(this, c)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion = file("libs.version.toml")

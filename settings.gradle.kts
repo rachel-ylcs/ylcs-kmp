@@ -77,7 +77,10 @@ include(
 
     /* -----------------  [4] 程序模块  ----------------- */
 
-    "ylcs-app:app",
+    "ylcs-app:shared",
+
+    "ylcs-app:androidApp",
+
     "ylcs-app:server",
     "ylcs-app:mod-manager",
 )
