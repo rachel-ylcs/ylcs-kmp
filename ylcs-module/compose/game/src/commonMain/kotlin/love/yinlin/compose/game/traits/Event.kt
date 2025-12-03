@@ -7,7 +7,7 @@ import androidx.compose.ui.geometry.Offset
 sealed interface Event
 
 @Stable
-interface PointerEvent : Event {
+sealed interface PointerEvent : Event {
     val id: Long
     val position: Offset
 

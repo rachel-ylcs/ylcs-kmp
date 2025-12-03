@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import love.yinlin.Local
 import love.yinlin.api.ServerRes
 
 @Stable
@@ -50,7 +49,7 @@ enum class Game(
     ),
     Rhyme(
         title = "琴韵",
-        description = "演离合相遇悲喜为谁",
+        description = "阳光微凉 琴弦微凉",
         type = GameType.SINGLE
     );
 

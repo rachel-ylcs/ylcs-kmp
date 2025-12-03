@@ -7,14 +7,14 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
+import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.traits.Event
-import love.yinlin.compose.game.traits.PointerDownEvent
-import love.yinlin.compose.game.traits.PointerEvent
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
@@ -50,15 +50,6 @@ class Track(
         val BackgroundColor = Colors.Black.copy(alpha = 0.4f)
         // 轨道激活色
         val ActiveColor = Colors.Cyan3.copy(alpha = 0.2f)
-
-        // 点击区域起始
-        const val CLICK_START_RATIO = 0.8f
-        // 点击区域结束
-        const val CLICK_END_RATIO = 0.9f
-        // 点击区域中间
-        const val CLICK_CENTER_RATIO = (CLICK_START_RATIO + CLICK_END_RATIO) / 2
-        // 点击区域区间
-        const val CLICK_RANGE = CLICK_END_RATIO - CLICK_START_RATIO
     }
 
     // 位置
@@ -86,29 +77,7 @@ class Track(
     val area: Array<Offset> = arrayOf(vertices, left, right)
     val areaPath: Path = Path(area)
     // 透视矩阵
-    val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(3f, left, right, slopeLeft, slopeRight)
-}
-
-// 激活轨道
-@Stable
-class ActiveTrack {
-    private val events = List<PointerEvent?>(Track.Num) { null }.toMutableStateList()
-
-    operator fun get(index: Int): Boolean = events[index] != null
-
-    fun safeSet(index: Int, event: PointerEvent) {
-        // 防止多指按下同一个轨道
-        if (event is PointerDownEvent) { // 按下
-            if (events[index] == null) {
-                events[index] = event
-            }
-        }
-        else { // 抬起
-            if (events.indexOfFirst { it?.id == event.id } == index) {
-                events[index] = null
-            }
-        }
-    }
+    val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(DynamicAction.PERSPECTIVE_K.toFloat(), left, right, slopeLeft, slopeRight)
 }
 
 @Stable
@@ -144,19 +113,12 @@ class TrackMap(
     }
 
     // 轨道区域
-    val tracksAreaPath = Path(arrayOf(
+    val tracksArea = arrayOf(
         tracks.first().left,
         vertices,
         tracks.last().right
-    ))
-
-    // 点击区域
-    val clickArea = arrayOf(
-        vertices.onLine(tracks.first().left, Track.CLICK_START_RATIO),
-        vertices.onLine(tracks.first().left, Track.CLICK_END_RATIO),
-        vertices.onLine(tracks.last().right, Track.CLICK_END_RATIO),
-        vertices.onLine(tracks.last().right, Track.CLICK_START_RATIO),
     )
+    val tracksAreaPath = Path(tracksArea)
 
     // 轨道线画刷 (注意所有轨道左右侧线高度相同)
     val trackLineBrush = Brush.verticalGradient(
@@ -166,9 +128,20 @@ class TrackMap(
     )
 
     // 当前按下轨道
-    private val active = ActiveTrack()
+    val activeTracks = List<Long?>(Track.Num) { null }.toMutableStateList()
 
-    private fun calcTrackIndex(point: Offset): Track? {
+    // 判定区域
+    val hitLine = vertices.onLine(tracksArea[0], DynamicAction.HIT_RATIO) to vertices.onLine(tracksArea[2], DynamicAction.HIT_RATIO)
+    val hitAreaData = ActionResult.entries.fastMapIndexed { index, result ->
+        Path(arrayOf(
+            vertices.onLine(tracksArea[0], result.startRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[0], result.endRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[2], result.endRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[2], result.startRange(DynamicAction.HIT_RATIO)),
+        )) to index * 0.05f
+    }
+
+    fun calcTrackIndex(point: Offset): Track? {
         // 非屏幕可点击区域忽略
         if (point.y <= size.height * SCREEN_CLICK_AREA_RATIO) return null
         // 不需要计算点是否位于每个轨道三角形内，只需要计算斜率即可
@@ -193,40 +166,29 @@ class TrackMap(
         return null
     }
 
-    override fun onClientEvent(tick: Long, event: Event): Boolean = when (event) {
-        is PointerEvent -> {
-            // 获取指针所在轨道
-            val track = calcTrackIndex(event.position)
-            if (track != null) active.safeSet(track.index, event)
-            track != null
-        }
-    }
-
     override fun Drawer.onClientDraw() {
         // 画轨道背景
         path(Track.BackgroundColor, tracksAreaPath)
 
-        // 画点击区域横线
-        line(Colors.Ghost, clickArea[0], clickArea[3], Stroke(5f), 0.6f)
-        line(Colors.Ghost, clickArea[1], clickArea[2], Stroke(5f), 0.6f)
+        // 画判定区域
+        for ((area, alpha) in hitAreaData) path(Colors.Green4, area, alpha = alpha)
+        line(Colors.Green4, hitLine.first, hitLine.second, style = Stroke(5f), alpha = 0.6f)
 
         for (index in 0 ..< Track.Num) {
             val track = tracks[index]
             // 画激活轨道
-            if (active[index]) path(Track.ActiveColor, track.areaPath)
+            if (activeTracks[index] != null) path(Track.ActiveColor, track.areaPath)
 
             // 画轨道左侧射线
-            // 阴影
-            path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f)
-            // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
-            path(trackLineBrush, track.leftLineAreaPath)
-            path(Colors.Steel4, track.leftLineAreaPath, 0.75f, Stroke(2f))
+            path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f) // 阴影
+            path(trackLineBrush, track.leftLineAreaPath) // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
+            path(Colors.Steel4, track.leftLineAreaPath, style = Stroke(2f), alpha = 0.75f)
         }
 
         // 最后一个轨道右侧射线
         val track = tracks.last()
         path(Colors.Steel2, track.rightLineShadowAreaPath, alpha = 0.2f)
         path(trackLineBrush, track.rightLineAreaPath)
-        path(Colors.Steel4, track.rightLineAreaPath, 0.75f, Stroke(2f))
+        path(Colors.Steel4, track.rightLineAreaPath, style = Stroke(2f), alpha = 0.75f)
     }
 }

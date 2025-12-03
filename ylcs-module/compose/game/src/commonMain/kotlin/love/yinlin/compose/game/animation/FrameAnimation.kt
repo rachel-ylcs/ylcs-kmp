@@ -15,18 +15,32 @@ abstract class FrameAnimation(
         private const val END = -1
     }
 
-    protected var total by mutableIntStateOf(totalFrame)
+    protected abstract fun calcProgress(t: Int, f: Int): Float
 
-    var frame by mutableIntStateOf(END)
-        protected set
+    private var total by mutableIntStateOf(totalFrame)
+
+    private var frame by mutableIntStateOf(END)
 
     val isCompleted by derivedStateOf { frame == END }
 
-    abstract val progress: Float
+    val progress: Float by derivedStateOf {
+        val currentFrame = frame
+        if (currentFrame == END) 0f else calcProgress(total, currentFrame).coerceIn(0f, 1f)
+    }
+
+    inline fun withProgress(block: (Float) -> Unit) {
+        val currentProgress = progress
+        if (currentProgress > 0f) block(currentProgress)
+    }
+
+    inline fun withProgress(transform: (Boolean, Float) -> Float, block: (Float) -> Unit) {
+        block(transform(isCompleted, progress))
+    }
 
     fun update(): Boolean {
-        if (frame != END) {
-            if (frame >= total - 1) {
+        val currentFrame = frame
+        if (currentFrame != END) {
+            if (currentFrame >= total - 1) {
                 frame = if (isInfinite) 0 else END
                 return false
             }

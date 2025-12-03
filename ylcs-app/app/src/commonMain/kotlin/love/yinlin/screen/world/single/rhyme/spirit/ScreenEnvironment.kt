@@ -11,10 +11,12 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 class ScreenEnvironment(
     rhymeManager: RhymeManager,
 ) : Container(rhymeManager), BoxBody {
+    val missEnvironment = MissEnvironment(rhymeManager)
+
     override val size: Size = manager.size
 
     override val souls: List<Soul> = listOf(
-        MissEnvironment(rhymeManager),
+        missEnvironment,
         ChorusEnvironment(rhymeManager),
     )
 }

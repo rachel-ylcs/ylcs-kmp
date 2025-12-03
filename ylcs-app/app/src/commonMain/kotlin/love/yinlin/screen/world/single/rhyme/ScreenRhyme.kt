@@ -352,11 +352,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        val playConfig = RhymePlayConfig(
-                            difficulty = RhymeDifficulty.Easy,
-                            audioDelay = 0L
-                        )
-                        if (entry.enabled) startGame(entry.musicInfo, playConfig)
+                        if (entry.enabled) startGame(entry.musicInfo, RhymePlayConfig.Default)
                         else slot.tip.warning("此MOD不支持")
                     }
                 )

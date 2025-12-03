@@ -38,13 +38,17 @@ class ScoreBoard(
     }
 
     override fun Drawer.onClientDraw() {
-        val content = measureText(textCache, scoreText, this@ScoreBoard.size.height, FontWeight.ExtraBold)
-        translate((size.width - content.width) / 2, 0f) {
-            text(
-                content = content,
-                color = Colors(0xffe2e6ff).copy(alpha = if (animation.isCompleted) 1f else (animation.progress + 0.3f).coerceAtMost(1f)),
-                shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
-            )
+        animation.withProgress({ isCompleted, progress ->
+            if (isCompleted) 1f else (progress + 0.3f).coerceAtMost(1f)
+        }) { progress ->
+            val content = measureText(textCache, scoreText, this@ScoreBoard.size.height, FontWeight.ExtraBold)
+            translate((size.width - content.width) / 2, 0f) {
+                text(
+                    content = content,
+                    color = Colors(0xffe2e6ff).copy(alpha = progress),
+                    shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
+                )
+            }
         }
     }
 
