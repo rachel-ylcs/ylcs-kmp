@@ -26,14 +26,16 @@ enum class ActionResult(
     val title: String,
     val brush: Brush
 ) {
-    MISS(0, 0.2f, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
-    BAD(1, 0.15f, "BAD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Red6))),
-    GOOD(2, 0.1f, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
-    PERFECT(3, 0.05f, "PERFECT", Brush.verticalGradient(listOf(Colors.Yellow2, Colors.Green2)));
+    MISS(0, DynamicAction.BODY_RATIO * 6f, "MISS", Brush.verticalGradient(listOf(Colors.Ghost, Colors.Pink4))),
+    BAD(1, DynamicAction.BODY_RATIO * 2.25f, "BAD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Red6))),
+    GOOD(2, DynamicAction.BODY_RATIO * 1.5f, "GOOD", Brush.verticalGradient(listOf(Colors.Gray2, Colors.Orange2))),
+    PERFECT(3, DynamicAction.BODY_RATIO * 0.75f, "PERFECT", Brush.verticalGradient(listOf(Colors.Yellow2, Colors.Green2)));
 
     fun startRange(center: Float) = center - range / 2
     fun endRange(center: Float) = center + range / 2
     fun inRange(center: Float, value: Float) = value >= startRange(center) && value <= endRange(center)
+    fun viewStartRange(center: Float) = center - (range + DynamicAction.BODY_RATIO) / 2
+    fun viewEndRange(center: Float) = center + (range + DynamicAction.BODY_RATIO) / 2
 
     companion object {
         const val COMBO_REWARD_COUNT = 20

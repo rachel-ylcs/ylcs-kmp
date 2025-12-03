@@ -33,6 +33,8 @@ sealed interface DynamicAction {
     companion object {
         const val PERSPECTIVE_K = 3 // 透视参数
         const val HIT_RATIO = 0.8f // 判定线
+        const val BODY_RATIO = 0.05f // 自身比例
+        val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
     }
 
     val action: RhymeAction // 行为
@@ -91,8 +93,8 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
             State.Moving -> {
                 // 更新进度
                 progress = ((tick - appearance) / DURATION.toFloat()).asActual.coerceIn(0f, 1f)
-                // 超出时长仍未处理标记错过
-                if (tick >= appearance + DURATION) {
+                // 超出死线仍未处理的音符标记错过
+                if (progress > DynamicAction.deadline) {
                     state = State.Missing
                     animation.start()
                     callback.updateResult(ActionResult.MISS)
