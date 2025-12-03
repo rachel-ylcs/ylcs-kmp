@@ -15,7 +15,7 @@ data class Activity(
 	val title: String? = null, // [活动标题]
 	val content: String? = null, // [活动内容]
 	val price: List<ActivityPrice> = emptyList(), // [活动票价]
-	val saleTime: List<String> = emptyList(), // [开票时间]
+	val saleTime: List<String> = emptyList(), // [开售时间]
 	val lineup: List<String> = emptyList(), // [演出阵容]
 	val photo: ActivityPhoto = ActivityPhoto(), // [活动照片]
 	val link: ActivityLink = ActivityLink(), // [活动链接]

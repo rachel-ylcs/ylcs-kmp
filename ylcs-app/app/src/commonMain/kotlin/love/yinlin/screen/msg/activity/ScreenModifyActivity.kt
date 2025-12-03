@@ -383,10 +383,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 				icon = Icons.Outlined.Timer,
 				color = MaterialTheme.colorScheme.tertiary,
 				onClick = {
-					inputDialog.openSuspend(DateEx.TodayString)?.let { input ->
-						if (DateEx.Formatter.standardDate.parse(input) != null) saleTime += input
-						else slot.tip.warning("开售时间格式非法")
-					}
+					inputDialog.openSuspend(DateEx.TodayString)?.let { saleTime += it }
 				}
 			)
 			FlowRow(modifier = Modifier.fillMaxWidth()) {
