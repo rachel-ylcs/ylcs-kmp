@@ -43,9 +43,6 @@ class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
 
     private val build = dir("build")
     val composeCompilerReport = build.dir("composeCompiler")
-
-    val webOriginOutput = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-    val webOutput = root.outputs.dir("web")
 }
 
 class AndroidAppNode(root: RootProjectNode, c: Constants): Directory by root.dir("ylcs-app").dir("androidApp") {
@@ -77,6 +74,13 @@ class DesktopAppNode(root: RootProjectNode, c: Constants) : Directory by root.di
     })
 }
 
+class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("webApp") {
+    private val build = dir("build")
+
+    val originOutput = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+    val output = root.outputs.dir("web")
+}
+
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
     val workspace = dir("build").dir("serverRun")
     val outputs = root.outputs
@@ -101,6 +105,7 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)
+    val webApp = WebAppNode(this, c)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion = file("libs.version.toml")

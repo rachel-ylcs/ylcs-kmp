@@ -72,8 +72,6 @@ afterEvaluate {
             
             // 由构建脚本自动生成，请勿手动修改
             object Local {
-                const val DEVELOPMENT: Boolean = ${C.environment == BuildEnvironment.Dev}
-                
                 val info = AppInfo(
                     appName = "${C.app.name}",
                     name = "${C.app.displayName}",
@@ -86,10 +84,7 @@ afterEvaluate {
                 
                 const val MAIN_HOST: String = "${C.host.mainHost}"
                 const val API_HOST: String = "${C.host.apiHost}"
-                
-                val API_BASE_URL: String = run {
-                    if (platform == Platform.WebWasm && DEVELOPMENT) "${C.host.webServerUrl}" else "${C.host.apiUrl}"
-                }
+                const val API_BASE_URL: String = "${C.host.apiUrl}"
             }
         """.trimIndent()
         val constantsFile = C.root.cs.generatedLocalFile.let {

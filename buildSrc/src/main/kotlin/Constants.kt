@@ -227,7 +227,6 @@ class HostConfig(
         BuildEnvironment.Dev -> "http://localhost:$mainPort"
         BuildEnvironment.Prod -> "https://$apiHost"
     }
-    val webServerUrl: String = "http://localhost:$webServerPort"
 }
 
 val projectMap = mutableMapOf<Project, Constants>()

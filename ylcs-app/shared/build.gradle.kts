@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -93,23 +92,12 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser {
-            commonWebpackConfig {
-                outputFileName = "${C.app.projectName}.js"
-                cssSupport {
-                    enabled = true
-                }
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    port = C.host.webServerPort
-                    client?.overlay = false
-                    proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
-                        context = mutableListOf(),
-                        target = C.host.apiUrl,
-                        secure = false
-                    ))
-                }
+            testTask {
+                enabled = false
             }
         }
         binaries.executable()
+        binaries.library()
     }
 
     sourceSets {
@@ -200,8 +188,6 @@ composeCompiler {
     metricsDestination = C.root.app.composeCompilerReport
 }
 
-// ----------------------------------------- 任务列表 ----------------------------------------------
-
 afterEvaluate {
     // 生成苹果版本号配置
     val appleGenVersionConfig by tasks.registering {
@@ -218,41 +204,5 @@ afterEvaluate {
         doLast {
             configFile.writeText(content)
         }
-    }
-
-    val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")
-    val wasmJsBrowserDistribution = tasks.named("wasmJsBrowserDistribution")
-
-    val webCopyDir by tasks.registering {
-        mustRunAfter(wasmJsBrowserDistribution)
-        doLast {
-            copy {
-                from(C.root.app.webOriginOutput)
-                into(C.root.app.webOutput)
-            }
-            delete {
-                delete(*C.root.app.webOutput.asFile.listFiles {
-                    it.extension == "map" || it.extension == "txt"
-                }.map { C.root.app.webOutput.file(it.name) }.toTypedArray())
-            }
-            zip {
-                from(C.root.app.webOutput)
-                to(C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
-            }
-            delete {
-                delete(C.root.app.webOutput)
-            }
-        }
-    }
-
-    // 运行 Web 应用程序
-    val webRun by tasks.registering {
-        dependsOn(wasmJsBrowserDevelopmentRun)
-    }
-
-    // 发布 Web 应用程序
-    val webPublish by tasks.registering {
-        dependsOn(wasmJsBrowserDistribution)
-        dependsOn(webCopyDir)
     }
 }

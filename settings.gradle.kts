@@ -81,6 +81,7 @@ include(
 
     "ylcs-app:androidApp",
     "ylcs-app:desktopApp",
+    "ylcs-app:webApp",
 
     "ylcs-app:server",
     "ylcs-app:mod-manager",
