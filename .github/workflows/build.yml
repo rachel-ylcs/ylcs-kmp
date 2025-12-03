@@ -127,10 +127,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build iOS
-        run: |
-          cd ylcs-app/iosApp
-          pod install
-          ./gradlew ylcs-app:shared:linkPodDebugFrameworkIosArm64
+        run: ./gradlew ylcs-app:shared:linkPodDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop
