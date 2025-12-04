@@ -25,7 +25,7 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
 interface ActionCallback {
-    fun updateResult(result: ActionResult) // 更新连击
+    fun updateResult(result: ActionResult, scoreRatio: Float = 1f) // 处理音符结果
 }
 
 @Stable
@@ -272,9 +272,9 @@ class NoteQueue(
 
     // 音符行为回调
     private val callback = object : ActionCallback {
-        override fun updateResult(result: ActionResult) {
+        override fun updateResult(result: ActionResult, scoreRatio: Float) {
             // 更新连击和分数
-            val score = comboBoard.updateAction(result)
+            val score = comboBoard.updateAction(result, scoreRatio)
             scoreBoard.addScore(score)
             // 更新环境
             if (result == ActionResult.MISS) screenEnvironment.missEnvironment.animation.start()

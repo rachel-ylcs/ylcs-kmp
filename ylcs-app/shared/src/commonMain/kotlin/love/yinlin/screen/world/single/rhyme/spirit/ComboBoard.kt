@@ -96,13 +96,13 @@ class ComboBoard(
         }
     }
 
-    fun updateAction(newResult: ActionResult): Int {
+    fun updateAction(newResult: ActionResult, scoreRatio: Float = 1f): Int {
         // 重置进度
         result = newResult
         // 计算得分
         if (newResult == ActionResult.MISS || newResult == ActionResult.BAD) combo = 0 // 清空连击
         else ++combo // 增加连击
-        val reward = newResult.score + combo / ActionResult.COMBO_REWARD_COUNT // 连击得分奖励
+        val reward = (newResult.score * scoreRatio).toInt() + combo / ActionResult.COMBO_REWARD_COUNT // 连击得分奖励
         animation.start()
         return reward
     }
