@@ -10,7 +10,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ImageBitmap
+import love.yinlin.compose.Colors
+import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.traits.BoxBody
@@ -20,6 +23,7 @@ import love.yinlin.compose.game.traits.PointerMoveEvent
 import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
+import love.yinlin.compose.onLine
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
@@ -38,9 +42,9 @@ sealed interface DynamicAction {
         const val BODY_RATIO = 0.05f // 自身比例
         val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
 
-        fun mapTrackIndex(scale: Byte): Int = when (val v = (scale - 1) % 7) {
-            in 5 .. 7 -> v - 1
-            else -> 4 - v
+        fun mapTrackIndex(scale: Byte): Int = when (val v = (scale - 1) % 7 + 1) {
+            in 5 .. 7 -> 7 - v
+            else -> v + 2
         }
 
         fun mapNoteScale(scale: Byte): Int = (scale - 1) / 7
@@ -78,7 +82,8 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
 
     private var state: State by mutableStateOf(State.Ready) // 状态
     private var progress: Float by mutableFloatStateOf(0f) // 进度
-    private var animation = LineFrameAnimation(30) // 动画
+    private var clickingAnimation = LineFrameAnimation(30) // 点击动画
+    private var missingAnimation = LineFrameAnimation(15) // 消失动画
 
     override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
 
@@ -95,17 +100,17 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
                     state = State.Missing
-                    animation.start()
+                    missingAnimation.start()
                     callback.updateResult(ActionResult.MISS)
                 }
             }
             State.Clicking -> {
                 // 动画时间到，切换完成状态
-                if (!animation.update()) state = State.Done
+                if (!clickingAnimation.update()) state = State.Done
             }
             State.Missing -> {
-                // 动画时间到，切换完成状态
-                if (!animation.update()) state = State.Done
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                if (!missingAnimation.update()) state = State.Done
             }
         }
     }
@@ -122,7 +127,7 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
         }
         return result?.also {
             state = if (it == ActionResult.MISS) State.Missing else State.Clicking
-            animation.start()
+            missingAnimation.start()
             callback.updateResult(it)
         } != null
     }
@@ -135,7 +140,6 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
-        // 实际进度
         transform({
             // 先将轨道底部的画布以顶点为中心缩放到指定进度上
             scale(progress, track.vertices)
@@ -150,11 +154,11 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
                 }
                 State.Clicking -> {
                     // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - clickingAnimation.progress)
                 }
                 State.Missing -> {
                     // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - missingAnimation.progress)
                 }
             }
         }
@@ -177,10 +181,15 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
     private val blockSize = Size(256f, 85f)
     private val blockRect = Rect(Offset(0f, (noteScale + 3) * blockSize.height), blockSize) to Rect(Offset(blockSize.width, (noteScale + 3) * blockSize.height), blockSize)
+    // private val brush = Brush.
+
+    private val tailRatio = (end - start) / DynamicAction.BASE_DURATION.toFloat()
 
     private var state: State by mutableStateOf(State.Ready) // 状态
     private var progress: Float by mutableFloatStateOf(0f) // 进度
-    private var animation = LineFrameAnimation(30) // 动画
+    private var pressingAnimation = LineFrameAnimation(30) // 长按动画
+    private var releasingAnimation = LineFrameAnimation(30) // 释放动画
+    private var missingAnimation = LineFrameAnimation(15) // 消失动画
 
     override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
 
@@ -197,20 +206,20 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
                     state = State.Missing
-                    animation.start()
+                    missingAnimation.start()
                     callback.updateResult(ActionResult.MISS)
                 }
             }
             State.Pressing -> {
-
+                // 保持进度不变
             }
             State.Releasing -> {
                 // 动画时间到，切换完成状态
-                if (!animation.update()) state = State.Done
+                if (!releasingAnimation.update()) state = State.Done
             }
             State.Missing -> {
-                // 动画时间到，切换完成状态
-                if (!animation.update()) state = State.Done
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                if (!missingAnimation.update()) state = State.Done
             }
         }
     }
@@ -233,7 +242,35 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
-        // 实际进度
+
+        // 拖尾
+        when (currentState) {
+            State.Moving -> {
+                val tailEndRatio = (progress.asVirtual - tailRatio).coerceIn(0f, 1f).asActual
+                val startLeft = track.vertices.onLine(track.left, progress)
+                val startRight = track.vertices.onLine(track.right, progress)
+                val endLeft = track.vertices.onLine(track.left, tailEndRatio)
+                val endRight = track.vertices.onLine(track.right, tailEndRatio)
+                // 尾部起始连线的六等分点
+                val tailArea = arrayOf(
+                    startLeft.onLine(startRight, 0.166667f),
+                    endLeft.onLine(endRight, 0.166667f),
+                    endLeft.onLine(endRight, 0.833333f),
+                    startLeft.onLine(startRight, 0.833333f)
+                )
+                path(Colors.Yellow4, Path(tailArea), alpha = 0.5f)
+            }
+            State.Pressing -> {
+
+            }
+            State.Releasing -> {
+
+            }
+            State.Missing -> {
+
+            }
+        }
+
         transform({
             // 先将轨道底部的画布以顶点为中心缩放到指定进度上
             scale(progress, track.vertices)
@@ -250,12 +287,10 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 
                 }
                 State.Releasing -> {
-                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - releasingAnimation.progress)
                 }
                 State.Missing -> {
-                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - missingAnimation.progress)
                 }
             }
         }

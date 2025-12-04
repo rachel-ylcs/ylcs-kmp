@@ -62,7 +62,7 @@ class Scene(
     private val scoreBoard = ScoreBoard(rhymeManager)
     private val comboBoard = ComboBoard(rhymeManager)
     private val trackMap = TrackMap(rhymeManager)
-    private val screenEnvironment = ScreenEnvironment(rhymeManager)
+    private val screenEnvironment = ScreenEnvironment(rhymeManager, lyricsConfig)
 
     override val souls: List<Soul> = listOf(
         trackMap,
