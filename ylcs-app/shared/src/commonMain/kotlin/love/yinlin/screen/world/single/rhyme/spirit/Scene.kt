@@ -65,9 +65,9 @@ class Scene(
     private val screenEnvironment = ScreenEnvironment(rhymeManager)
 
     override val souls: List<Soul> = listOf(
-        comboBoard,
         trackMap,
         NoteQueue(rhymeManager, lyricsConfig, scoreBoard, comboBoard, trackMap, screenEnvironment),
+        comboBoard,
         screenEnvironment,
         LeftUI(rhymeManager, scoreBoard, recordImage),
         RightUI(rhymeManager, lyricsConfig),

@@ -26,6 +26,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.PointerDownEvent
+import love.yinlin.compose.game.traits.PointerMoveEvent
 import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
 
@@ -114,14 +115,18 @@ abstract class Manager {
                             val id = change.id.value
                             val position = change.position / canvasScale
                             when {
-                                change.changedToDown() -> {
+                                change.changedToDown() -> { // 按下
                                     pointers[id] = position
                                     eventChannel.trySend(PointerDownEvent(id = id, position = position))
                                 }
-                                change.changedToUp() -> {
+                                change.changedToUp() -> { // 抬起
                                     pointers.remove(id)?.let { rawPosition ->
-                                        // 抬起时的位置仍然按原来按下的位置计算
-                                        eventChannel.trySend(PointerUpEvent(id = id, position = rawPosition))
+                                        eventChannel.trySend(PointerUpEvent(id = id, position = position, rawPosition = rawPosition))
+                                    }
+                                }
+                                else -> { // 移动
+                                    pointers[id]?.let { rawPosition ->
+                                        eventChannel.trySend(PointerMoveEvent(id = id, position = position, rawPosition = rawPosition))
                                     }
                                 }
                             }

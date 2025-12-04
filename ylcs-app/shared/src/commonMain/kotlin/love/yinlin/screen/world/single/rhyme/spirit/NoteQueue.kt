@@ -15,7 +15,7 @@ import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.PointerDownEvent
-import love.yinlin.compose.game.traits.PointerEvent
+import love.yinlin.compose.game.traits.PointerMoveEvent
 import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
@@ -43,8 +43,8 @@ sealed interface DynamicAction {
     fun onAdmission() // 入场
     fun isDismiss(): Boolean // 消失
     fun onUpdate(tick: Long, callback: ActionCallback) // 更新
-    fun onPointerDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
-    fun onPointerUp(track: Track, tick: Long, callback: ActionCallback): Boolean // 抬起
+    fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
+    fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean // 抬起
     fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) // 渲染
 }
 
@@ -52,7 +52,7 @@ private val Float.asActual get() = 1 / (DynamicAction.PERSPECTIVE_K / this + 1 -
 private val Float.asVirtual get() = DynamicAction.PERSPECTIVE_K / (1 / this + DynamicAction.PERSPECTIVE_K - 1)
 
 @Stable
-class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) : DynamicAction {
+class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAction {
     @Stable
     enum class State {
         Ready, // 就绪
@@ -111,7 +111,7 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
         }
     }
 
-    override fun onPointerDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
+    override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
         // 校验轨道一致, 状态移动中
         if (track.index != trackIndex || state != State.Moving) return false
         val result = when {
@@ -128,7 +128,7 @@ class NoteAction(start: Long, end: Long, override val action: RhymeAction.Note) 
         } != null
     }
 
-    override fun onPointerUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
         val currentState = state
@@ -182,9 +182,9 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 
     }
 
-    override fun onPointerDown(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean = false
 
-    override fun onPointerUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
 
@@ -205,9 +205,9 @@ class OffsetSlurAction(start: Long, end: Long, override val action: RhymeAction.
 
     }
 
-    override fun onPointerDown(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean = false
 
-    override fun onPointerUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
 
@@ -242,7 +242,7 @@ class NoteQueue(
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                 val end = action.end + line.start
                 val dynamicAction = when (action) {
-                    is RhymeAction.Note -> NoteAction(start, end, action) // 单音
+                    is RhymeAction.Note -> NoteAction(start, action) // 单音
                     is RhymeAction.Slur -> {
                         val first = action.scale.firstOrNull()
                         if (action.scale.all { it == first }) FixedSlurAction(start, end, action) // 延音
@@ -300,29 +300,65 @@ class NoteQueue(
 
     override fun onClientEvent(tick: Long, event: Event): Boolean {
         val compensateTick = tick - audioDelay // 延时补偿
+        val activeTracks = trackMap.activeTracks
         return when (event) {
-            is PointerEvent -> {
-                // 获取实际轨道索引
-                trackMap.calcTrackIndex(event.position)?.also { track ->
+            is PointerDownEvent -> {
+                // 按下时根据当前位置判定轨道
+                val track = trackMap.calcTrackIndex(event.position)
+                if (track != null) {
                     val trackIndex = track.index
-                    val activeTracks = trackMap.activeTracks
-                    when (event) {
-                        is PointerDownEvent -> {
-                            // 防止多指按下统一轨道
-                            if (activeTracks[trackIndex] == null) {
-                                activeTracks[trackIndex] = event.id
-                                foreachAction { it.onPointerDown(track, compensateTick, callback) }
-                            }
-                        }
-                        is PointerUpEvent -> {
-                            if (activeTracks.indexOfFirst { it == event.id } == trackIndex) {
-                                // 抬起时回调先于置空
-                                foreachAction { it.onPointerUp(track, compensateTick, callback) }
-                                activeTracks[trackIndex] = null
-                            }
+                    // 防止多指按下统一轨道
+                    if (activeTracks[trackIndex] == null) {
+                        // 标记该轨道被按下
+                        activeTracks[trackIndex] = event.id
+                        // 寻找相匹配的音符并处理
+                        foreachAction { it.onTrackDown(track, compensateTick, callback) }
+                    }
+                }
+                // 音符轨道事件区域本身就覆盖全屏, 并且位于事件触发最底层, 后续不需要再处理
+                true
+            }
+            is PointerUpEvent -> {
+                // 查找指针原始轨道
+                val rawTrackIndex = activeTracks.indexOfFirst { it == event.id }
+                if (rawTrackIndex != -1) {
+                    // 抬起时根据当前位置判定轨道
+                    val track = trackMap.calcTrackIndex(event.position)
+                    if (track != null) {
+                        val trackIndex = track.index
+                        // 避免响应不是来自原轨道的指针
+                        if (rawTrackIndex == trackIndex) {
+                            // 抬起时回调先于置空
+                            foreachAction { it.onTrackUp(track, compensateTick, callback) }
+                            activeTracks[trackIndex] = null
                         }
                     }
-                } != null
+                    else if (activeTracks[rawTrackIndex] != null) {
+                        // 指针移出轨道则移除原始轨道
+                        activeTracks[rawTrackIndex] = null
+                        foreachAction { it.onTrackUp(tracks[rawTrackIndex], compensateTick, callback) }
+                    }
+                }
+                true
+            }
+            is PointerMoveEvent -> {
+                // 查找指针原始轨道
+                val rawTrackIndex = activeTracks.indexOfFirst { it == event.id }
+                if (rawTrackIndex != -1) {
+                    // 移动时根据当前位置判定轨道
+                    val track = trackMap.calcTrackIndex(event.position)
+                    if (track != null) {
+                        val trackIndex = track.index
+                        if (rawTrackIndex != trackIndex) { // 轨道发生变化
+                            // 标记当前轨道被按下, 移除原始轨道
+                            activeTracks[trackIndex] = event.id
+                            activeTracks[rawTrackIndex] = null
+                            // 寻找相匹配的音符并处理
+                            foreachAction { it.onTrackDown(track, compensateTick, callback) }
+                        }
+                    }
+                }
+                true
             }
         }
     }

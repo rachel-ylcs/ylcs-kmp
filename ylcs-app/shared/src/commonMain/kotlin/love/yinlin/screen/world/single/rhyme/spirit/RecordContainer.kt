@@ -34,11 +34,9 @@ class RecordContainer(
         angle = newAngle
     }
 
-    override fun onClientEvent(tick: Long, event: Event): Boolean = when (event) {
-        is PointerUpEvent -> (event.position in this).also {
-            if (it) rhymeManager.onPause()
-        }
-        else -> false
+    override fun onClientEvent(tick: Long, event: Event): Boolean {
+        if (event is PointerUpEvent && event.rawPosition in this) rhymeManager.onPause()
+        return true
     }
 
     override fun Drawer.onClientDraw() {

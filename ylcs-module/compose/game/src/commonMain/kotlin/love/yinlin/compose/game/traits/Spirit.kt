@@ -55,12 +55,22 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
         return matrix
     }
 
-    final override fun onEvent(tick: Long, event: Event): Boolean {
-        return when (event) {
-            is PointerEvent -> {
-                val position = clientMatrix.map(event.position)
-                if (position in this) onClientEvent(tick, event.reset(position)) else false
-            }
+    final override fun onEvent(tick: Long, event: Event): Boolean = when (event) {
+        is PointerEvent -> {
+            val position = clientMatrix.map(event.position)
+            if (position in this) {
+                when (event) {
+                    is PointerDownEvent -> onClientEvent(tick, event.reset(position))
+                    is PointerUpEvent -> {
+                        val rawPosition = clientMatrix.map(event.rawPosition)
+                        onClientEvent(tick, event.reset(position, rawPosition))
+                    }
+                    is PointerMoveEvent -> {
+                        val rawPosition = clientMatrix.map(event.rawPosition)
+                        onClientEvent(tick, event.reset(position, rawPosition))
+                    }
+                }
+            } else false
         }
     }
 
