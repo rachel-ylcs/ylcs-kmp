@@ -6,11 +6,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
-import love.yinlin.extension.LazyReference
+import love.yinlin.extension.BaseLazyReference
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
-    self: LazyReference<A>,
+    self: BaseLazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Application<A>(self, delegate) {
     @Composable

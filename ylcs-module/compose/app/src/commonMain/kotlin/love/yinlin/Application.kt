@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import love.yinlin.compose.*
-import love.yinlin.extension.LazyReference
+import love.yinlin.extension.BaseLazyReference
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class Application<out A : Application<A>>(
-    private val self: LazyReference<A>,
+    private val self: BaseLazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Service() {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM

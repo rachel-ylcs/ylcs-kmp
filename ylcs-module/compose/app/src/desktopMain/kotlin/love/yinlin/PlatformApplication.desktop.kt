@@ -24,14 +24,14 @@ import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Space
-import love.yinlin.extension.LazyReference
+import love.yinlin.extension.BaseLazyReference
 import love.yinlin.fixup.Fixup
 import org.jetbrains.compose.resources.*
 import kotlin.system.exitProcess
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
-    self: LazyReference<A>,
+    self: BaseLazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Application<A>(self, delegate) {
     @Composable

@@ -5,6 +5,7 @@ import kotlinx.io.files.Path
 import love.yinlin.api.ClientEngine
 import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
+import love.yinlin.compose.LazyStateReference
 import love.yinlin.compose.LocalAnimationSpeed
 import love.yinlin.compose.ThemeMode
 import love.yinlin.data.compose.ImageQuality
@@ -22,7 +23,6 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.LazyReference
 import love.yinlin.extension.mkdir
 import love.yinlin.platform.Platform
 import love.yinlin.platform.lyrics.LyricsEngineConfig
@@ -276,7 +276,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
 }
 
 @Stable
-private val mApp = LazyReference<RachelApplication>()
+val mApp = LazyStateReference<RachelApplication>()
 
 @Stable
 val app by mApp

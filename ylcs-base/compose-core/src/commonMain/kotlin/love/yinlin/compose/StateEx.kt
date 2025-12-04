@@ -2,6 +2,7 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -9,6 +10,10 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import love.yinlin.extension.BaseLazyReference
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 fun <T> mutableRefStateOf(value: T) = mutableStateOf(value, referentialEqualityPolicy())
 
@@ -101,3 +106,12 @@ fun <T> rememberDerivedState(key1: Any?, key2: Any?, key3: Any?, calculation: ()
 @Composable
 fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
     remember(*keys) { derivedStateOf(calculation) }
+
+class LazyStateReference<T : Any> : BaseLazyReference<T> {
+    private var mValue: T? by mutableStateOf(null)
+    override val isInit: Boolean by derivedStateOf { mValue != null }
+    override fun init(value: T) {
+        if (mValue != null) mValue = value
+    }
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = mValue!!
+}
