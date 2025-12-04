@@ -111,7 +111,7 @@ class LazyStateReference<T : Any> : BaseLazyReference<T> {
     private var mValue: T? by mutableStateOf(null)
     override val isInit: Boolean by derivedStateOf { mValue != null }
     override fun init(value: T) {
-        if (mValue != null) mValue = value
+        if (mValue == null) mValue = value
     }
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = mValue!!
 }

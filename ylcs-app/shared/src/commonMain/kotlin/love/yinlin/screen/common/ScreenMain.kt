@@ -28,6 +28,7 @@ import love.yinlin.screen.music.SubScreenMusic
 import love.yinlin.screen.world.SubScreenWorld
 import love.yinlin.compose.ui.layout.EqualItem
 import love.yinlin.compose.ui.layout.EqualRow
+import love.yinlin.mApp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -140,6 +141,10 @@ class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
         sub(::SubScreenMe),
     )
 
+    private fun onNavigate(index: Int) {
+        if (mApp.isInit) pageIndex = index
+    }
+
     @Composable
     private fun Portrait(device: Device, index: Int, content: @Composable (Device) -> Unit) {
         Column(
@@ -155,7 +160,7 @@ class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
                 PortraitNavigation(
                     modifier = Modifier.fillMaxWidth().zIndex(2f),
                     currentPage = index,
-                    onNavigate = { pageIndex = it }
+                    onNavigate = ::onNavigate
                 )
             }
         }
@@ -171,7 +176,7 @@ class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
                 LandscapeNavigation(
                     modifier = Modifier.fillMaxHeight().zIndex(2f),
                     currentPage = index,
-                    onNavigate = { pageIndex = it }
+                    onNavigate = ::onNavigate
                 )
             }
             CompositionLocalProvider(LocalImmersivePadding provides LocalImmersivePadding.current.withoutStart) {
