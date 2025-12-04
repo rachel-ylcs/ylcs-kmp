@@ -1,6 +1,7 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,17 +32,25 @@ interface ActionCallback {
 @Stable
 sealed interface DynamicAction {
     companion object {
+        const val BASE_DURATION = 3000L // 音符持续时间
         const val PERSPECTIVE_K = 3 // 透视参数
         const val HIT_RATIO = 0.8f // 判定线
         const val BODY_RATIO = 0.05f // 自身比例
         val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
+
+        fun mapTrackIndex(scale: Byte): Int = when (val v = (scale - 1) % 7) {
+            in 5 .. 7 -> v - 1
+            else -> 4 - v
+        }
+
+        fun mapNoteScale(scale: Byte): Int = (scale - 1) / 7
     }
 
     val action: RhymeAction // 行为
     val appearance: Long // 出现时刻
+    val isDismiss: Boolean // 消失
 
     fun onAdmission() // 入场
-    fun isDismiss(): Boolean // 消失
     fun onUpdate(tick: Long, callback: ActionCallback) // 更新
     fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
     fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean // 抬起
@@ -62,18 +71,8 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
         Done; // 已完成
     }
 
-    companion object {
-        // 单音符时长与实际字符发音时长无关, 全部为固定值
-        private const val DURATION = 3000L
-    }
-
-    override val appearance: Long = start - (DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
-
-    private val trackIndex = when (val v = (action.scale - 1) % 7) {
-        in 5 .. 7 -> v - 1
-        else -> 4 - v
-    }
-    private val noteScale = (action.scale - 1) / 7
+    private val trackIndex = DynamicAction.mapTrackIndex(action.scale)
+    private val noteScale = DynamicAction.mapNoteScale(action.scale)
     private val blockSize = Size(256f, 85f)
     private val blockRect = Rect(Offset(0f, noteScale * blockSize.height), blockSize) to Rect(Offset(blockSize.width, noteScale * blockSize.height), blockSize)
 
@@ -81,18 +80,18 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
     private var progress: Float by mutableFloatStateOf(0f) // 进度
     private var animation = LineFrameAnimation(30) // 动画
 
-    override fun onAdmission() {
-        state = State.Moving
-    }
+    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
 
-    override fun isDismiss(): Boolean = state == State.Done
+    override val isDismiss: Boolean by derivedStateOf { state == State.Done }
+
+    override fun onAdmission() { state = State.Moving }
 
     override fun onUpdate(tick: Long, callback: ActionCallback) {
         when (state) {
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             State.Moving -> {
                 // 更新进度
-                progress = ((tick - appearance) / DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
                     state = State.Missing
@@ -164,30 +163,98 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
 
 @Stable
 class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction {
-    companion object {
-        private const val DURATION_BASE_RATIO = 5L
-        private const val LENGTH_RATIO = 0.7f
-        private const val HEADER_RATIO = 0.1f
+    @Stable
+    enum class State {
+        Ready, // 就绪
+        Moving, // 移动
+        Pressing, // 长按中
+        Releasing, // 释放中
+        Missing, // 错过中
+        Done; // 已完成
     }
 
-    override val appearance: Long = 0L
+    private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
+    private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
+    private val blockSize = Size(256f, 85f)
+    private val blockRect = Rect(Offset(0f, (noteScale + 3) * blockSize.height), blockSize) to Rect(Offset(blockSize.width, (noteScale + 3) * blockSize.height), blockSize)
 
-    override fun onAdmission() {
+    private var state: State by mutableStateOf(State.Ready) // 状态
+    private var progress: Float by mutableFloatStateOf(0f) // 进度
+    private var animation = LineFrameAnimation(30) // 动画
 
-    }
+    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
 
-    override fun isDismiss(): Boolean = false
+    override val isDismiss: Boolean by derivedStateOf { state == State.Done }
+
+    override fun onAdmission() { state = State.Moving }
 
     override fun onUpdate(tick: Long, callback: ActionCallback) {
+        when (state) {
+            State.Ready, State.Done -> { } // 就绪或完成状态不更新
+            State.Moving -> {
+                // 更新进度
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                // 超出死线仍未处理的音符标记错过
+                if (progress > DynamicAction.deadline) {
+                    state = State.Missing
+                    animation.start()
+                    callback.updateResult(ActionResult.MISS)
+                }
+            }
+            State.Pressing -> {
 
+            }
+            State.Releasing -> {
+                // 动画时间到，切换完成状态
+                if (!animation.update()) state = State.Done
+            }
+            State.Missing -> {
+                // 动画时间到，切换完成状态
+                if (!animation.update()) state = State.Done
+            }
+        }
     }
 
-    override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
+        return false
+    }
 
-    override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean = false
+    override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean {
+        return false
+    }
 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
+        val currentState = state
+        if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
 
+        val track = tracks[trackIndex]
+        val (matrix, srcRect, _) = track.perspectiveMatrix
+        // 实际进度
+        transform({
+            // 先将轨道底部的画布以顶点为中心缩放到指定进度上
+            scale(progress, track.vertices)
+            // 然后透视
+            transform(matrix)
+            // 再根据轨道左右位置决定是否水平翻转
+            if (track.isRight) scale(-1f, 1f, srcRect.center)
+        }) {
+            when (currentState) {
+                State.Moving -> {
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
+                }
+                State.Pressing -> {
+
+                }
+                State.Releasing -> {
+                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                }
+                State.Missing -> {
+                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - animation.progress)
+                }
+            }
+        }
     }
 }
 
@@ -195,11 +262,10 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 class OffsetSlurAction(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction {
     override val appearance: Long = 0L
 
-    override fun onAdmission() {
+    override val isDismiss: Boolean = true
 
-    }
+    override fun onAdmission() { }
 
-    override fun isDismiss(): Boolean = false
 
     override fun onUpdate(tick: Long, callback: ActionCallback) {
 
@@ -244,8 +310,9 @@ class NoteQueue(
                 val dynamicAction = when (action) {
                     is RhymeAction.Note -> NoteAction(start, action) // 单音
                     is RhymeAction.Slur -> {
-                        val first = action.scale.firstOrNull()
-                        if (action.scale.all { it == first }) FixedSlurAction(start, end, action) // 延音
+                        // 不同音级但同音高的仍然算做延音
+                        val first = DynamicAction.mapTrackIndex(action.scale.first())
+                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(start, end, action) // 延音
                         else OffsetSlurAction(start, end, action) // 连音
                     }
                 }
@@ -263,9 +330,7 @@ class NoteQueue(
             for (index in 0 .. actionIndex) {
                 val action = queue[index]
                 // 只有未消失的字符才需要更新或渲染
-                if (!action.isDismiss()) {
-                    if (block(action)) break
-                }
+                if (!action.isDismiss && block(action)) break
             }
         }
     }
