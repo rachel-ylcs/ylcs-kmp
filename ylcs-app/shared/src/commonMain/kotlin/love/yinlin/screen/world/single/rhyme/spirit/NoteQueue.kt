@@ -216,7 +216,11 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
     }
 
     override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
-        return false
+        // 校验轨道一致, 状态移动中
+        if (track.index != trackIndex || state != State.Moving) return false
+        // 切换状态为按下
+        state = State.Pressing
+        return true
     }
 
     override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean {

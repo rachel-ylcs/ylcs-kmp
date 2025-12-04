@@ -21,10 +21,6 @@ data class PointerDownEvent(override val id: Long, override val position: Offset
 // 指针抬起
 @Stable
 data class PointerUpEvent(override val id: Long, override val position: Offset, val rawPosition: Offset) : PointerEvent {
-    companion object {
-        const val LONG_PRESS_TIMEOUT = 500L
-    }
-
     fun reset(p: Offset, raw: Offset) = PointerUpEvent(id, p, raw)
 }
 
