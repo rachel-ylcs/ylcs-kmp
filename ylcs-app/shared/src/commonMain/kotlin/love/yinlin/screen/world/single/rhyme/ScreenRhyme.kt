@@ -224,14 +224,13 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
     @Composable
     private fun GameMaskResume(resumeState: GameLockState.Resume) {
+        val brush = remember { Brush.linearGradient(listOf(Colors.Steel4, Colors.Blue4, Colors.Purple4)) }
         StrokeText(
             text = remember(resumeState) { resumeState.time.toString() },
             color = Colors.Steel4,
             strokeColor = Colors.White,
             fontStyle = FontStyle.Italic,
-            style = CustomTheme.typography.rhymeDisplay.copy(
-                brush = Brush.linearGradient(listOf(Colors.Steel4, Colors.Blue4, Colors.Purple4))
-            ),
+            style = CustomTheme.typography.rhymeDisplay.copy(brush = brush),
             maxLines = 1,
             overflow = TextOverflow.Clip
         )

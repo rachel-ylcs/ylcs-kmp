@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,12 @@ internal fun RhymeButton(
     onClick: () -> Unit
 ) {
     val acrylicColor = Colors(0x99f2f2f2)
+    val brush = remember(acrylicColor) {
+        Brush.verticalGradient(colors = listOf(acrylicColor.copy(alpha = 0.6f), acrylicColor.copy(alpha = 0.3f)))
+    }
+    val borderBrush = remember {
+        Brush.verticalGradient(colors = listOf(Colors.White.copy(alpha = 0.5f), Colors.Transparent))
+    }
 
     Box(modifier = modifier) {
         Box(
@@ -44,24 +51,14 @@ internal fun RhymeButton(
                     onDrawWithContent {
                         drawContent()
                         drawRect(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    acrylicColor.copy(alpha = 0.6f),
-                                    acrylicColor.copy(alpha = 0.3f)
-                                )
-                            ),
+                            brush = brush,
                             blendMode = BlendMode.Overlay
                         )
                     }
                 }
                 .border(
                     width = CustomTheme.border.small,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Colors.White.copy(alpha = 0.5f),
-                            Colors.Transparent
-                        )
-                    ),
+                    brush = borderBrush,
                     shape = CircleShape
                 )
                 .clickable(onClick = onClick)

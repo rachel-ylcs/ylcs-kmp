@@ -112,6 +112,7 @@ fun DockedColorPicker(
 
         BoxWithConstraints(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
             val radius = with(LocalDensity.current) { (maxWidth / 2f).toPx() }
+            val brush = remember { Brush.sweepGradient(listOf(Colors.Red, Colors.Yellow, Colors.Green, Colors.Cyan, Colors.Blue, Colors.Fuchsia, Colors.Red)) }
             var pickerLocation by rememberState(radius, initialColor) {
                 val hsv = initialColor.hsv
                 val angle = hsv.hue * 3.141592f / 180
@@ -138,7 +139,7 @@ fun DockedColorPicker(
                 }
             ) {
                 // Palette
-                drawCircle(Brush.sweepGradient(listOf(Colors.Red, Colors.Yellow, Colors.Green, Colors.Cyan, Colors.Blue, Colors.Fuchsia, Colors.Red)))
+                drawCircle(brush)
                 drawCircle(ShaderBrush(RadialGradientShader(
                     center = Offset(size.width / 2f, size.height / 2f),
                     colors = listOf(Color.White, Color.Transparent),
