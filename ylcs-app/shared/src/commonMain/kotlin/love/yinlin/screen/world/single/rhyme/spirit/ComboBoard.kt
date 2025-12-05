@@ -80,7 +80,7 @@ class ComboBoard(
                     text(
                         content = contentBorder,
                         color = Colors.Dark.copy(alpha = 0.5f),
-                        drawStyle = Stroke(width = 2f, join = StrokeJoin.Round)
+                        drawStyle = Stroke(width = 1f, join = StrokeJoin.Round)
                     )
                 }
                 // 连击数

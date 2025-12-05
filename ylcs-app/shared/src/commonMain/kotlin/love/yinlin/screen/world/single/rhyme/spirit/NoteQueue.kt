@@ -471,8 +471,8 @@ class NoteQueue(
         return when (event) {
             is PointerDownEvent -> {
                 // 按下时根据当前位置判定轨道
-                val track = trackMap.calcTrackIndex(event.position)
-                if (track != null) {
+                val (track, inTracks) = trackMap.calcTrackIndex(event.position)
+                if (track != null && inTracks) {
                     val trackIndex = track.index
                     // 防止多指按下统一轨道
                     if (activeTracks[trackIndex] == null) {
@@ -490,8 +490,8 @@ class NoteQueue(
                 val rawTrackIndex = activeTracks.indexOfFirst { it == event.id }
                 if (rawTrackIndex != -1) {
                     // 抬起时根据当前位置判定轨道
-                    val track = trackMap.calcTrackIndex(event.position)
-                    if (track != null) {
+                    val (track, inTracks) = trackMap.calcTrackIndex(event.position)
+                    if (track != null && inTracks) {
                         val trackIndex = track.index
                         // 避免响应不是来自原轨道的指针
                         if (rawTrackIndex == trackIndex) {
@@ -500,7 +500,7 @@ class NoteQueue(
                             activeTracks[trackIndex] = null
                         }
                     }
-                    else if (activeTracks[rawTrackIndex] != null) {
+                    else {
                         // 指针移出轨道则移除原始轨道
                         activeTracks[rawTrackIndex] = null
                         foreachAction { it.onTrackUp(tracks[rawTrackIndex], compensateTick, callback) }
@@ -513,7 +513,7 @@ class NoteQueue(
                 val rawTrackIndex = activeTracks.indexOfFirst { it == event.id }
                 if (rawTrackIndex != -1) {
                     // 移动时根据当前位置判定轨道
-                    val track = trackMap.calcTrackIndex(event.position)
+                    val (track, inTracks) = trackMap.calcTrackIndex(event.position)
                     if (track != null) {
                         val trackIndex = track.index
                         if (rawTrackIndex != trackIndex) { // 轨道发生变化
@@ -526,6 +526,11 @@ class NoteQueue(
                             // 寻找相匹配的音符并处理
                             foreachAction { it.onTrackDown(track, compensateTick, callback) }
                         }
+                    }
+                    else if (!inTracks) {
+                        // 指针移出轨道则移除原始轨道
+                        activeTracks[rawTrackIndex] = null
+                        foreachAction { it.onTrackUp(tracks[rawTrackIndex], compensateTick, callback) }
                     }
                 }
                 true

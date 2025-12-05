@@ -139,17 +139,18 @@ class TrackMap(
     // 点击区域边界
     val clickAreaBound = size.height * (1 - ActionResult.MISS.range + DynamicAction.BODY_RATIO / 2)
 
-    fun calcTrackIndex(point: Offset): Track? {
-        // 非屏幕可点击区域忽略
-        if (point.y <= clickAreaBound) return null
+    fun calcTrackIndex(point: Offset): Pair<Track?, Boolean> {
         // 不需要计算点是否位于每个轨道三角形内，只需要计算斜率即可
         val slope = vertices.slope(point)
+        val inTracks = slope <= tracks.first().slopeLeft || slope >= tracks.last().slopeRight
+        // 非屏幕可点击区域忽略
+        if (point.y <= clickAreaBound) return null to inTracks
         if (slope >= 0f) { // 右侧
             for (i in 3 .. 6) {
                 val (left, right)  = tracks[i].slopeRightRange
                 if (slope >= right) {
                     // 点击到轨道线上的不计入
-                    return if (slope >= left) tracks[i] else null
+                    return (if (slope >= left) tracks[i] else null) to inTracks
                 }
             }
         }
@@ -157,11 +158,11 @@ class TrackMap(
             for (i in 3 downTo 0) {
                 val (left, right)  = tracks[i].slopeLeftRange
                 if (slope <= left) {
-                    return if (slope <= right) tracks[i] else null
+                    return (if (slope <= right) tracks[i] else null) to inTracks
                 }
             }
         }
-        return null
+        return null to inTracks
     }
 
     override fun Drawer.onClientDraw() {

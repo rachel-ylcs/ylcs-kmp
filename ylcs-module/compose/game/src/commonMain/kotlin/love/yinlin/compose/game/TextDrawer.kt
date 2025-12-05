@@ -30,6 +30,7 @@ class TextDrawer(
         private val lruCache = lruCache<CacheKey, Paragraph>(maxSize)
 
         internal fun measureText(manager: TextDrawer, text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
+            // 查询缓存
             val cacheKey = CacheKey(text, height, fontWeight)
             val cacheResult = lruCache[cacheKey]
             if (cacheResult != null) return cacheResult
@@ -42,7 +43,6 @@ class TextDrawer(
     private val density = Density(1f)
 
     private fun makeParagraph(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
-        // 查询缓存
         val intrinsics = ParagraphIntrinsics(
             text = text,
             style = TextStyle(
