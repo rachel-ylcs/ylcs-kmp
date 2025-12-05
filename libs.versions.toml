@@ -101,7 +101,7 @@ tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.0" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.1" }
 skiko-android = { module = "org.jetbrains.skiko:skiko-android", version.ref = "skiko" }
 skiko-android-runtime = { module = "org.jetbrains.skiko:skiko-android-runtime-arm64", version.ref = "skiko" }
 
