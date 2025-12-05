@@ -381,7 +381,12 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun GameBackground() {
         if (state is GameState.Playing) {
-            Box(modifier = Modifier.fillMaxSize().background(Colors.Red2))
+            LocalFileImage(
+                path = { prologueBackground ?: Path("") },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().background(Colors.Black),
+                alpha = 0.5f
+            )
         }
     }
 

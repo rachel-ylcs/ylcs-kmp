@@ -47,7 +47,7 @@ class Track(
         // 线宽
         const val LINE_STROKE_WIDTH = 20f
         // 轨道背景色
-        val BackgroundColor = Colors.Black.copy(alpha = 0.4f)
+        val BackgroundColor = Colors.Black.copy(alpha = 0.75f)
         // 轨道激活色
         val ActiveColor = Colors.Cyan3.copy(alpha = 0.2f)
     }
