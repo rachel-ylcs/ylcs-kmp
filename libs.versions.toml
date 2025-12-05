@@ -19,8 +19,8 @@ lottie = "2.0.2"
 skiko = "0.9.38"
 
 # Android
-cmp-android = "1.9.5"
-media3 = "1.9.0-beta01"
+cmp-android = "1.10.0"
+media3 = "1.9.0-rc01"
 
 # iOS
 vlcKit = "3.6.1b1"
