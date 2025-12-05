@@ -33,7 +33,7 @@ class Track(
 ) {
     companion object {
         // 音阶表
-        val Scales = intArrayOf(4, 3, 2, 1, 5, 6, 7)
+        val Scales = intArrayOf(4, 5, 6, 1, 2, 3, 7)
         // 顶点偏移比率
         const val VERTICES_TOP_RATIO = 0.2f
         // 虚拟顶点

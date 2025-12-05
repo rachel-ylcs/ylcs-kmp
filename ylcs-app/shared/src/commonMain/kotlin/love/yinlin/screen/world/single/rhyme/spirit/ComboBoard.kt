@@ -8,7 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
@@ -54,7 +55,7 @@ class ComboBoard(
     private var animation = CurveFrameAnimation(manager.fps / 2)
 
     private val actionTextCache = TextDrawer.Cache()
-    private val comboTextCache = TextDrawer.Cache(16)
+    private val comboTextCache = TextDrawer.Cache(32)
 
     override fun onClientUpdate(tick: Long) {
         if (!animation.update()) result = null
@@ -66,6 +67,7 @@ class ComboBoard(
                 val canvasWidth = this@ComboBoard.size.width
                 val textHeight = this@ComboBoard.size.height
                 val content = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.ExtraBold)
+                val contentBorder = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.Bold)
                 // 判定结果
                 transform({
                     scale(progress, this@ComboBoard.center)
@@ -73,13 +75,19 @@ class ComboBoard(
                 }) {
                     text(
                         content = content,
-                        brush = currentResult.brush,
-                        shadow = Shadow(Colors.Dark, Offset(5f, 5f), 5f)
+                        brush = currentResult.brush
+                    )
+                    text(
+                        content = contentBorder,
+                        color = Colors.Dark.copy(alpha = 0.5f),
+                        drawStyle = Stroke(width = 2f, join = StrokeJoin.Round)
                     )
                 }
                 // 连击数
                 if (combo > 1) {
-                    val comboContent = measureText(comboTextCache, "+$combo", textHeight / 2, FontWeight.ExtraBold)
+                    val comboText = "+$combo"
+                    val comboContent = measureText(comboTextCache, comboText, textHeight / 2, FontWeight.ExtraBold)
+                    val comboContentBorder = measureText(comboTextCache, comboText, textHeight / 2, FontWeight.Bold)
                     val topLeft = Offset(canvasWidth - comboContent.width, textHeight / 2)
                     transform({
                         translate(topLeft)
@@ -87,8 +95,12 @@ class ComboBoard(
                     }) {
                         text(
                             content = comboContent,
-                            color = Colors.White.copy(alpha = (progress * 2).coerceIn(0f, 1f)),
-                            shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
+                            color = Colors.White.copy(alpha = (progress * 2).coerceIn(0f, 1f))
+                        )
+                        text(
+                            content = comboContentBorder,
+                            color = Colors.Dark.copy(alpha = 0.5f),
+                            drawStyle = Stroke(width = 1f, join = StrokeJoin.Round)
                         )
                     }
                 }

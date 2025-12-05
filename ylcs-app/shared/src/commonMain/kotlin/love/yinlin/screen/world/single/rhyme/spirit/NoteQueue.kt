@@ -42,10 +42,7 @@ sealed interface DynamicAction {
         const val BODY_RATIO = 0.05f // 自身比例
         val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
 
-        fun mapTrackIndex(scale: Byte): Int = when (val v = (scale - 1) % 7 + 1) {
-            in 5 .. 7 -> 7 - v
-            else -> v + 2
-        }
+        fun mapTrackIndex(scale: Byte): Int = Track.Scales.indexOf((scale - 1) % 7 + 1)
 
         fun mapNoteScale(scale: Byte): Int = (scale - 1) / 7
     }
@@ -65,7 +62,10 @@ private val Float.asActual get() = 1 / (DynamicAction.PERSPECTIVE_K / this + 1 -
 private val Float.asVirtual get() = DynamicAction.PERSPECTIVE_K / (1 / this + DynamicAction.PERSPECTIVE_K - 1)
 
 @Stable
-class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAction {
+class NoteAction(
+    start: Long,
+    override val action: RhymeAction.Note
+) : DynamicAction {
     @Stable
     enum class State {
         Ready, // 就绪
@@ -126,8 +126,14 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
             else -> null
         }
         return result?.also {
-            state = if (it == ActionResult.MISS) State.Missing else State.Clicking
-            missingAnimation.start()
+            if (it == ActionResult.MISS) { // 错过
+                state = State.Missing
+                missingAnimation.start()
+            }
+            else { // 完成点击
+                state = State.Clicking
+                clickingAnimation.start()
+            }
             callback.updateResult(it)
         } != null
     }
@@ -166,28 +172,48 @@ class NoteAction(start: Long, override val action: RhymeAction.Note) : DynamicAc
 }
 
 @Stable
-class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.Slur) : DynamicAction {
+class FixedSlurAction(
+    private val start: Long,
+    private val end: Long,
+    override val action: RhymeAction.Slur
+) : DynamicAction {
     @Stable
-    enum class State {
-        Ready, // 就绪
-        Moving, // 移动
-        Pressing, // 长按中
-        Releasing, // 释放中
-        Missing, // 错过中
-        Done; // 已完成
+    sealed interface State {
+        @Stable
+        data object Ready : State // 就绪
+        data object Moving : State // 移动
+        data class Pressing(
+            val pressTick: Long, // 按下时间
+            val result: ActionResult, // 按下结果
+        ) : State // 长按中
+        data class Releasing(
+            val pressTick: Long, // 抬起时间
+            val releaseTick: Long, // 释放时间
+            val result: ActionResult, // 按下结果
+        ) : State // 释放中
+        data object Missing : State // 错过中
+        data object Done : State // 已完成
+    }
+
+    companion object {
+        val brush = arrayOf(
+            listOf(Colors.Red5.copy(alpha = 0.8f), Colors.Red5.copy(alpha = 0.2f), Colors.Transparent),
+            listOf(Colors.Orange6.copy(alpha = 0.8f), Colors.Orange6.copy(alpha = 0.4f), Colors.Transparent),
+            listOf(Colors.Cyan6.copy(alpha = 0.8f), Colors.Cyan6.copy(alpha = 0.4f), Colors.Transparent)
+        )
     }
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
     private val blockSize = Size(256f, 85f)
     private val blockRect = Rect(Offset(0f, (noteScale + 3) * blockSize.height), blockSize) to Rect(Offset(blockSize.width, (noteScale + 3) * blockSize.height), blockSize)
-    // private val brush = Brush.
-
-    private val tailRatio = (end - start) / DynamicAction.BASE_DURATION.toFloat()
 
     private var state: State by mutableStateOf(State.Ready) // 状态
     private var progress: Float by mutableFloatStateOf(0f) // 进度
-    private var pressingAnimation = LineFrameAnimation(30) // 长按动画
+
+    private var tailRatio by mutableFloatStateOf((end - start) / DynamicAction.BASE_DURATION.toFloat())
+
+    private var pressingAnimation = LineFrameAnimation(30, true) // 长按动画
     private var releasingAnimation = LineFrameAnimation(30) // 释放动画
     private var missingAnimation = LineFrameAnimation(15) // 消失动画
 
@@ -197,8 +223,19 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 
     override fun onAdmission() { state = State.Moving }
 
+    private fun ActionCallback.calcResult(state: State.Releasing) {
+        // 计算长按持续时间
+        val actualPressTick = state.pressTick.coerceAtLeast(start)
+        val actualReleaseTick = state.releaseTick.coerceAtMost(end)
+        val pressDuration = (actualReleaseTick - actualPressTick).coerceAtLeast(0L)
+        // 系数计分规则
+        val ratio = pressDuration / (end - start).toFloat()
+        val coefficient = (1 + 0.87f * ratio * ratio * (ratio + 1)).coerceIn(1f, 2f)
+        updateResult(state.result, coefficient)
+    }
+
     override fun onUpdate(tick: Long, callback: ActionCallback) {
-        when (state) {
+        when (val currentState = state) {
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             State.Moving -> {
                 // 更新进度
@@ -210,10 +247,18 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
                     callback.updateResult(ActionResult.MISS)
                 }
             }
-            State.Pressing -> {
-                // 保持进度不变
+            is State.Pressing -> {
+                // 保持进度不变, 减小拖尾长度
+                tailRatio = (end - tick) / DynamicAction.BASE_DURATION.toFloat()
+                // 超过长按长度自动结算
+                if (tailRatio <= 0f) {
+                    val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
+                    state = releasingState
+                    releasingAnimation.start()
+                    callback.calcResult(releasingState)
+                }
             }
-            State.Releasing -> {
+            is State.Releasing -> {
                 // 动画时间到，切换完成状态
                 if (!releasingAnimation.update()) state = State.Done
             }
@@ -227,13 +272,37 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
     override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
         // 校验轨道一致, 状态移动中
         if (track.index != trackIndex || state != State.Moving) return false
-        // 切换状态为按下
-        state = State.Pressing
-        return true
+
+        val result = when {
+            ActionResult.PERFECT.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.PERFECT
+            ActionResult.GOOD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.GOOD
+            ActionResult.BAD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.BAD
+            ActionResult.MISS.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.MISS
+            else -> null
+        }
+
+        return result?.also {
+            if (it == ActionResult.MISS) { // 错过
+                state = State.Missing
+                missingAnimation.start()
+            }
+            else { // 长按
+                state = State.Pressing(pressTick = tick, result = it)
+                pressingAnimation.start()
+            }
+        } != null
     }
 
     override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback): Boolean {
-        return false
+        // 校验轨道一致, 状态长按中
+        val currentState = state
+        if (track.index != trackIndex || currentState !is State.Pressing) return false
+
+        val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
+        state = releasingState
+        releasingAnimation.start()
+        callback.calcResult(releasingState)
+        return true
     }
 
     override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
@@ -245,30 +314,24 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
 
         // 拖尾
         when (currentState) {
-            State.Moving -> {
+            State.Moving, is State.Pressing -> {
                 val tailEndRatio = (progress.asVirtual - tailRatio).coerceIn(0f, 1f).asActual
                 val startLeft = track.vertices.onLine(track.left, progress)
                 val startRight = track.vertices.onLine(track.right, progress)
                 val endLeft = track.vertices.onLine(track.left, tailEndRatio)
                 val endRight = track.vertices.onLine(track.right, tailEndRatio)
                 // 尾部起始连线的六等分点
-                val tailArea = arrayOf(
-                    startLeft.onLine(startRight, 0.166667f),
-                    endLeft.onLine(endRight, 0.166667f),
-                    endLeft.onLine(endRight, 0.833333f),
-                    startLeft.onLine(startRight, 0.833333f)
+                path(
+                    brush = Brush.verticalGradient(brush[noteScale], startY = startLeft.y, endY = endLeft.y),
+                    path = Path(arrayOf(
+                        startLeft.onLine(startRight, 0.166667f),
+                        endLeft.onLine(endRight, 0.166667f),
+                        endLeft.onLine(endRight, 0.833333f),
+                        startLeft.onLine(startRight, 0.833333f)
+                    ))
                 )
-                path(Colors.Yellow4, Path(tailArea), alpha = 0.5f)
             }
-            State.Pressing -> {
-
-            }
-            State.Releasing -> {
-
-            }
-            State.Missing -> {
-
-            }
+            else -> { }
         }
 
         transform({
@@ -283,10 +346,10 @@ class FixedSlurAction(start: Long, end: Long, override val action: RhymeAction.S
                 State.Moving -> {
                     image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
                 }
-                State.Pressing -> {
-
+                is State.Pressing -> {
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
                 }
-                State.Releasing -> {
+                is State.Releasing -> {
                     image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - releasingAnimation.progress)
                 }
                 State.Missing -> {
@@ -454,9 +517,12 @@ class NoteQueue(
                     if (track != null) {
                         val trackIndex = track.index
                         if (rawTrackIndex != trackIndex) { // 轨道发生变化
-                            // 标记当前轨道被按下, 移除原始轨道
-                            activeTracks[trackIndex] = event.id
+                            // 标记原始轨道被抬起
                             activeTracks[rawTrackIndex] = null
+                            // 寻找相匹配的音符并处理
+                            foreachAction { it.onTrackUp(tracks[rawTrackIndex], compensateTick, callback) }
+                            // 标记当前轨道被按下
+                            activeTracks[trackIndex] = event.id
                             // 寻找相匹配的音符并处理
                             foreachAction { it.onTrackDown(track, compensateTick, callback) }
                         }

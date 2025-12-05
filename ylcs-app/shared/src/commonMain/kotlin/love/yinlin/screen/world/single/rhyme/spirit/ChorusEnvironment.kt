@@ -44,6 +44,8 @@ class ChorusEnvironment(
         rightCenter.translate(y = TIP_HEIGHT / 2)
     ))
 
+    private val leftText = "C   H   O   "
+    private val rightText = "   R   U   S"
     private val textCache = TextDrawer.Cache()
 
     override fun onClientUpdate(tick: Long) {
@@ -60,16 +62,18 @@ class ChorusEnvironment(
     override fun Drawer.onClientDraw() {
         animation.withProgress { progress ->
             val offset = size.width / 2 * progress
+            val textHeight = TIP_HEIGHT * 0.8f
             translate(x = offset, y = 0f) {
                 path(Colors.Ghost, leftArea, alpha = 0.25f * progress)
-                val content = measureText(textCache, "C   H   O   ", TIP_HEIGHT * 0.8f, FontWeight.ExtraBold)
+                val content = measureText(textCache, leftText, textHeight, FontWeight.ExtraBold)
+                val contentBorder = measureText(textCache, leftText, textHeight, FontWeight.Bold)
                 translate(x = -TIP_HEIGHT - content.width, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
                     text(
                         content = content,
                         color = Colors.Ghost.copy(alpha = 0.75f * progress)
                     )
                     text(
-                        content = content,
+                        content = contentBorder,
                         color = Colors.Steel4.copy(alpha = 0.25f * progress),
                         drawStyle = Stroke(1f * progress)
                     )
@@ -77,14 +81,15 @@ class ChorusEnvironment(
             }
             translate(x = -offset, y = 0f) {
                 path(Colors.Ghost, rightArea, alpha = 0.25f * progress)
-                val content = measureText(textCache, "   R   U   S", TIP_HEIGHT * 0.8f, FontWeight.ExtraBold)
+                val content = measureText(textCache, rightText, textHeight, FontWeight.ExtraBold)
+                val contentBorder = measureText(textCache, rightText, textHeight, FontWeight.Bold)
                 translate(x = size.width + TIP_HEIGHT, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
                     text(
                         content = content,
                         color = Colors.Ghost.copy(alpha = 0.75f * progress)
                     )
                     text(
-                        content = content,
+                        content = contentBorder,
                         color = Colors.Steel4.copy(alpha = 0.25f * progress),
                         drawStyle = Stroke(1f * progress)
                     )

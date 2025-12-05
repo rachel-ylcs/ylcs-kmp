@@ -53,4 +53,9 @@ abstract class FrameAnimation(
         if (totalFrame != null) total = totalFrame
         frame = 0
     }
+
+    fun reset(totalFrame: Int? = null) {
+        if (totalFrame != null) total = totalFrame
+        frame = END
+    }
 }
