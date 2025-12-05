@@ -34,6 +34,13 @@ fun urlDigest32(s: String): String {
     }
 }
 
+suspend fun NetClient.downloadCacheWithPath(url: String): Path? {
+    val path = Path(app.os.storage.cachePath, urlDigest32(url))
+    return if (path.isFile && path.size > 0L) path
+    else if (simpleDownload(url, path.bufferedSink) && path.size > 0L) path
+    else null
+}
+
 suspend fun NetClient.downloadCache(url: String): ByteArray? {
     val path = Path(app.os.storage.cachePath, urlDigest32(url))
     var result: ByteArray? = null

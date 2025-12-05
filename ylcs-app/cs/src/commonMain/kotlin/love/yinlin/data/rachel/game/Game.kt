@@ -56,7 +56,6 @@ enum class Game(
     val xPath by lazy { ServerRes.Game.x(this.ordinal + 1) }
     val yPath by lazy { ServerRes.Game.y(this.ordinal + 1) }
     fun xyPath(isX: Boolean) = ServerRes.Game.xy(this.ordinal + 1, isX)
-    fun resPath(key: String) = ServerRes.Game.res(this.ordinal + 1, key)
 
     object Serializer : KSerializer<Game> {
         override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Game", PrimitiveKind.INT)

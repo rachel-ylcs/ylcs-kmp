@@ -33,7 +33,6 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.NetClient
-import love.yinlin.shared.resources.Res
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
@@ -225,7 +224,7 @@ class ScreenPlatformMusic(manager: ScreenManager, deeplink: Uri?, type: Platform
                     // 6. 写入封面
                     recordFile.writeTo(info.path(Paths.modPath, ModResourceType.Record))
                     // 7. 写入壁纸
-                    info.path(Paths.modPath, ModResourceType.Background).writeByteArray(Res.readBytes("files/black_background.webp"))
+                    info.path(Paths.modPath, ModResourceType.Background).writeByteArray(DataBin.BlackBackgroundPicture)
                     // 8. 写入歌词
                     info.path(Paths.modPath, ModResourceType.LineLyrics).writeText(item.lyrics)
                     // 9. 更新曲库

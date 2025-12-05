@@ -48,7 +48,6 @@ include(
     "ylcs-module:compose:platform-view",
     "ylcs-module:compose:ui",
     "ylcs-module:compose:screen",
-    "ylcs-module:compose:shader",
     "ylcs-module:compose:game",
     "ylcs-module:compose:animated-webp-decoder",
 

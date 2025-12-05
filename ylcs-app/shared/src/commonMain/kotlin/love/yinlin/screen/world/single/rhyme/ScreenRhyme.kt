@@ -22,17 +22,20 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.zIndex
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.io.files.Path
+import love.yinlin.api.ServerRes
 import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.Paths
-import love.yinlin.common.Shaders
+import love.yinlin.common.downloadCache
+import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.compose.*
-import love.yinlin.compose.graphics.ShaderBox
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -43,6 +46,7 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Switch
@@ -57,6 +61,7 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.exists
 import love.yinlin.extension.readByteArray
 import love.yinlin.extension.readText
+import love.yinlin.platform.NetClient
 import love.yinlin.platform.ioContext
 
 @Stable
@@ -76,6 +81,8 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private var resumePauseJob: Job? = null
 
     private val orientationStarter = LaunchFlag()
+
+    private var prologueBackground: Path? = null
 
     private fun onScreenOrientationChanged(type: Device.Type) {
         if (type == Device.Type.LANDSCAPE) {
@@ -249,8 +256,8 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun GameOverlayStart() {
         Box(modifier = Modifier.fillMaxSize()) {
-            WebImage(
-                uri = remember { Game.Rhyme.resPath("start").url },
+            LocalFileImage(
+                path = { prologueBackground ?: Path("") },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
@@ -374,13 +381,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun GameBackground() {
         if (state is GameState.Playing) {
-            ShaderBox(Shaders.GradientFlow, modifier = Modifier.fillMaxSize()) {
-                WebImage(
-                    uri = remember { Game.Rhyme.resPath("background").url },
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            Box(modifier = Modifier.fillMaxSize().background(Colors.Red2))
         }
     }
 
@@ -436,23 +437,34 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     override suspend fun initialize() {
         rhymeManager.init()
         if (rhymeManager.isInit) coroutineScope {
-            var isInit = false
-            awaitAll(
+            val count = atomic(0)
+            val tasks = arrayOf(
                 async(ioContext) {
-                    // 从服务器下载资源文件
-                    isInit = rhymeManager.run { downloadAssets() }
+                    catching { // 下载开屏背景图
+                        prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.res("prologue").url)
+                        count.incrementAndGet()
+                    }
                 },
                 async(ioContext) {
-                    // 检查包含游戏配置文件的 MOD
-                    library = app.mp.library.values.map { info ->
-                        RhymeMusic(
-                            musicInfo = info,
-                            enabled = info.path(Paths.modPath, ModResourceType.Rhyme).exists
-                        )
+                    catching { // 从服务器下载资源文件
+                        rhymeManager.run { downloadAssets() }
+                        count.incrementAndGet()
+                    }
+                },
+                async(ioContext) {
+                    catching { // 检查包含游戏配置文件的 MOD
+                        library = app.mp.library.values.map { info ->
+                            RhymeMusic(
+                                musicInfo = info,
+                                enabled = info.path(Paths.modPath, ModResourceType.Rhyme).exists
+                            )
+                        }
+                        count.incrementAndGet()
                     }
                 }
             )
-            if (isInit) state = GameState.Start
+            awaitAll(*tasks)
+            if (count.value == tasks.size) state = GameState.Start
             else slot.tip.warning("下载资源失败")
         }
     }
