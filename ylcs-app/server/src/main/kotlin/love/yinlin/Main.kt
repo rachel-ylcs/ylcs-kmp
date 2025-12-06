@@ -49,7 +49,8 @@ fun main() = object : ServerEngine() {
         ::mailAPI,
         ::profileAPI,
         ::topicAPI,
-        ::songAPI
+        ::songAPI,
+        ::prizeAPI
     )
 
     override val proxy = Proxy(name = APIConfig.PROXY_NAME, whitelist = listOf(

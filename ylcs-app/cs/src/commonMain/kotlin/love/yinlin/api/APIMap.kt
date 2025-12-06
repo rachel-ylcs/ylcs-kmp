@@ -27,6 +27,13 @@ import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
+import love.yinlin.data.rachel.prize.PrizeItem
+import love.yinlin.data.rachel.prize.Prize
+import love.yinlin.data.rachel.prize.PrizeCreate
+import love.yinlin.data.rachel.prize.PrizeDraw
+import love.yinlin.data.rachel.prize.PrizeItemPic
+import love.yinlin.data.rachel.prize.PrizeStatus
+import love.yinlin.data.rachel.prize.VerifyDrawResult
 
 // Common
 
@@ -395,3 +402,61 @@ val ApiSongSendSongComment by API.post.i<String, String, String>().o<Long>()
 @APIParam("token")
 @APIParam("cid")
 val ApiSongDeleteSongComment by API.post.i<String, Long>().o()
+
+
+@APIParam("pid")
+@APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
+@APIParam("PrizeStatus")
+@APIParam("token")
+val ApiPrizeGetPrize by API.post.i<Int,Int, PrizeStatus,String>() .o<List<Prize>>()
+//支持懒加载，传入token是为了保证只有管理员可以看到处于草稿状态的prize
+
+@APIParam("token")
+@APIParam("PrizeCreate")
+@APIReturn("pic")
+val ApiPrizeCreatePrize by API.form.i<String,PrizeCreate>().o<Int,List<PrizeItemPic>>()
+//创建抽奖的草稿
+//如果成功创建，返回pid
+
+@APIParam("pid")
+@APIParam("token")
+val ApiPrizePublish by API.post.i<Int,String>().o<String>()
+//正式发布抽奖
+
+@APIParam("token")
+@APIParam("pid")
+val ApiPrizeCancelPrize by API.post.i<String,Int>().o<String>()
+
+
+@APIParam("token")
+@APIParam("pid")
+val ApiPrizeParticipate by API.post.i<String,Int>().o()
+//用户参加Prize
+
+
+@APIParam("pid")
+@APIReturn("List<PrizeDraw>")
+val ApiPrizeGetWinners by API.post.i<Int>().o<List<PrizeDraw>>()
+//展示一个抽奖里所有抽中的人员的信息
+
+
+@APIParam("pid")
+@APIParam("drawid")
+@APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
+val ApiPrizeGetAllParticipators by API.post.i<Int,Int,Int>().o<List<PrizeDraw>>()
+//支持懒加载，按参加时间的从晚到早排序，越新的时间越靠前，时间相同按照uid降序
+
+@APIParam("token")
+@APIParam("pid")
+val ApiPrizeDrawPrize by API.post.i<String,Int>().o<String>()
+//管理员手动开奖，生成中奖名单
+//使用承诺-揭示机制确保公平性
+
+
+@APIParam("pid")
+@APIReturn("verifyResult")
+val ApiPrizeVerifyDraw by API.post.i<Int>().o<VerifyDrawResult>()
+//验证某个已开奖的抽奖结果的公平性，任何人都可以调用此API来验证结果
+
+
+
