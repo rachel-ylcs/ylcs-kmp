@@ -1,10 +1,15 @@
 package love.yinlin.startup
 
 import androidx.compose.runtime.Stable
+import com.github.panpf.sketch.ComponentRegistry
 import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
+import com.github.panpf.sketch.decode.AnimatedWebpDecoder
+import com.github.panpf.sketch.decode.GifDecoder
+import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
+import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import com.github.panpf.sketch.util.Logger
@@ -25,14 +30,25 @@ import okio.Path.Companion.toPath
 class StartupUrlImage : SyncStartup() {
     private lateinit var sketch: Sketch
 
+    private fun ComponentRegistry.Builder.registerComponent() {
+        addFetcher(ComposeResourceUriFetcher.Factory())
+        addFetcher(KtorHttpUriFetcher.Factory())
+
+        addDecoder(GifDecoder.Factory())
+        addDecoder(AnimatedWebpDecoder.Factory())
+
+        addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
+    }
+
     override fun init(context: Context, args: StartupArgs) {
         val cachePath: Path? = args.fetch(0)
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
         sketch = buildSketch(context).apply {
             logger(level = Logger.Level.Error)
+            componentLoaderEnabled(false)
             components {
-                addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
+                registerComponent()
             }
             Platform.useNot(Platform.WebWasm) {
                 require(cachePath != null)

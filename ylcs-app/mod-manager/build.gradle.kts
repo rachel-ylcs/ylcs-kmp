@@ -31,6 +31,8 @@ compose.desktop {
     application {
         mainClass = C.modManager.mainClass
 
+        jvmArgs += "--enable-native-access=ALL-UNNAMED"
+
         buildTypes.release.proguard {
             version = C.proguard.version
             isEnabled = true

@@ -36,15 +36,16 @@ compose.desktop {
             jvmArgs += arrayOf(
                 "-Duser.dir=$desktopWorkSpace",
                 "-Djava.library.path=${C.root.native.libs}",
-                "--enable-native-access=ALL-UNNAMED"
             )
         }
+        jvmArgs += "--enable-native-access=ALL-UNNAMED"
 
         buildTypes.release.proguard {
             version = C.proguard.version
             isEnabled = true
             optimize = true
             obfuscate = true
+            joinOutputJars = true
             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
         }
 

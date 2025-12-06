@@ -96,3 +96,15 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "${C.app.packageName}.compose.component.url_image.resources"
 }
+
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            version = C.proguard.version
+            isEnabled = true
+            optimize = true
+            obfuscate = true
+            configurationFiles.from(file("proguard/R8Desktop.pro"))
+        }
+    }
+}
