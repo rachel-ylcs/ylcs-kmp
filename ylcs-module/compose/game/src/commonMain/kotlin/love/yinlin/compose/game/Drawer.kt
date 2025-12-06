@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
@@ -53,6 +54,14 @@ class Drawer(
 
     fun circle(brush: Brush, position: Offset, radius: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
         scope.drawCircle(brush = brush, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
+    }
+
+    fun oval(color: Color, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
+    }
+
+    fun oval(brush: Brush, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
@@ -137,7 +146,15 @@ class Drawer(
 
     // 绘制文字
 
-    fun measureText(textCache: TextDrawer.Cache, text: String, textHeight: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph = textCache.measureText(textDrawer, text, textHeight, fontWeight)
+    fun measureText(
+        textCache: TextDrawer.Cache,
+        text: String,
+        textHeight: Float,
+        fontWeight: FontWeight = FontWeight.Light,
+        fontStyle: FontStyle = FontStyle.Normal,
+        letterSpacing: Float = 0.0625f,
+        fontIndex: Int = 0
+    ): Paragraph = textCache.measureText(textDrawer, text, textHeight, fontWeight, fontStyle, letterSpacing, fontIndex)
 
     fun text(content: Paragraph, color: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
         content.paint(
@@ -161,44 +178,16 @@ class Drawer(
         )
     }
 
-    fun strokeText(content: Paragraph, color: Color, strokeColor: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
-        val canvas = scope.drawContext.canvas
-        content.paint(
-            canvas = canvas,
-            color = color,
-            shadow = shadow,
-            textDecoration = decoration,
-            drawStyle = null,
-            blendMode = blendMode
-        )
-        content.paint(
-            canvas = canvas,
-            color = strokeColor,
-            shadow = null,
-            textDecoration = null,
-            drawStyle = Stroke(width = 1f), // StrokeText 在 skia 内部构造 Paragraph 时实现有逆天 BUG
-            blendMode = DrawScope.DefaultBlendMode
-        )
+    fun text(content: Paragraph, color: Color, position: Offset, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        translate(position) {
+            text(content, color, shadow, decoration, drawStyle, blendMode)
+        }
     }
 
-    fun strokeText(content: Paragraph, brush: Brush, strokeColor: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
-        val canvas = scope.drawContext.canvas
-        content.paint(
-            canvas = canvas,
-            brush = brush,
-            shadow = shadow,
-            textDecoration = decoration,
-            drawStyle = null,
-            blendMode = blendMode
-        )
-        content.paint(
-            canvas = canvas,
-            color = strokeColor,
-            shadow = null,
-            textDecoration = null,
-            drawStyle = Stroke(width = 1f),
-            blendMode = DrawScope.DefaultBlendMode
-        )
+    fun text(content: Paragraph, brush: Brush, position: Offset, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        translate(position) {
+            text(content, brush, shadow, decoration, drawStyle, blendMode)
+        }
     }
 
     // 转换

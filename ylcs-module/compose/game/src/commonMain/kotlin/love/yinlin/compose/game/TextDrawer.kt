@@ -6,6 +6,7 @@ import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -15,7 +16,7 @@ import androidx.compose.ui.unit.TextUnitType
 
 @Stable
 class TextDrawer(
-    private val font: FontFamily,
+    userFonts: Array<FontFamily>,
     private val fontFamilyResolver: FontFamily.Resolver
 ) {
     @Stable
@@ -25,13 +26,24 @@ class TextDrawer(
             val text: String,
             val height: Float,
             val fontWeight: FontWeight,
+            val fontStyle: FontStyle,
+            val letterSpacingRatio: Float,
+            val fontIndex: Int
         )
 
         private val lruCache = lruCache<CacheKey, Paragraph>(maxSize)
 
-        internal fun measureText(manager: TextDrawer, text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
+        internal fun measureText(
+            manager: TextDrawer,
+            text: String,
+            height: Float,
+            fontWeight: FontWeight,
+            fontStyle: FontStyle,
+            letterSpacing: Float,
+            fontIndex: Int,
+        ): Paragraph {
             // 查询缓存
-            val cacheKey = CacheKey(text, height, fontWeight)
+            val cacheKey = CacheKey(text, height, fontWeight, fontStyle, letterSpacing, fontIndex)
             val cacheResult = lruCache[cacheKey]
             if (cacheResult != null) return cacheResult
             val newResult = manager.makeParagraph(cacheKey)
@@ -42,6 +54,11 @@ class TextDrawer(
 
     private val density = Density(1f)
 
+    private val fonts: List<FontFamily> = buildList {
+        if (userFonts.isEmpty()) add(FontFamily.Default)
+        else addAll(userFonts)
+    }
+
     private fun makeParagraph(cacheKey: Cache.CacheKey): Paragraph {
         val fontSize = TextUnit(cacheKey.height / 1.17f, TextUnitType.Sp)
         val intrinsics = ParagraphIntrinsics(
@@ -49,9 +66,10 @@ class TextDrawer(
             style = TextStyle(
                 fontSize = fontSize,
                 fontWeight = cacheKey.fontWeight,
-                fontFamily = font,
+                fontFamily = fonts.getOrNull(cacheKey.fontIndex) ?: FontFamily.Default,
+                fontStyle = cacheKey.fontStyle,
                 lineHeight = fontSize * 1.5f,
-                letterSpacing = fontSize / 16f
+                letterSpacing = fontSize * cacheKey.letterSpacingRatio,
             ),
             annotations = emptyList(),
             density = density,

@@ -102,12 +102,12 @@ abstract class Manager {
     @Composable
     fun SceneContent(
         modifier: Modifier = Modifier,
-        font: FontFamily,
+        fonts: Array<FontFamily>,
     ) {
         BoxWithConstraints(modifier = modifier) {
             val canvasScale = with(LocalDensity.current) { maxWidth.toPx() } / size.width
             val fontFamilyResolver = LocalFontFamilyResolver.current
-            val textDrawer = remember(font, fontFamilyResolver) { TextDrawer(font, fontFamilyResolver) }
+            val textDrawer = remember(fonts, fontFamilyResolver) { TextDrawer(fonts, fontFamilyResolver) }
 
             Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(canvasScale) {
                 awaitPointerEventScope {

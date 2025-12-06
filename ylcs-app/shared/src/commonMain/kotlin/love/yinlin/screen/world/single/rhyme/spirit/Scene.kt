@@ -45,9 +45,12 @@ private class LeftUI(
 
         // 画标题
         val content = measureText(textCache, name, 38f, FontWeight.Bold)
-        translate(250f, 10f) {
-            text(content, Colors.Ghost.copy(alpha = 0.8f), shadow = Shadow(Colors.Dark, Offset(1f, 1f), 1f))
-        }
+        text(
+            content = content,
+            color = Colors.Ghost.copy(alpha = 0.8f),
+            position = Offset(250f, 10f),
+            shadow = Shadow(Colors.Dark, Offset(1f, 1f), 1f)
+        )
 
         // 画难度星级
         repeat(difficulty.ordinal + 1) { index ->

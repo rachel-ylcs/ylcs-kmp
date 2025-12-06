@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.*
@@ -28,7 +29,7 @@ class SingleSelectorScope<T>(
     private val hasIcon: Boolean
 ) {
     @Composable
-    fun Item(item: T, title: String, enabled: Boolean = true) {
+    fun Item(item: T, title: String, enabled: Boolean = true, color: Color = Colors.Unspecified) {
         val selected = current == item
         Row(
             modifier = Modifier
@@ -52,7 +53,7 @@ class SingleSelectorScope<T>(
                 text = title,
                 color = if (!enabled) MaterialTheme.colorScheme.surfaceVariant
                     else if (item == current) MaterialTheme.colorScheme.onSecondaryContainer
-                    else Colors.Unspecified,
+                    else color,
                 style = textStyle,
                 maxLines = 1,
                 overflow = TextOverflow.Clip

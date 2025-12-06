@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -61,6 +62,9 @@ import love.yinlin.platform.NetClient
 import love.yinlin.platform.ioContext
 import love.yinlin.screen.world.game.GameSlider
 import love.yinlin.screen.world.game.cast
+import love.yinlin.shared.resources.Res
+import love.yinlin.shared.resources.rhyme
+import org.jetbrains.compose.resources.Font
 
 @Stable
 class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
@@ -394,7 +398,8 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                         for (item in RhymeDifficulty.entries) {
                             Item(
                                 item = item,
-                                title = item.title
+                                title = item.title,
+                                color = Colors.White
                             )
                         }
                     }
@@ -434,7 +439,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 path = { prologueBackground ?: Path("") },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().background(Colors.Black),
-                alpha = 0.75f
+                alpha = 0.9f
             )
         }
     }
@@ -442,9 +447,13 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun GameCanvas() {
         if (state is GameState.Playing) {
+            val rhymeFont = Font(Res.font.rhyme)
             rhymeManager.SceneContent(
                 modifier = Modifier.fillMaxSize(),
-                font = mainFont()
+                fonts = arrayOf(
+                    mainFont(),
+                    remember(rhymeFont) { FontFamily(rhymeFont) }
+                )
             )
         }
     }

@@ -170,11 +170,11 @@ class TrackMap(
 
     override fun Drawer.onClientDraw() {
         // 画轨道背景
-        path(Track.BackgroundColor, tracksAreaPath)
+        path(Track.BackgroundColor, tracksAreaPath, alpha = 0.95f)
 
         // 画判定区域
         for ((area, alpha) in hitAreaData) path(Colors.Purple4, area, alpha = alpha)
-        line(Colors.Purple4, hitLine.first, hitLine.second, style = Stroke(5f), alpha = 0.8f)
+        line(Colors.Purple4, hitLine.first, hitLine.second, style = Stroke(10f))
 
         // 其他轨道线
         for (index in 0 ..< Track.Num) {

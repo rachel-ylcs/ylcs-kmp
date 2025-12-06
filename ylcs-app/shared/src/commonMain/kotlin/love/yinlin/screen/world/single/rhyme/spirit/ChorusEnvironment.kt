@@ -1,7 +1,9 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
@@ -20,7 +22,7 @@ class ChorusEnvironment(
     lyricsConfig: RhymeLyricsConfig,
 ) : Spirit(rhymeManager), BoxBody {
     companion object {
-        const val TIP_HEIGHT = 100f
+        const val TIP_HEIGHT = 150f
         const val ANIMATION_DURATION = 4000L
     }
 
@@ -43,8 +45,8 @@ class ChorusEnvironment(
         rightCenter.translate(y = TIP_HEIGHT / 2)
     ))
 
-    private val leftText = "C   H   O   "
-    private val rightText = "   R   U   S"
+    private val leftText = "C  H  O "
+    private val rightText = " R  U  S"
     private val textCache = TextDrawer.Cache()
 
     override fun onClientUpdate(tick: Long) {
@@ -61,30 +63,24 @@ class ChorusEnvironment(
     override fun Drawer.onClientDraw() {
         animation.withProgress { progress ->
             val offset = size.width / 2 * progress
-            val textHeight = TIP_HEIGHT * 0.8f
+            val textHeight = TIP_HEIGHT * 0.9f
             translate(x = offset, y = 0f) {
-                path(Colors.Ghost, leftArea, alpha = 0.25f * progress)
-                val content = measureText(textCache, leftText, textHeight, FontWeight.ExtraBold)
-                val contentBorder = measureText(textCache, leftText, textHeight, FontWeight.Bold)
-                translate(x = -TIP_HEIGHT - content.width, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
-                    strokeText(
-                        content = content,
-                        color = Colors.Ghost.copy(alpha = 0.75f * progress),
-                        strokeColor = Colors.Steel4.copy(alpha = 0.25f * progress)
-                    )
-                }
+                path(Colors.Ghost, leftArea, alpha = 0.33333f * progress)
+                val content = measureText(textCache, leftText, textHeight, FontWeight.SemiBold, FontStyle.Italic, fontIndex = 1)
+                text(
+                    content = content,
+                    color = Colors.Red4.copy(alpha = 0.75f * progress),
+                    position = Offset(-TIP_HEIGHT - content.width, (size.height - textHeight) / 2)
+                )
             }
             translate(x = -offset, y = 0f) {
-                path(Colors.Ghost, rightArea, alpha = 0.25f * progress)
-                val content = measureText(textCache, rightText, textHeight, FontWeight.ExtraBold)
-                val contentBorder = measureText(textCache, rightText, textHeight, FontWeight.Bold)
-                translate(x = size.width + TIP_HEIGHT, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
-                    strokeText(
-                        content = content,
-                        color = Colors.Ghost.copy(alpha = 0.75f * progress),
-                        strokeColor = Colors.Steel4.copy(alpha = 0.25f * progress)
-                    )
-                }
+                path(Colors.Ghost, rightArea, alpha = 0.33333f * progress)
+                val content = measureText(textCache, rightText, textHeight, FontWeight.SemiBold, FontStyle.Italic, fontIndex = 1)
+                text(
+                    content = content,
+                    color = Colors.Red4.copy(alpha = 0.75f * progress),
+                    position = Offset(size.width + TIP_HEIGHT, (size.height - textHeight) / 2)
+                )
             }
         }
     }
