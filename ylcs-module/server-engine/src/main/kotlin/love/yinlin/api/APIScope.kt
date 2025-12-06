@@ -531,7 +531,34 @@ abstract class APIScope internal constructor(
             }
         }
 
-        inline operator fun <reified I> invoke(): I = if (I::class == APIFile::class) fileList[fileIndex++] as I else dataList[dataIndex++].parseJsonValue()
+        inline operator fun <reified I> invoke(): I {
+            // Check if I is APIFile type (including APIFile?)
+            // In Kotlin, nullable types are erased at runtime, so we need to check differently
+            val isAPIFile = try {
+                // Try to check if I is assignable to APIFile
+                APIFile::class.java.isAssignableFrom(I::class.java) || I::class == APIFile::class
+            } catch (e: Exception) {
+                // Fallback: check if the type name contains APIFile
+                I::class.simpleName?.contains("APIFile") == true
+            }
+            return if (isAPIFile) {
+                // Safely access fileList with bounds checking
+                if (fileIndex < fileList.size) {
+                    fileList[fileIndex++] as I
+                } else {
+                    // Return null if out of bounds (for APIFile? type)
+                    @Suppress("UNCHECKED_CAST")
+                    null as I
+                }
+            } else {
+                // Safely access dataList with bounds checking
+                if (dataIndex < dataList.size) {
+                    dataList[dataIndex++].parseJsonValue()
+                } else {
+                    throw IndexOutOfBoundsException("Index $dataIndex out of bounds for dataList of length ${dataList.size}. Expected form fields: 0=token, 1=PrizeCreate")
+                }
+            }
+        }
     }
 
     inline fun API<out APIType>.internalResponseForm(crossinline block: suspend (FormResult) -> JsonElement) {

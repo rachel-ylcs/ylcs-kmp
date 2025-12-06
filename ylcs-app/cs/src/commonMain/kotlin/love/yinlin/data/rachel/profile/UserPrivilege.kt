@@ -16,4 +16,5 @@ object UserPrivilege {
 	fun vipAccount(privilege: Int): Boolean = has(privilege, VIP_ACCOUNT)
 	fun vipTopic(privilege: Int): Boolean = has(privilege, VIP_TOPIC)
 	fun vipCalendar(privilege: Int): Boolean = has(privilege, VIP_CALENDAR)
+	fun vipPrize(privilege: Int): Boolean = has(privilege, VIP_TOPIC)
 }
