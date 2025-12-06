@@ -24,8 +24,8 @@ class LyricsBar(
     rhymeManager: RhymeManager,
     lyricsConfig: RhymeLyricsConfig
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(50f, 22f))
-    override val size: Size = Size(620f, 50f)
+    override val preTransform: List<Transform> = listOf(Transform.Translate(50f, 25f))
+    override val size: Size = Size(620f, 44f)
 
     private val lines = lyricsConfig.lyrics
     private var currentIndex = -1
@@ -69,7 +69,7 @@ class LyricsBar(
         translate((size.width - textWidth) / 2, 0f) {
             text(
                 content = content,
-                color = Colors(0xffe2e6ff),
+                color = Colors(0xFFE2E6FF),
                 shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
             )
             clip(Offset.Zero, Size(textWidth * progress, size.height)) {

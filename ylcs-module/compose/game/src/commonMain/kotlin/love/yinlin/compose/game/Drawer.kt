@@ -161,6 +161,46 @@ class Drawer(
         )
     }
 
+    fun strokeText(content: Paragraph, color: Color, strokeColor: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        val canvas = scope.drawContext.canvas
+        content.paint(
+            canvas = canvas,
+            color = color,
+            shadow = shadow,
+            textDecoration = decoration,
+            drawStyle = null,
+            blendMode = blendMode
+        )
+        content.paint(
+            canvas = canvas,
+            color = strokeColor,
+            shadow = null,
+            textDecoration = null,
+            drawStyle = Stroke(width = 1f), // StrokeText 在 skia 内部构造 Paragraph 时实现有逆天 BUG
+            blendMode = DrawScope.DefaultBlendMode
+        )
+    }
+
+    fun strokeText(content: Paragraph, brush: Brush, strokeColor: Color, shadow: Shadow? = null, decoration: TextDecoration? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
+        val canvas = scope.drawContext.canvas
+        content.paint(
+            canvas = canvas,
+            brush = brush,
+            shadow = shadow,
+            textDecoration = decoration,
+            drawStyle = null,
+            blendMode = blendMode
+        )
+        content.paint(
+            canvas = canvas,
+            color = strokeColor,
+            shadow = null,
+            textDecoration = null,
+            drawStyle = Stroke(width = 1f),
+            blendMode = DrawScope.DefaultBlendMode
+        )
+    }
+
     // 转换
 
     inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {

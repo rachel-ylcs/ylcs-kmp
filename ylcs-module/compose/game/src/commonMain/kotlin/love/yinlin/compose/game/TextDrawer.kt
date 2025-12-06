@@ -21,10 +21,10 @@ class TextDrawer(
     @Stable
     class Cache(maxSize: Int = 8) {
         @Stable
-        private data class CacheKey(
+        internal data class CacheKey(
             val text: String,
             val height: Float,
-            val fontWeight: FontWeight
+            val fontWeight: FontWeight,
         )
 
         private val lruCache = lruCache<CacheKey, Paragraph>(maxSize)
@@ -34,7 +34,7 @@ class TextDrawer(
             val cacheKey = CacheKey(text, height, fontWeight)
             val cacheResult = lruCache[cacheKey]
             if (cacheResult != null) return cacheResult
-            val newResult = manager.makeParagraph(text, height, fontWeight)
+            val newResult = manager.makeParagraph(cacheKey)
             lruCache.put(cacheKey, newResult)
             return newResult
         }
@@ -42,13 +42,16 @@ class TextDrawer(
 
     private val density = Density(1f)
 
-    private fun makeParagraph(text: String, height: Float, fontWeight: FontWeight = FontWeight.Light): Paragraph {
+    private fun makeParagraph(cacheKey: Cache.CacheKey): Paragraph {
+        val fontSize = TextUnit(cacheKey.height / 1.17f, TextUnitType.Sp)
         val intrinsics = ParagraphIntrinsics(
-            text = text,
+            text = cacheKey.text,
             style = TextStyle(
-                fontSize = TextUnit(height / 1.17f, TextUnitType.Sp),
-                fontWeight = fontWeight,
-                fontFamily = font
+                fontSize = fontSize,
+                fontWeight = cacheKey.fontWeight,
+                fontFamily = font,
+                lineHeight = fontSize * 1.5f,
+                letterSpacing = fontSize / 16f
             ),
             annotations = emptyList(),
             density = density,
@@ -57,7 +60,7 @@ class TextDrawer(
         )
         return Paragraph(
             paragraphIntrinsics = intrinsics,
-            constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = height.toInt()),
+            constraints = Constraints.fitPrioritizingWidth(minWidth = 0, maxWidth = intrinsics.maxIntrinsicWidth.toInt(), minHeight = 0, maxHeight = cacheKey.height.toInt()),
             maxLines = 1,
             overflow = TextOverflow.Clip
         )

@@ -7,8 +7,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
@@ -121,6 +119,11 @@ class TrackMap(
         startY = Track.VIRTUAL_HEIGHT,
         endY = 0f
     )
+    val trackLineSideBrush = Brush.verticalGradient(
+        colors = listOf(Colors.Purple3, Colors.Transparent),
+        startY = Track.VIRTUAL_HEIGHT,
+        endY = 0f
+    )
 
     // 当前按下轨道
     val activeTracks = List<Long?>(Track.Num) { null }.toMutableStateList()
@@ -170,24 +173,30 @@ class TrackMap(
         path(Track.BackgroundColor, tracksAreaPath)
 
         // 画判定区域
-        for ((area, alpha) in hitAreaData) path(Colors.Green4, area, alpha = alpha)
-        line(Colors.Green4, hitLine.first, hitLine.second, style = Stroke(5f), alpha = 0.6f)
+        for ((area, alpha) in hitAreaData) path(Colors.Purple4, area, alpha = alpha)
+        line(Colors.Purple4, hitLine.first, hitLine.second, style = Stroke(5f), alpha = 0.8f)
 
+        // 其他轨道线
         for (index in 0 ..< Track.Num) {
             val track = tracks[index]
             // 画激活轨道
             if (activeTracks[index] != null) path(Track.ActiveColor, track.areaPath)
 
-            // 画轨道左侧射线
-            path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f) // 阴影
-            path(trackLineBrush, track.leftLineAreaPath) // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
-            path(Colors.Steel4, track.leftLineAreaPath, style = Stroke(2f), alpha = 0.75f)
-        }
+            if (index == 0) {
+                path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f)
+                path(trackLineSideBrush, track.leftLineAreaPath)
+            }
+            else {
+                // 画轨道左侧射线
+                path(Colors.Steel2, track.leftLineShadowAreaPath, alpha = 0.2f) // 阴影
+                path(trackLineBrush, track.leftLineAreaPath) // 轨道线用三角形模拟, 这样能做出一个越远越细的效果
+                path(Colors.Steel4, track.leftLineAreaPath, style = Stroke(2f), alpha = 0.75f)
+            }
 
-        // 最后一个轨道右侧射线
-        val track = tracks.last()
-        path(Colors.Steel2, track.rightLineShadowAreaPath, alpha = 0.2f)
-        path(trackLineBrush, track.rightLineAreaPath)
-        path(Colors.Steel4, track.rightLineAreaPath, style = Stroke(2f), alpha = 0.75f)
+            if (index == tracks.lastIndex) {
+                path(Colors.Steel2, track.rightLineShadowAreaPath, alpha = 0.2f)
+                path(trackLineSideBrush, track.rightLineAreaPath)
+            }
+        }
     }
 }

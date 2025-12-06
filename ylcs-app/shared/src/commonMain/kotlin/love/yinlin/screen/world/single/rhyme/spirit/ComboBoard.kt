@@ -8,8 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
@@ -39,7 +37,7 @@ enum class ActionResult(
     fun viewEndRange(center: Float) = center + (range + DynamicAction.BODY_RATIO) / 2
 
     companion object {
-        const val COMBO_REWARD_COUNT = 20
+        const val COMBO_REWARD_COUNT = 30
     }
 }
 
@@ -68,40 +66,30 @@ class ComboBoard(
                 val textHeight = size.height
                 val contentCenter = center
                 val content = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.ExtraBold)
-                val contentBorder = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.Bold)
                 // 判定结果
                 transform({
                     scale(progress, contentCenter)
                     translate((canvasWidth - content.width) / 2, 0f)
                 }) {
-                    text(
+                    strokeText(
                         content = content,
-                        brush = currentResult.brush
-                    )
-                    text(
-                        content = contentBorder,
-                        color = Colors.Dark.copy(alpha = 0.5f),
-                        drawStyle = Stroke(width = 1f, join = StrokeJoin.Round)
+                        brush = currentResult.brush,
+                        strokeColor = Colors.Dark.copy(alpha = 0.5f)
                     )
                 }
                 // 连击数
                 if (combo > 1) {
                     val comboText = "+$combo"
                     val comboContent = measureText(comboTextCache, comboText, textHeight / 2, FontWeight.ExtraBold)
-                    val comboContentBorder = measureText(comboTextCache, comboText, textHeight / 2, FontWeight.Bold)
                     val topLeft = Offset(canvasWidth - comboContent.width, textHeight / 2)
                     transform({
                         translate(topLeft)
                         scale(progress, Offset(comboContent.width / 2, textHeight / 4))
                     }) {
-                        text(
+                        strokeText(
                             content = comboContent,
-                            color = Colors.White.copy(alpha = (progress * 2).coerceIn(0f, 1f))
-                        )
-                        text(
-                            content = comboContentBorder,
-                            color = Colors.Dark.copy(alpha = 0.5f),
-                            drawStyle = Stroke(width = 1f, join = StrokeJoin.Round)
+                            color = Colors.White.copy(alpha = (progress * 2).coerceIn(0f, 1f)),
+                            strokeColor = Colors.Dark.copy(alpha = 0.5f)
                         )
                     }
                 }

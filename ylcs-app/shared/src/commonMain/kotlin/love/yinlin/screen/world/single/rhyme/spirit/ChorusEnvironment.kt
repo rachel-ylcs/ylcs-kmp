@@ -2,7 +2,6 @@ package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
@@ -68,14 +67,10 @@ class ChorusEnvironment(
                 val content = measureText(textCache, leftText, textHeight, FontWeight.ExtraBold)
                 val contentBorder = measureText(textCache, leftText, textHeight, FontWeight.Bold)
                 translate(x = -TIP_HEIGHT - content.width, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
-                    text(
+                    strokeText(
                         content = content,
-                        color = Colors.Ghost.copy(alpha = 0.75f * progress)
-                    )
-                    text(
-                        content = contentBorder,
-                        color = Colors.Steel4.copy(alpha = 0.25f * progress),
-                        drawStyle = Stroke(1f * progress)
+                        color = Colors.Ghost.copy(alpha = 0.75f * progress),
+                        strokeColor = Colors.Steel4.copy(alpha = 0.25f * progress)
                     )
                 }
             }
@@ -84,14 +79,10 @@ class ChorusEnvironment(
                 val content = measureText(textCache, rightText, textHeight, FontWeight.ExtraBold)
                 val contentBorder = measureText(textCache, rightText, textHeight, FontWeight.Bold)
                 translate(x = size.width + TIP_HEIGHT, y = (size.height - TIP_HEIGHT * 0.8f) / 2) {
-                    text(
+                    strokeText(
                         content = content,
-                        color = Colors.Ghost.copy(alpha = 0.75f * progress)
-                    )
-                    text(
-                        content = contentBorder,
-                        color = Colors.Steel4.copy(alpha = 0.25f * progress),
-                        drawStyle = Stroke(1f * progress)
+                        color = Colors.Ghost.copy(alpha = 0.75f * progress),
+                        strokeColor = Colors.Steel4.copy(alpha = 0.25f * progress)
                     )
                 }
             }
