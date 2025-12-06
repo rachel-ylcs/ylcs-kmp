@@ -183,8 +183,8 @@ compose.resources {
 
 composeCompiler {
     stabilityConfigurationFiles.add(C.root.config.stability)
-    reportsDestination = C.root.app.composeCompilerReport
-    metricsDestination = C.root.app.composeCompilerReport
+    reportsDestination = C.root.shared.composeCompilerReport
+    metricsDestination = C.root.shared.composeCompilerReport
 }
 
 afterEvaluate {

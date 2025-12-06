@@ -36,7 +36,7 @@ compose.desktop {
             isEnabled = true
             optimize = true
             obfuscate = true
-            configurationFiles.from(C.root.app.commonR8Rule, C.root.app.desktopR8Rule)
+            configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
         }
 
         nativeDistributions {

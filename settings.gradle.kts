@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs {
-        create("libs") {
+        create("libs").apply {
             from(files("libs.versions.toml"))
         }
     }

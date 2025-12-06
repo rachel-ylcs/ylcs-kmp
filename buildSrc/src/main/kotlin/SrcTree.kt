@@ -101,7 +101,7 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val script = ScriptNode(this)
     val work = WorkNode(this)
     val cs = CSNode(this)
-    val app = SharedNode(this, c)
+    val shared = SharedNode(this, c)
     val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)

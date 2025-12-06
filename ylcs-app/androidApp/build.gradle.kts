@@ -74,7 +74,7 @@ android {
             isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile(C.proguard.defaultRule),
-                C.root.app.commonR8Rule, C.root.app.androidR8Rule
+                C.root.shared.commonR8Rule, C.root.shared.androidR8Rule
             )
             signingConfig = androidSigningConfig
         }
