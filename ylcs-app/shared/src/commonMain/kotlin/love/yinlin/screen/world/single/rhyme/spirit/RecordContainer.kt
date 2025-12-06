@@ -18,11 +18,12 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 
 @Stable
 class RecordContainer(
-    private val rhymeManager: RhymeManager,
-    private val recordImage: ImageBitmap
+    private val rhymeManager: RhymeManager
 ) : Spirit(rhymeManager), CircleBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(-28f, -44f))
     override val size: Size = Size(236f, 236f)
+
+    private val mainRecord: ImageBitmap by manager.assets()
 
     // 封面旋转角
     private var angle: Float by mutableFloatStateOf(0f)
@@ -42,7 +43,7 @@ class RecordContainer(
     override fun Drawer.onClientDraw() {
         rotate(angle) {
             // 画封面
-            circleImage(recordImage)
+            circleImage(mainRecord)
             // 画挖孔
             circle(Colors.Black, center, 15f)
             circle(Colors.Gray4, center, 15f, style = Stroke(width = 2f))

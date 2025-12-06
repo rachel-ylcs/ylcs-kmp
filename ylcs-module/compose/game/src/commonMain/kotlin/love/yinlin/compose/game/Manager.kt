@@ -73,6 +73,7 @@ abstract class Manager {
         scene = null
         pointers.clear()
         clearEventChannel()
+        assets.clearLocal()
     }
 
     protected fun onSceneCreate(spirit: Spirit) {
@@ -95,6 +96,7 @@ abstract class Manager {
         scene = null
         pointers.clear()
         clearEventChannel()
+        assets.clearLocal()
     }
 
     @Composable

@@ -116,6 +116,7 @@ fun ColumnScope.GameRecordCard(type: Game, answer: JsonElement, info: JsonElemen
 }
 
 internal fun Float.cast(minValue: Int, maxValue: Int): Int = (this * (maxValue - minValue) + minValue).toInt()
+internal fun Float.cast(minValue: Long, maxValue: Long): Long = (this * (maxValue - minValue) + minValue).toLong()
 internal fun Float.cast(minValue: Float, maxValue: Float): Float = this * (maxValue - minValue) + minValue
 
 @Composable
@@ -147,6 +148,7 @@ fun <T : Number> GameSlider(
                 text = remember(percent, minValue, maxValue) {
                     "当前: ${when (minValue) {
                         is Int if maxValue is Int -> percent.cast(minValue, maxValue)
+                        is Long if maxValue is Long -> percent.cast(minValue, maxValue)
                         is Float if maxValue is Float -> percent.cast(minValue, maxValue)
                         else -> "N/A"
                     }}"

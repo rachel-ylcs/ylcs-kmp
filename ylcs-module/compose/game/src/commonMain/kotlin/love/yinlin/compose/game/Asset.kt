@@ -6,9 +6,9 @@ import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.decode
 
 @Stable
-class Asset private constructor(val value: Any) {
+class Asset private constructor(val value: Any, val isLocal: Boolean) {
     companion object {
-        fun image(data: ByteArray): Asset? = ImageBitmap.decode(data)?.let { Asset(it) }
-        fun animation(data: ByteArray): Asset? = AnimatedWebp.decode(data)?.let { Asset(it) }
+        fun image(data: ByteArray, isLocal: Boolean = false): Asset? = ImageBitmap.decode(data)?.let { Asset(it, isLocal) }
+        fun animation(data: ByteArray, isLocal: Boolean = false): Asset? = AnimatedWebp.decode(data)?.let { Asset(it, isLocal) }
     }
 }

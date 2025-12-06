@@ -12,5 +12,8 @@ data class RhymePlayConfig(
             difficulty = RhymeDifficulty.Easy,
             audioDelay = 0L
         )
+
+        const val MIN_AUDIO_DELAY = -500L
+        const val MAX_AUDIO_DELAY = 500L
     }
 }

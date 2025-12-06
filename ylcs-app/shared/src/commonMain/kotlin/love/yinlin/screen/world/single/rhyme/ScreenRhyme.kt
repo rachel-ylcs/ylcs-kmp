@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontStyle
@@ -33,22 +32,19 @@ import love.yinlin.api.ServerRes
 import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.Paths
-import love.yinlin.common.downloadCache
 import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.compose.*
-import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.compose.ui.animation.AnimationLayout
 import love.yinlin.compose.ui.image.LoadingCircle
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.LoadingBox
@@ -63,6 +59,8 @@ import love.yinlin.extension.readByteArray
 import love.yinlin.extension.readText
 import love.yinlin.platform.NetClient
 import love.yinlin.platform.ioContext
+import love.yinlin.screen.world.game.GameSlider
+import love.yinlin.screen.world.game.cast
 
 @Stable
 class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
@@ -103,7 +101,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 }
             }
             val task2 = async(ioContext) {
-                info.path(Paths.modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
+                info.path(Paths.modPath, ModResourceType.Record).readByteArray()
             }
             val lyricsConfig = task1.await()
             val recordImage = task2.await()
@@ -114,6 +112,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 rhymeManager.apply {
                     start(
                         playConfig = playConfig,
+                        name = info.name,
                         lyricsConfig = lyricsConfig,
                         recordImage = recordImage,
                         audio = info.path(Paths.modPath, ModResourceType.Audio)
@@ -154,6 +153,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 }
                 resumePauseJob = null
             }
+            Icons.Outlined.Close
         }
     }
 
@@ -350,6 +350,9 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
     @Composable
     private fun GameOverlayMusicDetails(entry: RhymeMusic) {
+        var difficulty by rememberState { RhymePlayConfig.Default.difficulty }
+        var audioDelay by rememberValueState(0.5f)
+
         RhymeOverlayLayout(
             title = entry.musicInfo.name,
             onBack = ::onBack,
@@ -358,13 +361,59 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     icon = Icons.Outlined.PlayArrow,
                     transparent = false,
                     onClick = {
-                        if (entry.enabled) startGame(entry.musicInfo, RhymePlayConfig.Default)
+                        if (entry.enabled) startGame(
+                            info = entry.musicInfo,
+                            playConfig = RhymePlayConfig(
+                                difficulty = difficulty,
+                                audioDelay = audioDelay.cast(RhymePlayConfig.MIN_AUDIO_DELAY, RhymePlayConfig.MAX_AUDIO_DELAY)
+                            )
+                        )
                         else slot.tip.warning("此MOD不支持")
                     }
                 )
             }
         ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.equalExtraValue),
+                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace * 2),
+                ) {
+                    Text(
+                        text = "难度",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Colors.White
+                    )
+                    SingleSelector(
+                        current = difficulty,
+                        onSelected = { difficulty = it },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        for (item in RhymeDifficulty.entries) {
+                            Item(
+                                item = item,
+                                title = item.title
+                            )
+                        }
+                    }
+                    GameSlider(
+                        title = "延迟补偿(毫秒)",
+                        progress = audioDelay,
+                        minValue = RhymePlayConfig.MIN_AUDIO_DELAY,
+                        maxValue = RhymePlayConfig.MAX_AUDIO_DELAY,
+                        onProgressChange = { audioDelay = it },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
 
+                }
+                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+
+                }
+            }
         }
     }
 
@@ -385,7 +434,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                 path = { prologueBackground ?: Path("") },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().background(Colors.Black),
-                alpha = 0.5f
+                alpha = 0.75f
             )
         }
     }

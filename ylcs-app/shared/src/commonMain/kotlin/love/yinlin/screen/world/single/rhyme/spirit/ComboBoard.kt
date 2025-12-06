@@ -64,13 +64,14 @@ class ComboBoard(
     override fun Drawer.onClientDraw() {
         result?.let { currentResult ->
             animation.withProgress { progress ->
-                val canvasWidth = this@ComboBoard.size.width
-                val textHeight = this@ComboBoard.size.height
+                val canvasWidth = size.width
+                val textHeight = size.height
+                val contentCenter = center
                 val content = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.ExtraBold)
                 val contentBorder = measureText(actionTextCache, currentResult.title, textHeight, FontWeight.Bold)
                 // 判定结果
                 transform({
-                    scale(progress, this@ComboBoard.center)
+                    scale(progress, contentCenter)
                     translate((canvasWidth - content.width) / 2, 0f)
                 }) {
                     text(

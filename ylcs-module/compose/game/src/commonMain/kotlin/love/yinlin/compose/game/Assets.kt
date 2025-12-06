@@ -10,4 +10,5 @@ class Assets {
     operator fun set(key: String, asset: Asset) { items[key] = asset }
     @Suppress("unchecked_cast")
     operator fun <T : Any> invoke() = lazyName { key -> items[key]!!.value as T }
+    fun clearLocal() = items.entries.removeAll { it.value.isLocal }
 }

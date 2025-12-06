@@ -3,7 +3,7 @@ package love.yinlin.screen.world.single.rhyme.spirit
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.traits.Container
+import love.yinlin.compose.game.traits.SoulContainer
 import love.yinlin.compose.game.traits.Soul
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
@@ -12,7 +12,7 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 class ScreenEnvironment(
     rhymeManager: RhymeManager,
     lyricsConfig: RhymeLyricsConfig,
-) : Container(rhymeManager), BoxBody {
+) : SoulContainer(rhymeManager), BoxBody {
     val missEnvironment = MissEnvironment(rhymeManager)
 
     override val size: Size = manager.size

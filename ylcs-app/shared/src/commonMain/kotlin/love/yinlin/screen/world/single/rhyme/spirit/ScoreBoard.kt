@@ -23,12 +23,12 @@ import love.yinlin.screen.world.single.rhyme.RhymeManager
 class ScoreBoard(
     rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(275f, 14f))
-    override val size: Size = Size(350f, 70f)
+    override val preTransform: List<Transform> = listOf(Transform.Translate(470f, 50f))
+    override val size: Size = Size(200f, 40f)
 
     // 游戏得分
     private var score: Int by mutableIntStateOf(0)
-    private val scoreText: String by derivedStateOf { score.toString().padStart(4, '0').toList().fastJoinToString(" ") }
+    private val scoreText: String by derivedStateOf { score.toString().padStart(4, ' ').toList().fastJoinToString(" ") }
 
     private val textCache = TextDrawer.Cache()
     private val animation = LineFrameAnimation(manager.fps / 2)
@@ -41,12 +41,12 @@ class ScoreBoard(
         animation.withProgress({ isCompleted, progress ->
             if (isCompleted) 1f else (progress + 0.3f).coerceAtMost(1f)
         }) { progress ->
-            val content = measureText(textCache, scoreText, this@ScoreBoard.size.height, FontWeight.ExtraBold)
+            val content = measureText(textCache, scoreText, size.height, FontWeight.ExtraBold)
             translate((size.width - content.width) / 2, 0f) {
                 text(
                     content = content,
                     color = Colors(0xffe2e6ff).copy(alpha = progress),
-                    shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
+                    shadow = Shadow(Colors.Dark, Offset(1f, 1f), 1f)
                 )
             }
         }

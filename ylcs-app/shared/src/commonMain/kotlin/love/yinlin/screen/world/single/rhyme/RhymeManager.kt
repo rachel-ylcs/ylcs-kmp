@@ -2,7 +2,6 @@ package love.yinlin.screen.world.single.rhyme
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -45,17 +44,24 @@ class RhymeManager(
 
     suspend fun CoroutineScope.start(
         playConfig: RhymePlayConfig,
+        name: String,
         lyricsConfig: RhymeLyricsConfig,
-        recordImage: ImageBitmap,
+        recordImage: ByteArray,
         audio: Path
     ) {
         config = playConfig
+
+        assets["mainRecord"] = Asset.image(recordImage, true)!!
+
         onSceneCreate(Scene(
             rhymeManager = this@RhymeManager,
-            lyricsConfig = lyricsConfig,
-            recordImage = recordImage
+            playConfig = playConfig,
+            name = name,
+            lyricsConfig = lyricsConfig
         ))
+
         mp.load(audio)
+
         resume()
     }
 
@@ -79,6 +85,7 @@ class RhymeManager(
             AssetKey("leftUIBackground"),
             AssetKey("rightUIBackground"),
             AssetKey("blockMap"),
+            AssetKey("difficultyStar"),
         )
 
         val animationKeys = arrayOf<AssetKey>(

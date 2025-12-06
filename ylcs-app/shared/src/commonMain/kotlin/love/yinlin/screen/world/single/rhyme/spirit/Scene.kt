@@ -1,34 +1,58 @@
 package love.yinlin.screen.world.single.rhyme.spirit
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.font.FontWeight
+import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
+import love.yinlin.compose.game.TextDrawer
 import love.yinlin.compose.game.traits.BoxBody
-import love.yinlin.compose.game.traits.Container
+import love.yinlin.compose.game.traits.SoulContainer
 import love.yinlin.compose.game.traits.Soul
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
 
 @Stable
 private class LeftUI(
     rhymeManager: RhymeManager,
-    scoreBoard: ScoreBoard,
-    recordImage: ImageBitmap
-) : Container(rhymeManager), BoxBody {
+    playConfig: RhymePlayConfig,
+    private val name: String,
+    scoreBoard: ScoreBoard
+) : SoulContainer(rhymeManager), BoxBody {
     override val size: Size = Size(700f, 200f)
 
     override val souls: List<Soul> = listOf(
-        RecordContainer(rhymeManager, recordImage),
+        RecordContainer(rhymeManager),
         ProgressBar(rhymeManager),
         scoreBoard
     )
 
     private val leftUIBackground: ImageBitmap by manager.assets()
+    private val difficultyStar: ImageBitmap by manager.assets()
+
+    private val difficulty = playConfig.difficulty
+
+    private val textCache = TextDrawer.Cache()
 
     override fun Drawer.onClientPreDraw() {
+        // 画背景
         image(leftUIBackground)
+
+        // 画标题
+        val content = measureText(textCache, name, 38f, FontWeight.Bold)
+        translate(250f, 10f) {
+            text(content, Colors.Ghost.copy(alpha = 0.8f), shadow = Shadow(Colors.Dark, Offset(1f, 1f), 1f))
+        }
+
+        // 画难度星级
+        repeat(difficulty.ordinal + 1) { index ->
+            image(difficultyStar, Offset(250f + index * 40f, 54f), Size(32f, 32f))
+        }
     }
 }
 
@@ -36,7 +60,7 @@ private class LeftUI(
 private class RightUI(
     rhymeManager: RhymeManager,
     lyricsConfig: RhymeLyricsConfig
-) : Container(rhymeManager), BoxBody {
+) : SoulContainer(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(1220f, 0f))
     override val size: Size = Size(700f, 100f)
 
@@ -54,9 +78,10 @@ private class RightUI(
 @Stable
 class Scene(
     rhymeManager: RhymeManager,
+    playConfig: RhymePlayConfig,
+    name: String,
     lyricsConfig: RhymeLyricsConfig,
-    recordImage: ImageBitmap,
-) : Container(rhymeManager), BoxBody {
+) : SoulContainer(rhymeManager), BoxBody {
     override val size: Size = manager.size
 
     private val scoreBoard = ScoreBoard(rhymeManager)
@@ -69,7 +94,7 @@ class Scene(
         NoteQueue(rhymeManager, lyricsConfig, scoreBoard, comboBoard, trackMap, screenEnvironment),
         comboBoard,
         screenEnvironment,
-        LeftUI(rhymeManager, scoreBoard, recordImage),
+        LeftUI(rhymeManager, playConfig, name, scoreBoard),
         RightUI(rhymeManager, lyricsConfig),
     )
 }

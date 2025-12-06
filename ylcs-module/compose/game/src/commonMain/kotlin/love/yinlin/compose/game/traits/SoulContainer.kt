@@ -7,7 +7,7 @@ import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Manager
 
 @Stable
-abstract class Container(manager: Manager) : Spirit(manager) {
+abstract class SoulContainer(manager: Manager) : Spirit(manager) {
     @Stable
     private data class SoulEntry(val soul: Soul, val addIndex: Long) {
         companion object {
