@@ -5,8 +5,9 @@ import androidx.compose.runtime.Stable
 @Stable
 class CurveFrameAnimation(
     totalFrame: Int,
-    isInfinite: Boolean = false
-) : FrameAnimation(totalFrame, isInfinite) {
+    isInfinite: Boolean = false,
+    totalStep: Int = 1,
+) : FrameAnimation(totalFrame, isInfinite, totalStep) {
     override fun calcProgress(t: Int, f: Int): Float {
         val s = t / 3
         //         { 1 - ((x - s) / s) ^ 2  , 0 <= x <= s
