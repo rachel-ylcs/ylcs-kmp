@@ -14,6 +14,7 @@ import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Transform
+import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
 import love.yinlin.compose.translate
@@ -49,6 +50,8 @@ class Track(
         // 轨道激活色
         val ActiveColor = Colors.Cyan3.copy(alpha = 0.2f)
     }
+
+    val bottomCenter = left.onCenter(right)
 
     // 位置
     val isLeft = index < Num / 2
@@ -147,7 +150,7 @@ class TrackMap(
         val slope = vertices.slope(point)
         val inTracks = slope <= tracks.first().slopeLeft || slope >= tracks.last().slopeRight
         // 非屏幕可点击区域忽略
-        if (point.y <= clickAreaBound) return null to inTracks
+        if (point.y <= clickAreaBound) return null to false
         if (slope >= 0f) { // 右侧
             for (i in 3 .. 6) {
                 val (left, right)  = tracks[i].slopeRightRange

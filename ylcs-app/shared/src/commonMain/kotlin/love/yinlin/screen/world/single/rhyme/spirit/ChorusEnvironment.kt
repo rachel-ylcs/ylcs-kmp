@@ -3,6 +3,7 @@ package love.yinlin.screen.world.single.rhyme.spirit
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
@@ -70,7 +71,8 @@ class ChorusEnvironment(
                 text(
                     content = content,
                     color = Colors.Red4.copy(alpha = 0.75f * progress),
-                    position = Offset(-TIP_HEIGHT - content.width, (size.height - textHeight) / 2)
+                    position = Offset(-TIP_HEIGHT - content.width, (size.height - textHeight) / 2),
+                    shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
                 )
             }
             translate(x = -offset, y = 0f) {
@@ -79,7 +81,8 @@ class ChorusEnvironment(
                 text(
                     content = content,
                     color = Colors.Red4.copy(alpha = 0.75f * progress),
-                    position = Offset(size.width + TIP_HEIGHT, (size.height - textHeight) / 2)
+                    position = Offset(size.width + TIP_HEIGHT, (size.height - textHeight) / 2),
+                    shadow = Shadow(Colors.Dark, Offset(3f, 3f), 3f)
                 )
             }
         }
