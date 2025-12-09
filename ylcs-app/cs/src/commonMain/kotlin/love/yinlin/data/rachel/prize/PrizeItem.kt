@@ -21,14 +21,13 @@ data class PrizeItem(
     fun picPath(itemID: Int) : String ="${Local.API_BASE_URL}/${ServerRes.Prize.prize(itemID)}"
 }
 
-//API参数限制在5以下，所以把需要输入的属性提取出来做一个新类，该类仅会在createPrize时使用到
+//API参数限制在5以下，所以把需要输入的属性提取出来做一个新类，这个类为不含APIFile的数据类，APIFile在API处会单独传入，特殊处理
 @Serializable
-data class PrizeItemCreate(
+data class PrizeItemdata(
     val prizeLevel:Int?,
     val name: String,
     val description:String?,
     val count:Int,
-    @Transient val pic: APIFile? = null  // APIFile 字段不参与 JSON 序列化，从 form 中单独提取
 )
 
 // API返回的奖品图片信息

@@ -2,7 +2,6 @@ package love.yinlin.data.rachel.prize
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 import love.yinlin.data.rachel.prize.PrizeItem
-import love.yinlin.data.rachel.prize.PrizeItemCreate
 @Stable
 @Serializable
 enum class PrizeStatus {
@@ -35,12 +34,12 @@ data class Prize(
 
 //API参数限制在5以下，所以把需要输入的属性提取出来封装成新类，该类仅会在createPrize时使用到
 @Serializable
-data class PrizeCreate(
+data class Prizedata(
     val title :String,
     val content :String,
     val deadline: String,
     val drawtime: String?,
     val mixAppLevel: Int,
-    val totalSlots :Int?,
-    val PrizeItems: List<PrizeItemCreate>
+    val totalSlots :Int?
 )
+
