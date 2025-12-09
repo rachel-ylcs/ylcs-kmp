@@ -7,6 +7,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asAndroidColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -28,23 +30,27 @@ actual class AnimatedWebp internal constructor(
     private val paint: Paint,
     private val bitmap: Bitmap
 ) {
-    actual fun DrawScope.drawFrame(index: Int, dst: Rect) {
+    actual fun DrawScope.drawFrame(index: Int, dst: Rect, filter: ColorFilter?) {
         if (index >= 0 && !bitmap.isRecycled) {
             drawIntoCanvas { canvas ->
                 val left = index % col * width
                 val top = index / col * height
+
+                val oldFilter = paint.colorFilter
+                paint.colorFilter = filter?.asAndroidColorFilter()
                 canvas.nativeCanvas.drawBitmap(
                     bitmap,
                     android.graphics.Rect(left, top, left + width, top + height),
                     dst.toAndroidRectF(),
                     paint
                 )
+                paint.colorFilter = oldFilter
             }
         }
     }
 
-    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size) {
-        this.drawFrame(index, Rect(position, size))
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, filter: ColorFilter?) {
+        this.drawFrame(index, Rect(position, size), filter)
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(bitmap).encode(format, quality)

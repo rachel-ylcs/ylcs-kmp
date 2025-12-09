@@ -9,10 +9,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
+import love.yinlin.compose.game.Assets
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.traits.*
+import love.yinlin.compose.graphics.AnimatedWebp
+import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
+import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
@@ -28,7 +32,6 @@ sealed interface DynamicAction {
         const val BASE_DURATION = 3000L // 音符持续时间
         const val PERSPECTIVE_K = 3 // 透视参数
         const val HIT_RATIO = 0.8f // 判定线
-        const val BODY_RATIO = 0.05f // 自身比例
 
         val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
 
@@ -54,85 +57,102 @@ sealed interface DynamicAction {
     fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
     fun onTrackUp(track: Track, tick: Long, callback: ActionCallback) // 抬起
     fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean // 变轨
-    fun onTrackMove(track: Track, offset: Float, tick: Long, callback: ActionCallback) // 移动
-    fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) // 渲染
+    fun Drawer.onDraw(tracks: List<Track>) // 渲染
 }
 
-private val Float.asActual get() = 1 / (DynamicAction.PERSPECTIVE_K / this + 1 - DynamicAction.PERSPECTIVE_K)
-private val Float.asVirtual get() = DynamicAction.PERSPECTIVE_K / (1 / this + DynamicAction.PERSPECTIVE_K - 1)
+private val Float.asUncheckedActual: Float get() = this / (DynamicAction.PERSPECTIVE_K + this * (1 - DynamicAction.PERSPECTIVE_K))
+private val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActual.coerceIn(0f, 1f)
+private val Float.asUncheckedVirtual: Float get() = DynamicAction.PERSPECTIVE_K * this / (1 + this * (DynamicAction.PERSPECTIVE_K - 1))
+private val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 
 @Stable
 class NoteAction(
+    assets: Assets,
     start: Long,
     override val action: RhymeAction.Note
 ) : DynamicAction {
     @Stable
-    private enum class State {
-        Ready, // 就绪
-        Moving, // 移动
-        Clicking, // 点击中
-        Missing, // 错过中
-        Done; // 已完成
+    private sealed interface State {
+        @Stable
+        data object Ready : State // 就绪
+        @Stable
+        class Moving : State { // 移动
+            var progress by mutableFloatStateOf(0f)
+        }
+        @Stable
+        class Clicking(val lastProgress: Float) : State { // 点击中
+            val animation = LineFrameAnimation(30)
+
+            init {
+                animation.start()
+            }
+        }
+        @Stable
+        class Missing(lastProgress: Float) : State { // 错过中
+            var progress by mutableFloatStateOf(lastProgress)
+            val animation = LineFrameAnimation(30)
+
+            init {
+                animation.start()
+            }
+        }
+        @Stable
+        data object Done : State // 已完成
     }
+
+    private val blockMap: ImageBitmap by assets()
+    private val noteDismiss: AnimatedWebp by assets()
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale)
     private val noteScale = DynamicAction.mapNoteScale(action.scale)
     private val blockRect = DynamicAction.calcBlockRect(noteScale, 0)
     private var state: State by mutableStateOf(State.Ready) // 状态
-    private var progress: Float by mutableFloatStateOf(0f) // 进度
-    private var clickingAnimation = LineFrameAnimation(30) // 点击动画
-    private var missingAnimation = LineFrameAnimation(30) // 消失动画
 
     override var bindId: Long? = null
 
-    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
+    // A[(start - appearance) / duration] = hit
+    // -> (start - appearance) / duration = V(hit)
+    // -> start - appearance = duration * V(hit)
+    // -> appearance = start - duration * V(hit)
+    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asUncheckedVirtual).toLong()
 
     override val isDismiss: Boolean by derivedStateOf { state == State.Done }
 
-    override fun onAdmission() { state = State.Moving }
+    override fun onAdmission() { state = State.Moving() }
 
     override fun onUpdate(tick: Long, callback: ActionCallback) {
-        when (state) {
+        when (val currentState = state) {
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
-            State.Moving -> {
+            is State.Moving -> {
                 // 更新进度
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                val progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
+                currentState.progress = progress
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
-                    state = State.Missing
-                    missingAnimation.start()
+                    state = State.Missing(progress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
-            State.Clicking -> {
-                // 动画时间到，切换完成状态
-                if (!clickingAnimation.update()) state = State.Done
+            is State.Clicking -> {
+                // 动画时间到, 切换完成态
+                if (!currentState.animation.update()) state = State.Done
             }
-            State.Missing -> {
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
-                if (!missingAnimation.update()) state = State.Done
+            is State.Missing -> {
+                // 动画时间到, 切换完成态
+                if (!currentState.animation.update()) state = State.Done
+                currentState.progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
             }
         }
     }
 
     override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
         // 校验轨道一致, 状态移动中
-        if (track.index != trackIndex || state != State.Moving) return false
-        return when {
-            ActionResult.PERFECT.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.PERFECT
-            ActionResult.GOOD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.GOOD
-            ActionResult.BAD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.BAD
-            ActionResult.MISS.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.MISS
-            else -> null
-        }?.also { result ->
-            if (result == ActionResult.MISS) { // 错过
-                state = State.Missing
-                missingAnimation.start()
-            }
-            else { // 完成点击
-                state = State.Clicking
-                clickingAnimation.start()
-            }
+        val currentState = state
+        if (track.index != trackIndex || currentState !is State.Moving) return false
+        val progress = currentState.progress
+        return ActionResult.inRange(DynamicAction.HIT_RATIO, progress)?.also { result ->
+            // 切换点击态或错过态
+            state = if (result == ActionResult.MISS) State.Missing(progress) else State.Clicking(progress)
             callback.updateResult(result)
         } != null
     }
@@ -141,33 +161,43 @@ class NoteAction(
 
     override fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean = false
 
-    override fun onTrackMove(track: Track, offset: Float, tick: Long, callback: ActionCallback) { }
-
-    override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
+    override fun Drawer.onDraw(tracks: List<Track>) {
         val currentState = state
         if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
-        transform({
-            // 先将轨道底部的画布以顶点为中心缩放到指定进度上
-            scale(progress, track.vertices)
-            // 然后透视
-            transform(matrix)
-            // 再根据轨道左右位置决定是否水平翻转
-            if (track.isRight) scale(-1f, 1f, srcRect.center)
-        }) {
-            when (currentState) {
-                State.Moving -> {
+
+        when (currentState) {
+            is State.Moving -> {
+                transform({
+                    // 先将轨道底部的画布以顶点为中心缩放到指定进度上
+                    scale(currentState.progress, track.vertices)
+                    // 然后透视
+                    transform(matrix)
+                    // 再根据轨道左右位置决定是否水平翻转
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
                     image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
                 }
-                State.Clicking -> {
-                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - clickingAnimation.progress)
+            }
+            is State.Clicking -> {
+                transform({
+                    scale(currentState.lastProgress, track.vertices)
+                    transform(matrix)
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - currentState.animation.progress)
                 }
-                State.Missing -> {
-                    // 在 progress 处停滞, 播放消失动画(先用淡出模拟)
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - missingAnimation.progress)
+            }
+            is State.Missing -> {
+                transform({
+                    scale(currentState.progress, track.vertices)
+                    transform(matrix)
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
+                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - currentState.animation.progress)
+                    drawAnimatedWebp(noteDismiss, currentState.animation.frame, srcRect)
                 }
             }
         }
@@ -176,6 +206,7 @@ class NoteAction(
 
 @Stable
 class FixedSlurAction(
+    assets: Assets,
     private val start: Long,
     private val end: Long,
     override val action: RhymeAction.Slur
@@ -211,6 +242,8 @@ class FixedSlurAction(
         )
     }
 
+    private val blockMap: ImageBitmap by assets()
+
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
     private val blockRect = DynamicAction.calcBlockRect(noteScale, 3)
@@ -218,7 +251,7 @@ class FixedSlurAction(
     private var state: State by mutableStateOf(State.Ready) // 状态
     private var progress: Float by mutableFloatStateOf(0f) // 进度
 
-    private var tailRatio by mutableFloatStateOf((end - start) / DynamicAction.BASE_DURATION.toFloat())
+    private var tailRatio: Float by mutableFloatStateOf((end - start) / DynamicAction.BASE_DURATION.toFloat())
 
     private var pressingAnimation = LineFrameAnimation(30, true) // 长按动画
     private var releasingAnimation = LineFrameAnimation(30) // 释放动画
@@ -248,7 +281,7 @@ class FixedSlurAction(
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             State.Moving -> {
                 // 更新进度
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
                     state = State.Missing
@@ -259,6 +292,7 @@ class FixedSlurAction(
             is State.Pressing -> {
                 // 保持进度不变, 减小拖尾长度
                 tailRatio = (end - tick) / DynamicAction.BASE_DURATION.toFloat()
+                pressingAnimation.update()
                 // 超过长按长度自动结算
                 if (tailRatio <= 0f) {
                     val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
@@ -272,7 +306,7 @@ class FixedSlurAction(
                 if (!releasingAnimation.update()) state = State.Done
             }
             State.Missing -> {
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
                 if (!missingAnimation.update()) state = State.Done
             }
         }
@@ -304,19 +338,17 @@ class FixedSlurAction(
     override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback) {
         val currentState = state
         // 状态必须是按下
-        require(track.index == trackIndex && currentState is State.Pressing)
-
-        val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
-        state = releasingState
-        releasingAnimation.start()
-        callback.calcResult(releasingState)
+        if (track.index == trackIndex && currentState is State.Pressing) {
+            val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
+            state = releasingState
+            releasingAnimation.start()
+            callback.calcResult(releasingState)
+        }
     }
 
     override fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean = false
 
-    override fun onTrackMove(track: Track, offset: Float, tick: Long, callback: ActionCallback) { }
-
-    override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
+    override fun Drawer.onDraw(tracks: List<Track>) {
         val currentState = state
         if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
 
@@ -326,7 +358,7 @@ class FixedSlurAction(
         // 拖尾
         when (currentState) {
             State.Moving, is State.Pressing -> {
-                val tailEndRatio = (progress.asVirtual - tailRatio).coerceIn(0f, 1f).asActual
+                val tailEndRatio = (progress.asVirtual - tailRatio).asActual
                 val startLeft = track.vertices.onLine(track.left, progress)
                 val startRight = track.vertices.onLine(track.right, progress)
                 val endLeft = track.vertices.onLine(track.left, tailEndRatio)
@@ -370,64 +402,84 @@ class FixedSlurAction(
 
 @Stable
 class OffsetSlurAction(
+    assets: Assets,
     private val start: Long,
     private val end: Long,
     override val action: RhymeAction.Slur
 ) : DynamicAction {
+    // 长按信息
     @Stable
-    private enum class State {
-        Ready, // 就绪
-        Moving, // 移动
-        Pressing, // 长按中
-        Transfering, // 变轨中
-        Releasing, // 释放中
-        Missing, // 释放中
-        Done; // 已完成
-    }
+    data class PressInfo(
+        val pressTick: Long, // 按下时间
+        val releaseTick: Long?, // 释放时间
+        val result: ActionResult // 按下结果
+    )
 
     // 变轨信息
     @Stable
     private class TransferInfo(
-        val isBeginning: Boolean, // 初始轨道
         val tick: Long, // 按下时刻
-        val noteScale: Int, // 音阶
+        val duration: Long, // 时长
         val trackIndex: Int, // 轨道索引
-        val blockRect: Pair<Rect, Rect> // 主体图区域
     ) {
-        companion object {
-            const val TRANSFER_DURATION = 100L // 变轨时长
-        }
+        val appearance: Long = tick - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
 
-        val startTick = tick - TRANSFER_DURATION
-        val endTick = tick + TRANSFER_DURATION
+        var progress: Float by mutableFloatStateOf(0f) // 进度
+        var tailRatio: Float by mutableFloatStateOf(duration / DynamicAction.BASE_DURATION.toFloat())
 
-        var pressTick: Long? = null
-        var releaseTick: Long? = null
+        val missingAnimation = LineFrameAnimation(30) // 消失动画
+        val releasingAnimation = LineFrameAnimation(30) // 释放动画
     }
 
-    // 变轨信息
-    private val infos = run {
-        val perDuration = (end - start) / action.scale.size
-        action.scale.fastMapIndexed { index, scale ->
-            val noteScale = DynamicAction.mapNoteScale(scale)
-            TransferInfo(
-                isBeginning = index == 0,
-                tick = start + perDuration * index,
-                noteScale = noteScale,
-                trackIndex = DynamicAction.mapTrackIndex(scale),
-                blockRect = DynamicAction.calcBlockRect(noteScale, 3)
-            )
-        }
+    // 连接信息
+    @Stable
+    private data class ActionConnection(
+        val left: Offset,
+        val right: Offset,
+        val track: Track
+    )
+
+    @Stable
+    private sealed interface State {
+        @Stable
+        data object Ready : State // 就绪
+        @Stable
+        data object Moving : State // 移动
+        @Stable
+        data class Pressing(
+            val infos: List<PressInfo>, // 按下信息
+            val transferIndex: Int, // 变轨索引
+        ) : State // 长按中
+        @Stable
+        data class Releasing(
+            val infos: List<PressInfo>, // 按下信息
+            val transferIndex: Int, // 变轨索引
+        ) : State // 释放中
+        @Stable
+        data object Missing : State // 错过中
+        @Stable
+        data object Done : State // 已完成
     }
+
+    private val blockMap: ImageBitmap by assets()
+
+    // 长按总时长
+    private val pressDuration = (end - start)
+    // 每个音符长按时长
+    private val perDuration = pressDuration / action.scale.size
+    // 原始变轨信息
+    private val transferInfos = action.scale.fastMapIndexed { index, scale ->
+        TransferInfo(
+            tick = start + perDuration * index,
+            duration = perDuration,
+            trackIndex = DynamicAction.mapTrackIndex(scale),
+        )
+    }
+    private val blockRect = DynamicAction.calcBlockRect(0, 6)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
-    private var progress: Float by mutableFloatStateOf(0f) // 进度
-    private var transferIndex by mutableIntStateOf(0) // 变轨信息
-    private var actionResult by mutableStateOf<ActionResult?>(null) // 判定结果
 
     private var pressingAnimation = LineFrameAnimation(30, true) // 长按动画
-    private var releasingAnimation = LineFrameAnimation(30) // 释放动画
-    private var missingAnimation = LineFrameAnimation(30) // 消失动画
 
     override var bindId: Long? = null
 
@@ -442,40 +494,50 @@ class OffsetSlurAction(
     }
 
     override fun onUpdate(tick: Long, callback: ActionCallback) {
-        when (state) {
+        when (val currentState = state) {
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             State.Moving -> {
                 // 更新进度
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                for (transferInfo in transferInfos) {
+                    transferInfo.progress = ((tick - transferInfo.appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
+                }
                 // 超出死线仍未处理的音符标记错过
-                if (progress > DynamicAction.deadline) {
+                if (transferInfos[0].progress > DynamicAction.deadline) {
                     state = State.Missing
-                    missingAnimation.start()
+                    for (transferInfo in transferInfos) transferInfo.missingAnimation.start()
                     callback.updateResult(ActionResult.MISS)
                 }
             }
-            State.Pressing -> {
-
+            is State.Pressing -> {
+                pressingAnimation.update()
             }
-            State.Transfering -> {
-
-            }
-            State.Releasing -> {
+            is State.Releasing -> {
                 // 动画时间到，切换完成状态
-                if (!releasingAnimation.update()) state = State.Done
+                val transferIndex = currentState.transferIndex
+                for (index in transferIndex .. transferInfos.lastIndex) {
+                    if (!transferInfos[index].releasingAnimation.update()) {
+                        state = State.Done
+                        break
+                    }
+                }
             }
             State.Missing -> {
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
-                if (!missingAnimation.update()) state = State.Done
+                for (transferInfo in transferInfos) {
+                    transferInfo.progress = ((tick - transferInfo.appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual.coerceIn(0f, 1f)
+                    if (!transferInfo.missingAnimation.update()) {
+                        state = State.Done
+                        break
+                    }
+                }
             }
         }
     }
 
     override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
-        val currentState = state
-        val info = infos[0]
         // 校验轨道一致, 状态移动中
-        if (track.index != info.trackIndex || currentState != State.Moving) return false
+        val transferInfo = transferInfos[0]
+        if (track.index != transferInfo.trackIndex || state != State.Moving) return false
+        val progress = transferInfo.progress
 
         return when {
             ActionResult.PERFECT.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.PERFECT
@@ -486,83 +548,145 @@ class OffsetSlurAction(
         }?.also { result ->
             if (result == ActionResult.MISS) { // 错过
                 state = State.Missing
-                missingAnimation.start()
+                for (transferInfo in transferInfos) transferInfo.missingAnimation.start()
                 callback.updateResult(result)
             }
             else { // 长按
-                state = State.Pressing
-                info.pressTick = tick
-                actionResult = result
+                state = State.Pressing(
+                    infos = listOf(
+                        PressInfo(
+                            pressTick = tick,
+                            releaseTick = null,
+                            result = result
+                        )
+                    ),
+                    transferIndex = 0
+                )
+                pressingAnimation.start()
             }
         } != null
     }
 
     override fun onTrackUp(track: Track, tick: Long, callback: ActionCallback) {
-        // 状态是按下或变轨, 并且已经记录按下时刻
+        // 状态变轨
         val currentState = state
-        val info = infos[transferIndex]
-        require(info.pressTick != null && currentState == State.Pressing || currentState == State.Transfering)
-        // 立即结算
-        info.releaseTick = tick
-        state = State.Releasing
-        releasingAnimation.start()
-        callback.calcResult()
+        if (currentState is State.Pressing) {
+            // 立即结算
+            val infos = currentState.infos.toMutableList()
+            val info = infos.last().copy(releaseTick = tick)
+            infos.removeLast()
+            infos.add(info)
+            val transferIndex = currentState.transferIndex
+            state = State.Releasing(infos, transferIndex)
+            for (index in transferIndex .. transferInfos.lastIndex) {
+                transferInfos[index].releasingAnimation.start()
+            }
+            callback.calcResult()
+        }
     }
 
     override fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean {
-        val currentState = state
-        val info = infos[transferIndex]
-        val nextTransferIndex = transferIndex + 1
-        val nextInfo = infos.getOrNull(nextTransferIndex)
-        // 状态是按下, 当前轨道已记录按下时刻
-        require(info.pressTick != null && currentState == State.Pressing)
-
-        info.releaseTick = tick
-        // 所有轨道已经变换完成或变轨方向错误
-        if (nextInfo == null || nextInfo.trackIndex != newTrack.index) {
-            // 立即结算
-            state = State.Releasing
-            releasingAnimation.start()
-            callback.calcResult()
-            return false
+        // 状态变轨
+        if (state is State.Pressing) {
+//            val nextTransferIndex = transferIndex + 1
+//            val nextInfo = infos[nextTransferIndex]
+//            // 如果变轨序号等于下一个变轨序号
+//            if (nextInfo.trackIndex == newTrack.index) {
+//                // 开始变轨
+//                transferIndex = nextTransferIndex
+//                nextInfo.pressTick = tick
+//                // 如果已经完成最后一个轨道变换立即结算
+//                if (nextTransferIndex == infos.lastIndex) {
+//                    state = State.Releasing
+//                    releasingAnimation.start()
+//                    callback.calcResult()
+//                }
+//            }
+            return true
         }
-        // 开始变轨
-        ++transferIndex
-        return true
+        return false
     }
 
-    override fun onTrackMove(track: Track, offset: Float, tick: Long, callback: ActionCallback) {
-
-    }
-
-    override fun Drawer.onDraw(tracks: List<Track>, blockMap: ImageBitmap) {
+    override fun Drawer.onDraw(tracks: List<Track>) {
         val currentState = state
         if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
 
-        // 根据变轨信息找到当前轨道
-        val info = infos.getOrNull(transferIndex)
-        if (info != null) {
-            val track = tracks[info.trackIndex]
-            val (matrix, srcRect, _) = track.perspectiveMatrix
-            val blockRect = info.blockRect
+        when (currentState) {
+            State.Moving, is State.Pressing -> {
+                val transferIndex = if (currentState is State.Pressing) currentState.transferIndex else 0
+                val perAlpha = 0.8f / transferInfos.size
+                var lastInfo: ActionConnection? = null
 
-            transform({
-                scale(progress, track.vertices)
-                transform(matrix)
-                if (track.isRight) scale(-1f, 1f, srcRect.center)
-            }) {
-                when (currentState) {
-                    State.Moving -> {
+                // 拖尾
+                for (index in transferIndex .. transferInfos.lastIndex) {
+                    val transferInfo = transferInfos[index]
+                    val trackIndex = transferInfo.trackIndex
+                    val track = tracks[trackIndex]
+                    val progress = transferInfo.progress
+                    val tailEndRatio = (progress.asVirtual - transferInfo.tailRatio).asActual
+                    val startLeft = track.vertices.onLine(track.left, progress)
+                    val startRight = track.vertices.onLine(track.right, progress)
+                    val endLeft = track.vertices.onLine(track.left, tailEndRatio)
+                    val endRight = track.vertices.onLine(track.right, tailEndRatio)
+
+                    val color = Colors.Pink3
+                    val startAlpha = 0.8f - index * perAlpha
+                    val endAlpha = (startAlpha - perAlpha).coerceAtLeast(0f)
+
+                    // 尾部起始连线的六等分点
+                    val tailEndLeft = endLeft.onLine(endRight, 0.166667f)
+                    val tailEndRight = endLeft.onLine(endRight, 0.833333f)
+                    path(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(color.copy(alpha = startAlpha), color.copy(alpha = endAlpha)),
+                            startY = startLeft.y,
+                            endY = endLeft.y),
+                        path = Path(arrayOf(
+                            startLeft.onLine(startRight, 0.166667f),
+                            tailEndLeft,
+                            tailEndRight,
+                            startLeft.onLine(startRight, 0.833333f)
+                        ))
+                    )
+
+                    // 链接
+                    lastInfo?.let { (lastLeft, lastRight, track) ->
+                        val p2 = startLeft.onCenter(startRight)
+                        val p1 = p2.translate(y = -10f)
+                        val p3 = if (trackIndex > track.index) lastLeft else lastRight
+                        val p4 = p3.translate(x = 10f / p3.y * (track.vertices.x - p3.x), y = -10f)
+                        path(color.copy(alpha = startAlpha), Path(arrayOf(p1, p2, p3, p4)))
+                    }
+                    lastInfo = ActionConnection(tailEndLeft, tailEndRight, track)
+                }
+
+                for (index in transferIndex .. transferInfos.lastIndex) {
+                    val transferInfo = transferInfos[index]
+                    val track = tracks[transferInfo.trackIndex]
+                    val (matrix, srcRect, _) = track.perspectiveMatrix
+                    transform({
+                        scale(transferInfo.progress, track.vertices)
+                        transform(matrix)
+                        if (track.isRight) scale(-1f, 1f, srcRect.center)
+                    }) {
                         image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
                     }
-                    State.Pressing, State.Transfering -> {
-
-                    }
-                    State.Releasing -> {
-
-                    }
-                    State.Missing -> {
-                        image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - missingAnimation.progress)
+                }
+            }
+            is State.Releasing, State.Missing -> {
+                for (transferInfo in transferInfos) {
+                    val track = tracks[transferInfo.trackIndex]
+                    val (matrix, srcRect, _) = track.perspectiveMatrix
+                    transform({
+                        scale(transferInfo.progress, track.vertices)
+                        transform(matrix)
+                        if (track.isRight) scale(-1f, 1f, srcRect.center)
+                    }) {
+                        val progress = when (currentState) {
+                            is State.Releasing -> transferInfo.releasingAnimation.progress
+                            is State.Missing -> transferInfo.missingAnimation.progress
+                        }
+                        image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - progress)
                     }
                 }
             }
@@ -587,8 +711,6 @@ class NoteQueue(
     private val lyrics = lyricsConfig.lyrics
     private val tracks = trackMap.tracks
 
-    private val blockMap: ImageBitmap by manager.assets()
-
     // 预编译队列
     private val queue: List<DynamicAction> = buildList(lyrics.size) {
         for (line in lyrics) {
@@ -598,12 +720,12 @@ class NoteQueue(
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                 val end = action.end + line.start
                 val dynamicAction = when (action) {
-                    is RhymeAction.Note -> NoteAction(start, action) // 单音
+                    is RhymeAction.Note -> NoteAction(manager.assets, start, action) // 单音
                     is RhymeAction.Slur -> {
                         // 不同音级但同音高的仍然算做延音
                         val first = DynamicAction.mapTrackIndex(action.scale.first())
-                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(start, end, action) // 延音
-                        else OffsetSlurAction(start, end, action) // 连音
+                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(manager.assets, start, end, action) // 延音
+                        else OffsetSlurAction(manager.assets, start, end, action) // 连音
                     }
                 }
                 add(dynamicAction)
@@ -733,20 +855,8 @@ class NoteQueue(
                             }
                             activeTracks[rawTrackIndex] = null
                         }
-                        else {
-                            // 计算水平位置偏移
-                            val offset = event.position.x - rawTrack.bottomCenter.x
-                            // 在轨道内部移动
-                            action?.onTrackMove(rawTrack, offset, compensateTick, callback)
-                        }
                     }
-                    else if (inTracks) {
-                        // 计算水平位置偏移
-                        val offset = event.position.x - rawTrack.bottomCenter.x
-                        // 在轨道线交界处移动
-                        action?.onTrackMove(rawTrack, offset, compensateTick, callback)
-                    }
-                    else { // 指针移出轨道区域则移除原始轨道
+                    else if (!inTracks) { // 指针移出轨道区域则移除原始轨道
                         if (action != null) {
                             action.onTrackUp(rawTrack, compensateTick, callback)
                             action.bindId = -1L
@@ -761,7 +871,7 @@ class NoteQueue(
 
     override fun Drawer.onClientDraw() {
         foreachAction {
-            it.apply { onDraw(tracks, blockMap) }
+            it.apply { onDraw(tracks) }
             false
         }
     }

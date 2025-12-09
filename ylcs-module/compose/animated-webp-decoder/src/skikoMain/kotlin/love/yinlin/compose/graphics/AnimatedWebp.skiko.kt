@@ -4,6 +4,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asSkiaColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -32,9 +34,11 @@ actual class AnimatedWebp internal constructor(
     private val paint: Paint,
     private val image: Image,
 ) {
-    actual fun DrawScope.drawFrame(index: Int, dst: Rect) {
+    actual fun DrawScope.drawFrame(index: Int, dst: Rect, filter: ColorFilter?) {
         if (index >= 0 && !image.isClosed) {
             drawIntoCanvas { canvas ->
+                val oldColorFilter = paint.colorFilter
+                paint.colorFilter = filter?.asSkiaColorFilter()
                 canvas.nativeCanvas.drawImageRect(
                     image = image,
                     src = org.jetbrains.skia.Rect.makeXYWH(
@@ -48,12 +52,13 @@ actual class AnimatedWebp internal constructor(
                     samplingMode = SamplingMode.MITCHELL,
                     strict = true
                 )
+                paint.colorFilter = oldColorFilter
             }
         }
     }
 
-    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size) {
-        this.drawFrame(index, Rect(position, size))
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, filter: ColorFilter?) {
+        this.drawFrame(index, Rect(position, size), filter)
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(image).encode(format, quality)

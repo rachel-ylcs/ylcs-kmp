@@ -135,15 +135,15 @@ class TrackMap(
     val hitLine = vertices.onLine(tracksArea[0], DynamicAction.HIT_RATIO) to vertices.onLine(tracksArea[2], DynamicAction.HIT_RATIO)
     val hitAreaData = ActionResult.entries.fastMapIndexed { index, result ->
         Path(arrayOf(
-            vertices.onLine(tracksArea[0], result.viewStartRange(DynamicAction.HIT_RATIO)),
-            vertices.onLine(tracksArea[0], result.viewEndRange(DynamicAction.HIT_RATIO)),
-            vertices.onLine(tracksArea[2], result.viewEndRange(DynamicAction.HIT_RATIO)),
-            vertices.onLine(tracksArea[2], result.viewStartRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[0], result.startRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[0], result.endRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[2], result.endRange(DynamicAction.HIT_RATIO)),
+            vertices.onLine(tracksArea[2], result.startRange(DynamicAction.HIT_RATIO)),
         )) to index * 0.05f
     }
 
     // 点击区域边界
-    val clickAreaBound = size.height * (1 - ActionResult.MISS.range + DynamicAction.BODY_RATIO / 2)
+    val clickAreaBound = size.height * (1 - ActionResult.MISS.range)
 
     fun calcTrackIndex(point: Offset): Pair<Track?, Boolean> {
         // 不需要计算点是否位于每个轨道三角形内，只需要计算斜率即可

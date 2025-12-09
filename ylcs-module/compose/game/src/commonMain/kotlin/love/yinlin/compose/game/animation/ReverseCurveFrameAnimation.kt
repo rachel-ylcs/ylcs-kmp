@@ -3,11 +3,10 @@ package love.yinlin.compose.game.animation
 import androidx.compose.runtime.Stable
 
 @Stable
-class CurveFrameAnimation(
+class ReverseCurveFrameAnimation(
     totalFrame: Int,
     isInfinite: Boolean = false,
-    totalStep: Int = 1,
-) : FrameAnimation(totalFrame, isInfinite, totalStep) {
+) : FrameAnimation(totalFrame, isInfinite) {
     override fun calcProgress(t: Int, f: Int): Float {
         val s = t / 3
         //         { 1 - ((x - s) / s) ^ 2  , 0 <= x <= s

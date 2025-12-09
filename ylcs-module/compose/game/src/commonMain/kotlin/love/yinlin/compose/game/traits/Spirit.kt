@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.drawscope.DrawStyle
@@ -102,8 +103,8 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
     protected fun Drawer.roundRect(brush: Brush, radius: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = roundRect(brush, radius, Offset.Zero, size, alpha, style, blendMode)
     protected fun Drawer.arc(color: Color, startAngle: Float, sweepAngle: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = arc(color, startAngle, sweepAngle, Offset.Zero, size, alpha, style, blendMode)
     protected fun Drawer.arc(brush: Brush, startAngle: Float, sweepAngle: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = arc(brush, startAngle, sweepAngle, Offset.Zero, size, alpha, style, blendMode)
-    protected fun Drawer.image(image: ImageBitmap, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) = image(image, Offset.Zero, size, alpha, blendMode)
-    protected fun Drawer.circleImage(image: ImageBitmap, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) = circleImage(image, Offset.Zero, size, alpha, blendMode)
+    protected fun Drawer.image(image: ImageBitmap, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) = image(image, Offset.Zero, size, alpha, colorFilter, blendMode)
+    protected fun Drawer.circleImage(image: ImageBitmap, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) = circleImage(image, Offset.Zero, size, alpha, colorFilter, blendMode)
     protected fun Drawer.clip(block: Drawer.() -> Unit) = clip(Offset.Zero, size, block)
     protected fun Drawer.rotate(degrees: Float, block: Drawer.() -> Unit) = rotate(degrees, center, block)
 }

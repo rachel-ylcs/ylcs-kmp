@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Matrix
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.Path
+import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.roundToIntOffset
 import love.yinlin.compose.translate
 
@@ -122,26 +124,52 @@ class Drawer(
 
     // 绘制图片
 
-    fun image(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope.drawImage(image = image, dstOffset = position.roundToIntOffset(), dstSize = size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
+    fun image(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawImage(
+            image = image,
+            dstOffset = position.roundToIntOffset(),
+            dstSize = size.roundToIntSize(),
+            alpha = alpha,
+            colorFilter = colorFilter,
+            blendMode = blendMode,
+            filterQuality = FilterQuality.High,
+        )
     }
 
-    fun image(image: ImageBitmap, rect: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope.drawImage(image = image, dstOffset = rect.topLeft.roundToIntOffset(), dstSize = rect.size.roundToIntSize(), alpha = alpha, filterQuality = FilterQuality.High, blendMode = blendMode)
+    fun image(image: ImageBitmap, rect: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawImage(
+            image = image,
+            dstOffset = rect.topLeft.roundToIntOffset(),
+            dstSize = rect.size.roundToIntSize(),
+            alpha = alpha,
+            colorFilter = colorFilter,
+            blendMode = blendMode,
+            filterQuality = FilterQuality.High,
+        )
     }
 
-    fun image(image: ImageBitmap, src: Rect, dst: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope.drawImage(image = image, srcOffset = src.topLeft.roundToIntOffset(), srcSize = src.size.roundToIntSize(), dstOffset = dst.topLeft.roundToIntOffset(), dstSize = dst.size.roundToIntSize(), alpha = alpha, blendMode = blendMode)
+    fun image(image: ImageBitmap, src: Rect, dst: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
+        scope.drawImage(
+            image = image,
+            srcOffset = src.topLeft.roundToIntOffset(),
+            srcSize = src.size.roundToIntSize(),
+            dstOffset = dst.topLeft.roundToIntOffset(),
+            dstSize = dst.size.roundToIntSize(),
+            alpha = alpha,
+            colorFilter = colorFilter,
+            blendMode = blendMode,
+            filterQuality = FilterQuality.High,
+        )
     }
 
-    fun circleImage(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
+    fun circleImage(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
+        clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, colorFilter, blendMode) }
     }
 
-    fun circleImage(image: ImageBitmap, rect: Rect, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
+    fun circleImage(image: ImageBitmap, rect: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
         val position = rect.topLeft
         val size = rect.size
-        clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, blendMode) }
+        clip(Path().apply { addOval(Rect(position, size)) }) { image(image, position, size, alpha, colorFilter, blendMode) }
     }
 
     // 绘制文字
@@ -187,6 +215,19 @@ class Drawer(
     fun text(content: Paragraph, brush: Brush, position: Offset, shadow: Shadow? = null, decoration: TextDecoration? = null, drawStyle: DrawStyle? = null, blendMode: BlendMode = DrawScope.DefaultBlendMode) {
         translate(position) {
             text(content, brush, shadow, decoration, drawStyle, blendMode)
+        }
+    }
+
+    // 绘制动图
+    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, position: Offset, size: Size, colorFilter: ColorFilter? = null) {
+        image.apply {
+            scope.drawFrame(frame, position, size, colorFilter)
+        }
+    }
+
+    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, dst: Rect, colorFilter: ColorFilter? = null) {
+        image.apply {
+            scope.drawFrame(frame, dst, colorFilter)
         }
     }
 
@@ -248,6 +289,10 @@ class Drawer(
     fun DrawTransform.translate(offset: Offset) = translate(offset.x, offset.y)
 
     fun DrawTransform.scale(ratio: Float, pivot: Offset) = scale(ratio, ratio, pivot)
+
+    fun DrawTransform.flipX(pivot: Offset = center) = scale(-1f, 1f, pivot)
+
+    fun DrawTransform.flipY(pivot: Offset = center) = scale(1f, -1f, pivot)
 
     fun DrawTransform.perspective(src: Rect, dst: Array<Offset>) {
         transform(calcPerspectiveMatrix(src, dst))

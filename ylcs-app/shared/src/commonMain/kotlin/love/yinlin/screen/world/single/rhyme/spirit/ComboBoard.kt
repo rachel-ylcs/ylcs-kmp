@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.TextDrawer
-import love.yinlin.compose.game.animation.CurveFrameAnimation
+import love.yinlin.compose.game.animation.ReverseCurveFrameAnimation
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
@@ -31,25 +31,25 @@ enum class ActionResult(
 ) {
     MISS(
         score = 0,
-        range = DynamicAction.BODY_RATIO * 6f,
+        range = 0.3f,
         title = "MISS",
         colors = listOf(Colors(0xFFFF0844), Colors(0xFFFFB199))
     ),
     BAD(
         score = 1,
-        range = DynamicAction.BODY_RATIO * 2.25f,
+        range = 0.12f,
         title = "BAD",
         colors = listOf(Colors(0xFF9FA5D5), Colors(0xFFE8F5C8))
     ),
     GOOD(
         score = 2,
-        range = DynamicAction.BODY_RATIO * 1.5f,
+        range = 0.1f,
         title = "GOOD",
         colors = listOf(Colors(0xFF43E97B), Colors(0xFF38F9D7))
     ),
     PERFECT(
         score = 3,
-        range = DynamicAction.BODY_RATIO * 0.75f,
+        range = 0.06f,
         title = "PERFECT",
         colors = listOf(Colors(0xFFF6D365), Colors(0xFFFDA085))
     );
@@ -57,11 +57,17 @@ enum class ActionResult(
     fun startRange(center: Float) = center - range / 2
     fun endRange(center: Float) = center + range / 2
     fun inRange(center: Float, value: Float) = value >= startRange(center) && value <= endRange(center)
-    fun viewStartRange(center: Float) = center - (range + DynamicAction.BODY_RATIO) / 2
-    fun viewEndRange(center: Float) = center + (range + DynamicAction.BODY_RATIO) / 2
 
     companion object {
         const val COMBO_REWARD_COUNT = 30
+
+        fun inRange(center: Float, value: Float): ActionResult? = when {
+            PERFECT.inRange(center, value) -> PERFECT
+            GOOD.inRange(center, value) -> GOOD
+            BAD.inRange(center, value) -> BAD
+            MISS.inRange(center, value) -> MISS
+            else -> null
+        }
     }
 }
 
@@ -74,7 +80,7 @@ class ComboBoard(
 
     private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)
-    private var animation = CurveFrameAnimation((manager.fps * 0.7f).toInt())
+    private var animation = ReverseCurveFrameAnimation((manager.fps * 0.7f).toInt())
 
     private val actionTextHeight = size.height * 0.6f
     private val comboTextHeight = size.height - actionTextHeight

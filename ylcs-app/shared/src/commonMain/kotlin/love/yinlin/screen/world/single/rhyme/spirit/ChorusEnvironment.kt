@@ -10,7 +10,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.TextDrawer
-import love.yinlin.compose.game.animation.CurveFrameAnimation
+import love.yinlin.compose.game.animation.ReverseCurveFrameAnimation
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.translate
@@ -32,7 +32,7 @@ class ChorusEnvironment(
     private val chorusList = lyricsConfig.chorus
 
     private var chorusIndex = 0
-    private val animation = CurveFrameAnimation(manager.fps * (ANIMATION_DURATION / 1000).toInt(), false)
+    private val animation = ReverseCurveFrameAnimation(manager.fps * (ANIMATION_DURATION / 1000).toInt(), false)
     private val leftArea = Path(arrayOf(
         leftCenter.translate(x = -size.width / 2, y = -TIP_HEIGHT / 2),
         leftCenter.translate(x = -size.width / 2, y = TIP_HEIGHT / 2),

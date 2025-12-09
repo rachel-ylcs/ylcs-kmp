@@ -54,8 +54,6 @@ kotlin {
         val commonMain by getting {
             useApi(
                 projects.ylcsBase.composeCore,
-            )
-            useLib(
                 projects.ylcsModule.compose.animatedWebpDecoder,
             )
         }

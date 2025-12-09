@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 abstract class FrameAnimation(
     totalFrame: Int,
     private val isInfinite: Boolean,
-    private val totalStep: Int = 1,
 ) {
     companion object {
         private const val END = -1
@@ -22,7 +21,8 @@ abstract class FrameAnimation(
 
     private var total by mutableIntStateOf(totalFrame)
 
-    private var frame by mutableIntStateOf(END)
+    var frame by mutableIntStateOf(END)
+        private set
 
     val isCompleted by derivedStateOf { frame == END }
 
@@ -47,13 +47,7 @@ abstract class FrameAnimation(
                 frame = if (isInfinite) 0 else END
                 return false
             }
-            else {
-                ++step
-                if (step == totalStep) {
-                    ++frame
-                    step = 0
-                }
-            }
+            else ++frame
         }
         return true
     }

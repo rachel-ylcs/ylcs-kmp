@@ -88,8 +88,8 @@ class RhymeManager(
             AssetKey("difficultyStar"),
         )
 
-        val animationKeys = arrayOf<AssetKey>(
-
+        val animationKeys = arrayOf(
+            AssetKey("noteDismiss")
         )
 
         val assetList = (imageKeys.map { (name, version) ->
