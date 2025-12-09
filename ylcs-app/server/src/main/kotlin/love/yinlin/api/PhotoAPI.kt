@@ -13,10 +13,10 @@ fun APIScope.photoAPI() {
         """, ts, ts, aid, num) else db.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo
-            WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?)) AND (JSON_CONTAINS(keyword, JSON_QUOTE(?)) OR location = ? OR author = ?)
+            WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?)) AND (JSON_CONTAINS(keyword, JSON_QUOTE(?)) OR location = ? OR author = ? OR title LIKE CONCAT('%', ?, '%'))
             ORDER BY ts DESC, aid DESC
             LIMIT ?
-        """, ts, ts, aid, keyword, keyword, keyword, num)
+        """, ts, ts, aid, keyword, keyword, keyword, keyword, num)
         result(photos.to())
     }
 }
