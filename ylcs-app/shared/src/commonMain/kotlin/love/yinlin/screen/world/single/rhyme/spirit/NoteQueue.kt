@@ -5,7 +5,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
@@ -287,6 +286,7 @@ class FixedSlurAction(
 
     private val blockMap: ImageBitmap by assets()
     private val noteDismiss: AnimatedWebp by assets()
+    private val longPress: AnimatedWebp by assets()
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
@@ -430,14 +430,12 @@ class FixedSlurAction(
                 // 拖尾
                 val headProgress = currentState.lastHeadProgress
                 drawTrailing(track, headProgress, currentState.tailProgress)
-                // 按键
-                transform({
-                    scale(headProgress, track.vertices)
-                    transform(matrix)
-                    if (track.isRight) flipX(srcRect.center)
-                }) {
-                    image(blockMap, imgRect, srcRect)
-                }
+
+                val left = track.vertices.onLine(track.left, DynamicAction.HIT_RATIO)
+                val right = track.vertices.onLine(track.right, DynamicAction.HIT_RATIO)
+                val topLeft = left.translate(y = -(right.x - left.x) / 2)
+                val size = Size(right.x - left.x, right.x - left.x)
+                drawAnimatedWebp(longPress, currentState.animation.frame, topLeft, size)
             }
             is State.Releasing -> { } // 暂定为空
             is State.Missing -> {
