@@ -22,6 +22,7 @@ import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 
+// 操作结果
 @Stable
 enum class ActionResult(
     val score: Int,
@@ -77,6 +78,8 @@ class ComboBoard(
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(1400f, 150f))
     override val size: Size = Size(450f, 250f)
+
+    private val statistics = IntArray(ActionResult.entries.size) { 0 }
 
     private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)
@@ -149,6 +152,8 @@ class ComboBoard(
     }
 
     fun updateAction(newResult: ActionResult, scoreRatio: Float = 1f): Int {
+        // 统计
+        ++statistics[newResult.ordinal]
         // 重置进度
         result = newResult
         // 计算得分
