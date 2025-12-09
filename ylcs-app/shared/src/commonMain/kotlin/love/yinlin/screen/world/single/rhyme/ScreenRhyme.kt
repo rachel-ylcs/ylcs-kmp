@@ -110,7 +110,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             val lyricsConfig = task1.await()
             val recordImage = task2.await()
             catchingError {
-                require(lyricsConfig != null) { "歌词资源文件丢失" }
+                require(lyricsConfig != null) { "歌词资源文件丢失或损坏" }
                 require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
                 require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {

@@ -19,7 +19,8 @@ abstract class FrameAnimation(
 
     private var step = 0
 
-    private var total by mutableIntStateOf(totalFrame)
+    var total by mutableIntStateOf(totalFrame)
+        private set
 
     var frame by mutableIntStateOf(END)
         private set

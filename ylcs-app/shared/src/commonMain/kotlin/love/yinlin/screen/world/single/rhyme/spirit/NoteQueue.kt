@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
@@ -14,6 +15,7 @@ import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.traits.*
 import love.yinlin.compose.graphics.AnimatedWebp
+import love.yinlin.compose.graphics.SolidColorFilter
 import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
 import love.yinlin.compose.translate
@@ -30,6 +32,8 @@ interface ActionCallback {
 sealed interface DynamicAction {
     companion object {
         const val BASE_DURATION = 3000L // 音符持续时间
+        const val BASE_DURATION_F = BASE_DURATION.toFloat()
+
         const val PERSPECTIVE_K = 3 // 透视参数
         const val HIT_RATIO = 0.8f // 判定线
 
@@ -83,21 +87,29 @@ class NoteAction(
         class Clicking(val lastProgress: Float) : State { // 点击中
             val animation = LineFrameAnimation(30)
 
-            init {
-                animation.start()
-            }
+            init { animation.start() }
         }
         @Stable
         class Missing(lastProgress: Float) : State { // 错过中
             var progress by mutableFloatStateOf(lastProgress)
             val animation = LineFrameAnimation(30)
 
-            init {
-                animation.start()
+            init { animation.start() }
+
+            fun frameIndex(isCenter: Boolean): Int = animation.frame.let {
+                if (isCenter) it + animation.total else it
             }
         }
         @Stable
         data object Done : State // 已完成
+    }
+
+    companion object {
+        val ColorFilters = arrayOf(
+            SolidColorFilter(Colors.Cyan3),
+            SolidColorFilter(Colors.Green3),
+            SolidColorFilter(Colors.Purple3),
+        )
     }
 
     private val blockMap: ImageBitmap by assets()
@@ -106,6 +118,7 @@ class NoteAction(
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale)
     private val noteScale = DynamicAction.mapNoteScale(action.scale)
     private val blockRect = DynamicAction.calcBlockRect(noteScale, 0)
+
     private var state: State by mutableStateOf(State.Ready) // 状态
 
     override var bindId: Long? = null
@@ -125,7 +138,7 @@ class NoteAction(
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             is State.Moving -> {
                 // 更新进度
-                val progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
+                val progress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asActual
                 currentState.progress = progress
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
@@ -140,7 +153,7 @@ class NoteAction(
             is State.Missing -> {
                 // 动画时间到, 切换完成态
                 if (!currentState.animation.update()) state = State.Done
-                currentState.progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
+                currentState.progress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asUncheckedActual.coerceAtMost(0.95f)
             }
         }
     }
@@ -167,6 +180,7 @@ class NoteAction(
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
+        val imgRect = if (track.isCenter) blockRect.second else blockRect.first
 
         when (currentState) {
             is State.Moving -> {
@@ -178,7 +192,7 @@ class NoteAction(
                     // 再根据轨道左右位置决定是否水平翻转
                     if (track.isRight) flipX(srcRect.center)
                 }) {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
+                    image(blockMap, imgRect, srcRect)
                 }
             }
             is State.Clicking -> {
@@ -187,7 +201,7 @@ class NoteAction(
                     transform(matrix)
                     if (track.isRight) flipX(srcRect.center)
                 }) {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - currentState.animation.progress)
+                    image(blockMap, imgRect, srcRect, alpha = 1 - currentState.animation.progress)
                 }
             }
             is State.Missing -> {
@@ -196,8 +210,8 @@ class NoteAction(
                     transform(matrix)
                     if (track.isRight) flipX(srcRect.center)
                 }) {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - currentState.animation.progress)
-                    drawAnimatedWebp(noteDismiss, currentState.animation.frame, srcRect)
+                    image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
+                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, ColorFilters[noteScale])
                 }
             }
         }
@@ -216,54 +230,79 @@ class FixedSlurAction(
         @Stable
         data object Ready : State // 就绪
         @Stable
-        data object Moving : State // 移动
+        class Moving : State { // 移动
+            var headProgress by mutableFloatStateOf(0f)
+            var tailProgress by mutableFloatStateOf(0f)
+        }
         @Stable
-        data class Pressing(
+        class Pressing(
             val pressTick: Long, // 按下时间
             val result: ActionResult, // 按下结果
-        ) : State // 长按中
+            val lastHeadProgress: Float,
+            lastTailProgress: Float,
+        ) : State { // 长按中
+            var tailProgress by mutableFloatStateOf(lastTailProgress)
+            val animation = LineFrameAnimation(30, true)
+
+            init { animation.start() }
+        }
         @Stable
-        data class Releasing(
+        class Releasing(
             val pressTick: Long, // 抬起时间
             val releaseTick: Long, // 释放时间
             val result: ActionResult, // 按下结果
-        ) : State // 释放中
+        ) : State { // 释放中
+            val animation = LineFrameAnimation(30)
+
+            init { animation.start() }
+        }
         @Stable
-        data object Missing : State // 错过中
+        class Missing(lastHeadProgress: Float, lastTailProgress: Float) : State { // 错过中
+            var headProgress by mutableFloatStateOf(lastHeadProgress)
+            var tailProgress by mutableFloatStateOf(lastTailProgress)
+            val animation = LineFrameAnimation(30)
+
+            init { animation.start() }
+
+            fun frameIndex(isCenter: Boolean): Int = animation.frame.let {
+                if (isCenter) it + animation.total else it
+            }
+        }
         @Stable
         data object Done : State // 已完成
     }
 
     companion object {
-        val brush = arrayOf(
-            listOf(Colors.Red5.copy(alpha = 0.8f), Colors.Red5.copy(alpha = 0.2f), Colors.Transparent),
-            listOf(Colors.Orange6.copy(alpha = 0.8f), Colors.Orange6.copy(alpha = 0.4f), Colors.Transparent),
-            listOf(Colors.Cyan6.copy(alpha = 0.8f), Colors.Cyan6.copy(alpha = 0.4f), Colors.Transparent)
+        val ColorFilters = arrayOf(
+            SolidColorFilter(Colors.Red5),
+            SolidColorFilter(Colors.Orange6),
+            SolidColorFilter(Colors.Cyan6),
+        )
+        val TailBrushes = arrayOf(
+            listOf(Colors.Red5.copy(alpha = 0.8f), Colors.Transparent),
+            listOf(Colors.Orange6.copy(alpha = 0.8f), Colors.Transparent),
+            listOf(Colors.Cyan6.copy(alpha = 0.8f), Colors.Transparent)
         )
     }
 
     private val blockMap: ImageBitmap by assets()
+    private val noteDismiss: AnimatedWebp by assets()
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
     private val blockRect = DynamicAction.calcBlockRect(noteScale, 3)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
-    private var progress: Float by mutableFloatStateOf(0f) // 进度
-
-    private var tailRatio: Float by mutableFloatStateOf((end - start) / DynamicAction.BASE_DURATION.toFloat())
-
-    private var pressingAnimation = LineFrameAnimation(30, true) // 长按动画
-    private var releasingAnimation = LineFrameAnimation(30) // 释放动画
-    private var missingAnimation = LineFrameAnimation(30) // 消失动画
 
     override var bindId: Long? = null
 
-    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asVirtual).toLong()
+    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asUncheckedVirtual).toLong()
+    private val actionDuration = end - start
+    private val tailAppearance: Long = appearance + actionDuration
 
     override val isDismiss: Boolean by derivedStateOf { state == State.Done }
 
-    override fun onAdmission() { state = State.Moving }
+    override fun onAdmission() { state = State.Moving() }
 
     private fun ActionCallback.calcResult(state: State.Releasing) {
         // 计算长按持续时间
@@ -271,7 +310,7 @@ class FixedSlurAction(
         val actualReleaseTick = state.releaseTick.coerceAtMost(end)
         val pressDuration = (actualReleaseTick - actualPressTick).coerceAtLeast(0L)
         // 系数计分规则
-        val ratio = pressDuration / (end - start).toFloat()
+        val ratio = pressDuration / actionDuration.toFloat()
         val coefficient = (1 + 0.87f * ratio * ratio * (ratio + 1)).coerceIn(1f, 2f)
         updateResult(state.result, coefficient)
     }
@@ -279,59 +318,58 @@ class FixedSlurAction(
     override fun onUpdate(tick: Long, callback: ActionCallback) {
         when (val currentState = state) {
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
-            State.Moving -> {
+            is State.Moving -> {
                 // 更新进度
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
+                val headProgress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asActual
+                val tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
+                currentState.headProgress = headProgress
+                currentState.tailProgress = tailProgress
                 // 超出死线仍未处理的音符标记错过
-                if (progress > DynamicAction.deadline) {
-                    state = State.Missing
-                    missingAnimation.start()
+                if (headProgress > DynamicAction.deadline) {
+                    state = State.Missing(headProgress, tailProgress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
             is State.Pressing -> {
-                // 保持进度不变, 减小拖尾长度
-                tailRatio = (end - tick) / DynamicAction.BASE_DURATION.toFloat()
-                pressingAnimation.update()
-                // 超过长按长度自动结算
-                if (tailRatio <= 0f) {
-                    val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
-                    state = releasingState
-                    releasingAnimation.start()
-                    callback.calcResult(releasingState)
+                currentState.animation.update()
+                currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
+                // 尾部到达头部时自动结算
+                if (currentState.tailProgress > currentState.lastHeadProgress) {
+                    state = State.Releasing(currentState.pressTick, tick, currentState.result).also {
+                        callback.calcResult(it)
+                    }
                 }
             }
             is State.Releasing -> {
-                // 动画时间到，切换完成状态
-                if (!releasingAnimation.update()) state = State.Done
+                if (!currentState.animation.update()) state = State.Done
             }
-            State.Missing -> {
-                progress = ((tick - appearance) / DynamicAction.BASE_DURATION.toFloat()).asActual
-                if (!missingAnimation.update()) state = State.Done
+            is State.Missing -> {
+                if (!currentState.animation.update()) state = State.Done
+                currentState.headProgress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asUncheckedActual.coerceAtMost(0.95f)
+                // 加速尾部下落, 防止按键消失后突显拖尾
+                val fastRatio = 1 + actionDuration / DynamicAction.BASE_DURATION_F
+                currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F * fastRatio).asUncheckedActual.coerceAtMost(0.95f)
             }
         }
     }
 
     override fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean {
         // 校验轨道一致, 状态移动中
-        if (track.index != trackIndex || state != State.Moving) return false
-
-        return when {
-            ActionResult.PERFECT.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.PERFECT
-            ActionResult.GOOD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.GOOD
-            ActionResult.BAD.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.BAD
-            ActionResult.MISS.inRange(DynamicAction.HIT_RATIO, progress) -> ActionResult.MISS
-            else -> null
-        }?.also { result ->
+        val currentState = state
+        if (track.index != trackIndex || currentState !is State.Moving) return false
+        val headProgress = currentState.headProgress
+        val tailProgress = currentState.tailProgress
+        return ActionResult.inRange(DynamicAction.HIT_RATIO, headProgress)?.also { result ->
             if (result == ActionResult.MISS) { // 错过
-                state = State.Missing
-                missingAnimation.start()
+                state = State.Missing(headProgress, tailProgress)
                 callback.updateResult(result)
             }
-            else { // 长按
-                state = State.Pressing(pressTick = tick, result = result)
-                pressingAnimation.start()
-            }
+            else state = State.Pressing(
+                pressTick = tick,
+                result = result,
+                lastHeadProgress = headProgress,
+                lastTailProgress = tailProgress
+            ) // 长按
         } != null
     }
 
@@ -339,14 +377,32 @@ class FixedSlurAction(
         val currentState = state
         // 状态必须是按下
         if (track.index == trackIndex && currentState is State.Pressing) {
-            val releasingState = State.Releasing(currentState.pressTick, tick, currentState.result)
-            state = releasingState
-            releasingAnimation.start()
-            callback.calcResult(releasingState)
+            state = State.Releasing(currentState.pressTick, tick, currentState.result).also {
+                callback.calcResult(it)
+            }
         }
     }
 
     override fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean = false
+
+    private fun Drawer.drawTrailing(track: Track, headProgress: Float, tailProgress: Float) {
+        if (headProgress > tailProgress) {
+            val headLeft = track.vertices.onLine(track.left, headProgress)
+            val headRight = track.vertices.onLine(track.right, headProgress)
+            val tailLeft = track.vertices.onLine(track.left, tailProgress)
+            val tailRight = track.vertices.onLine(track.right, tailProgress)
+            path(
+                brush = Brush.verticalGradient(TailBrushes[noteScale], headLeft.y, tailLeft.y),
+                // 尾部起始连线的六等分点
+                path = Path(arrayOf(
+                    headLeft.onLine(headRight, 0.166667f),
+                    tailLeft.onLine(tailRight, 0.166667f),
+                    tailLeft.onLine(tailRight, 0.833333f),
+                    headLeft.onLine(headRight, 0.833333f)
+                ))
+            )
+        }
+    }
 
     override fun Drawer.onDraw(tracks: List<Track>) {
         val currentState = state
@@ -354,46 +410,50 @@ class FixedSlurAction(
 
         val track = tracks[trackIndex]
         val (matrix, srcRect, _) = track.perspectiveMatrix
+        val imgRect = if (track.isCenter) blockRect.second else blockRect.first
 
-        // 拖尾
         when (currentState) {
-            State.Moving, is State.Pressing -> {
-                val tailEndRatio = (progress.asVirtual - tailRatio).asActual
-                val startLeft = track.vertices.onLine(track.left, progress)
-                val startRight = track.vertices.onLine(track.right, progress)
-                val endLeft = track.vertices.onLine(track.left, tailEndRatio)
-                val endRight = track.vertices.onLine(track.right, tailEndRatio)
-                // 尾部起始连线的六等分点
-                path(
-                    brush = Brush.verticalGradient(brush[noteScale], startY = startLeft.y, endY = endLeft.y),
-                    path = Path(arrayOf(
-                        startLeft.onLine(startRight, 0.166667f),
-                        endLeft.onLine(endRight, 0.166667f),
-                        endLeft.onLine(endRight, 0.833333f),
-                        startLeft.onLine(startRight, 0.833333f)
-                    ))
-                )
+            is State.Moving -> {
+                // 拖尾
+                val headProgress = currentState.headProgress
+                drawTrailing(track, headProgress, currentState.tailProgress)
+                // 按键
+                transform({
+                    scale(headProgress, track.vertices)
+                    transform(matrix)
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
+                    image(blockMap, imgRect, srcRect)
+                }
             }
-            else -> { }
-        }
+            is State.Pressing -> {
+                // 拖尾
+                val headProgress = currentState.lastHeadProgress
+                drawTrailing(track, headProgress, currentState.tailProgress)
+                // 按键
+                transform({
+                    scale(headProgress, track.vertices)
+                    transform(matrix)
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
+                    image(blockMap, imgRect, srcRect)
+                }
+            }
+            is State.Releasing -> { } // 暂定为空
+            is State.Missing -> {
+                // 拖尾
+                val headProgress = currentState.headProgress
+                val tailProgress = currentState.tailProgress
+                drawTrailing(track, headProgress, tailProgress)
 
-        transform({
-            scale(progress, track.vertices)
-            transform(matrix)
-            if (track.isRight) scale(-1f, 1f, srcRect.center)
-        }) {
-            when (currentState) {
-                State.Moving -> {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
-                }
-                is State.Pressing -> {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect)
-                }
-                is State.Releasing -> {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - releasingAnimation.progress)
-                }
-                State.Missing -> {
-                    image(blockMap, if (track.isLeft) blockRect.first else blockRect.second, srcRect, alpha = 1 - missingAnimation.progress)
+                // 按键
+                transform({
+                    scale(headProgress, track.vertices)
+                    transform(matrix)
+                    if (track.isRight) flipX(srcRect.center)
+                }) {
+                    image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
+                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, ColorFilters[noteScale])
                 }
             }
         }

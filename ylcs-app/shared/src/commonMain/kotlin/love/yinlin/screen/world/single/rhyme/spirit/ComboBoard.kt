@@ -76,14 +76,14 @@ enum class ActionResult(
 class ComboBoard(
     rhymeManager: RhymeManager,
 ) : Spirit(rhymeManager), BoxBody {
-    override val preTransform: List<Transform> = listOf(Transform.Translate(1400f, 150f))
-    override val size: Size = Size(450f, 250f)
+    override val preTransform: List<Transform> = listOf(Transform.Translate(1450f, 150f))
+    override val size: Size = Size(400f, 200f)
 
     private val statistics = IntArray(ActionResult.entries.size) { 0 }
 
     private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)
-    private var animation = ReverseCurveFrameAnimation((manager.fps * 0.7f).toInt())
+    private var animation = ReverseCurveFrameAnimation((manager.fps * 0.75f).toInt())
 
     private val actionTextHeight = size.height * 0.6f
     private val comboTextHeight = size.height - actionTextHeight
