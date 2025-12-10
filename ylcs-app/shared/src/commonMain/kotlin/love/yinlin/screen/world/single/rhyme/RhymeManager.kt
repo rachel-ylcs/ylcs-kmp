@@ -3,20 +3,12 @@ package love.yinlin.screen.world.single.rhyme
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.io.files.Path
 import love.yinlin.Context
-import love.yinlin.api.ServerRes
-import love.yinlin.api.url
-import love.yinlin.common.downloadCache
-import love.yinlin.common.downloadCacheWithPath
-import love.yinlin.compose.game.Asset
-import love.yinlin.compose.game.AssetKey
 import love.yinlin.compose.game.Manager
+import love.yinlin.compose.game.asset.ImageAsset
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
-import love.yinlin.platform.NetClient
 import love.yinlin.platform.SoundPlayer
 import love.yinlin.screen.world.single.rhyme.spirit.Scene
 
@@ -30,12 +22,14 @@ class RhymeManager(
     override val fps: Int = RhymeConfig.FPS
     override val currentTick: Long get() = mp.position
 
+    override val assets: RhymeAssets = RhymeAssets()
+
     private val mp = AudioPlayer(context) {
         stop()
         onComplete()
     }
 
-    private val sound = SoundPlayer()
+    private val sp = SoundPlayer()
 
     var config = RhymePlayConfig.Default
 
@@ -55,7 +49,7 @@ class RhymeManager(
     ) {
         config = playConfig
 
-        assets["mainRecord"] = Asset.image(recordImage, true)!!
+        assets["mainRecord"] = ImageAsset.buildImmediately(recordImage)
 
         onSceneCreate(Scene(
             rhymeManager = this@RhymeManager,
@@ -84,39 +78,14 @@ class RhymeManager(
         onSceneStop()
     }
 
-    fun playSound(type: RhymeSound) {
-        sound.play(type.ordinal)
+    fun playSound(sound: RhymeSound) {
+        sp.play(sound.index)
     }
 
-    suspend fun CoroutineScope.downloadAssets(): Boolean {
-        val imageKeys = arrayOf(
-            AssetKey("leftUIBackground"),
-            AssetKey("rightUIBackground"),
-            AssetKey("blockMap"),
-            AssetKey("difficultyStar"),
-        )
-
-        val animationKeys = arrayOf(
-            AssetKey("noteClick"),
-            AssetKey("noteDismiss"),
-            AssetKey("longPress"),
-        )
-
-        val assetList = (imageKeys.map { (name, version) ->
-            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.pic(name).url}?v=$version")?.let { Asset.image(it) } }
-        } + animationKeys.map { (name, version) ->
-            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.pic(name).url}?v=$version")?.let { Asset.animation(it) } }
-        }).awaitAll()
-
-        for ((name, asset) in assetList) assets[name] = asset ?: return false
-
-        val soundList = RhymeSound.entries.map { item ->
-            async { NetClient.downloadCacheWithPath("${ServerRes.Game.Rhyme.res("${item.title}.wav").url}?v=${item.version}") }
-        }.awaitAll().filterNotNull().toList()
-
-        if (soundList.size != RhymeSound.entries.size) return false
-        sound.loadFromPath(soundList)
-
-        return true
+    suspend fun CoroutineScope.downloadAssets() {
+        assets.apply {
+            require(init())
+            sp.loadFromPath(initSound())
+        }
     }
 }

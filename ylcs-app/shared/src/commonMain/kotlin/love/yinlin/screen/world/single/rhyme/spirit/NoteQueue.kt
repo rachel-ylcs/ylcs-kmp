@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
-import love.yinlin.compose.game.Assets
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.animation.SpeedAdapter
@@ -21,6 +20,7 @@ import love.yinlin.compose.onLine
 import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
+import love.yinlin.screen.world.single.rhyme.RhymeAssets
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 import love.yinlin.screen.world.single.rhyme.RhymeSound
 
@@ -73,7 +73,7 @@ private val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirt
 
 @Stable
 class NoteAction(
-    assets: Assets,
+    assets: RhymeAssets,
     start: Long,
     override val action: RhymeAction.Note
 ) : DynamicAction {
@@ -114,9 +114,10 @@ class NoteAction(
         )
     }
 
-    private val blockMap: ImageBitmap by assets()
-    private val noteClick: AnimatedWebp by assets()
-    private val noteDismiss: AnimatedWebp by assets()
+    private val blockMap = assets.blockMap()
+    private val noteClick = assets.noteClick()
+    private val noteDismiss = assets.noteDismiss()
+    private val soundNoteClick = assets.soundNoteClick
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale)
     private val noteScale = DynamicAction.mapNoteScale(action.scale)
@@ -170,7 +171,7 @@ class NoteAction(
             // 切换点击态或错过态
             state = if (result == ActionResult.MISS) State.Missing(progress) else State.Clicking(progress)
             callback.updateResult(result)
-            callback.playSound(RhymeSound.NoteClick)
+            callback.playSound(soundNoteClick)
         } != null
     }
 
@@ -228,7 +229,7 @@ class NoteAction(
 
 @Stable
 class FixedSlurAction(
-    assets: Assets,
+    assets: RhymeAssets,
     private val start: Long,
     private val end: Long,
     override val action: RhymeAction.Slur
@@ -250,7 +251,7 @@ class FixedSlurAction(
             lastTailProgress: Float,
         ) : State { // 长按中
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(30, true, SpeedAdapter(0.75f))
+            val animation = LineFrameAnimation(100, true)
 
             init { animation.start() }
         }
@@ -293,9 +294,9 @@ class FixedSlurAction(
         )
     }
 
-    private val blockMap: ImageBitmap by assets()
-    private val noteDismiss: AnimatedWebp by assets()
-    private val longPress: AnimatedWebp by assets()
+    private val blockMap = assets.blockMap()
+    private val longPress = assets.longPress()
+    private val noteDismiss = assets.noteDismiss()
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
     private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
@@ -441,7 +442,7 @@ class FixedSlurAction(
                 drawTrailing(track, headProgress, currentState.tailProgress)
 
                 // 动画
-                val plainRect = track.plainRect(DynamicAction.HIT_RATIO, 1f)
+                val plainRect = track.plainRect(DynamicAction.HIT_RATIO, 1f, 1.5f)
                 drawAnimatedWebp(longPress, currentState.animation.frame, plainRect)
             }
             is State.Releasing -> { } // 暂定为空
@@ -467,7 +468,7 @@ class FixedSlurAction(
 
 @Stable
 class OffsetSlurAction(
-    assets: Assets,
+    assets: RhymeAssets,
     private val start: Long,
     private val end: Long,
     override val action: RhymeAction.Slur
@@ -526,7 +527,7 @@ class OffsetSlurAction(
         data object Done : State // 已完成
     }
 
-    private val blockMap: ImageBitmap by assets()
+    private val blockMap = assets.blockMap()
 
     // 长按总时长
     private val pressDuration = (end - start)
@@ -785,12 +786,12 @@ class NoteQueue(
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
                 val end = action.end + line.start
                 val dynamicAction = when (action) {
-                    is RhymeAction.Note -> NoteAction(manager.assets, start, action) // 单音
+                    is RhymeAction.Note -> NoteAction(rhymeManager.assets, start, action) // 单音
                     is RhymeAction.Slur -> {
                         // 不同音级但同音高的仍然算做延音
                         val first = DynamicAction.mapTrackIndex(action.scale.first())
-                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(manager.assets, start, end, action) // 延音
-                        else OffsetSlurAction(manager.assets, start, end, action) // 连音
+                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(rhymeManager.assets, start, end, action) // 延音
+                        else OffsetSlurAction(rhymeManager.assets, start, end, action) // 连音
                     }
                 }
                 add(dynamicAction)

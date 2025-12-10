@@ -81,12 +81,14 @@ class Track(
     // 透视矩阵
     val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(DynamicAction.PERSPECTIVE_K.toFloat(), left, right, slopeLeft, slopeRight)
 
-    fun plainRect(ratio: Float, sizeRatio: Float): Rect {
+    fun plainRect(ratio: Float, sizeRatio: Float, scaleRatio: Float = 1f): Rect {
         val plainLeft = vertices.onLine(left, ratio)
         val plainRight = vertices.onLine(right, ratio)
         val plainWidth = plainRight.x - plainLeft.x
         val plainHeight = plainWidth / sizeRatio
-        return Rect(plainLeft.translate(y = -plainHeight / 2), Size(plainWidth, plainHeight))
+        val actualWidth = plainWidth * scaleRatio
+        val actualHeight = plainHeight * scaleRatio
+        return Rect(plainLeft.translate(x = (1 - scaleRatio) * plainWidth / 2, y = -actualHeight / 2), Size(actualWidth, actualHeight))
     }
 }
 

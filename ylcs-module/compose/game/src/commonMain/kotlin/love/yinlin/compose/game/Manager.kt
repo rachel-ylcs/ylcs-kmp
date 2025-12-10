@@ -24,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import love.yinlin.compose.game.asset.Assets
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.PointerDownEvent
 import love.yinlin.compose.game.traits.PointerMoveEvent
@@ -36,8 +37,7 @@ abstract class Manager {
     abstract val fps: Int // 帧率
 
     abstract val currentTick: Long
-
-    val assets = Assets() // 资源
+    abstract val assets: Assets
 
     private var scene: Spirit? = null // 主场景
 

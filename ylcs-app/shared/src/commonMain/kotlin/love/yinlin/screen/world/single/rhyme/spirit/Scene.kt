@@ -3,7 +3,6 @@ package love.yinlin.screen.world.single.rhyme.spirit
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
@@ -32,8 +31,8 @@ private class LeftUI(
         scoreBoard
     )
 
-    private val leftUIBackground: ImageBitmap by manager.assets()
-    private val difficultyStar: ImageBitmap by manager.assets()
+    private val leftUIBackground= rhymeManager.assets.leftUIBackground()
+    private val difficultyStar = rhymeManager.assets.difficultyStar()
 
     private val difficulty = playConfig.difficulty
 
@@ -71,7 +70,7 @@ private class RightUI(
         LyricsBar(rhymeManager, lyricsConfig)
     )
 
-    private val rightUIBackground: ImageBitmap by manager.assets()
+    private val rightUIBackground = rhymeManager.assets.rightUIBackground()
 
     override fun Drawer.onClientPreDraw() {
         image(rightUIBackground)

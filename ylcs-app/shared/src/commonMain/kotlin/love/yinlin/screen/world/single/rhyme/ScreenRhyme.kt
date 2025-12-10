@@ -504,7 +504,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             val tasks = arrayOf(
                 async(ioContext) {
                     catching { // 下载开屏背景图
-                        prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.pic("prologue").url)
+                        prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.res("prologue.webp").url)
                         count.incrementAndGet()
                     }
                 },
