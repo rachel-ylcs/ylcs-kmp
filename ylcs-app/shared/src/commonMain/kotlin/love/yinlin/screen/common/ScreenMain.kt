@@ -199,6 +199,7 @@ class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
     }
 
     override suspend fun initialize() {
+        get<SubScreenMe>().validateToken()
         get<SubScreenMe>().updateUserToken()
     }
 }

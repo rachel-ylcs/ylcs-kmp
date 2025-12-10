@@ -122,11 +122,23 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         app.config.cacheUserWall = CacheState.UPDATE
     }
 
+    suspend fun validateToken() {
+        val token = app.config.userToken
+        if (token.isNotEmpty()) {
+            ApiAccountValidateToken.request(token) { isValid ->
+                if (!isValid) {
+                    cleanUserToken()
+                    navigate(::ScreenLogin)
+                }
+            }
+        }
+    }
+
     suspend fun updateUserToken() {
         val token = app.config.userToken
         val currentTime = DateEx.CurrentLong
         val duration = currentTime - app.config.userShortToken
-        if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
+        if (token.isNotEmpty() && duration > 30 * 24 * 3600 * 1000L &&
             isUpdateToken.compareAndSet(expect = false, update = true)) {
             ApiAccountUpdateToken.request(token) {
                 app.config.userShortToken = currentTime
