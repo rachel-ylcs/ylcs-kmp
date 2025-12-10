@@ -219,15 +219,15 @@ class Drawer(
     }
 
     // 绘制动图
-    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, position: Offset, size: Size, colorFilter: ColorFilter? = null) {
+    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, position: Offset, size: Size, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
         image.apply {
-            scope.drawFrame(frame, position, size, colorFilter)
+            scope.drawFrame(frame, position, size, alpha, colorFilter, blendMode)
         }
     }
 
-    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, dst: Rect, colorFilter: ColorFilter? = null) {
+    fun drawAnimatedWebp(image: AnimatedWebp, frame: Int, dst: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
         image.apply {
-            scope.drawFrame(frame, dst, colorFilter)
+            scope.drawFrame(frame, dst, alpha, colorFilter, blendMode)
         }
     }
 

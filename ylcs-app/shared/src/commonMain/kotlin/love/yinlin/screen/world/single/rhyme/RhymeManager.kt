@@ -89,6 +89,7 @@ class RhymeManager(
         )
 
         val animationKeys = arrayOf(
+            AssetKey("noteClick"),
             AssetKey("noteDismiss"),
             AssetKey("longPress"),
         )

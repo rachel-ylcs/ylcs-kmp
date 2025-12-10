@@ -3,6 +3,7 @@ package love.yinlin.screen.world.single.rhyme.spirit
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
@@ -79,6 +80,14 @@ class Track(
     val areaPath: Path = Path(area)
     // 透视矩阵
     val perspectiveMatrix = Drawer.calcFixedPerspectiveMatrix(DynamicAction.PERSPECTIVE_K.toFloat(), left, right, slopeLeft, slopeRight)
+
+    fun plainRect(ratio: Float, sizeRatio: Float): Rect {
+        val plainLeft = vertices.onLine(left, ratio)
+        val plainRight = vertices.onLine(right, ratio)
+        val plainWidth = plainRight.x - plainLeft.x
+        val plainHeight = plainWidth / sizeRatio
+        return Rect(plainLeft.translate(y = -plainHeight / 2), Size(plainWidth, plainHeight))
+    }
 }
 
 @Stable

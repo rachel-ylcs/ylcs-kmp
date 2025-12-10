@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asSkiaColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toSkiaRect
 import love.yinlin.data.MimeType
@@ -34,31 +34,38 @@ actual class AnimatedWebp internal constructor(
     private val paint: Paint,
     private val image: Image,
 ) {
-    actual fun DrawScope.drawFrame(index: Int, dst: Rect, filter: ColorFilter?) {
+    actual fun DrawScope.drawFrame(index: Int, dst: Rect, alpha: Float, filter: ColorFilter?, blendMode: BlendMode) {
         if (index >= 0 && !image.isClosed) {
-            drawIntoCanvas { canvas ->
-                val oldColorFilter = paint.colorFilter
-                paint.colorFilter = filter?.asSkiaColorFilter()
-                canvas.nativeCanvas.drawImageRect(
-                    image = image,
-                    src = org.jetbrains.skia.Rect.makeXYWH(
-                        l = (index % col * width).toFloat(),
-                        t = (index / col * height).toFloat(),
-                        w = width.toFloat(),
-                        h = height.toFloat()
-                    ),
-                    dst = dst.toSkiaRect(),
-                    paint = paint,
-                    samplingMode = SamplingMode.MITCHELL,
-                    strict = true
-                )
-                paint.colorFilter = oldColorFilter
-            }
+            val canvas = drawContext.canvas.nativeCanvas
+            val oldAlpha = paint.alpha
+            val oldColorFilter = paint.colorFilter
+            val oldBlendMode = paint.blendMode
+            paint.alpha = (alpha * 255).toInt()
+            paint.colorFilter = filter?.asSkiaColorFilter()
+            paint.blendMode = blendMode.asSkiaBlendMode()
+
+            canvas.drawImageRect(
+                image = image,
+                src = org.jetbrains.skia.Rect.makeXYWH(
+                    l = (index % col * width).toFloat(),
+                    t = (index / col * height).toFloat(),
+                    w = width.toFloat(),
+                    h = height.toFloat()
+                ),
+                dst = dst.toSkiaRect(),
+                paint = paint,
+                samplingMode = SamplingMode.MITCHELL,
+                strict = true
+            )
+
+            paint.alpha = oldAlpha
+            paint.colorFilter = oldColorFilter
+            paint.blendMode = oldBlendMode
         }
     }
 
-    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, filter: ColorFilter?) {
-        this.drawFrame(index, Rect(position, size), filter)
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, alpha: Float, filter: ColorFilter?, blendMode: BlendMode) {
+        this.drawFrame(index, Rect(position, size), alpha, filter, blendMode)
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(image).encode(format, quality)

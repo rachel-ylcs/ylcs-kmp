@@ -7,10 +7,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toAndroidRectF
 import love.yinlin.data.compose.ImageFormat
@@ -30,27 +30,34 @@ actual class AnimatedWebp internal constructor(
     private val paint: Paint,
     private val bitmap: Bitmap
 ) {
-    actual fun DrawScope.drawFrame(index: Int, dst: Rect, filter: ColorFilter?) {
+    actual fun DrawScope.drawFrame(index: Int, dst: Rect, alpha: Float, filter: ColorFilter?, blendMode: BlendMode) {
         if (index >= 0 && !bitmap.isRecycled) {
-            drawIntoCanvas { canvas ->
-                val left = index % col * width
-                val top = index / col * height
+            val canvas = drawContext.canvas.nativeCanvas
+            val left = index % col * width
+            val top = index / col * height
 
-                val oldFilter = paint.colorFilter
-                paint.colorFilter = filter?.asAndroidColorFilter()
-                canvas.nativeCanvas.drawBitmap(
-                    bitmap,
-                    android.graphics.Rect(left, top, left + width, top + height),
-                    dst.toAndroidRectF(),
-                    paint
-                )
-                paint.colorFilter = oldFilter
-            }
+            val oldAlpha = paint.alpha
+            val oldFilter = paint.colorFilter
+            val oldBlendMode = paint.blendMode
+            paint.alpha = (alpha * 255).toInt()
+            paint.colorFilter = filter?.asAndroidColorFilter()
+            paint.blendMode = blendMode.asAndroidBlendMode()
+
+            canvas.drawBitmap(
+                bitmap,
+                android.graphics.Rect(left, top, left + width, top + height),
+                dst.toAndroidRectF(),
+                paint
+            )
+
+            paint.alpha = oldAlpha
+            paint.colorFilter = oldFilter
+            paint.blendMode = oldBlendMode
         }
     }
 
-    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, filter: ColorFilter?) {
-        this.drawFrame(index, Rect(position, size), filter)
+    actual fun DrawScope.drawFrame(index: Int, position: Offset, size: Size, alpha: Float, filter: ColorFilter?, blendMode: BlendMode) {
+        this.drawFrame(index, Rect(position, size), alpha, filter, blendMode)
     }
 
     actual fun encode(format: ImageFormat, quality: ImageQuality): ByteArray? = PlatformImage(bitmap).encode(format, quality)

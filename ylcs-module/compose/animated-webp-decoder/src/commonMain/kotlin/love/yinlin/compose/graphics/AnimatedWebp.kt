@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import love.yinlin.data.compose.ImageFormat
@@ -16,8 +17,8 @@ expect class AnimatedWebp {
     val height: Int
     val frameCount: Int
 
-    fun DrawScope.drawFrame(index: Int, dst: Rect, filter: ColorFilter? = null)
-    fun DrawScope.drawFrame(index: Int, position: Offset = Offset.Zero, size: Size = Size(width.toFloat(), height.toFloat()), filter: ColorFilter? = null)
+    fun DrawScope.drawFrame(index: Int, dst: Rect, alpha: Float = 1f, filter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver)
+    fun DrawScope.drawFrame(index: Int, position: Offset = Offset.Zero, size: Size = Size(width.toFloat(), height.toFloat()), alpha: Float = 1f, filter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver)
     fun encode(format: ImageFormat = ImageFormat.WEBP, quality: ImageQuality = ImageQuality.Full): ByteArray?
 
     companion object {

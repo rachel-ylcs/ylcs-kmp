@@ -85,7 +85,7 @@ class NoteAction(
         }
         @Stable
         class Clicking(val lastProgress: Float) : State { // 点击中
-            val animation = LineFrameAnimation(30)
+            val animation = LineFrameAnimation(36)
 
             init { animation.start() }
         }
@@ -113,6 +113,7 @@ class NoteAction(
     }
 
     private val blockMap: ImageBitmap by assets()
+    private val noteClick: AnimatedWebp by assets()
     private val noteDismiss: AnimatedWebp by assets()
 
     private val trackIndex = DynamicAction.mapTrackIndex(action.scale)
@@ -196,13 +197,17 @@ class NoteAction(
                 }
             }
             is State.Clicking -> {
+                val lastProgress = currentState.lastProgress
                 transform({
-                    scale(currentState.lastProgress, track.vertices)
+                    scale(lastProgress, track.vertices)
                     transform(matrix)
                     if (track.isRight) flipX(srcRect.center)
                 }) {
-                    image(blockMap, imgRect, srcRect, alpha = 1 - currentState.animation.progress)
+                    image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
                 }
+
+                val plainRect = track.plainRect(lastProgress, 1f)
+                drawAnimatedWebp(noteClick, currentState.animation.frame, plainRect)
             }
             is State.Missing -> {
                 transform({
@@ -211,7 +216,7 @@ class NoteAction(
                     if (track.isRight) flipX(srcRect.center)
                 }) {
                     image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
-                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, ColorFilters[noteScale])
+                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, colorFilter = ColorFilters[noteScale])
                 }
             }
         }
@@ -432,11 +437,9 @@ class FixedSlurAction(
                 val headProgress = currentState.lastHeadProgress
                 drawTrailing(track, headProgress, currentState.tailProgress)
 
-                val left = track.vertices.onLine(track.left, DynamicAction.HIT_RATIO)
-                val right = track.vertices.onLine(track.right, DynamicAction.HIT_RATIO)
-                val topLeft = left.translate(y = -(right.x - left.x) / 2)
-                val size = Size(right.x - left.x, right.x - left.x)
-                drawAnimatedWebp(longPress, currentState.animation.frame, topLeft, size)
+                // 动画
+                val plainRect = track.plainRect(DynamicAction.HIT_RATIO, 1f)
+                drawAnimatedWebp(longPress, currentState.animation.frame, plainRect)
             }
             is State.Releasing -> { } // 暂定为空
             is State.Missing -> {
@@ -452,7 +455,7 @@ class FixedSlurAction(
                     if (track.isRight) flipX(srcRect.center)
                 }) {
                     image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
-                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, ColorFilters[noteScale])
+                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, colorFilter = ColorFilters[noteScale])
                 }
             }
         }
