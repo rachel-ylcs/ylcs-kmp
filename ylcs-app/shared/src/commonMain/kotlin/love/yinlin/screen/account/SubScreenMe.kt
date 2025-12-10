@@ -134,11 +134,19 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         }
     }
 
+    fun shouldUpdateToken(): Boolean {
+        val token = app.config.userToken
+        if (token.isEmpty()) return false
+        val currentTime = DateEx.CurrentLong
+        val duration = currentTime - app.config.userShortToken
+        return duration > 7 * 24 * 3600 * 1000L
+    }
+
     suspend fun updateUserToken() {
         val token = app.config.userToken
         val currentTime = DateEx.CurrentLong
         val duration = currentTime - app.config.userShortToken
-        if (token.isNotEmpty() && duration > 30 * 24 * 3600 * 1000L &&
+        if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
             isUpdateToken.compareAndSet(expect = false, update = true)) {
             ApiAccountUpdateToken.request(token) {
                 app.config.userShortToken = currentTime

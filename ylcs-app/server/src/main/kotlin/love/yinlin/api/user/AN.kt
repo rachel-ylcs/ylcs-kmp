@@ -112,13 +112,9 @@ object AN {
     }
 
     fun checkToken(tokenString: String): Boolean {
-        return try {
             val token = parseToken(tokenString)
             val saveTokenString = redis[token.key]
-            saveTokenString == tokenString
-        } catch (e: Exception) {
-            false
-        }
+            return(saveTokenString == tokenString)
     }
 
     fun throwReGenerateToken(tokenString: String): String {
