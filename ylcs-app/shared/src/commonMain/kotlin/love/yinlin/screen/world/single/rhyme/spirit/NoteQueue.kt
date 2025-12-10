@@ -12,6 +12,7 @@ import love.yinlin.compose.Path
 import love.yinlin.compose.game.Assets
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
+import love.yinlin.compose.game.animation.SpeedAdapter
 import love.yinlin.compose.game.traits.*
 import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.SolidColorFilter
@@ -241,7 +242,7 @@ class FixedSlurAction(
             lastTailProgress: Float,
         ) : State { // 长按中
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(30, true)
+            val animation = LineFrameAnimation(30, true, SpeedAdapter(0.75f))
 
             init { animation.start() }
         }

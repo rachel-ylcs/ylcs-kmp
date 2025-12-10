@@ -6,7 +6,8 @@ import androidx.compose.runtime.Stable
 class ReverseCurveFrameAnimation(
     totalFrame: Int,
     isInfinite: Boolean = false,
-) : FrameAnimation(totalFrame, isInfinite) {
+    adapter: FrameAdapter? = null,
+) : FrameAnimation(totalFrame, isInfinite, adapter) {
     override fun calcProgress(t: Int, f: Int): Float {
         val s = t / 3
         //         { 1 - ((x - s) / s) ^ 2  , 0 <= x <= s

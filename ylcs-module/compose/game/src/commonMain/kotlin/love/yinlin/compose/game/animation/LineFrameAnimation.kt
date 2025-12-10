@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 class LineFrameAnimation(
     totalFrame: Int,
     isInfinite: Boolean = false,
-) : FrameAnimation(totalFrame, isInfinite) {
+    adapter: FrameAdapter? = null,
+) : FrameAnimation(totalFrame, isInfinite, adapter) {
     override fun calcProgress(t: Int, f: Int): Float = (f + 1f) / t
 }
