@@ -66,6 +66,10 @@ val ApiAccountLogin by API.post.i<String, String, Platform>().o<String>()
 val ApiAccountLogOff by API.post.i<String>().o()
 
 @APIParam("token")
+@APIReturn("Boolean")
+val ApiAccountValidateToken by API.post.i<String>().o<Boolean>()
+
+@APIParam("token")
 @APIReturn("newToken")
 val ApiAccountUpdateToken by API.post.i<String>().o<String>()
 
@@ -482,7 +486,6 @@ val ApiPrizeGetAllParticipators by API.post.i<Int,Int,Int>().o<List<PrizeDraw>>(
 val ApiPrizeDrawPrize by API.post.i<String,Int>().o<String>()
 //管理员手动开奖，生成中奖名单
 //使用承诺-揭示机制确保公平性
-
 
 
 

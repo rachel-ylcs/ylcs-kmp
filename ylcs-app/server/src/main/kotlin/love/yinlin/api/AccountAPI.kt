@@ -39,6 +39,10 @@ fun APIScope.accountAPI() {
         result(AN.throwReGenerateToken(token))
     }
 
+    ApiAccountValidateToken.response { token ->
+        result(AN.checkToken(token))
+    }
+
     ApiAccountRegister.response { name, pwd, inviterName ->
         VN.throwName(name, inviterName)
         VN.throwPassword(pwd)
