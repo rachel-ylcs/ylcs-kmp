@@ -10,12 +10,14 @@ import love.yinlin.Context
 import love.yinlin.api.ServerRes
 import love.yinlin.api.url
 import love.yinlin.common.downloadCache
+import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.compose.game.Asset
 import love.yinlin.compose.game.AssetKey
 import love.yinlin.compose.game.Manager
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.NetClient
+import love.yinlin.platform.SoundPlayer
 import love.yinlin.screen.world.single.rhyme.spirit.Scene
 
 @Stable
@@ -32,6 +34,8 @@ class RhymeManager(
         stop()
         onComplete()
     }
+
+    private val sound = SoundPlayer()
 
     var config = RhymePlayConfig.Default
 
@@ -80,6 +84,10 @@ class RhymeManager(
         onSceneStop()
     }
 
+    fun playSound(type: RhymeSound) {
+        sound.play(type.ordinal)
+    }
+
     suspend fun CoroutineScope.downloadAssets(): Boolean {
         val imageKeys = arrayOf(
             AssetKey("leftUIBackground"),
@@ -95,12 +103,19 @@ class RhymeManager(
         )
 
         val assetList = (imageKeys.map { (name, version) ->
-            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.res(name).url}?v=$version")?.let { Asset.image(it) } }
+            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.pic(name).url}?v=$version")?.let { Asset.image(it) } }
         } + animationKeys.map { (name, version) ->
-            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.res(name).url}?v=$version")?.let { Asset.animation(it) } }
+            async { name to NetClient.downloadCache("${ServerRes.Game.Rhyme.pic(name).url}?v=$version")?.let { Asset.animation(it) } }
         }).awaitAll()
 
         for ((name, asset) in assetList) assets[name] = asset ?: return false
+
+        val soundList = RhymeSound.entries.map { item ->
+            async { NetClient.downloadCacheWithPath("${ServerRes.Game.Rhyme.res("${item.title}.wav").url}?v=${item.version}") }
+        }.awaitAll().filterNotNull().toList()
+
+        if (soundList.size != RhymeSound.entries.size) return false
+        sound.loadFromPath(soundList)
 
         return true
     }

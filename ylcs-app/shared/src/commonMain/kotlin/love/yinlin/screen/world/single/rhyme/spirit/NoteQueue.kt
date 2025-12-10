@@ -22,10 +22,12 @@ import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+import love.yinlin.screen.world.single.rhyme.RhymeSound
 
 @Stable
 interface ActionCallback {
     fun updateResult(result: ActionResult, scoreRatio: Float = 1f) // 处理音符结果
+    fun playSound(type: RhymeSound) // 播放音效
 }
 
 @Stable
@@ -168,6 +170,7 @@ class NoteAction(
             // 切换点击态或错过态
             state = if (result == ActionResult.MISS) State.Missing(progress) else State.Clicking(progress)
             callback.updateResult(result)
+            callback.playSound(RhymeSound.NoteClick)
         } != null
     }
 
@@ -829,6 +832,8 @@ class NoteQueue(
             // 更新环境
             if (result == ActionResult.MISS) screenEnvironment.missEnvironment.animation.start()
         }
+
+        override fun playSound(type: RhymeSound) = rhymeManager.playSound(type)
     }
 
     override fun onClientUpdate(tick: Long) {
