@@ -5,12 +5,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
+import love.yinlin.compose.game.animation.FrameAnimation
 import love.yinlin.compose.game.animation.LineFrameAnimation
+import love.yinlin.compose.game.animation.SpeedAdapter
 import love.yinlin.compose.game.traits.*
+import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.SolidColorFilter
 import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
@@ -48,6 +52,8 @@ sealed interface DynamicAction {
         fun mapTrackIndex(scale: Byte): Int = Track.Scales.indexOf((scale - 1) % 7 + 1)
 
         fun mapNoteScale(scale: Byte): Int = (scale - 1) / 7
+
+        val ResultColorFilters = ActionResult.entries.map { SolidColorFilter(it.colors.first()) }
     }
 
     var bindId: Long? // 绑定指针ID
@@ -68,6 +74,35 @@ private val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActua
 private val Float.asUncheckedVirtual: Float get() = DynamicAction.PERSPECTIVE_K * this / (1 + this * (DynamicAction.PERSPECTIVE_K - 1))
 private val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 
+// 画平铺动画
+private fun Drawer.drawPlainAnimation(
+    track: Track,
+    progress: Float,
+    asset: AnimatedWebp,
+    animation: FrameAnimation,
+    scaleRatio: Float = 1f,
+    alpha: Float = 1f,
+    colorFilter: ColorFilter? = null
+) {
+    val plainRect = track.plainRect(progress, asset.width.toFloat() / asset.height, scaleRatio)
+    drawAnimatedWebp(asset, animation.frame, plainRect, alpha, colorFilter)
+}
+
+// 画透视动画
+private fun Drawer.drawPerspectiveAnimation(
+    track: Track,
+    srcRect: Rect,
+    asset: AnimatedWebp,
+    animation: FrameAnimation,
+    alpha: Float = 1f,
+    colorFilter: ColorFilter? = null
+) {
+    val frame = animation.frame.let {
+        if (track.isCenter) it + animation.total else it
+    }
+    drawAnimatedWebp(asset, frame, srcRect, alpha, colorFilter)
+}
+
 @Stable
 class NoteAction(
     assets: RhymeAssets,
@@ -85,22 +120,15 @@ class NoteAction(
         @Stable
         class Clicking(
             frameCount: Int,
+            val result: ActionResult,
             val lastProgress: Float
         ) : State { // 点击中
-            val animation = LineFrameAnimation(frameCount)
-
-            init { animation.start() }
+            val animation = LineFrameAnimation(frameCount, adapter = SpeedAdapter(0.5f)).also { it.start() }
         }
         @Stable
         class Missing(frameCount: Int, lastProgress: Float) : State { // 错过中
             var progress by mutableFloatStateOf(lastProgress)
-            val animation = LineFrameAnimation(frameCount)
-
-            init { animation.start() }
-
-            fun frameIndex(isCenter: Boolean): Int = animation.frame.let {
-                if (isCenter) it + animation.total else it
-            }
+            val animation = LineFrameAnimation(frameCount / 2, adapter = SpeedAdapter(0.5f)).also { it.start() }
         }
         @Stable
         data object Done : State // 已完成
@@ -170,7 +198,7 @@ class NoteAction(
         return ActionResult.inRange(DynamicAction.HIT_RATIO, progress)?.also { result ->
             // 切换点击态或错过态
             state = if (result == ActionResult.MISS) State.Missing(noteDismiss.frameCount, progress)
-                else State.Clicking(noteClick.frameCount, progress)
+                else State.Clicking(noteClick.frameCount, result, progress)
             callback.updateResult(result)
             callback.playSound(soundNoteClick)
         } != null
@@ -210,9 +238,7 @@ class NoteAction(
                 }) {
                     image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
                 }
-
-                val plainRect = track.plainRect(lastProgress, 1f)
-                drawAnimatedWebp(noteClick, currentState.animation.frame, plainRect)
+                drawPlainAnimation(track, lastProgress, noteClick, currentState.animation, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
                 transform({
@@ -220,8 +246,8 @@ class NoteAction(
                     transform(matrix)
                     if (track.isRight) flipX(srcRect.center)
                 }) {
-                    image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
-                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, colorFilter = ColorFilters[noteScale])
+                    image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f))
+                    drawPerspectiveAnimation(track, srcRect, noteDismiss, currentState.animation, colorFilter = ColorFilters[noteScale])
                 }
             }
         }
@@ -253,9 +279,7 @@ class FixedSlurAction(
             lastTailProgress: Float,
         ) : State { // 长按中
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(frameCount, true)
-
-            init { animation.start() }
+            val animation = LineFrameAnimation(frameCount, true).also { it.start() }
         }
         @Stable
         class Releasing(
@@ -263,9 +287,7 @@ class FixedSlurAction(
             val releaseTick: Long, // 释放时间
             val result: ActionResult, // 按下结果
         ) : State { // 释放中
-            val animation = LineFrameAnimation(30)
-
-            init { animation.start() }
+            val animation = LineFrameAnimation(30).also { it.start() }
         }
         @Stable
         class Missing(
@@ -275,13 +297,7 @@ class FixedSlurAction(
         ) : State { // 错过中
             var headProgress by mutableFloatStateOf(lastHeadProgress)
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(frameCount)
-
-            init { animation.start() }
-
-            fun frameIndex(isCenter: Boolean): Int = animation.frame.let {
-                if (isCenter) it + animation.total else it
-            }
+            val animation = LineFrameAnimation(frameCount / 2).also { it.start() }
         }
         @Stable
         data object Done : State // 已完成
@@ -447,10 +463,8 @@ class FixedSlurAction(
                 // 拖尾
                 val headProgress = currentState.lastHeadProgress
                 drawTrailing(track, headProgress, currentState.tailProgress)
-
                 // 动画
-                val plainRect = track.plainRect(DynamicAction.HIT_RATIO, 1f, 1.5f)
-                drawAnimatedWebp(longPress, currentState.animation.frame, plainRect, colorFilter = ColorFilters[noteScale])
+                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = ColorFilters[noteScale])
             }
             is State.Releasing -> { } // 暂定为空
             is State.Missing -> {
@@ -466,7 +480,7 @@ class FixedSlurAction(
                     if (track.isRight) flipX(srcRect.center)
                 }) {
                     image(blockMap, imgRect, srcRect, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
-                    drawAnimatedWebp(noteDismiss, currentState.frameIndex(track.isCenter), srcRect, colorFilter = ColorFilters[noteScale])
+                    drawPerspectiveAnimation(track, srcRect, noteDismiss, currentState.animation, colorFilter = ColorFilters[noteScale])
                 }
             }
         }
