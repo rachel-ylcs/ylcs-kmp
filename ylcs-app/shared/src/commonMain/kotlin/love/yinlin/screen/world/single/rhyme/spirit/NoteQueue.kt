@@ -5,15 +5,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
-import love.yinlin.compose.game.animation.SpeedAdapter
 import love.yinlin.compose.game.traits.*
-import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.SolidColorFilter
 import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
@@ -86,15 +83,18 @@ class NoteAction(
             var progress by mutableFloatStateOf(0f)
         }
         @Stable
-        class Clicking(val lastProgress: Float) : State { // 点击中
-            val animation = LineFrameAnimation(36)
+        class Clicking(
+            frameCount: Int,
+            val lastProgress: Float
+        ) : State { // 点击中
+            val animation = LineFrameAnimation(frameCount)
 
             init { animation.start() }
         }
         @Stable
-        class Missing(lastProgress: Float) : State { // 错过中
+        class Missing(frameCount: Int, lastProgress: Float) : State { // 错过中
             var progress by mutableFloatStateOf(lastProgress)
-            val animation = LineFrameAnimation(30)
+            val animation = LineFrameAnimation(frameCount)
 
             init { animation.start() }
 
@@ -146,7 +146,7 @@ class NoteAction(
                 currentState.progress = progress
                 // 超出死线仍未处理的音符标记错过
                 if (progress > DynamicAction.deadline) {
-                    state = State.Missing(progress)
+                    state = State.Missing(noteDismiss.frameCount, progress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
@@ -169,7 +169,8 @@ class NoteAction(
         val progress = currentState.progress
         return ActionResult.inRange(DynamicAction.HIT_RATIO, progress)?.also { result ->
             // 切换点击态或错过态
-            state = if (result == ActionResult.MISS) State.Missing(progress) else State.Clicking(progress)
+            state = if (result == ActionResult.MISS) State.Missing(noteDismiss.frameCount, progress)
+                else State.Clicking(noteClick.frameCount, progress)
             callback.updateResult(result)
             callback.playSound(soundNoteClick)
         } != null
@@ -245,13 +246,14 @@ class FixedSlurAction(
         }
         @Stable
         class Pressing(
+            frameCount: Int,
             val pressTick: Long, // 按下时间
             val result: ActionResult, // 按下结果
             val lastHeadProgress: Float,
             lastTailProgress: Float,
         ) : State { // 长按中
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(100, true)
+            val animation = LineFrameAnimation(frameCount, true)
 
             init { animation.start() }
         }
@@ -266,10 +268,14 @@ class FixedSlurAction(
             init { animation.start() }
         }
         @Stable
-        class Missing(lastHeadProgress: Float, lastTailProgress: Float) : State { // 错过中
+        class Missing(
+            frameCount: Int,
+            lastHeadProgress: Float,
+            lastTailProgress: Float
+        ) : State { // 错过中
             var headProgress by mutableFloatStateOf(lastHeadProgress)
             var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(30)
+            val animation = LineFrameAnimation(frameCount)
 
             init { animation.start() }
 
@@ -336,7 +342,7 @@ class FixedSlurAction(
                 currentState.tailProgress = tailProgress
                 // 超出死线仍未处理的音符标记错过
                 if (headProgress > DynamicAction.deadline) {
-                    state = State.Missing(headProgress, tailProgress)
+                    state = State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
@@ -371,10 +377,11 @@ class FixedSlurAction(
         val tailProgress = currentState.tailProgress
         return ActionResult.inRange(DynamicAction.HIT_RATIO, headProgress)?.also { result ->
             if (result == ActionResult.MISS) { // 错过
-                state = State.Missing(headProgress, tailProgress)
+                state = State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
                 callback.updateResult(result)
             }
             else state = State.Pressing(
+                longPress.frameCount,
                 pressTick = tick,
                 result = result,
                 lastHeadProgress = headProgress,
