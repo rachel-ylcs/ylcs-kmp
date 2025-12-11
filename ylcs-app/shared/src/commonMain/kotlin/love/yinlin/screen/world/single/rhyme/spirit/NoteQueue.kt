@@ -443,7 +443,7 @@ class FixedSlurAction(
 
                 // 动画
                 val plainRect = track.plainRect(DynamicAction.HIT_RATIO, 1f, 1.5f)
-                drawAnimatedWebp(longPress, currentState.animation.frame, plainRect)
+                drawAnimatedWebp(longPress, currentState.animation.frame, plainRect, colorFilter = ColorFilters[noteScale])
             }
             is State.Releasing -> { } // 暂定为空
             is State.Missing -> {

@@ -21,7 +21,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreate(JNIEnv* env, jclass, jbyteArray data) {
     WebPAnimDecoderOptions options;
     WebPAnimDecoderOptionsInit(&options);
-    options.color_mode = MODE_RGBA;
+    options.color_mode = MODE_rgbA;
     options.use_threads = 1;
 
     jint size = (*env)->GetArrayLength(env, data);
