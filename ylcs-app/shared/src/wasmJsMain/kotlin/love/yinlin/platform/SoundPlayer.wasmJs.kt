@@ -10,10 +10,12 @@ import org.khronos.webgl.toInt8Array
 private fun newAudioContext(): JsAny = js("new (window.AudioContext || window.webkitAudioContext)()")
 private fun decodeAudioData(context: JsAny, buffer: ArrayBuffer): JsAny = js("context.decodeAudioData(buffer).await()")
 private fun playAudioBuffer(context: JsAny, audioBuffer: JsAny): JsAny = js("""
+{
     const source = context.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(context.destination);
     source.start(0.0);
+}
 """)
 
 actual class SoundPlayer {
