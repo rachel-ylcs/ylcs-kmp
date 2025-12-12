@@ -38,6 +38,7 @@ compose.desktop {
             isEnabled = true
             optimize = true
             obfuscate = true
+            joinOutputJars = true
             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
         }
 

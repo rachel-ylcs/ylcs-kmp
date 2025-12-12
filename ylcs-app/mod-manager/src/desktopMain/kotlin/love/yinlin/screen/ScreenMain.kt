@@ -1,10 +1,6 @@
-package love.yinlin
+package love.yinlin.screen
 
-import androidx.compose.foundation.ContextMenuArea
-import androidx.compose.foundation.ContextMenuItem
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -28,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
+import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.screen.BasicScreen
@@ -54,12 +51,11 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.mod.ModFactory
-import love.yinlin.mod.ModFactory.Preview.PreviewResult
 import love.yinlin.platform.Coroutines
 import org.jetbrains.compose.resources.stringResource
 
 @Stable
-class MainUI(manager: ScreenManager) : BasicScreen(manager) {
+class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
     private var state by mutableStateOf(BoxState.EMPTY)
     private val library = mutableStateListOf<ModItem>()
     private val searchLibrary by derivedStateOf { library.filter { it.shown } }
@@ -87,7 +83,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     require(Path(folder, ModResourceType.Background.filename).exists)
                     require(Path(folder, ModResourceType.LineLyrics.filename).exists)
                     require(Path(folder, ModResourceType.Audio.filename).exists)
-                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                    val musicInfo =
+                        Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     id = musicInfo.id
                     name = musicInfo.name
                 }?.let {
@@ -181,7 +178,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     }
                     // 基础资源打包
                     Path(itemPath, ModResourceType.BASE_RES).write { sink ->
-                        ModFactory.Merge(listOf(item.path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
+                        ModFactory.Merge(listOf(item.path), sink)
+                            .process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
             }
@@ -194,7 +192,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
     }
 
     @Composable
-    private fun ModCard(modifier: Modifier = Modifier, item: ModItem) {
+    private fun ModCard(modifier: Modifier = Modifier.Companion, item: ModItem) {
         val needRename = remember(item) { item.path.name != item.name }
 
         ContextMenuArea(items = {
@@ -217,6 +215,11 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                         }
                     })
                 }
+                add(ContextMenuItem("音游编辑") {
+                    launch {
+                        navigate(::ScreenRhyme, item.path.toString())
+                    }
+                })
             }
         }) {
             Box(modifier = modifier) {
@@ -316,8 +319,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.Center)
                             )
-                        }
-                        else {
+                        } else {
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(120.dp),
                                 modifier = Modifier.fillMaxSize(),
@@ -331,7 +333,11 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     }
                 }
                 Box(modifier = Modifier.fillMaxHeight()) {
-                    VerticalDivider(modifier = Modifier.fillMaxHeight().zIndex(1f), thickness = 10.dp, color = Colors.White)
+                    VerticalDivider(
+                        modifier = Modifier.fillMaxHeight().zIndex(1f),
+                        thickness = 10.dp,
+                        color = Colors.White
+                    )
                     VerticalScrollbar(
                         modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight().zIndex(2f),
                         adapter = rememberScrollbarAdapter(scrollState = leftState)
@@ -345,8 +351,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.align(Alignment.Center)
                         )
-                    }
-                    else {
+                    } else {
                         LazyVerticalGrid(
                             columns = GridCells.Adaptive(120.dp),
                             modifier = Modifier.fillMaxSize(),
@@ -422,7 +427,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalExtraSpace),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(vertical = CustomTheme.padding.verticalExtraSpace),
                     horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -455,14 +461,14 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                         LoadingBox(text = statusText)
                     }
-                }
-                else {
+                } else {
                     Text(
                         text = "过滤器",
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     FlowRow(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalExtraSpace),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(vertical = CustomTheme.padding.verticalExtraSpace),
                         horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
                         verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
                     ) {
@@ -473,7 +479,8 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalExtraSpace),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(vertical = CustomTheme.padding.verticalExtraSpace),
                         horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -501,7 +508,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
 
         private var isRunning by mutableStateOf(false)
-        private var result: PreviewResult? by mutableStateOf(null)
+        private var result: ModFactory.Preview.PreviewResult? by mutableStateOf(null)
 
         private var statusText by mutableStateOf("")
 
@@ -543,8 +550,7 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                     Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                         LoadingBox(text = "正在解析中...")
                     }
-                }
-                else {
+                } else {
                     val previewResult = result
                     if (previewResult == null) {
                         Box(
@@ -557,10 +563,10 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                                 )
                             }
                         }
-                    }
-                    else {
+                    } else {
                         ModPreviewLayout(
-                            modifier = Modifier.fillMaxSize().padding(vertical = CustomTheme.padding.verticalSpace),
+                            modifier = Modifier.fillMaxSize()
+                                .padding(vertical = CustomTheme.padding.verticalSpace),
                             result = previewResult
                         )
                     }
@@ -618,14 +624,16 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
                             }
                         }
                     },
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(
+                    CustomTheme.padding.verticalSpace,
+                    Alignment.CenterVertically
+                ),
             ) {
                 if (isRunning) {
                     Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                         LoadingBox(text = statusText)
                     }
-                }
-                else {
+                } else {
                     Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                         EmptyBox(text = "拖拽一个或多个MOD文件导入")
                     }
@@ -644,7 +652,10 @@ class MainUI(manager: ScreenManager) : BasicScreen(manager) {
         @Composable
         override fun Content(args: ModItem) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(top = CustomTheme.padding.verticalExtraSpace, end = CustomTheme.padding.horizontalExtraSpace),
+                modifier = Modifier.fillMaxSize().padding(
+                    top = CustomTheme.padding.verticalExtraSpace,
+                    end = CustomTheme.padding.horizontalExtraSpace
+                ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
             ) {
