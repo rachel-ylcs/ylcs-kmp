@@ -26,12 +26,14 @@ import io.ktor.http.Headers
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.parameters
 import io.ktor.http.setCookie
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.appendAll
+import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.asByteWriteChannel
 import io.ktor.utils.io.copyAndClose
 import kotlinx.coroutines.currentCoroutineContext
@@ -78,6 +80,7 @@ internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
 }
 
 object NetClient {
+    @OptIn(InternalAPI::class)
     suspend inline fun <reified Body : Any, reified Output : Any> request(
         crossinline onRequest: RequestScope.() -> Unit,
         crossinline onResponse: suspend ResponseScope<Body>.() -> Output
@@ -86,6 +89,7 @@ object NetClient {
         Coroutines.io {
             internalCommon.prepareRequest {
                 val builder = this
+                var contentType = ContentType.Text.Plain
                 val requestScope = object : RequestScope {
                     override var method: HttpMethod = HttpMethod.Get
                         set(value) {
@@ -109,6 +113,7 @@ object NetClient {
                         set(value) {
                             field = value
                             builder.setBody(FormDataContent(parameters { appendAll(value) }))
+                            contentType = ContentType.Application.FormUrlEncoded
                         }
 
                     override fun headers(block: HeadersBuilder.() -> Unit) {
@@ -116,14 +121,20 @@ object NetClient {
                     }
                 }
                 headers {
-                    append(HttpHeaders.ContentType, ContentType.Text.Plain.toString())
+                    append(HttpHeaders.ContentType, contentType.toString())
                     append(HttpHeaders.Accept, ContentType.Any.toString())
                 }
                 onRequest(requestScope)
             }.execute { response ->
-                val headers = response.headers
-                val cookies = response.setCookie()
-                val data = response.bodyAsBytes()
+                // 代理
+                val (headers, cookies, data) = if (response.status == HttpStatusCode.Accepted) {
+                    val rawContent = response.bodyAsBytes()
+                    val rawCookiesLength = rawContent.copyOfRange(0, 8).decodeToString().toInt()
+                    val rawCookies = rawContent.copyOfRange(8, 8 + rawCookiesLength).decodeToString().parseJsonValue<Map<String, String>>()
+                    val rawData = rawContent.copyOfRange(8 + rawCookiesLength, rawContent.size)
+                    val actualCookies = rawCookies.map { (key, value) -> Cookie(key, value) }
+                    Triple(response.headers, actualCookies, rawData)
+                } else Triple(response.headers, response.setCookie(), response.bodyAsBytes())
                 Coroutines.with(context) {
                     onResponse(object : ResponseScope<Body> {
                         override val headers: Headers = headers

@@ -5,10 +5,11 @@ import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
-import io.ktor.http.ContentType
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.util.appendAll
+import io.ktor.util.encodeBase64
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.uri.Uri
@@ -23,7 +24,19 @@ import love.yinlin.compose.ui.text.buildRichString
 
 @Stable
 data object WeiboAPI {
-	private fun proxy(url: String) = Platform.use(Platform.WebWasm, ifTrue = { ClientEngine.proxy(APIConfig.PROXY_NAME, url) }, ifFalse = { url })
+	private fun proxy(url: String) = Platform.use(Platform.WebWasm,
+		ifTrue = { ClientEngine.proxy(APIConfig.PROXY_NAME, url) },
+		ifFalse = { url }
+	)
+
+	private fun proxyRes(url: String) = Platform.use(Platform.WebWasm,
+		ifTrue = {
+			val cookie = "SUB=${weiboCookie?.sub};SUBP=${weiboCookie?.subp};XSRF-TOKEN=${weiboCookie?.xsrfToken}"
+			val referer = "https://m.weibo.cn"
+			"${ClientEngine.proxy(APIConfig.PROXY_NAME, url)}&Cookie=${Uri.encodeUri(cookie)}&Referer=${Uri.encodeUri(referer)}"
+		},
+		ifFalse = { url }
+	)
 
 	@Stable
 	data class WeiboCookie(
@@ -94,7 +107,7 @@ data object WeiboAPI {
 		// 提取名称和头像
 		val userId = user["id"].String
 		val userName = user["screen_name"].String
-		val avatar = proxy(user["avatar_hd"].String)
+		val avatar = proxyRes(user["avatar_hd"].String)
 		return WeiboUserInfo(
 			id = userId,
 			name = userName,
@@ -127,8 +140,8 @@ data object WeiboAPI {
 			for (picItem in blogs.arr("pics")) {
 				val pic = picItem.Object
 				pictures += Picture(
-					image = proxy(pic["url"].String),
-					source = proxy(pic.obj("large")["url"].String)
+					image = proxyRes(pic["url"].String),
+					source = proxyRes(pic.obj("large")["url"].String)
 				)
 			}
 		} else if ("page_info" in blogs) {
@@ -140,9 +153,9 @@ data object WeiboAPI {
 				else urls["mp4_ld_mp4"].String
 				val videoPicUrl = pageInfo.obj("page_pic")["url"].String
 				pictures += Picture(
-					image = proxy(videoPicUrl),
-					source = proxy(videoPicUrl),
-					video = proxy(videoUrl)
+					image = proxyRes(videoPicUrl),
+					source = proxyRes(videoPicUrl),
+					video = proxyRes(videoUrl)
 				)
 			}
 		}
@@ -173,8 +186,8 @@ data object WeiboAPI {
 		val pic = if ("pic" in card) {
 			card.obj("pic").let {
 				Picture(
-					image = proxy(it["url"].String),
-					source = proxy(it.obj("large")["url"].String)
+					image = proxyRes(it["url"].String),
+					source = proxyRes(it.obj("large")["url"].String)
 				)
 			}
 		} else null
@@ -204,19 +217,15 @@ data object WeiboAPI {
 		)
 	}
 
-	suspend fun generateWeiboCookie(): WeiboCookie? {
-		// TODO:
+	suspend fun generateWeiboCookie(): WeiboCookie {
 		val xsrfToken = NetClient.request<ByteArray, String>({
 			url = Container.xsrfConfig
 		}) {
-			cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { it.value != "deleted" }.value
+			cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { !it.value.equals("deleted", ignoreCase = true) }.value
 		} ?: "fukyou"
 		val sub = NetClient.request(Container.genvisitor2, {
 			method = HttpMethod.Post
 			form = mapOf("cb" to "visitor_gray_callback")
-			headers {
-				append(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
-			}
 		}) { text: String ->
 			val json = text.substringAfter("(").substringBeforeLast(")").parseJson.Object
 			val data = json.obj("data")
@@ -227,8 +236,14 @@ data object WeiboAPI {
 
 	private val buildWeiboCookieHeader: HeadersBuilder.() -> Unit = {
 		weiboCookie?.let { cookie ->
-			append(HttpHeaders.Cookie, "SUB=${cookie.sub};SUBP=${cookie.subp};XSRF-TOKEN=${cookie.xsrfToken}")
-			append(HttpHeaders.Referrer, "https://m.weibo.cn")
+			val extraHeaders = mapOf(
+				HttpHeaders.Cookie to "SUB=${cookie.sub};SUBP=${cookie.subp};XSRF-TOKEN=${cookie.xsrfToken}",
+				HttpHeaders.Referrer to "https://m.weibo.cn"
+			)
+			Platform.use(Platform.WebWasm,
+				ifTrue = { append("VHeaders", extraHeaders.toJsonString().encodeBase64()) },
+				ifFalse = { appendAll(extraHeaders) }
+			)
 		}
 	}
 
@@ -260,8 +275,8 @@ data object WeiboAPI {
 		val userInfo = json.obj("data").obj("userInfo")
 		val id = userInfo["id"].String
 		val name = userInfo["screen_name"].String
-		val avatar = proxy(userInfo["avatar_hd"].String)
-		val background = proxy(userInfo["cover_image_phone"].String)
+		val avatar = proxyRes(userInfo["avatar_hd"].String)
+		val background = proxyRes(userInfo["cover_image_phone"].String)
 		val signature = userInfo["description"].String
 		val followNum = userInfo["follow_count"].String
 		val fansNum = userInfo["followers_count_str"]?.StringNull ?: userInfo["followers_count"].String
@@ -291,7 +306,7 @@ data object WeiboAPI {
 							title = album["title_sub"].String,
 							num = album["desc1"].String,
 							time = album["desc2"].String,
-							pic = proxy(album["pic"].String)
+							pic = proxyRes(album["pic"].String)
 						)
 					}
 				}
@@ -313,8 +328,8 @@ data object WeiboAPI {
 			for (item2 in card.arr("pics")) {
 				val pic = item2.Object
 				pics += Picture(
-					image = proxy(pic["pic_middle"].String),
-					source = proxy(pic["pic_ori"].String)
+					image = proxyRes(pic["pic_middle"].String),
+					source = proxyRes(pic["pic_ori"].String)
 				)
 			}
 		}
@@ -336,7 +351,7 @@ data object WeiboAPI {
 						items += WeiboUserInfo(
 							id = user["id"].String,
 							name = user["screen_name"].String,
-							avatar = proxy(user["avatar_hd"].String)
+							avatar = proxyRes(user["avatar_hd"].String)
 						)
 					}
 				}

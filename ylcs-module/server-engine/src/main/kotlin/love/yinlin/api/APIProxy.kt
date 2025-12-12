@@ -6,6 +6,7 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsBytes
@@ -13,7 +14,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.headers
+import io.ktor.http.setCookie
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.request.contentType
 import io.ktor.server.request.httpMethod
@@ -24,9 +25,14 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.route
+import io.ktor.util.appendAll
+import io.ktor.util.decodeBase64String
 import io.ktor.util.flattenForEach
+import io.ktor.util.toMap
 import love.yinlin.extension.Json
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.uri.Uri
 import java.net.Proxy
@@ -64,34 +70,63 @@ class Proxy(
                 catchingError {
                     Coroutines.io {
                         val request = call.request
-                        val dest = Uri.decodeUri(request.queryParameters[name]!!)
-
+                        val rawParameters = request.queryParameters.toMap().mapValues { (_, v) -> v.first() }.toMutableMap()
+                        val dest = Uri.decodeUri(rawParameters[name]!!)
+                        rawParameters.remove(name)
                         require(whitelist.any { it.matches(dest) })
 
                         client.prepareRequest(urlString = dest) {
                             method = request.httpMethod
 
+                            val headersMap = mutableMapOf<String, String>()
                             headers {
-                                request.headers.forEach { key, value ->
-                                    if (!key.equals(HttpHeaders.ContentLength, ignoreCase = true)) {
-                                        appendAll(key, value)
+                                var vHeaders = mapOf<String, String>()
+                                request.headers.flattenForEach { key, value ->
+                                    when {
+                                        key.equals(HttpHeaders.ContentLength, ignoreCase = true) -> { }
+                                        key.equals(HttpHeaders.Host, ignoreCase = true) -> { }
+                                        key.equals(HttpHeaders.Origin, ignoreCase = true) -> { }
+                                        key.equals(HttpHeaders.Referrer, ignoreCase = true) -> { }
+                                        key.equals(HttpHeaders.AcceptEncoding, ignoreCase = true) -> { }
+                                        key.equals("VHeaders", ignoreCase = true) -> vHeaders = value.decodeBase64String().parseJsonValue<Map<String, String>>()
+                                        else -> headersMap[key] = value
                                     }
                                 }
+                                for ((vKey, vValue) in vHeaders) {
+                                    headersMap.remove(vKey)
+                                    headersMap.remove(vKey.lowercase())
+                                    headersMap[vKey] = vValue
+                                }
+                                for ((hKey, hValue) in rawParameters) headersMap[hKey] = Uri.decodeUri(hValue)
+                                appendAll(headersMap)
                             }
 
                             val contentType = request.contentType()
                             when {
                                 contentType.contentType == ContentType.Text.TYPE -> setBody(call.receiveText())
-                                contentType == ContentType.Application.FormUrlEncoded -> setBody(FormDataContent(call.receiveParameters()))
+                                contentType.match(ContentType.Application.FormUrlEncoded) -> setBody(FormDataContent(call.receiveParameters()))
                                 else -> setBody(call.receiveNullable<ByteArray>())
                             }
-                        }.execute {
-                            it.headers.flattenForEach { key, value ->
-                                if (!key.equals(HttpHeaders.ContentLength, ignoreCase = true)) {
-                                    call.response.headers.append(key, value)
+                        }.execute { response ->
+                            response.headers.flattenForEach { key, value ->
+                                when {
+                                    // 跳过Content-Length 和 SetCookie
+                                    key.equals(HttpHeaders.ContentLength, ignoreCase = true) -> { }
+                                    key.equals(HttpHeaders.SetCookie, ignoreCase = true) -> { }
+                                    else -> call.response.headers.append(key, value)
                                 }
                             }
-                            call.respondBytes(bytes = it.bodyAsBytes(), status = HttpStatusCode.OK)
+                            // 修改cookie安全限制
+                            val rawBytes = response.bodyAsBytes()
+                            val rawCookies = mutableMapOf<String, String>()
+                            for (cookie in response.setCookie()) rawCookies[cookie.name] = cookie.value
+                            if (rawCookies.isNotEmpty()) {
+                                val cookiesJson = rawCookies.toJsonString().encodeToByteArray()
+                                val cookiesLength = cookiesJson.size
+                                val actualBytes = cookiesLength.toString().padStart(8, '0').encodeToByteArray() + cookiesJson + rawBytes
+                                call.respondBytes(bytes = actualBytes, status = HttpStatusCode.Accepted)
+                            }
+                            else call.respondBytes(bytes = rawBytes, status = HttpStatusCode.OK)
                         }
                     }
                 }?.let {
