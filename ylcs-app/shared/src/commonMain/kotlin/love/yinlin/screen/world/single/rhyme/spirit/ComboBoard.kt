@@ -40,7 +40,7 @@ enum class ActionResult(
         score = 1,
         range = 0.12f,
         title = "BAD",
-        colors = listOf(Colors(0xFF0C3483), Colors(0xFFA2B6DF), Colors(0xFF6B8CCE), Colors(0xFFA2B6DF))
+        colors = listOf(Colors(0xFF0C3483), Colors(0xFFA2B6DF), Colors(0xFF6B8CCE))
     ),
     GOOD(
         score = 2,
