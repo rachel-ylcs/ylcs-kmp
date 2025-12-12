@@ -65,4 +65,5 @@ data class RhymeLyricsConfig(
     val duration: Long, // 时长
     val chorus: List<Chorus>, // 副歌点
     val lyrics: List<RhymeLine>, // 歌词
+    val offset: Int = 0, // 偏移
 )

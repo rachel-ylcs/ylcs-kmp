@@ -113,7 +113,8 @@ class ScreenRhyme(manager: ScreenManager, private val path: String) : Screen(man
                     id = musicInfo.id,
                     duration = 0L,
                     chorus = musicInfo.chorus?.map { Chorus(it, it) } ?: emptyList(),
-                    lyrics = emptyList()
+                    lyrics = emptyList(),
+                    offset = 0,
                 ).toJsonString())
                 name = musicInfo.name
                 rhymePath.readText()!!

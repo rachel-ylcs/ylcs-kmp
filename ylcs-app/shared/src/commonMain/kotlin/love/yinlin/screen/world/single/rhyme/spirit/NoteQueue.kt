@@ -784,7 +784,7 @@ class OffsetSlurAction(
 @Stable
 class NoteQueue(
     rhymeManager: RhymeManager,
-    lyricsConfig: RhymeLyricsConfig,
+    private val lyricsConfig: RhymeLyricsConfig,
     private val scoreBoard: ScoreBoard,
     private val comboBoard: ComboBoard,
     private val trackMap: TrackMap,
@@ -795,17 +795,17 @@ class NoteQueue(
 
     private val audioDelay = rhymeManager.config.audioDelay
 
-    private val lyrics = lyricsConfig.lyrics
     private val tracks = trackMap.tracks
 
     // 预编译队列
-    private val queue: List<DynamicAction> = buildList(lyrics.size) {
-        for (line in lyrics) {
+    private val queue: List<DynamicAction> = buildList(lyricsConfig.lyrics.size) {
+        for (line in lyricsConfig.lyrics) {
             val theme = line.theme
+            val lineStart = line.start + lyricsConfig.offset // 偏移补偿
             for (i in theme.indices) {
                 val action = theme[i]
-                val start = (theme.getOrNull(i - 1)?.end ?: 0) + line.start
-                val end = action.end + line.start
+                val start = (theme.getOrNull(i - 1)?.end ?: 0) + lineStart
+                val end = action.end + lineStart
                 val dynamicAction = when (action) {
                     is RhymeAction.Note -> NoteAction(rhymeManager.assets, start, action) // 单音
                     is RhymeAction.Slur -> {
