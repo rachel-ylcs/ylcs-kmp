@@ -30,7 +30,8 @@ import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 
 @Stable
-class ScreenRhyme(manager: ScreenManager, private val path: String) : Screen(manager) {
+class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(manager) {
+    private val useFile by derivedStateOf { path != null }
     private var name by mutableStateOf("未知歌曲")
     private val rhymeConfig = TextInputState()
     private val platformConfig = TextInputState()
@@ -91,33 +92,49 @@ class ScreenRhyme(manager: ScreenManager, private val path: String) : Screen(man
     }
 
     private suspend fun saveConfig() {
-        if (!slot.confirm.openSuspend(content = "替换音游配置到库")) return
-        val rhymePath = Path(path, ModResourceType.Rhyme.filename)
-        rhymePath.writeText(rhymeConfig.text)
-        slot.tip.success("保存成功")
+        path?.let {
+            if (!slot.confirm.openSuspend(content = "替换音游配置到库")) return
+            val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+            rhymePath.writeText(rhymeConfig.text)
+            slot.tip.success("保存成功")
+        }
     }
 
     private suspend fun deleteConfig() {
-        if (!slot.confirm.openSuspend(content = "删除音游配置")) return
-        val rhymePath = Path(path, ModResourceType.Rhyme.filename)
-        rhymePath.delete()
-        pop()
+        path?.let {
+            if (!slot.confirm.openSuspend(content = "删除音游配置")) return
+            val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+            rhymePath.delete()
+            pop()
+        }
     }
 
     override suspend fun initialize() {
         catchingError {
             rhymeConfig.text = Coroutines.io {
-                val musicInfo = Path(path, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
-                val rhymePath = Path(path, ModResourceType.Rhyme.filename)
-                if (!rhymePath.exists) rhymePath.writeText(RhymeLyricsConfig(
-                    id = musicInfo.id,
-                    duration = 0L,
-                    chorus = musicInfo.chorus?.map { Chorus(it, it) } ?: emptyList(),
-                    lyrics = emptyList(),
-                    offset = 0,
-                ).toJsonString())
-                name = musicInfo.name
-                rhymePath.readText()!!
+                path?.let {
+                    val musicInfo = Path(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                    val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+                    val newConfig = RhymeLyricsConfig(
+                        id = musicInfo.id,
+                        duration = 0L,
+                        chorus = musicInfo.chorus?.map { Chorus(it, it) } ?: emptyList(),
+                        lyrics = emptyList(),
+                        offset = 0,
+                    )
+                    if (!rhymePath.exists) rhymePath.writeText(prettyJson.encodeToString(newConfig))
+                    name = musicInfo.name
+                    rhymePath.readText()!!
+                } ?: run {
+                    name = "未知歌曲"
+                    prettyJson.encodeToString(RhymeLyricsConfig(
+                        id = "",
+                        duration = 0L,
+                        chorus = emptyList(),
+                        lyrics = emptyList(),
+                        offset = 0,
+                    ))
+                }
             }
         }.errorTip
     }
@@ -125,8 +142,8 @@ class ScreenRhyme(manager: ScreenManager, private val path: String) : Screen(man
     @Composable
     override fun ActionScope.RightActions() {
         ActionSuspend(Icons.Outlined.TurnLeft, onClick = ::updateConfig)
-        ActionSuspend(Icons.Outlined.Done, onClick = ::saveConfig)
-        ActionSuspend(Icons.Outlined.Delete, onClick = ::deleteConfig)
+        ActionSuspend(Icons.Outlined.Done, enabled = useFile, onClick = ::saveConfig)
+        ActionSuspend(Icons.Outlined.Delete, enabled = useFile, onClick = ::deleteConfig)
     }
 
     @Composable

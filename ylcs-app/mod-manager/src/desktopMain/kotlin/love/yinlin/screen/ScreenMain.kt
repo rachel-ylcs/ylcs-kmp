@@ -287,6 +287,9 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                         }
                     },
                     right = {
+                        Action(Icons.Outlined.MusicNote, "音游配置") {
+                            navigate(::ScreenRhyme, null)
+                        }
                         ActionSuspend(Icons.Outlined.Preview, "预览") {
                             previewSheet.open()
                         }
