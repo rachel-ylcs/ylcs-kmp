@@ -199,11 +199,6 @@ class ScreenMain(manager: ScreenManager) : NavigationScreen(manager) {
     }
 
     override suspend fun initialize() {
-        val subScreenMe = get<SubScreenMe>()
-        if (subScreenMe.shouldUpdateToken()) {
-            subScreenMe.updateUserToken()
-        } else {
-            subScreenMe.validateToken()
-        }
+        get<SubScreenMe>().updateUserToken()
     }
 }

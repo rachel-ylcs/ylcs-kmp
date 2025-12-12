@@ -69,6 +69,7 @@ import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.platform.QrcodeScanner
+import love.yinlin.data.Data
 import love.yinlin.extension.catchingError
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -122,40 +123,23 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         app.config.cacheUserWall = CacheState.UPDATE
     }
 
-    suspend fun validateToken() {
-        val token = app.config.userToken
-        if (token.isNotEmpty()) {
-            ApiAccountValidateToken.request(token) { isValid ->
-                if (!isValid) {
-                    cleanUserToken()
-                    navigate(::ScreenLogin)
-                }
-            }
-        }
-    }
-
-    fun shouldUpdateToken(): Boolean {
-        val token = app.config.userToken
-        if (token.isEmpty()) return false
-        val currentTime = DateEx.CurrentLong
-        val duration = currentTime - app.config.userShortToken
-        return duration > 7 * 24 * 3600 * 1000L
-    }
-
     suspend fun updateUserToken() {
         val token = app.config.userToken
-        val currentTime = DateEx.CurrentLong
-        val duration = currentTime - app.config.userShortToken
-        if (token.isNotEmpty() && duration > 7 * 24 * 3600 * 1000L &&
-            isUpdateToken.compareAndSet(expect = false, update = true)) {
-            ApiAccountUpdateToken.request(token) {
-                app.config.userShortToken = currentTime
-                app.config.userToken = it
-            }?.let {
-                if (it is UnauthorizedException) {
-                    cleanUserToken()
-                    navigate(::ScreenLogin)
-                }
+        if (token.isNotEmpty() && isUpdateToken.compareAndSet(expect = false, update = true)) {
+            val currentTime = DateEx.CurrentLong
+            val duration = currentTime - app.config.userShortToken
+            val isExpired = if (duration > 7 * 24 * 3600 * 1000L) { // 更新 Token
+                ApiAccountUpdateToken.request(token) {
+                    app.config.userShortToken = currentTime
+                    app.config.userToken = it
+                } is UnauthorizedException
+            }
+            else { // 校验 Token
+                (ApiAccountValidateToken.request(token) as? Data.Success)?.data?.o1 == false
+            }
+            if (isExpired) {
+                cleanUserToken()
+                navigate(::ScreenLogin)
             }
             isUpdateToken.value = false
         }

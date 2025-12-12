@@ -111,11 +111,7 @@ object AN {
         else throw UnauthorizedException("token ${token.uid} unauthorized")
     }
 
-    fun checkToken(tokenString: String): Boolean {
-            val token = parseToken(tokenString)
-            val saveTokenString = redis[token.key]
-            return(saveTokenString == tokenString)
-    }
+    fun checkToken(tokenString: String): Boolean = redis[parseToken(tokenString).key] == tokenString
 
     fun throwReGenerateToken(tokenString: String): String {
         val token = parseToken(tokenString)
