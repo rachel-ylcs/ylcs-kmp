@@ -43,6 +43,10 @@ actual class SoundPlayer {
     }
 
     actual fun release() {
-        for (clip in caches) clip.close()
+        for (clip in caches) {
+            clip.stop()
+            clip.close()
+        }
+        caches = emptyList()
     }
 }

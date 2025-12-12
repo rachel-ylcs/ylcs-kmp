@@ -38,7 +38,10 @@ class RhymeManager(
 
     suspend fun init() = mp.init()
 
-    fun release() = mp.release()
+    fun release() {
+        mp.release()
+        sp.release()
+    }
 
     suspend fun CoroutineScope.start(
         playConfig: RhymePlayConfig,
