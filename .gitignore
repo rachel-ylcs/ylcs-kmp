@@ -23,7 +23,6 @@ xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
 Pods/
 **/Version.xcconfig
-**/**.podspec
 
 # native
 native/**/vs/
