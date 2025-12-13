@@ -262,7 +262,7 @@ class FixedSlurAction(
                     image(blockMap, imgRect, it)
                 }
                 // 动画
-                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.SlurColorFilters[noteScale])
+                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Releasing -> {
                 val lastHeadProgress = currentState.lastHeadProgress
