@@ -6,7 +6,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Matrix
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.FrameAnimation
@@ -58,9 +57,9 @@ sealed interface DynamicAction {
         val SlurColorFilters = SlurColors.map { SolidColorFilter(it) }
 
         val SlurTailColors = arrayOf(
-            listOf(Colors(0xFFF43B47), Colors(0xFF453A94), Colors.White),
-            listOf(Colors(0xFFFF4E50), Colors(0xFFF9D423), Colors.White),
-            listOf(Colors(0xFF5EE7DF), Colors(0xFFB490CA), Colors.White),
+            listOf(Colors(0xFFF43B47), Colors(0xFF453A94), Colors.Transparent),
+            listOf(Colors(0xFFFF4E50), Colors(0xFFF9D423), Colors.Transparent),
+            listOf(Colors(0xFF5EE7DF), Colors(0xFFB490CA), Colors.Transparent),
         )
 
         @Stable

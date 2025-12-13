@@ -6,10 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
-import love.yinlin.compose.onCenter
 import love.yinlin.compose.onLine
 import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
@@ -168,25 +168,35 @@ class FixedSlurAction(
 
     private fun Drawer.drawTrailing(track: Track, headProgress: Float, tailProgress: Float) {
         if (headProgress > tailProgress) {
-            val headLeft = Tracks.Vertices.onLine(track.left, headProgress)
-            val headRight = Tracks.Vertices.onLine(track.right, headProgress)
-            val headCenter = headLeft.onCenter(headRight)
-            val tailLeft = Tracks.Vertices.onLine(track.left, tailProgress)
-            val tailRight = Tracks.Vertices.onLine(track.right, tailProgress)
-            val tailCenter = tailLeft.onCenter(tailRight)
-            val headWidth = 20f * headProgress
-            val tailWidth = 20f * tailProgress
+            // 绘制拖尾
+            val headLeft = Tracks.Vertices.onLine(track.bottomTailLeft, headProgress)
+            val headRight = Tracks.Vertices.onLine(track.bottomTailRight, headProgress)
+            val tailLeft = Tracks.Vertices.onLine(track.bottomTailLeft, tailProgress)
+            val tailRight = Tracks.Vertices.onLine(track.bottomTailRight, tailProgress)
             path(
                 brush = DynamicAction.SlurTailBrushes[noteScale],
-                // 尾部起始连线的六等分点
-                path = Path(arrayOf(
-                    headCenter.translate(x = -headWidth),
-                    tailCenter.translate(x = -tailWidth),
-                    tailCenter.translate(x = tailWidth),
-                    headCenter.translate(x = headWidth),
-                ))
+                path = Path(arrayOf(headLeft, tailLeft, tailRight, headRight))
             )
-            // 尾部绘制
+            // 绘制侧边
+            val sideWidth = 10f
+            path(
+                color = Colors.Ghost.copy(alpha = 0.8f),
+                path = Path(arrayOf(headLeft, tailLeft, tailLeft.translate(x = sideWidth * tailProgress), headLeft.translate(x = sideWidth * headProgress)))
+            )
+            path(
+                color = Colors.Ghost.copy(alpha = 0.8f),
+                path = Path(arrayOf(headRight, tailRight, tailRight.translate(x = -sideWidth * tailProgress), headRight.translate(x = -sideWidth * headProgress)))
+            )
+            // 绘制终端
+            val miniTailProgress = tailProgress + 0.01f
+            if (headProgress > miniTailProgress) {
+                val terminalLeft = Tracks.Vertices.onLine(track.bottomTailLeft, miniTailProgress)
+                val terminalRight = Tracks.Vertices.onLine(track.bottomTailRight, miniTailProgress)
+                path(
+                    color = Colors.Ghost.copy(alpha = 0.8f),
+                    path = Path(arrayOf(terminalLeft, tailLeft, tailRight, terminalRight))
+                )
+            }
         }
     }
 
@@ -212,6 +222,10 @@ class FixedSlurAction(
                 // 拖尾
                 val headProgress = currentState.lastHeadProgress
                 drawTrailing(track, headProgress, currentState.tailProgress)
+
+                noteTransform(headProgress, track) {
+                    image(blockMap, imgRect, it)
+                }
 
                 // 动画
                 drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.SlurColorFilters[noteScale])

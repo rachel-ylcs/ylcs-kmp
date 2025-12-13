@@ -31,7 +31,9 @@ class Track(
     }
 
     // 关键点
-    val bottomCenter = left.onCenter(right)
+    val bottomCenter = left.onCenter(right) // 底部中点
+    val bottomTailLeft = left.onLine(right, 1 / 6f) // 拖尾线左侧
+    val bottomTailRight = right.onLine(left, 1 / 6f) // 拖尾线右侧
 
     // 位置
     val isLeft = index < Tracks.Size / 2
