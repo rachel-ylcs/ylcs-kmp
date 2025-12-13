@@ -18,7 +18,7 @@ inline fun <reified T> StartupKV.getJson(key: String, defaultFactory: () -> T): 
     json.parseJsonValue()
 }
 
-fun <T> StartupKV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaultFactory: () -> T): T = catchingDefault({ defaultFactory() }) {
+inline fun <T> StartupKV.getJson(deserializer: DeserializationStrategy<T>, key: String, defaultFactory: () -> T): T = catchingDefault({ defaultFactory() }) {
     val json = get(key, "")
     require(json.isNotEmpty())
     json.parseJsonValue(deserializer)

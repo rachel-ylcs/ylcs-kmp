@@ -105,6 +105,6 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
     protected fun Drawer.arc(brush: Brush, startAngle: Float, sweepAngle: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = arc(brush, startAngle, sweepAngle, Offset.Zero, size, alpha, style, blendMode)
     protected fun Drawer.image(image: ImageBitmap, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) = image(image, Offset.Zero, size, alpha, colorFilter, blendMode)
     protected fun Drawer.circleImage(image: ImageBitmap, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) = circleImage(image, Offset.Zero, size, alpha, colorFilter, blendMode)
-    protected fun Drawer.clip(block: Drawer.() -> Unit) = clip(Offset.Zero, size, block)
-    protected fun Drawer.rotate(degrees: Float, block: Drawer.() -> Unit) = rotate(degrees, center, block)
+    protected inline fun Drawer.clip(block: Drawer.() -> Unit) = clip(Offset.Zero, size, block)
+    protected inline fun Drawer.rotate(degrees: Float, block: Drawer.() -> Unit) = rotate(degrees, center, block)
 }

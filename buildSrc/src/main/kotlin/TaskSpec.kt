@@ -47,7 +47,7 @@ class ZipSpec {
     }
 }
 
-fun zip(action: ZipSpec.() -> Unit) {
+inline fun zip(action: ZipSpec.() -> Unit) {
     val spec = ZipSpec()
     spec.action()
     spec.run()

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 typealias EqualRowScope = RowScope
 
 @Composable
-fun EqualRowScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
+inline fun EqualRowScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier.weight(1f),
         contentAlignment = Alignment.Center,
@@ -37,7 +37,7 @@ fun EqualRow(
 typealias EqualColumnScope = ColumnScope
 
 @Composable
-fun EqualColumnScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
+inline fun EqualColumnScope.EqualItem(content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = Modifier.weight(1f),
         contentAlignment = Alignment.Center,

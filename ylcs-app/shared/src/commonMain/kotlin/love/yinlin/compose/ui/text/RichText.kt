@@ -116,7 +116,7 @@ abstract class RichContainer(type: String) : RichObject(type) {
 		items += item
 	}
 
-	protected fun makeContainer(item: RichContainer, content: RichContainer.() -> Unit) {
+	protected inline fun makeContainer(item: RichContainer, content: RichContainer.() -> Unit) {
 		item.content()
 		items += item
 	}
