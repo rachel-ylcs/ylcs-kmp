@@ -327,7 +327,7 @@ class Drawer(
                 val values = m.values
 
                 if (dx3 == 0f && dy3 == 0f) {
-                    // Affine
+                    // 仿射变换
                     values[Matrix.ScaleX] = x1 - x0
                     values[Matrix.SkewX]  = x3 - x0
                     values[Matrix.TranslateX] = x0
@@ -338,7 +338,7 @@ class Drawer(
                     values[Matrix.Perspective1] = 0f
                     values[Matrix.Perspective2] = 1f
                 } else {
-                    // Perspective
+                    // 透视变换
                     val det1 = dx1 * dy2 - dx2 * dy1
                     if (det1 == 0f) return Matrix()
 
