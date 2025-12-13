@@ -148,9 +148,10 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             resumePauseJob = launch {
                 catching {
                     // 倒计时解除暂停状态
+                    lockState = GameLockState.Resume(RhymeConfig.PAUSE_TIME)
                     repeat(RhymeConfig.PAUSE_TIME) {
-                        lockState = GameLockState.Resume(RhymeConfig.PAUSE_TIME - it)
                         delay(1000L)
+                        --(lockState as? GameLockState.Resume)?.time
                     }
                     lockState = GameLockState.Normal
                     rhymeManager.apply { resume() }
@@ -237,7 +238,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     private fun GameMaskResume(resumeState: GameLockState.Resume) {
         val brush = remember { Brush.linearGradient(listOf(Colors.Steel4, Colors.Blue4, Colors.Purple4)) }
         StrokeText(
-            text = remember(resumeState) { resumeState.time.toString() },
+            text = resumeState.timeString,
             color = Colors.Steel4,
             strokeColor = Colors.White,
             fontStyle = FontStyle.Italic,
@@ -424,75 +425,27 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
     @Composable
     private fun GameOverlayPlaying() {
+        val rhymeFont = Font(Res.font.rhyme)
 
+        LocalFileImage(
+            path = { prologueBackground ?: Path("") },
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize().background(Colors.Black).zIndex(1f),
+            alpha = 0.9f
+        )
+
+        rhymeManager.SceneContent(
+            modifier = Modifier.fillMaxSize().zIndex(2f),
+            fonts = arrayOf(
+                mainFont(),
+                remember(rhymeFont) { FontFamily(rhymeFont) }
+            )
+        )
     }
 
     @Composable
     private fun GameOverlaySettling() {
 
-    }
-
-    @Composable
-    private fun GameBackground() {
-        if (state is GameState.Playing) {
-            LocalFileImage(
-                path = { prologueBackground ?: Path("") },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().background(Colors.Black),
-                alpha = 0.9f
-            )
-        }
-    }
-
-    @Composable
-    private fun GameCanvas() {
-        if (state is GameState.Playing) {
-            val rhymeFont = Font(Res.font.rhyme)
-            rhymeManager.SceneContent(
-                modifier = Modifier.fillMaxSize(),
-                fonts = arrayOf(
-                    mainFont(),
-                    remember(rhymeFont) { FontFamily(rhymeFont) }
-                )
-            )
-        }
-    }
-
-    @Composable
-    private fun GameOverlay() {
-        AnimationLayout(
-            state = state,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when (it) {
-                is GameState.Loading -> GameOverlayLoading()
-                is GameState.Start -> GameOverlayStart()
-                is GameState.MusicLibrary -> GameOverlayMusicLibrary()
-                is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
-                is GameState.Playing -> GameOverlayPlaying()
-                is GameState.Settling -> GameOverlaySettling()
-            }
-        }
-    }
-
-    @Composable
-    private fun GameScrimMask() {
-        val currentLockState = lockState
-        if (currentLockState !is GameLockState.Normal && state != GameState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = RhymeConfig.LOCK_SCRIM_ALPHA))
-                    .clickableNoRipple { },
-                contentAlignment = Alignment.Center
-            ) {
-                when (currentLockState) {
-                    is GameLockState.Normal -> {}
-                    is GameLockState.PortraitLock -> GameMaskPortraitLock()
-                    is GameLockState.Pause -> GameMaskPause()
-                    is GameLockState.Resume -> GameMaskResume(currentLockState)
-                }
-            }
-        }
     }
 
     override val title: String? = null
@@ -571,15 +524,40 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         }
 
         Layout(
-            modifier = Modifier
-                .background(Colors.Black)
-                .fillMaxSize()
-                .background(Colors.Dark),
+            modifier = Modifier.background(Colors.Black).fillMaxSize().background(Colors.Dark),
             content = {
-                GameBackground() // 背景层
-                GameCanvas() // 画布层
-                GameOverlay() // 状态层
-                GameScrimMask() // 遮罩层
+                // 状态层
+                AnimationLayout(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    when (it) {
+                        is GameState.Loading -> GameOverlayLoading()
+                        is GameState.Start -> GameOverlayStart()
+                        is GameState.MusicLibrary -> GameOverlayMusicLibrary()
+                        is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
+                        is GameState.Playing -> GameOverlayPlaying()
+                        is GameState.Settling -> GameOverlaySettling()
+                    }
+                }
+
+                // 遮罩层
+                val currentLockState = lockState
+                if (currentLockState !is GameLockState.Normal && state != GameState.Loading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .background(MaterialTheme.colorScheme.scrim.copy(alpha = RhymeConfig.LOCK_SCRIM_ALPHA))
+                            .zIndex(2f)
+                            .clickableNoRipple { },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        when (currentLockState) {
+                            is GameLockState.PortraitLock -> GameMaskPortraitLock()
+                            is GameLockState.Pause -> GameMaskPause()
+                            is GameLockState.Resume -> GameMaskResume(currentLockState)
+                        }
+                    }
+                }
             },
             measurePolicy = { measurables, constraints ->
                 val maxWidth = constraints.maxWidth

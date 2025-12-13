@@ -109,33 +109,38 @@ abstract class Manager {
             val fontFamilyResolver = LocalFontFamilyResolver.current
             val textDrawer = remember(fonts, fontFamilyResolver) { TextDrawer(fonts, fontFamilyResolver) }
 
-            Canvas(modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(canvasScale) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                        for (change in event.changes) {
-                            val id = change.id.value
-                            val position = change.position / canvasScale
-                            when {
-                                change.changedToDown() -> { // 按下
-                                    pointers[id] = position
-                                    eventChannel.trySend(PointerDownEvent(id = id, position = position))
-                                }
-                                change.changedToUp() -> { // 抬起
-                                    pointers.remove(id)?.let { rawPosition ->
-                                        eventChannel.trySend(PointerUpEvent(id = id, position = position, rawPosition = rawPosition))
-                                    }
-                                }
-                                else -> { // 移动
-                                    pointers[id]?.let { rawPosition ->
-                                        eventChannel.trySend(PointerMoveEvent(id = id, position = position, rawPosition = rawPosition))
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clipToBounds()
+                    .pointerInput(canvasScale) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                                for (change in event.changes) {
+                                    val id = change.id.value
+                                    val position = change.position / canvasScale
+                                    when {
+                                        change.changedToDown() -> { // 按下
+                                            pointers[id] = position
+                                            eventChannel.trySend(PointerDownEvent(id = id, position = position))
+                                        }
+                                        change.changedToUp() -> { // 抬起
+                                            pointers.remove(id)?.let { rawPosition ->
+                                                eventChannel.trySend(PointerUpEvent(id = id, position = position, rawPosition = rawPosition))
+                                            }
+                                        }
+                                        else -> { // 移动
+                                            pointers[id]?.let { rawPosition ->
+                                                eventChannel.trySend(PointerMoveEvent(id = id, position = position, rawPosition = rawPosition))
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            }) {
+            ) {
                 scale(scale = canvasScale, pivot = Offset.Zero) {
                     scene?.apply { Drawer(this@scale, textDrawer).onDraw() }
                 }

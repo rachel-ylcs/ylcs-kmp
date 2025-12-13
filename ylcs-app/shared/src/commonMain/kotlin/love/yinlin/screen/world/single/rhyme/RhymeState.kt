@@ -1,6 +1,10 @@
 package love.yinlin.screen.world.single.rhyme
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import love.yinlin.data.music.MusicInfo
 
 @Stable
@@ -36,5 +40,9 @@ sealed interface GameLockState {
     @Stable
     data object Pause : GameLockState // 暂停
     @Stable
-    data class Resume(val time: Int) : GameLockState // 恢复准备
+    class Resume(t: Int) : GameLockState { // 恢复准备
+        var time by mutableIntStateOf(t)
+
+        val timeString by derivedStateOf { time.toString() }
+    }
 }
