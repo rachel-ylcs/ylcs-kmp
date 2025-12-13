@@ -98,10 +98,13 @@ class NoteAction(
         val progress = currentState.progress
         return ActionResult.inRange(DynamicAction.HIT_RATIO, progress)?.also { result ->
             // 切换点击态或错过态
-            state = if (result == ActionResult.MISS) State.Missing(noteDismiss.frameCount, progress)
-            else State.Clicking(noteClick.frameCount, result, progress)
+            state = if (result == ActionResult.MISS) {
+                State.Missing(noteDismiss.frameCount, progress)
+            } else {
+                callback.playSound(soundNoteClick)
+                State.Clicking(noteClick.frameCount, result, progress)
+            }
             callback.updateResult(result)
-            callback.playSound(soundNoteClick)
         } != null
     }
 
