@@ -57,9 +57,9 @@ sealed interface DynamicAction {
         val SlurColorFilters = SlurColors.map { SolidColorFilter(it) }
 
         val SlurTailColors = arrayOf(
-            listOf(Colors(0xFFF43B47), Colors(0xFF453A94), Colors.Transparent),
+            listOf(Colors(0xFF453A94), Colors(0xFFF43B47), Colors.Transparent),
             listOf(Colors(0xFFFF4E50), Colors(0xFFF9D423), Colors.Transparent),
-            listOf(Colors(0xFF5EE7DF), Colors(0xFFB490CA), Colors.Transparent),
+            listOf(Colors(0xFF6E45E2), Colors(0xFF88D3CE), Colors.Transparent),
         )
 
         @Stable

@@ -27,11 +27,7 @@ class NoteAction(
             var progress by mutableFloatStateOf(0f)
         }
         @Stable
-        class Clicking(
-            frameCount: Int,
-            val result: ActionResult,
-            val lastProgress: Float
-        ) : State { // 点击中
+        class Clicking(frameCount: Int, val result: ActionResult, val lastProgress: Float) : State { // 点击中
             val animation = LineFrameAnimation(frameCount, adapter = SpeedAdapter(0.5f)).also { it.start() }
         }
         @Stable

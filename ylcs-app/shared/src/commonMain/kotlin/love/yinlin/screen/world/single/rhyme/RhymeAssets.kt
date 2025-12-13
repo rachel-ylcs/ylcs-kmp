@@ -23,6 +23,7 @@ class RhymeAssets : Assets() {
     val noteClick by animation()
     val noteDismiss by animation()
     val longPress by animation()
+    val longRelease by animation()
 
     suspend fun CoroutineScope.init(): Boolean = fetch(
         leftUIBackground,
@@ -31,7 +32,8 @@ class RhymeAssets : Assets() {
         difficultyStar,
         noteClick,
         noteDismiss,
-        longPress
+        longPress,
+        longRelease
     )
 
     val soundNoteClick by sound()
