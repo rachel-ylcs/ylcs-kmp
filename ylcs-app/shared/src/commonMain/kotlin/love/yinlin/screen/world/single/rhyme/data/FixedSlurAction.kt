@@ -47,6 +47,7 @@ class FixedSlurAction(
             val pressTick: Long, // 抬起时间
             val releaseTick: Long, // 释放时间
             val result: ActionResult, // 按下结果
+            val lastHeadProgress: Float,
         ) : State { // 释放中
             val animation = LineFrameAnimation(30).also { it.start() }
         }
@@ -65,6 +66,7 @@ class FixedSlurAction(
     }
 
     private val blockMap = assets.blockMap()
+    private val noteClick = assets.noteClick()
     private val longPress = assets.longPress()
     private val noteDismiss = assets.noteDismiss()
 
@@ -111,11 +113,12 @@ class FixedSlurAction(
                 }
             }
             is State.Pressing -> {
+                val lastHeadProgress = currentState.lastHeadProgress
                 currentState.animation.update()
                 currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
                 // 尾部到达头部时自动结算
-                if (currentState.tailProgress > currentState.lastHeadProgress) {
-                    state = State.Releasing(currentState.pressTick, tick, currentState.result).also {
+                if (currentState.tailProgress > lastHeadProgress) {
+                    state = State.Releasing(currentState.pressTick, tick, currentState.result, lastHeadProgress).also {
                         callback.calcResult(it)
                     }
                 }
@@ -158,7 +161,7 @@ class FixedSlurAction(
         val currentState = state
         // 状态必须是按下
         if (track.index == trackIndex && currentState is State.Pressing) {
-            state = State.Releasing(currentState.pressTick, tick, currentState.result).also {
+            state = State.Releasing(currentState.pressTick, tick, currentState.result, currentState.lastHeadProgress).also {
                 callback.calcResult(it)
             }
         }
@@ -209,37 +212,42 @@ class FixedSlurAction(
 
         when (currentState) {
             is State.Moving -> {
-                // 拖尾
                 val headProgress = currentState.headProgress
+                // 拖尾
                 drawTrailing(track, headProgress, currentState.tailProgress)
-
                 // 按键
                 noteTransform(headProgress, track) {
                     image(blockMap, imgRect, it)
                 }
             }
             is State.Pressing -> {
-                // 拖尾
                 val headProgress = currentState.lastHeadProgress
+                // 拖尾
                 drawTrailing(track, headProgress, currentState.tailProgress)
-
+                // 按键
                 noteTransform(headProgress, track) {
                     image(blockMap, imgRect, it)
                 }
-
                 // 动画
                 drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.SlurColorFilters[noteScale])
             }
-            is State.Releasing -> { } // 暂定为空
+            is State.Releasing -> {
+                val lastHeadProgress = currentState.lastHeadProgress
+                // 按键
+                noteTransform(lastHeadProgress, track) {
+                    image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
+                }
+                // 动画
+                drawPlainAnimation(track, lastHeadProgress, noteClick, currentState.animation, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
+            }
             is State.Missing -> {
-                // 拖尾
                 val headProgress = currentState.headProgress
                 val tailProgress = currentState.tailProgress
+                // 拖尾
                 drawTrailing(track, headProgress, tailProgress)
-
                 // 按键
                 noteTransform(headProgress, track) {
-                    image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
+                    image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f))
                     drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = DynamicAction.SlurColorFilters[noteScale])
                 }
             }

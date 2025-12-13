@@ -118,18 +118,22 @@ class NoteAction(
 
         when (currentState) {
             is State.Moving -> {
+                // 按键
                 noteTransform(currentState.progress, track) {
                     image(blockMap, imgRect, it)
                 }
             }
             is State.Clicking -> {
                 val lastProgress = currentState.lastProgress
+                // 按键
                 noteTransform(lastProgress, track) {
                     image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
                 }
+                // 动画
                 drawPlainAnimation(track, lastProgress, noteClick, currentState.animation, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
+                // 按键
                 noteTransform(currentState.progress, track) {
                     image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f))
                     drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = DynamicAction.NoteColorFilters[noteScale])
