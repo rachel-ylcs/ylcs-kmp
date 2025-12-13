@@ -10,6 +10,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
+import love.yinlin.compose.game.animation.SpeedAdapter
 import love.yinlin.compose.onLine
 import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
@@ -44,22 +45,21 @@ class FixedSlurAction(
         }
         @Stable
         class Releasing(
+            frameCount: Int,
             val pressTick: Long, // 抬起时间
             val releaseTick: Long, // 释放时间
             val result: ActionResult, // 按下结果
             val lastHeadProgress: Float,
         ) : State { // 释放中
-            val animation = LineFrameAnimation(30).also { it.start() }
+            val animation = LineFrameAnimation(frameCount, adapter = SpeedAdapter(0.5f)).also { it.start() }
         }
         @Stable
         class Missing(
             frameCount: Int,
-            lastHeadProgress: Float,
-            lastTailProgress: Float
+            lastHeadProgress: Float
         ) : State { // 错过中
             var headProgress by mutableFloatStateOf(lastHeadProgress)
-            var tailProgress by mutableFloatStateOf(lastTailProgress)
-            val animation = LineFrameAnimation(frameCount / 2).also { it.start() }
+            val animation = LineFrameAnimation(frameCount / 2, adapter = SpeedAdapter(0.5f)).also { it.start() }
         }
         @Stable
         data object Done : State // 已完成
@@ -108,7 +108,7 @@ class FixedSlurAction(
                 currentState.tailProgress = tailProgress
                 // 超出死线仍未处理的音符标记错过
                 if (headProgress > DynamicAction.deadline) {
-                    state = State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
+                    state = State.Missing(noteDismiss.frameCount, headProgress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
@@ -118,7 +118,7 @@ class FixedSlurAction(
                 currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
                 // 尾部到达头部时自动结算
                 if (currentState.tailProgress > lastHeadProgress) {
-                    state = State.Releasing(currentState.pressTick, tick, currentState.result, lastHeadProgress).also {
+                    state = State.Releasing(noteClick.frameCount, currentState.pressTick, tick, currentState.result, lastHeadProgress).also {
                         callback.calcResult(it)
                     }
                 }
@@ -129,9 +129,6 @@ class FixedSlurAction(
             is State.Missing -> {
                 if (!currentState.animation.update()) state = State.Done
                 currentState.headProgress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asUncheckedActual.coerceAtMost(0.95f)
-                // 加速尾部下落, 防止按键消失后突显拖尾
-                val fastRatio = 1 + actionDuration / DynamicAction.BASE_DURATION_F
-                currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F * fastRatio).asUncheckedActual.coerceAtMost(0.95f)
             }
         }
     }
@@ -144,7 +141,7 @@ class FixedSlurAction(
         val tailProgress = currentState.tailProgress
         return ActionResult.inRange(DynamicAction.HIT_RATIO, headProgress)?.also { result ->
             if (result == ActionResult.MISS) { // 错过
-                state = State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
+                state = State.Missing(noteDismiss.frameCount, headProgress)
                 callback.updateResult(result)
             }
             else state = State.Pressing(
@@ -161,7 +158,7 @@ class FixedSlurAction(
         val currentState = state
         // 状态必须是按下
         if (track.index == trackIndex && currentState is State.Pressing) {
-            state = State.Releasing(currentState.pressTick, tick, currentState.result, currentState.lastHeadProgress).also {
+            state = State.Releasing(noteClick.frameCount, currentState.pressTick, tick, currentState.result, currentState.lastHeadProgress).also {
                 callback.calcResult(it)
             }
         }
@@ -241,12 +238,8 @@ class FixedSlurAction(
                 drawPlainAnimation(track, lastHeadProgress, noteClick, currentState.animation, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
-                val headProgress = currentState.headProgress
-                val tailProgress = currentState.tailProgress
-                // 拖尾
-                drawTrailing(track, headProgress, tailProgress)
                 // 按键
-                noteTransform(headProgress, track) {
+                noteTransform(currentState.headProgress, track) {
                     image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f))
                     drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = DynamicAction.SlurColorFilters[noteScale])
                 }
