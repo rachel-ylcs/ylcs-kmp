@@ -16,10 +16,10 @@
 |             Compose Multiplatform             | Kotlin Multiplatform (Only macOS) |
 | Compose Multiplatform for Desktop IDE Support |                                   |
 
-然后你需要为构建系统准备`Gradle`，参考版本：`9.1.0`。
+然后你需要为构建系统准备`Gradle`，参考版本：`9.2.1`。
 
 !!! Tip
-    `Gradle`下载链接: [https://services.gradle.org/distributions/gradle-9.1.0-all.zip](https://services.gradle.org/distributions/gradle-9.1.0-all.zip)
+    `Gradle`下载链接: [https://services.gradle.org/distributions/gradle-9.2.1-all.zip](https://services.gradle.org/distributions/gradle-9.1.0-all.zip)
     
     如果你的网络状态较差可以单独下载或从其他镜像源下载然后手动拷贝到`.gradle`目录。
 
