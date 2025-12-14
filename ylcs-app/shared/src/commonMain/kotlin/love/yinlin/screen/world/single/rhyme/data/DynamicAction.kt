@@ -12,13 +12,18 @@ import love.yinlin.compose.game.animation.FrameAnimation
 import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.SolidColorFilter
 import love.yinlin.data.music.RhymeAction
+import love.yinlin.screen.world.single.rhyme.RhymeAssets
+import love.yinlin.screen.world.single.rhyme.RhymeDifficulty
+import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
 
 @Stable
-sealed interface DynamicAction {
+sealed class DynamicAction(
+    protected val assets: RhymeAssets,
+    protected val playConfig: RhymePlayConfig,
+    protected val start: Long,
+    protected val end: Long,
+) {
     companion object {
-        const val BASE_DURATION = 3000L // 音符持续时间
-        const val BASE_DURATION_F = BASE_DURATION.toFloat()
-
         const val PERSPECTIVE_K = 3 // 透视参数
         const val HIT_RATIO = 0.8f // 判定线
 
@@ -66,23 +71,40 @@ sealed interface DynamicAction {
         val SlurTailBrushes = SlurTailColors.map { Brush.verticalGradient(it, 0f, Tracks.VirtualHeight) }
     }
 
-    var bindId: Long? // 绑定指针ID
-    val action: RhymeAction // 行为
-    val appearance: Long // 出现时刻
-    val isDismiss: Boolean // 消失
+    abstract var bindId: Long? // 绑定指针ID
+    abstract val action: RhymeAction // 行为
+    abstract val appearance: Long // 出现时刻
+    abstract val isDismiss: Boolean // 消失
 
-    fun onAdmission() // 入场
-    fun onUpdate(tick: Long, callback: ActionCallback) // 更新
-    fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
-    fun onTrackUp(track: Track, tick: Long, callback: ActionCallback) // 抬起
-    fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean // 变轨
-    fun Drawer.onDraw() // 渲染
+    abstract fun onAdmission() // 入场
+    abstract fun onUpdate(tick: Long, callback: ActionCallback) // 更新
+    abstract fun onTrackDown(track: Track, tick: Long, callback: ActionCallback): Boolean // 按下
+    abstract fun onTrackUp(track: Track, tick: Long, callback: ActionCallback) // 抬起
+    abstract fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean // 变轨
+    abstract fun Drawer.onDraw() // 渲染
+
+    protected val blockMap by lazy { assets.blockMap() }
+    protected val noteClick by lazy { assets.noteClick() }
+    protected val noteDismiss by lazy { assets.noteDismiss() }
+    protected val longPress by lazy { assets.longPress() }
+    protected val longRelease by lazy { assets.longRelease() }
+
+    protected val soundNoteClick by lazy { assets.soundNoteClick }
+
+    protected val difficulty = playConfig.difficulty
+    protected val baseDuration = when (difficulty) {
+        RhymeDifficulty.Easy -> 3500L
+        RhymeDifficulty.Medium -> 3000L
+        RhymeDifficulty.Hard -> 2500L
+        RhymeDifficulty.Extra -> 2000L
+    }
+    protected val baseDurationF = baseDuration.toFloat()
+
+    protected val Float.asUncheckedActual: Float get() = this / (PERSPECTIVE_K + this * (1 - PERSPECTIVE_K))
+    protected val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActual.coerceIn(0f, 1f)
+    protected val Float.asUncheckedVirtual: Float get() = PERSPECTIVE_K * this / (1 + this * (PERSPECTIVE_K - 1))
+    protected val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 }
-
-internal val Float.asUncheckedActual: Float get() = this / (DynamicAction.PERSPECTIVE_K + this * (1 - DynamicAction.PERSPECTIVE_K))
-internal val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActual.coerceIn(0f, 1f)
-internal val Float.asUncheckedVirtual: Float get() = DynamicAction.PERSPECTIVE_K * this / (1 + this * (DynamicAction.PERSPECTIVE_K - 1))
-internal val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 
 // 音符透视
 internal fun Drawer.noteTransform(ratio: Float, track: Track, block: Drawer.(srcRect: Rect) -> Unit) {

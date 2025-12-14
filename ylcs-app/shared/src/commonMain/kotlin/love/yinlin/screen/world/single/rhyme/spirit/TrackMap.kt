@@ -15,7 +15,9 @@ import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.compose.onLine
 import love.yinlin.compose.slope
+import love.yinlin.screen.world.single.rhyme.RhymeDifficulty
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
 import love.yinlin.screen.world.single.rhyme.data.ActionResult
 import love.yinlin.screen.world.single.rhyme.data.DynamicAction
 import love.yinlin.screen.world.single.rhyme.data.Track
@@ -24,9 +26,13 @@ import love.yinlin.screen.world.single.rhyme.data.Tracks
 @Stable
 class TrackMap(
     rhymeManager: RhymeManager,
+    playConfig: RhymePlayConfig,
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Tracks.VirtualTopHeight))
     override val size: Size = Size(Tracks.VirutalWidth, Tracks.VirtualHeight)
+
+    // 难度影响
+    private val showHitArea = playConfig.difficulty < RhymeDifficulty.Hard
 
     // 轨道区域
     val tracksArea = arrayOf(Tracks.first().left, Tracks.Vertices, Tracks.last().right)
@@ -84,7 +90,10 @@ class TrackMap(
         path(Track.BackgroundColor, tracksAreaPath, alpha = 0.95f)
 
         // 画判定区域
-        for ((area, alpha) in hitAreaData) path(Colors.Purple4, area, alpha = alpha)
+        if (showHitArea) {
+            for ((area, alpha) in hitAreaData) path(Colors.Purple4, area, alpha = alpha)
+        }
+
         line(Colors.Purple4, hitLine.first, hitLine.second, style = Stroke(10f))
 
         // 其他轨道线
